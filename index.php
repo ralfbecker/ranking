@@ -19,6 +19,6 @@
 	);
 	include('../header.inc.php');
 
-	ExecMethod('ranking.ranking.competitions');
+	ExecMethod('ranking.uicompetitions.index');
 
 	$GLOBALS['phpgw']->common->phpgw_footer();

@@ -11,12 +11,12 @@
 			<rows>
 				<row class="row">
 					<description value="Startdate" options=",,,datum"/>
-					<date options="Y-m-d" id="datum" statustext="startdate (first heat, not registration) of the competition (must not be empty)"/>
+					<date options="Y-m-d" id="datum" statustext="startdate (first heat, not registration) of the competition (must not be empty)" needed="1"/>
 					<textbox size="15" id="duration" statustext="duration in days or textual competition-date like 'mid July'" label="Duration or textual date"/>
 				</row>
-				<row class="row">
+				<row class="row" valign="top" height="100">
 					<description value="Cathegories" options=",,,gruppen"/>
-					<listbox rows="5" id="gruppen" statustext="which cathegories are competing" span="all"/>
+					<listbox rows="6" id="gruppen" statustext="which cathegories are competing" span="all" no_lang="1"/>
 				</row>
 				<row class="row">
 					<description value="Homepage" options=",,,homepage"/>
@@ -58,7 +58,7 @@
 						<menupopup type="select-percent" id="feld_bis" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%"/>
 					</menulist>
 				</row>
-				<row height="80">
+				<row height="100" disabled="!@dru_bez">
 					<description span="all"/>
 				</row>
 			</rows>
@@ -87,7 +87,7 @@
 					<description id="pdf_result"/>
 					<file id="upload_result" statustext="each new upload will overwrite the previous one"/>
 				</row>
-				<row class="row" height="80">
+				<row class="row" height="100">
 					<description span="all"/>
 				</row>
 			</rows>
@@ -103,22 +103,21 @@
 			</columns>
 			<rows>
 				<row>
-					<description span="3" id="msg"/>
-					<description class="gray" value="WetId" no_lang="1" align="right" id="WetId"/>
+					<description span="3" class="redItalic" id="msg" no_lang="1"/>
 				</row>
 				<row class="th">
-					<description value="Nation"/>
+					<description value="Nation" options=",,,nation"/>
 					<menulist>
 						<menupopup id="nation" statustext="nation if national competition or internatinal" no_lang="1" onchange="1"/>
 					</menulist>
 					<description value="Cup" options=",,,serie"/>
 					<menulist span="all">
-						<menupopup id="serie" onchange="1"/>
+						<menupopup id="serie" onchange="1" no_lang="1"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Name"/>
-					<textbox size="100" maxlength="100" id="name" statustext="full competition name (must not be empty)" span="all"/>
+					<description value="Name" options=",,,name"/>
+					<textbox size="100" maxlength="100" id="name" statustext="full competition name (must not be empty)" span="all" needed="1"/>
 				</row>
 				<row class="row">
 					<description value="Shortcut" options=",,,dru_bez"/>

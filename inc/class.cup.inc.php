@@ -37,19 +37,31 @@ class cup extends so_sql
 		'nation' => 'nation', 'gruppen' => 'gruppen',
 	);
 */
-	var $source_charset = 'iso-8859-1';
+	var $charset,$source_charset;
 
 	/*!
 	@function cup
 	@abstract constructor of the cup class
 	*/
-	function cup($key=0)
+	function cup($source_charset='')
 	{
 		$this->so_sql('ranking','rang.Serien');	// call constructor of derived class
 
+		if ($source_charset) $this->source_charset = $source_charset;
+		
 		$this->charset = $GLOBALS['phpgw']->translation->charset();
-	
-		if ($key) $this->read($key);
+		
+		foreach(array(
+				'cats'  => 'category',
+			) as $var => $class)
+		{
+			$egw_name = 'ranking_'.$class;
+			if (!is_object($GLOBALS['egw']->$class))
+			{
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset);
+			}
+			$this->$var =& $GLOBALS['egw']->$egw_name;
+		}
 	}
 
 	/*!
@@ -59,13 +71,17 @@ class cup extends so_sql
 	*/
 	function db2data($data=0)
 	{
-		if ($intern = !is_array($data))
+		if (!is_array($data))
 		{
 			$data =& $this->data;
 		}
-		if ($this->source_charset)
+		if (count($data) && $this->source_charset)
 		{
 			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+		}
+		if ($data['gruppen'])
+		{
+			$data['gruppen'] = $this->cats->cat_rexp2rkeys($data['gruppen']);
 		}
 		return $data;
 	}
@@ -77,17 +93,20 @@ class cup extends so_sql
 	*/
 	function data2db($data=0)
 	{
-		if ($intern = !is_array($data))
+		if (!is_array($data))
 		{
 			$data =& $this->data;
 		}
-		
 		if ($data['rkey']) $data['rkey'] = strtoupper($data['rkey']);
 		if ($data['nation'] && !is_array($data['nation'])) 
 		{
 			$data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
 		}
-		if ($this->source_charset)
+		if (is_array($data['gruppen']))
+		{
+			$data['gruppen'] = implode(',',$data['gruppen']);
+		}
+		if (count($data) && $this->source_charset)
 		{
 			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
@@ -98,15 +117,17 @@ class cup extends so_sql
 	@function search
 	@abstract reimplmented from so_sql to exclude some cols from search and to calc. year from rkey
 	*/
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False)
+	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
 		unset($criteria['pkte']);	// is always set
 		unset($criteria['split_by_places']);
 		if ($criteria['nation'] == 'NULL') $criteria['nation'] = null;
+		if ($filter['nation'] == 'NULL') $filter['nation'] = null;
 
-		$extra_cols .= ($extra_cols!=''?',':'').'IF(LEFT(rkey,2)>80,1900,2000)+LEFT(rkey,2) AS year';
+		if ($extra_cols && !is_array($extra_cols)) $extra_cols = array($extra_cols);
+		$extra_cols[] = 'IF(LEFT(rkey,2)>80,1900,2000)+LEFT(rkey,2) AS year';
 
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty);
+		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 	}
 
 	/*!
@@ -116,13 +137,8 @@ class cup extends so_sql
 	*/
 	function names($keys=array(),$rkey_only=false)
 	{
-		$all = $this->search($keys,False,'year DESC','','',true);
-echo "<p>cup::names(".print_r($keys,true).",'$rkey_only') search="; _debug_array($all);
-		if (!$all)
-			return array();
-
 		$names = array();
-		while (list($key,$data) = each($all))
+		foreach((array)$this->search(array(),False,'year DESC','','',true,'AND',false,$keys ) as $data)
 		{
 			$names[$data['SerId']] = $data['rkey'].($rkey_only ? '' : ': '.$data['name']);
 		}

@@ -41,20 +41,32 @@ class competition extends so_sql
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 		'durartion' => 'duration'
 	);
-	var $source_charset = 'iso-8859-1';
+	var $charset,$source_charset;
 
 	/*!
 	@function competition
 	@abstract constructor of the competition class
 	*/
-	function competition($key=0)
+	function competition($source_charset='')
 	{
 		//$this->debug = 1;
 		$this->so_sql('ranking','rang.Wettkaempfe');	// call constructor of extended class
 		
+		if ($source_charset) $this->source_charset = $source_charset;
+		
 		$this->charset = $GLOBALS['phpgw']->translation->charset();
 
-		if ($key) $this->read($key);
+		foreach(array(
+				'cats'  => 'category',
+			) as $var => $class)
+		{
+			$egw_name = 'ranking_'.$class;
+			if (!is_object($GLOBALS['egw']->$class))
+			{
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset);
+			}
+			$this->$var =& $GLOBALS['egw']->$egw_name;
+		}
 	}
 
 	/**
@@ -83,15 +95,19 @@ class competition extends so_sql
 	*/
 	function db2data($data=0)
 	{
-		if ($intern = !is_array($data))
+		if (!is_array($data))
 		{
 			$data =& $this->data;
 		}
-		if ($this->source_charset)
+		if (count($data) && $this->source_charset)
 		{
 			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
 		}
 		list($data['gruppen'],$data['duration']) = explode('@',$data['gruppen']);
+		if ($data['gruppen'])
+		{
+			$data['gruppen'] = $this->cats->cat_rexp2rkeys($data['gruppen']);
+		}
 		$data['pkt_bis'] = $data['pkt_bis']!='' ? intval(100 * $data['pkt_bis']) : 100;
 		$data['feld_bis'] = $data['feld_bis']!='' ? intval(100 * $data['feld_bis']) : 100;
 
@@ -109,13 +125,17 @@ class competition extends so_sql
 		{
 			$data =& $this->data;
 		}
+		if (is_array($data['gruppen']))
+		{
+			$data['gruppen'] = implode(',',$data['gruppen']);
+		}
 		if ($data['duration']) $data['gruppen'] .= '@' . $data['duration'];
 		if ($data['pkt_bis'])  $data['pkt_bis']  = $data['pkt_bis']  == 100 ? '' : 100.0*$data['pkt_bis'];
 		if ($data['feld_bis']) $data['feld_bis'] = $data['feld_bis'] == 100 ? '' : 100.0*$data['feld_bis'];
 		if ($data['rkey'])     $data['rkey'] = strtoupper($data['rkey']);
 		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
 
-		if ($this->source_charset)
+		if (count($data) && $this->source_charset)
 		{
 			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
@@ -145,13 +165,8 @@ class competition extends so_sql
 	*/
 	function names($keys=array())
 	{
-		$all = $this->search($keys,False,'datum');
-
-		if (!$all)
-			return array();
-
 		$names = array();
-		foreach($all as $data)
+		foreach((array) $this->search(array(),False,'datum','','',false,'AND',false,$keys) as $data)
 		{
 			$names[$data['WetId']] = $data['rkey'].': '.$data['name'];
 		}
