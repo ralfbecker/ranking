@@ -10,6 +10,7 @@
 				<column/>
 				<column/>
 				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -18,6 +19,7 @@
 					<nextmatch-filterheader options="Nation..." align="center" id="nation" no_lang="1"/>
 					<nextmatch-filterheader options="Cup..." id="serie" align="center" no_lang="1"/>
 					<nextmatch-sortheader label="Key" align="center" id="rkey"/>
+					<description value="Status" align="center"/>
 					<description value="Action" align="center"/>
 				</row>
 				<row class="nmr">
@@ -28,10 +30,15 @@
 						<menupopup align="center" id="${row}[serie]" no_lang="1" readonly="true"/>
 					</menulist>
 					<description no_lang="1" align="center" id="${row}[rkey]"/>
+					<hbox>
+						<image options="@${row}[pdf][info][link]" src="${row}[pdf][info][icon]" statustext="View the attached PDF" label="@${row}[pdf][info][label]" no_lang="1"/>
+						<image options="@${row}[pdf][startlist][link]" src="${row}[pdf][startlist][icon]" statustext="View the attached PDF" label="@${row}[pdf][startlist][label]" no_lang="1"/>
+						<image options="@${row}[pdf][result][link]" src="${row}[pdf][result][icon]" statustext="View the attached PDF" label="@${row}[pdf][result][label]" no_lang="1"/>
+					</hbox>
 					<hbox align="center">
 						<button id="view[$row_cont[WetId]]" image="view" label="View" statustext="View this competition"/>
 						<button label="Edit" align="center" id="edit[$row_cont[WetId]]" image="edit" statustext="Edit this competition"/>
-						<button id="delete[$row_cont[WetId]]" image="delete" label="Delete" onclick="return confirm('Delete this competition with all its results');" statustext="Delete this competition with all its results"/>
+						<button id="delete[$row_cont[WetId]]" image="delete" label="Delete" onclick="return confirm('Delete this competition');" statustext="Delete this competition"/>
 					</hbox>
 				</row>
 			</rows>
@@ -47,7 +54,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description class="redItalic" id="msg" align="center"/>
+					<description class="redItalic" id="msg" align="center" no_lang="1"/>
 				</row>
 				<row>
 					<nextmatch options="ranking.comp.list.rows" id="nm"/>

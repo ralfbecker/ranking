@@ -1,84 +1,75 @@
-%d matches on search criteria	ranking	en	%d matches on search criteria
 aborts without saving changes	ranking	en	aborts without saving changes
+add a new competition	ranking	en	add a new competition
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
-allways	ranking	en	Allways
+apply the changes made	ranking	en	apply the changes made
 before	ranking	en	before
 before which year the old system was used (first year of new system)	ranking	en	before which year the old system was used (first year of new system)
 better result splits ties	ranking	en	Better result splits ties
 birthyears from	ranking	en	Birthyears from
-category saved	ranking	en	Category saved
 cathegories	ranking	en	Cathegories
-competition saved	ranking	en	Competition saved
-competitions	ranking	en	Competitions
+click to view	ranking	en	click to view
+competition name	ranking	en	Competition name
+competitions counting	ranking	en	competitions counting
+counting for rankings	ranking	en	counting for rankings
 cup	ranking	en	Cup
-cup saved	ranking	en	Cup saved
-cup the competition is part of or none	ranking	en	Cup the competition is part of or none
+cup...	ranking	en	Cup...
 cuppattern	ranking	en	Cuppattern
-cups	ranking	en	Cups
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
-delete this competition with all its results	ranking	en	Delete this competition with all its results
-duration	ranking	en	Duration
-duration in days or textual competitiondate like 'july 2002'	ranking	en	duration in days or textual competitiondate like 'July 2002'
-entry not found !!!	ranking	en	Entry not found !!!
-entry saved	ranking	en	Entry saved
-error: key '%s' exists already, it has to be unique !!!	ranking	en	Error: Key '%s' exists already, it has to be unique !!!
-error: saveing !!!	ranking	en	Error: saveing !!!
-error: writeing !!!	ranking	en	Error: writeing !!!
+delete this competition	ranking	en	Delete this competition
+deletes this cup	ranking	en	deletes this cup
+duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
+duration or textual date	ranking	en	Duration or textual date
+each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
+edit competition	ranking	en	Edit competition
+edit this competition	ranking	en	Edit this competition
 factor	ranking	en	Factor
-female	ranking	en	female
 fieldfactorpoints	ranking	en	Fieldfactorpoints
 full cathegory name (must not be empty)	ranking	en	full cathegory name (must not be empty)
 full competition name (must not be empty)	ranking	en	full competition name (must not be empty)
 full cup name (must not be empty)	ranking	en	full cup name (must not be empty)
 gender	ranking	en	Gender
+general	ranking	en	General
 grpid	ranking	en	GrpId
 homepage	ranking	en	Homepage
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	en	how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
-if competiton is an open / qualificatio for an other competition and only the better one gets points awarded select the main-comp. or none	ranking	en	if competiton is an open / qualificatio for an other competition and only the better one gets points awarded select the main-comp. or none
-key	ranking	en	Key
-key must not be empty !!!	ranking	en	Key must not be empty !!!
-male	ranking	en	male
-name	ranking	en	Name
+information pdf	ranking	en	Information PDF
+maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
 nation	ranking	en	Nation
+nation acl	ranking	en	Nation ACL
+nation if national competition or internatinal	ranking	en	nation if national competition or internatinal
 nation if national competition or none for an internatinal one	ranking	en	nation if national competition or none for an internatinal one
-no never	ranking	en	No never
-none	ranking	en	none
-nothing matched search criteria !!!	ranking	en	Nothing matched search criteria !!!
-number of competitions counting	ranking	en	Number of competitions counting
-only if competition is counting	ranking	en	Only if competition is counting
+nation...	ranking	en	Nation...
+number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
 pointalocation	ranking	en	Pointalocation
+presets	ranking	en	Presets
+presets for competitions	ranking	en	Presets for competitions
 previous rankingsystem	ranking	en	previous Rankingsystem
-ranking	common	en	Rankings
-rankings	ranking	en	Rankings
+ranking	ranking	en	Ranking
 rankings - categories	ranking	en	Rankings - Categories
 rankings - cathegories	ranking	en	Rankings - Cathegories
-rankings - competitions	ranking	en	Rankings - Competitions
-rankings - cups	ranking	en	Rankings - Cups
 rankingsystem	ranking	en	Rankingsystem
-read / searches for competitions matching the above criteria	ranking	en	read / searches for competitions matching the above criteria
-results	ranking	en	Results
+remove the attached pdf	ranking	en	Remove the attached PDF
+result pdf	ranking	en	Result PDF
 saves the changes made	ranking	en	saves the changes made
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
 serid	ranking	en	SerId
-short	ranking	en	Short
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
+shortcut	ranking	en	Shortcut
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
-starts the cathegory editor	ranking	en	starts the cathegory editor
-starts the competition editor	ranking	en	starts the competition editor
-starts the cup editor	ranking	en	starts the cup editor
-starts the result editor	ranking	en	starts the result editor
+startlist pdf	ranking	en	Startlist PDF
 til place	ranking	en	til place
 to year	ranking	en	to year
-unique (internal) key, in the form: 'nat_{f|m}_??' nat=nation, f|m=gender, ?? = a|b|j for juniors + s|b|d for disciplin	ranking	en	unique (internal) key, in the form: 'NAT_{F|M}_??' NAT=nation, F|M=gender, ?? = A|B|J for juniors + S|B|D for disciplin
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 use better result to break ties in the ranking	ranking	en	Use better result to break ties in the ranking
 used to preset a link in rankings and competition-calendar	ranking	en	used to preset a link in rankings and competition-calendar
+view the attached pdf	ranking	en	View the attached PDF
+view this competition	ranking	en	View this competition
 wetid	ranking	en	WetId
 which birthyear are allowd in this cathegory, if it is limited on this	ranking	en	which birthyear are allowd in this cathegory, if it is limited on this
 which cathegories are competing	ranking	en	which cathegories are competing
