@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.admin.acl" template="" lang="" group="0" version="1.0.0.001">
+		<grid>
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<description value="Nation"/>
+					<description value="Read"/>
+					<description value="Edit"/>
+					<description value="Delete"/>
+				</row>
+				<row class="row">
+					<menulist>
+						<menupopup no_lang="1" id="${$row}[nation]"/>
+					</menulist>
+					<listbox type="select-account" rows="5" id="${row}[read]"/>
+					<listbox type="select-account" rows="5" id="${row}[edit]"/>
+					<button image="delete" label="Delete" align="center" id="delete[$row_cont[nation]]" onclick="return confirm('Delete all rights for that nation');"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
