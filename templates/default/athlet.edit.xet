@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.athlet.edit.contact" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column width="25%"/>
+				<column width="10%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description options=",,,email" value="Email"/>
+					<textbox size="30" maxlength="40" id="email" statustext="use the access control to deny display on the website"/>
+					<description options=",,,homepage" value="Homepage"/>
+					<textbox size="40" maxlength="60" id="homepage" statustext="URL to own homepage, eg. http://domain.com"/>
+				</row>
+				<row class="row">
+					<description options=",,,tel" value="Phone"/>
+					<textbox size="20" maxlength="20" id="tel" statustext="use the access control to deny display on the website"/>
+					<description options=",,,fax" value="Fax"/>
+					<textbox size="20" maxlength="20" id="fax" statustext="use the access control to deny display on the website"/>
+				</row>
+				<row class="row" disabled="1">
+					<description options=",,,mobil" value="Cellphone"/>
+					<textbox size="20" maxlength="20" id="mobil" statustext="use the access control to deny display on the website" span="all"/>
+				</row>
+				<row class="row">
+					<description options=",,,ort" value="City"/>
+					<textbox size="30" maxlength="35" id="ort" statustext="use the access control to deny display on the website"/>
+					<description options=",,,plz" value="Postalcode"/>
+					<textbox size="8" maxlength="8" id="plz" statustext="incl. nation-code"/>
+				</row>
+				<row class="row">
+					<description options=",,,strasse" value="Street"/>
+					<textbox size="30" maxlength="35" id="strasse"/>
+					<description options=",,,anrede" value="Title"/>
+					<textbox size="40" maxlength="40" id="anrede"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.athlet.edit.profile" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column width="15%"/>
+				<column width="10%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description options=",,,gewicht" value="Weight (kg)"/>
+					<int id="gewicht" statustext="in kilogram"/>
+					<description options=",,,groesse" value="Size (cm)"/>
+					<int id="groesse" statustext="body height in centimeter"/>
+				</row>
+				<row class="row">
+					<description options=",,,profi" value="Climbing professional"/>
+					<textbox size="30" maxlength="40" id="profi" statustext="use &quot;yes&quot; or &quot;no, prefession&quot;"/>
+					<description options=",,,practice" value="climbing since (years)"/>
+					<int options="1,99" id="practice" statustext="since how many years are you climbing (not only competing)"/>
+				</row>
+				<row class="row">
+					<description options=",,,sport" value="other sports"/>
+					<textbox size="60" maxlength="60" id="sport" statustext="other sports practiced" span="all"/>
+				</row>
+				<row class="row">
+					<description options=",,,hobby" value="Hobbies"/>
+					<textbox size="60" maxlength="60" id="hobby" span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.athlet.edit.notice" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<textbox multiline="true" data="" rows="5" cols="80" id="bemerkung" statustext="This text will be shown in the profil on the website."/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.athlet.edit.other" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column width="15%"/>
+				<column width="10%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row" valign="top">
+					<description options=",,,acl" value="access control"/>
+					<listbox rows="5" id="acl" statustext="deny public display of the checked information" span="all"/>
+				</row>
+				<row class="row" disabled="!@is_admin">
+					<description options=",,,rkey" value="Key"/>
+					<textbox id="rkey" statustext="internal key, leave it empty to have it automaticaly generated" size="8" maxlength="8" span="all"/>
+				</row>
+				<row class="row" disabled="!@is_admin">
+					<description options=",,,lizenz" value="License number"/>
+					<textbox size="6" maxlength="6" id="lizenz" statustext="not used at the moment"/>
+					<description options=",,,kader" value="Squad"/>
+					<textbox size="5" maxlength="5" id="kader" statustext="not used at the moment"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.athlet.edit.results" template="" lang="" group="0" version="">
+		<grid>
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<description/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.athlet.edit" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column width="20%"/>
+				<column width="12%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<description span="3" id="msg"/>
+					<description class="gray" value="PerId" no_lang="1" align="right" id="PerId" readonly="true"/>
+				</row>
+				<row class="th">
+					<description options=",,,nachname" value="Last name"/>
+					<textbox size="20" maxlength="20" id="nachname" needed="1" statustext="Family name of the athlet in latin chars! Accents and umlauts are ok"/>
+					<description options=",,,vorname" value="First name"/>
+					<textbox size="20" maxlength="20" id="vorname" needed="1" statustext="First name of the athlet in Latin chars! Accents and umlauts are ok"/>
+				</row>
+				<row class="row">
+					<description options=",,,nation" value="Nation"/>
+					<menulist>
+						<menupopup options="none" id="nation" statustext="nation the athlet is competing for"/>
+					</menulist>
+					<description options=",,,sex" value="Gender"/>
+					<menulist>
+						<menupopup options="none" id="sex" statustext="gender of the athlet"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description options=",,,geb_date" value="Birthdate"/>
+					<date options="Y-m-d" id="geb_date" statustext="use access control to deny display on the website"/>
+					<description options=",,,geb_ort" value="Place of birth"/>
+					<textbox size="35" maxlength="35" id="geb_ort"/>
+				</row>
+				<row class="row">
+					<description options=",,,verband" value="Federation"/>
+					<textbox size="60" maxlength="60" span="3" id="verband"/>
+				</row>
+				<row>
+					<tabbox span="all">
+						<tabs>
+							<tab label="Contact" statustext="telephone, email, homepage, city, ..."/>
+							<tab label="Profile" statustext="Weight, size, hobbies, ..."/>
+							<tab label="Notice" statustext="free text"/>
+							<tab label="Access" statustext="access control, key"/>
+							<tab label="Results" statustext="Competition results"/>
+						</tabs>
+						<tabpanels>
+							<template id="ranking.athlet.edit.contact"/>
+							<template id="ranking.athlet.edit.profile"/>
+							<template id="ranking.athlet.edit.notice"/>
+							<template id="ranking.athlet.edit.other"/>
+							<template id="ranking.athlet.edit.results"/>
+						</tabpanels>
+					</tabbox>
+				</row>
+				<row>
+					<hbox span="3">
+						<button label="Save" id="save" statustext="Saves the changes made"/>
+						<button label="Apply" id="apply" statustext="Applies the changes made"/>
+						<button label="Cancel" id="cancel" statustext="exists without saving the changes"/>
+					</hbox>
+					<button label="Delete" align="right" id="delete" statustext="Deletes the athlet only if it has NO results!" onclick="return confirm('Delete this athlet');"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
