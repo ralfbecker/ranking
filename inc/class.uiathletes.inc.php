@@ -84,11 +84,11 @@ class uiathletes extends boranking
 		{
 			$view = $content['view'];
 
-			if (!$view && $this->only_nation_Athlete) $content['nation'] = $this->only_nation_Athlete;
+			if (!$view && $this->only_nation_athlete) $content['nation'] = $this->only_nation_athlete;
 
 			//echo "<br>uiathletes::edit: content ="; _debug_array($content);
-			$this->athlete->data =& $content['Athlete_data'];
-			unset($content['Athlete_data']);
+			$this->athlete->data =& $content['athlete_data'];
+			unset($content['athlete_data']);
 			$old_geb_date = $this->athlete->data['geb_date'];
 
 			$this->athlete->data_merge($content);
@@ -154,7 +154,7 @@ class uiathletes extends boranking
 		);
 		$readonlys = array(
 			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]],
-			'nation' => !!$this->only_nation_Athlete,
+			'nation' => !!$this->only_nation_athlete,
 		);
 		// dont allow non-admins to change sex and nation, once it's been set
 		if ($this->athlete->data['PerId'] && !$this->is_admin)
@@ -178,7 +178,7 @@ class uiathletes extends boranking
 		$this->tmpl->read('ranking.athlete.edit');
 		$this->tmpl->exec('ranking.uiathletes.edit',$content,
 			$sel_options,$readonlys,array(
-				'Athlete_data' => $this->athlete->data,
+				'athlete_data' => $this->athlete->data,
 				'view' => $view,
 			));
 	}
@@ -193,7 +193,7 @@ class uiathletes extends boranking
 	function get_rows($query,&$rows,&$readonlys)
 	{
 		//echo "uiathletes::get_rows() query="; _debug_array($query);
-		$GLOBALS['phpgw']->session->appsession('ranking','Athlete_state',$query);
+		$GLOBALS['phpgw']->session->appsession('ranking','athlete_state',$query);
 
 		foreach((array) $query['col_filter'] as $col => $val)
 		{
@@ -203,10 +203,10 @@ class uiathletes extends boranking
 		{
 			if ($query['col_filter']['nation'])
 			{
-				$sel_options[$name] =& $this->athlete->distinct_list($name,array(
-					'nation' => $query['col_filter']['nation'],
-					'sex'    => $query['col_filter']['sex'],
-				));
+				$filter = array('nation' => $query['col_filter']['nation']);
+				if ($query['col_filter']['sex']) $filter['sex'] = $query['col_filter']['sex'];
+
+				$sel_options[$name] =& $this->athlete->distinct_list($name,$filter);
 			}
 			else
 			{
@@ -301,7 +301,7 @@ class uiathletes extends boranking
 		}
 		$content = array();
 
-		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['phpgw']->session->appsession('ranking','Athlete_state');
+		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['phpgw']->session->appsession('ranking','athlete_state');
 		
 		if (!is_array($content['nm']))
 		{
