@@ -3,141 +3,198 @@
 %d matches on search criteria	ranking	de	%d Treffer bei der Suche
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
 aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
-add a new competition	ranking	de	eine neuen Wettkampf anlegen
+access control, key	ranking	de	Zugriffskontrolle, Schlüssel
+add a new athlete	ranking	de	einen neuen Athleten anlegen
+add a new competition	ranking	de	einen neuen Wettkampf anlegen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 allways	ranking	de	Immer
 apply the changes made	ranking	de	vorgenommene Änderungen anwenden
-athlets	ranking	de	Athleten
+athlete	ranking	de	Athlet
+athletes	ranking	de	Athleten
 before	ranking	de	vor
 before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)
 better result splits ties	ranking	de	Besseres Ergebnis bricht Gleichstände auf
 birthdate	ranking	de	Geburtsdatum
+birthday, shows only the year	ranking	de	Geburtstag, zeigt nur das Jahr
 birthyears from	ranking	de	Geburtsjahr von
+body height in centimeter	ranking	de	Körpergröße in Zentimeter
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
 category saved	ranking	de	Kategorie gespeichert
 cathegories	ranking	de	Kategorien
+cellphone	ranking	de	Mobiltelefon
 city	ranking	de	Stadt
 click to view	ranking	de	anklicken zum Anzeigen
+climbing professional	ranking	de	Profi
+climbing since (years)	ranking	de	klettert seit (Jahren)
 competition	ranking	de	Wettkampf
 competition name	ranking	de	Wettkampfname
+competition results	ranking	de	Wettkampfergebnisse
 competitions	ranking	de	Wettkämpfe
 competitions counting	ranking	de	zählende Wettkämpfe
+complete profile	ranking	de	komplettes Profil
+contact	ranking	de	Kontakt
 counting for rankings	ranking	de	zählend für die Rangliste
 cup	ranking	de	Cup
-cup the competition is part of or none	ranking	de	Cup zu dem der Wettkampf gehört oder keiner
+cup the competition is part of or none	ranking	de	Cup zu dem der Wettkampf gehï¿½rt oder keiner
 cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
 database	admin	de	Datenbank
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
 delete all rights for this nation	ranking	de	Alle Rechte für diese Nation löschen
+delete this athlete	ranking	de	Diesen Athleten löschen
 delete this competition	ranking	de	Diesen Wettkampf löschen
-delete this competition with all its results	ranking	de	Diesen Wettkampf mit allen seinen Ergebnissen löschen
+delete this competition with all its results	ranking	de	Diesen Wettkampf mit allen seinen Ergebnissen lï¿½schen
 delete this cup	ranking	de	Diesen Cup löschen
 deletes this cup	ranking	de	Diesen Cup löschen
-duration	ranking	de	Länge
+deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
+deny public display of the checked information	ranking	de	öffentlichen Anzeige der ausgewählte Informationen verweigern
+duration	ranking	de	Lï¿½nge
 duration in days or textual competition-date like 'mid july'	ranking	de	Dauer in Tagen oder Text für Wettkampfdatum wie 'Mitte Juli'
-duration in days or textual competitiondate like 'july 2002'	ranking	de	Länge in Tagen oder ein Text wie 'Juli 2002' für das Wettkampfdatum
+duration in days or textual competitiondate like 'july 2002'	ranking	de	Lï¿½nge in Tagen oder ein Text wie 'Juli 2002' fï¿½r das Wettkampfdatum
 duration or textual date	ranking	de	Dauer oder Text
 each new upload will overwrite the previous one	ranking	de	jeder neue Upload überschreibt den vorherigen
 edit %1	ranking	de	%1 bearbeiten
-edit this competition	ranking	de	Diesen Wettkampf bearbeiten
+edit athlete	ranking	de	Athlet bearbeiten
+edit competition	ranking	de	Wettkampf bearbeiten
+edit this athlete	ranking	de	diesen Athleten bearbeiten
+edit this competition	ranking	de	diesen Wettkampf bearbeiten
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 entry saved	ranking	de	Eintrag gespeichert
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
 error: deleting %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlüssel '%1' existiert bereits, er muß eindeutig sein !!!
-error: key '%s' exists already, it has to be unique !!!	ranking	de	Fehler: Der Schlüssel '%s' existiert bereits, er muss einmalig sein !!!
+error: key '%s' exists already, it has to be unique !!!	ranking	de	Fehler: Der Schlï¿½ssel '%s' existiert bereits, er muss einmalig sein !!!
 error: removing the %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: renaming the attachments !!!	ranking	de	Fehler: beim Umbenennen der Anhänge !!!
 error: saveing !!!	ranking	de	Fehler: beim Speichern !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
 error: writeing !!!	ranking	de	Fehler: beim Schreiben !!!
+exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
 factor	ranking	de	Faktor
+family name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Familienname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
+fax	ranking	de	Fax
 federation	ranking	de	Verband
 female	ranking	de	weiblich
 fieldfactorpoints	ranking	de	Feldfaktorpunkte
 file '%1' successful attached as %2	ranking	de	Datei '%1' erfolgreich als %2 angehangen
 file is not a pdf	ranking	de	Die Datei ist kein PDF
+first name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Vorname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
+free text	ranking	de	freier Text
 full cathegory name (must not be empty)	ranking	de	vollständiger Name der Kategorie (darf nicht leer sein)
 full competition name (must not be empty)	ranking	de	vollständiger Name des Wettkampfs (darf nicht leer sein)
 full cup name (must not be empty)	ranking	de	vollständiger Name des Cups (darf nicht leer sein)
 gender	ranking	de	Geschlecht
+gender of the athlete	ranking	de	Geschlecht des Athleten
 gender...	ranking	de	Geschlecht...
 general	ranking	de	Allgemein
 grpid	ranking	de	GrpId
+hobbies	ranking	de	Hobies
 homepage	ranking	de	Internetadresse
 host	admin	de	Rechner
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	de	wie wird der Schlüssel für den Cup dieser Kategorie gebildet, zB. '??_WC' für den Weltcup (?? wird durch das Jahr ersetzt)
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
-how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athletehn des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
+how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athleten des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
-if competiton is an open / qualificatio for an other competition and only the better one gets points awarded select the main-comp. or none	ranking	de	Wenn der Wettkampf ein Open / Qualification für einen anderen Wettkampf ist und nur das bessere Ergebnis berücksichtigt werden soll, hier den Hauptwettkampf auswählen oder keinen
+if competiton is an open / qualificatio for an other competition and only the better one gets points awarded select the main-comp. or none	ranking	de	Wenn der Wettkampf ein Open / Qualification fï¿½r einen anderen Wettkampf ist und nur das bessere Ergebnis berï¿½cksichtigt werden soll, hier den Hauptwettkampf auswï¿½hlen oder keinen
+in kilogram	ranking	de	in Kilogram
+incl. nation-code	ranking	de	einschl. Länderkennung
 information pdf	ranking	de	Informations PDF
-key	ranking	de	Schlüssel
+internal key, leave it empty to have it automaticaly generated	ranking	de	interner Schlï¿½ssel, leer lassen um ihn automatisch zu generieren
+key	ranking	de	Schlï¿½ssel
 key must not be empty !!!	ranking	de	Schlüssel darf nicht leer sein
 last competition	ranking	de	Letzter Wettkampf
+license number	ranking	de	Lizenznummer
 male	ranking	de	männlich
-maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
+maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer fï¿½r alle)
 name	ranking	de	Name
 nation	ranking	de	Nation
 nation acl	common	de	Nationen ACL
 nation if national competition or internatinal	ranking	de	Nation für nationalen Wettkampf oder international
 nation if national competition or none for an internatinal one	ranking	de	Nation falls es sich um einen natinalen Wettkampf handelt oder keine für einen internationalen
+nation the athlete is competing for	ranking	de	Nation für die der Athlete startet
 no never	ranking	de	Nein niemals
 none	ranking	de	Keine(r)
+not used at the moment	ranking	de	im Moment nicht benutzt
 nothing matched search criteria !!!	ranking	de	Keine Treffer auf ihre Suchanfrage !!!
-number of competitions counting	ranking	de	Anzahl der gewerteten Wettkämpfe
+notice	ranking	de	Notiz
+number of competitions counting	ranking	de	Anzahl der gewerteten Wettkï¿½mpfe
 number of competitions counting for the cup (empty for all)	ranking	de	Anzahl Wettkämpfe die für den Cup zählen (leer für alle)
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
 only if competition is counting	ranking	de	Nur wenn der Wettkampf gewertet wird
-permission denied	ranking	de	Zugriff verweigert
+other sports	ranking	de	Andere Sportarten
+other sports practiced	ranking	de	ausgeübte andere Sportarten
+perid	ranking	de	PerId
+permission denied !!!	ranking	de	Zugriff verweigert !!!
+phone	ranking	de	Telefon
+place of birth	ranking	de	Geburtsort
 pointalocation	ranking	de	Punkteverteilung
 port	admin	de	Port
+postalcode	ranking	de	Postleitzahl
 presets	ranking	de	Voreinstellungen
 presets for competitions	ranking	de	Voreinstellungen für die Wettkämpfe
 previous rankingsystem	ranking	de	vorhergegendes Ranglistensystem
-ranking	ranking	de	Ranglisten
+professional	ranking	de	Profi
+profile	ranking	de	Profil
+ranking	common	de	Ranglisten
 ranking database	admin	de	Ranglisten Datenbank
 rankings	ranking	de	Ranglisten
-rankings - categories	ranking	de	Ranglisten - Ketegorien
-rankings - cathegories	ranking	de	Ranglisten - Ketegorien
-rankings - competitions	ranking	de	Ranglisten - Wettkämpfe
+rankings - categories	ranking	de	Ranglisten - Kategorien
+rankings - cathegories	ranking	de	Ranglisten - Kategorien
+rankings - competitions	ranking	de	Ranglisten - Wettkï¿½mpfe
 rankings - cups	ranking	de	Ranglisten - Cups
 rankingsystem	ranking	de	Ranglistensystem
-read / searches for competitions matching the above criteria	ranking	de	Liest / sucht nach Wettkämpfen die den angegebenen Kriterien entsprechen
+read / searches for competitions matching the above criteria	ranking	de	Liest / sucht nach Wettkï¿½mpfen die den angegebenen Kriterien entsprechen
 read competition	ranking	de	Wettkampf lesen
 remove the attached pdf	ranking	de	Das angehangene PDF löschen
 removed the %1	ranking	de	Das %1 wurde gelöscht
 result pdf	ranking	de	Ergebnis PDF
 results	ranking	de	Ergebnis
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
+select a nation first	ranking	de	Zuerst eine Nation auswählen
 select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
 serid	ranking	de	SerId
-short	ranking	de	Abkürzung
+short	ranking	de	Abkï¿½rzung
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
+since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
+size (cm)	ranking	de	Größe (cm)
+squad	ranking	de	Kader
 startdate	ranking	de	Startdatum
-startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darft nicht leer sein)
+startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darf nicht leer sein)
 startlist pdf	ranking	de	Startlisten PDF
 starts the cathegory editor	ranking	de	Startet das Bearbeiten der Kategorien
-starts the competition editor	ranking	de	Startet das Bearbeiten der Wettkämpfe
+starts the competition editor	ranking	de	Startet das Bearbeiten der Wettkï¿½mpfe
 starts the cup editor	ranking	de	Startet das Bearbeiten der Cups
 starts the result editor	ranking	de	Startet die Ergebnis Eingabe
+street	ranking	de	Straße
+street, postcode	ranking	de	Straße, Postleitzahl
+telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
+this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
 to year	ranking	de	bis Jahr
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
+url to own homepage, eg. http://domain.com	ranking	de	URL zu eigener Homepage, zB. http://climbing.de
+use "yes" or "no, prefession"	ranking	de	benützen Sie "yes" oder "no, Beruf"
+use access control to deny display on the website	ranking	de	benützen Sie die Zugangskontrolle um die Anzeige auf der Webseite zu verhindern
 use better result to break ties in the ranking	ranking	de	Benutze ein besseres Ergebnis um Gleichstände in der Rangliste aufzubrechen
+use the acl to hide the birthdate, you can't remove it !!!	ranking	de	Benutzen sie die Zugangscontrolle um das Geburtsdatum nicht anzuzeigen, Sie dürfen es nicht löschen !!!
 used to preset a link in rankings and competition-calendar	ranking	de	wird benutzt um einen Verweis in der Rangliste oder dem Wettkampfkalender anzuzeigen
-vfs directory for the pdf files (excluding the year)	admin	de	VFS Verzeichnis für PDF Dateien (ohne dir Jahreszahl)
+vfs directory for the pdf files (excluding the year)	admin	de	VFS Verzeichnis für PDF Dateien (ohne die Jahreszahl)
+vfs path for pictures of the athletes	ranking	de	VFS Pfad für Bilder der Athleten
 view %1	ranking	de	%1 anzeigen
 view the attached pdf	ranking	de	Angehangenes PDF anzeigen
-view this competition	ranking	de	Diesen Wettkampf anzeigen
+view this athlete	ranking	de	diesen Athleten anzeigen
+view this competition	ranking	de	diesen Wettkampf anzeigen
+weight (kg)	ranking	de	Gewicht (kg)
+weight in kilogram	ranking	de	Gewicht in Kilogram
+weight, size, hobbies, ...	ranking	de	Gewicht, Größe, Hobies, ...
 wetid	ranking	de	WetId
+where is the athlete born (incl. nation)	ranking	de	wo wurde der Athlet geboren (einschl. Land)
 which birthyear are allowd in this cathegory, if it is limited on this	ranking	de	Welche Jahrgänge sind in dieser Kategorie zulässig, falls sie darin begrenzt ist
 which cathegories are competing	ranking	de	Welche Kategorien nehmen teil
 which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	de	welche Punkteverteilung soll benützt werden um den Feldfaktor zu berechnen, normalerweise CUWR oder keiner, wenn kein Feldfaktor benutzt wird
 which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem wurde zuvor benützt, wenn überhaupt
-you need to delete the competitions results first !!!	ranking	de	Sie müssen das Wettkampfergebnis zuerst löschen !!!
+you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!

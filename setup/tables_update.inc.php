@@ -259,4 +259,35 @@
 		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.005';
 		return $GLOBALS['setup_info']['ranking']['currentver'];
 	}
+
+
+	$test[] = '1.0.0.005';
+	function ranking_upgrade1_0_0_005()
+	{
+		$GLOBALS['phpgw_setup']->oProc->AlterColumn('Wettkaempfe','gruppen',array(
+			'type' => 'varchar',
+			'precision' => '80'
+		));
+
+		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.006';
+		return $GLOBALS['setup_info']['ranking']['currentver'];
+	}
+
+
+	$test[] = '1.0.0.006';
+	function ranking_upgrade1_0_0_006()
+	{
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Personen','mobil',array(
+			'type' => 'varchar',
+			'precision' => '20'
+		));
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Personen','acl',array(
+			'type' => 'int',
+			'precision' => '4',
+			'default' => '0'
+		));
+
+		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.007';
+		return $GLOBALS['setup_info']['ranking']['currentver'];
+	}
 ?>

@@ -18,7 +18,7 @@
 				'pflicht' => array('type' => 'varchar','precision' => '3','default' => 'no'),
 				'ex_pkte' => array('type' => 'varchar','precision' => '3','default' => 'no'),
 				'nation' => array('type' => 'char','precision' => '5'),
-				'gruppen' => array('type' => 'varchar','precision' => '60'),
+				'gruppen' => array('type' => 'varchar','precision' => '80'),
 				'homepage' => array('type' => 'varchar','precision' => '60')
 			),
 			'pk' => array('WetId'),
@@ -168,7 +168,9 @@
 				'sport' => array('type' => 'varchar','precision' => '60'),
 				'profi' => array('type' => 'varchar','precision' => '40'),
 				'email' => array('type' => 'varchar','precision' => '40'),
-				'homepage' => array('type' => 'varchar','precision' => '60')
+				'homepage' => array('type' => 'varchar','precision' => '60'),
+				'mobil' => array('type' => 'varchar','precision' => '20'),
+				'acl' => array('type' => 'int','precision' => '4','default' => '0')
 			),
 			'pk' => array('PerId'),
 			'fk' => array(),
