@@ -24,12 +24,19 @@ class uicompetitions extends boranking
 		'edit'  => true,
 		'view'  => true,
 	);
+	var $attachment_type = array();
 
 	function uicompetitions()
 	{
 		$this->boranking();
 
 		$this->tmpl =& CreateObject('etemplate.etemplate');
+		
+		$this->attachment_type = array(
+			'info'      => lang('Information PDF'),
+			'startlist' => lang('Startlist PDF'),
+			'result'    => lang('Result PDF'),
+		);
 	}
 
 	/**
@@ -50,7 +57,7 @@ class uicompetitions extends boranking
 	{
 		if (($_GET['rkey'] || $_GET['WetId']) && !$this->comp->read($_GET))
 		{
-			$msg .= $this->messages['not_found'];
+			$msg .= lang('Entry not found !!!');
 		}
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
@@ -73,6 +80,7 @@ class uicompetitions extends boranking
 
 			//echo "<br>uicompetitions::edit: content ="; _debug_array($content);
 			$this->comp->data = $content['comp_data'];
+			$old_rkey = $content['comp_data']['rkey'];
 			unset($content['comp_data']);
 			
 			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] && 
@@ -106,21 +114,45 @@ class uicompetitions extends boranking
 							$this->comp->data['dru_bez'][0].$n)));					// 1. char from dru_bez plus number
 					}
 					while ($this->comp->not_unique());
-
-					//$msg .= $this->messages['rkey_empty'];
 				}
 				elseif ($this->comp->not_unique())
 				{
-					$msg .= sprintf($this->messages['rkey_not_unique'],$this->comp->data['rkey']);
+					$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->comp->data['rkey']);
 				}
 				elseif ($this->comp->save())
 				{
-					$msg .= $this->messages['error_writing'];
+					$msg .= lang('Error: while saving !!!');
 				}
 				else
 				{
-					$msg .= $this->messages['comp_saved'];
+					$msg .= lang('Competition saved');
+					
+					//echo "<p>renaming attachments from '?$old_rkey' to '?".$this->comp->data['rkey']."'</p>\n";					
+					if ($old_rkey && $this->comp->data['rkey'] != $old_rkey && 
+						!$this->comp->rename_attachments($old_rkey))
+					{
+						$msg .= ', '.lang("Error: renaming the attachments !!!");
+					}
+					foreach($this->comp->attachment_prefixes as $type => $prefix)
+					{
+						$file = $content['upload_'.$type];
+						if (is_array($file) && $file['tmp_name'] && $file['name'])
+						{
+							//echo $type; _debug_array($file);
+							$error_msg = $file['type'] != 'application/pdf' && 
+								strtolower(substr($file['name'],-4)) != '.pdf' ?
+								lang('File is not a PDF'): false;
 
+							if (!$error_msg && $this->comp->attach_files(array($type => $file['tmp_name']),$error_msg))
+							{
+								$msg .= ', '.lang("File '%1' successful attached as %2",$file['name'],$this->attachment_type[$type]);
+							}
+							else
+							{
+								$msg .= ', '.lang("Error: attaching '%1' as %2 (%3) !!!",$file['name'],$this->attachment_type[$type],$error_msg);
+							}
+						}	
+					}
 					if ($content['save']) $content['cancel'] = true;	// leave dialog now
 				}
 			}
@@ -141,10 +173,26 @@ class uicompetitions extends boranking
 				));
 				return;
 			}
+			if ($content['remove'] && in_array($content['nation'],$this->edit_rights))
+			{
+				list($type) = each($content['remove']);
+				
+				$msg .= $this->comp->remove_attachment($type) ?
+					lang('Removed the %1',$this->attachment_type[$type]) :
+					lang('Error: removing the %1 !!!',$this->attachment_type[$type]);
+			}
 		}
 		$content = $this->comp->data + array(
 			'msg' => $msg
 		);
+		foreach((array) $this->comp->attachments() as $type => $linkdata)
+		{
+			$content['pdf'][$type] = array(
+				'icon' => $type,
+				'file' => $this->comp->attachment_path($type),
+				'link' => $linkdata,
+			);
+		}
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
@@ -157,6 +205,10 @@ class uicompetitions extends boranking
 			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
 			'nation' => !!$this->only_nation_edit,
 		);
+		foreach($this->attachment_type as $type => $label)
+		{
+			$readonlys['remove['.$type.']'] = $view || !isset($content['pdf'][$type]);
+		}
 		if ($view)
 		{
 			foreach($this->comp->data as $name => $val)
@@ -201,8 +253,17 @@ class uicompetitions extends boranking
 		$total = $this->comp->get_rows($query,$rows,$readonlys);
 		
 		$readonlys = array();
-		foreach($rows as $row)
+		foreach($rows as $n => $row)
 		{
+			foreach((array) $this->comp->attachments($row) as $type => $linkdata)
+			{
+				$rows[$n]['pdf'][$type] = array(
+					'icon' => $type,
+					'file' => $this->comp->attachment_path($type),
+					'link' => $linkdata,
+					'label'=> $this->attachment_type[$type],
+				);
+			}
 			if (!$this->is_admin && !in_array($row['nation']?$row['nation']:'NULL',$this->edit_rights))
 			{
 				$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = true;
