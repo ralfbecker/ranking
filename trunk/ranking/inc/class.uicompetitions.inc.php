@@ -67,7 +67,7 @@ class uicompetitions extends boranking
 				$this->comp->data['nation'] = $this->edit_rights[0];
 			}
 			// we have no edit-rights for that nation
-			if (!in_array($this->comp->data['nation'] ? $this->comp->data['nation'] : 'NULL',$this->edit_rights))
+			if (!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
 			{
 				$view = true;
 			}
@@ -94,7 +94,7 @@ class uicompetitions extends boranking
 			$this->comp->data_merge($content);
 			//echo "<br>uicompetitions::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (($content['save'] || $content['apply']) && in_array($content['nation'],$this->edit_rights))
+			if (($content['save'] || $content['apply']) && $this->acl_check($content['nation'],EGW_ACL_EDIT))
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -125,7 +125,7 @@ class uicompetitions extends boranking
 				}
 				else
 				{
-					$msg .= lang('Competition saved');
+					$msg .= lang('%1 saved',lang('Competition'));
 					
 					//echo "<p>renaming attachments from '?$old_rkey' to '?".$this->comp->data['rkey']."'</p>\n";					
 					if ($old_rkey && $this->comp->data['rkey'] != $old_rkey && 
@@ -218,7 +218,7 @@ class uicompetitions extends boranking
 			$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
 			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] = true;
 		}
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('edit competition');
+		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 		$this->tmpl->read('ranking.comp.edit');
 		$this->tmpl->exec('ranking.uicompetitions.edit',$content,
 			$sel_options,$readonlys,array(
@@ -237,19 +237,25 @@ class uicompetitions extends boranking
 	function get_rows($query,&$rows,&$readonlys)
 	{
 		$GLOBALS['phpgw']->session->appsession('ranking','comp_state',$query);
-		
 		if (!$this->is_admin && !in_array($query['col_filter']['nation'],$this->read_rights))
 		{
 			$query['col_filter']['nation'] = $this->read_rights;
-			if (($null_key = array_search('NULL',$this->read_rights)))
+			if (($null_key = array_search('NULL',$this->read_rights)) !== false)
 			{
 				$query['col_filter']['nation'][$null_key] = null;
 			}
 		}
+		$nation = $query['col_filter']['nation'];
+
 		foreach((array) $query['col_filter'] as $col => $val)
 		{
 			if ($val == 'NULL') $query['col_filter'][$col] = null;
 		}
+		// set the cups based on the selected nation
+		$cups = $this->cup->names(!$nation ? array() : array('nation' => $query['col_filter']['nation']),true);
+		// unset the cup, if it's not (longer) in the selected nations cups
+		if (!isset($cups[$query['col_filter']['serie']])) $query['col_filter']['serie'] = '';
+		
 		$total = $this->comp->get_rows($query,$rows,$readonlys);
 		
 		$readonlys = array();
@@ -264,11 +270,11 @@ class uicompetitions extends boranking
 					'label'=> $this->attachment_type[$type],
 				);
 			}
-			if (!$this->is_admin && !in_array($row['nation']?$row['nation']:'NULL',$this->edit_rights))
-			{
-				$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = true;
-			}
+			$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = !$this->acl_check($row['nation'],EGW_ACL_EDIT);
 		}
+		// set the cups based on the selected nation
+		$rows['sel_options']['serie'] = $cups;
+		
 		if ($this->debug)
 		{
 			echo "<p>uicompetitions::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
@@ -321,8 +327,8 @@ class uicompetitions extends boranking
 					}
 					else
 					{
-						$msg = $this->comp->delete(array('WetId' => $id)) ? lang('Competition deleted') :
-							lang('Error: deleting competition !!!');
+						$msg = $this->comp->delete(array('WetId' => $id)) ? lang('%1 deleted',lang('Competition')) :
+							lang('Error: deleting %1 !!!',lang('Competition'));
 					}						
 					break;
 			}						
@@ -353,7 +359,7 @@ class uicompetitions extends boranking
 		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 		$this->tmpl->exec('ranking.uicompetitions.index',$content,array(
 			'nation' => $this->ranking_nations,
-			'serie'  => $this->cup->names(array(),true),
+//			'serie'  => $this->cup->names(array(),true),
 		));
 	}
 }

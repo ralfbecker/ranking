@@ -1,62 +1,90 @@
+%1 deleted	ranking	en	%1 deleted
+%1 saved	ranking	en	%1 saved
+'%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 aborts without saving changes	ranking	en	aborts without saving changes
 add a new competition	ranking	en	add a new competition
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 apply the changes made	ranking	en	apply the changes made
+athlets	ranking	en	Athlets
 before	ranking	en	before
 before which year the old system was used (first year of new system)	ranking	en	before which year the old system was used (first year of new system)
 better result splits ties	ranking	en	Better result splits ties
+birthdate	ranking	en	Birthdate
 birthyears from	ranking	en	Birthyears from
+can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
+can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
 cathegories	ranking	en	Cathegories
+city	ranking	en	City
 click to view	ranking	en	click to view
+competition	ranking	en	Competition
 competition name	ranking	en	Competition name
+competitions	ranking	en	competitions
 competitions counting	ranking	en	competitions counting
 counting for rankings	ranking	en	counting for rankings
 cup	ranking	en	Cup
-cup deleted	ranking	en	Cup deleted
-cup...	ranking	en	Cup...
 cuppattern	ranking	en	Cuppattern
+cups	ranking	en	cups
+database	admin	en	Database
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
+delete all rights for this nation	ranking	en	Delete all rights for this nation
 delete this competition	ranking	en	Delete this competition
 delete this cup	ranking	en	Delete this cup
 deletes this cup	ranking	en	deletes this cup
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
 duration or textual date	ranking	en	Duration or textual date
 each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
-edit competition	ranking	en	Edit competition
-edit cup	ranking	en	Edit cup
+edit %1	ranking	en	edit %1
 edit this competition	ranking	en	Edit this competition
-error: deleting cup !!!	ranking	en	Error: deleting cup !!!
+entry not found !!!	ranking	en	Entry not found !!!
+error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
+error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
+error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
+error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
+error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
+error: while saving !!!	ranking	en	Error: while saving !!!
 factor	ranking	en	Factor
+federation	ranking	en	Federation
 fieldfactorpoints	ranking	en	Fieldfactorpoints
+file '%1' successful attached as %2	ranking	en	File '%1' successful attached as %2
+file is not a pdf	ranking	en	File is not a PDF
 full cathegory name (must not be empty)	ranking	en	full cathegory name (must not be empty)
 full competition name (must not be empty)	ranking	en	full competition name (must not be empty)
 full cup name (must not be empty)	ranking	en	full cup name (must not be empty)
 gender	ranking	en	Gender
+gender...	ranking	en	Gender...
 general	ranking	en	General
 grpid	ranking	en	GrpId
 homepage	ranking	en	Homepage
+host	admin	en	Host
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	en	how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
 information pdf	ranking	en	Information PDF
+key must not be empty !!!	ranking	en	Key must not be empty !!!
+last competition	ranking	en	Last competition
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
 nation	ranking	en	Nation
 nation acl	common	en	Nation ACL
 nation if national competition or internatinal	ranking	en	nation if national competition or internatinal
 nation if national competition or none for an internatinal one	ranking	en	nation if national competition or none for an internatinal one
-nation...	ranking	en	Nation...
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
+only fill values different from egw	admin	en	only fill values different from eGW
+permission denied	ranking	en	permission denied
 pointalocation	ranking	en	Pointalocation
+port	admin	en	Port
 presets	ranking	en	Presets
 presets for competitions	ranking	en	Presets for competitions
 previous rankingsystem	ranking	en	previous Rankingsystem
 ranking	ranking	en	Ranking
+ranking database	admin	en	Ranking database
 rankings - categories	ranking	en	Rankings - Categories
 rankings - cathegories	ranking	en	Rankings - Cathegories
 rankingsystem	ranking	en	Rankingsystem
+read competition	ranking	en	Read competition
 remove the attached pdf	ranking	en	Remove the attached PDF
+removed the %1	ranking	en	Removed the %1
 result pdf	ranking	en	Result PDF
 saves the changes made	ranking	en	saves the changes made
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
@@ -72,6 +100,8 @@ unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 use better result to break ties in the ranking	ranking	en	Use better result to break ties in the ranking
 used to preset a link in rankings and competition-calendar	ranking	en	used to preset a link in rankings and competition-calendar
+vfs directory for the pdf files (excluding the year)	admin	en	VFS directory for the pdf files (excluding the year)
+view %1	ranking	en	view %1
 view the attached pdf	ranking	en	View the attached PDF
 view this competition	ranking	en	View this competition
 wetid	ranking	en	WetId
@@ -79,3 +109,4 @@ which birthyear are allowd in this cathegory, if it is limited on this	ranking	e
 which cathegories are competing	ranking	en	which cathegories are competing
 which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	en	which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used
 which rankingsystem was used before, if any	ranking	en	which rankingsystem was used before, if any
+you need to delete the competitions results first !!!	ranking	en	You need to delete the competitions results first !!!
