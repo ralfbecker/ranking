@@ -7,7 +7,7 @@ before which year the old system was used (first year of new system)	ranking	de	
 better result splits ties	ranking	de	Besseres Ergebnis bricht Gleichstände auf
 birthyears from	ranking	de	Geburtsjahr von
 category saved	ranking	de	Kategorie gespeichert
-cathegories	ranking	de	Ketegorien
+cathegories	ranking	de	Kategorien
 competition saved	ranking	de	Wettkampf gespeichert
 competitions	ranking	de	Wettkämpfe
 cup	ranking	de	Cup
@@ -17,7 +17,7 @@ cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
-deletes the competition with all it results	ranking	de	Löscht den Wettkampf mit all seinen Ergebnissen
+delete this competition with all its results	ranking	de	Diesen Wettkampf mit allen seinen Ergebnissen löschen
 duration	ranking	de	Länge
 duration in days or textual competitiondate like 'july 2002'	ranking	de	Länge in Tagen oder ein Text wie 'Juli 2002' für das Wettkampfdatum
 entry not found !!!	ranking	de	Eintrag nicht gefunden

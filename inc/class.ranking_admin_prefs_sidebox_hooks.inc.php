@@ -12,13 +12,16 @@
 
 	/* $Id$ */
 
-class admin_prefs_sidebox_hooks
+class ranking_admin_prefs_sidebox_hooks
 {
+	var $public_functions = array(
+		'all_hooks' => true,
+	);
 	function all_hooks($args)
 	{
 		$appname = 'ranking';
 		$location = is_array($args) ? $args['location'] : $args;
-		//echo "<p>admin_prefs_sidebox_hooks::all_hooks(".print_r($args,True).") appname='$appname', location='$location'</p>\n";
+		//echo "<p>ranking_admin_prefs_sidebox_hooks::all_hooks(".print_r($args,True).") appname='$appname', location='$location'</p>\n";
 
 		if ($location == 'sidebox_menu')
 		{
@@ -36,7 +39,7 @@ class admin_prefs_sidebox_hooks
 		if ($GLOBALS['phpgw_info']['user']['apps']['preferences'] && $location != 'admin')
 		{
 			$file = array(
-				'Preferences'     => $GLOBALS['phpgw']->link('/preferences/preferences.php','appname='.$appname),
+				//'Preferences'     => $GLOBALS['phpgw']->link('/preferences/preferences.php','appname='.$appname),
 			);
 			if ($location == 'preferences')
 			{
@@ -51,8 +54,8 @@ class admin_prefs_sidebox_hooks
 		if ($GLOBALS['phpgw_info']['user']['apps']['admin'] && $location != 'preferences')
 		{
 			$file = Array(
-				'Site configuration' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.ranking.admin' )),
+				//'Site configuration' => $GLOBALS['phpgw']->link('/index.php',array('menuaction' => 'ranking.ranking.admin' )),
+				'Nation ACL' => $GLOBALS['phpgw']->link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
 			);
 			if ($location == 'admin')
 			{

@@ -41,6 +41,7 @@ class competition extends so_sql
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 		'durartion' => 'duration'
 	);
+	var $source_charset = 'iso-8859-1';
 
 	/*!
 	@function competition
@@ -56,6 +57,25 @@ class competition extends so_sql
 		if ($key) $this->read($key);
 	}
 
+	/**
+	 * initializes an empty competition
+	 *
+	 * reimplemented from so_sql to set some defaults
+	 *
+	 * @param array $keys array with keys in form internalName => value
+	 */
+	function init($keys=array())
+	{
+		$this->data = array(
+			'pkte'   => 'uiaa',
+			'faktor' => 0.0,
+		);
+
+		$this->db2data();
+
+		$this->data_merge($keys);
+	}
+
 	/*!
 	@function db2data
 	@abstract changes the data from the db-format to our work-format
@@ -67,8 +87,10 @@ class competition extends so_sql
 		{
 			$data =& $this->data;
 		}
-		$data = $GLOBALS['phpgw']->translation->convert($data,'iso-8859-1');
-
+		if ($this->source_charset)
+		{
+			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+		}
 		list($data['gruppen'],$data['duration']) = explode('@',$data['gruppen']);
 		$data['pkt_bis'] = $data['pkt_bis']!='' ? intval(100 * $data['pkt_bis']) : 100;
 		$data['feld_bis'] = $data['feld_bis']!='' ? intval(100 * $data['feld_bis']) : 100;
@@ -91,10 +113,12 @@ class competition extends so_sql
 		if ($data['pkt_bis'])  $data['pkt_bis']  = $data['pkt_bis']  == 100 ? '' : 100.0*$data['pkt_bis'];
 		if ($data['feld_bis']) $data['feld_bis'] = $data['feld_bis'] == 100 ? '' : 100.0*$data['feld_bis'];
 		if ($data['rkey'])     $data['rkey'] = strtoupper($data['rkey']);
-		if ($data['nation'])   $data['nation'] = strtoupper($data['nation']);
+		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
 
-		$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,'iso-8859-1');
-
+		if ($this->source_charset)
+		{
+			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+		}
 		return $data;
 	}
 
@@ -126,10 +150,12 @@ class competition extends so_sql
 		if (!$all)
 			return array();
 
-		while (list($key,$data) = each($all))
-			$arr[$data['WetId']] = $data['rkey'].': '.$data['name'];
-
-		return $arr;
+		$names = array();
+		foreach($all as $data)
+		{
+			$names[$data['WetId']] = $data['rkey'].': '.$data['name'];
+		}
+		return $names;
 	}
 	
 	/**

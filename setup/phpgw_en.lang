@@ -17,7 +17,7 @@ cuppattern	ranking	en	Cuppattern
 cups	ranking	en	Cups
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
-deletes the competition with all it results	ranking	en	deletes the competition with all it results
+delete this competition with all its results	ranking	en	Delete this competition with all its results
 duration	ranking	en	Duration
 duration in days or textual competitiondate like 'july 2002'	ranking	en	duration in days or textual competitiondate like 'July 2002'
 entry not found !!!	ranking	en	Entry not found !!!
