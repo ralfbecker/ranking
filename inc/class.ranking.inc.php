@@ -46,19 +46,19 @@
 		var $public_functions = array
 		(
 			'start'          => True,
+			'competitions'   => True,
+			'get_comps'      => True,
 			'comp_edit'      => True,
 			'cup_edit'       => True,
 			'cat_edit'       => True,
-			//'delete'       => True,
-			//'show'         => True,
-			//'admin'       => True,
-			//'preferences' => True,
 			'writeLangFile' => True
 		);
+		var $maxmatches = 12;
 
 		function ranking($lang_on_messages = True)
 		{
 			$this->comp = CreateObject('ranking.competition');
+			$this->comp_nations = array('NULL'=>lang('international'))+$this->comp->nations();
 			$this->cup  = CreateObject('ranking.cup');
 			$this->pkte = CreateObject('ranking.pktsystem');
 			$this->pkt_names = $this->pkte->names();
@@ -67,12 +67,18 @@
 			$this->tmpl = CreateObject('etemplate.etemplate');
 			$this->rls  = CreateObject('ranking.rls_system');
 			$this->rls_names = $this->rls->names();
-
+			
 			if ($lang_on_messages)
 			{
-				reset($this->messages);
-				while (list($key,$msg) = each($this->messages))
+				foreach($this->messages as $key => $msg)
+				{
 					$this->messages[$key] = lang($msg);
+				}
+			}
+			
+			if ((int) $GLOBALS['phpgw_info']['user']['preferences']['common']['maxmatchs']) 
+			{
+				$this->maxmatches = (int) $GLOBALS['phpgw_info']['user']['preferences']['common']['maxmatchs'];
 			}
 		}
 
@@ -151,10 +157,73 @@
 				'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
 				'start[comp]' => True
 			);
+			$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 			$this->tmpl->read('ranking.comp.edit');
-
 			$this->tmpl->exec('ranking.ranking.comp_edit',$content,
 				$sel_options,$no_button,array('comp_data' => $this->comp->data));
+		}
+
+		/**
+		 * query competitions for nextmatch in the competitions list
+		 *
+		 * @param array $query
+		 * @param array &$rows returned rows/competitions
+		 * @param array &$readonlys eg. to disable buttons based on acl
+		 */
+		function get_comps($query,&$rows,&$readonlys)
+		{
+			$GLOBALS['phpgw']->session->appsession('ranking','comp_state',$query);
+			
+			foreach((array) $query['col_filter'] as $col => $val)
+			{
+				if ($val == 'NULL') $query['col_filter'][$col] = null;
+			}
+			return $this->comp->get_rows($query,$rows,$readonlys);
+		}
+
+		/**
+		 * List existing competitions
+		 *
+		 * @param array $content
+		 */
+		function competitions($content=null)
+		{
+			if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['phpgw']->session->appsession('ranking','comp_state');
+			
+			if (!is_array($content['nm']))
+			{
+				$content['nm'] = array(
+					'get_rows'       =>	'ranking.ranking.get_comps',
+					//'filter_label'   =>	// I  label for filter    (optional)
+					//'filter_help'    =>	// I  help-msg for filter (optional)
+					'no_filter'      => True,// I  disable the 1. filter
+					'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
+					'no_cat'         => True,// I  disable the cat-selectbox
+					//'template'       =>	// I  template to use for the rows, if not set via options
+					//'header_left'    =>	// I  template to show left of the range-value, left-aligned (optional)
+					//'header_right'   =>	// I  template to show right of the range-value, right-aligned (optional)
+					'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
+					//'start'          =>	// IO position in list
+					//'cat_id'         =>	// IO category, if not 'no_cat' => True
+					//'search'         =>	// IO search pattern
+					'order'          =>	'datum',// IO name of the column to sort after (optional for the sortheaders)
+					'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
+					//'col_filter'     =>	// IO array of column-name value pairs (optional for the filterheaders)
+					//'filter'         =>	// IO filter, if not 'no_filter' => True
+					//'filter_no_lang' => True,// I  set no_lang for filter (=dont translate the options)
+					//'filter2'        =>	// IO filter2, if not 'no_filter2' => True
+					//'filter2_no_lang'=> True,// I  set no_lang for filter2 (=dont translate the options)
+					//'rows'           =>	//  O content set by callback
+					//'total'          =>	//  O the total number of entries
+				);
+			}
+
+			$this->tmpl->read('ranking.comp.list');
+			$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
+			$this->tmpl->exec('ranking.ranking.comp_edit',$content,array(
+				'nation' => $this->comp_nations,
+				'serie'  => $this->cup->names(array(),true),
+			));
 		}
 
 		function comp_list($found)

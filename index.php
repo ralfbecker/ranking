@@ -19,9 +19,6 @@
 	);
 	include('../header.inc.php');
 
-	$ranking = CreateObject('ranking.ranking');
-
-	$ranking->start();
+	ExecMethod('ranking.ranking.competitions');
 
 	$GLOBALS['phpgw']->common->phpgw_footer();
-?>

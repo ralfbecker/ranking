@@ -49,14 +49,11 @@ class competition extends so_sql
 	function competition($key=0)
 	{
 		//$this->debug = 1;
-		$this->so_sql('ranking','rang.Wettkaempfe');	// call constructor of extending class
+		$this->so_sql('ranking','rang.Wettkaempfe');	// call constructor of extended class
+		
+		$this->charset = $GLOBALS['phpgw']->translation->charset();
 
-		$this->public_functions += array(
-			'names' => True
-		);
-
-		if ($key)
-			$this->read($key);
+		if ($key) $this->read($key);
 	}
 
 	/*!
@@ -67,14 +64,14 @@ class competition extends so_sql
 	function db2data($data=0)
 	{
 		if ($intern = !is_array($data))
-			$data = $this->data;
+		{
+			$data =& $this->data;
+		}
+		$data = $GLOBALS['phpgw']->translation->convert($data,'iso-8859-1');
 
 		list($data['gruppen'],$data['duration']) = explode('@',$data['gruppen']);
 		$data['pkt_bis'] = $data['pkt_bis']!='' ? intval(100 * $data['pkt_bis']) : 100;
 		$data['feld_bis'] = $data['feld_bis']!='' ? intval(100 * $data['feld_bis']) : 100;
-
-		if ($intern)
-			$this->data = $data;
 
 		return $data;
 	}
@@ -87,37 +84,34 @@ class competition extends so_sql
 	function data2db($data=0)
 	{
 		if ($intern = !is_array($data))
-			$data = $this->data;
+		{
+			$data =& $this->data;
+		}
+		if ($data['duration']) $data['gruppen'] .= '@' . $data['duration'];
+		if ($data['pkt_bis'])  $data['pkt_bis']  = $data['pkt_bis']  == 100 ? '' : 100.0*$data['pkt_bis'];
+		if ($data['feld_bis']) $data['feld_bis'] = $data['feld_bis'] == 100 ? '' : 100.0*$data['feld_bis'];
+		if ($data['rkey'])     $data['rkey'] = strtoupper($data['rkey']);
+		if ($data['nation'])   $data['nation'] = strtoupper($data['nation']);
 
-		if ($data['duration'])
-			$data['gruppen'] .= '@' . $data['duration'];
-		$data['pkt_bis']  = $data['pkt_bis']  == 100 ? '' : 100.0*$data['pkt_bis'];
-		$data['feld_bis'] = $data['feld_bis'] == 100 ? '' : 100.0*$data['feld_bis'];
-		$data['rkey'] = strtoupper($data['rkey']);
-		$data['nation'] = strtoupper($data['nation']);
-
-		if ($intern)
-			$this->data = $data;
+		$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,'iso-8859-1');
 
 		return $data;
 	}
 
 	/*!
 	@function search
-	@abstract reimplmented from so_sql to be able to call data2db before save and db2data after
+	@abstract reimplmented from so_sql unset/not use some columns in the search
 	*/
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False)
+	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
-		unset($criteria['pkte']);	// is allwas set
-		if (!$criteria['feld_pkte'])
-			unset($criteria['feld_pkte']);
+		unset($criteria['pkte']);	// is allways set
+		if (!$criteria['feld_pkte']) unset($criteria['feld_pkte']);
 		unset($criteria['open']);
-		if (!$criteria['serie'])
-			unset($criteria['serie']);
-		$criteria['rkey'] = strtoupper($criteria['rkey']);
+		if (!$criteria['serie']) unset($criteria['serie']);
+		if ($criteria['rkey']) $criteria['rkey'] = strtoupper($criteria['rkey']);
 
 		//$this->debug = 1;
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty);
+		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 	}
 
 	/*!
@@ -137,4 +131,21 @@ class competition extends so_sql
 
 		return $arr;
 	}
-};
+	
+	/**
+	 * get the nations of the competitions
+	 * @return array with nations as key and value
+	 */
+	function nations()
+	{
+		$this->db->select($this->table_name,'DISTINCT nation','nation IS NOT NULL',__LINE__,__FILE__);
+		
+		$nations = array();
+		while($this->db->next_record())
+		{
+			$nat = $this->db->f(0);
+			$nations[$nat] = $nat;
+		}
+		return $nations;
+	}
+}
