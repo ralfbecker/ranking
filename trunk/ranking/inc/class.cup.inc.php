@@ -37,6 +37,7 @@ class cup extends so_sql
 		'nation' => 'nation', 'gruppen' => 'gruppen',
 	);
 */
+	var $source_charset = 'iso-8859-1';
 
 	/*!
 	@function cup
@@ -46,7 +47,27 @@ class cup extends so_sql
 	{
 		$this->so_sql('ranking','rang.Serien');	// call constructor of derived class
 
+		$this->charset = $GLOBALS['phpgw']->translation->charset();
+	
 		if ($key) $this->read($key);
+	}
+
+	/*!
+	@function db2data
+	@abstract changes the data from the db-format to our work-format
+	@param $data if given works on that array and returns result, else works on internal data-array
+	*/
+	function db2data($data=0)
+	{
+		if ($intern = !is_array($data))
+		{
+			$data =& $this->data;
+		}
+		if ($this->source_charset)
+		{
+			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+		}
+		return $data;
 	}
 
 	/*!
@@ -60,9 +81,16 @@ class cup extends so_sql
 		{
 			$data =& $this->data;
 		}
+		
 		if ($data['rkey']) $data['rkey'] = strtoupper($data['rkey']);
-		if ($data['nation']) $data['nation'] = strtoupper($data['nation']);
-
+		if ($data['nation'] && !is_array($data['nation'])) 
+		{
+			$data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
+		}
+		if ($this->source_charset)
+		{
+			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+		}
 		return $data;
 	}
 
@@ -74,6 +102,7 @@ class cup extends so_sql
 	{
 		unset($criteria['pkte']);	// is always set
 		unset($criteria['split_by_places']);
+		if ($criteria['nation'] == 'NULL') $criteria['nation'] = null;
 
 		$extra_cols .= ($extra_cols!=''?',':'').'IF(LEFT(rkey,2)>80,1900,2000)+LEFT(rkey,2) AS year';
 
@@ -87,8 +116,8 @@ class cup extends so_sql
 	*/
 	function names($keys=array(),$rkey_only=false)
 	{
-		$all = $this->search($keys,False,'year DESC');
-
+		$all = $this->search($keys,False,'year DESC','','',true);
+echo "<p>cup::names(".print_r($keys,true).",'$rkey_only') search="; _debug_array($all);
 		if (!$all)
 			return array();
 

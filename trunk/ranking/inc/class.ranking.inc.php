@@ -37,18 +37,43 @@
 		);
 		var $comp;
 		var $cup;
-		var $pkte;
+		var $pkte,$pkt_names;
+		var $cat,$cat_names;
+		var $rls,$rls_names;
+		/**
+		 * @var array $ranking_nations Nations allowed to create rankings and competitions
+		 */
+		var $ranking_nations=array();
+		/**
+		 * @var string $only_nation nation if there's only one ranking-nation
+		 */
+		var $only_nation='';
+		/**
+		 * @var string $only_nation_edit nation if there's only one nation the user has edit-rights to
+		 */
+		var $only_nation_edit='';
+		var $nations=array();
 		var $tmpl;
-		var $cat;
 		var $akt_grp; // selected cat to work on
-		var $rls;
+		/**
+		 * @var array $read_rights nations the user is allowed to see
+		 */
+		var $read_rights = array();
+		/**
+		 * @var array $edit_rights nations the user is allowed to edit
+		 */
+		var $edit_rights = array();
+		/**
+		 * @var boolean $is_admin true if user is an administrator, implies all read- and edit-rights
+		 */
+		var $is_admin = false;
 
 		var $public_functions = array
 		(
 			'start'          => True,
 			'competitions'   => True,
 			'get_comps'      => True,
-			'comp_edit'      => True,
+			'edit_comp'      => True,
 			'cup_edit'       => True,
 			'cat_edit'       => True,
 			'writeLangFile' => True
@@ -58,15 +83,14 @@
 		function ranking($lang_on_messages = True)
 		{
 			$this->comp = CreateObject('ranking.competition');
-			$this->comp_nations = array('NULL'=>lang('international'))+$this->comp->nations();
 			$this->cup  = CreateObject('ranking.cup');
 			$this->pkte = CreateObject('ranking.pktsystem');
 			$this->pkt_names = $this->pkte->names();
 			$this->cat  = CreateObject('ranking.category');
 			$this->cat_names = $this->cat->names();
-			$this->tmpl = CreateObject('etemplate.etemplate');
 			$this->rls  = CreateObject('ranking.rls_system');
 			$this->rls_names = $this->rls->names();
+			$this->tmpl = CreateObject('etemplate.etemplate');
 			
 			if ($lang_on_messages)
 			{
@@ -80,78 +104,125 @@
 			{
 				$this->maxmatches = (int) $GLOBALS['phpgw_info']['user']['preferences']['common']['maxmatchs'];
 			}
+			
+			// read the nation ACL
+			foreach(array('read_rights' => PHPGW_ACL_READ,'edit_rights' => PHPGW_ACL_EDIT) as $var => $right)
+			{
+				$ids = (array) $GLOBALS['phpgw']->acl->get_location_list_for_id('ranking',$right);
+				foreach($ids as $n => $val)
+				{
+					if ($val == 'run') unset($ids[$n]);
+				}
+				$this->$var = array_values($ids);
+				//echo $var; _debug_array($this->$var);
+			}
+			//$this->is_admin = $GLOBALS['phpgw_info']['user']['apps']['admin'];
+
+			// setup list with nations we rank and intersect it with the read_rights
+			$this->ranking_nations = array('NULL'=>lang('international'))+$this->comp->nations();
+			if (!$this->is_admin)
+			{
+				foreach($this->ranking_nations as $key => $label)
+				{
+					if (!in_array($key,$this->read_rights)) unset($this->ranking_nations[$key]);
+				}
+				if (count($this->ranking_nations) == 1)
+				{
+					$this->only_nation = $this->ranking_nations[0];
+				}
+				if (count($this->edit_rights) == 1)
+				{
+					$this->only_nation_edit = $this->edit_rights[0];
+				}
+				//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
+			}
+			// this need to go to the athlet-class
+			$GLOBALS['phpgw']->db->select('rang.Personen','DISTINCT nation',false,__LINE__,__FILE__,false,'ORDER BY nation');
+			while($GLOBALS['phpgw']->db->next_record())
+			{
+				$nat = $GLOBALS['phpgw']->db->f(0);
+				$this->nations[$nat] = $nat;
+			}
 		}
 
-		function comp_edit($content = '')
+		/**
+		 * Edit a competition
+		 *
+		 * @param array $content
+		 * @param string $msg
+		 */
+		function edit_comp($content=null,$msg='')
 		{
 			if (($_GET['rkey'] || $_GET['WetId']) && !$this->comp->read($_GET))
+			{
 				$msg .= $this->messages['not_found'];
-
+			}
+			// set and enforce the nation if only one allowed
+			if ($this->only_nation_edit)
+			{
+				$content['nation'] = $this->comp->data['nation'] = $this->only_nation_edit;
+			}
+			elseif (!$_GET['WetId'] && !$_GET['rkey'])
+			{
+				$this->comp->data['nation'] = $this->edit_rights[0];
+			}
 			if (is_array($content))
 			{
-				//echo "<br>comp_edit: HTTP_POST_VARS ="; _debug_array($post_vars);
+				//echo "<br>comp_edit: content ="; _debug_array($content);
 				$this->comp->data = $content['comp_data'];
 				unset($content['comp_data']);
 
 				$this->comp->data_merge($content);
 				//echo "<br>comp_edit: comp->data ="; _debug_array($this->comp->data);
 
-				if (isset($content['save']))
+				if ($content['save'] || $content['apply'])
 				{
 					if (!$this->comp->data['rkey'])
+					{
 						$msg .= $this->messages['rkey_empty'];
+					}
 					elseif ($this->comp->not_unique())
+					{
 						$msg .= sprintf($this->messages['rkey_not_unique'],$this->comp->data['rkey']);
-					else
-						$msg .= $this->messages[!$this->comp->save() ? 'comp_saved' : 'error_writing'];
-				}
-				elseif (isset($content['read']))
-				{
-					$found = $this->comp->search($content,False,'datum DESC');
-
-					if (!$found)
-						$msg .= $this->messages['nothing_found'];
-					elseif (count($found) == 1)
-						$this->comp->init($found[0]);
+					}
+					elseif (!$this->comp->save())
+					{
+						$msg .= $this->messages['error_writing'];
+					}
 					else
 					{
-						$this->comp_list($found);
-						return;
+						$msg .= $this->messages['comp_saved'];
+
+						if ($content['save']) $content['cancel'] = true;	// leave dialog now
 					}
 				}
-				elseif (isset($content['cancel']))
+				if ($content['cancel'])
 				{
-					$this->comp->init();
+					$this->tmpl->location(array('menuaction'=>'ranking.ranking.competitions'));
 				}
-				elseif (isset($content['delete']))
+				if ($content['delete'])
 				{
-					$this->comp->delete();
-					$this->comp->init();
-				}
-				elseif (isset($content['edit']))
-				{
-					list($WetId) = each($content['edit']);
-					if ($WetId > 0)
-						$this->comp->read(array('WetId' => $WetId));
-				}
-				elseif (isset($content['start']))
-				{
-					$this->start();
+					$this->competitions(array(
+						'nm' => array(
+							'rows' => array(
+								'delete' => array(
+									$this->comp->data['WetId'] => 'delete'
+								)
+							)
+						)
+					));
 					return;
 				}
-			}
-			elseif ($content) 
-			{
-				$msg = $content;
 			}
 			$content = $this->comp->data + array(
 				'msg' => $msg
 			);
 			$sel_options = array(
-				'pkte' => $this->pkt_names,
+				'pkte'      => $this->pkt_names,
 				'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
-				'serie' => array(0 => lang('none')) + $this->cup->names(),
-				'akt_grp' => $this->cat_names
+				'serie'     => array(0 => lang('none')) + $this->cup->names(array(
+					'nation'=>$this->comp->data['nation'])),
+				'nation'    => $this->ranking_nations,
 			);
 			$no_button = array(
 				'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
@@ -159,7 +230,11 @@
 			);
 			$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 			$this->tmpl->read('ranking.comp.edit');
-			$this->tmpl->exec('ranking.ranking.comp_edit',$content,
+			if ($this->only_nation_edit)
+			{
+				$this->tmpl->set_cell_attribute('nation','readonly',true);
+			}
+			$this->tmpl->exec('ranking.ranking.edit_comp',$content,
 				$sel_options,$no_button,array('comp_data' => $this->comp->data));
 		}
 
@@ -174,72 +249,106 @@
 		{
 			$GLOBALS['phpgw']->session->appsession('ranking','comp_state',$query);
 			
+			if (!$this->is_admin && !in_array($query['col_filter']['nation'],$this->read_rights))
+			{
+				$query['col_filter']['nation'] = $this->read_rights;
+				if (($null_key = array_search('NULL',$this->read_rights)))
+				{
+					$query['col_filter']['nation'][$null_key] = null;
+				}
+			}
 			foreach((array) $query['col_filter'] as $col => $val)
 			{
 				if ($val == 'NULL') $query['col_filter'][$col] = null;
 			}
-			return $this->comp->get_rows($query,$rows,$readonlys);
+			$total = $this->comp->get_rows($query,$rows,$readonlys);
+			
+			$readonlys = array();
+			foreach($rows as $row)
+			{
+				if (!$this->is_admin && !in_array($row['nation']?$row['nation']:null,$this->edit_rights))
+				{
+					$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = true;
+				}
+			}
+			if ($this->debug)
+			{
+				echo "<p>ranking::get_comps(".print_r($query,true).") rows ="; _debug_array($rows);
+				_debug_array($readonlys);
+			}
+			return $total;		
 		}
 
 		/**
 		 * List existing competitions
 		 *
 		 * @param array $content
+		 * @param string $msg
 		 */
-		function competitions($content=null)
+		function competitions($content=null,$msg='')
 		{
+			$content = $content['nm']['rows'];
+			
+			if ($content['view'] || $content['edit'] || $content['delete'])
+			{
+				foreach(array('view','edit','delete') as $action)
+				{
+					if ($content[$action])
+					{
+						list($id) = each($content[$action]);
+						break;
+					}
+				}
+				//echo "<p>ranking::competitions() action='$action', id='$id'</p>\n";
+				switch($action)
+				{
+					case 'view':
+						$this->tmpl->location(array(
+							'menuaction' => 'ranking.ranking.view_comp',
+							'WetId'      => $id,
+						));
+						break;
+						
+					case 'edit':
+						$this->tmpl->location(array(
+							'menuaction' => 'ranking.ranking.edit_comp',
+							'WetId'      => $id,
+						));
+						break;
+						
+					case 'delete':
+						$msg = 'delete is not yet implemented!!!';
+						break;
+				}						
+			}
+			$content = array();
+
 			if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['phpgw']->session->appsession('ranking','comp_state');
 			
 			if (!is_array($content['nm']))
 			{
 				$content['nm'] = array(
 					'get_rows'       =>	'ranking.ranking.get_comps',
-					//'filter_label'   =>	// I  label for filter    (optional)
-					//'filter_help'    =>	// I  help-msg for filter (optional)
 					'no_filter'      => True,// I  disable the 1. filter
 					'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 					'no_cat'         => True,// I  disable the cat-selectbox
-					//'template'       =>	// I  template to use for the rows, if not set via options
-					//'header_left'    =>	// I  template to show left of the range-value, left-aligned (optional)
-					//'header_right'   =>	// I  template to show right of the range-value, right-aligned (optional)
 					'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
-					//'start'          =>	// IO position in list
-					//'cat_id'         =>	// IO category, if not 'no_cat' => True
-					//'search'         =>	// IO search pattern
 					'order'          =>	'datum',// IO name of the column to sort after (optional for the sortheaders)
 					'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
-					//'col_filter'     =>	// IO array of column-name value pairs (optional for the filterheaders)
-					//'filter'         =>	// IO filter, if not 'no_filter' => True
-					//'filter_no_lang' => True,// I  set no_lang for filter (=dont translate the options)
-					//'filter2'        =>	// IO filter2, if not 'no_filter2' => True
-					//'filter2_no_lang'=> True,// I  set no_lang for filter2 (=dont translate the options)
-					//'rows'           =>	//  O content set by callback
-					//'total'          =>	//  O the total number of entries
 				);
+				if (count($this->read_rights) == 1)
+				{
+					$content['nm']['col_filter']['nation'] = $this->read_rights[0];
+				}
 			}
+			$content['msg'] = $msg;
 
 			$this->tmpl->read('ranking.comp.list');
 			$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
-			$this->tmpl->exec('ranking.ranking.comp_edit',$content,array(
-				'nation' => $this->comp_nations,
+			$this->tmpl->exec('ranking.ranking.competitions',$content,array(
+				'nation' => $this->ranking_nations,
 				'serie'  => $this->cup->names(array(),true),
 			));
-		}
-
-		function comp_list($found)
-		{
-			if (!is_array($found) || !count($found))
-			{
-				$this->comp_edit();
-				return;
-			}
-			$content = array(
-				'msg' => sprintf($this->messages['anz_found'],count($found)),
-				'comps' => array_merge(array('not listed'),$found)
-			);
-			$this->tmpl->read('ranking.comp.list');
-
-			$this->tmpl->exec('ranking.ranking.comp_edit',$content,array('akt_grp'=>$this->cat_names));
 		}
 
 		function cup_edit($content = '')

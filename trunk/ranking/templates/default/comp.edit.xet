@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.comp.edit.general" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column width="20%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Startdate" options=",,,datum"/>
+					<date options="Y-m-d" id="datum" statustext="startdate (first heat, not registration) of the competition (must not be empty)"/>
+					<textbox size="15" id="duration" statustext="duration in days or textual competition-date like 'mid July'" label="Duration or textual date"/>
+				</row>
+				<row class="row">
+					<description value="Cathegories" options=",,,gruppen"/>
+					<listbox rows="5" id="gruppen" statustext="which cathegories are competing" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Homepage" options=",,,homepage"/>
+					<textbox size="60" maxlength="60" id="homepage" statustext="used to preset a link in rankings and competition-calendar" span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column width="20%"/>
+				<column width="7%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Pointalocation" options=",,,pkte"/>
+					<menulist>
+						<menupopup no_lang="1" id="pkte" statustext="defines how many points gets awarded for each place in the ranking (not cup)"/>
+					</menulist>
+					<description value="til place" options=",,,pkt_bis"/>
+					<menulist>
+						<menupopup type="select-percent" id="pkt_bis" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Factor" options=",,,faktor"/>
+					<textbox type="float" id="faktor" statustext="all points gets multiplicated with this factor, eg. for different competition types" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Fieldfactorpoints" options=",,,feld_pkte"/>
+					<menulist>
+						<menupopup no_lang="1" id="feld_pkte" statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used"/>
+					</menulist>
+					<description value="til place" options=",,,feld_bis"/>
+					<menulist>
+						<menupopup type="select-percent" id="feld_bis" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%"/>
+					</menulist>
+				</row>
+				<row height="80">
+					<description span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column width="20%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Information PDF" options=",,,upload_info"/>
+					<description id="pdf_info"/>
+					<file id="upload_info" statustext="each new upload will overwrite the previous one"/>
+				</row>
+				<row class="row">
+					<description value="Startlist PDF" options=",,,upload_startlist"/>
+					<description id="pdf_startlist"/>
+					<file id="upload_startlist" statustext="each new upload will overwrite the previous one"/>
+				</row>
+				<row class="row">
+					<description value="Result PDF" options=",,,upload_result"/>
+					<description id="pdf_result"/>
+					<file id="upload_result" statustext="each new upload will overwrite the previous one"/>
+				</row>
+				<row class="row" height="80">
+					<description span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.comp.edit" template="" lang="" group="0" version="1.0.0.002">
+		<grid width="100%\0">
+			<columns>
+				<column width="15%"/>
+				<column width="20%"/>
+				<column width="7%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<description span="3" id="msg"/>
+					<description class="gray" value="WetId" no_lang="1" align="right" id="WetId"/>
+				</row>
+				<row class="th">
+					<description value="Nation"/>
+					<menulist>
+						<menupopup id="nation" statustext="nation if national competition or internatinal" no_lang="1" onchange="1"/>
+					</menulist>
+					<description value="Cup" options=",,,serie"/>
+					<menulist span="all">
+						<menupopup id="serie" onchange="1"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Name"/>
+					<textbox size="100" maxlength="100" id="name" statustext="full competition name (must not be empty)" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Shortcut" options=",,,dru_bez"/>
+					<textbox size="20" maxlength="20" id="dru_bez" statustext="short for display in rankings / tables"/>
+					<description options=",,,rkey" value="Key"/>
+					<textbox size="8" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " span="all"/>
+				</row>
+				<row>
+					<tabbox span="all">
+						<tabs>
+							<tab label="General" statustext=""/>
+							<tab label="Ranking" statustext=""/>
+							<tab label="Files" statustext=""/>
+						</tabs>
+						<tabpanels>
+							<template id="ranking.comp.edit.general"/>
+							<template id="ranking.comp.edit.ranking"/>
+							<template id="ranking.comp.edit.files"/>
+						</tabpanels>
+					</tabbox>
+				</row>
+				<row>
+					<hbox data="" rows="1" cols="4" span="2">
+						<button label="Save" id="save" statustext="saves the changes made"/>
+						<button label="Apply" id="apply" statustext="saves the changes made"/>
+						<button label="Cancel" id="cancel" statustext="aborts without saving changes"/>
+					</hbox>
+					<description/>
+					<button label="Delete" id="delete" statustext="delete this competition with all its results" align="right" onclick="return confirm('delete this competition with all its results');"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
