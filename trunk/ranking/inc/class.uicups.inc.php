@@ -235,8 +235,16 @@ class uicups extends boranking
 					break;
 					
 				case 'delete':
-					$msg = $this->cup->delete(array('SerId' => $id)) ? 
-						lang('%1 deleted',lang('Cup')) : lang('Error: deleting %1 !!!',lang('Cup'));
+					if (!$this->is_admin && $this->cup->read(array('SerId' => $id)) &&
+						!in_array($this->cup->data['nation'],$this->edit_rights))
+					{
+						$msg = lang('Permission denied !!!');
+					}
+					else
+					{
+						$msg = $this->cup->delete(array('SerId' => $id)) ? 
+							lang('%1 deleted',lang('Cup')) : lang('Error: deleting %1 !!!',lang('Cup'));
+					}
 					break;
 			}						
 		}

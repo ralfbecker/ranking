@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.athlet.edit.contact" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.athlete.edit.contact" template="" lang="" group="0" version="1.0.0.001">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -12,36 +12,36 @@
 			<rows>
 				<row class="row">
 					<description options=",,,email" value="Email"/>
-					<textbox size="30" maxlength="40" id="email" statustext="use the access control to deny display on the website"/>
+					<textbox size="30" maxlength="40" id="email" statustext="use access control to deny display on the website"/>
 					<description options=",,,homepage" value="Homepage"/>
 					<textbox size="40" maxlength="60" id="homepage" statustext="URL to own homepage, eg. http://domain.com"/>
 				</row>
 				<row class="row">
 					<description options=",,,tel" value="Phone"/>
-					<textbox size="20" maxlength="20" id="tel" statustext="use the access control to deny display on the website"/>
+					<textbox size="20" maxlength="20" id="tel" statustext="use access control to deny display on the website"/>
 					<description options=",,,fax" value="Fax"/>
-					<textbox size="20" maxlength="20" id="fax" statustext="use the access control to deny display on the website"/>
+					<textbox size="20" maxlength="20" id="fax" statustext="use access control to deny display on the website"/>
 				</row>
 				<row class="row" disabled="1">
 					<description options=",,,mobil" value="Cellphone"/>
-					<textbox size="20" maxlength="20" id="mobil" statustext="use the access control to deny display on the website" span="all"/>
+					<textbox size="20" maxlength="20" id="mobil" statustext="use access control to deny display on the website" span="all"/>
 				</row>
 				<row class="row">
 					<description options=",,,ort" value="City"/>
-					<textbox size="30" maxlength="35" id="ort" statustext="use the access control to deny display on the website"/>
+					<textbox size="30" maxlength="35" id="ort" statustext="use access control to deny display on the website"/>
 					<description options=",,,plz" value="Postalcode"/>
 					<textbox size="8" maxlength="8" id="plz" statustext="incl. nation-code"/>
 				</row>
 				<row class="row">
 					<description options=",,,strasse" value="Street"/>
-					<textbox size="30" maxlength="35" id="strasse"/>
-					<description options=",,,anrede" value="Title"/>
+					<textbox size="30" maxlength="35" id="strasse" statustext="use access control to deny display on the website"/>
+					<description options=",,,anrede" value="Title" statustext="use access control to deny display on the website"/>
 					<textbox size="40" maxlength="40" id="anrede"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlet.edit.profile" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.athlete.edit.profile" template="" lang="" group="0" version="1.0.0.001">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -52,15 +52,15 @@
 			<rows>
 				<row class="row">
 					<description options=",,,gewicht" value="Weight (kg)"/>
-					<int id="gewicht" statustext="in kilogram"/>
+					<int id="gewicht" statustext="weight in kilogram"/>
 					<description options=",,,groesse" value="Size (cm)"/>
 					<int id="groesse" statustext="body height in centimeter"/>
 				</row>
 				<row class="row">
-					<description options=",,,profi" value="Climbing professional"/>
+					<description options=",,,profi" value="Professional"/>
 					<textbox size="30" maxlength="40" id="profi" statustext="use &quot;yes&quot; or &quot;no, prefession&quot;"/>
 					<description options=",,,practice" value="climbing since (years)"/>
-					<int options="1,99" id="practice" statustext="since how many years are you climbing (not only competing)"/>
+					<int options="1,99" id="practice" statustext="since how many years is the athlete climbing (not only competing)"/>
 				</row>
 				<row class="row">
 					<description options=",,,sport" value="other sports"/>
@@ -73,7 +73,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlet.edit.notice" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.athlete.edit.notice" template="" lang="" group="0" version="1.0.0.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -85,7 +85,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlet.edit.other" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.0.0.001">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -111,7 +111,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlet.edit.results" template="" lang="" group="0" version="">
+	<template id="ranking.athlete.edit.results" template="" lang="" group="0" version="">
 		<grid>
 			<columns>
 				<column/>
@@ -123,7 +123,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlet.edit" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.0.0.001">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -133,30 +133,29 @@
 			</columns>
 			<rows>
 				<row>
-					<description span="3" id="msg"/>
-					<description class="gray" value="PerId" no_lang="1" align="right" id="PerId" readonly="true"/>
+					<description span="3" class="redItalic" id="msg" no_lang="1"/>
 				</row>
 				<row class="th">
 					<description options=",,,nachname" value="Last name"/>
-					<textbox size="20" maxlength="20" id="nachname" needed="1" statustext="Family name of the athlet in latin chars! Accents and umlauts are ok"/>
+					<textbox size="20" maxlength="20" id="nachname" needed="1" statustext="Family name of the athlete in latin chars! Accents and umlauts are ok"/>
 					<description options=",,,vorname" value="First name"/>
-					<textbox size="20" maxlength="20" id="vorname" needed="1" statustext="First name of the athlet in Latin chars! Accents and umlauts are ok"/>
+					<textbox size="20" maxlength="20" id="vorname" needed="1" statustext="First name of the athlete in Latin chars! Accents and umlauts are ok"/>
 				</row>
 				<row class="row">
 					<description options=",,,nation" value="Nation"/>
 					<menulist>
-						<menupopup options="none" id="nation" statustext="nation the athlet is competing for"/>
+						<menupopup options="none" id="nation" statustext="nation the athlete is competing for" no_lang="1"/>
 					</menulist>
 					<description options=",,,sex" value="Gender"/>
 					<menulist>
-						<menupopup options="none" id="sex" statustext="gender of the athlet"/>
+						<menupopup options="none" id="sex" statustext="gender of the athlete"/>
 					</menulist>
 				</row>
 				<row class="row">
 					<description options=",,,geb_date" value="Birthdate"/>
 					<date options="Y-m-d" id="geb_date" statustext="use access control to deny display on the website"/>
 					<description options=",,,geb_ort" value="Place of birth"/>
-					<textbox size="35" maxlength="35" id="geb_ort"/>
+					<textbox size="35" maxlength="35" id="geb_ort" statustext="where is the athlete born (incl. nation)"/>
 				</row>
 				<row class="row">
 					<description options=",,,verband" value="Federation"/>
@@ -172,11 +171,11 @@
 							<tab label="Results" statustext="Competition results"/>
 						</tabs>
 						<tabpanels>
-							<template id="ranking.athlet.edit.contact"/>
-							<template id="ranking.athlet.edit.profile"/>
-							<template id="ranking.athlet.edit.notice"/>
-							<template id="ranking.athlet.edit.other"/>
-							<template id="ranking.athlet.edit.results"/>
+							<template id="ranking.athlete.edit.contact"/>
+							<template id="ranking.athlete.edit.profile"/>
+							<template id="ranking.athlete.edit.notice"/>
+							<template id="ranking.athlete.edit.other"/>
+							<template id="ranking.athlete.edit.results"/>
 						</tabpanels>
 					</tabbox>
 				</row>
@@ -186,7 +185,7 @@
 						<button label="Apply" id="apply" statustext="Applies the changes made"/>
 						<button label="Cancel" id="cancel" statustext="exists without saving the changes"/>
 					</hbox>
-					<button label="Delete" align="right" id="delete" statustext="Deletes the athlet only if it has NO results!" onclick="return confirm('Delete this athlet');"/>
+					<button label="Delete" align="right" id="delete" statustext="Delete this athlete" onclick="return confirm('Delete this athlete');"/>
 				</row>
 			</rows>
 		</grid>

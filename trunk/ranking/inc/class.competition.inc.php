@@ -124,6 +124,8 @@ class competition extends so_sql
 		if ($data['feld_bis']) $data['feld_bis'] = $data['feld_bis'] == 100 ? '' : 100.0*$data['feld_bis'];
 		if ($data['rkey'])     $data['rkey'] = strtoupper($data['rkey']);
 		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
+		if (isset($data['pkte']) && !$data['pkte']) $data['pkte'] = null;
+		if (isset($data['feld_pkte']) && !$data['feld_pkte']) $data['feld_pkte'] = null;
 
 		if (count($data) && $this->source_charset)
 		{
@@ -233,14 +235,14 @@ class competition extends so_sql
 	/**
 	 * Checks and returns links to the attached files
 	 *
-	 * @param array $keys to read/use a given competitions, default use the already read one
+	 * @param array $data a given competition, default use the already read one
 	 * @param boolean $return_link return links or arrays with vars for the link-function, default false=array
 	 * @return boolean/array links for the keys: info, startlist, result or false on error
 	 */
-	function attachments($keys=null,$return_link=false)
+	function attachments($data=null,$return_link=false)
 	{
-		if ($keys && !$this->read($keys)) return false;
-		
+		$rkey = is_array($data) ? $data['rkey'] : $this->data['rkey'];
+			
 		if (!is_object($GLOBALS['egw']->vfs))
 		{
 			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
@@ -248,7 +250,7 @@ class competition extends so_sql
 		$attachments = false;
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
-			$vfs_path = $this->attachment_path($type);
+			$vfs_path = $this->attachment_path($type,$rkey);
 			if ($GLOBALS['egw']->vfs->file_exists(array(
 					'string' => $vfs_path,
 					'relatives' => RELATIVE_ROOT,

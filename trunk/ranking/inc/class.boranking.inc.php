@@ -42,9 +42,9 @@ class boranking extends soranking
 	 */
 	var $only_nation_edit='';
 	/**
-	 * @var string $only_nation_athlet nation if there's only one nation the user has athlet-rights to
+	 * @var string $only_nation_athlete nation if there's only one nation the user has athlet-rights to
 	 */
-	var $only_nation_athlet='';
+	var $only_nation_athlete='';
 	var $tmpl;
 	var $akt_grp; // selected cat to work on
 	/**
@@ -56,9 +56,9 @@ class boranking extends soranking
 	 */
 	var $edit_rights = array();
 	/**
-	 * @var array $athlet_rights nations the user is allowed to edit
+	 * @var array $athlete_rights nations the user is allowed to edit
 	 */
-	var $athlet_rights = array();
+	var $athlete_rights = array();
 	/**
 	 * @var boolean $is_admin true if user is an administrator, implies all read- and edit-rights
 	 */
@@ -88,7 +88,7 @@ class boranking extends soranking
 		{
 			if ($data['appname'] != 'ranking' || $data['location'] == 'run') continue;
 
-			foreach(array('read_rights' => EGW_ACL_READ,'edit_rights' => EGW_ACL_EDIT,'athlet_rights' => EGW_ACL_ADD) as $var => $right)
+			foreach(array('read_rights' => EGW_ACL_READ,'edit_rights' => EGW_ACL_EDIT,'athlete_rights' => EGW_ACL_ADD) as $var => $right)
 			{
 				if (($data['rights'] & $right) && !in_array($data['location'],$this->$var))
 				{
@@ -96,9 +96,9 @@ class boranking extends soranking
 				}
 			}
 		}
-		//foreach(array('read_rights','edit_rights','athlet_rights') as $right) echo "$right: ".print_r($this->$right,true)."<br>\n";
+		//foreach(array('read_rights','edit_rights','athlete_rights') as $right) echo "$right: ".print_r($this->$right,true)."<br>\n";
 
-		//$this->is_admin = $GLOBALS['egw_info']['user']['apps']['admin'];
+		$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
 
 		// setup list with nations we rank and intersect it with the read_rights
 		$this->ranking_nations = array('NULL'=>lang('international'))+$this->comp->nations();
@@ -116,9 +116,9 @@ class boranking extends soranking
 			{
 				$this->only_nation_edit = $this->edit_rights[0];
 			}
-			if (count($this->athlet_rights) == 1)
+			if (count($this->athlete_rights) == 1)
 			{
-				$this->only_nation_athlet = $this->athlet_rights[0];
+				$this->only_nation_athlete = $this->athlete_rights[0];
 			}
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
 		}
@@ -127,7 +127,7 @@ class boranking extends soranking
 	/**
 	 * Checks if the user is admin or has ACL-settings for a required right and a nation
 	 *
-	 * Editing athlets data is mapped to EGW_ACL_ADD.
+	 * Editing athletes data is mapped to EGW_ACL_ADD.
 	 * Having EGW_ACL_ADD for NULL=international, is equivalent to having that right for ANY nation.
 	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international

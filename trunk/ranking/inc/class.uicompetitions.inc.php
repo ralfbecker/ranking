@@ -321,9 +321,14 @@ class uicompetitions extends boranking
 					break;
 					
 				case 'delete':
-					if ($this->comp->has_results($id))
+					if (!$this->is_admin && $this->comp->read(array('WetId' => $id)) &&
+						!in_array($this->comp->data['nation'],$this->edit_rights))
 					{
-						$msg = lang('You need to delete the competitions results first !!!');
+						$msg = lang('Permission denied !!!');
+					}
+					elseif ($this->comp->has_results($id))
+					{
+						$msg = lang('You need to delete the results first !!!');
 					}
 					else
 					{

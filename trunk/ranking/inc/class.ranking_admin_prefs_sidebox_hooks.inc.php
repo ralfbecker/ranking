@@ -32,8 +32,8 @@ class ranking_admin_prefs_sidebox_hooks
 					'menuaction' => 'ranking.uicups.index' )),
 				/*'Categories' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.ranking.cat_edit' )),*/
-				'Athlets' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiathlets.index' )),
+				'Athletes' => $GLOBALS['phpgw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiathletes.index' )),
 			);
 			display_sidebox($appname,$GLOBALS['phpgw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 		}

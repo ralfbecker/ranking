@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.athlete.list.rows" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="7%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="7%"/>
+				<column width="10%"/>
+				<column width="15%"/>
+				<column width="25%"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-filterheader options="Nation..." align="center" id="nation" no_lang="1"/>
+					<nextmatch-filterheader id="nachname" options="Last name..." no_lang="1"/>
+					<nextmatch-filterheader id="vorname" options="First name..." no_lang="1"/>
+					<nextmatch-filterheader options="Gender..." id="sex" align="center"/>
+					<nextmatch-sortheader id="geb_date" align="center" label="Birthdate"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-sortheader label="Federation" id="verband"/>
+					<nextmatch-sortheader label="Last competition" id="last_comp"/>
+					<description value="Action" align="center"/>
+				</row>
+				<row class="nmr">
+					<description id="${row}[nation]" align="center" no_lang="1"/>
+					<description id="${row}[nachname]" no_lang="1"/>
+					<description class="ml10" no_lang="1" id="${row}[vorname]"/>
+					<menulist>
+						<menupopup align="center" id="${row}[sex]" readonly="true"/>
+					</menulist>
+					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
+					<description 1="image" 2="image" 3="image" no_lang="1" id="${row}[ort]"/>
+					<description id="${row}[verband]" no_lang="1"/>
+					<date id="${row}[last_comp]" readonly="true"/>
+					<hbox align="center">
+						<button id="view[$row_cont[PerId]]" image="view" label="View" statustext="View this athlete"/>
+						<button label="Edit" align="center" id="edit[$row_cont[PerId]]" image="edit" statustext="Edit this athlete"/>
+						<button id="delete[$row_cont[PerId]]" image="delete" label="Delete" onclick="return confirm('Delete this athlete');" statustext="Delete this athlete"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
+		</styles>
+	</template>
+	<template id="ranking.athlete.list" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description class="redItalic" id="msg" align="center" no_lang="1"/>
+				</row>
+				<row>
+					<nextmatch options="ranking.athlete.list.rows" id="nm"/>
+				</row>
+				<row>
+					<button label="Add" id="nm[rows][edit][0]" statustext="add a new athlete"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
