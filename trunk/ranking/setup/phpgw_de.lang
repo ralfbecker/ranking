@@ -1,0 +1,85 @@
+%d matches on search criteria	ranking	de	%d Treffer bei der Suche
+aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
+all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
+allways	ranking	de	Immer
+before	ranking	de	vor
+before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)
+better result splits ties	ranking	de	Besseres Ergebnis bricht Gleichstände auf
+birthyears from	ranking	de	Geburtsjahr von
+category saved	ranking	de	Kategorie gespeichert
+cathegories	ranking	de	Ketegorien
+competition saved	ranking	de	Wettkampf gespeichert
+competitions	ranking	de	Wettkämpfe
+cup	ranking	de	Cup
+cup saved	ranking	de	Cup gespeichert
+cup the competition is part of or none	ranking	de	Cup zu dem der Wettkampf gehört oder keiner
+cuppattern	ranking	de	Muster des Cups
+cups	ranking	de	Cups
+defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
+defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
+deletes the competition with all it results	ranking	de	Löscht den Wettkampf mit all seinen Ergebnissen
+duration	ranking	de	Länge
+duration in days or textual competitiondate like 'july 2002'	ranking	de	Länge in Tagen oder ein Text wie 'Juli 2002' für das Wettkampfdatum
+entry not found !!!	ranking	de	Eintrag nicht gefunden
+entry saved	ranking	de	Eintrag gespeichert
+error: key '%s' exists already, it has to be unique !!!	ranking	de	Fehler: Der Schlüssel '%s' existiert bereits, er muss einmalig sein !!!
+error: saveing !!!	ranking	de	Fehler: beim Speichern !!!
+error: writeing !!!	ranking	de	Fehler: beim Schreiben !!!
+factor	ranking	de	Faktor
+female	ranking	de	weiblich
+fieldfactorpoints	ranking	de	Feldfaktorpunkte
+full cathegory name (must not be empty)	ranking	de	vollständiger Name der Kategorie (darf nicht leer sein)
+full competition name (must not be empty)	ranking	de	vollständiger Name des Wettkampfs (darf nicht leer sein)
+full cup name (must not be empty)	ranking	de	vollständiger Name des Cups (darf nicht leer sein)
+gender	ranking	de	Geschlecht
+grpid	ranking	de	GrpId
+homepage	ranking	de	Internetadresse
+how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	de	wie wird der Schlüssel für den Cup dieser Kategorie gebildet, zB. '??_WC' für den Weltcup (?? wird durch das Jahr ersetzt)
+how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
+how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athletehn des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
+if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
+if competiton is an open / qualificatio for an other competition and only the better one gets points awarded select the main-comp. or none	ranking	de	Wenn der Wettkampf ein Open / Qualification für einen anderen Wettkampf ist und nur das bessere Ergebnis berücksichtigt werden soll, hier den Hauptwettkampf auswählen oder keinen
+key	ranking	de	Schlüssel
+key must not be empty !!!	ranking	de	Schlüssel darf nicht leer sein
+male	ranking	de	männlich
+name	ranking	de	Name
+nation	ranking	de	Nation
+nation if national competition or none for an internatinal one	ranking	de	Nation falls es sich um einen natinalen Wettkampf handelt oder keine für einen internationalen
+no never	ranking	de	Nein niemals
+none	ranking	de	Keine(r)
+nothing matched search criteria !!!	ranking	de	Keine Treffer auf ihre Suchanfrage !!!
+number of competitions counting	ranking	de	Anzahl der gewerteten Wettkämpfe
+only if competition is counting	ranking	de	Nur wenn der Wettkampf gewertet wird
+pointalocation	ranking	de	Punkteverteilung
+previous rankingsystem	ranking	de	vorhergegendes Ranglistensystem
+ranking	common	de	Ranglisten
+rankings	ranking	de	Ranglisten
+rankings - categories	ranking	de	Ranglisten - Ketegorien
+rankings - cathegories	ranking	de	Ranglisten - Ketegorien
+rankings - competitions	ranking	de	Ranglisten - Wettkämpfe
+rankings - cups	ranking	de	Ranglisten - Cups
+rankingsystem	ranking	de	Ranglistensystem
+read / searches for competitions matching the above criteria	ranking	de	Liest / sucht nach Wettkämpfen die den angegebenen Kriterien entsprechen
+results	ranking	de	Ergebnis
+saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
+select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
+serid	ranking	de	SerId
+short	ranking	de	Abkürzung
+short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
+startdate	ranking	de	Startdatum
+startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darft nicht leer sein)
+starts the cathegory editor	ranking	de	Startet das Bearbeiten der Kategorien
+starts the competition editor	ranking	de	Startet das Bearbeiten der Wettkämpfe
+starts the cup editor	ranking	de	Startet das Bearbeiten der Cups
+starts the result editor	ranking	de	Startet die Ergebnis Eingabe
+til place	ranking	de	bis Platz
+to year	ranking	de	bis Jahr
+unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
+unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
+use better result to break ties in the ranking	ranking	de	Benutze ein besseres Ergebnis um Gleichstände in der Rangliste aufzubrechen
+used to preset a link in rankings and competition-calendar	ranking	de	wird benutzt um einen Verweis in der Rangliste oder dem Wettkampfkalender anzuzeigen
+wetid	ranking	de	WetId
+which birthyear are allowd in this cathegory, if it is limited on this	ranking	de	Welche Jahrgänge sind in dieser Kategorie zulässig, falls sie darin begrenzt ist
+which cathegories are competing	ranking	de	Welche Kategorien nehmen teil
+which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	de	welche Punkteverteilung soll benützt werden um den Feldfaktor zu berechnen, normalerweise CUWR oder keiner, wenn kein Feldfaktor benutzt wird
+which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem wurde zuvor benützt, wenn überhaupt
