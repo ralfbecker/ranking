@@ -12,9 +12,9 @@
 
 /* $Id$ */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.uiranking.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 
-class uicompetitions extends uiranking 
+class uicompetitions extends boranking 
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -27,7 +27,9 @@ class uicompetitions extends uiranking
 
 	function uicompetitions()
 	{
-		$this->uiranking();
+		$this->boranking();
+
+		$this->tmpl =& CreateObject('etemplate.etemplate');
 	}
 
 	/**
@@ -72,7 +74,15 @@ class uicompetitions extends uiranking
 			//echo "<br>uicompetitions::edit: content ="; _debug_array($content);
 			$this->comp->data = $content['comp_data'];
 			unset($content['comp_data']);
-
+			
+			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] && 
+				$this->cup->read(array('SerId' => $content['serie'])))
+			{
+				foreach($this->cup->data['presets']+array('gruppen' => $this->cup->data['gruppen']) as $key => $val)
+				{
+					$content[$key] = $val;
+				}
+			}
 			$this->comp->data_merge($content);
 			//echo "<br>uicompetitions::edit: comp->data ="; _debug_array($this->comp->data);
 
@@ -80,7 +90,24 @@ class uicompetitions extends uiranking
 			{
 				if (!$this->comp->data['rkey'])
 				{
-					$msg .= $this->messages['rkey_empty'];
+					// generate an rkey using the cup's rkey or the year as prefix
+					$pattern = date('y');
+					if ($this->comp->data['serie'] && $this->cup->read(array('SerId' => $this->comp->data['serie'])))
+					{
+						$pattern = $this->cup->data['rkey'];
+						if (strlen($pattern) > 5) $pattern = str_replace('_','',$pattern);
+					}
+					$n = 0;					
+					do
+					{
+						$this->comp->data['rkey'] = $pattern . '_' . strtoupper(
+							(!$this->comp->data['dru_bez'] ? ++$n :					// number starting with 1
+							(++$n < 2 ? substr($this->comp->data['dru_bez'],0,2) : 	// 2 char shortcut from dru_bez
+							$this->comp->data['dru_bez'][0].$n)));					// 1. char from dru_bez plus number
+					}
+					while ($this->comp->not_unique());
+
+					//$msg .= $this->messages['rkey_empty'];
 				}
 				elseif ($this->comp->not_unique())
 				{
@@ -227,7 +254,15 @@ class uicompetitions extends uiranking
 					break;
 					
 				case 'delete':
-					$msg = 'delete is not yet implemented!!!';
+					if ($this->comp->has_results($id))
+					{
+						$msg = lang('You need to delete the competitions results first !!!');
+					}
+					else
+					{
+						$msg = $this->comp->delete(array('WetId' => $id)) ? lang('Competition deleted') :
+							lang('Error: deleting competition !!!');
+					}						
 					break;
 			}						
 		}

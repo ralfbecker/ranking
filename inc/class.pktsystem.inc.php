@@ -47,9 +47,9 @@ class pktsystem extends so_sql
 	@function pktsytem
 	@abstract pktsystem of the competition class
 	*/
-	function pktsystem($source_charset='')
+	function pktsystem($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','rang.PktSysteme');	// call constructor of derived class
+		$this->so_sql('ranking','PktSysteme',$db);	// call constructor of derived class
 
 /*    not needed so far
 		$this->pkte = new so_sql;

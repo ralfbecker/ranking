@@ -47,10 +47,10 @@ class competition extends so_sql
 	@function competition
 	@abstract constructor of the competition class
 	*/
-	function competition($source_charset='')
+	function competition($source_charset='',$db=null)
 	{
 		//$this->debug = 1;
-		$this->so_sql('ranking','rang.Wettkaempfe');	// call constructor of extended class
+		$this->so_sql('ranking','Wettkaempfe',$db);	// call constructor of extended class
 		
 		if ($source_charset) $this->source_charset = $source_charset;
 		
@@ -63,7 +63,7 @@ class competition extends so_sql
 			$egw_name = 'ranking_'.$class;
 			if (!is_object($GLOBALS['egw']->$class))
 			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset);
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
@@ -188,5 +188,30 @@ class competition extends so_sql
 			$nations[$nat] = $nat;
 		}
 		return $nations;
+	}
+	
+	/**
+	 * checks if a competition already has results recorded
+	 *
+	 * @param int/array $keys WetId or array with keys of competition to check, default null = use keys in data
+	 * @return boolean 
+	 */
+	function has_results($keys=null)
+	{
+		if (is_array($keys))
+		{
+			$data_backup = $this->data;
+			if (!$this->read($keys))
+			{
+				$this->data = $data_backup;
+				return false;
+			}
+		}
+		$WetId = is_numeric($keys) ? $keys : $this->data['WetId'];
+		if ($data_backup) $this->data = $data_backup;
+		
+		$this->db->select('Results','count(*)',array('WetId' => $WetId),__LINE__,__FILE__);
+		
+		return $this->db->next_record() && $this->db->f(0);
 	}
 }

@@ -12,9 +12,9 @@
 
 /* $Id$ */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.uiranking.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 
-class uicups extends uiranking 
+class uicups extends boranking 
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -27,7 +27,9 @@ class uicups extends uiranking
 
 	function uicups()
 	{
-		$this->uiranking();
+		$this->boranking();
+
+		$this->tmpl =& CreateObject('etemplate.etemplate');
 	}
 
 	/**

@@ -43,9 +43,9 @@ class cup extends so_sql
 	@function cup
 	@abstract constructor of the cup class
 	*/
-	function cup($source_charset='')
+	function cup($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','rang.Serien');	// call constructor of derived class
+		$this->so_sql('ranking','Serien',$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 		
@@ -58,7 +58,7 @@ class cup extends so_sql
 			$egw_name = 'ranking_'.$class;
 			if (!is_object($GLOBALS['egw']->$class))
 			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset);
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
@@ -83,6 +83,8 @@ class cup extends so_sql
 		{
 			$data['gruppen'] = $this->cats->cat_rexp2rkeys($data['gruppen']);
 		}
+		if ($data['presets']) $data['presets'] = (array) @unserialize($data['presets']);
+
 		return $data;
 	}
 
@@ -106,6 +108,8 @@ class cup extends so_sql
 		{
 			$data['gruppen'] = implode(',',$data['gruppen']);
 		}
+		if (is_array($data['presets'])) $data['presets'] = serialize($data['presets']);
+
 		if (count($data) && $this->source_charset)
 		{
 			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
