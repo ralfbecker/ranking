@@ -16,17 +16,6 @@ include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
 
 class boranking extends soranking 
 {
-	var $messages = array(
-		'not_found' => 'Entry not found !!!',
-		'rkey_empty' => 'Key must not be empty !!!',
-		'nothing_found' => 'Nothing matched search criteria !!!',
-		'anz_found' => '%d matches on search criteria',
-		'cat_saved' => 'Category saved',
-		'comp_saved' => 'Competition saved',
-		'cup_saved' => 'Cup saved',
-		'error_writing' => 'Error: saveing !!!',
-		'rkey_not_unique' => 'Error: Key \'%s\' exists already, it has to be unique !!!'
-	);
 	var $split_by_places = array(
 		'no' => 'No never',
 		'only_counting' => 'Only if competition is counting',
@@ -76,21 +65,13 @@ class boranking extends soranking
 	);
 	var $maxmatches = 12;
 
-	function boranking($lang_on_messages = True)
+	function boranking()
 	{
 		$this->soranking();	// calling the parent constructor
 
 		$this->pkt_names = $this->pkte->names();
 		$this->cat_names = $this->cats->names();
 		$this->rls_names = $this->rls->names();
-		
-		if ($lang_on_messages)
-		{
-			foreach($this->messages as $key => $msg)
-			{
-				$this->messages[$key] = lang($msg);
-			}
-		}
 		
 		if ((int) $GLOBALS['phpgw_info']['user']['preferences']['common']['maxmatchs']) 
 		{
@@ -137,10 +118,6 @@ class boranking extends soranking
 	 */
 	function writeLangFile()
 	{
-		$r =& new uiranking(False);	// no lang on messages
-
-		$add = array_merge($r->messages,$r->split_by_places);
-		$add = array_merge($add,$r->genders);
-		$this->tmpl->writeLangFile('ranking','en',$add);
+		$this->tmpl->writeLangFile('ranking','en',array_merge($this->split_by_places,$this->genders));
 	}
 }

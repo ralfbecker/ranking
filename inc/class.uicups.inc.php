@@ -50,7 +50,7 @@ class uicups extends boranking
 	{
 		if (($_GET['rkey'] || $_GET['SerId']) && !$this->cup->read($_GET))
 		{
-			$msg .= $this->messages['not_found'];
+			$msg .= lang('Entry not found !!!');
 		}
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
@@ -82,19 +82,19 @@ class uicups extends boranking
 			{
 				if (!$this->cup->data['rkey'])
 				{
-					$msg .= $this->messages['rkey_empty'];
+					$msg .= lang('Key must not be empty !!!');
 				}
 				elseif ($this->cup->not_unique())
 				{
-					$msg .= sprintf($this->messages['rkey_not_unique'],$this->cup->data['rkey']);
+					$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->cup->data['rkey']);
 				}
 				elseif ($this->cup->save())
 				{
-					$msg .= $this->messages['error_writing'];
+					$msg .= lang('Error: while saving !!!');
 				}
 				else
 				{
-					$msg .= $this->messages['cup_saved'];
+					$msg .= lang('Cup saved');
 
 					if ($content['save']) $content['cancel'] = true;	// leave dialog now
 				}
