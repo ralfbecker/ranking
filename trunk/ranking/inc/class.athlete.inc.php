@@ -138,11 +138,11 @@ class athlete extends so_sql
 	 */
 	function distinct_list($column,$keys='')
 	{
-		//echo "<p>athlete::distinct_list('$column','$nation')</p>\n";
+		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),")</p>\n";
 		if (!($column = array_search($column,$this->db_cols))) return false;
 
 		if ($keys && !is_array($keys)) $keys = array('nation' => $keys);
-
+		
 		$values = array();
 		foreach((array)$this->search(array(),'DISTINCT '.$column,$column,'','',true,'AND',false,$keys) as $data)
 		{
