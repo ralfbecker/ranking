@@ -60,7 +60,7 @@ class uicups extends boranking
 				$this->cup->data['nation'] = $this->edit_rights[0];
 			}
 			// we have no edit-rights for that nation
-			if (!in_array($this->cup->data['nation'] ? $this->cup->data['nation'] : 'NULL',$this->edit_rights))
+			if (!$this->acl_check($this->cup->data['nation'],EGW_ACL_EDIT))
 			{
 				$view = true;
 			}
@@ -78,7 +78,7 @@ class uicups extends boranking
 			$this->cup->data_merge($content);
 			//echo "<br>uicups::edit: cup->data ="; _debug_array($this->cup->data);
 
-			if (($content['save'] || $content['apply']) && in_array($content['nation'],$this->edit_rights))
+			if (($content['save'] || $content['apply']) && $this->acl_check($content['nation'],EGW_ACL_EDIT))
 			{
 				if (!$this->cup->data['rkey'])
 				{
@@ -94,7 +94,7 @@ class uicups extends boranking
 				}
 				else
 				{
-					$msg .= lang('Cup saved');
+					$msg .= lang('%1 saved',lang('Cup'));
 
 					if ($content['save']) $content['cancel'] = true;	// leave dialog now
 				}
@@ -103,7 +103,7 @@ class uicups extends boranking
 			{
 				$this->tmpl->location(array('menuaction'=>'ranking.uicups.index'));
 			}
-			if ($content['delete'] && in_array($content['nation'],$this->edit_rights))
+			if ($content['delete'] && $this->acl_check($content['nation'],EGW_ACL_EDIT))
 			{
 				$this->index(array(
 					'nm' => array(
@@ -147,7 +147,7 @@ class uicups extends boranking
 				$readonlys['presets'][$name] = true;
 			}
 		}
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('edit cup');
+		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('cup'));
 		$this->tmpl->read('ranking.cup.edit');
 		$this->tmpl->exec('ranking.uicups.edit',$content,
 			$sel_options,$readonlys,array(
@@ -184,7 +184,7 @@ class uicups extends boranking
 		$readonlys = array();
 		foreach($rows as $row)
 		{
-			if (!$this->is_admin && !in_array($row['nation']?$row['nation']:'NULL',$this->edit_rights))
+			if (!$this->acl_check($row['nation'],EGW_ACL_EDIT))
 			{
 				$readonlys["edit[$row[SerId]]"] = $readonlys["delete[$row[SerId]]"] = true;
 			}
@@ -236,7 +236,7 @@ class uicups extends boranking
 					
 				case 'delete':
 					$msg = $this->cup->delete(array('SerId' => $id)) ? 
-						lang('Cup deleted') : lang('Error: deleting cup !!!');
+						lang('%1 deleted',lang('Cup')) : lang('Error: deleting %1 !!!',lang('Cup'));
 					break;
 			}						
 		}

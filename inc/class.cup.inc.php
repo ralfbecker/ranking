@@ -12,37 +12,18 @@
 
 	/* $Id$ */
 
-require_once(PHPGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
+require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
-/*!
-@class cup
-@abstract cup object
-*/
+/**
+ * cup object
+ */
 class cup extends so_sql
 {
-	/* var $public_functions = array(
-		'init'	=> True,
-		'read'	=> True,
-		'save'	=> True,
-		'delete'	=> True,
-		'search'	=> True,
-	) */	// set in so_sql
-/* set by so_sql('ranking','rang.Serien'):
-	var $table_name = 'rang.Serien';
-	var $autoinc_id = 'SerId';
-	var $db_key_cols = array('SerId' => 'SerId');
-	var $db_data_cols = array(
-		'rkey' => 'rkey', 'name' => 'name', 'max_serie' => 'max_serie', 'faktor' => 'faktor',
-		'serie' => 'serie', 'pkte' => 'pkte','split_by_places' => 'split_by_places',
-		'nation' => 'nation', 'gruppen' => 'gruppen',
-	);
-*/
 	var $charset,$source_charset;
 
-	/*!
-	@function cup
-	@abstract constructor of the cup class
-	*/
+	/**
+	 * constructor of the cup class
+	 */
 	function cup($source_charset='',$db=null)
 	{
 		$this->so_sql('ranking','Serien',$db);	// call constructor of derived class
@@ -55,20 +36,20 @@ class cup extends so_sql
 				'cats'  => 'category',
 			) as $var => $class)
 		{
-			$egw_name = 'ranking_'.$class;
-			if (!is_object($GLOBALS['egw']->$class))
+			$egw_name = /*'ranking_'.*/$class;
+			if (!is_object($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
+				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$this->source_charset,$this->db);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
 	}
 
-	/*!
-	@function db2data
-	@abstract changes the data from the db-format to our work-format
-	@param $data if given works on that array and returns result, else works on internal data-array
-	*/
+	/**
+	 * changes the data from the db-format to our work-format
+	 * @param array $data if given works on that array and returns result, else works on internal data-array
+	 * @return array
+	 */
 	function db2data($data=0)
 	{
 		if (!is_array($data))
@@ -88,11 +69,11 @@ class cup extends so_sql
 		return $data;
 	}
 
-	/*!
-	@function data2db
-	@abstract changes the data from our work-format to the db-format
-	@param $data if given works on that array and returns result, else works on internal data-array
-	*/
+	/**
+	 * changes the data from our work-format to the db-format
+	 * @param array $data if given works on that array and returns result, else works on internal data-array
+	 * @return array
+	 */
 	function data2db($data=0)
 	{
 		if (!is_array($data))
@@ -117,10 +98,11 @@ class cup extends so_sql
 		return $data;
 	}
 
-	/*!
-	@function search
-	@abstract reimplmented from so_sql to exclude some cols from search and to calc. year from rkey
-	*/
+	/**
+	 * Search for cups
+	 *
+	 * reimplmented from so_sql to exclude some cols from search and to calc. year from rkey
+	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
 		unset($criteria['pkte']);	// is always set
@@ -134,18 +116,22 @@ class cup extends so_sql
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 	}
 
-	/*!
-	@function names
-	@param $keys array with col => value pairs to limit name-list, like for so_sql.search
-	@returns array with all Cups of form SerId => name
-	*/
+	/**
+	 * get the names of all or certain cups, eg. to use in a selectbox
+	 *
+	 * @param array/string $keys array with col => value pairs to limit name-list, like for so_sql.search
+	 *	or string with nation
+	 * @return array with all Cups of form SerId => name
+	 */
 	function names($keys=array(),$rkey_only=false)
 	{
+		if (!is_array($keys)) $keys = $keys ? array('nation' => ($keys == 'NULL' ? null : $keys)) : array();
+		
 		$names = array();
-		foreach((array)$this->search(array(),False,'year DESC','','',true,'AND',false,$keys ) as $data)
+		foreach((array)$this->search(array(),False,'year DESC','','',true,'AND',false,$keys) as $data)
 		{
 			$names[$data['SerId']] = $data['rkey'].($rkey_only ? '' : ': '.$data['name']);
 		}
 		return $names;
 	}
-};
+}

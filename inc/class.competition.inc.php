@@ -1,43 +1,24 @@
 <?php
-	/**************************************************************************\
-	* eGroupWare - digital ROCK Rankings - Competition Object                  *
-	* http://www.egroupware.org, http://www.digitalROCK.de                     *
-	* Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
-	* --------------------------------------------                             *
-	*  This program is free software; you can redistribute it and/or modify it *
-	*  under the terms of the GNU General Public License as published by the   *
-	*  Free Software Foundation; either version 2 of the License, or (at your  *
-	*  option) any later version.                                              *
-	\**************************************************************************/
+/**************************************************************************\
+* eGroupWare - digital ROCK Rankings - Competition Object                  *
+* http://www.egroupware.org, http://www.digitalROCK.de                     *
+* Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
+* --------------------------------------------                             *
+*  This program is free software; you can redistribute it and/or modify it *
+*  under the terms of the GNU General Public License as published by the   *
+*  Free Software Foundation; either version 2 of the License, or (at your  *
+*  option) any later version.                                              *
+\**************************************************************************/
 
-	/* $Id$ */
+/* $Id$ */
 
-require_once(PHPGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
+require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
-/*!
-@class competition
-@abstract competition object
-*/
+/**
+ * competition object
+ */
 class competition extends so_sql
 {
-	/*var $public_functions = array(
-		'init'	=> True,
-		'read'	=> True,
-		'save'	=> True,
-		'delete'	=> True,
-		'search'	=> True,
-	) */	// set in so_sql
-/* set by so_sql('ranking','rang.Wettkaempfe'):
-	var $table_name = 'rang.Wettkaempfe';
-	var $autoinc_id = 'WetId';
-	var $db_key_cols = array('WetId' => 'WetId');
-	var $db_data_cols = array(
-		'rkey' => 'rkey', 'name' => 'name', 'dru_bez' => 'dru_bez', 'datum' => 'datum',
-		'pkte' => 'pkte', 'pkt_bis' => 'pkt_bis', 'feld_pkte' => 'feld_pkte', 'feld_bis' => 'feld_bis',
-		'faktor' => 'faktor', 'serie' => 'serie', 'open' => 'open','nation' => 'nation',
-		'gruppen' => 'gruppen', 'homepage' => 'homepage'
-	);
-*/
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 		'durartion' => 'duration'
 	);
@@ -52,10 +33,9 @@ class competition extends so_sql
 	);
 	var $vfs_pdf_dir = '';
 
-	/*!
-	@function competition
-	@abstract constructor of the competition class
-	*/
+	/**
+	 * constructor of the competition class
+	 */
 	function competition($source_charset='',$db=null,$vfs_pdf_dir='')
 	{
 		//$this->debug = 1;
@@ -69,10 +49,10 @@ class competition extends so_sql
 				'cats'  => 'category',
 			) as $var => $class)
 		{
-			$egw_name = 'ranking_'.$class;
-			if (!is_object($GLOBALS['egw']->$class))
+			$egw_name = /*'ranking_'.*/$class;
+			if (!is_object($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
+				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$this->source_charset,$this->db);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
@@ -98,11 +78,11 @@ class competition extends so_sql
 		$this->data_merge($keys);
 	}
 
-	/*!
-	@function db2data
-	@abstract changes the data from the db-format to our work-format
-	@param $data if given works on that array and returns result, else works on internal data-array
-	*/
+	/**
+	 * changes the data from the db-format to our work-format
+	 * @param array $data if given works on that array and returns result, else works on internal data-array
+	 * @return array
+	 */
 	function db2data($data=0)
 	{
 		if (!is_array($data))
@@ -124,11 +104,11 @@ class competition extends so_sql
 		return $data;
 	}
 
-	/*!
-	@function data2db
-	@abstract changes the data from our work-format to the db-format
-	@param $data if given works on that array and returns result, else works on internal data-array
-	*/
+	/**
+	 * changes the data from our work-format to the db-format
+	 * @param array $data if given works on that array and returns result, else works on internal data-array
+	 * @return array
+	 */
 	function data2db($data=0)
 	{
 		if (!is_array($data))
@@ -152,10 +132,11 @@ class competition extends so_sql
 		return $data;
 	}
 
-	/*!
-	@function search
-	@abstract reimplmented from so_sql unset/not use some columns in the search
-	*/
+	/**
+	 * Search for competitions
+	 *
+	 * reimplmented from so_sql unset/not use some columns in the search
+	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
 		unset($criteria['pkte']);	// is allways set
@@ -168,11 +149,12 @@ class competition extends so_sql
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 	}
 
-	/*!
-	@function names
-	@param $keys likes to limit name-list, like for so_sql.search
-	@returns array with all Competitions of form WetId => name
-	*/
+	/**
+	 * get the names of all or certain competitions, eg. to use in a selectbox
+	 *
+	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
+	 * @returns array with all Cups of form SerId => name
+	 */
 	function names($keys=array())
 	{
 		$names = array();
@@ -185,6 +167,7 @@ class competition extends so_sql
 	
 	/**
 	 * get the nations of the competitions
+	 *
 	 * @return array with nations as key and value
 	 */
 	function nations()
@@ -325,7 +308,7 @@ class competition extends so_sql
 					'relatives' => array(RELATIVE_NONE|VFS_REAL,RELATIVE_ROOT),
 				)))
 			{
-				$error_msg = lang("Can not move '%1' to $vfs_path !!!",$path,$vfs_path);
+				$error_msg = lang("Can not move '%1' to %2 !!!",$path,$vfs_path);
 				return false;
 			}
 		}
