@@ -1,2 +1,4 @@
+/* $Id$ */
 .gray { color: gray; }
 .redItalic { color: red; font-style: italic; }
+.bold { font-weight: bold; }

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.cup.list.rows" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column width="50%"/>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-sortheader label="Year" align="center" id="year"/>
+					<nextmatch-sortheader label="Name" id="name"/>
+					<nextmatch-filterheader align="center" options="Nation..." id="nation" no_lang="1"/>
+					<nextmatch-sortheader label="Key" align="center" id="rkey"/>
+					<description value="Action" align="center"/>
+				</row>
+				<row class="row">
+					<description align="center" id="${row}[year]" no_lang="1"/>
+					<html class="ml10" no_lang="1" id="${row}[name]"/>
+					<description no_lang="1" align="center" id="${row}[nation]"/>
+					<description no_lang="1" align="center" id="${row}[rkey]"/>
+					<hbox align="center">
+						<button label="View" align="center" id="view[$row_cont[SerId]]" image="view"/>
+						<button label="Edit" align="center" id="edit[$row_cont[SerId]]" image="edit"/>
+						<button label="Delete" align="center" id="delete[$row_cont[SerId]]" image="delete" onclick="return confirm('Delete this cup');"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
+		</styles>
+	</template>
+	<template id="ranking.cup.list" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" id="msg"/>
+					<description/>
+				</row>
+				<row>
+					<nextmatch options="ranking.cup.list.rows" span="all" align="center" id="nm"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

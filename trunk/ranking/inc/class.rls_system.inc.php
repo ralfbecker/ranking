@@ -37,15 +37,55 @@ class rls_system extends so_sql
 		'end_pflicht_tol' => 'end_pflicht_tol', 'anz_digits' => 'anz_digits'
 	);
 */
+	var $charset,$source_charset;
+
 	/*!
 	@function rls_sytem
 	@abstract constructor of the rls_system class
 	*/
-	function rls_system($key=0)
+	function rls_system($source_charset='')
 	{
 		$this->so_sql('ranking','rang.RangListenSysteme');	// call constructor of derived class
 
-		if ($key) $this->read($key);
+		if ($source_charset) $this->source_charset = $source_charset;
+		
+		$this->charset = $GLOBALS['phpgw']->translation->charset();
+	}
+
+	/*!
+	@function db2data
+	@abstract changes the data from the db-format to our work-format
+	@param $data if given works on that array and returns result, else works on internal data-array
+	*/
+	function db2data($data=0)
+	{
+		if (!is_array($data))
+		{
+			$data =& $this->data;
+		}
+		if (count($data) && $this->source_charset)
+		{
+			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+		}
+		return $data;
+	}
+
+	/*!
+	@function data2db
+	@abstract changes the data from our work-format to the db-format
+	@param $data if given works on that array and returns result, else works on internal data-array
+	*/
+	function data2db($data=0)
+	{
+		if (!is_array($data))
+		{
+			$data =& $this->data;
+		}
+		if (count($data) && $this->source_charset)
+		{
+			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+		}
+		return $data;
 	}
 
 	/*!

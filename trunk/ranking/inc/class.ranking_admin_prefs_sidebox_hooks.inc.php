@@ -1,16 +1,16 @@
 <?php
-	/**************************************************************************\
-	* eGroupWare - Ranking Admin-, Preferences- and SideboxMenu-Hooks          *
-	* http://www.eGroupWare.org                                                *
-	* Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
-	* -------------------------------------------------------                  *
-	*  This program is free software; you can redistribute it and/or modify it *
-	*  under the terms of the GNU General Public License as published by the   *
-	*  Free Software Foundation; either version 2 of the License, or (at your  *
-	*  option) any later version.                                              *
-	\**************************************************************************/
+/**************************************************************************\
+* eGroupWare - Ranking Admin-, Preferences- and SideboxMenu-Hooks          *
+* http://www.eGroupWare.org                                                *
+* Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
+* -------------------------------------------------------                  *
+*  This program is free software; you can redistribute it and/or modify it *
+*  under the terms of the GNU General Public License as published by the   *
+*  Free Software Foundation; either version 2 of the License, or (at your  *
+*  option) any later version.                                              *
+\**************************************************************************/
 
-	/* $Id$ */
+/* $Id$ */
 
 class ranking_admin_prefs_sidebox_hooks
 {
@@ -27,11 +27,11 @@ class ranking_admin_prefs_sidebox_hooks
 		{
 			$file = array(
 				'Competitions' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.ranking.competitions' )),
+					'menuaction' => 'ranking.uicompetitions.index' )),
 				'Cups' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.ranking.cup_edit' )),
-				'Categories' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.ranking.cat_edit' )),
+					'menuaction' => 'ranking.uicups.index' )),
+				/*'Categories' => $GLOBALS['phpgw']->link('/index.php',array(
+					'menuaction' => 'ranking.ranking.cat_edit' )),*/
 			);
 			display_sidebox($appname,$GLOBALS['phpgw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 		}
@@ -54,7 +54,10 @@ class ranking_admin_prefs_sidebox_hooks
 		if ($GLOBALS['phpgw_info']['user']['apps']['admin'] && $location != 'preferences')
 		{
 			$file = Array(
-				//'Site configuration' => $GLOBALS['phpgw']->link('/index.php',array('menuaction' => 'ranking.ranking.admin' )),
+				'Site configuration' => $GLOBALS['phpgw']->link('/index.php',array(
+					'menuaction' => 'admin.uiconfig.index',
+					'appname'    => 'ranking',
+				 )),
 				'Nation ACL' => $GLOBALS['phpgw']->link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
 			);
 			if ($location == 'admin')

@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.cup.edit.general" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row" valign="top" height="115">
+					<description options=",,,gruppen" value="Categories"/>
+					<listbox rows="6" no_lang="1" id="gruppen"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%\0">
+			<columns>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description class="nowrap" value="competitions counting" options=",,,max_serie"/>
+					<int id="max_serie" statustext="number of competitions counting for the cup (empty for all)"/>
+				</row>
+				<row class="row">
+					<description value="Pointalocation" options=",,,pkte"/>
+					<menulist>
+						<menupopup no_lang="1" id="pkte" statustext="defines how many points gets awarded for each place in the cup (not ranking)"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Factor" options=",,,faktor"/>
+					<textbox type="float" id="faktor" statustext="all points gets multiplicated with this factor, eg. for different competition types"/>
+				</row>
+				<row class="row">
+					<description value="Better result splits ties" options=",,,split_by_places"/>
+					<menulist>
+						<menupopup id="split_by_places" statustext="Use better result to break ties in the ranking"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description options=",,,max_rang" value="counting for rankings"/>
+					<int id="max_rang" statustext="maximum number of competition counting for the ranking (empty for all)"/>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.nowrap { white-space: nowrap; }\r\n.gray { color: gray; }
+		</styles>
+	</template>
+	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column width="20%"/>
+				<column width="7%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Pointalocation" options=",,,pkte"/>
+					<menulist>
+						<menupopup no_lang="1" id="pkte" statustext="defines how many points gets awarded for each place in the ranking (not cup)"/>
+					</menulist>
+					<description value="til place" options=",,,pkt_bis"/>
+					<menulist>
+						<menupopup type="select-percent" id="pkt_bis" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Factor" options=",,,faktor"/>
+					<textbox type="float" id="faktor" statustext="all points gets multiplicated with this factor, eg. for different competition types" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Fieldfactorpoints" options=",,,feld_pkte"/>
+					<menulist>
+						<menupopup no_lang="1" id="feld_pkte" statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used"/>
+					</menulist>
+					<description value="til place" options=",,,feld_bis"/>
+					<menulist>
+						<menupopup type="select-percent" id="feld_bis" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%"/>
+					</menulist>
+				</row>
+				<row height="100" disabled="!@dru_bez">
+					<description span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.cup.edit.presets" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<description span="all" value="Presets for competitions"/>
+				</row>
+				<row class="row_off">
+					<description options=",,,comp[name]" value="Competition name"/>
+					<textbox size="100" maxlength="100" no_lang="1" id="comp[name]"/>
+				</row>
+				<row>
+					<template content="comp" span="all" id="ranking.comp.edit.ranking"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.cup.edit" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%\0">
+			<columns>
+				<column width="15%"/>
+				<column width="20%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<description span="2" class="redItalic" no_lang="1" id="msg"/>
+				</row>
+				<row class="th">
+					<description value="Name" options=",,,name"/>
+					<textbox size="64" maxlength="64" id="name" statustext="full cup name (must not be empty)" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Nation" options=",,,nation"/>
+					<menulist>
+						<menupopup id="nation" statustext="nation if national competition or none for an internatinal one" no_lang="1"/>
+					</menulist>
+					<textbox size="10" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" label="Key"/>
+				</row>
+				<row>
+					<tabbox span="all">
+						<tabs>
+							<tab label="Categories" statustext=""/>
+							<tab label="Ranking" statustext=""/>
+							<tab label="Presets" statustext=""/>
+						</tabs>
+						<tabpanels>
+							<template id="ranking.cup.edit.general"/>
+							<template id="ranking.cup.edit.ranking"/>
+							<template id="ranking.cup.edit.presets"/>
+						</tabpanels>
+					</tabbox>
+				</row>
+				<row>
+					<hbox data="" rows="1" cols="4" span="2">
+						<button label="Save" id="save" statustext="saves the changes made"/>
+						<button label="Apply" id="apply" statustext="apply the changes made"/>
+						<button label="Cancel" id="cancel" statustext="aborts without saving changes"/>
+					</hbox>
+					<button label="Delete" id="delete" statustext="deletes this cup" align="right" onclick="return confirm('deletes this cup');"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

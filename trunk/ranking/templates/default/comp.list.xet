@@ -12,7 +12,7 @@
 				<column/>
 			</columns>
 			<rows>
-				<row class="nmh">
+				<row class="th">
 					<nextmatch-sortheader label="Date" align="center" id="datum"/>
 					<nextmatch-sortheader label="Name" id="name"/>
 					<nextmatch-filterheader options="Nation..." align="center" id="nation" no_lang="1"/>
