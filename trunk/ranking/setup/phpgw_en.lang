@@ -12,17 +12,21 @@ competition name	ranking	en	Competition name
 competitions counting	ranking	en	competitions counting
 counting for rankings	ranking	en	counting for rankings
 cup	ranking	en	Cup
+cup deleted	ranking	en	Cup deleted
 cup...	ranking	en	Cup...
 cuppattern	ranking	en	Cuppattern
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
 delete this competition	ranking	en	Delete this competition
+delete this cup	ranking	en	Delete this cup
 deletes this cup	ranking	en	deletes this cup
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
 duration or textual date	ranking	en	Duration or textual date
 each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
 edit competition	ranking	en	Edit competition
+edit cup	ranking	en	Edit cup
 edit this competition	ranking	en	Edit this competition
+error: deleting cup !!!	ranking	en	Error: deleting cup !!!
 factor	ranking	en	Factor
 fieldfactorpoints	ranking	en	Fieldfactorpoints
 full cathegory name (must not be empty)	ranking	en	full cathegory name (must not be empty)
@@ -39,7 +43,7 @@ if a gender is selected, only athlets of this gender can be in the cathegory (us
 information pdf	ranking	en	Information PDF
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
 nation	ranking	en	Nation
-nation acl	ranking	en	Nation ACL
+nation acl	common	en	Nation ACL
 nation if national competition or internatinal	ranking	en	nation if national competition or internatinal
 nation if national competition or none for an internatinal one	ranking	en	nation if national competition or none for an internatinal one
 nation...	ranking	en	Nation...
