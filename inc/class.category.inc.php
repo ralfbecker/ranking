@@ -44,12 +44,8 @@ class category extends so_sql
 	function category($key=0)
 	{
 		$this->so_sql('ranking','rang.Gruppen');	// call constructor of derived class
-		$this->public_functions += array(
-			'names' => True
-		);
 
-		if ($key)
-			$this->read($key);
+		if ($key) $this->read($key);
 	}
 
 	/*!

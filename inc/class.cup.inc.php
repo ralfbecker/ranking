@@ -45,12 +45,8 @@ class cup extends so_sql
 	function cup($key=0)
 	{
 		$this->so_sql('ranking','rang.Serien');	// call constructor of derived class
-		$this->public_functions += array(
-			'names' => True
-		);
 
-		if ($key)
-			$this->read($key);
+		if ($key) $this->read($key);
 	}
 
 	/*!
@@ -61,13 +57,11 @@ class cup extends so_sql
 	function data2db($data=0)
 	{
 		if ($intern = !is_array($data))
-			$data = $this->data;
-
-		$data['rkey'] = strtoupper($data['rkey']);
-		$data['nation'] = strtoupper($data['nation']);
-
-		if ($intern)
-			$this->data = $data;
+		{
+			$data =& $this->data;
+		}
+		if ($data['rkey']) $data['rkey'] = strtoupper($data['rkey']);
+		if ($data['nation']) $data['nation'] = strtoupper($data['nation']);
 
 		return $data;
 	}
@@ -91,7 +85,7 @@ class cup extends so_sql
 	@param $keys array with col => value pairs to limit name-list, like for so_sql.search
 	@returns array with all Cups of form SerId => name
 	*/
-	function names($keys=array())
+	function names($keys=array(),$rkey_only=false)
 	{
 		$all = $this->search($keys,False,'year DESC');
 
@@ -101,7 +95,7 @@ class cup extends so_sql
 		$names = array();
 		while (list($key,$data) = each($all))
 		{
-			$names[$data['SerId']] = $data['rkey'].': '.$data['name'];
+			$names[$data['SerId']] = $data['rkey'].($rkey_only ? '' : ': '.$data['name']);
 		}
 		return $names;
 	}

@@ -44,11 +44,8 @@ class rls_system extends so_sql
 	function rls_system($key=0)
 	{
 		$this->so_sql('ranking','rang.RangListenSysteme');	// call constructor of derived class
-		$this->public_functions += array(	// init,read,save,delete,search are already set by so_sql
-			'names' => True
-		);
-		if ($key)
-			$this->read($key);
+
+		if ($key) $this->read($key);
 	}
 
 	/*!

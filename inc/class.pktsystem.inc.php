@@ -50,9 +50,6 @@ class pktsystem extends so_sql
 	function pktsystem($key=0)
 	{
 		$this->so_sql('ranking','rang.PktSysteme');	// call constructor of derived class
-		$this->public_functions += array(	// init,read,save,delete,search are already set by so_sql
-			'names' => True
-		);
 
 /*    not needed so far
 		$this->pkte = new so_sql;
@@ -61,8 +58,7 @@ class pktsystem extends so_sql
 		$this->pkte->db_data_cols = $this->db_data_cols_pkte;
 		$this->pkte->so_sql(); // call constructor again manually after setting up fields
 */
-		if ($key)
-			$this->read($key);
+		if ($key) $this->read($key);
 	}
 
 	/*!
