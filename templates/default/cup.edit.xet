@@ -103,10 +103,10 @@
 				</row>
 				<row class="row_off">
 					<description options=",,,comp[name]" value="Competition name"/>
-					<textbox size="100" maxlength="100" no_lang="1" id="comp[name]"/>
+					<textbox size="100" maxlength="100" no_lang="1" id="presets[name]"/>
 				</row>
 				<row>
-					<template content="comp" span="all" id="ranking.comp.edit.ranking"/>
+					<template content="presets" span="all" id="ranking.comp.edit.ranking"/>
 				</row>
 			</rows>
 		</grid>
