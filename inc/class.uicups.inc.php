@@ -140,6 +140,12 @@ class uicups extends boranking
 				$readonlys[$name] = true;
 			}
 			$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
+			$readonlys['presets[name]'] = true;
+			$readonlys['presets'] = array();
+			foreach(array('name','pkte','pkt_bis','faktor','feld_pkte','feld_bis') as $name)
+			{
+				$readonlys['presets'][$name] = true;
+			}
 		}
 		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('edit cup');
 		$this->tmpl->read('ranking.cup.edit');
@@ -229,7 +235,8 @@ class uicups extends boranking
 					break;
 					
 				case 'delete':
-					$msg = 'delete is not yet implemented!!!';
+					$msg = $this->cup->delete(array('SerId' => $id)) ? 
+						lang('Cup deleted') : lang('Error: deleting cup !!!');
 					break;
 			}						
 		}

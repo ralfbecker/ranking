@@ -17,6 +17,7 @@ competitions	ranking	de	Wettkämpfe
 competitions counting	ranking	de	zählende Wettkämpfe
 counting for rankings	ranking	de	zählend für die Rangliste
 cup	ranking	de	Cup
+cup deleted	ranking	de	Cup gelöscht
 cup saved	ranking	de	Cup gespeichert
 cup the competition is part of or none	ranking	de	Cup zu dem der Wettkampf gehört oder keiner
 cup...	ranking	de	Cup...
@@ -26,6 +27,7 @@ defines how many points gets awarded for each place in the cup (not ranking)	ran
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
 delete this competition	ranking	de	Diesen Wettkampf löschen
 delete this competition with all its results	ranking	de	Diesen Wettkampf mit allen seinen Ergebnissen löschen
+delete this cup	ranking	de	Diesen Cup löschen
 deletes this cup	ranking	de	Diesen Cup löschen
 duration	ranking	de	Länge
 duration in days or textual competition-date like 'mid july'	ranking	de	Dauer in Tagen oder Text für Wettkampfdatum wie 'Mitte Juli'
@@ -33,9 +35,11 @@ duration in days or textual competitiondate like 'july 2002'	ranking	de	Länge in
 duration or textual date	ranking	de	Dauer oder Text
 each new upload will overwrite the previous one	ranking	de	jeder neue Upload überschreibt den vorherigen
 edit competition	ranking	de	Wettkampf bearbeiten
+edit cup	ranking	de	Cup bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 entry saved	ranking	de	Eintrag gespeichert
+error: deleting cup !!!	ranking	de	Fehler: beim löschen des Cups !!!
 error: key '%s' exists already, it has to be unique !!!	ranking	de	Fehler: Der Schlüssel '%s' existiert bereits, er muss einmalig sein !!!
 error: saveing !!!	ranking	de	Fehler: beim Speichern !!!
 error: writeing !!!	ranking	de	Fehler: beim Schreiben !!!
@@ -61,7 +65,7 @@ male	ranking	de	männlich
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
 name	ranking	de	Name
 nation	ranking	de	Nation
-nation acl	ranking	de	Nationen ACL
+nation acl	common	de	Nationen ACL
 nation if national competition or internatinal	ranking	de	Nation für nationalen Wettkampf oder international
 nation if national competition or none for an internatinal one	ranking	de	Nation falls es sich um einen natinalen Wettkampf handelt oder keine für einen internationalen
 nation...	ranking	de	Nation...
