@@ -95,8 +95,8 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description options=",,,acl" value="access control"/>
-					<listbox rows="5" id="acl" statustext="deny public display of the checked information" span="all"/>
+					<description options=",,,acl" value="deny public access to"/>
+					<listbox rows="5" id="acl" statustext="deny public display of the checked information" span="all" no_lang="1"/>
 				</row>
 				<row class="row" disabled="!@is_admin">
 					<description options=",,,rkey" value="Key"/>
