@@ -43,9 +43,9 @@ class rls_system extends so_sql
 	@function rls_sytem
 	@abstract constructor of the rls_system class
 	*/
-	function rls_system($source_charset='')
+	function rls_system($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','rang.RangListenSysteme');	// call constructor of derived class
+		$this->so_sql('ranking','RangListenSysteme',$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 		

@@ -91,9 +91,9 @@ class category extends so_sql
 	@function category
 	@abstract constructor of the category class
 	*/
-	function category($source_charset='')
+	function category($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','rang.Gruppen');	// call constructor of derived class
+		$this->so_sql('ranking','Gruppen',$db);	// call constructor of derived class
 		
 		if ($source_charset) $this->source_charset = $source_charset;
 		

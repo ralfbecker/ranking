@@ -12,7 +12,9 @@
 
 /* $Id$ */
 
-class uiranking
+include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
+
+class boranking extends soranking 
 {
 	var $messages = array(
 		'not_found' => 'Entry not found !!!',
@@ -74,32 +76,13 @@ class uiranking
 	);
 	var $maxmatches = 12;
 
-	function uiranking($lang_on_messages = True)
+	function boranking($lang_on_messages = True)
 	{
-		$c =& CreateObject('phpgwapi.config','ranking');
-		$c->read_repository();
-		$this->config = $c->config_data;
-		unset($c);
-		
-		foreach(array(
-				'pkte' => 'pktsystem',
-				'rls'  => 'rls_system',
-				'cats' => 'category',
-				'cup'  => 'cup',
-				'comp' => 'competition',
-			) as $var => $class)
-		{
-			$egw_name = 'ranking_'.$class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$this->config['ranking_db_charset']);
-			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
-		}
+		$this->soranking();	// calling the parent constructor
+
 		$this->pkt_names = $this->pkte->names();
 		$this->cat_names = $this->cats->names();
 		$this->rls_names = $this->rls->names();
-		$this->tmpl =& CreateObject('etemplate.etemplate');
 		
 		if ($lang_on_messages)
 		{
@@ -144,13 +127,6 @@ class uiranking
 				$this->only_nation_edit = $this->edit_rights[0];
 			}
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
-		}
-		// this need to go to the athlet-class
-		$GLOBALS['phpgw']->db->select('rang.Personen','DISTINCT nation',false,__LINE__,__FILE__,false,'ORDER BY nation');
-		while($GLOBALS['phpgw']->db->next_record())
-		{
-			$nat = $GLOBALS['phpgw']->db->f(0);
-			$this->nations[$nat] = $nat;
 		}
 	}
 
