@@ -42,12 +42,21 @@ class competition extends so_sql
 		'durartion' => 'duration'
 	);
 	var $charset,$source_charset;
+	/**
+	 * @var array $attachment_prefixes prefixes of the rkey for the different attachments
+	 */
+	var $attachment_prefixes = array(
+		'info'      => '',
+		'startlist' => 'S',
+		'result'    => 'R',
+	);
+	var $vfs_pdf_dir = '';
 
 	/*!
 	@function competition
 	@abstract constructor of the competition class
 	*/
-	function competition($source_charset='',$db=null)
+	function competition($source_charset='',$db=null,$vfs_pdf_dir='')
 	{
 		//$this->debug = 1;
 		$this->so_sql('ranking','Wettkaempfe',$db);	// call constructor of extended class
@@ -67,6 +76,7 @@ class competition extends so_sql
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
+		if ($vfs_pdf_dir) $this->vfs_pdf_dir = $vfs_pdf_dir;
 	}
 
 	/**
@@ -121,7 +131,7 @@ class competition extends so_sql
 	*/
 	function data2db($data=0)
 	{
-		if ($intern = !is_array($data))
+		if (!is_array($data))
 		{
 			$data =& $this->data;
 		}
@@ -213,5 +223,175 @@ class competition extends so_sql
 		$this->db->select('Results','count(*)',array('WetId' => $WetId),__LINE__,__FILE__);
 		
 		return $this->db->next_record() && $this->db->f(0);
+	}
+	
+	/**
+	 * path of a pdf attachment of a certain type for the competition in data
+	 *
+	 * @param string $type 'info', 'startlist', 'result'
+	 * @param string $rkey rkey to use, default ''=use the one from our internal data
+	 * @return string the path
+	 */	 
+	function attachment_path($type,$rkey='')
+	{
+		if (!$rkey) $rkey = $this->data['rkey'];
+
+		if (is_numeric(substr($rkey,0,2)))
+		{
+			$year = (int) $rkey + ((int) $rkey < 80 ? 2000 : 1900);
+		}
+		else
+		{
+			$year = substr($this->data['datum'],0,4);
+		}
+		return $this->vfs_pdf_dir.'/'.$year.'/'.$this->attachment_prefixes[$type].$rkey.'.pdf';
+	}		
+		
+	/**
+	 * Checks and returns links to the attached files
+	 *
+	 * @param array $keys to read/use a given competitions, default use the already read one
+	 * @param boolean $return_link return links or arrays with vars for the link-function, default false=array
+	 * @return boolean/array links for the keys: info, startlist, result or false on error
+	 */
+	function attachments($keys=null,$return_link=false)
+	{
+		if ($keys && !$this->read($keys)) return false;
+		
+		if (!is_object($GLOBALS['egw']->vfs))
+		{
+			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+		}
+		$attachments = false;
+		foreach($this->attachment_prefixes as $type => $prefix)
+		{
+			$vfs_path = $this->attachment_path($type);
+			if ($GLOBALS['egw']->vfs->file_exists(array(
+					'string' => $vfs_path,
+					'relatives' => RELATIVE_ROOT,
+				)))
+			{
+				$parts = explode('/',$vfs_path); 
+				$file = array_pop($parts);
+				$path = implode('/',$parts);
+				$linkdata = array(
+					'menuaction' => 'filemanager.uifilemanager.view',
+					'path'       => base64_encode($path),
+					'file'       => base64_encode($file),
+				);
+				$attachments[$type] = $return_link ? $GLOBALS['egw']->link('/index.php',$linkdata) : $linkdata;
+			}
+		}
+		return $attachments;
+	}
+	
+	/**
+	 * attaches one or more files as info, startlist or result
+	 *
+	 * @param array $files full path to files for the keys info, startlist and result
+	 * @param string &$error_msg error-messaage if returning false
+	 * @param array $keys to read/use a given competitions, default use the already read one
+	 * @return boolean true on success, false otherwise
+	 */
+	function attach_files($files,&$error_msg,$keys=null)
+	{
+		if ($keys && !$this->read($keys)) return false;
+		
+		if (!is_object($GLOBALS['egw']->vfs))
+		{
+			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+		}
+		foreach($files as $type => $path)
+		{
+			if (!file_exists($path) || !is_readable($path)) 
+			{
+				$error_msg = lang("'%1' does not exist or is not readable by the webserver !!!",$path);
+				return false;
+			}
+			$vfs_path = $this->attachment_path($type);
+			
+			// check and evtl. create the year directory
+			if (!$GLOBALS['egw']->vfs->file_exists($vfs_dir = array(
+					'string' => dirname($vfs_path),
+					'relatives' => RELATIVE_ROOT,
+				)) && !$GLOBALS['egw']->vfs->mkdir($vfs_dir)) 
+			{
+				$error_msg = lang("Can not create directory '%1' !!!",dirname($vfs_path));
+				return false;
+			}
+			if (!$GLOBALS['egw']->vfs->mv(array(
+					'from' => $path,
+					'to'   => $vfs_path,
+					'relatives' => array(RELATIVE_NONE|VFS_REAL,RELATIVE_ROOT),
+				)))
+			{
+				$error_msg = lang("Can not move '%1' to $vfs_path !!!",$path,$vfs_path);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * removes an attached file of $type = info, startlist or result
+	 *
+	 * @param string $type 'info', 'startlist', 'result'
+	 * @param array $keys to read/use a given competitions, default use the already read one
+	 * @return boolean true on success, false otherwise
+	 */
+	function remove_attachment($type,$keys=null)
+	{
+		if ($keys && !$this->read($keys)) return false;
+		
+		if (!is_object($GLOBALS['egw']->vfs))
+		{
+			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+		}
+		$vfs_path_arr = array(
+			'string' => $this->attachment_path($type),
+			'relatives' => RELATIVE_ROOT,
+		);
+		if (!$GLOBALS['egw']->vfs->file_exists($vfs_path_arr) || !$GLOBALS['egw']->vfs->rm($vfs_path_arr)) 
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * renames the attachments to a new rkey
+	 *
+	 * @param string $old_rkey
+	 * @param array $keys to read/use a given competitions, default use the already read one
+	 */
+	function rename_attachments($old_rkey,$keys=null)
+	{
+		//echo "<p>competitions::rename_attachments('$old_rkey',".print_r($keys,true).") data[rkey]='".$this->data['rkey']."'</p>\n";
+		if (!$old_rkey || $keys && !$this->read($keys)) return false;
+		
+		if (!is_object($GLOBALS['egw']->vfs))
+		{
+			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+		}
+		$ok = true;
+		foreach($this->attachment_prefixes as $type => $prefix)
+		{
+			$old_path = $this->attachment_path($type,$old_rkey);
+			$new_path = $this->attachment_path($type);
+			//echo "$old_path --> $new_path<br>\n";
+
+			if ($old_path != $new_path && $GLOBALS['egw']->vfs->file_exists(array(
+					'string' => $old_path,
+					'relatives' => RELATIVE_ROOT,
+				)) && !$GLOBALS['egw']->vfs->mv(array(
+					'from' => $old_path,
+					'to'   => $new_path,
+					'relatives' => array(RELATIVE_ROOT,RELATIVE_ROOT),
+				)))
+			{
+				$ok = false;
+			}
+		}
+		return $ok;
 	}
 }
