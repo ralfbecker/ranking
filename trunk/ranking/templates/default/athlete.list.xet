@@ -36,7 +36,7 @@
 					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
 					<description 1="image" 2="image" 3="image" no_lang="1" id="${row}[ort]"/>
 					<description id="${row}[verband]" no_lang="1"/>
-					<date id="${row}[last_comp]" readonly="true"/>
+					<date id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
 					<hbox align="center">
 						<button id="view[$row_cont[PerId]]" image="view" label="View" statustext="View this athlete"/>
 						<button label="Edit" align="center" id="edit[$row_cont[PerId]]" image="edit" statustext="Edit this athlete"/>

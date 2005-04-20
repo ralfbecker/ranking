@@ -29,6 +29,7 @@ define('ACL_DENY_PROFILE',128);
 class athlete extends so_sql
 {
 	var $charset,$source_charset;
+	var $result_table = 'Results';
 
 	/**
 	 * constructor of the athlete class
@@ -120,13 +121,20 @@ class athlete extends so_sql
 	 *
 	 * reimplmented from so_sql
 	 */
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
+	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
 	{
 		if ($filter['nation'] == 'NULL') $filter['nation'] = null;
 		
 		if (!$criteria) $criteria = 'sex IS NOT NULL AND nation IS NOT NULL';	// only real athletes
-
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
+		
+		if ($join === true)
+		{
+			$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
+			if ($extra_cols) $extra_cols = explode(',',$extra_cols);
+			$extra_cols[] = 'MAX(datum) AS last_comp';
+			$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : '');
+		}
+		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
 	
 	/**
@@ -144,7 +152,7 @@ class athlete extends so_sql
 		if ($keys && !is_array($keys)) $keys = array('nation' => $keys);
 		
 		$values = array();
-		foreach((array)$this->search(array(),'DISTINCT '.$column,$column,'','',true,'AND',false,$keys) as $data)
+		foreach((array)$this->search(array(),'DISTINCT '.$column,$column,'','',true,'AND',false,$keys,'') as $data)
 		{
 			$val = $data[$column];
 			$values[$val] = $val;

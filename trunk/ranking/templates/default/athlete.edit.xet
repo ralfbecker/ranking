@@ -111,14 +111,26 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit.results" template="" lang="" group="0" version="">
-		<grid>
+	<template id="ranking.athlete.edit.results" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%" height="200px" overflow="auto">
 			<columns>
+				<column width="5%"/>
+				<column/>
+				<column/>
 				<column/>
 			</columns>
 			<rows>
-				<row>
-					<description/>
+				<row class="th" height="10">
+					<description value="Place"/>
+					<description value="Competition"/>
+					<description value="Date"/>
+					<description value="Category"/>
+				</row>
+				<row class="row" valign="top">
+					<description id="comp[$row][platz]" no_lang="1" value=" " class="place"/>
+					<html id="comp[$row][name]" no_lang="1"/>
+					<date id="comp[$row][datum]" readonly="true" options="Y-m-d"/>
+					<description id="comp[$row][cat_name]" no_lang="1"/>
 				</row>
 			</rows>
 		</grid>

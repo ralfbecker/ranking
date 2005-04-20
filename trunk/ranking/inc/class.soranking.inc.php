@@ -46,6 +46,10 @@ class soranking
 	 * @var athlete-object $athlet
 	 */
 	var $athlete;
+	/**
+	 * @var result-object $athlet
+	 */
+	var $result;
 	
 	/**
 	 * Constructor
@@ -72,12 +76,13 @@ class soranking
 			$this->db =& $GLOBALS['egw']->db;
 		}
 		foreach(array(
-				'pkte' => 'pktsystem',
-				'rls'  => 'rls_system',
-				'cats' => 'category',
-				'cup'  => 'cup',
-				'comp' => 'competition',
+				'pkte'    => 'pktsystem',
+				'rls'     => 'rls_system',
+				'cats'    => 'category',
+				'cup'     => 'cup',
+				'comp'    => 'competition',
 				'athlete' => 'athlete',
+				'result'  => 'result',
 			) as $var => $class)
 		{
 			$egw_name = /*'ranking_'.*/$class;

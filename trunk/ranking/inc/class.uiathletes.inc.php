@@ -63,9 +63,18 @@ class uiathletes extends boranking
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
-		if (($_GET['rkey'] || $_GET['PerId']) && !$this->athlete->read($_GET))
+		if ($_GET['rkey'] || $_GET['PerId']) 
 		{
-			$msg .= lang('Entry not found !!!');
+			if ($this->athlete->read($_GET))
+			{
+				// read the athletes results
+				$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
+				array_unshift($this->athlete->data['comp'],false);	// need index starting with 1
+			}
+			else
+			{
+				$msg .= lang('Entry not found !!!');
+			}
 		}
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
@@ -106,10 +115,6 @@ class uiathletes extends boranking
 					$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
 					$this->athlete->data['geb_date'] = $old_geb_date;
 				}
-				/*elseif (!$this->athlete->data['rkey'])
-				{
-					$msg .= lang('Key must not be empty !!!');
-				}*/
 				elseif ($this->athlete->not_unique())
 				{
 					$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->athlete->data['rkey']);
@@ -170,7 +175,7 @@ class uiathletes extends boranking
 			}
 			$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
 		}
-		elseif (!$this->athlete->data['PerId'] || $this->athlete->has_results($this->athlete->data['PerId']))
+		elseif (!$this->athlete->data['PerId'] || $this->athlete->data['last_comp'])
 		{
 			$readonlys['delete'] = true;
 		}
@@ -229,7 +234,7 @@ class uiathletes extends boranking
 			{
 				$readonlys["edit[$row[PerId]]"] = $readonlys["delete[$row[PerId]]"] = true;
 			}
-			if ($this->athlete->has_results($row['PerId']))
+			if ($row['last_comp'])
 			{
 				$readonlys["delete[$row[PerId]]"] = true;
 			}
