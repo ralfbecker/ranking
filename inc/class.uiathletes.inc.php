@@ -189,7 +189,7 @@ class uiathletes extends boranking
 	}
 
 	/**
-	 * query cups for nextmatch in the cups list
+	 * query athlets for nextmatch in the athlets list
 	 *
 	 * @param array $query
 	 * @param array &$rows returned rows/cups

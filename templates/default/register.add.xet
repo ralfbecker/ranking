@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.register.add.rows" template="" lang="" group="0" version="1.0.0.001">
+		<grid>
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-filterheader options="Lastname..." no_lang="1" id="nachname"/>
+					<nextmatch-filterheader options="Firstname..." id="vorname" no_lang="1"/>
+					<nextmatch-sortheader label="Birthdate" id="geb_date"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-sortheader label="Last competition" id="last_comp"/>
+					<description value="Action" align="center"/>
+				</row>
+				<row class="row">
+					<description no_lang="1" id="${row}[nachname]"/>
+					<description no_lang="1" id="${row}[vorname]"/>
+					<date id="${row}[geb_date]" readonly="true" options="Y-m-d" align="center"/>
+					<description no_lang="1" id="${row}[ort]"/>
+					<date id="${row}[last_comp]" readonly="true" options="Y-m-d" align="center"/>
+					<button class="small" label="Register" id="register[$row_cont[PerId]]" statustext="Register this athlete for the selected category" onclick="opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.register&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.register.add" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="83"/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
+					<description/>
+				</row>
+				<row class="th">
+					<description options=",,,comp" value="Competition"/>
+					<textbox id="comp_name" onchange="1" size="Select one" no_lang="1" readonly="true"/>
+				</row>
+				<row class="row" disabled="!@comp">
+					<description value="Category" options=",,,cat"/>
+					<menulist>
+						<menupopup id="cat" no_lang="1" onchange="1"/>
+					</menulist>
+				</row>
+				<row disabled="!@cat">
+					<nextmatch span="all" id="nm" options="ranking.register.add.rows"/>
+				</row>
+				<row valign="top">
+					<button label="Close" onclick="window.close()"/>
+					<description/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

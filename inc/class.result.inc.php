@@ -57,12 +57,12 @@ class result extends so_sql
 	 */
 	function &read($keys,$extra_cols='',$join=true,$order='')
 	{
-		if ($order && !preg_match('/^[a-z_, ]+$/i',$order)) $order = '';
+		if ($order && !preg_match('/^[a-z_,. ]+$/i',$order)) $order = '';
 
 		$filter = $keys;
 		foreach(array('WetId','GrpId','PerId') as $key)
 		{
-			if ((int) $keys[$key] > 0)
+			if ((int) $keys[$key])
 			{
 				$this->$key = (int) $keys[$key];
 			}
@@ -77,8 +77,10 @@ class result extends so_sql
 			if ($join === true)
 			{
 				$join = ",$this->athlete_table WHERE $this->result_table.PerId=$this->athlete_table.PerId";
-				$extra_cols = 'nachname,vorname,nation,geb_date';
+				$extra_cols = "nachname,vorname,nation AS nation,geb_date";
 			}
+			if ($this->GrpId < 0) unset($keys['GrpId']);	// return all cats
+
 			return $this->search($keys,false,$order ? $order : 'platz,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
 		}
 		elseif (!$this->WetId && !$this->GrpId && $this->PerId)	// read list comps of one athlet
@@ -140,6 +142,22 @@ class result extends so_sql
 		}
 		return $data;
 	}
+	
+	/**
+	 * Checks if there are any results (platz > 0) for the given keys
+	 *
+	 * @param array $keys with index WetId, PerId and/or GrpId
+	 * @return boolean/int number of found results or false on error
+	 */
+	function has_results($keys)
+	{
+		$keys[] = 'platz > 0';
+
+		$this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__);
+		
+		return $this->db->next_record() ? $this->db->f(0) : false;
+	}
+
 	/**
 	 * searches db for rows matching searchcriteria
 	 *

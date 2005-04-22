@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.register.form" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="83"/>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
+					<description/>
+					<description span="all"/>
+				</row>
+				<row class="th">
+					<description options=",,,comp" value="Competition"/>
+					<menulist>
+						<menupopup id="calendar" onchange="1" options="Select one" no_lang="1"/>
+					</menulist>
+					<menulist>
+						<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
+					</menulist>
+				</row>
+				<row class="row" disabled="!@deadline">
+					<description value="Deadline"/>
+					<date-time id="deadline" readonly="true"/>
+					<description/>
+				</row>
+				<row class="row" disabled="!@registration">
+					<description options=",,,nation" value="Nation"/>
+					<menulist>
+						<menupopup id="nation" onchange="1" options="Select one" no_lang="1"/>
+					</menulist>
+					<button label="Registration" statustext="Register athlets for this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiregistration.add&amp;comp=$cont[comp]&amp;nation=$cont[nation]'),'_blank', 'dependent=yes,width=700,height=500,scrollbars=yes,status=yes'); return false;"/>
+				</row>
+				<row disabled="!@comp">
+					<grid>
+						<columns>
+							<column width="80"/>
+							<column/>
+						</columns>
+						<rows>
+							<row class="th">
+								<description value="Nation"/>
+								<description id="cats[$col][name]" no_lang="1"/>
+							</row>
+							<row class="row">
+								<description id="rows[$row][nation]" no_lang="1" align="center"/>
+								<description 1="label" 2="label" id="rows[$row][$col][cn]" no_lang="1"/>
+							</row>
+						</rows>
+					</grid>
+				</row>
+				<row class="th" disabled="!@count">
+					<description span="all" value="Total of %s Athlets registered in all Categories." no_lang="1" id="count"/>
+				</row>
+				<row class="th" valign="top" disabled="1!@nation">
+					<description value="Teamofficials" options=",,,officials"/>
+					<textbox multiline="true" rows="5" cols="64" id="officials" span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

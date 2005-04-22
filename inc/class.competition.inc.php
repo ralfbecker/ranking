@@ -123,7 +123,7 @@ class competition extends so_sql
 		if ($data['pkt_bis'])  $data['pkt_bis']  = $data['pkt_bis']  == 100 ? '' : 100.0*$data['pkt_bis'];
 		if ($data['feld_bis']) $data['feld_bis'] = $data['feld_bis'] == 100 ? '' : 100.0*$data['feld_bis'];
 		if ($data['rkey'])     $data['rkey'] = strtoupper($data['rkey']);
-		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
+		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? null : strtoupper($data['nation']);
 		if (isset($data['pkte']) && !$data['pkte']) $data['pkte'] = null;
 		if (isset($data['feld_pkte']) && !$data['feld_pkte']) $data['feld_pkte'] = null;
 
@@ -157,10 +157,12 @@ class competition extends so_sql
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
 	 * @returns array with all Cups of form SerId => name
 	 */
-	function names($keys=array())
+	function names($keys=array(),$sort='datum DESC')
 	{
+		if (!preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort)) $sort = 'datum DESC';
+
 		$names = array();
-		foreach((array) $this->search(array(),False,'datum','','',false,'AND',false,$keys) as $data)
+		foreach((array) $this->search(array(),'WetId,rkey,name',$sort,'','',false,'AND',false,$keys) as $data)
 		{
 			$names[$data['WetId']] = $data['rkey'].': '.$data['name'];
 		}
@@ -193,21 +195,24 @@ class competition extends so_sql
 	 */
 	function has_results($keys=null)
 	{
-		if (is_array($keys))
+		if (is_array($keys) || !$keys['WetId'])
 		{
 			$data_backup = $this->data;
-			if (!$this->read($keys))
+			$keys = $this->read($keys);
+			$this->data = $data_backup;
+			
+			if (!$keys)
 			{
-				$this->data = $data_backup;
 				return false;
 			}
 		}
-		$WetId = is_numeric($keys) ? $keys : $this->data['WetId'];
-		if ($data_backup) $this->data = $data_backup;
+		$WetId = !is_array($keys) ? $keys : $keys['WetId'];
 		
-		$this->db->select('Results','count(*)',array('WetId' => $WetId),__LINE__,__FILE__);
+		static $has_results = array();	// little bit of caching
 		
-		return $this->db->next_record() && $this->db->f(0);
+		if (isset($has_results[$WetId])) return $has_results[$WetId];
+		
+		return $has_results[$WetId] = ExecMethod('ranking.result.has_results',array('WetId' => $WetId));
 	}
 	
 	/**
