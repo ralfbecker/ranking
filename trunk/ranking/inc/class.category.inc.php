@@ -67,6 +67,10 @@ class category extends so_sql
 		'SUI_M_B' => 'SUI_H_B',
 		'SUI_M_M' => 'SUI_H_M',
 	);
+	/**
+	 * @var array $cache result from search() without params = all cats
+	 */
+	var $cache = null;
 	var $charset,$source_charset;
 
 	/**
@@ -123,29 +127,92 @@ class category extends so_sql
 	/**
 	 * Search for cups
 	 *
-	 * reimplmented from so_sql to exclude some cols from search
+	 * reimplmented from so_sql to exclude some cols from search and do some caching
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
 		unset($criteria['rls']);	// is always set
 		unset($criteria['vor_rls']);
-
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
+		
+		if ($this->cache)
+		{
+			switch (count($criteria)+count($filter))
+			{
+				case 0:
+					return $this->cache;
+					
+				case 1:
+					$ret = false;
+					list($key,$val) = count($criteria) ? each($criteria) : each($filter);
+					foreach($this->cache as $cat)
+					{
+						if (is_array($val) && in_array($cat[$key],$val) ||
+							!is_array($val) && $cat[$key] == $val)
+						{
+							$ret[] = $cat;
+						}
+					}
+					return $ret;
+			}
+		}
+		$ret =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
+		
+		if (!$this->cache && count($criteria)+count($filter) == 0)
+		{
+			$this->cache =& $ret;
+		}
+		return $ret; 
+	}
+	
+	/**
+	 * read a category, reimplemented to use the cache
+	 */
+	function read($keys)
+	{
+		if (!is_array($keys))
+		{
+			$keys = is_numeric($keys) ? array('GrpId' => (int) $keys) : array('rkey' => $keys);
+		}
+		if ($cache && count($keys) == 1 && ($keys['GrpId'] || $keys['rkey']))
+		{
+			list($key,$val) = each($keys);
+			foreach($this->cache as $cat)
+			{
+				if ($cat[$key] == $val)
+				{
+					return $this->data = $cat;
+				}
+			}
+			return false;
+		}
+		return parent::read($keys);
 	}
 
 	/**
 	 * get the names of all or certain categories, eg. to use in a selectbox
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
-	 * @returns array with all Cups of form GrpId => name
+	 * @param int $rkeys 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
+	 * @returns array with all Cups in the from specified in $rkeys
 	 */
-	function names($keys=array())
+	function &names($keys=array(),$rkeys=2)
 	{
 		if ($keys['nation'] == 'NULL') $keys['nation'] = null;
 
 		$names = array();
-		foreach((array)$this->search(array(),False,'rkey','','',false,'AND',false,$keys) as $data)
+		foreach((array)$this->search($keys,False,'rkey'/*,'','',false,'AND',false,$keys*/) as $data)
 		{
-			$names[$data['rkey']] = $data['rkey'] . ': ' . $data['name'];
+			switch($rkeys)
+			{
+				case 0:
+					$names[$data['GrpId']] = $data['name'];
+					break;
+				case 1:
+					$names[$data['rkey']] = $data['name'];
+					break;
+				default:
+					$names[$data['rkey']] = $data['rkey'] . ': ' . $data['name'];
+					break;
+			}
 		}
 		//echo "<p>category::names(".print_r($keys,true).") = <pre>".print_r($names,true)."</pre>\n";
 		return $names;

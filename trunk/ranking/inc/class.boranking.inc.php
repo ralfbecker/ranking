@@ -14,6 +14,8 @@
 
 include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
 
+define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
+
 class boranking extends soranking 
 {
 	var $split_by_places = array(
@@ -45,6 +47,10 @@ class boranking extends soranking
 	 * @var string $only_nation_athlete nation if there's only one nation the user has athlet-rights to
 	 */
 	var $only_nation_athlete='';
+	/**
+	 * @var string $only_nation_register nation if there's only one nation the user has register-rights to
+	 */
+	var $only_nation_register='';
 	var $tmpl;
 	var $akt_grp; // selected cat to work on
 	/**
@@ -56,9 +62,13 @@ class boranking extends soranking
 	 */
 	var $edit_rights = array();
 	/**
-	 * @var array $athlete_rights nations the user is allowed to edit
+	 * @var array $athlete_rights nations the user is allowed to edit athlets
 	 */
 	var $athlete_rights = array();
+	/**
+	 * @var array $register_rights nations the user is allowed to register athlets for competitions
+	 */
+	var $register_rights = array();
 	/**
 	 * @var boolean $is_admin true if user is an administrator, implies all read- and edit-rights
 	 */
@@ -88,7 +98,12 @@ class boranking extends soranking
 		{
 			if ($data['appname'] != 'ranking' || $data['location'] == 'run') continue;
 
-			foreach(array('read_rights' => EGW_ACL_READ,'edit_rights' => EGW_ACL_EDIT,'athlete_rights' => EGW_ACL_ADD) as $var => $right)
+			foreach(array(
+				'read_rights'     => EGW_ACL_READ,
+				'edit_rights'     => EGW_ACL_EDIT,
+				'athlete_rights'  => EGW_ACL_ADD,
+				'register_rights' => EGW_ACL_REGISTER,
+			) as $var => $right)
 			{
 				if (($data['rights'] & $right) && !in_array($data['location'],$this->$var))
 				{
@@ -120,6 +135,10 @@ class boranking extends soranking
 			{
 				$this->only_nation_athlete = $this->athlete_rights[0];
 			}
+			if (count($this->register_rights) == 1)
+			{
+				$this->only_nation_register = $this->register_rights[0];
+			}
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
 		}
 	}
@@ -128,10 +147,10 @@ class boranking extends soranking
 	 * Checks if the user is admin or has ACL-settings for a required right and a nation
 	 *
 	 * Editing athletes data is mapped to EGW_ACL_ADD.
-	 * Having EGW_ACL_ADD for NULL=international, is equivalent to having that right for ANY nation.
+	 * Having EGW_ACL_ADD or EGW_ACL_REGISTER for NULL=international, is equivalent to having that right for ANY nation.
 	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international
-	 * @param int $required EGW_ACL_{READ|EDIT|ADD}
+	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER}
 	 */
 	function acl_check($nation,$required)
 	{
@@ -142,7 +161,46 @@ class boranking extends soranking
 		if (isset($acl_cache[$nation][$required])) return $acl_cache[$nation][$required];
 		
 		return $acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($nation ? $nation : 'NULL',$required,'ranking') ||
-			$required == EGW_ACL_ADD && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
+			($required == EGW_ACL_ADD || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
+	}
+	
+	function date_over($date)
+	{
+		$now = explode('-',date('Y-m-d'));
+		
+		$over = false;	// same date ==> not over
+		foreach(explode('-',$date) as $i => $n) 
+		{
+			if ((int) $n != (int) $now[$i]) 
+			{
+				$over = $n < $now[$i];
+				break;
+			}
+		}
+		return $over;	// same date ==> not over
+	}
+
+	/**
+	 * Check if user is allowed to register athlets for $comp and $nation
+	 *
+	 * ToDo taking a deadline and competition judges into account !!!
+	 *
+	 * @param int/array $comp WetId or complete competition array
+	 * @param string $nation='' nation of the athlets to register, if empty do a general check independent of nation
+	 */
+	function registration_check($comp,$nation='')
+	{
+		// check for registration rights of given nation, if given
+		$ret = (!$nation || $this->acl_check($nation,EGW_ACL_REGISTER)) && 
+			// check if comp already has a result
+			!$this->comp->has_results($comp) &&
+			// check if comp already happend or registration deadline over
+			(is_array($comp) || ($comp = $this->comp->read($comp))) && 
+			!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']);
+
+		//echo "<p>boranking::registration_check(".print_r($comp,true).",'$nation') = $ret</p>\n";
+		
+		return $ret;
 	}
 
 	/**

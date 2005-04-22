@@ -152,7 +152,7 @@ class athlete extends so_sql
 		if ($keys && !is_array($keys)) $keys = array('nation' => $keys);
 		
 		$values = array();
-		foreach((array)$this->search(array(),'DISTINCT '.$column,$column,'','',true,'AND',false,$keys,'') as $data)
+		foreach((array)$this->search($keys,'DISTINCT '.$column,$column,'','',true,'AND',false,null,'') as $data)
 		{
 			$val = $data[$column];
 			$values[$val] = $val;
