@@ -290,4 +290,82 @@
 		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.007';
 		return $GLOBALS['setup_info']['ranking']['currentver'];
 	}
+
+
+	$test[] = '1.0.0.007';
+	function ranking_upgrade1_0_0_007()
+	{
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','quota',array(
+			'type' => 'int',
+			'precision' => '2'
+		));
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','host_nation',array(
+			'type' => 'varchar',
+			'precision' => '3'
+		));
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','host_quota',array(
+			'type' => 'int',
+			'precision' => '2'
+		));
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','deadline',array(
+			'type' => 'date'
+		));
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','prequalified',array(
+			'type' => 'varchar',
+			'precision' => '100'
+		));
+
+		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.008';
+		return $GLOBALS['setup_info']['ranking']['currentver'];
+	}
+
+
+	$test[] = '1.0.0.008';
+	function ranking_upgrade1_0_0_008()
+	{
+		$GLOBALS['phpgw_setup']->oProc->DropColumn('Wettkaempfe',array(
+			'fd' => array(
+				'WetId' => array('type' => 'auto','nullable' => False),
+				'rkey' => array('type' => 'char','precision' => '8','nullable' => False),
+				'name' => array('type' => 'varchar','precision' => '100','nullable' => False),
+				'dru_bez' => array('type' => 'varchar','precision' => '20'),
+				'datum' => array('type' => 'date','nullable' => False,'default' => '0000-00-00'),
+				'pkte' => array('type' => 'int','precision' => '4'),
+				'pkt_bis' => array('type' => 'float','precision' => '16'),
+				'feld_pkte' => array('type' => 'int','precision' => '4'),
+				'feld_bis' => array('type' => 'float','precision' => '16'),
+				'faktor' => array('type' => 'float','precision' => '16'),
+				'serie' => array('type' => 'int','precision' => '4'),
+				'open' => array('type' => 'int','precision' => '4'),
+				'pflicht' => array('type' => 'varchar','precision' => '3','default' => 'no'),
+				'ex_pkte' => array('type' => 'varchar','precision' => '3','default' => 'no'),
+				'nation' => array('type' => 'char','precision' => '5'),
+				'gruppen' => array('type' => 'varchar','precision' => '80'),
+				'homepage' => array('type' => 'varchar','precision' => '60'),
+				'quota' => array('type' => 'int','precision' => '2'),
+				'host_nation' => array('type' => 'varchar','precision' => '3'),
+				'host_quota' => array('type' => 'int','precision' => '2'),
+				'deadline' => array('type' => 'date')
+			),
+			'pk' => array('WetId'),
+			'fk' => array(),
+			'ix' => array(),
+			'uc' => array('rkey')
+		),'prequalified');
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','prequal_ranking',array(
+			'type' => 'int',
+			'precision' => '2'
+		));
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','prequal_comp',array(
+			'type' => 'int',
+			'precision' => '2'
+		));
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','prequal_comps',array(
+			'type' => 'varchar',
+			'precision' => '64'
+		));
+
+		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.009';
+		return $GLOBALS['setup_info']['ranking']['currentver'];
+	}
 ?>

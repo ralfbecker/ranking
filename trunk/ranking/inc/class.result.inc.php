@@ -26,7 +26,9 @@ class result extends so_sql
 	var $cat_table     = 'Gruppen';
 	var $comp_table    = 'Wettkaempfe';
 	var $ff_table      = 'Feldfaktoren';
+	var $pkte_table    = 'PktSystemPkte';
 	var $charset,$source_charset;
+	var $athlete;
 
 	/**
 	 * constructor of the competition class
@@ -39,6 +41,18 @@ class result extends so_sql
 		if ($source_charset) $this->source_charset = $source_charset;
 		
 		$this->charset = $GLOBALS['phpgw']->translation->charset();
+
+		foreach(array(
+				'athlete'  => 'athlete',
+			) as $var => $class)
+		{
+			$egw_name = /*'ranking_'.*/$class;
+			if (!is_object($GLOBALS['egw']->$egw_name))
+			{
+				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
+			}
+			$this->$var =& $GLOBALS['egw']->$egw_name;
+		}
 	}
 
 	/**
@@ -182,4 +196,103 @@ class result extends so_sql
 		//$this->debug = 1;
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}*/
+
+	/**
+	 * get competitiors prequalified for a given competition, because of a certain place in spec. competitions 
+	 *
+	 * @param int/array $comp WetId or complete competition array
+	 * @param int/array $cat GrpId or complete category array
+	 * @return array of PerId's
+	 */
+	function prequalified($comp,$cat)
+	{
+		if (!is_array($comp) || !isset($comp['prequal_comp']))
+		{
+			$comp = $this->read($comp);
+		}
+		if (is_array($cat) || !is_numeric($cat))
+		{
+			if (!$cat['GrpId'])
+			{
+				$cat = $this->read($cat);
+			}
+			$cat = $cat['GrpId'];
+		}
+		$prequals = array();
+		if ($cat && $comp['WetId'] && $comp['prequal_comp'] > 0 && $comp['prequal_comps'])
+		{
+			foreach((array)$this->search(array(),'DISTINCT PerId','','','',false,'AND',false,array(
+				'GrpId' => $cat,
+				'WetId' => explode(',',$comp['prequal_comps']),
+				'platz <= '.(int)$comp['prequal_comp'],
+			)) as $athlet)
+			{
+				$prequals[] = $athlet['PerId'];
+			}
+		}
+		//_debug_array($prequals);
+		return $prequals;
+	}
+	
+	/**
+	 * return result-list for a cup-ranking of $cup as of $stand
+	 *
+	 * @param int $SerId id of the cup
+	 * @param int $PktId id of the point-system to use
+	 * @param array $cats array of integer cat-id's (GrpId)
+	 * @param string $stand date as 'Y-m-d'
+	 * @param array $allowed_nations=null array with 3-digit nation-codes to limit the nations to return, default all
+	 * @return array ordered by PerId and number of points of arrays with full athlete-data, platz, pkt, WetId, GrpId
+	 */
+	function &cup_results($SerId,$PktId,$cats,$stand,$allowed_nations)
+	{
+		$this->db->query("SELECT p.*,r.platz,s.pkt,r.WetId,r.GrpId
+			FROM $this->result_table r,$this->comp_table w,$this->athlete_table p,$this->pkte_table s
+			WHERE r.WetId=w.WetId AND p.PerId=r.PerId
+			AND r.GrpId ".(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').' 
+			AND w.serie='.(int) $SerId.' AND r.platz=s.platz AND s.PktId='.(int) $PktId.'
+			AND s.pkt > 0 AND w.datum <= '.$this->db->quote($stand).
+			($allowed_nations ? ' AND p.nation IN (\'' . implode("','",$allowed_nations) . "')" : '').'
+			ORDER BY r.PerId,s.pkt DESC',__LINE__,__FILE__);
+		
+		$results = array();	
+		while(($row = $this->db->row(true)))
+		{
+			$results[] = $this->athlete->db2data($row);
+		}
+		return $results;
+	}
+
+	/**
+	 * return result-list for a ranking from $start to $stand
+	 *
+	 * @param array $cats array of integer cat-id's (GrpId)
+	 * @param string $stand date as 'Y-m-d'
+	 * @param string $start date as 'Y-m-d'
+	 * @param int $from_year=0 start-year of age-group, default 0 = no age-group
+	 * @param int $to_year=0 end-year of age-group, default 0 = no age-group
+	 * @return array ordered by PerId and number of points of arrays with full athlete-data, platz, pkt, WetId, GrpId
+	 */
+	function &ranking_results($cats,$stand,$start,$from_year=0,$to_year=0)
+	{
+		//list($usec,$sec) = explode(' ',microtime()); $s_time = (float)$usec + (float)$sec;
+
+		$this->db->query($sql="SELECT p.*,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId
+			FROM $this->result_table r,$this->comp_table w,$this->athlete_table p
+			WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.pkt > 0
+			AND r.GrpId ".(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').'
+			AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
+			($from_year && $to_year ? ' AND NOT ISNULL(p.geb_date) AND '.
+			(int) $from_year.' <= YEAR(p.geb_date) AND YEAR(p.geb_date) <= '.(int) $to_year : '').'
+			ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__);
+		
+		$results = array();
+		while(($row = $this->db->row(true)))
+		{
+			$results[] = $this->athlete->db2data($row);
+		}
+		//list($usec,$sec) = explode(' ',microtime()); $e_time = (float)$usec + (float)$sec;
+		//echo "<p>result::ranking_results(".print_r($cats,true).",'$stand','$start',$from_year,$to_year) count(\$results)=".count($results).", time=".sprintf('%0.2lf',$e_time-$s_time)."<br>$sql</p>\n";
+		return $results;
+	}
 }

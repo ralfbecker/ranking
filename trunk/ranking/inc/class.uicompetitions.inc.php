@@ -200,6 +200,12 @@ class uicompetitions extends boranking
 				'nation'=>$this->comp->data['nation'])),
 			'nation'    => $this->ranking_nations,
 			'gruppen'   => $this->cats->names(array('nation' => $this->comp->data['nation'])),
+			'prequal_comps' => $this->comp->names(array(
+				!$this->comp->data['datum'] ? 'datum > \''.(date('Y')-2).'\'' :
+					'datum < '.$this->db->quote($this->comp->data['datum']).' AND datum > \''.((int)$this->comp->data['datum']-2).'-01-01\'',
+				'nation' => $this->comp->data['nation'],
+			)),
+			'host_nation' => $this->athlete->distinct_list('nation'),
 		);
 		$readonlys = array(
 			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],

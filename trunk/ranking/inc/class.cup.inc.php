@@ -47,6 +47,7 @@ class cup extends so_sql
 
 	/**
 	 * changes the data from the db-format to our work-format
+	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 * @return array
 	 */
@@ -62,6 +63,18 @@ class cup extends so_sql
 		}
 		if ($data['gruppen'])
 		{
+			foreach(explode(',',$data['gruppen']) as $cat_str)
+			{
+				if (strstr($cat_str,'='))
+				{
+					list($cat,$params) = explode('=',$cat_str,2);
+					$cat = strtoupper(($c = in_array($cat,$this->cats->cat2old)) ? $c : $cat);
+					$params = explode('+',$params);
+
+					if ($params[0]) $data['nat_team_quota'][$cat] = $params[0];
+					if ($params[1]) $data['max_per_cat'][$cat] = $params[1];
+				}
+			}
 			$data['gruppen'] = $this->cats->cat_rexp2rkeys($data['gruppen']);
 		}
 		if ($data['presets']) $data['presets'] = (array) @unserialize($data['presets']);
@@ -71,6 +84,7 @@ class cup extends so_sql
 
 	/**
 	 * changes the data from our work-format to the db-format
+	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 * @return array
 	 */
@@ -87,6 +101,17 @@ class cup extends so_sql
 		}
 		if (is_array($data['gruppen']))
 		{
+			foreach($data['gruppen'] as $k => $cat_rkey)
+			{
+				if ($data['nat_team_quota'][$cat_rkey] || $data['max_per_cat'][$cat_rkey])
+				{
+					$data['gruppen'] .= '='.$data['nat_team_quota'][$cat_rkey].
+						($data['max_per_cat'][$cat_rkey] ? '+'.$data['max_per_cat'][$cat_rkey] : '');
+				}
+			}
+			unset($data['nat_team_quota']);
+			unset($data['max_per_cat']);
+			
 			$data['gruppen'] = implode(',',$data['gruppen']);
 		}
 		if (is_array($data['presets'])) $data['presets'] = serialize($data['presets']);
@@ -133,5 +158,23 @@ class cup extends so_sql
 			$names[$data['SerId']] = $data['rkey'].($rkey_only ? '' : ': '.$data['name']);
 		}
 		return $names;
+	}
+	
+	/**
+	 * get max. number of comps. counting for $cat in $cup
+	 *
+	 * ToDo: cat-specific max. number cant be set in the UI
+	 *
+	 * @param string $cat_rkey cat-rkey to check
+	 * @param array $cup=null cup-array to use, default use internal data
+	 * @return int number of competitions counting
+	 */
+	function get_max_comps($cat_rkey,$cup=null)
+	{
+		if (!is_array($cup))
+		{
+			$cup =& $this->data;
+		}
+		return $cup['max_per_cat'][$cat_rkey] ? (int) $cup['max_per_cat'][$cat_rkey] : $cup['max_serie'];
 	}
 }

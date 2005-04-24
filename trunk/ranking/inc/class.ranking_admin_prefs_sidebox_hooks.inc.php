@@ -36,6 +36,8 @@ class ranking_admin_prefs_sidebox_hooks
 					'menuaction' => 'ranking.uiathletes.index' )),
 				'Registration' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.register' )),
+				'Ranking' => $GLOBALS['phpgw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiranking.index' )),
 			);
 			display_sidebox($appname,$GLOBALS['phpgw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 		}

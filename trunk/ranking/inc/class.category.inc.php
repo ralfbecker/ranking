@@ -100,6 +100,10 @@ class category extends so_sql
 		{
 			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
 		}
+		// setting up meta-groups, not yet saved int the db
+		$data['GrpIds'] = $data['GrpIds'] ? explode(',',$data['GrpIds']) : array();
+		if ($data['GrpId']) $data['GrpIds'][] = $data['GrpId'];
+
 		return $data;
 	}
 
@@ -169,11 +173,17 @@ class category extends so_sql
 	 */
 	function read($keys)
 	{
+		// replace only key with new one if neccessary
+		if ((!is_array($keys) && !is_numeric($keys) || is_array($keys) && $keys['rkey']) &&
+			($new_rkey = array_search(is_array($keys) ? $keys['rkey'] : $keys,$this->cat2old)))
+		{
+			$keys['rkey'] = $new_rkey;
+		}	
 		if (!is_array($keys))
 		{
 			$keys = is_numeric($keys) ? array('GrpId' => (int) $keys) : array('rkey' => $keys);
 		}
-		if ($cache && count($keys) == 1 && ($keys['GrpId'] || $keys['rkey']))
+		if ($this->cache && count($keys) == 1 && ($keys['GrpId'] || $keys['rkey']))
 		{
 			list($key,$val) = each($keys);
 			foreach($this->cache as $cat)
@@ -192,14 +202,16 @@ class category extends so_sql
 	 * get the names of all or certain categories, eg. to use in a selectbox
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
 	 * @param int $rkeys 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
+	 * @param string $sort='rkey' 
 	 * @returns array with all Cups in the from specified in $rkeys
 	 */
-	function &names($keys=array(),$rkeys=2)
+	function &names($keys=array(),$rkeys=2,$sort='rkey')
 	{
+		if (!preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort)) $sort = 'rkey';
 		if ($keys['nation'] == 'NULL') $keys['nation'] = null;
 
 		$names = array();
-		foreach((array)$this->search($keys,False,'rkey'/*,'','',false,'AND',false,$keys*/) as $data)
+		foreach((array)$this->search(array(),False,'rkey','','',false,'AND',false,$keys) as $data)
 		{
 			switch($rkeys)
 			{
@@ -247,5 +259,31 @@ class category extends so_sql
 		}
 		//echo "<p>category::cat_rexp2rkeys('$rexp')=".print_r($cats,true)."</p>\n";
 		return $cats;
+	}
+
+	/**
+	 * calculate the age-group ($from_year, $to_year) of a category for $stand
+	 *
+	 * @param array $cat category array, as eg. returned from read
+	 * @param string $stand date as 'Y-m-d' (only year is used)
+	 * @param int &$from_year on return starting year
+	 * @param int &$to_year on return finishing year
+	 * @return boolean true if cat uses an age_group, false otherwise
+	 */
+	function age_group($cat,$stand,&$from_year,&$to_year)
+	{
+		if (($from_year = $cat['from_year']) < 0) // neg. is age not year
+		{
+			$from_year += $stand;
+		}
+		if (($to_year = $cat['to_year']) < 0)
+		{
+			$to_year += $stand;
+		}
+		if ($from_year > $to_year) 
+		{
+			$y = $from_year; $from_year = $to_year; $to_year = $y;
+		}
+		return $cat['from_year'] && $cat['to_year'];
 	}
 }

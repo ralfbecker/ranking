@@ -30,6 +30,8 @@ class athlete extends so_sql
 {
 	var $charset,$source_charset;
 	var $result_table = 'Results';
+	
+	var $cats;
 
 	/**
 	 * constructor of the athlete class
@@ -46,10 +48,10 @@ class athlete extends so_sql
 				'cats'  => 'category',
 			) as $var => $class)
 		{
-			$egw_name = 'ranking_'.$class;
-			if (!is_object($GLOBALS['egw']->$class))
+			$egw_name = /*'ranking_'.*/$class;
+			if (!is_object($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
+				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
@@ -80,6 +82,8 @@ class athlete extends so_sql
 				if ($acl & $n) $data['acl'][] = $n;
 			}
 		}
+		if ($data['geb_date']) $data['geb_year'] = (int) $data['geb_date'];
+
 		return $data;
 	}
 
@@ -129,10 +133,17 @@ class athlete extends so_sql
 		
 		if ($join === true)
 		{
-			$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
-			if ($extra_cols) $extra_cols = explode(',',$extra_cols);
-			$extra_cols[] = 'MAX(datum) AS last_comp';
-			$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : '');
+			if ($criteria['PerId'])
+			{
+				$join = '';
+			}
+			else
+			{
+				$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
+				if ($extra_cols) $extra_cols = explode(',',$extra_cols);
+				$extra_cols[] = 'MAX(datum) AS last_comp';
+				$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
+			}
 		}
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
