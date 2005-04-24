@@ -1,5 +1,6 @@
 %1 deleted	ranking	en	%1 deleted
 %1 saved	ranking	en	%1 saved
+%1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
@@ -7,6 +8,7 @@ add a new athlete	ranking	en	add a new athlete
 add a new competition	ranking	en	add a new competition
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 apply the changes made	ranking	en	apply the changes made
+as of	ranking	en	As of
 athlete	ranking	en	Athlete
 athletes	ranking	en	Athletes
 before	ranking	en	before
@@ -14,6 +16,7 @@ before which year the old system was used (first year of new system)	ranking	en	
 better result splits ties	ranking	en	Better result splits ties
 birthdate	ranking	en	Birthdate
 birthday, shows only the year	ranking	en	birthday, shows only the year
+birthyear	ranking	en	Birthyear
 birthyears from	ranking	en	Birthyears from
 body height in centimeter	ranking	en	body height in centimeter
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
@@ -36,6 +39,7 @@ cup	ranking	en	Cup
 cuppattern	ranking	en	Cuppattern
 cups	ranking	en	cups
 database	admin	en	Database
+deadline	ranking	en	Deadline
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
 delete all rights for this nation	ranking	en	Delete all rights for this nation
@@ -57,6 +61,7 @@ entry not found !!!	ranking	en	Entry not found !!!
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
+error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
 error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
 error: while saving !!!	ranking	en	Error: while saving !!!
@@ -71,6 +76,8 @@ file '%1' successful attached as %2	ranking	en	File '%1' successful attached as 
 file is not a pdf	ranking	en	File is not a PDF
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	en	First name of the athlete in Latin chars! Accents and umlauts are ok
 free text	ranking	en	free text
+from other competitions	ranking	en	from other competitions
+from the ranking	ranking	en	from the ranking
 full cathegory name (must not be empty)	ranking	en	full cathegory name (must not be empty)
 full competition name (must not be empty)	ranking	en	full competition name (must not be empty)
 full cup name (must not be empty)	ranking	en	full cup name (must not be empty)
@@ -82,6 +89,8 @@ grpid	ranking	en	GrpId
 hobbies	ranking	en	Hobbies
 homepage	ranking	en	Homepage
 host	admin	en	Host
+host nation	ranking	en	Host nation
+host quota	ranking	en	Host quota
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	en	how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
@@ -100,6 +109,7 @@ nation acl	common	en	Nation ACL
 nation if national competition or internatinal	ranking	en	nation if national competition or internatinal
 nation if national competition or none for an internatinal one	ranking	en	nation if national competition or none for an internatinal one
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
+no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 not used at the moment	ranking	en	not used at the moment
 notice	ranking	en	Notice
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
@@ -109,26 +119,37 @@ other sports practiced	ranking	en	other sports practiced
 perid	ranking	en	PerId
 permission denied !!!	ranking	en	Permission denied !!!
 phone	ranking	en	Phone
+place	ranking	en	Place
 place of birth	ranking	en	Place of birth
 pointalocation	ranking	en	Pointalocation
+points	ranking	en	Points
 port	admin	en	Port
 postalcode	ranking	en	Postalcode
+prequalified competitiors	ranking	en	Prequalified competitiors
 presets	ranking	en	Presets
 presets for competitions	ranking	en	Presets for competitions
 previous rankingsystem	ranking	en	previous Rankingsystem
 professional	ranking	en	Professional
 profile	ranking	en	Profile
+quota	ranking	en	Quota
+rank	ranking	en	Rank
 ranking	common	en	Ranking
 ranking database	admin	en	Ranking database
 rankings - categories	ranking	en	Rankings - Categories
 rankings - cathegories	ranking	en	Rankings - Cathegories
 rankingsystem	ranking	en	Rankingsystem
 read competition	ranking	en	Read competition
+register	ranking	en	Register
+register athlets for this competition	ranking	en	Register athlets for this competition
+register this athlete for the selected category	ranking	en	Register this athlete for the selected category
+registration	ranking	en	Registration
+registration deadline	ranking	en	Registration deadline
 remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
 result pdf	ranking	en	Result PDF
 results	ranking	en	Results
 saves the changes made	ranking	en	saves the changes made
+select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
 serid	ranking	en	SerId
@@ -139,15 +160,19 @@ size (cm)	ranking	en	Size (cm)
 squad	ranking	en	Squad
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
+startlist	ranking	en	Startlist
 startlist pdf	ranking	en	Startlist PDF
 street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
+teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
 to year	ranking	en	to year
+total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
+until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
 url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. http://domain.com
 use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"
 use access control to deny display on the website	ranking	en	use access control to deny display on the website
