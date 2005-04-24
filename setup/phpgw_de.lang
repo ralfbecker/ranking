@@ -101,13 +101,13 @@ if competiton is an open / qualificatio for an other competition and only the be
 in kilogram	ranking	de	in Kilogram
 incl. nation-code	ranking	de	einschl. Länderkennung
 information pdf	ranking	de	Informations PDF
-internal key, leave it empty to have it automaticaly generated	ranking	de	interner Schlï¿½ssel, leer lassen um ihn automatisch zu generieren
-key	ranking	de	Schlï¿½ssel
+internal key, leave it empty to have it automaticaly generated	ranking	de	interner Schlüssel, leer lassen um ihn automatisch zu generieren
+key	ranking	de	Schlüssel
 key must not be empty !!!	ranking	de	Schlüssel darf nicht leer sein
 last competition	ranking	de	Letzter Wettkampf
 license number	ranking	de	Lizenznummer
 male	ranking	de	männlich
-maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer fï¿½r alle)
+maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
 name	ranking	de	Name
 nation	ranking	de	Nation
 nation acl	common	de	Nationen ACL

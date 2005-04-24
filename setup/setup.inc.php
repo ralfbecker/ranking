@@ -13,7 +13,7 @@
 	/* $Id$ */
 
 	$setup_info['ranking']['name']      = 'ranking';
-	$setup_info['ranking']['version']   = '1.0.0.007';
+	$setup_info['ranking']['version']   = '1.0.0.009';
 	$setup_info['ranking']['app_order'] = 1;
 	$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen');
 	$setup_info['ranking']['enable']    = 1;
@@ -32,6 +32,8 @@
              'appname' => 'etemplate',
              'versions' => Array('1.0.0','1.0.1')
     );
+
+
 
 
 

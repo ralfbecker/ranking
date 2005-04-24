@@ -97,6 +97,52 @@
 			</rows>
 		</grid>
 	</template>
+	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description options=",,,deadline" value="Registration deadline"/>
+					<date-time options="Y-m-d H:i:s" id="deadline" statustext="Until which date (incl.) are registrations allowed" span="all"/>
+				</row>
+				<row class="row">
+					<description options=",,,quota" value="Quota"/>
+					<menulist span="all">
+						<menupopup type="select-number" options="Select one,1,10,1" id="quota"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description options=",,,host_quota" value="Host quota"/>
+					<menulist>
+						<menupopup type="select-number" options="None,1,10,1" id="host_quota"/>
+					</menulist>
+					<menulist>
+						<menupopup options="Select one" id="host_nation" label="Host nation"/>
+					</menulist>
+				</row>
+				<row class="th">
+					<description span="all" value="Prequalified competitiors"/>
+				</row>
+				<row class="row">
+					<description options=",,,prequal_ranking" value="from the ranking"/>
+					<menulist span="all">
+						<menupopup type="select-number" options="None,1,15,1" id="prequal_ranking"/>
+					</menulist>
+				</row>
+				<row class="row" valign="top">
+					<description options=",,,prequal_comps" value="from other competitions"/>
+					<menulist>
+						<menupopup type="select-number" options="None,1,10" id="prequal_comp"/>
+					</menulist>
+					<listbox rows="5" id="preqal_comps"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
 	<template id="ranking.comp.edit" template="" lang="" group="0" version="1.0.0.003">
 		<grid width="100%\0">
 			<columns>
@@ -136,11 +182,13 @@
 							<tab label="General" statustext=""/>
 							<tab label="Ranking" statustext=""/>
 							<tab label="Files" statustext=""/>
+							<tab label="Startlist" statustext=""/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.comp.edit.general"/>
 							<template id="ranking.comp.edit.ranking"/>
 							<template id="ranking.comp.edit.files"/>
+							<template id="ranking.comp.edit.startlist"/>
 						</tabpanels>
 					</tabbox>
 				</row>

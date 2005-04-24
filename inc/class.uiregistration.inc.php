@@ -172,7 +172,7 @@ class uiregistration extends boranking
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(($calendar ? array('nation'=>$calendar) : array()) +
-				array('datum >= \''.date('Y-m-d',time()).'\''),'datum ASC'),
+				array('datum >= \''.date('Y-m-d',time()).'\''),0,'datum ASC'),
 		);
 		foreach($this->athlete_rights as $nat)
 		{

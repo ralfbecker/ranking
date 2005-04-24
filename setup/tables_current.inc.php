@@ -19,7 +19,14 @@
 				'ex_pkte' => array('type' => 'varchar','precision' => '3','default' => 'no'),
 				'nation' => array('type' => 'char','precision' => '5'),
 				'gruppen' => array('type' => 'varchar','precision' => '80'),
-				'homepage' => array('type' => 'varchar','precision' => '60')
+				'homepage' => array('type' => 'varchar','precision' => '60'),
+				'quota' => array('type' => 'int','precision' => '2'),
+				'host_nation' => array('type' => 'varchar','precision' => '3'),
+				'host_quota' => array('type' => 'int','precision' => '2'),
+				'deadline' => array('type' => 'date'),
+				'prequal_ranking' => array('type' => 'int','precision' => '2'),
+				'prequal_comp' => array('type' => 'int','precision' => '2'),
+				'prequal_comps' => array('type' => 'varchar','precision' => '64')
 			),
 			'pk' => array('WetId'),
 			'fk' => array(),

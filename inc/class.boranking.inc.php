@@ -74,11 +74,19 @@ class boranking extends soranking
 	 */
 	var $is_admin = false;
 
-	var $public_functions = array
-	(
+	var $public_functions = array(
 		'writeLangFile' => True
 	);
 	var $maxmatches = 12;
+	/**
+	 * @var array $european_nations 3-digit nation codes of nation in europe
+	 */
+	var $european_nations = array(
+		'AUT','BEL','BLS','BUL','CRO','CZE','DEN','ESP',
+		'FIN','FRA','GBR','GER','GRE','HUN','IRL','ITA',
+		'KAZ','LAT','LUX','MKD','NED','NOR','POL','POR',
+		'ROM','RUS','SCG','SLO','SUI','SVK','SWE','UKR',
+	);
 
 	function boranking()
 	{
@@ -164,6 +172,12 @@ class boranking extends soranking
 			($required == EGW_ACL_ADD || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
 	}
 	
+	/**
+	 * Checks if a given date is "over": today > $date
+	 *
+	 * @param string $date as 'Y-m-d'
+	 * @return boolean
+	 */
 	function date_over($date)
 	{
 		$now = explode('-',date('Y-m-d'));
@@ -201,6 +215,229 @@ class boranking extends soranking
 		//echo "<p>boranking::registration_check(".print_r($comp,true).",'$nation') = $ret</p>\n";
 		
 		return $ret;
+	}
+	
+	/** 
+	 * calculates a ranking of type $rls->window_type:
+	 *  monat = $rls->window_anz Monate z�hlen f�r Rangl.
+	 *  wettk = $rls->window_anz Wettk�mpfe ---- " -----
+	 * It uses, if defined, only the $rls->best_wettk best resutls.
+	 *
+	 * @param mixed &$cat GrpId, rkey or cat as array, on return: cat-array
+	 * @param string &$stand  rkey or WetId of a comp, Date YYYY-MM-DD or '.'=todays date, 
+	 *	on return: date of last comp. of the rankin
+	 * @param string &$start on return: start-date of the ranking = date of the oldest comp. in the ranking
+	 * @param array &$comp on return: comp. as array to whichs date the ranking is calculated ($stand)
+	 * @param array &$pers on return: ranking as array with PerId as key
+	 * @param array &$rls on return: RankingSystem used for the calculation of the ranking
+	 * @param array &$ex_aquo on return: array with place => number of ex_aqous per place pairs
+	 * @param array &$not_counting on return: array PerId => string off all not valued WetId's pairs
+	 * @param mixed $cup='' rkey,SerId or array of cup or '' for a ranking
+	 * @return array sorted by ranking place
+	 *
+	 * Achtung:   Nicht berücksichtigt sind die folgenden Parameter:
+	 *             - $rls->window_type=="wettk_athlet", dh. alte Schweizer Rangl.
+	 *             - $rls->min_wettk, dh. min. Anzahl Wettk. um gewertet zu werden
+	 *             - $comp->open, dh. nur bessere Erg. von. Wettk. und Open verw.
+	 *             - $cup->max_rang, dh. max. Anz. Wettk. der Serie in Rangliste
+	 *             - $cup->faktor, dh. Faktor f�r Serienpunkte
+	 *            Diese Parameter werden im Moment von keiner Rangliste mehr verw.
+	 *
+	 * 01.05.2001:	Jahrgänge berücksichtigen, dh. wenn in Gruppe from_year und
+	 *		to_year angegeben ist und rls->window_type != "wettk_athlet" &&
+	 *		rls->end_pflich_tol (!= 0 | I_EMPTY | nul) dann werden nur
+	 *		solche Athleten in die Rangliste aufgenommen, die zum Datum
+	 *		der Rangliste innerhalb der Jahrgangsgrenzen liegen
+	 */
+	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup='')
+	{
+		if ($cup && !is_array($cup))
+		{
+			$cup = $this->cup->read($cup);
+		}
+		if (!is_array($cat))
+		{
+			$cat = $this->cats->read($cat);
+		}
+		if ($this->debug) echo "<p>boranking::ranking(cat='$cat[rkey]',stand='$stand',...,cup='$cup[rkey]')</p>\n";
+
+		if (!$stand || $stand == '.')	// last comp. before today
+		{
+			$stand = date ('Y-m-d',time());
+			
+			$comp = $this->comp->last_comp($stand,$cat['GrpIds'],$cat['nation'],$cup['SerId']);
+		}
+		elseif (!preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/',$stand))
+		{
+			if (!is_array($stand))
+			{
+				$comp = $this->comp->read($stand);
+			}
+			else
+			{
+				$comp = $stand;
+			}
+		}
+		else
+		{
+			$comp = false;
+		}
+		if ($comp) 
+		{
+			$stand = $comp['datum'];
+	
+			$cats = array($cat['rkey']);
+			if ($this->cats->cat2old[$cat['rkey']]) $cats[] = $this->cats->cat2old[$cat['rkey']];
+			
+			if (!$this->comp->next_comp_this_year($comp['datum'],$cats,$cat['nation'],$cup['SerId']))
+			{
+				$stand = (int)$comp['datum'] . '-12-31';	// no further comp. -> stand 31.12.
+			}
+		}
+		if ($this->debug) echo "<p>boranking::ranking: stand='$stand', comp='$comp[rkey]'</p>\n";
+		
+		if ($cup)
+		{
+			$max_comp = $this->cup->get_max_comps($cat['rkey'],$cup);
+
+			if ((int) $stand >= 2000 && !in_array($cat['rkey'],$cup['gruppen']))
+			{
+				return false;			// no cup (ranking) defined for that group
+			}
+		} 
+		else 
+		{ 				
+			// $rls = used ranking-system
+			$rls = $cat['vor'] && $stand < $cat['vor'] ? $cat['vor_rls'] : $cat['rls'];
+	
+			if (!$rls || !($rls = $this->rls->read(array('RlsId' => $rls))))
+			{
+				return false; 		// no (valid) ranking definiert
+			}			
+			$max_comp = $rls['best_wettk'];
+	
+			switch ($rls['window_type']) 
+			{
+				case 'monat':			// ranking using a given number of month
+					list($year,$month,$day) = explode('-',$stand);
+					$start = date('Y-m-d',mktime(0,0,0,$month-$rls['window_anz'],$day+1,$year));
+					break;
+				case 'wettk_athlet':
+					die( "boranking::ranking: Windowtype 'wettk_athlet' is no longer supported !!!" );
+					break;
+				case 'wettk':			// ranking using a given number of competitions in the category
+				case 'wettk_nat':		// ------------------ " ----------------------- in any category
+					$cats = $rls['window_type'] == 'wettk' ? $cat['GrpIds'] : false;
+					if (!($first_comp = $this->comp->last_comp($stand,$cats,$cat['nation'],0,$rls['window_anz'])))
+					{
+						return false;	// not enough competitions
+					}					
+					$start = $first_comp['datum'];
+					unset($first_comp);
+					break;
+			}
+		}
+		if ($this->debug) echo "<p>boranking::ranking: start='$start'</p>\n";
+
+		if ($cup) 
+		{
+			$results =& $this->result->cup_results($cup['SerId'],$cup['pkte'],$cat['GrpIds'],$stand,
+				stristr($cup['rkey'],'EYC') ? $this->european_nations : false);
+		} 
+		else 
+		{
+			if (!($rls['window_type'] != 'wettk_athlet' && $rls['end_pflicht_tol'] &&
+				$this->cats->age_group($cat,$stand,$from_year,$to_year)))
+			{
+				$from_year = $to_year = 0;
+			}
+			$results =& $this->result->ranking_results($cat['GrpIds'],$stand,$start,$from_year,$to_year);
+		}
+		$pers = false;
+		$pkte = $anz = $platz = array();
+		foreach($results as $result) 
+		{
+			$id = $result['PerId'];
+			if (!isset($pers[$id]))		// Person neu --> anlegen
+			{
+				$pers[$id] = $result;
+				$pkte[$id] = sprintf('%04.2f',$result['pkt']);
+				$anz[$id] = 1;
+				++$platz[$result['platz']][$id];
+			}
+			elseif (!$max_comp || $anz[$id] < $max_comp)
+			{
+				$pkte[$id] = sprintf('%04.2f',$pkte[$id] + $result['pkt']);
+				$anz[$id]++;
+				++$platz[$result['platz']][$id];
+			}
+			else 
+			{
+				$not_counting[$id][$result['WetId']][$result['GrpId']] = $result['pkt'];
+				if ($cup['split_by_places'] != 'only_counting')
+				{
+					++$platz[$result['platz']][$id];
+				}
+			}
+		}
+		if (!$pers)
+		{
+			return ($pers);
+		}
+		arsort ($pkte);
+	
+		if ($cup['SerId'] == 60)	// EYC 2003. not sure what this is for, why only 2003?
+		{
+			switch($cup['split_by_places'])
+			{
+				case 'first':
+					$max_pkte = current($pkte);
+					if (next($pkte) != $max_pkte)
+					{
+						break;	// kein exAquo of 1. platz ==> fertig
+					}
+				case 'all':
+				case 'only_counting':
+					$max_platz = 0;
+					foreach($platz as $pl => $ids)
+					{
+						if ($pl > $max_platz)
+						{
+							$max_platz = $pl;
+						}
+					}
+					for($pl=1; $pl <= $max_platz; ++$pl)
+					{
+						reset($pkte);
+						do
+						{
+							$id = key($pkte);
+							$pkte[$id] .= sprintf('.%02d',intval($platz[$pl][$id]));
+						}
+						while(next($pkte) && (!isset($max_pkte) || substr(current($pkte),0,7) == $max_pkte));
+					}
+					arsort ($pkte);
+					break;
+			}
+			reset($pkte);
+		}
+		$abs_pl = 1;
+		$last_pkte = $last_platz = 0;
+		foreach($pkte as $id => $pkt)
+		{
+			$pers[$id]['platz'] = $abs_pl > 1 && $pkt == $last_pkte ? $last_platz : ($last_platz = $abs_pl);
+			$ex_aquo[$last_platz] = 1+$abs_pl-$last_platz;
+			$abs_pl++;
+			$last_pkte = $pers[$id]['pkt'] = $pkt;
+			$rang[sprintf("%04d%s%s",$pers[$id]['platz'],$pers[$id]['nachname'],$pers[$id]['vorname'])] =& $pers[$id];
+		} 
+		ksort ($rang);			// array $rang contains now the ranking, sorted by points, lastname, firstname
+	
+		$ret_ex_aquo =& $ex_aquo;
+		$ret_pers =& $pers;
+		$not_counting =& $not_counting;
+	
+		return $rang;
 	}
 
 	/**

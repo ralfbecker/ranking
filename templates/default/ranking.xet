@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.ranking" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="10%"/>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" align="center" id="msg" no_lang="1"/>
+					<description/>
+					<description/>
+				</row>
+				<row class="th">
+					<description options=",,,cup" value="Cup"/>
+					<menulist>
+						<menupopup id="nation" no_lang="1" onchange="1"/>
+					</menulist>
+					<menulist>
+						<menupopup options="Ranking" no_lang="1" id="cup" onchange="1" statustext="Select a cup for a cup-ranking"/>
+					</menulist>
+				</row>
+				<row class="row_on">
+					<description options=",,,cat" value="Category"/>
+					<menulist span="all">
+						<menupopup id="cat" no_lang="1" onchange="1"/>
+					</menulist>
+				</row>
+				<row class="row_on">
+					<description options=",,,stand" value="As of"/>
+					<date options="Y-m-d" id="stand" onchange="1"/>
+					<menulist>
+						<menupopup options="Date" id="stand_rkey" no_lang="1" onchange="1"/>
+					</menulist>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<grid>
+						<columns>
+							<column/>
+							<column/>
+							<column/>
+							<column/>
+							<column disabled="!@nation=NULL"/>
+							<column/>
+							<column/>
+						</columns>
+						<rows>
+							<row class="th">
+								<description value="Rank"/>
+								<description value="Lastname"/>
+								<description value="Firstname"/>
+								<description value="Birthyear"/>
+								<description value="Nation"/>
+								<description value="City"/>
+								<description value="Points"/>
+							</row>
+							<row class="row">
+								<description class="place" id="ranking[$row][platz]" no_lang="1" align="center"/>
+								<description id="ranking[$row][nachname]" no_lang="1"/>
+								<description id="ranking[$row][vorname]" no_lang="1"/>
+								<date options="Y-m-d" id="ranking[$row][geb_year]" readonly="true" align="center"/>
+								<description no_lang="1" id="ranking[$row][nation]" align="center"/>
+								<description no_lang="1" id="ranking[$row][ort]"/>
+								<description no_lang="1" id="ranking[$row][pkt]" align="right"/>
+							</row>
+						</rows>
+					</grid>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

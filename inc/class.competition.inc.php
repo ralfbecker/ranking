@@ -32,6 +32,7 @@ class competition extends so_sql
 		'result'    => 'R',
 	);
 	var $vfs_pdf_dir = '';
+	var $result_table = 'Results';
 
 	/**
 	 * constructor of the competition class
@@ -135,11 +136,28 @@ class competition extends so_sql
 	}
 
 	/**
+	 * Read a competition, reimplemented to allow to pass WetId or rkey instead of the array
+	 *
+	 * @param mixed $keys array with keys, or WetId or rkey
+	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or 
+	 * @return array/boolean array with competition or false on error (eg. not found)
+	 */
+	function read($keys,$extra_cols='',$join='')
+	{
+		if (!is_array($keys))
+		{
+			$keys = is_numeric($keys) ? array('WetId' => (int) $keys) : array('rkey' => $keys);
+		}
+		return parent::read($keys,$extra_cols,$join);
+	}
+
+	/**
 	 * Search for competitions
 	 *
 	 * reimplmented from so_sql unset/not use some columns in the search
 	 */
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
+	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
 		unset($criteria['pkte']);	// is allways set
 		if (!$criteria['feld_pkte']) unset($criteria['feld_pkte']);
@@ -148,23 +166,96 @@ class competition extends so_sql
 		if ($criteria['rkey']) $criteria['rkey'] = strtoupper($criteria['rkey']);
 
 		//$this->debug = 1;
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
+		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+	}
+	
+	/**
+	 * get the $num-last competition before $date in a given category, calendar and cup
+	 *
+	 * ToDo: Query is very slow, propably because of DISTINCT *
+	 *
+	 * @param string $date in 'Y-m-d' format
+	 * @param array/int $cats (array of) cat-id's (GrpId)
+	 * @param string $nation of the competition (calendar)
+	 * @param int $cup=0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
+	 * @param int $num=1 how many competitions back are searched, default 1 = last competition
+	 * @return array/boolean array with competition or false on error (eg. none found)
+	 */
+	function last_comp($date,$cats,$nation,$cup=0,$num=1)
+	{
+		$query = array(
+			'nation' => $nation,
+		);
+		if ($cup)
+		{
+			$query['serie'] = $cup;
+		}
+		else
+		{
+			$query[] = 'faktor > 0.0';
+		}
+		if ($cats)
+		{
+			$query[] = $this->db->expression($this->result_table,array('GrpId' => $cats));
+		}
+		$ret = $this->search(array(),false,$this->table_name.'.datum DESC','','',false,
+			'AND',array($num-1,1),$query,",$this->result_table WHERE $this->table_name.WetId=$this->result_table.WetId 
+			AND $this->table_name.datum <= ".$this->db->quote($date));
+		
+		if ($this->debug) echo "<p>competition::last_comp('$date',".print_r($cats,true).",'$nation',$cup)=".$ret[0]['rkey']."</p>\n";
+			
+		return $ret ? $ret[0] : false;
+	}
+	
+	/**
+	 * get the next competition after $date in the _same_ year in a given category, calendar and cup
+	 *
+	 * ToDo: change function/query to work for non-MySQL DB's too
+	 *
+	 * @param string $date in 'Y-m-d' format
+	 * @param array/string $cats (array of) cat-rkey's
+	 * @param string $nation of the competition (calendar)
+	 * @param int $cup=0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
+	 * @return array/boolean array with competition or false on error (eg. none found)
+	 */
+	function next_comp_this_year($date,$cats,$nation,$cup=0)
+	{
+		// old competitions might have regular expressions of the cats attending them
+		$or_query = array();
+		foreach($cats as $rkey)
+		{
+			$or_query[] = 'find_in_set('.$this->db->quote($rkey).",IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen))";
+			$or_query[] = $this->db->quote($rkey). " REGEXP IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen)";
+		}
+		$ret = $this->search(array(),false,'datum ASC','','',false,'AND',array(0,1),array(
+			'nation' => $nation,
+			'datum > '.$this->db->quote($date),
+			'datum <= '.$this->db->quote((int)$date.'-12-31'),
+			$cup ? 'serie='.(int)$cup : 'faktor > 0.0',
+			'('.implode(' OR ',$or_query).')',			
+		));
+		if ($this->debug) echo "<p>competition::next_comp_this_year('$date',".print_r($cats,true).",'$nation',$cup) = '$ret[rkey]'</p>\n";
+		
+		return $ret ? $ret[0] : false;
 	}
 
 	/**
 	 * get the names of all or certain competitions, eg. to use in a selectbox
 	 *
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
-	 * @returns array with all Cups of form SerId => name
+	 * @param int $rkeys=0 0: WetId=>name, 1: rkey=>name, 2: rkey=>rkey: name
+	 * @param string $sort='datum DESC' 
+	 * @return array with comp-names as specified in $rkeys
 	 */
-	function names($keys=array(),$sort='datum DESC')
+	function names($keys=array(),$rkeys=0,$sort='datum DESC')
 	{
 		if (!preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort)) $sort = 'datum DESC';
 
 		$names = array();
 		foreach((array) $this->search(array(),'WetId,rkey,name',$sort,'','',false,'AND',false,$keys) as $data)
 		{
-			$names[$data['WetId']] = $data['rkey'].': '.$data['name'];
+			$names[$rkeys ? $data['rkey'] : $data['WetId']] = ($rkeys == 2 ? $data['rkey'].': ' : '').
+				strip_tags($data['name']);
 		}
 		return $names;
 	}
