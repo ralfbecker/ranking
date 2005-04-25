@@ -36,6 +36,7 @@ competition results	ranking	de	Wettkampfergebnisse
 competitions	ranking	de	Wettkämpfe
 competitions counting	ranking	de	zählende Wettkämpfe
 complete profile	ranking	de	komplettes Profil
+complimentary	ranking	de	Zusätzlich
 contact	ranking	de	Kontakt
 counting for rankings	ranking	de	zählend für die Rangliste
 cup	ranking	de	Cup
@@ -144,6 +145,7 @@ pointalocation	ranking	de	Punkteverteilung
 points	ranking	de	Punkte
 port	admin	de	Port
 postalcode	ranking	de	Postleitzahl
+prequalified	ranking	de	Vorqualifiziert
 prequalified competitiors	ranking	de	Vorqualifizierte Teilnehmer
 presets	ranking	de	Voreinstellungen
 presets for competitions	ranking	de	Voreinstellungen für die Wettkämpfe
@@ -197,7 +199,7 @@ telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt
 this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
 to year	ranking	de	bis Jahr
-total of %s athlets registered in all categories.	ranking	de	Insgesammt %1 Athleten in allen Kategorien registriert.
+total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt

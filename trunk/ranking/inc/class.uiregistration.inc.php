@@ -80,8 +80,8 @@ class uiregistration extends boranking
 				'cat'      => $_GET['cat'],
 			);
 		}
-		$comp   = $content['comp'];
 		$nation = $content['nation'];
+		$comp   = $content['comp'];
 		$cat    = $content['cat'];
 		
 		if (!in_array($nation,$this->register_rights) || 	// no rights for that nation
@@ -149,10 +149,9 @@ class uiregistration extends boranking
 			if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'])))
 			{
 				$content['nation'] = $athlete['nation'];
+				$content['cat']    = $_GET['cat'];
 			}
 		}
-		//_debug_array($content);
-
 		$comp     = $this->comp->read($content['comp']);
 
 		if ($this->only_nation)
@@ -163,16 +162,22 @@ class uiregistration extends boranking
 		{
 			$calendar = $comp['nation'] ? $comp['nation'] : 'NULL';
 		}
+		elseif ($content['calendar'])
+		{
+			$calendar = $content['calendar'];
+		}
 		else
 		{
-			$calendar = $content['nation'];
+			list($calendar) = each($this->ranking_nations);
 		}
 		$nation   = $this->only_nation_register ? $this->only_nation_register : ($athlete ? $athlete['nation'] : $content['nation']);
 
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
-			'comp'     => $this->comp->names(($calendar ? array('nation'=>$calendar) : array()) +
-				array('datum >= \''.date('Y-m-d',time()).'\''),0,'datum ASC'),
+			'comp'     => $this->comp->names(array(
+				'nation' => $calendar,
+				'datum >= '.$this->db->quote(date('Y-m-d',time())),
+			),0,'datum ASC'),
 		);
 		foreach($this->athlete_rights as $nat)
 		{
@@ -189,56 +194,154 @@ class uiregistration extends boranking
 					$cat2col[$cat['GrpId']] = $tmpl->num2chrs($i);
 				}
 			}
+			if ($nation)	// read prequalified athlets
+			{
+				$prequalified = $this->national_prequalified($comp,$nation);
+				//_debug_array($prequalified);
+			}
 			//_debug_array($cat2col);
 			if (!$this->registration_check($comp,$nation))	// user allowed to register that nation
 			{
 				$nation = '';
 			}
 			// athlete to register
-			elseif($athlete)
+			elseif($athlete || $content['register'] || $content['delete'])
 			{
-				if (!($cat = $this->cats->read($_GET['cat'])) || !in_array($cat['rkey'],$comp['gruppen']))
+				if ($athlete)
+				{
+					$cat = $_GET['cat'];
+				}
+				else
+				{
+					
+					list($athlete) = $content['register'] ? each($content['register']) : each($content['delete']);
+					list($cat,$athlete) = explode('/',$athlete);
+					$athlete = $this->athlete->read($athlete);
+				}
+				if (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']))
 				{
 					_debug_array($cat);
 					_debug_array($comp);
 					$msg = lang('Permission denied !!!');
 				}
-				elseif ($this->result->save(array(
-					'PerId' => $athlete['PerId'],
-					'WetId' => $comp['WetId'],
-					'GrpId' => $cat['GrpId'],
-					'platz' => 0,
-					'pkte'  => 1,
-					'datum' => date('Y-m-d'),
-				)) == 0)
+				elseif($content['delete'])
 				{
-					$msg = lang('%1, %2 registered for category %3',$athlete['nachname'], $athlete['vorname'], $cat['name']);
+					if ($this->result->delete(array(
+						'WetId' => $comp['WetId'],
+						'GrpId' => $cat['GrpId'],
+						'PerId' => $athlete['PerId'],
+						'platz = 0',	// precausion to not delete a result
+					)))
+					{
+						$msg = lang('%1, %2 deleted for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']);
+					}
+					else
+					{
+						$msg = lang('Error: registration');
+					}
 				}
-				else
+				else // register
 				{
-					$msg = lang('Error: registration');
+					// prequalified athlets get a number < 1000
+					$is_prequalified = isset($prequalified[$cat['GrpId']][$athlete['PerId']]);
+
+					list($num) = $this->result->search(array(),'MAX(pkte)','','','',false,'AND',false,array(
+						'nation' => $nation,
+						$is_prequalified ? 'pkte < 1000' : 'pkte >= 1000',
+					),false);
+					if ($num)
+					{
+						$num++;
+					}
+					else
+					{
+						$num = $is_prequalified ? 1 : 1000;
+					}
+					if ($this->result->save(array(
+						'PerId' => $athlete['PerId'],
+						'WetId' => $comp['WetId'],
+						'GrpId' => $cat['GrpId'],
+						'platz' => 0,
+						'pkte'  => $num,
+						'datum' => date('Y-m-d'),
+					)) == 0)
+					{
+						$msg = lang('%1, %2 registered for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']);
+					}
+					else
+					{
+						$msg = lang('Error: registration');
+					}
 				}
 			}
-			$starters =& $this->result->read(array('WetId'=>$comp['WetId'],'GrpId'=>-1)+($nation ? array('nation'=>$nation):array()),
-				'',true,'nation,platz,pkt,GrpId');
+			$starters =& $this->result->read(array(
+				'WetId'  => $comp['WetId'],
+				'GrpId'  => -1,
+			)+($nation ? array(
+				'nation' => $nation,
+			):array()),'',true,'nation,platz,pkt,GrpId');
 			//_debug_array($starters);
 			
 			$nat = '';
-			$rows = array(false);	// we need 1 to be the index of the first row
 			$nat_starters = array();
+			$prequal_lines = 0;
+			if ($nation)
+			{
+				foreach($prequalified as $cat_id => $athletes)
+				{
+					$i = 0;
+					$col = $cat2col[$cat_id];
+					foreach($athletes as $athlete)
+					{
+						$registered = false;
+						// search athlete in starters
+						foreach((array)$starters as $starter)
+						{
+							if ($starter['PerId'] == $athlete['PerId'] && $starter['GrpId'] == $cat_id)
+							{
+								$registered = true;
+								break;
+							}
+						}
+						$delete_button = 'delete['.$cat_id.'/'.$athlete['PerId'].']';
+						$register_button = 'register['.$cat_id.'/'.$athlete['PerId'].']';
+						$nat_starters[$i++][$col] = $athlete+array(
+							'cn' => strtoupper($athlete['nachname']).', '.$athlete['vorname'],
+							'class' => $registered ? 'prequalifiedRegistered' : 'prequalified',
+							'delete_button' => $delete_button,
+							'register_button' => $register_button,
+						);
+						$readonlys[$registered ? $delete_button : $register_button] = false;	// re-enable the button
+					}
+					if (count($athletes) > $prequal_lines)
+					{
+						$prequal_lines = count($athletes);
+						$nat = lang('Prequalified');
+					}
+				}
+			}
+			$rows = array(false);	// we need 1 to be the index of the first row
 			$starters[] = array('nation'=>'');	// to get the last line out
-			foreach($starters as $starter)
+			foreach((array)$starters as $starter)
 			{
 				// new nation and data for the previous nation ==> write that data
 				if ($nat != $starter['nation'])
 				{
-					foreach($nat_starters as $row)
+					foreach($nat_starters as $i => $row)
 					{
-						$rows[] = array('nation' => $nat) + $row;
+						$rows[] = array(
+							'nation' => !$nation || $nat && $nat != $nation || !$nat && $i != $quota ? $nat : 
+								($i == $quota ? lang('Complimentary') : lang('Quota')),
+						) + $row;
 						$nat = '';
 					}
 					$nat_starters = array();
 					$nat = $starter['nation'];
+					$quota = $comp['host_quota'] && $comp['host_nation'] == $nation ? $comp['host_quota'] : $comp['quota'];
+				}
+				if ($nation && isset($prequalified[$starter['GrpId']][$starter['PerId']]))
+				{
+					continue;	// prequalified athlets are in an own block
 				}
 				// set a new column for an unknown/new rkey/cat
 				if ($starter['nation'] && !isset($cat2col[$starter['GrpId']]))
@@ -248,9 +351,13 @@ class uiregistration extends boranking
 				$col = $cat2col[$starter['GrpId']];
 				// find first free line to add that starter
 				for ($i = 0; isset($nat_starters[$i][$col]); ++$i) ;
+				$delete_button = 'delete['.$starter['GrpId'].'/'.$starter['PerId'].']';
 				$nat_starters[$i][$col] = $starter+array(
 					'cn' => strtoupper($starter['nachname']).', '.$starter['vorname'],
+					'class' => $nation && $i >= $quota ? 'complimentary' : 'registered',
+					'delete_button' => $delete_button,
 				);
+				$readonlys[$delete_button] = !$nation;	// re-enable the button
 			}
 			$cats = array();
 			foreach($cat2col as $cat => $col)
@@ -261,6 +368,10 @@ class uiregistration extends boranking
 		else
 		{
 			$comp = '';
+		}
+		if (!$comp || !$nation)		// no register-button
+		{
+			$readonlys['register'] = true;
 		}
 		$content = $preserv = array(
 			'calendar' => $calendar,
@@ -275,7 +386,8 @@ class uiregistration extends boranking
 			'msg'      => $msg,
 		);
 		//_debug_array($content);
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration');
-		$tmpl->exec('ranking.uiregistration.register',$content,$select_options,$readonly,$preserv);
+		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
+			($nation ? ': '.$nation : '');
+		$tmpl->exec('ranking.uiregistration.register',$content,$select_options,$readonlys,$preserv);
 	}
 }

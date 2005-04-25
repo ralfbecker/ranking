@@ -230,8 +230,8 @@ class result extends so_sql
 				$prequals[] = $athlet['PerId'];
 			}
 		}
-		//_debug_array($prequals);
-		return $prequals;
+		//echo "result::prequalified($comp[rkey],$cat)="; _debug_array($prequals);
+		return array_values($prequals);
 	}
 	
 	/**
