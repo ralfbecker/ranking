@@ -21,7 +21,7 @@
 					<description value="Action" align="center"/>
 				</row>
 				<row class="row">
-					<description no_lang="1" id="${row}[nachname]"/>
+					<description no_lang="1" id="${row}[nachname]" class="lastname"/>
 					<description no_lang="1" id="${row}[vorname]"/>
 					<date id="${row}[geb_date]" readonly="true" options="Y-m-d" align="center"/>
 					<description no_lang="1" id="${row}[ort]"/>

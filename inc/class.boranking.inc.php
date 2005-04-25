@@ -439,6 +439,106 @@ class boranking extends soranking
 	
 		return $rang;
 	}
+	
+	/**
+	 * Calculate the prequalified athlets for a given competition
+	 *
+	 * for performance reasons the result is cached in the session
+	 *
+	 * @param mixed $comp complete competition array or WetId/rkey
+	 * @param mixed $do_cat complete category array or GrpId/rkey, or 0 for all cat's of $comp
+	 * @return array/boolean array of PerId's or false if $comp or $cat not found
+	 */
+	function prequalified($comp,$do_cat=0)
+	{
+		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
+		{
+			return false;
+		}
+		foreach($do_cat ? array($do_cat) : $comp['gruppen'] as $cat)
+		{
+			//echo "boranking::prequalified($comp[rkey],$do_cat) cat='$cat($cat[rkey])'<br>\n"; 
+			if (!is_array($cat) && !($cat = $this->cats->read($cat)))
+			{
+				return false;
+			}
+			$cat_id = $cat['GrpId'];
+
+			if (!is_array($prequalified))
+			{
+				list($prequal_comp,$prequalified) = $GLOBALS['egw']->session->appsession('prequalified','ranking');
+
+				if (!$prequal_comp || $prequal_comp !== $comp)	// no cached object or $comp changed
+				{
+					$prequalified = array();
+				}
+				unset($prequal_comp);
+			}
+			if (!isset($prequalified[$cat_id]))	// no cached object or $comp changed
+			{
+				$prequalified[$cat_id] = array();
+				// get athlets prequalified by result
+				if ($comp['prequal_comp'] && count($comp['prequal_comps']))
+				{
+					$prequalified[$cat_id] = $this->result->prequalified($comp,$cat_id);
+				}
+				// get athlets prequalified by ranking
+				if ($comp['prequal_ranking'])	
+				{
+					$stand = $comp['datum'];
+					$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);
+					
+					foreach($ranking as $athlet)
+					{
+						if ($athlet['platz'] > $comp['prequal_ranking']) break;
+						
+						if (!in_array($athlet['PerId'],$prequalified[$cat_id]))
+						{
+							$prequalified[$cat_id][] = $athlet['PerId'];
+						}
+					}
+				}
+				$GLOBALS['egw']->session->appsession('prequalified','ranking',array($comp,$prequalified));
+			}
+		}
+		//echo "prequalifed($comp[rkey],$do_cat$do_cat[rkey]) ="; _debug_array($prequalified);
+		return $do_cat ? $prequalified[$cat] : $prequalified;
+	}
+	
+	/**
+	 * get all prequalifed athlets of one nation for a given competition in all categories
+	 *
+	 * @param mixed $comp complete competition array or WetId/rkey
+	 * @param string $nation 3-digit nat-code
+	 * @return array with GrpId => array(PerId => athlete-array)
+	 */
+	function national_prequalified($comp,$nation)
+	{
+		if (!($prequalified = $this->prequalified($comp))) return false;
+		
+		$all_cats = $nat_prequals = array();
+		foreach($prequalified as $cat => $prequals)
+		{
+			$all_cats = array_merge($all_cats,$prequals);
+			$nat_prequals[$cat] = array();
+		}
+		$all_cats = array_unique($all_cats);
+		
+		foreach((array)$this->athlete->search(array(),false,'','','',false,'AND',false,array(
+			'nation' => $nation,
+			'PerId'  => $all_cats,
+		),false) as $athlete)
+		{
+			foreach($prequalified as $cat => $prequals)
+			{
+				if (in_array($athlete['PerId'],$prequalified[$cat]))
+				{
+					$nat_prequals[$cat][$athlete['PerId']] = $athlete;
+				}
+			}					
+		}
+		return $nat_prequals;
+	}
 
 	/**
 	 * writes langfile with all templates and messages registered here

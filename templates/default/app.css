@@ -5,3 +5,6 @@
 .place:after { content: "." }
 .place { padding-left: 1em; }
 .small { font-size: 70%; padding: 0px; }
+.prequalified { color: gray; font-style: italic; }
+.complimentary { font-style: italic; }
+.lastname { text-transform:  uppercase; }

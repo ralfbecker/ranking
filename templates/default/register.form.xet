@@ -17,7 +17,7 @@
 				<row class="th">
 					<description options=",,,comp" value="Competition"/>
 					<menulist>
-						<menupopup id="calendar" onchange="1" options="Select one" no_lang="1"/>
+						<menupopup id="calendar" onchange="1" no_lang="1"/>
 					</menulist>
 					<menulist>
 						<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
@@ -33,7 +33,7 @@
 					<menulist>
 						<menupopup id="nation" onchange="1" options="Select one" no_lang="1"/>
 					</menulist>
-					<button label="Registration" statustext="Register athlets for this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiregistration.add&amp;comp=$cont[comp]&amp;nation=$cont[nation]'),'_blank', 'dependent=yes,width=700,height=500,scrollbars=yes,status=yes'); return false;"/>
+					<button label="Register" statustext="Register athlets for this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiregistration.add&amp;comp=$cont[comp]&amp;nation=$cont[nation]'),'register', 'dependent=yes,width=700,height=500,scrollbars=yes,status=yes'); return false;" id="register"/>
 				</row>
 				<row disabled="!@comp">
 					<grid>
@@ -47,8 +47,12 @@
 								<description id="cats[$col][name]" no_lang="1"/>
 							</row>
 							<row class="row">
-								<description id="rows[$row][nation]" no_lang="1" align="center"/>
-								<description 1="label" 2="label" id="rows[$row][$col][cn]" no_lang="1"/>
+								<description id="rows[$row][nation]" no_lang="1" options="b"/>
+								<hbox orient=",0,0">
+									<description id="rows[$row][$col][cn]" no_lang="1" class="@rows[$row][$col][class]"/>
+									<button id="@rows[$row][$col][delete_button]" image="delete" label="Delete" align="right" disabled="true"/>
+									<button id="@rows[$row][$col][register_button]" image="new" label="Register" align="right" disabled="true"/>
+								</hbox>
 							</row>
 						</rows>
 					</grid>
