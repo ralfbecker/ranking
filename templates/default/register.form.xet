@@ -33,7 +33,7 @@
 					<menulist>
 						<menupopup id="nation" onchange="1" options="Select one" no_lang="1"/>
 					</menulist>
-					<button label="Register" statustext="Register athlets for this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiregistration.add&amp;comp=$cont[comp]&amp;nation=$cont[nation]'),'register', 'dependent=yes,width=700,height=500,scrollbars=yes,status=yes'); return false;" id="register"/>
+					<button label="Register" statustext="Register athlets for this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiregistration.add&amp;comp=$cont[comp]&amp;nation=$cont[nation]'),'register', 'dependent=yes,width=700,height=520,scrollbars=yes,status=yes'); return false;" id="register"/>
 				</row>
 				<row disabled="!@comp">
 					<grid>

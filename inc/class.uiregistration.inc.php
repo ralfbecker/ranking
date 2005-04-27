@@ -52,7 +52,7 @@ class uiregistration extends boranking
 				$query['col_filter'][$name] = '';
 			}
 		}
-		$total = $this->athlete->get_rows($query,$rows,$readonlys);
+		$total = $this->athlete->get_rows($query,$rows,$readonlys,$query['show_all'] ? true : $query['cat']);
 		$rows['sel_options'] =& $sel_options;
 		$rows['comp'] = $query['comp'];
 		$rows['cat']  = $query['cat'];
@@ -83,6 +83,7 @@ class uiregistration extends boranking
 		$nation = $content['nation'];
 		$comp   = $content['comp'];
 		$cat    = $content['cat'];
+		$show_all = $content['show_all'];
 		
 		if (!in_array($nation,$this->register_rights) || 	// no rights for that nation
 			!($comp = $this->comp->read($comp)) || 			// unknown competition
@@ -90,10 +91,6 @@ class uiregistration extends boranking
 			(!in_array($cat['rkey'],$comp['gruppen'])))		// cat not in this competition
 		{
 			$msg = lang('Permission denied !!!');
-		}
-		else
-		{
-			
 		}
 		$content = $preserv = array(
 			'comp'     => $comp['WetId'],
@@ -103,8 +100,8 @@ class uiregistration extends boranking
 				'no_filter'      => True,// I  disable the 1. filter
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 				'no_cat'         => True,// I  disable the cat-selectbox
-				'order'          =>	'nachname',// IO name of the column to sort after (optional for the sortheaders)
-				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
+				'order'          =>	'last_comp',// IO name of the column to sort after (optional for the sortheaders)
+				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'col_filter'     => array(
 					'nation' => $nation,
 				),
@@ -114,17 +111,20 @@ class uiregistration extends boranking
 		$content += array(
 			'comp_name' => $comp ? $comp['name'] : '',
 			'cat'       => $cat['GrpId'],
+			'show_all'  => $show_all,
 			'msg'       => $msg,
 		);
 		// make (maybe changed) category infos avalible for nextmatch
 		$content['nm']['cat'] = $cat['GrpId'];
 		$content['nm']['col_filter']['sex'] = $cat['sex'];
+		$content['nm']['show_all'] = $show_all;
 
 		$select_options = array(
 			'cat' => $this->cats->names(array('rkey' => $comp['gruppen']),0),
 		);
 		//_debug_array($content);
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Register');
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Register');
+		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
 		$tmpl =& new etemplate('ranking.register.add');
 		$tmpl->exec('ranking.uiregistration.add',$content,$select_options,$readonly,$preserv,2);
 	}
@@ -386,7 +386,7 @@ class uiregistration extends boranking
 			'msg'      => $msg,
 		);
 		//_debug_array($content);
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
 			($nation ? ': '.$nation : '');
 		$tmpl->exec('ranking.uiregistration.register',$content,$select_options,$readonlys,$preserv);
 	}

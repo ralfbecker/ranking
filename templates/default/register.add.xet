@@ -35,28 +35,32 @@
 		<grid width="100%">
 			<columns>
 				<column width="83"/>
+				<column width="10%"/>
 				<column/>
 			</columns>
 			<rows>
 				<row disabled="!@msg">
 					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
 					<description/>
+					<description/>
 				</row>
 				<row class="th">
 					<description options=",,,comp" value="Competition"/>
-					<textbox id="comp_name" onchange="1" size="Select one" no_lang="1" readonly="true"/>
+					<textbox id="comp_name" onchange="1" size="Select one" no_lang="1" readonly="true" span="all"/>
 				</row>
-				<row class="row" disabled="!@comp">
+				<row class="row">
 					<description value="Category" options=",,,cat"/>
 					<menulist>
 						<menupopup id="cat" no_lang="1" onchange="1"/>
 					</menulist>
+					<checkbox label="show athlets from all categories" id="show_all" onchange="1"/>
 				</row>
 				<row disabled="!@cat">
 					<nextmatch span="all" id="nm" options="ranking.register.add.rows"/>
 				</row>
 				<row valign="top">
 					<button label="Close" onclick="window.close()"/>
+					<description/>
 					<description/>
 				</row>
 			</rows>

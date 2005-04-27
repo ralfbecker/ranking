@@ -121,25 +121,55 @@ class athlete extends so_sql
 	}
 
 	/**
-	 * Search for athletes
+	 * Search for athletes, joins by default with the Result table to show the last competition and to filter by a category
 	 *
-	 * reimplmented from so_sql
+	 * '*' and '?' are replaced with sql-wildcards '%' and '_'
+	 *
+	 * @param array/string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
+	 * @param boolean $only_keys=true True returns only keys, False returns all cols
+	 * @param string $order_by='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
+	 * @param string/array $extra_cols='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $wildcard='' appended befor and after each criteria
+	 * @param boolean $empty=false False=empty criteria are ignored in query, True=empty have to be empty in row
+	 * @param string $op='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
+	 * @param mixed $start=false if != false, return only maxmatch rows begining with start, or array($start,$num)
+	 * @param array $filter=null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
+	 * @param mixed $join=true sql to do a join (as so_sql::search), default true = add join for latest result
+	 *	if numeric a special join is added to only return athlets competed in the given category (GrpId).
+	 * @return array of matching rows (the row is an array of the cols) or False
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
 	{
-		if ($filter['nation'] == 'NULL') $filter['nation'] = null;
+		//echo "<p>athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 		
-		if (!$criteria) $criteria = 'sex IS NOT NULL AND nation IS NOT NULL';	// only real athletes
-		
-		if ($join === true)
+		foreach(array('nation','sex') as $name)
 		{
-			if ($criteria['PerId'])
+			if ($filter[$name] == 'NULL')
+			{
+				$filter[$name] = null;
+			}
+			elseif (!isset($filter[$name]) && !isset($criteria[$name]) && $op == 'AND')
+			{
+				// by default only show real athlets (nation and sex set)
+				$filter[] = $name . ' IS NOT NULL';
+			}
+		}
+		if ($join === true || is_numeric($join))
+		{
+			if (is_array($criteria) && $criteria['PerId'])
 			{
 				$join = '';
 			}
 			else
 			{
-				$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
+				if (is_numeric($join))	// add join to filter for a category
+				{
+					$join = ", $this->result_table WHERE GrpId=".(int)$join." AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+				}
+				else	// LEFT join to get latest competition 
+				{
+					$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
+				}
 				if ($extra_cols) $extra_cols = explode(',',$extra_cols);
 				$extra_cols[] = 'MAX(datum) AS last_comp';
 				$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
