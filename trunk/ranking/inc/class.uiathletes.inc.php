@@ -204,13 +204,26 @@ class uiathletes extends boranking
 		{
 			if ($val == 'NULL') $query['col_filter'][$col] = null;
 		}
+		$cat_filter = array(
+			'nation' => array_keys($this->ranking_nations),
+		);
+		if ($query['col_filter']['sex'])
+		{
+			$cat_filter['sex'] = $query['col_filter']['sex'] == 'NULL' ? null : $query['col_filter']['sex'];
+		}
+		else
+		{
+			unset($query['col_filter']['sex']);	// no filtering
+		}
 		foreach(array('vorname','nachname') as $name)
 		{
 			if ($query['col_filter']['nation'])
 			{
 				$filter = array('nation' => $query['col_filter']['nation']);
-				if ($query['col_filter']['sex']) $filter['sex'] = $query['col_filter']['sex'];
-
+				if ($query['col_filter']['sex'])
+				{
+					$filter['sex'] = $query['col_filter']['sex'];
+				}
 				$sel_options[$name] =& $this->athlete->distinct_list($name,$filter);
 			}
 			else
@@ -222,7 +235,9 @@ class uiathletes extends boranking
 				$query['col_filter'][$name] = '';
 			}
 		}
-		$total = $this->athlete->get_rows($query,$rows,$readonlys);
+		$sel_options['filter'] = array('' => lang('All')) + $this->cats->names($cat_filter,-1);
+
+		$total = $this->athlete->get_rows($query,$rows,$readonlys,(int)$query['filter'] ? (int)$query['filter'] : true);
 		
 		//_debug_array($rows);
 		
@@ -312,7 +327,8 @@ class uiathletes extends boranking
 		{
 			$content['nm'] = array(
 				'get_rows'       =>	'ranking.uiathletes.get_rows',
-				'no_filter'      => True,// I  disable the 1. filter
+				'filter_no_lang' => True,
+				'filter_label'   => lang('Category'),
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 				'no_cat'         => True,// I  disable the cat-selectbox
 				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows

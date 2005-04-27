@@ -1,5 +1,6 @@
 %1 deleted	ranking	de	%1 gelöscht
 %1 saved	ranking	de	%1 gespeichert
+%1, %2 deleted for category %3	ranking	de	%1, %2 gelöscht für Kategorie %3
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
 %d matches on search criteria	ranking	de	%d Treffer bei der Suche
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
@@ -181,6 +182,7 @@ serid	ranking	de	SerId
 short	ranking	de	Abkï¿½rzung
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
+show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
 since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
 size (cm)	ranking	de	Größe (cm)
 squad	ranking	de	Kader

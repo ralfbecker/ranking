@@ -118,9 +118,14 @@ class category extends so_sql
 		{
 			$data =& $this->data;
 		}
-		$data['rkey'] = strtoupper($data['rkey']);
-		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
-
+		if ($data['rkey'] && !is_array($data['rkey']))
+		{
+			$data['rkey'] = strtoupper($data['rkey']);
+		}
+		if ($data['nation'] && !is_array($data['nation']))
+		{
+			$data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
+		}
 		if (count($data) && $this->source_charset)
 		{
 			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
@@ -135,6 +140,8 @@ class category extends so_sql
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
+		//echo "<p>category::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
+
 		unset($criteria['rls']);	// is always set
 		unset($criteria['vor_rls']);
 		
@@ -159,6 +166,8 @@ class category extends so_sql
 					return $ret;
 			}
 		}
+		$filter[] = "rkey NOT LIKE 'X\\_%'";	// dont show old dR internal cats
+
 		$ret =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 		
 		if (!$this->cache && count($criteria)+count($filter) == 0)
@@ -201,20 +210,40 @@ class category extends so_sql
 	/**
 	 * get the names of all or certain categories, eg. to use in a selectbox
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
-	 * @param int $rkeys 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
+	 * @param int $rkeys -1: GrpId=>rkey:name 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
 	 * @param string $sort='rkey' 
 	 * @returns array with all Cups in the from specified in $rkeys
 	 */
 	function &names($keys=array(),$rkeys=2,$sort='rkey')
 	{
 		if (!preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort)) $sort = 'rkey';
-		if ($keys['nation'] == 'NULL') $keys['nation'] = null;
-
+		if (isset($keys['nation']))
+		{
+			if (!is_array($keys['nation']) && $keys['nation'] == 'NULL')
+			{
+				$keys['nation'] = null;
+			}
+			if (is_array($keys['nation']) && ($k = array_search('NULL',$keys['nation'])) !== false) 
+			{
+				$keys['nation'][$k] = null;
+			}
+		}
+		if (!is_null($keys['sex']) && !$keys['sex'])
+		{
+			unset($keys['sex']);
+		}
+		elseif ($keys['sex'] == 'NULL')
+		{
+			$keys['sex'] = null;
+		}
 		$names = array();
 		foreach((array)$this->search(array(),False,'rkey','','',false,'AND',false,$keys) as $data)
 		{
 			switch($rkeys)
 			{
+				case -1:
+					$names[$data['GrpId']] = $data['rkey'] . ': ' . $data['name'];
+					break;
 				case 0:
 					$names[$data['GrpId']] = $data['name'];
 					break;

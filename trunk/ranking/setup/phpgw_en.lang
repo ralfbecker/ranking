@@ -1,5 +1,6 @@
 %1 deleted	ranking	en	%1 deleted
 %1 saved	ranking	en	%1 saved
+%1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 aborts without saving changes	ranking	en	aborts without saving changes
@@ -157,6 +158,7 @@ select how the ranking should be calculated	ranking	en	select how the ranking sh
 serid	ranking	en	SerId
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
+show athlets from all categories	ranking	en	show athlets from all categories
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
 squad	ranking	en	Squad
