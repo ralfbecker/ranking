@@ -313,6 +313,7 @@ class category extends so_sql
 		{
 			$y = $from_year; $from_year = $to_year; $to_year = $y;
 		}
+		//echo "category::age_group(,'$stand',from=$from_year, to=$to_year)"; _debug_array($cat);
 		return $cat['from_year'] && $cat['to_year'];
 	}
 }

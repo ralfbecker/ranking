@@ -26,7 +26,7 @@
 					<date id="${row}[geb_date]" readonly="true" options="Y-m-d" align="center"/>
 					<description no_lang="1" id="${row}[ort]"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d" align="center"/>
-					<button class="small" label="Register" id="register[$row_cont[PerId]]" statustext="Register this athlete for the selected category" onclick="opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.register&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;"/>
+					<button class="small" label="Register" id="register[$row_cont[PerId]]" statustext="Register this athlete for the selected category" onclick="opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;"/>
 				</row>
 			</rows>
 		</grid>

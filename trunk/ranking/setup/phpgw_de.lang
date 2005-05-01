@@ -32,6 +32,7 @@ click to view	ranking	de	anklicken zum Anzeigen
 climbing professional	ranking	de	Profi
 climbing since (years)	ranking	de	klettert seit (Jahren)
 competition	ranking	de	Wettkampf
+competition has not yet or no longer a startlist	ranking	de	Wettkampf hat noch keine Startliste oder keine mehr
 competition name	ranking	de	Wettkampfname
 competition results	ranking	de	Wettkampfergebnisse
 competitions	ranking	de	Wettkämpfe
@@ -56,6 +57,7 @@ delete this cup	ranking	de	Diesen Cup löschen
 deletes this cup	ranking	de	Diesen Cup löschen
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
 deny public display of the checked information	ranking	de	öffentlichen Anzeige der ausgewählte Informationen verweigern
+download	ranking	de	Herunterladen
 duration	ranking	de	Lï¿½nge
 duration in days or textual competition-date like 'mid july'	ranking	de	Dauer in Tagen oder Text für Wettkampfdatum wie 'Mitte Juli'
 duration in days or textual competitiondate like 'july 2002'	ranking	de	Lï¿½nge in Tagen oder ein Text wie 'Juli 2002' fï¿½r das Wettkampfdatum
@@ -70,6 +72,7 @@ entry not found !!!	ranking	de	Eintrag nicht gefunden
 entry saved	ranking	de	Eintrag gespeichert
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
 error: deleting %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
+error: generating startlist	ranking	de	Fehler: beim Erzeugen der Startliste
 error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlüssel '%1' existiert bereits, er muß eindeutig sein !!!
 error: key '%s' exists already, it has to be unique !!!	ranking	de	Fehler: Der Schlï¿½ssel '%s' existiert bereits, er muss einmalig sein !!!
 error: registration	ranking	de	Fehler: Registrierung
@@ -98,6 +101,7 @@ gender	ranking	de	Geschlecht
 gender of the athlete	ranking	de	Geschlecht des Athleten
 gender...	ranking	de	Geschlecht...
 general	ranking	de	Allgemein
+generate startlist	ranking	de	Startliste erzeugen
 grpid	ranking	de	GrpId
 hobbies	ranking	de	Hobies
 homepage	ranking	de	Internetadresse
@@ -174,6 +178,7 @@ remove the attached pdf	ranking	de	Das angehangene PDF löschen
 removed the %1	ranking	de	Das %1 wurde gelöscht
 result pdf	ranking	de	Ergebnis PDF
 results	ranking	de	Ergebnisse
+routes	ranking	de	Routen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
 select a cup for a cup-ranking	ranking	de	Einen Cup auswählen für eine Cup-Ranliste
 select a nation first	ranking	de	Zuerst Nation auswählen
@@ -189,7 +194,11 @@ squad	ranking	de	Kader
 startdate	ranking	de	Startdatum
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darf nicht leer sein)
 startlist	ranking	de	Startliste
+startlist for category %1 generated	ranking	de	Startliste für Kategorie %1 erzeugt
 startlist pdf	ranking	de	Startlisten PDF
+startlists	ranking	de	Startlisten
+startlists or results	ranking	de	Startlisten oder Ergebnisse
+startnumber	ranking	de	Startnummer
 starts the cathegory editor	ranking	de	Startet das Bearbeiten der Kategorien
 starts the competition editor	ranking	de	Startet das Bearbeiten der Wettkï¿½mpfe
 starts the cup editor	ranking	de	Startet das Bearbeiten der Cups
@@ -204,6 +213,7 @@ to year	ranking	de	bis Jahr
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
+unknown category or not a category of this competition	ranking	de	Unbekannte Kategorie oder nicht eine Kategorie dieses Wettkampfes
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt
 url to own homepage, eg. http://domain.com	ranking	de	URL zu eigener Homepage, zB. http://climbing.de
 use "yes" or "no, prefession"	ranking	de	benützen Sie "yes" oder "no, Beruf"

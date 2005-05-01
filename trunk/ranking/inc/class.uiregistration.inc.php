@@ -21,8 +21,9 @@ class uiregistration extends boranking
 	 * @var array $public_functions functions callable via menuaction
 	 */
 	var $public_functions = array(
-		'register' => true,
-		'add'      => true,
+		'lists' => true,
+		'index' => true,
+		'add'   => true,
 	);
 
 	function uiregistration()
@@ -135,7 +136,7 @@ class uiregistration extends boranking
 	 * @param array $content
 	 * @param string $msg
 	 */
-	function register($content=null,$msg='')
+	function index($content=null,$msg='')
 	{
 		$tmpl =& new etemplate('ranking.register.form');
 
@@ -177,6 +178,7 @@ class uiregistration extends boranking
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
 				'datum >= '.$this->db->quote(date('Y-m-d',time())),
+				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 		);
 		foreach($this->athlete_rights as $nat)
@@ -187,13 +189,16 @@ class uiregistration extends boranking
 		if ($comp)
 		{
 			//_debug_array($this->comp->data);
-			foreach($this->comp->data['gruppen'] as $i => $rkey)
+			foreach((array) $this->comp->data['gruppen'] as $i => $rkey)
 			{
 				if (($cat = $this->cats->read(array('rkey'=>$rkey))))
 				{
 					$cat2col[$cat['GrpId']] = $tmpl->num2chrs($i);
+					$readonlys['download['.$cat['GrpId'].']'] = true;
 				}
 			}
+			$readonlys['download'] = true;
+
 			if ($nation)	// read prequalified athlets
 			{
 				$prequalified = $this->national_prequalified($comp,$nation);
@@ -220,60 +225,64 @@ class uiregistration extends boranking
 				}
 				if (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']))
 				{
-					_debug_array($cat);
-					_debug_array($comp);
+					//_debug_array($cat);
+					//_debug_array($comp);
 					$msg = lang('Permission denied !!!');
 				}
 				elseif($content['delete'])
 				{
-					if ($this->result->delete(array(
-						'WetId' => $comp['WetId'],
-						'GrpId' => $cat['GrpId'],
-						'PerId' => $athlete['PerId'],
-						'platz = 0',	// precausion to not delete a result
-					)))
-					{
-						$msg = lang('%1, %2 deleted for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']);
-					}
-					else
-					{
-						$msg = lang('Error: registration');
-					}
+					$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete['PerId'],2) ?
+						lang('%1, %2 deleted for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
+						lang('Error: registration');
 				}
 				else // register
 				{
-					// prequalified athlets get a number < 1000
-					$is_prequalified = isset($prequalified[$cat['GrpId']][$athlete['PerId']]);
-
-					list($num) = $this->result->search(array(),'MAX(pkte)','','','',false,'AND',false,array(
-						'nation' => $nation,
-						$is_prequalified ? 'pkte < 1000' : 'pkte >= 1000',
-					),false);
-					if ($num)
-					{
-						$num++;
-					}
-					else
-					{
-						$num = $is_prequalified ? 1 : 1000;
-					}
-					if ($this->result->save(array(
-						'PerId' => $athlete['PerId'],
-						'WetId' => $comp['WetId'],
-						'GrpId' => $cat['GrpId'],
-						'platz' => 0,
-						'pkte'  => $num,
-						'datum' => date('Y-m-d'),
-					)) == 0)
-					{
-						$msg = lang('%1, %2 registered for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']);
-					}
-					else
-					{
-						$msg = lang('Error: registration');
-					}
+					$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete,isset($prequalified[$cat['GrpId']][$athlete['PerId']])) ?
+						lang('%1, %2 registered for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
+						lang('Error: registration');
 				}
 			}
+			// generate a startlist
+			elseif ($content['startlist'] && $this->acl_check($comp['nation'],EGW_ACL_EDIT|EGW_ACL_REGISTER))
+			{
+				$cats = false;
+				list($cat) = @each($content['startlist']);
+				foreach($cat ? array($cat) : $comp['gruppen'] as $cat)
+				{
+					if ($cat && ($cat = $this->cats->read($cat)))
+					{
+						$max_compl = $content['max_compl'][$cat['GrpId']];
+						if ($max_compl === '') $max_compl = 999;	// all
+						$num_routes = $content['num_routes'][$cat['GrpId']];
+						
+						if ($num_routes && $this->generate_startlist($comp,$cat,$num_routes,$max_compl,1))
+						{
+							$cats[] = $cat['name'];
+						}
+						else
+						{
+							break;
+						}
+					}
+				}
+				if ($cats)
+				{
+					$msg .= lang('Startlist for category %1 generated',implode(', ',$cats));
+				}
+				else
+				{
+					$msg = lang('Error: generating startlist');
+				}
+			}
+			elseif ($content['download'])
+			{
+				list($cat) = @each($content['download']);
+				return $this->lists(array(
+					'comp' => $comp['WetId'],
+					'cat'  => (int) $cat,
+					'download' => 1,
+				));
+			}	
 			$starters =& $this->result->read(array(
 				'WetId'  => $comp['WetId'],
 				'GrpId'  => -1,
@@ -320,10 +329,16 @@ class uiregistration extends boranking
 					}
 				}
 			}
-			$rows = array(false);	// we need 1 to be the index of the first row
+			$rows = array(false,false);	// we need 2 to be the index of the first row
 			$starters[] = array('nation'=>'');	// to get the last line out
 			foreach((array)$starters as $starter)
 			{
+				// download button only if there's a startlist (platz==0 && pkt>64)
+				$download = 'download['.$starter['GrpId'].']';
+				if ($starter['GrpId'] && (!isset($readonlys[$download]) || $readonlys[$download] || $starter['platz']))
+				{
+					$readonlys['download'] = $readonlys[$download] = $starter['platz'] || $starter['pkt'] > 64;
+				}
 				// new nation and data for the previous nation ==> write that data
 				if ($nat != $starter['nation'])
 				{
@@ -360,7 +375,7 @@ class uiregistration extends boranking
 				$readonlys[$delete_button] = !$nation;	// re-enable the button
 			}
 			$cats = array();
-			foreach($cat2col as $cat => $col)
+			foreach((array)$cat2col as $cat => $col)
 			{
 				$cats[$col] = $this->cats->read(array('GrpId' => $cat));
 			}
@@ -385,9 +400,180 @@ class uiregistration extends boranking
 			'count'    => $starters ? count($starters)-1 : 0,	// -1 as we add an empty starter at the end
 			'msg'      => $msg,
 		);
+		if ($cats)
+		{
+			foreach($cats as $col => $cat)
+			{
+				$content['startlist'][$col] = array(
+					'num_routes' => 'num_routes['.$cat['GrpId'].']',
+					'max_compl'  => 'max_compl['.$cat['GrpId'].']',
+					'button'     => 'startlist['.$cat['GrpId'].']',
+					'download'   => 'download['.$cat['GrpId'].']',
+				);
+			}
+		}
+		// dont show startlist options, if no comp selected, no starters, a nation selected or no rights to generate a startlist
+		if (!$comp || count($starters) <= 1 || $nation || !$this->acl_check($comp['nation'],EGW_ACL_EDIT|EGW_ACL_REGISTER))
+		{
+			$content['startlist'] =  false;
+		}
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
 			($nation ? ': '.$nation : '');
-		$tmpl->exec('ranking.uiregistration.register',$content,$select_options,$readonlys,$preserv);
+		$tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
 	}
+
+	/**
+	 * Show/download the startlist or result of a competition for one or all categories
+	 *
+	 * @param array $content
+	 * @param string $msg
+	 */
+	function lists($content=null,$msg='')
+	{
+		$tmpl =& new etemplate('ranking.register.lists');
+		
+		if (!is_array($content))
+		{
+			$content['calendar'] = $_GET['calendar'];
+			$content['comp'] = $_GET['comp'];
+			$content['cat']  = $_GET['cat'];
+			$content['download'] = $_GET['download'];
+		}
+		$comp     = $this->comp->read($content['comp']);
+		$cat      = $content['cat'];
+
+		if ($this->only_nation)
+		{
+			$calendar = $this->only_nation;
+		}
+		elseif ($comp)
+		{
+			$calendar = $comp['nation'] ? $comp['nation'] : 'NULL';
+		}
+		elseif ($content['calendar'])
+		{
+			$calendar = $content['calendar'];
+		}
+		else
+		{
+			list($calendar) = each($this->ranking_nations);
+		}
+		$select_options = array(
+			'calendar' => $this->ranking_nations,
+			'comp'     => $this->comp->names(array(
+				'nation' => $calendar,
+				'datum >= '.$this->db->quote(date('Y-m-d',time())),
+			),0,'datum ASC'),
+			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
+		);
+		
+		if ($comp && $cat && (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen'])))
+		{
+			$cat = '';
+			//$msg = lang('Unknown category or not a category of this competition');
+		}
+		if ($comp)
+		{
+			$starters =& $this->result->read(array(
+				'WetId'  => $comp['WetId'],
+				'GrpId'  => $cat ? $cat['GrpId'] : -1,
+				'(platz > 0 OR pkt >= 64)',		// startlist or result
+			),'',true,'GrpId,platz,pkt,nachname,vorname');
+			
+			if ($content['download'] && $starters && count($starters))
+			{
+				$browser =& CreateObject('phpgwapi.browser');
+				$browser->content_header($comp['rkey'].'.csv','text/comma-separated-values');
+				$name2csv = array(
+					'WetId'    => 'comp',
+					'GrpId'    => 'cat',
+					'PerId'    => 'athlete',
+					'platz'    => 'place',
+					'category',			
+					'startnumber',
+					'nachname' => 'lastname',
+					'vorname'  => 'firstname',
+					'nation'   => 'nation',
+					'geb_date' => 'birthdate',
+				);
+				echo implode(';',$name2csv)."\n";
+				$charset = $GLOBALS['phpgw']->translation->charset();
+				$c = $cat;
+				foreach($starters as $athlete)
+				{
+					if ($c['GrpId'] != $athlete['GrpId'])
+					{
+						$c = $this->cats->read($athlete['GrpId']);
+					}
+					$values = array();
+					foreach($name2csv as $name => $csv)
+					{
+						switch($csv)
+						{
+							case 'startnumber':
+								$val = $athlete['platz'] ? '' : ($athlete['pkt'] >> 13 ? (1+($athlete['pkt'] >> 13)).': ' : '') .
+									(($athlete['pkt'] >> 6) & 127);
+								break;
+							case 'place':
+								$val = $athlete['platz'] ? $athlete['platz'] : '';
+								break;
+							case 'category':
+								$val = $c['name'];
+								break;
+							default:
+								$val = $athlete[$name];
+						}
+						if (strchr($val,';') !== false)
+						{
+							$val = '"'.str_replace('"','',$val).'"';
+						}
+						$values[$csv] = $val;
+					}
+					// convert by default to iso-8859-1, as this seems to be the default of excel
+					echo $GLOBALS['egw']->translation->convert(implode(';',$values),$charset,
+						$_GET['charset'] ? $_GET['charset'] : 'iso-8859-1')."\n";
+				}
+				$GLOBALS['egw']->common->egw_exit();
+			}
+			if (!$starters || !count($starters))
+			{
+				$msg = lang('Competition has not yet or no longer a startlist');
+				$readonlys['download'] = true;
+			}
+			else
+			{
+				$c = $cat;
+				$rows = array(false);
+				foreach($starters as $athlete)
+				{
+					if ($athlete['GrpId'] != $c['GrpId'])
+					{
+						$c = $this->cats->read($athlete['GrpId']);
+					}
+					$rows[] = $athlete + array(
+						'start'    => ($athlete['pkt'] >> 13 ? (1+($athlete['pkt'] >> 13)).': ' : '') .
+							(($athlete['pkt'] >> 6) & 127),
+						'year'     => substr($athlete['geb_date'],0,4),
+						'cat_name' => $c['name'],
+					);
+				}
+				unset($starters);
+				//_debug_array($rows);
+			}
+		}
+		$content = array(
+			'calendar' => $calendar,
+			'comp'     => $comp['WetId'],
+			'cat'      => $cat ? $cat['GrpId'] : '',
+			'rows'     => $rows,
+			'msg'      => $msg,
+			'result'   => $athlete['platz'] > 0,
+		);
+		
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.
+			($athlete['platz'] > 0 ? lang('Results') : lang('Startlists'));
+		$tmpl->exec('ranking.uiregistration.lists',$content,$select_options,$readonlys,$preserv);
+	}
+
 }

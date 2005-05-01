@@ -29,6 +29,7 @@ click to view	ranking	en	click to view
 climbing professional	ranking	en	Climbing professional
 climbing since (years)	ranking	en	climbing since (years)
 competition	ranking	en	Competition
+competition has not yet or no longer a startlist	ranking	en	Competition has not yet or no longer a startlist
 competition name	ranking	en	Competition name
 competition results	ranking	en	Competition results
 competitions	ranking	en	competitions
@@ -51,6 +52,7 @@ delete this cup	ranking	en	Delete this cup
 deletes this cup	ranking	en	deletes this cup
 deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
+download	ranking	en	Download
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
 duration or textual date	ranking	en	Duration or textual date
 each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
@@ -62,6 +64,7 @@ edit this competition	ranking	en	Edit this competition
 entry not found !!!	ranking	en	Entry not found !!!
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
+error: generating startlist	ranking	en	Error: generating startlist
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
 error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
@@ -87,6 +90,7 @@ gender	ranking	en	Gender
 gender of the athlete	ranking	en	gender of the athlete
 gender...	ranking	en	Gender...
 general	ranking	en	General
+generate startlist	ranking	en	Generate startlist
 grpid	ranking	en	GrpId
 hobbies	ranking	en	Hobbies
 homepage	ranking	en	Homepage
@@ -151,6 +155,7 @@ remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
 result pdf	ranking	en	Result PDF
 results	ranking	en	Results
+routes	ranking	en	Routes
 saves the changes made	ranking	en	saves the changes made
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
@@ -165,7 +170,11 @@ squad	ranking	en	Squad
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
 startlist	ranking	en	Startlist
+startlist for category %1 generated	ranking	en	Startlist for category %1 generated
 startlist pdf	ranking	en	Startlist PDF
+startlists	ranking	en	Startlists
+startlists or results	ranking	en	Startlists or results
+startnumber	ranking	en	Startnumber
 street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
 teamofficials	ranking	en	Teamofficials
@@ -176,6 +185,7 @@ to year	ranking	en	to year
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
+unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
 url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. http://domain.com
 use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"

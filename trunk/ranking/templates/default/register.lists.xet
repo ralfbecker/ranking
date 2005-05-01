@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.register.lists" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%">
+			<columns>
+				<column width="83"/>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
+					<description/>
+					<description span="all"/>
+				</row>
+				<row class="th">
+					<description options=",,,comp" value="Competition"/>
+					<menulist>
+						<menupopup id="calendar" onchange="1" no_lang="1"/>
+					</menulist>
+					<menulist>
+						<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
+					</menulist>
+				</row>
+				<row class="th" disabled="!@comp">
+					<description value="Category" options=",,,cat"/>
+					<menulist>
+						<menupopup id="cat" options="All" onchange="1" no_lang="1"/>
+					</menulist>
+					<button label="Download" id="download"/>
+				</row>
+				<row disabled="!@comp">
+					<grid>
+						<columns>
+							<column disabled="@cat"/>
+							<column width="80" disabled="@result"/>
+							<column disabled="!@result"/>
+							<column/>
+							<column/>
+							<column/>
+							<column/>
+						</columns>
+						<rows>
+							<row class="th">
+								<description value="Category"/>
+								<description value="Startnumber"/>
+								<description value="Place"/>
+								<description value="Lastname"/>
+								<description value="Firstname"/>
+								<description value="Birthyear"/>
+								<description value="Nation"/>
+							</row>
+							<row class="row">
+								<description id="rows[$row][cat_name]" no_lang="1"/>
+								<description id="rows[$row][start]" no_lang="1" class="place" align="center"/>
+								<description class="place" no_lang="1" id="rows[$row][platz]"/>
+								<description id="rows[$row][nachname]" no_lang="1" class="lastname"/>
+								<description id="rows[$row][vorname]" no_lang="1"/>
+								<description no_lang="1" id="rows[$row][year]" align="center"/>
+								<description no_lang="1" id="rows[$row][nation]" align="center"/>
+							</row>
+						</rows>
+					</grid>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
