@@ -26,6 +26,8 @@ class ranking_admin_prefs_sidebox_hooks
 		if ($location == 'sidebox_menu')
 		{
 			$file = array(
+				'Ranking' => $GLOBALS['phpgw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiranking.index' )),
 				'Competitions' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.uicompetitions.index' )),
 				'Cups' => $GLOBALS['phpgw']->link('/index.php',array(
@@ -35,9 +37,9 @@ class ranking_admin_prefs_sidebox_hooks
 				'Athletes' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiathletes.index' )),
 				'Registration' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiregistration.register' )),
-				'Ranking' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiranking.index' )),
+					'menuaction' => 'ranking.uiregistration.index' )),
+				'Startlists or results' => $GLOBALS['phpgw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiregistration.lists' )),
 			);
 			display_sidebox($appname,$GLOBALS['phpgw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 		}

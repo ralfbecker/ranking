@@ -148,7 +148,7 @@ class athlete extends so_sql
 			{
 				$filter[$name] = null;
 			}
-			elseif (!isset($filter[$name]) && !isset($criteria[$name]) && $op == 'AND')
+			elseif (!isset($filter[$name]) && !(isset($criteria[$name]) && $op == 'AND'))
 			{
 				// by default only show real athlets (nation and sex set)
 				$filter[] = $name . ' IS NOT NULL';
@@ -164,7 +164,14 @@ class athlete extends so_sql
 			{
 				if (is_numeric($join))	// add join to filter for a category
 				{
-					$join = ", $this->result_table WHERE GrpId=".(int)$join." AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+					$cat = (int) $join;
+					$join = ", $this->result_table WHERE GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+					
+					// if cat uses an age-group only show athlets in that age-group
+					if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
+					{
+						$join .= " AND $from_year <= YEAR(geb_date) AND YEAR(geb_date) <= $to_year";
+					}
 				}
 				else	// LEFT join to get latest competition 
 				{
@@ -188,6 +195,14 @@ class athlete extends so_sql
 	function distinct_list($column,$keys='')
 	{
 		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),")</p>\n";
+		
+		static $cache;
+		$cache_key = serialize($keys);
+		
+		if (isset($cache[$cache_key]))
+		{
+			return $cache[$cache_key];
+		}		
 		if (!($column = array_search($column,$this->db_cols))) return false;
 
 		if ($keys && !is_array($keys)) $keys = array('nation' => $keys);
@@ -198,7 +213,7 @@ class athlete extends so_sql
 			$val = $data[$column];
 			$values[$val] = $val;
 		}
-		return $values;
+		return $cache[$cache_key] =& $values;
 	}
 	
 	/**

@@ -88,14 +88,23 @@ class result extends so_sql
 		}
 		if ($this->WetId && $this->GrpId && !$this->PerId)	// read complete result of comp. WetId for cat GrpId
 		{
+			$cols = false;
 			if ($join === true)
 			{
 				$join = ",$this->athlete_table WHERE $this->result_table.PerId=$this->athlete_table.PerId";
-				$extra_cols = "nachname,vorname,nation AS nation,geb_date";
+				if (!$extra_cols) 
+				{
+					$extra_cols = "nachname,vorname,nation,geb_date";
+				}
+				else
+				{
+					$cols = $extra_cols;
+					$extra_cols = '';
+				}
 			}
 			if ($this->GrpId < 0) unset($keys['GrpId']);	// return all cats
 
-			return $this->search($keys,false,$order ? $order : 'platz,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
+			return $this->search($keys,$cols,$order ? $order : 'platz,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
 		}
 		elseif (!$this->WetId && !$this->GrpId && $this->PerId)	// read list comps of one athlet
 		{

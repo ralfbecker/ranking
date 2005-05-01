@@ -15,6 +15,7 @@
 include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
 
 define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
+define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
 
 class boranking extends soranking 
 {
@@ -149,6 +150,10 @@ class boranking extends soranking
 			}
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
 		}
+		else
+		{
+			$this->athlete_rights = $this->register_rights = array_values($this->athlete->distinct_list('nation'));
+		}
 	}
 	
 	/**
@@ -156,6 +161,7 @@ class boranking extends soranking
 	 *
 	 * Editing athletes data is mapped to EGW_ACL_ADD.
 	 * Having EGW_ACL_ADD or EGW_ACL_REGISTER for NULL=international, is equivalent to having that right for ANY nation.
+	 * EGW_ACL_RESULT requires _both_ EGW_ACL_EDIT or EGW_ACL_REGISTER (for the nation of the calendar/competition)
 	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international
 	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER}
@@ -168,6 +174,12 @@ class boranking extends soranking
 		
 		if (isset($acl_cache[$nation][$required])) return $acl_cache[$nation][$required];
 		
+		// Result ACL requires _both_ EDIT AND REGISTER rights, acl::check cant check both at once!
+		if($required == EGW_ACL_RESULT)
+		{
+			return $acl_cache[$nation][$required] = $this->acl_check($nation,EGW_ACL_EDIT) && 
+				$this->acl_check($nation,EGW_ACL_REGISTER|1024);	// |1024 prevents int. registrations rights to be sufficent for national calendars
+		}
 		return $acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($nation ? $nation : 'NULL',$required,'ranking') ||
 			($required == EGW_ACL_ADD || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
 	}
@@ -502,7 +514,7 @@ class boranking extends soranking
 			}
 		}
 		//echo "prequalifed($comp[rkey],$do_cat$do_cat[rkey]) ="; _debug_array($prequalified);
-		return $do_cat ? $prequalified[$cat] : $prequalified;
+		return $do_cat ? $prequalified[$cat_id] : $prequalified;
 	}
 	
 	/**
@@ -524,20 +536,234 @@ class boranking extends soranking
 		}
 		$all_cats = array_unique($all_cats);
 		
-		foreach((array)$this->athlete->search(array(),false,'','','',false,'AND',false,array(
-			'nation' => $nation,
-			'PerId'  => $all_cats,
-		),false) as $athlete)
+		if (count($all_cats))
 		{
-			foreach($prequalified as $cat => $prequals)
+			foreach((array)$this->athlete->search(array(),false,'','','',false,'AND',false,array(
+				'nation' => $nation,
+				'PerId'  => $all_cats,
+			),false) as $athlete)
 			{
-				if (in_array($athlete['PerId'],$prequalified[$cat]))
+				foreach($prequalified as $cat => $prequals)
 				{
-					$nat_prequals[$cat][$athlete['PerId']] = $athlete;
-				}
-			}					
+					if (in_array($athlete['PerId'],$prequalified[$cat]))
+					{
+						$nat_prequals[$cat][$athlete['PerId']] = $athlete;
+					}
+				}					
+			}
 		}
 		return $nat_prequals;
+	}
+	
+	/**
+	 * (de-)register an athlete for a competition and category
+	 *
+	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
+	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
+	 * - startnumber in the next 7 bits (($pkt >> 6) & 127))
+	 * - route in the other bits ($pkt >> 13)
+	 *
+	 * @param int $comp WetId
+	 * @param int $cat GrpId
+	 * @param int/array $athlete PerId or complete athlete array
+	 * @param int $mode=0  0: register (quota or supplimentary), 1: register prequalified, 2: remove registration
+	 * @return boolean true of everythings ok, false on error
+	 */
+	function register($comp,$cat,$athlete,$mode=0)
+	{
+		//echo "<p>boranking::register($comp,$cat,$athlete$athlete[PerId],$mode)</p>\n";
+		if (!$comp || !$cat || !$athlete) return false;
+		
+		if ((int)$mode == 2)	// de-register
+		{
+			return !!$this->result->delete(array(
+				'WetId' => $comp,
+				'GrpId' => $cat,
+				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
+				'platz = 0',	// precausion to not delete a result
+			));
+		}
+		if (!is_array($athlete)) $athlete = $this->athlete->read($athlete);
+
+		// get next registration-number, to have registered athletes ordered
+		// registration number are from 1 to 63 in that 6 lowest bit (&63) of the points
+		$num = $this->result->read(array(
+			'GrpId'  => $cat,
+			'WetId'  => $comp,
+			'nation' => $athlete['nation'],
+			'(pkt & 63) '.($mode ? '< 32' : '>= 32'),	// prequalified athlets get a number < 32
+		),'MAX(pkt & 63) AS pkt');
+
+		if ($num && ($num = $num[0]['pkt']))
+		{
+			if ($num != 31 && $num != 63)	// prefent overflow => use highest number
+			{
+				$num++;
+			}
+		}
+		else
+		{
+			$num = $mode ? 1 : 32;
+		}
+		return !$this->result->save(array(
+			'PerId' => $athlete['PerId'],
+			'WetId' => $comp,
+			'GrpId' => $cat,
+			'platz' => 0,
+			'pkt'  => $num,
+			'datum' => date('Y-m-d'),
+		));
+	}
+	
+	/**
+	 * Generate a startlist for the given competition and category
+	 *
+	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
+	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
+	 * - startnumber in the next 7 bits (($pkt >> 6) & 127))
+	 * - route in the other bits ($pkt >> 13)
+	 *
+	 * @param int/array $comp WetId or complete comp array
+	 * @param int/array $cat GrpId or complete cat array
+	 * @param int $num_routes=1 number of routes, default 1
+	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
+	 * @param int $mode=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first
+	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
+	 */
+	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$mode=0)
+	{
+		if (!is_array($comp)) $comp = $this->comp->read($comp);
+		if (!is_array($cat)) $cat = $this->cats->read($cat);
+		if (!$comp || !$cat) return false;
+		
+		echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$mode)</p>\n";
+		
+		$starters = $this->result->read(array(
+			'WetId'  => $comp['WetId'],
+			'GrpId'  => $cat['GrpId'],
+			'platz = 0',		// savegard against an already exsiting result
+		),'',true,'nation,platz,pkt,GrpId');
+		//_debug_array($starters);
+		
+		if (!count($starters)) return false;	// no starters, or eg. already a result
+		
+		for ($route = 1; $route <= $num_routes; ++$route)
+		{
+			$startlist[$route] = array();
+		}
+		$prequalified = $this->prequalified($comp,$cat);
+		$reset_data = true;
+
+		// do we use a ranking, if yes calculate it and place the ranked competitors at the end of the startlist
+		if ($mode)
+		{
+			$stand = $comp['datum'];
+		 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$mode == 2 ? $comp['serie'] : '');
+
+			// index starters with their PerId
+			foreach($starters as $k => $athlete)
+			{
+				$starters[$athlete['PerId']] =& $starters[$k];
+				unset($starters[$k]);
+			}
+			// we generate the startlist starting from the end = first of the ranking
+			foreach((array) $ranking as $athlete)
+			{
+				if (isset($starters[$athlete['PerId']]))
+				{
+					$this->check_move_to_startlist($starters,$athlete['PerId'],$startlist,$num_routes,$comp,$prequalified,$max_compl,$reset_data);
+					$reset_data = false;
+				}
+			}
+		}
+		// now we randomly pick starters and devide them on the routes
+		while(count($starters))
+		{
+			$this->check_move_to_startlist($starters,array_rand($starters),$startlist,$num_routes,$comp,$prequalified,$max_compl,$reset_data);
+			$reset_data = false;
+		}
+		// store the startlist in the database
+		for ($route = 1; $route <= $num_routes; ++$route)
+		{
+			// if we used a ranking, we have to reverse the startlist
+			if ($mode) 
+			{
+				$startlist[$route] = array_reverse($startlist[$route]);
+			}
+			//_debug_array($startlist[$route]);
+
+			foreach($startlist[$route] as $n => $athlete)
+			{
+				// we preserve the registration number in the last 6 bit's
+				$num = (($route-1) << 13) + ((1+$n) << 6) + ($athlete['pkt'] & 63);
+
+				if ($this->debug) echo ($n+1).": $athlete[nachname], $athlete[vorname] ($athlete[nation]) $num=".($num >> 6).":".($num % 64)."<br>\n";
+
+				if($this->result->save(array(
+					'PerId' => $athlete['PerId'],
+					'WetId' => $athlete['WetId'],
+					'GrpId' => $athlete['GrpId'],
+					'platz' => 0,
+					'pkt'   => $num,
+					'datum' => $athlete['datum'] ? $athlete['datum'] : date('Y-m-d'),
+				)) != 0)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * move an athlete to the startlist, if he's not over the quota (plus max_supp(-limentary))
+	 *
+	 * @internal 
+	 * @return boolean true if athlete is moved, false if not 
+	 */
+	function check_move_to_startlist(&$starters,$k,&$startlist,$num_routes,&$comp,&$prequalified,$max_compl,$reset_data=false)
+	{
+		static $nations = array();
+		static $route = 1;
+		
+		if ($reset_nat_data) 
+		{
+			$nations = array();
+			$route = 1;
+		}
+		$athlete =& $starters[$k];
+	
+		$nation = $athlete['nation'];
+		if (!isset($nations[$nation]))
+		{
+			$nations[$nation] = array(
+				'quota'        => $comp['host_quota'] && $comp['host_nation'] == $nation ? $comp['host_quota'] : $comp['quota'],
+				'num'          => 0,
+			);
+		}
+		$nat_data =& $nations[$nation];
+
+		if (!in_array($athlete['PerId'],$prequalified) && ++$nat_data['num'] > $nat_data['quota'] + $max_compl)
+		{
+			if ($athlete['pkt'] > 64)	// athlet already has startingnumber, eg. not first run
+			{
+				$this->result->save(array(
+					'PerId' => $athlete['PerId'],
+					'WetId' => $athlete['WetId'],
+					'GrpId' => $athlete['GrpId'],
+					'platz' => 0,
+					'pkt'   => $athlete['pkt'] & 63,	// leave only the registration number
+					'datum' => $athlete['datum'] ? $athlete['datum'] : date('Y-m-d'),
+				));
+			}							
+			return false;	// not prequalified athlete is over the quota plus max_supp => ignore him
+		}
+		$startlist[$route][] =& $starters[$k];
+		unset($starters[$k]);
+		
+		if (++$route > $num_routes) $route = 1;
+		
+		return true;
 	}
 
 	/**
