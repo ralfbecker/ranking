@@ -5,30 +5,32 @@
 		<grid width="100%">
 			<columns>
 				<column width="83"/>
-				<column width="15%"/>
 				<column/>
 			</columns>
 			<rows>
 				<row disabled="!@msg">
 					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
 					<description/>
-					<description span="all"/>
 				</row>
 				<row class="th">
 					<description options=",,,comp" value="Competition"/>
-					<menulist>
-						<menupopup id="calendar" onchange="1" no_lang="1"/>
-					</menulist>
-					<menulist>
-						<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
-					</menulist>
+					<hbox orient=",0,0">
+						<menulist>
+							<menupopup id="calendar" onchange="1" no_lang="1"/>
+						</menulist>
+						<menulist>
+							<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
+						</menulist>
+					</hbox>
 				</row>
 				<row class="th" disabled="!@comp">
 					<description value="Category" options=",,,cat"/>
-					<menulist>
-						<menupopup id="cat" options="All" onchange="1" no_lang="1"/>
-					</menulist>
-					<button label="Download" id="download"/>
+					<hbox orient=",0,0">
+						<menulist>
+							<menupopup id="cat" no_lang="1" onchange="1" options="All"/>
+						</menulist>
+						<button label="Download" id="download"/>
+					</hbox>
 				</row>
 				<row disabled="!@comp">
 					<grid>

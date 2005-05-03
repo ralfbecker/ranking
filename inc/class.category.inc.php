@@ -214,9 +214,12 @@ class category extends so_sql
 	 * @param string $sort='rkey' 
 	 * @returns array with all Cups in the from specified in $rkeys
 	 */
-	function &names($keys=array(),$rkeys=2,$sort='rkey')
+	function &names($keys=array(),$rkeys=2,$sort='')
 	{
-		if (!preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort)) $sort = 'rkey';
+		if (!$sort || !preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort))
+		{
+			$sort = $rkeys == 0 || $rkeys == 1 ? 'name' : 'rkey';
+		}
 		if (isset($keys['nation']))
 		{
 			if (!is_array($keys['nation']) && $keys['nation'] == 'NULL')
@@ -237,7 +240,7 @@ class category extends so_sql
 			$keys['sex'] = null;
 		}
 		$names = array();
-		foreach((array)$this->search(array(),False,'rkey','','',false,'AND',false,$keys) as $data)
+		foreach((array)$this->search(array(),False,$sort,'','',false,'AND',false,$keys) as $data)
 		{
 			switch($rkeys)
 			{

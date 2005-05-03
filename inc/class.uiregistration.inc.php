@@ -132,7 +132,7 @@ class uiregistration extends boranking
 	}
 		
 	/**
-	 * Show the registration of a competition
+	 * Show the registrations of a competition and allow to register for it
 	 *
 	 * @param array $content
 	 * @param string $msg
@@ -166,6 +166,7 @@ class uiregistration extends boranking
 		if ($this->only_nation)
 		{
 			$calendar = $this->only_nation;
+			$tmpl->disable_cells('calendar');
 		}
 		elseif ($comp)
 		{
@@ -402,11 +403,13 @@ class uiregistration extends boranking
 			'nation'   => $nation,
 		);
 		$content += array(
-			'registration' => $comp ? $this->registration_check($comp) : false,
+			// dont show registration line if no comp, in sitemgr or no registration rights
+			'registration' => $comp && !$tmpl->sitemgr ? $this->registration_check($comp) : false,
 			'rows'     => &$rows,
 			'cats'     => &$cats,
 			'count'    => $starters ? count($starters)-1 : 0,	// -1 as we add an empty starter at the end
 			'msg'      => $msg,
+			'deadline' => $comp ? $comp['deadline'] : '',
 		);
 		if ($cats)
 		{
@@ -420,8 +423,8 @@ class uiregistration extends boranking
 				);
 			}
 		}
-		// dont show startlist options, if no comp selected, no starters, a nation selected or no rights to generate a startlist
-		if (!$comp || count($starters) <= 1 || $nation || !$this->acl_check($comp['nation'],EGW_ACL_EDIT|EGW_ACL_REGISTER))
+		// dont show startlist options, if no comp selected, in sitemgr, no starters, a nation selected or no rights to generate a startlist
+		if (!$comp || $tmpl->sitemgr || count($starters) <= 1 || $nation || !$this->acl_check($comp['nation'],EGW_ACL_EDIT|EGW_ACL_REGISTER))
 		{
 			$content['startlist'] =  false;
 		}
@@ -468,6 +471,7 @@ class uiregistration extends boranking
 		if ($this->only_nation)
 		{
 			$calendar = $this->only_nation;
+			$tmpl->disable_cells('calendar');
 		}
 		elseif ($comp)
 		{
