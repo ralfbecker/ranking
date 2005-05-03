@@ -5,35 +5,36 @@
 		<grid width="100%">
 			<columns>
 				<column width="83"/>
-				<column width="15%"/>
 				<column/>
 			</columns>
 			<rows>
 				<row disabled="!@msg">
 					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
 					<description/>
-					<description span="all"/>
 				</row>
 				<row class="th">
 					<description options=",,,comp" value="Competition"/>
-					<menulist>
-						<menupopup id="calendar" onchange="1" no_lang="1"/>
-					</menulist>
-					<menulist>
-						<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
-					</menulist>
+					<hbox orient=",0,0">
+						<menulist>
+							<menupopup id="calendar" onchange="1" no_lang="1"/>
+						</menulist>
+						<menulist>
+							<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
+						</menulist>
+					</hbox>
 				</row>
 				<row class="row" disabled="!@deadline">
 					<description value="Deadline"/>
-					<date-time id="deadline" readonly="true"/>
-					<description/>
+					<date id="deadline" readonly="true" options="Y-m-d"/>
 				</row>
 				<row class="row" disabled="!@registration">
 					<description options=",,,nation" value="Nation"/>
-					<menulist>
-						<menupopup id="nation" onchange="1" options="Select one" no_lang="1"/>
-					</menulist>
-					<button label="Register" statustext="Register athlets for this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiregistration.add&amp;comp=$cont[comp]&amp;nation=$cont[nation]'),'register', 'dependent=yes,width=700,height=520,scrollbars=yes,status=yes'); return false;" id="register"/>
+					<hbox orient=",0,0">
+						<menulist>
+							<menupopup id="nation" onchange="1" options="Select one" no_lang="1"/>
+						</menulist>
+						<button label="Register" statustext="Register athlets for this competition" onclick="return confirm('window.open(egw::link('/index.php','menuaction=ranking.uiregistration.add&amp;comp=$cont[comp]&amp;nation=$cont[nation]'),'register', 'dependent=yes,width=700,height=520,scrollbars=yes,status=yes'); return false;');" id="register"/>
+					</hbox>
 				</row>
 				<row disabled="!@comp">
 					<grid>
@@ -49,17 +50,17 @@
 							<row class="th" valign="bottom" disabled="!@startlist">
 								<vbox>
 									<description value="All" align="center"/>
-									<button id="startlist" label="Generate startlist" statustext="Generate all startlists together"/>
+									<button id="startlist" label="Generate startlist" statustext="Generate all startlists together" align="center"/>
 									<button id="download" label="Download" align="center"/>
 								</vbox>
 								<vbox>
 									<menulist>
-										<menupopup type="select-number" id="@startlist[$col][num_routes]" options=",1,3" label="Routes" statustext="On how many routes is the first round"/>
+										<menupopup type="select-number" id="@startlist[$col][num_routes]" options=",1,3" label="Routes" statustext="On how many routes is the first round" align="center"/>
 									</menulist>
 									<menulist>
-										<menupopup type="select-number" label="Complimentary" options="All,0,20" id="@startlist[$col][max_compl]" statustext="How many athletes from the complimentary list of each nation should be used"/>
+										<menupopup type="select-number" label="Complimentary" options="All,0,20" id="@startlist[$col][max_compl]" statustext="How many athletes from the complimentary list of each nation should be used" align="center"/>
 									</menulist>
-									<button label="Generate Startlist" id="@startlist[$col][button]"/>
+									<button label="Generate Startlist" id="@startlist[$col][button]" align="center"/>
 									<button label="Download" align="center" id="@startlist[$col][download]"/>
 								</vbox>
 							</row>

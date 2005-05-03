@@ -132,9 +132,9 @@ class boranking extends soranking
 			{
 				if (!in_array($key,$this->read_rights)) unset($this->ranking_nations[$key]);
 			}
-			if (count($this->ranking_nations) == 1)
+			if (count($this->read_rights) == 1)
 			{
-				$this->only_nation = $this->ranking_nations[0];
+				$this->only_nation = $this->read_rights[0];
 			}
 			if (count($this->edit_rights) == 1)
 			{
@@ -636,7 +636,7 @@ class boranking extends soranking
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
 		
-		echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$mode)</p>\n";
+		//echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$mode)</p>\n";
 		
 		$starters = $this->result->read(array(
 			'WetId'  => $comp['WetId'],
