@@ -1,6 +1,6 @@
 <?php
 /**************************************************************************\
-* eGroupWare - digital ROCK Rankings - Accreditation                       *
+* eGroupWare - digital ROCK Rankings - Registration and startlists         *
 * http://www.egroupware.org, http://www.digitalROCK.de                     *
 * Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
 * --------------------------------------------                             *
@@ -21,9 +21,10 @@ class uiregistration extends boranking
 	 * @var array $public_functions functions callable via menuaction
 	 */
 	var $public_functions = array(
-		'lists' => true,
-		'index' => true,
-		'add'   => true,
+		'lists'   => true,
+		'results' => true,
+		'index'   => true,
+		'add'     => true,
 	);
 
 	function uiregistration()
@@ -142,15 +143,22 @@ class uiregistration extends boranking
 
 		if (!is_array($content))
 		{
-			$content = array(
-				'calendar' => $_GET['calendar'],
-				'comp'     => $_GET['comp'],
-				'nation'   => $_GET['nation'],
-			);
-			if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'])))
+			if ($_GET['calendar'] || $_GET['comp'])
 			{
-				$content['nation'] = $athlete['nation'];
-				$content['cat']    = $_GET['cat'];
+				$content = array(
+					'calendar' => $_GET['calendar'],
+					'comp'     => $_GET['comp'],
+					'nation'   => $_GET['nation'],
+				);
+				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'])))
+				{
+					$content['nation'] = $athlete['nation'];
+					$content['cat']    = $_GET['cat'];
+				}
+			}
+			else
+			{
+				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
 			}
 		}
 		$comp     = $this->comp->read($content['comp']);
@@ -288,7 +296,7 @@ class uiregistration extends boranking
 				'GrpId'  => -1,
 			)+($nation ? array(
 				'nation' => $nation,
-			):array()),'',true,'nation,platz,pkt,GrpId');
+			):array()),'',true,'nation,GrpId,reg_nr');
 			//_debug_array($starters);
 			
 			$nat = '';
@@ -337,7 +345,7 @@ class uiregistration extends boranking
 				$download = 'download['.$starter['GrpId'].']';
 				if ($starter['GrpId'] && (!isset($readonlys[$download]) || $readonlys[$download] || $starter['platz']))
 				{
-					$readonlys['download'] = $readonlys[$download] = $starter['platz'] || $starter['pkt'] > 64;
+					$readonlys['download'] = $readonlys[$download] = !$starter['platz'] && $starter['pkt'] < 64;
 				}
 				// new nation and data for the previous nation ==> write that data
 				if ($nat != $starter['nation'])
@@ -417,10 +425,17 @@ class uiregistration extends boranking
 		{
 			$content['startlist'] =  false;
 		}
+		// save calendar, competition & nation between calls in the session
+		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
 			($nation ? ': '.$nation : '');
-		$tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
+		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
+	}
+
+	function results()
+	{
+		return $this->lists(null,'',true);
 	}
 
 	/**
@@ -429,16 +444,23 @@ class uiregistration extends boranking
 	 * @param array $content
 	 * @param string $msg
 	 */
-	function lists($content=null,$msg='')
+	function lists($content=null,$msg='',$show_results=false)
 	{
 		$tmpl =& new etemplate('ranking.register.lists');
 		
 		if (!is_array($content))
 		{
-			$content['calendar'] = $_GET['calendar'];
-			$content['comp'] = $_GET['comp'];
-			$content['cat']  = $_GET['cat'];
-			$content['download'] = $_GET['download'];
+			if ($_GET['calendar'] || $_GET['comp'])
+			{
+				$content['calendar'] = $_GET['calendar'];
+				$content['comp'] = $_GET['comp'];
+				$content['cat']  = $_GET['cat'];
+				$content['download'] = $_GET['download'];
+			}
+			else
+			{
+				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
+			}
 		}
 		$comp     = $this->comp->read($content['comp']);
 		$cat      = $content['cat'];
@@ -459,15 +481,6 @@ class uiregistration extends boranking
 		{
 			list($calendar) = each($this->ranking_nations);
 		}
-		$select_options = array(
-			'calendar' => $this->ranking_nations,
-			'comp'     => $this->comp->names(array(
-				'nation' => $calendar,
-				'datum >= '.$this->db->quote(date('Y-m-d',time())),
-			),0,'datum ASC'),
-			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
-		);
-		
 		if ($comp && $cat && (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen'])))
 		{
 			$cat = '';
@@ -538,7 +551,18 @@ class uiregistration extends boranking
 			}
 			if (!$starters || !count($starters))
 			{
-				$msg = lang('Competition has not yet or no longer a startlist');
+				// if we have registrations, show them
+				if($this->result->read(array(
+					'WetId'  => $comp['WetId'],
+					'GrpId'  => $cat ? $cat['GrpId'] : -1,
+				),'',true))
+				{
+					return $this->index(array(
+						'calendar'=>$calendar,
+						'comp'     => $comp['WetId'],
+					));
+				}
+				$msg = lang('Competition has not yet a startlist');
 				$readonlys['download'] = true;
 			}
 			else
@@ -562,18 +586,46 @@ class uiregistration extends boranking
 				//_debug_array($rows);
 			}
 		}
-		$content = array(
+		$content = $preserv = array(
 			'calendar' => $calendar,
 			'comp'     => $comp['WetId'],
 			'cat'      => $cat ? $cat['GrpId'] : '',
+		);
+		$content += array(
 			'rows'     => $rows,
 			'msg'      => $msg,
 			'result'   => $athlete['platz'] > 0,
 		);
+		// save calendar, competition & cat between calls in the session
+		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
 		
-		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.
-			($athlete['platz'] > 0 ? lang('Results') : lang('Startlists'));
-		$tmpl->exec('ranking.uiregistration.lists',$content,$select_options,$readonlys,$preserv);
+		$select_options = array(
+			'calendar' => $this->ranking_nations,
+			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
+		);
+		// are we showing a result or a startlist
+		if ($comp && $athlete['platz'] > 0 || !$comp && $show_results)
+		{
+			$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Results');
+			$select_options['comp'] = $this->comp->names(array(
+				'nation' => $calendar,
+				'datum < '.$this->db->quote(date('Y-m-d')),
+			),0,'datum DESC');
+		}
+		else
+		{
+			$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Startlists');
+			$select_options['comp'] = $this->comp->names(array(
+				'nation' => $calendar,
+				'WetId' => $this->result->comps_with_startlist(array('nation' => $calendar)),
+			),0,'datum ASC');
+		}
+		// anyway include the used competition
+		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
+		{
+			$select_options['comp'][$comp['WetId']]	= $comp['name'];
+		}
+		return $tmpl->exec('ranking.uiregistration.lists',$content,$select_options,$readonlys,$preserv);
 	}
 
 }

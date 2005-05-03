@@ -94,7 +94,7 @@ class result extends so_sql
 				$join = ",$this->athlete_table WHERE $this->result_table.PerId=$this->athlete_table.PerId";
 				if (!$extra_cols) 
 				{
-					$extra_cols = "nachname,vorname,nation,geb_date";
+					$extra_cols = "nachname,vorname,nation,geb_date,pkt & 63 AS reg_nr";
 				}
 				else
 				{
@@ -126,6 +126,21 @@ class result extends so_sql
 		}
 		// result of single person
 		return parent::read($keys,$extra_cols,$join !== true ? $join : '');
+	}
+	
+	function &comps_with_startlist($keys=array())
+	{
+		$keys['platz'] = 0;
+		$keys[] = 'pkt > 64';
+		if ($keys['nation'] == 'NULL') $keys['nation'] = null;
+		
+		$comps = array();
+		foreach ((array)$this->search(array(),"DISTINCT $this->table_name.WetId AS WetId",$this->comp_table.'.datum DESC','','',false,'AND',false,$keys,
+			", $this->comp_table WHERE $this->table_name.WetId=$this->comp_table.WetId") as $row)
+		{
+			$comps[] = $row['WetId'];
+		}
+		return $comps;
 	}
 
 	/**
