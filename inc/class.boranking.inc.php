@@ -642,7 +642,7 @@ class boranking extends soranking
 			'WetId'  => $comp['WetId'],
 			'GrpId'  => $cat['GrpId'],
 			'platz = 0',		// savegard against an already exsiting result
-		),'',true,'nation,platz,pkt,GrpId');
+		),'',true,'nation,reg_nr');
 		//_debug_array($starters);
 		
 		if (!count($starters)) return false;	// no starters, or eg. already a result
@@ -652,8 +652,41 @@ class boranking extends soranking
 			$startlist[$route] = array();
 		}
 		$prequalified = $this->prequalified($comp,$cat);
-		$reset_data = true;
 
+		// first we need to remove all not-prequalified starters which are over quota+max_complimentary
+		if ($max_compl < 999)
+		{
+			$nations = array();
+			foreach($starters as $k => $athlete)
+			{
+				$nation = $athlete['nation'];
+				if (!isset($nations[$nation]))
+				{
+					$nations[$nation] = array(
+						'quota'        => $comp['host_quota'] && $comp['host_nation'] == $nation ? $comp['host_quota'] : $comp['quota'],
+						'num'          => 0,
+					);
+				}
+				$nat_data =& $nations[$nation];
+				//echo "<p>$athlete[nachname]: nat=$athlete[nation], num=$nat_data[num], quota=$nat_data[quota]</p>\n";
+				if (!in_array($athlete['PerId'],$prequalified) && ++$nat_data['num'] > $nat_data['quota'] + $max_compl)
+				{
+					if ($athlete['pkt'] > 64)	// athlet already has startingnumber, eg. not first run
+					{
+						$this->result->save(array(
+							'PerId' => $athlete['PerId'],
+							'WetId' => $athlete['WetId'],
+							'GrpId' => $athlete['GrpId'],
+							'platz' => 0,
+							'pkt'   => $athlete['pkt'] & 63,	// leave only the registration number
+							'datum' => $athlete['datum'] ? $athlete['datum'] : date('Y-m-d'),
+						));
+					}
+					unset($starters[$k]);							
+				}
+			}
+		}
+		$reset_data = true;
 		// do we use a ranking, if yes calculate it and place the ranked competitors at the end of the startlist
 		if ($mode)
 		{
@@ -671,7 +704,7 @@ class boranking extends soranking
 			{
 				if (isset($starters[$athlete['PerId']]))
 				{
-					$this->check_move_to_startlist($starters,$athlete['PerId'],$startlist,$num_routes,$comp,$prequalified,$max_compl,$reset_data);
+					$this->move_to_startlist($starters,$athlete['PerId'],$startlist,$num_routes,$reset_data);
 					$reset_data = false;
 				}
 			}
@@ -679,7 +712,7 @@ class boranking extends soranking
 		// now we randomly pick starters and devide them on the routes
 		while(count($starters))
 		{
-			$this->check_move_to_startlist($starters,array_rand($starters),$startlist,$num_routes,$comp,$prequalified,$max_compl,$reset_data);
+			$this->move_to_startlist($starters,array_rand($starters),$startlist,$num_routes,$reset_data);
 			$reset_data = false;
 		}
 		// store the startlist in the database
@@ -716,54 +749,22 @@ class boranking extends soranking
 	}
 	
 	/**
-	 * move an athlete to the startlist, if he's not over the quota (plus max_supp(-limentary))
+	 * move an athlete to the startlist and diveds them on $num_routes routes
 	 *
 	 * @internal 
-	 * @return boolean true if athlete is moved, false if not 
 	 */
-	function check_move_to_startlist(&$starters,$k,&$startlist,$num_routes,&$comp,&$prequalified,$max_compl,$reset_data=false)
+	function move_to_startlist(&$starters,$k,&$startlist,$num_routes,$reset_data=false)
 	{
-		static $nations = array();
 		static $route = 1;
-		
-		if ($reset_nat_data) 
-		{
-			$nations = array();
-			$route = 1;
-		}
+		if ($reset_data)  $route = 1;
+		//echo "<p>boranking::check_move_to_startlist(,$k,,$num_routes,$reset_data) route=$route, athlete=".$starters[$k]['nachname'].', '.$starters[$k]['vorname']."</p>\n";
+
 		$athlete =& $starters[$k];
 	
-		$nation = $athlete['nation'];
-		if (!isset($nations[$nation]))
-		{
-			$nations[$nation] = array(
-				'quota'        => $comp['host_quota'] && $comp['host_nation'] == $nation ? $comp['host_quota'] : $comp['quota'],
-				'num'          => 0,
-			);
-		}
-		$nat_data =& $nations[$nation];
-
-		if (!in_array($athlete['PerId'],$prequalified) && ++$nat_data['num'] > $nat_data['quota'] + $max_compl)
-		{
-			if ($athlete['pkt'] > 64)	// athlet already has startingnumber, eg. not first run
-			{
-				$this->result->save(array(
-					'PerId' => $athlete['PerId'],
-					'WetId' => $athlete['WetId'],
-					'GrpId' => $athlete['GrpId'],
-					'platz' => 0,
-					'pkt'   => $athlete['pkt'] & 63,	// leave only the registration number
-					'datum' => $athlete['datum'] ? $athlete['datum'] : date('Y-m-d'),
-				));
-			}							
-			return false;	// not prequalified athlete is over the quota plus max_supp => ignore him
-		}
 		$startlist[$route][] =& $starters[$k];
 		unset($starters[$k]);
 		
 		if (++$route > $num_routes) $route = 1;
-		
-		return true;
 	}
 
 	/**
