@@ -190,7 +190,7 @@ class uiregistration extends boranking
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 		);
-		foreach($this->athlete_rights as $nat)
+		foreach($this->register_rights as $nat)
 		{
 			$select_options['nation'][$nat] = $nat;
 		}
@@ -432,7 +432,7 @@ class uiregistration extends boranking
 		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
-			($nation ? ': '.$nation : '');
+			($nation && $nation != 'NULL' ? ': '.$nation : '');
 		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
 	}
 
@@ -608,7 +608,7 @@ class uiregistration extends boranking
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
 		);
 		// are we showing a result or a startlist
-		if ($comp && $athlete['platz'] > 0 || !$comp && $show_results)
+		if ($comp && $athlete['platz'] > 0 || $show_results)
 		{
 			$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Results');
 			$select_options['comp'] = $this->comp->names(array(
@@ -627,9 +627,10 @@ class uiregistration extends boranking
 		// anyway include the used competition
 		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
 		{
-			$select_options['comp'][$comp['WetId']]	= $comp['name'];
+			$select_options['comp'] = array_merge(array(
+				$comp['WetId']	=> $comp['name']
+			),$select_options['comp']);
 		}
 		return $tmpl->exec('ranking.uiregistration.lists',$content,$select_options,$readonlys,$preserv);
 	}
-
 }

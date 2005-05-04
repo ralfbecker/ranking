@@ -122,8 +122,17 @@ class boranking extends soranking
 		}
 		//foreach(array('read_rights','edit_rights','athlete_rights') as $right) echo "$right: ".print_r($this->$right,true)."<br>\n";
 
-		$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
+		//$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
 
+		if (in_array('NULL',$this->athlete_rights) || $this->is_admin)
+		{ 
+			$this->athlete_rights = array_values($this->athlete->distinct_list('nation'));
+		}
+		if (in_array('NULL',$this->register_rights) || $this->is_admin)
+		{ 
+			$this->register_rights = array_values($this->athlete->distinct_list('nation'));
+		}
+		
 		// setup list with nations we rank and intersect it with the read_rights
 		$this->ranking_nations = array('NULL'=>lang('international'))+$this->comp->nations();
 		if (!$this->is_admin)
@@ -140,6 +149,7 @@ class boranking extends soranking
 			{
 				$this->only_nation_edit = $this->edit_rights[0];
 			}
+			if (in_array('NULL',$this->athlete_rights)) 
 			if (count($this->athlete_rights) == 1)
 			{
 				$this->only_nation_athlete = $this->athlete_rights[0];
@@ -149,10 +159,6 @@ class boranking extends soranking
 				$this->only_nation_register = $this->register_rights[0];
 			}
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
-		}
-		else
-		{
-			$this->athlete_rights = $this->register_rights = array_values($this->athlete->distinct_list('nation'));
 		}
 	}
 	
