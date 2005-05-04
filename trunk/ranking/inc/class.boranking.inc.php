@@ -226,9 +226,11 @@ class boranking extends soranking
 		$ret = (!$nation || $this->acl_check($nation,EGW_ACL_REGISTER)) && 
 			// check if comp already has a result
 			!$this->comp->has_results($comp) &&
-			// check if comp already happend or registration deadline over
+			// check if comp already happend or registration deadline over, 
+			// only checked for non-admins and people without result-rights for that calendar
 			(is_array($comp) || ($comp = $this->comp->read($comp))) && 
-			!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']);
+			(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) || 
+			 $this->is_admin || $this->acl_check($comp['nation'],EGW_ACL_RESULT));
 
 		//echo "<p>boranking::registration_check(".print_r($comp,true).",'$nation') = $ret</p>\n";
 		
