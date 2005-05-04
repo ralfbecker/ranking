@@ -12,13 +12,15 @@
 
 	/* $Id$ */
 
-	$GLOBALS['phpgw_info']['flags'] = array(
-		'currentapp'	=> 'ranking',
-		'noheader'		=> True,
-		'nonavbar'		=> True
-	);
+	$GLOBALS['egw_info'] = array(
+		'flags' => array(
+			'currentapp'	=> 'ranking',
+			'noheader'		=> True,
+			'nonavbar'		=> True
+	));
 	include('../header.inc.php');
 
-	ExecMethod('ranking.uicompetitions.index');
+	$default_view = $GLOBALS['egw_info']['user']['preferences']['ranking']['default_view'];
+	ExecMethod($default_view ? $default_view : 'ranking.uiranking.index');
 
 	$GLOBALS['phpgw']->common->phpgw_footer();

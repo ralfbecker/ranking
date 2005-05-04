@@ -47,6 +47,7 @@ cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
 database	admin	de	Datenbank
 deadline	ranking	de	Anmeldeschluss
+default ranking view	ranking	de	Standardansicht Ranglisten
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
 delete all rights for this nation	ranking	de	Alle Rechte für diese Nation löschen
@@ -197,7 +198,6 @@ startlist	ranking	de	Startliste
 startlist for category %1 generated	ranking	de	Startliste für Kategorie %1 erzeugt
 startlist pdf	ranking	de	Startlisten PDF
 startlists	ranking	de	Startlisten
-startlists or results	ranking	de	Startlisten oder Ergebnisse
 startnumber	ranking	de	Startnummer
 starts the cathegory editor	ranking	de	Startet das Bearbeiten der Kategorien
 starts the competition editor	ranking	de	Startet das Bearbeiten der Wettkï¿½mpfe
@@ -207,6 +207,7 @@ street	ranking	de	Straße
 street, postcode	ranking	de	Straße, Postleitzahl
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
+this module displays information from the ranking app.	ranking	de	Dieses Modul zeigt Informationen der Ranglisten Anwendung.
 this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
 to year	ranking	de	bis Jahr
@@ -236,4 +237,5 @@ which birthyear are allowd in this cathegory, if it is limited on this	ranking	d
 which cathegories are competing	ranking	de	Welche Kategorien nehmen teil
 which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	de	welche Punkteverteilung soll benützt werden um den Feldfaktor zu berechnen, normalerweise CUWR oder keiner, wenn kein Feldfaktor benutzt wird
 which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem wurde zuvor benützt, wenn überhaupt
+which view do you want to see, when you start the ranking app?	ranking	de	Welche Ansicht soll angezeigt werden, wenn sie die Ranglistenanwendung starten?
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!

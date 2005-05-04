@@ -28,6 +28,8 @@ class ranking_admin_prefs_sidebox_hooks
 			$file = array(
 				'Ranking' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiranking.index' )),
+				'Results' => $GLOBALS['phpgw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiregistration.results' )),
 				'Competitions' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.uicompetitions.index' )),
 				'Cups' => $GLOBALS['phpgw']->link('/index.php',array(
@@ -38,7 +40,7 @@ class ranking_admin_prefs_sidebox_hooks
 					'menuaction' => 'ranking.uiathletes.index' )),
 				'Registration' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.index' )),
-				'Startlists or results' => $GLOBALS['phpgw']->link('/index.php',array(
+				'Startlists' => $GLOBALS['phpgw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.lists' )),
 			);
 			display_sidebox($appname,$GLOBALS['phpgw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
@@ -47,7 +49,7 @@ class ranking_admin_prefs_sidebox_hooks
 		if ($GLOBALS['phpgw_info']['user']['apps']['preferences'] && $location != 'admin')
 		{
 			$file = array(
-				//'Preferences'     => $GLOBALS['phpgw']->link('/preferences/preferences.php','appname='.$appname),
+				'Preferences'     => $GLOBALS['phpgw']->link('/preferences/preferences.php','appname='.$appname),
 			);
 			if ($location == 'preferences')
 			{
@@ -77,5 +79,23 @@ class ranking_admin_prefs_sidebox_hooks
 				display_sidebox($appname,lang('Admin'),$file);
 			}
 		}
+	}
+	
+	function hook_settings()
+	{
+		$ranking_views = array(
+			'ranking.uiranking.index'        => lang('Ranking'),
+			'ranking.uiregistration.results' => lang('Results'),
+			'ranking.uicompetitions.index'   => lang('Competitions'),
+			'ranking.uicups.index'           => lang('Cups'),
+		//	'ranking.uicats.index'           => lang('Categories'),
+			'ranking.uiathletes.index'       => lang('Athletes'),
+			'ranking.uiregistration.index'   => lang('Registration'),
+			'ranking.uiregistration.lists'   => lang('Startlists'),
+		);
+		create_select_box('Default ranking view','default_view',$ranking_views,
+			'Which view do you want to see, when you start the ranking app?');
+			
+		return true;
 	}
 }
