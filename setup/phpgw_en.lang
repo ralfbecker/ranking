@@ -43,6 +43,7 @@ cuppattern	ranking	en	Cuppattern
 cups	ranking	en	cups
 database	admin	en	Database
 deadline	ranking	en	Deadline
+default ranking view	ranking	en	Default ranking view
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
 delete all rights for this nation	ranking	en	Delete all rights for this nation
@@ -173,12 +174,12 @@ startlist	ranking	en	Startlist
 startlist for category %1 generated	ranking	en	Startlist for category %1 generated
 startlist pdf	ranking	en	Startlist PDF
 startlists	ranking	en	Startlists
-startlists or results	ranking	en	Startlists or results
 startnumber	ranking	en	Startnumber
 street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
+this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
 to year	ranking	en	to year
@@ -208,4 +209,5 @@ which birthyear are allowd in this cathegory, if it is limited on this	ranking	e
 which cathegories are competing	ranking	en	which cathegories are competing
 which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	en	which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used
 which rankingsystem was used before, if any	ranking	en	which rankingsystem was used before, if any
+which view do you want to see, when you start the ranking app?	ranking	en	Which view do you want to see, when you start the ranking app?
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
