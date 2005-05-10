@@ -197,7 +197,7 @@ class athlete extends so_sql
 		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),")</p>\n";
 		
 		static $cache;
-		$cache_key = serialize($keys);
+		$cache_key = $column.'-'.serialize($keys);
 		
 		if (isset($cache[$cache_key]))
 		{
