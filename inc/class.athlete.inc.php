@@ -156,31 +156,26 @@ class athlete extends so_sql
 		}
 		if ($join === true || is_numeric($join))
 		{
-			if (is_array($criteria) && $criteria['PerId'])
+			if (is_numeric($join))	// add join to filter for a category
 			{
-				$join = '';
+				$cat = (int) $join;
+				$join = ", $this->result_table WHERE GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+				
+				// if cat uses an age-group only show athlets in that age-group
+				if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
+				{
+					$join .= " AND $from_year <= YEAR(geb_date) AND YEAR(geb_date) <= $to_year";
+				}
 			}
-			else
+			else	// LEFT JOIN to get latest competition 
 			{
-				if (is_numeric($join))	// add join to filter for a category
-				{
-					$cat = (int) $join;
-					$join = ", $this->result_table WHERE GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
-					
-					// if cat uses an age-group only show athlets in that age-group
-					if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
-					{
-						$join .= " AND $from_year <= YEAR(geb_date) AND YEAR(geb_date) <= $to_year";
-					}
-				}
-				else	// LEFT join to get latest competition 
-				{
-					$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
-				}
-				if ($extra_cols) $extra_cols = explode(',',$extra_cols);
-				$extra_cols[] = 'MAX(datum) AS last_comp';
-				$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
+				$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
 			}
+			if ($extra_cols) $extra_cols = explode(',',$extra_cols);
+			$extra_cols[] = 'MAX(datum) AS last_comp';
+			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// LEFT JOIN'ed Results.PerId is NULL if there's no result
+			unset($criteria['PerId']);	// this column would be ambigues
+			$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
 		}
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
