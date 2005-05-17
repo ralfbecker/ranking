@@ -101,33 +101,39 @@ class uiathletes extends boranking
 			$old_geb_date = $this->athlete->data['geb_date'];
 
 			$this->athlete->data_merge($content);
-			//echo "<br>uiathletes::edit: cup->data ="; _debug_array($this->athlete->data);
+			//echo "<br>uiathletes::edit: athlete->data ="; _debug_array($this->athlete->data);
 
-			if (($content['save'] || $content['apply']) && 
-				($this->is_admin || in_array($content['nation'],$this->athlete_rights)))
+			if (($content['save'] || $content['apply']))
 			{
-				if (!$this->athlete->data['rkey'])
+				if ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights))
 				{
-					$this->athlete->generate_rkey();
-				}
-				if ($old_geb_date && !$this->athlete->data['geb_date'] && !$this->is_admin)
-				{
-					$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
-					$this->athlete->data['geb_date'] = $old_geb_date;
-				}
-				elseif ($this->athlete->not_unique())
-				{
-					$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->athlete->data['rkey']);
-				}
-				elseif ($this->athlete->save())
-				{
-					$msg .= lang('Error: while saving !!!');
+					if (!$this->athlete->data['rkey'])
+					{
+						$this->athlete->generate_rkey();
+					}
+					if ($old_geb_date && !$this->athlete->data['geb_date'] && !$this->is_admin)
+					{
+						$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
+						$this->athlete->data['geb_date'] = $old_geb_date;
+					}
+					elseif ($this->athlete->not_unique())
+					{
+						$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->athlete->data['rkey']);
+					}
+					elseif ($this->athlete->save())
+					{
+						$msg .= lang('Error: while saving !!!');
+					}
+					else
+					{
+						$msg .= lang('%1 saved',lang('Athlete'));
+	
+						if ($content['save']) $content['cancel'] = true;	// leave dialog now
+					}
 				}
 				else
 				{
-					$msg .= lang('%1 saved',lang('Athlete'));
-
-					if ($content['save']) $content['cancel'] = true;	// leave dialog now
+					$msg .= lang('Permission denied').' ('.$this->athlete->data['nation'].')';
 				}
 			}
 			if ($content['cancel'])
