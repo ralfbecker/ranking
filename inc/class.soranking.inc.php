@@ -67,7 +67,7 @@ class soranking
 			{
 				if (!$this->config['ranking_db_'.$var]) $this->config['ranking_db_'.$var] = $GLOBALS['egw_info']['server']['db_'.$var];
 			}
-			$this->db =& new db();
+			$this->db =& new egw_db();
 			$this->db->connect($this->config['ranking_db_name'],$this->config['ranking_db_host'],
 				$this->config['ranking_db_port'],$this->config['ranking_db_user'],$this->config['ranking_db_pass']);
 		}
