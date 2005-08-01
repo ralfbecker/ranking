@@ -74,6 +74,10 @@ class boranking extends soranking
 	 * @var boolean $is_admin true if user is an administrator, implies all read- and edit-rights
 	 */
 	var $is_admin = false;
+	/**
+	 * @var int $user account_id of user
+	 */
+	var $user;
 
 	var $public_functions = array(
 		'writeLangFile' => True
@@ -122,7 +126,8 @@ class boranking extends soranking
 		}
 		//foreach(array('read_rights','edit_rights','athlete_rights') as $right) echo "$right: ".print_r($this->$right,true)."<br>\n";
 
-		//$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
+		$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
+		$this->user = $GLOBALS['egw_info']['user']['account_id'];
 
 		if (in_array('NULL',$this->athlete_rights) || $this->is_admin)
 		{ 
@@ -170,24 +175,32 @@ class boranking extends soranking
 	 * EGW_ACL_RESULT requires _both_ EGW_ACL_EDIT or EGW_ACL_REGISTER (for the nation of the calendar/competition)
 	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international
-	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER}
+	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER|RESULT}
+	 * @param array/int $comp=null competition array or id, default null
+	 * @return boolean true if access is granted, false otherwise
 	 */
-	function acl_check($nation,$required)
+	function acl_check($nation,$required,$comp=null)
 	{
 		static $acl_cache = array();
 		
 		if ($this->is_admin) return true;
 		
-		if (isset($acl_cache[$nation][$required])) return $acl_cache[$nation][$required];
-		
-		// Result ACL requires _both_ EDIT AND REGISTER rights, acl::check cant check both at once!
-		if($required == EGW_ACL_RESULT)
-		{
-			return $acl_cache[$nation][$required] = $this->acl_check($nation,EGW_ACL_EDIT) && 
-				$this->acl_check($nation,EGW_ACL_REGISTER|1024);	// |1024 prevents int. registrations rights to be sufficent for national calendars
+		if (!isset($acl_cache[$nation][$required]))
+		{		
+			// Result ACL requires _both_ EDIT AND REGISTER rights, acl::check cant check both at once!
+			if($required == EGW_ACL_RESULT)
+			{
+				$acl_cache[$nation][$required] = $this->acl_check($nation,EGW_ACL_EDIT) && 
+					$this->acl_check($nation,EGW_ACL_REGISTER|1024);	// |1024 prevents int. registrations rights to be sufficent for national calendars
+			}
+			else
+			{
+				$acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($nation ? $nation : 'NULL',$required,'ranking') ||
+					($required == EGW_ACL_ADD || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
+			}
 		}
-		return $acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($nation ? $nation : 'NULL',$required,'ranking') ||
-			($required == EGW_ACL_ADD || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
+		// check competition specific judges rights for REGISTER and RESULT too
+		return $acl_cache[$nation][$required] || $comp && in_array($required,array(EGW_ACL_REGISTER,EGW_ACL_RESULT)) && $this->is_judge($comp);
 	}
 	
 	/**
@@ -213,6 +226,24 @@ class boranking extends soranking
 	}
 
 	/**
+	 * checks if user is a judge of a given competition, this counts only 2 weeks before and after the competition!!!
+	 *
+	 * @param array/int $comp competitiion array or id
+	 * @return boolean
+	 */
+	function is_judge($comp)
+	{
+		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
+		{
+			return false;
+		}
+		list($y,$m,$d) = explode('-',$comp['datum']);
+		$distance = abs(mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
+		
+		return $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) && $distance < 15;
+	}
+		
+	/**
 	 * Check if user is allowed to register athlets for $comp and $nation
 	 *
 	 * ToDo taking a deadline and competition judges into account !!!
@@ -222,13 +253,16 @@ class boranking extends soranking
 	 */
 	function registration_check($comp,$nation='')
 	{
-		// check for registration rights of given nation, if given
-		$ret = (!$nation || $this->acl_check($nation,EGW_ACL_REGISTER)) && 
+		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
+		{
+			return false;	// comp not found
+		}
+		// check if user is a judge of the competition or has the necessary registration rights for $nation
+		$ret = $this->is_judge($comp) || (!$nation || $this->acl_check($nation,EGW_ACL_REGISTER)) && 
 			// check if comp already has a result
 			!$this->comp->has_results($comp) &&
 			// check if comp already happend or registration deadline over, 
 			// only checked for non-admins and people without result-rights for that calendar
-			(is_array($comp) || ($comp = $this->comp->read($comp))) && 
 			(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) || 
 			 $this->is_admin || $this->acl_check($comp['nation'],EGW_ACL_RESULT));
 
@@ -454,7 +488,7 @@ class boranking extends soranking
 		ksort ($rang);			// array $rang contains now the ranking, sorted by points, lastname, firstname
 	
 		$ret_ex_aquo =& $ex_aquo;
-		$ret_pers =& $pers;
+		$ret_pers = $pers;
 		$not_counting =& $not_counting;
 	
 		return $rang;
@@ -568,8 +602,8 @@ class boranking extends soranking
 	 *
 	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
 	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
-	 * - startnumber in the next 7 bits (($pkt >> 6) & 127))
-	 * - route in the other bits ($pkt >> 13)
+	 * - startnumber in the next 7 bits (($pkt >> 6) & 255))
+	 * - route in the other bits ($pkt >> 14)
 	 *
 	 * @param int $comp WetId
 	 * @param int $cat GrpId
@@ -628,8 +662,8 @@ class boranking extends soranking
 	 *
 	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
 	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
-	 * - startnumber in the next 7 bits (($pkt >> 6) & 127))
-	 * - route in the other bits ($pkt >> 13)
+	 * - startnumber in the next 8 bits (($pkt >> 6) & 255))
+	 * - route in the other bits ($pkt >> 14)
 	 *
 	 * @param int/array $comp WetId or complete comp array
 	 * @param int/array $cat GrpId or complete cat array
@@ -644,7 +678,7 @@ class boranking extends soranking
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
 		
-		//echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$mode)</p>\n";
+		if ($this->debug) echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$mode)</p>\n";
 		
 		$starters = $this->result->read(array(
 			'WetId'  => $comp['WetId'],
@@ -702,11 +736,12 @@ class boranking extends soranking
 		 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$mode == 2 ? $comp['serie'] : '');
 
 			// index starters with their PerId
+			$starters2 = array();
 			foreach($starters as $k => $athlete)
 			{
-				$starters[$athlete['PerId']] =& $starters[$k];
-				unset($starters[$k]);
+				$starters2[$athlete['PerId']] =& $starters[$k];
 			}
+			$starters =& $starters2; unset($starters2);
 			// we generate the startlist starting from the end = first of the ranking
 			foreach((array) $ranking as $athlete)
 			{
@@ -736,7 +771,7 @@ class boranking extends soranking
 			foreach($startlist[$route] as $n => $athlete)
 			{
 				// we preserve the registration number in the last 6 bit's
-				$num = (($route-1) << 13) + ((1+$n) << 6) + ($athlete['pkt'] & 63);
+				$num = (($route-1) << 14) + ((1+$n) << 6) + ($athlete['pkt'] & 63);
 
 				if ($this->debug) echo ($n+1).": $athlete[nachname], $athlete[vorname] ($athlete[nation]) $num=".($num >> 6).":".($num % 64)."<br>\n";
 

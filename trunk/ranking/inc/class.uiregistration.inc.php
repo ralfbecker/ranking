@@ -21,10 +21,11 @@ class uiregistration extends boranking
 	 * @var array $public_functions functions callable via menuaction
 	 */
 	var $public_functions = array(
-		'lists'   => true,
-		'results' => true,
-		'index'   => true,
-		'add'     => true,
+		'lists'     => true,
+		'result'    => true,
+		'startlist' => true,
+		'index'     => true,
+		'add'       => true,
 	);
 
 	function uiregistration()
@@ -87,8 +88,8 @@ class uiregistration extends boranking
 		$cat    = $content['cat'];
 		$show_all = $content['show_all'];
 		
-		if (!in_array($nation,$this->register_rights) || 	// no rights for that nation
-			!($comp = $this->comp->read($comp)) || 			// unknown competition
+		if (!($comp = $this->comp->read($comp)) || 			// unknown competition
+			!$this->acl_check($nation,EGW_ACL_REGISTER,$comp) || 	// no rights for that nation
 			!($cat  = $this->cats->read($cat ? $cat : $comp['gruppen'][0])) ||	// unknown category
 			(!in_array($cat['rkey'],$comp['gruppen'])))		// cat not in this competition
 		{
@@ -180,8 +181,11 @@ class uiregistration extends boranking
 		{
 			list($calendar) = each($this->ranking_nations);
 		}
-		$nation   = $this->only_nation_register ? $this->only_nation_register : ($athlete ? $athlete['nation'] : $content['nation']);
-
+		$nation = $athlete ? $athlete['nation'] : $content['nation'];
+		if ($this->only_nation_register && !$this->is_judge($comp))
+		{
+			$nation = $this->only_nation_register;
+		}
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
@@ -190,7 +194,7 @@ class uiregistration extends boranking
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 		);
-		foreach($this->register_rights as $nat)
+		foreach($this->is_judge($comp) ? $this->athlete->distinct_list('nation') : $this->register_rights as $nat)
 		{
 			$select_options['nation'][$nat] = $nat;
 		}
@@ -216,6 +220,7 @@ class uiregistration extends boranking
 			//_debug_array($cat2col);
 			if (!$this->registration_check($comp,$nation))	// user allowed to register that nation
 			{
+				echo "<h1>user not allowed to register nation '$nation'</h1>\n";
 				$nation = '';
 			}
 			// athlete to register
@@ -252,7 +257,7 @@ class uiregistration extends boranking
 				}
 			}
 			// generate a startlist
-			elseif ($content['startlist'] && $this->acl_check($comp['nation'],EGW_ACL_EDIT|EGW_ACL_REGISTER))
+			elseif ($content['startlist'] && $this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 			{
 				$cats = false;
 				list($cat) = @each($content['startlist']);
@@ -311,6 +316,8 @@ class uiregistration extends boranking
 					$col = $cat2col[$cat_id];
 					foreach($athletes as $athlete)
 					{
+						if (!is_array($athlete)) continue;
+
 						$registered = false;
 						// search athlete in starters
 						foreach((array)$starters as $starter)
@@ -346,7 +353,8 @@ class uiregistration extends boranking
 				$download = 'download['.$starter['GrpId'].']';
 				if ($starter['GrpId'] && (!isset($readonlys[$download]) || $readonlys[$download] || $starter['platz']))
 				{
-					$readonlys['download'] = $readonlys[$download] = !$starter['platz'] && $starter['pkt'] < 64;
+					// outside SiteMgr we always offer the download
+					$readonlys['download'] = $readonlys[$download] = $tmpl->sitemgr && !$starter['platz'] && $starter['pkt'] < 64;
 				}
 				// new nation and data for the previous nation ==> write that data
 				if ($nat != $starter['nation'])
@@ -424,7 +432,7 @@ class uiregistration extends boranking
 			}
 		}
 		// dont show startlist options, if no comp selected, in sitemgr, no starters, a nation selected or no rights to generate a startlist
-		if (!$comp || $tmpl->sitemgr || count($starters) <= 1 || $nation || !$this->acl_check($comp['nation'],EGW_ACL_EDIT|EGW_ACL_REGISTER))
+		if (!$comp || $tmpl->sitemgr || count($starters) <= 1 || $nation || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
 			$content['startlist'] =  false;
 		}
@@ -436,9 +444,14 @@ class uiregistration extends boranking
 		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
 	}
 
-	function results()
+	function result()
 	{
-		return $this->lists(null,'',true);
+		return $this->lists(null,'','result');
+	}
+
+	function startlist()
+	{
+		return $this->lists(null,'','startlist');
 	}
 
 	/**
@@ -446,9 +459,12 @@ class uiregistration extends boranking
 	 *
 	 * @param array $content
 	 * @param string $msg
+	 * @param string $show='' 'startlist','result' or '' for whatever is availible
 	 */
-	function lists($content=null,$msg='',$show_results=false)
+	function lists($content=null,$msg='',$show='')
 	{
+		//echo "uiregistration::lists(,'$msg','$show') content="; _debug_array($content);
+
 		$tmpl =& new etemplate('ranking.register.lists');
 		
 		if (!is_array($content))
@@ -492,11 +508,30 @@ class uiregistration extends boranking
 		}
 		if ($comp)
 		{
-			$starters =& $this->result->read(array(
+			$keys = array(
 				'WetId'  => $comp['WetId'],
 				'GrpId'  => $cat ? $cat['GrpId'] : -1,
-				'(platz > 0 OR pkt >= 64)',		// startlist or result
-			),'',true,'GrpId,platz,pkt,nachname,vorname');
+			);
+			// if we already have a result, dont include starters without result
+			if ($show == 'result' || !$show && $this->result->has_results($keys))
+			{
+				$show = 'result';
+				$keys[] = 'platz > 0';
+				$order = 'GrpId,platz,nachname,vorname';
+			}
+			// if we have a startlist (not just starters) sort by startnumber
+			elseif ($show == 'startlist' || !$show && $this->result->has_startlist($keys))
+			{
+				$keys[] = 'platz=0 AND pkt > 64';
+				$show = 'startlist';
+				$order = 'GrpId,pkt,nachname,vorname';
+			}
+			else	// sort by nation 
+			{
+				$keys['platz'] = 0;
+				$order = 'GrpId,nation,pkt,nachname,vorname';
+			}
+			$starters =& $this->result->read($keys,'',true,$order);
 			
 			if ($content['download'] && $starters && count($starters))
 			{
@@ -508,20 +543,25 @@ class uiregistration extends boranking
 					'PerId'    => 'athlete',
 					'platz'    => 'place',
 					'category',			
-					'startnumber',
+					$show == 'startlist' ? 'startnumber' : 'points',
 					'nachname' => 'lastname',
 					'vorname'  => 'firstname',
 					'nation'   => 'nation',
 					'geb_date' => 'birthdate',
+					'ranking',
+					'ranking-points',
 				);
 				echo implode(';',$name2csv)."\n";
 				$charset = $GLOBALS['phpgw']->translation->charset();
-				$c = $cat;
+				$c['GrpId'] = 0;
 				foreach($starters as $athlete)
 				{
 					if ($c['GrpId'] != $athlete['GrpId'])
 					{
 						$c = $this->cats->read($athlete['GrpId']);
+						
+						$stand = $comp['datum'];
+		 				$this->ranking($c,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
 					}
 					$values = array();
 					foreach($name2csv as $name => $csv)
@@ -529,14 +569,22 @@ class uiregistration extends boranking
 						switch($csv)
 						{
 							case 'startnumber':
-								$val = $athlete['platz'] ? '' : ($athlete['pkt'] >> 13 ? (1+($athlete['pkt'] >> 13)).': ' : '') .
-									(($athlete['pkt'] >> 6) & 127);
+								$val = ($athlete['pkt'] >> 14 ? (1+($athlete['pkt'] >> 14)).': ' : '') .(($athlete['pkt'] >> 6) & 255);
+								break;
+							case 'points':
+								$val = $athlete['pkt'];
 								break;
 							case 'place':
 								$val = $athlete['platz'] ? $athlete['platz'] : '';
 								break;
 							case 'category':
 								$val = $c['name'];
+								break;
+							case 'ranking':
+								$val = $ranking[$athlete['PerId']]['platz'];
+								break;
+							case 'ranking-points':
+								$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2lf',$ranking[$athlete['PerId']]['pkt']) : '';
 								break;
 							default:
 								$val = $athlete[$name];
@@ -562,7 +610,7 @@ class uiregistration extends boranking
 				),'',true))
 				{
 					return $this->index(array(
-						'calendar'=>$calendar,
+						'calendar' => $calendar,
 						'comp'     => $comp['WetId'],
 					));
 				}
@@ -580,8 +628,8 @@ class uiregistration extends boranking
 						$c = $this->cats->read($athlete['GrpId']);
 					}
 					$rows[] = $athlete + array(
-						'start'    => ($athlete['pkt'] >> 13 ? (1+($athlete['pkt'] >> 13)).': ' : '') .
-							(($athlete['pkt'] >> 6) & 127),
+						'start'    => ($athlete['pkt'] >> 14 ? (1+($athlete['pkt'] >> 14)).': ' : '') .
+							(($athlete['pkt'] >> 6) & 255),
 						'year'     => substr($athlete['geb_date'],0,4),
 						'cat_name' => $c['name'],
 					);
@@ -608,7 +656,7 @@ class uiregistration extends boranking
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
 		);
 		// are we showing a result or a startlist
-		if ($comp && $athlete['platz'] > 0 || $show_results)
+		if ($comp && $athlete['platz'] > 0 || $show == 'result')
 		{
 			$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Results');
 			$select_options['comp'] = $this->comp->names(array(
