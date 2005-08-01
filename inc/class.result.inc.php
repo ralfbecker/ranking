@@ -71,9 +71,18 @@ class result extends so_sql
 	 */
 	function &read($keys,$extra_cols='',$join=true,$order='')
 	{
+		//echo "<p>result::read(".print_r($keys,true).",'$extra_cols','$join','$order')</p>\n";
 		if ($order && !preg_match('/^[a-z_,. ]+$/i',$order)) $order = '';
 
 		$filter = $keys;
+		if (isset($filter['nation']))	// nation is from the joined athlete table, cant be quoted automatic
+		{
+			unset($filter['nation']);
+			
+			if ($join) $filter[] = $this->db->expression($this->athlete_table,array('nation' => $keys['nation']));
+			
+			unset($keys['nation']);
+		}
 		foreach(array('WetId','GrpId','PerId') as $key)
 		{
 			if ((int) $keys[$key])
@@ -132,8 +141,13 @@ class result extends so_sql
 	{
 		$keys['platz'] = 0;
 		$keys[] = 'pkt > 64';
-		if ($keys['nation'] == 'NULL') $keys['nation'] = null;
 		
+		if (isset($keys['nation']))		// nation is from the joined comp_table, it cant be quoted automatic
+		{
+			if ($keys['nation'] == 'NULL') $keys['nation'] = null;
+			$keys[] = $this->db->expression($this->comp_table,array('nation' => $keys['nation']));
+			unset($keys['nation']);
+		}
 		$comps = array();
 		foreach ((array)$this->search(array(),"DISTINCT $this->table_name.WetId AS WetId",$this->comp_table.'.datum DESC','','',false,'AND',false,$keys,
 			", $this->comp_table WHERE $this->table_name.WetId=$this->comp_table.WetId") as $row)
@@ -191,6 +205,25 @@ class result extends so_sql
 	{
 		$keys[] = 'platz > 0';
 
+		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
+
+		$this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__);
+		
+		return $this->db->next_record() ? $this->db->f(0) : false;
+	}
+
+	/**
+	 * Checks if there are any startnumbers (platz == 0 && pkt > 64) for the given keys
+	 *
+	 * @param array $keys with index WetId, PerId and/or GrpId
+	 * @return boolean/int number of found results or false on error
+	 */
+	function has_startlist($keys)
+	{
+		$keys[] = 'platz = 0 AND pkt >= 64';
+
+		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
+
 		$this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__);
 		
 		return $this->db->next_record() ? $this->db->f(0) : false;
@@ -214,7 +247,7 @@ class result extends so_sql
 	 *	"LEFT JOIN table2 ON (x=y)", Note: there's no quoting done on $join!
 	 * @return array of matching rows (the row is an array of the cols) or False
 	 */
-/* as it does nothing atm.
+	/* not yet needed
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
 		//$this->debug = 1;
@@ -272,7 +305,7 @@ class result extends so_sql
 	{
 		$this->db->query("SELECT p.*,r.platz,s.pkt,r.WetId,r.GrpId
 			FROM $this->result_table r,$this->comp_table w,$this->athlete_table p,$this->pkte_table s
-			WHERE r.WetId=w.WetId AND p.PerId=r.PerId
+			WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.platz > 0
 			AND r.GrpId ".(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').' 
 			AND w.serie='.(int) $SerId.' AND r.platz=s.platz AND s.PktId='.(int) $PktId.'
 			AND s.pkt > 0 AND w.datum <= '.$this->db->quote($stand).
@@ -303,7 +336,7 @@ class result extends so_sql
 
 		$this->db->query($sql="SELECT p.*,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId
 			FROM $this->result_table r,$this->comp_table w,$this->athlete_table p
-			WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.pkt > 0
+			WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0
 			AND r.GrpId ".(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').'
 			AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
 			($from_year && $to_year ? ' AND NOT ISNULL(p.geb_date) AND '.
