@@ -14,7 +14,7 @@
 
 if (!defined('DR_PATH'))
 {
-	define('DR_PATH',realpath(strstr('uiaaclimbing.com',$_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'].'/../../digitalrock.de/httpdocs' : $_SERVER['DOCUMENT_ROOT']));
+	define('DR_PATH',realpath(strstr($_SERVER['DOCUMENT_ROOT'],'uiaaclimbing.com') ? $_SERVER['DOCUMENT_ROOT'].'/../../digitalrock.de/httpdocs' : $_SERVER['DOCUMENT_ROOT']));
 }
 class module_ranking_digitalrock extends Module 
 {
@@ -81,9 +81,30 @@ class module_ranking_digitalrock extends Module
 				{
 					$file = 'latest';
 				}
-				elseif (!$GLOBALS['dr_config']['params']['comp'])
+				elseif (!$GLOBALS['dr_config']['params']['cat'])
 				{
 					$file = 'all_result';
+				}
+				break;
+				
+			case 'ranglist':
+				if (!$GLOBALS['dr_config']['params']['cat'])
+				{
+					return '&nbsp;';	// otherwise we get a fatal error
+				}
+				break;
+				
+			case 'pstambl':
+				if (!$GLOBALS['dr_config']['params']['person'])
+				{
+					return '&nbsp;';	// otherwise we get a fatal error
+				}
+				break;
+				
+			case 'nat_team_ranking':
+				if (!$GLOBALS['dr_config']['params']['comp'])
+				{
+					return '&nbsp;';	// otherwise we get a fatal error
 				}
 				break;
 		}
