@@ -90,21 +90,22 @@ class module_ranking_digitalrock extends Module
 			case 'ranglist':
 				if (!$GLOBALS['dr_config']['params']['cat'])
 				{
-					return '&nbsp;';	// otherwise we get a fatal error
+					$_GET['mode'] = 2;
+					$file = 'icc_calendar';
 				}
 				break;
 				
 			case 'pstambl':
 				if (!$GLOBALS['dr_config']['params']['person'])
 				{
-					return '&nbsp;';	// otherwise we get a fatal error
+					return '';	// otherwise we get a fatal error
 				}
 				break;
 				
 			case 'nat_team_ranking':
-				if (!$GLOBALS['dr_config']['params']['comp'])
+				if (!$GLOBALS['dr_config']['params']['comp'] && !$GLOBALS['dr_config']['params']['cup'])
 				{
-					return '&nbsp;';	// otherwise we get a fatal error
+					return '';	// otherwise we get a fatal error
 				}
 				break;
 		}
