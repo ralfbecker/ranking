@@ -102,7 +102,7 @@
 					<description span="all" value="Presets for competitions"/>
 				</row>
 				<row class="row_off">
-					<description options=",,,comp[name]" value="Competition name"/>
+					<description options=",,,presets[name]" value="Competition name"/>
 					<textbox size="100" maxlength="100" no_lang="1" id="presets[name]"/>
 				</row>
 				<row>
@@ -117,10 +117,11 @@
 				<column width="15%"/>
 				<column width="20%"/>
 				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row>
-					<description span="2" class="redItalic" no_lang="1" id="msg"/>
+					<description span="3" class="redItalic" no_lang="1" id="msg"/>
 				</row>
 				<row class="th">
 					<description value="Name" options=",,,name"/>
@@ -131,7 +132,7 @@
 					<menulist>
 						<menupopup id="nation" statustext="nation if national competition or none for an internatinal one" no_lang="1"/>
 					</menulist>
-					<textbox size="10" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" label="Key"/>
+					<textbox size="10" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" label="Key" span="all"/>
 				</row>
 				<row>
 					<tabbox span="all">
@@ -148,7 +149,8 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox data="" rows="1" cols="4" span="2">
+					<hbox data="" rows="1" cols="4" span="3">
+						<button id="edit" label="Edit" statustext="Edit this cup"/>
 						<button label="Save" id="save" statustext="saves the changes made"/>
 						<button label="Apply" id="apply" statustext="apply the changes made"/>
 						<button label="Cancel" id="cancel" statustext="aborts without saving changes"/>

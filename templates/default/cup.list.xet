@@ -24,9 +24,9 @@
 					<description no_lang="1" align="center" id="${row}[nation]"/>
 					<description no_lang="1" align="center" id="${row}[rkey]"/>
 					<hbox align="center">
-						<button label="View" align="center" id="view[$row_cont[SerId]]" image="view"/>
-						<button label="Edit" align="center" id="edit[$row_cont[SerId]]" image="edit"/>
-						<button label="Delete" align="center" id="delete[$row_cont[SerId]]" image="delete" onclick="return confirm('Delete this cup');"/>
+						<button label="View" align="center" id="view[$row_cont[SerId]]" image="view" statustext="View this cup"/>
+						<button label="Edit" align="center" id="edit[$row_cont[SerId]]" image="edit" statustext="Edit this cup"/>
+						<button label="Delete" align="center" id="delete[$row_cont[SerId]]" image="delete" onclick="return confirm('Delete this cup');" statustext="Delete this cup"/>
 					</hbox>
 				</row>
 			</rows>
@@ -43,7 +43,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description span="all" class="redItalic" id="msg"/>
+					<description span="all" class="redItalic" id="msg" no_lang="1"/>
 					<description/>
 				</row>
 				<row>

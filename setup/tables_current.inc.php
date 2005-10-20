@@ -26,7 +26,8 @@
 				'deadline' => array('type' => 'date'),
 				'prequal_ranking' => array('type' => 'int','precision' => '2'),
 				'prequal_comp' => array('type' => 'int','precision' => '2'),
-				'prequal_comps' => array('type' => 'varchar','precision' => '64')
+				'prequal_comps' => array('type' => 'varchar','precision' => '64'),
+				'judges' => array('type' => 'varchar','precision' => '64')
 			),
 			'pk' => array('WetId'),
 			'fk' => array(),
@@ -177,7 +178,8 @@
 				'email' => array('type' => 'varchar','precision' => '40'),
 				'homepage' => array('type' => 'varchar','precision' => '60'),
 				'mobil' => array('type' => 'varchar','precision' => '20'),
-				'acl' => array('type' => 'int','precision' => '4','default' => '0')
+				'acl' => array('type' => 'int','precision' => '4','default' => '0'),
+				'freetext' => array('type' => 'longtext')
 			),
 			'pk' => array('PerId'),
 			'fk' => array(),

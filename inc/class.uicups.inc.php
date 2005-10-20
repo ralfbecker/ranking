@@ -67,7 +67,7 @@ class uicups extends boranking
 		}
 		else
 		{
-			$view = $content['view'];
+			$view = $content['view'] && !($content['edit'] && $this->acl_check($content['nation'],EGW_ACL_EDIT));
 
 			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
 
@@ -117,8 +117,10 @@ class uicups extends boranking
 				return;
 			}
 		}
+		$tabs = 'general|ranking|presets';
 		$content = $this->cup->data + array(
-			'msg' => $msg
+			'msg' => $msg,
+			$tabs => $content[$tabs],
 		);
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,
@@ -132,6 +134,7 @@ class uicups extends boranking
 		$readonlys = array(
 			'delete' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]],
 			'nation' => !!$this->only_nation_edit,
+			'edit'   => !($view && $this->acl_check($content['nation'],EGW_ACL_EDIT)),
 		);
 		if ($view)
 		{
@@ -147,7 +150,7 @@ class uicups extends boranking
 				$readonlys['presets'][$name] = true;
 			}
 		}
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('cup'));
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('cup'));
 		$this->tmpl->read('ranking.cup.edit');
 		$this->tmpl->exec('ranking.uicups.edit',$content,
 			$sel_options,$readonlys,array(
@@ -165,7 +168,7 @@ class uicups extends boranking
 	 */
 	function get_rows($query,&$rows,&$readonlys)
 	{
-		$GLOBALS['phpgw']->session->appsession('ranking','cup_state',$query);
+		$GLOBALS['egw']->session->appsession('ranking','cup_state',$query);
 
 		if (!$this->is_admin && !in_array($query['col_filter']['nation'],$this->read_rights))
 		{
@@ -250,7 +253,7 @@ class uicups extends boranking
 		}
 		$content = array();
 
-		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['phpgw']->session->appsession('ranking','cup_state');
+		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','cup_state');
 		
 		if (!is_array($content['nm']))
 		{
@@ -271,7 +274,7 @@ class uicups extends boranking
 		$content['msg'] = $msg;
 
 		$this->tmpl->read('ranking.cup.list');
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('cups');
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('cups');
 		$this->tmpl->exec('ranking.uicups.index',$content,array(
 			'nation' => $this->ranking_nations,
 		));

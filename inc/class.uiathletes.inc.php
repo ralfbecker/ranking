@@ -69,7 +69,6 @@ class uiathletes extends boranking
 			{
 				// read the athletes results
 				$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
-				array_unshift($this->athlete->data['comp'],false);	// need index starting with 1
 			}
 			else
 			{
@@ -91,7 +90,7 @@ class uiathletes extends boranking
 		}
 		else
 		{
-			$view = $content['view'];
+			$view = $content['view'] && !($content['edit'] && ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights)));
 
 			if (!$view && $this->only_nation_athlete) $content['nation'] = $this->only_nation_athlete;
 
@@ -129,6 +128,34 @@ class uiathletes extends boranking
 						$msg .= lang('%1 saved',lang('Athlete'));
 	
 						if ($content['save']) $content['cancel'] = true;	// leave dialog now
+
+						if (is_array($content['foto']) && $content['foto']['tmp_name'] && $content['foto']['name'] && is_uploaded_file($content['foto']['tmp_name']))
+						{
+							//_debug_array($content['foto']);
+							list($width,$height,$type) = getimagesize($content['foto']['tmp_name']);
+							if ($type != 2)
+							{
+								$msg .= ($msg ? ', ' : '') . lang('Uploaded picture is no JPEG !!!');
+							}
+							else
+							{
+								if ($height > 250 && ($src = @imagecreatefromjpeg($content['foto']['tmp_name'])))	// we need to scale the picture down
+								{
+									$dst_w = (int) round(250.0 * $width / $height);
+									echo "<p>{$content['foto']['name']}: $width x $height ==> $dst_w x 250</p>\n";
+									$dst = imagecreatetruecolor($dst_w,250);
+									if (imagecopyresampled($dst,$src,0,0,0,0,$dst_w,250,$width,$height))
+									{
+										imagejpeg($dst,$content['foto']['tmp_name']);
+										$msg .= ($msg ? ', ' : '') . lang('Picture resized to %1 pixel',$dst_w.' x 250');
+									}
+									imagedestroy($src);
+									imagedestroy($dst);
+								}
+								$msg .= ($msg ? ', ' : '') . ($this->athlete->attach_picture($content['foto']['tmp_name']) ? 
+									lang('Picture attached') : lang('Error attaching the picture'));
+							}
+						}
 					}
 				}
 				else
@@ -154,9 +181,12 @@ class uiathletes extends boranking
 				return;
 			}
 		}
+		$tabs = 'contact|profile|freetext|other|pictures|results';
 		$content = $this->athlete->data + array(
 			'msg' => $msg,
 			'is_admin' => $this->is_admin,
+			$tabs => !$content[$tabs] && !$view && $this->tmpl->html->user_agent == 'mozilla' ? 'ranking.athlete.edit.freetext' : $content[$tabs],
+			'foto' => $this->athlete->picture_url().'?'.time(),
 		);
 		$sel_options = array(
 			'nation' => $this->athlete->distinct_list('nation'),
@@ -166,6 +196,7 @@ class uiathletes extends boranking
 		$readonlys = array(
 			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]],
 			'nation' => !!$this->only_nation_athlete,
+			'edit'   => !($view && ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights))),
 		);
 		// dont allow non-admins to change sex and nation, once it's been set
 		if ($this->athlete->data['PerId'] && !$this->is_admin)
@@ -179,13 +210,13 @@ class uiathletes extends boranking
 			{
 				$readonlys[$name] = true;
 			}
-			$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
+			$readonlys['foto'] = $readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
 		}
 		elseif (!$this->athlete->data['PerId'] || $this->athlete->data['last_comp'])
 		{
 			$readonlys['delete'] = true;
 		}
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$this->tmpl->read('ranking.athlete.edit');
 		$this->tmpl->exec('ranking.uiathletes.edit',$content,
 			$sel_options,$readonlys,array(
@@ -204,7 +235,7 @@ class uiathletes extends boranking
 	function get_rows($query,&$rows,&$readonlys)
 	{
 		//echo "uiathletes::get_rows() query="; _debug_array($query);
-		$GLOBALS['phpgw']->session->appsession('ranking','athlete_state',$query);
+		$GLOBALS['egw']->session->appsession('ranking','athlete_state',$query);
 
 		foreach((array) $query['col_filter'] as $col => $val)
 		{
@@ -327,7 +358,7 @@ class uiathletes extends boranking
 		}
 		$content = array();
 
-		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['phpgw']->session->appsession('ranking','athlete_state');
+		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','athlete_state');
 		
 		if (!is_array($content['nm']))
 		{
@@ -349,7 +380,7 @@ class uiathletes extends boranking
 		$content['msg'] = $msg;
 
 		$this->tmpl->read('ranking.athlete.list');
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
 		$this->tmpl->exec('ranking.uiathletes.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none

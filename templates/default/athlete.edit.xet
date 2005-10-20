@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.athlete.edit.contact" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+		<grid width="100%" height="210">
 			<columns>
 				<column width="100"/>
 				<column width="25%"/>
@@ -22,7 +22,7 @@
 					<description options=",,,fax" value="Fax"/>
 					<textbox size="20" maxlength="20" id="fax" statustext="use access control to deny display on the website"/>
 				</row>
-				<row class="row" disabled="1">
+				<row class="row">
 					<description options=",,,mobil" value="Cellphone"/>
 					<textbox size="20" maxlength="20" id="mobil" statustext="use access control to deny display on the website" span="all"/>
 				</row>
@@ -38,29 +38,35 @@
 					<description options=",,,anrede" value="Title" statustext="use access control to deny display on the website"/>
 					<textbox size="40" maxlength="40" id="anrede"/>
 				</row>
+				<row class="row" valign="top">
+					<description options=",,,notiz" value="Notice"/>
+					<textbox multiline="true" rows="2" cols="80" span="3" id="bemerkung" statustext="For internal use, not shown on the website."/>
+				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.profile" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+		<grid width="100%" height="210">
 			<columns>
 				<column width="100"/>
-				<column width="15%"/>
-				<column width="10%"/>
 				<column/>
 			</columns>
 			<rows>
 				<row class="row">
 					<description options=",,,gewicht" value="Weight (kg)"/>
 					<int id="gewicht" statustext="weight in kilogram"/>
+				</row>
+				<row class="row">
 					<description options=",,,groesse" value="Size (cm)"/>
 					<int id="groesse" statustext="body height in centimeter"/>
 				</row>
 				<row class="row">
-					<description options=",,,profi" value="Professional"/>
-					<textbox size="30" maxlength="40" id="profi" statustext="use &quot;yes&quot; or &quot;no, prefession&quot;"/>
 					<description options=",,,practice" value="climbing since (years)"/>
 					<int options="1,99" id="practice" statustext="since how many years is the athlete climbing (not only competing)"/>
+				</row>
+				<row class="row">
+					<description options=",,,profi" value="Professional"/>
+					<textbox maxlength="40" id="profi" statustext="use &quot;yes&quot; or &quot;no, prefession&quot;" span="all"/>
 				</row>
 				<row class="row">
 					<description options=",,,sport" value="other sports"/>
@@ -73,20 +79,20 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit.notice" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%" height="210">
 			<columns>
 				<column/>
 			</columns>
 			<rows>
 				<row>
-					<textbox multiline="true" data="" rows="5" cols="80" id="bemerkung" statustext="This text will be shown in the profil on the website."/>
+					<htmlarea data="" rows="1" cols="1" id="freetext" statustext="This text will be shown in the profil on the website." style="width: 100%; height: 200px;"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+		<grid width="100%" height="210">
 			<columns>
 				<column width="100"/>
 				<column width="15%"/>
@@ -111,8 +117,24 @@
 			</rows>
 		</grid>
 	</template>
+	<template id="ranking.athlete.edit.pictures" template="" lang="" group="0" version="1.0.0.001">
+		<grid width="100%" height="210">
+			<columns>
+				<column width="100"/>
+				<column width="100"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row" valign="top">
+					<description value="Picture"/>
+					<image src="foto"/>
+					<file id="foto" statustext="Upload a portrait picture for the profile"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
 	<template id="ranking.athlete.edit.results" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%" height="200px" overflow="auto">
+		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="5%"/>
 				<column/>
@@ -178,21 +200,24 @@
 						<tabs>
 							<tab label="Contact" statustext="telephone, email, homepage, city, ..."/>
 							<tab label="Profile" statustext="Weight, size, hobbies, ..."/>
-							<tab label="Notice" statustext="free text"/>
+							<tab label="Free text" statustext="This text will be shown in the profil on the website."/>
 							<tab label="Access" statustext="access control, key"/>
+							<tab label="Picture" statustext="Picture"/>
 							<tab label="Results" statustext="Competition results"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.athlete.edit.contact"/>
 							<template id="ranking.athlete.edit.profile"/>
-							<template id="ranking.athlete.edit.notice"/>
+							<template id="ranking.athlete.edit.freetext"/>
 							<template id="ranking.athlete.edit.other"/>
+							<template id="ranking.athlete.edit.pictures"/>
 							<template id="ranking.athlete.edit.results"/>
 						</tabpanels>
 					</tabbox>
 				</row>
 				<row>
 					<hbox span="3">
+						<button id="edit" label="Edit" statustext="Edit this athlete"/>
 						<button label="Save" id="save" statustext="Saves the changes made"/>
 						<button label="Apply" id="apply" statustext="Applies the changes made"/>
 						<button label="Cancel" id="cancel" statustext="exists without saving the changes"/>

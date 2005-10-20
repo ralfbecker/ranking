@@ -44,7 +44,7 @@ class competition extends so_sql
 		
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['phpgw']->translation->charset();
+		$this->charset = $GLOBALS['egw']->translation->charset();
 
 		foreach(array(
 				'cats'  => 'category',
@@ -92,7 +92,7 @@ class competition extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
 		}
 		list($data['gruppen'],$data['duration']) = explode('@',$data['gruppen']);
 		if ($data['gruppen'])
@@ -101,6 +101,8 @@ class competition extends so_sql
 		}
 		$data['pkt_bis'] = $data['pkt_bis']!='' ? intval(100 * $data['pkt_bis']) : 100;
 		$data['feld_bis'] = $data['feld_bis']!='' ? intval(100 * $data['feld_bis']) : 100;
+		
+		if ($data['judges']) $data['judges'] = explode(',',$data['judges']);
 
 		return $data;
 	}
@@ -127,10 +129,13 @@ class competition extends so_sql
 		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? null : strtoupper($data['nation']);
 		if (isset($data['pkte']) && !$data['pkte']) $data['pkte'] = null;
 		if (isset($data['feld_pkte']) && !$data['feld_pkte']) $data['feld_pkte'] = null;
-
+		if (isset($data['judges']) && is_array($data['judges']))
+		{
+			$data['judges'] = implode(',',$data['judges']);
+		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}

@@ -26,30 +26,30 @@ class ranking_admin_prefs_sidebox_hooks
 		if ($location == 'sidebox_menu')
 		{
 			$file = array(
-				'Ranking' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiranking.index' )),
-				'Results' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiregistration.results' )),
-				'Competitions' => $GLOBALS['phpgw']->link('/index.php',array(
+				'Competitions' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uicompetitions.index' )),
-				'Cups' => $GLOBALS['phpgw']->link('/index.php',array(
+				'Cups' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uicups.index' )),
-				/*'Categories' => $GLOBALS['phpgw']->link('/index.php',array(
+				/*'Categories' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.ranking.cat_edit' )),*/
-				'Athletes' => $GLOBALS['phpgw']->link('/index.php',array(
+				'Athletes' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiathletes.index' )),
-				'Registration' => $GLOBALS['phpgw']->link('/index.php',array(
+				'Registration' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.index' )),
-				'Startlists' => $GLOBALS['phpgw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiregistration.lists' )),
+				'Startlists' => $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiregistration.startlist' )),
+				'Results' => $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiregistration.result' )),
+				'Ranking' => $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiranking.index' )),
 			);
-			display_sidebox($appname,$GLOBALS['phpgw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
+			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 		}
 
-		if ($GLOBALS['phpgw_info']['user']['apps']['preferences'] && $location != 'admin')
+		if ($GLOBALS['egw_info']['user']['apps']['preferences'] && $location != 'admin')
 		{
 			$file = array(
-				'Preferences'     => $GLOBALS['phpgw']->link('/preferences/preferences.php','appname='.$appname),
+				'Preferences'     => $GLOBALS['egw']->link('/preferences/preferences.php','appname='.$appname),
 			);
 			if ($location == 'preferences')
 			{
@@ -61,14 +61,14 @@ class ranking_admin_prefs_sidebox_hooks
 			}
 		}
 
-		if ($GLOBALS['phpgw_info']['user']['apps']['admin'] && $location != 'preferences')
+		if ($GLOBALS['egw_info']['user']['apps']['admin'] && $location != 'preferences')
 		{
 			$file = Array(
-				'Site configuration' => $GLOBALS['phpgw']->link('/index.php',array(
+				'Site configuration' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'admin.uiconfig.index',
 					'appname'    => 'ranking',
 				 )),
-				'Nation ACL' => $GLOBALS['phpgw']->link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
+				'Nation ACL' => $GLOBALS['egw']->link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
 			);
 			if ($location == 'admin')
 			{

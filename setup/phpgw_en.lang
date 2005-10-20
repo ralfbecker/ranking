@@ -29,6 +29,7 @@ click to view	ranking	en	click to view
 climbing professional	ranking	en	Climbing professional
 climbing since (years)	ranking	en	climbing since (years)
 competition	ranking	en	Competition
+competition calendar	ranking	en	Competition calendar
 competition has not yet a startlist	ranking	en	Competition has not yet a startlist
 competition name	ranking	en	Competition name
 competition results	ranking	en	Competition results
@@ -50,19 +51,19 @@ delete all rights for this nation	ranking	en	Delete all rights for this nation
 delete this athlete	ranking	en	Delete this athlete
 delete this competition	ranking	en	Delete this competition
 delete this cup	ranking	en	Delete this cup
-deletes this cup	ranking	en	deletes this cup
 deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
+digital rock	ranking	en	digital ROCK
 download	ranking	en	Download
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
 duration or textual date	ranking	en	Duration or textual date
 each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
 edit %1	ranking	en	edit %1
 edit athlete	ranking	en	Edit athlete
-edit competition	ranking	en	Edit competition
 edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 entry not found !!!	ranking	en	Entry not found !!!
+error attaching the picture	ranking	en	Error attaching the picture
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
 error: generating startlist	ranking	en	Error: generating startlist
@@ -78,9 +79,11 @@ fax	ranking	en	Fax
 federation	ranking	en	Federation
 female	ranking	en	female
 fieldfactorpoints	ranking	en	Fieldfactorpoints
+file %1 not found (either type=%2 or dr_path=%3 wrong)	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)
 file '%1' successful attached as %2	ranking	en	File '%1' successful attached as %2
 file is not a pdf	ranking	en	File is not a PDF
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	en	First name of the athlete in Latin chars! Accents and umlauts are ok
+for internal use, not shown on the website.	ranking	en	For internal use, not shown on the website.
 free text	ranking	en	free text
 from other competitions	ranking	en	from other competitions
 from the ranking	ranking	en	from the ranking
@@ -91,6 +94,7 @@ gender	ranking	en	Gender
 gender of the athlete	ranking	en	gender of the athlete
 gender...	ranking	en	Gender...
 general	ranking	en	General
+generate all startlists together	ranking	en	Generate all startlists together
 generate startlist	ranking	en	Generate startlist
 grpid	ranking	en	GrpId
 hobbies	ranking	en	Hobbies
@@ -99,6 +103,7 @@ host	admin	en	Host
 host nation	ranking	en	Host nation
 host quota	ranking	en	Host quota
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	en	how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year
+how many athletes from the complimentary list of each nation should be used	ranking	en	How many athletes from the complimentary list of each nation should be used
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
@@ -106,7 +111,13 @@ in kilogram	ranking	en	in kilogram
 incl. nation-code	ranking	en	incl. nation-code
 information pdf	ranking	en	Information PDF
 internal key, leave it empty to have it automaticaly generated	ranking	en	internal key, leave it empty to have it automaticaly generated
+judges	ranking	en	Judges
+judges have the right to create startlists and results 2 weeks befor and after the competition	ranking	en	Judges have the right to create startlists and results 2 weeks befor and after the competition
 key must not be empty !!!	ranking	en	Key must not be empty !!!
+key of the category	ranking	en	Key of the category
+key of the competition	ranking	en	Key of the competition
+key of the cup	ranking	en	Key of the cup
+key of the person	ranking	en	Key of the Person
 last competition	ranking	en	Last competition
 license number	ranking	en	License number
 male	ranking	en	male
@@ -116,16 +127,23 @@ nation acl	common	en	Nation ACL
 nation if national competition or internatinal	ranking	en	nation if national competition or internatinal
 nation if national competition or none for an internatinal one	ranking	en	nation if national competition or none for an internatinal one
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
+nation to use (empty = international)	ranking	en	Nation to use (empty = international)
+national team ranking	ranking	en	National team ranking
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 not used at the moment	ranking	en	not used at the moment
 notice	ranking	en	Notice
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
+on how many routes is the first round	ranking	en	On how many routes is the first round
 only fill values different from egw	admin	en	only fill values different from eGW
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
 perid	ranking	en	PerId
 permission denied !!!	ranking	en	Permission denied !!!
+personal profile	ranking	en	Personal profile
 phone	ranking	en	Phone
+picture	ranking	en	Picture
+picture attached	ranking	en	Picture attached
+picture resized to %1 pixel	ranking	en	Picture resized to %1 pixel
 place	ranking	en	Place
 place of birth	ranking	en	Place of birth
 pointalocation	ranking	en	Pointalocation
@@ -140,6 +158,7 @@ previous rankingsystem	ranking	en	previous Rankingsystem
 professional	ranking	en	Professional
 profile	ranking	en	Profile
 quota	ranking	en	Quota
+ranglist	ranking	en	Ranglist
 rank	ranking	en	Rank
 ranking	common	en	Ranking
 ranking database	admin	en	Ranking database
@@ -154,6 +173,7 @@ registration	ranking	en	Registration
 registration deadline	ranking	en	Registration deadline
 remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
+result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
 result pdf	ranking	en	Result PDF
 results	ranking	en	Results
 routes	ranking	en	Routes
@@ -179,15 +199,19 @@ street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
+this module displays calendar, results and rankings	ranking	en	This module displays calendar, results and rankings
 this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
 to year	ranking	en	to year
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
+type of display	ranking	en	Type of display
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
+upload a portrait picture for the profile	ranking	en	Upload a portrait picture for the profile
+uploaded picture is no jpeg !!!	ranking	en	Uploaded picture is no JPEG !!!
 url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. http://domain.com
 use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"
 use access control to deny display on the website	ranking	en	use access control to deny display on the website
@@ -210,4 +234,5 @@ which cathegories are competing	ranking	en	which cathegories are competing
 which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	en	which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used
 which rankingsystem was used before, if any	ranking	en	which rankingsystem was used before, if any
 which view do you want to see, when you start the ranking app?	ranking	en	Which view do you want to see, when you start the ranking app?
+year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!

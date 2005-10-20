@@ -23,4 +23,4 @@
 	$default_view = $GLOBALS['egw_info']['user']['preferences']['ranking']['default_view'];
 	ExecMethod($default_view ? $default_view : 'ranking.uiranking.index');
 
-	$GLOBALS['phpgw']->common->phpgw_footer();
+	$GLOBALS['egw']->common->egw_footer();

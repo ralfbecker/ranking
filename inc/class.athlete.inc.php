@@ -32,6 +32,9 @@ class athlete extends so_sql
 	var $result_table = 'Results';
 	
 	var $cats;
+	
+	var $picture_url = '/jpgs';
+	var $picture_path = '../../../jpgs';
 
 	/**
 	 * constructor of the athlete class
@@ -42,7 +45,7 @@ class athlete extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['phpgw']->translation->charset();
+		$this->charset = $GLOBALS['egw']->translation->charset();
 		
 		foreach(array(
 				'cats'  => 'category',
@@ -55,6 +58,7 @@ class athlete extends so_sql
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
+		$this->picture_path = $_SERVER['DOCUMENT_ROOT'].'/jpgs';
 	}
 
 	/**
@@ -71,7 +75,11 @@ class athlete extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
+		}
+		if ($data['practice'] && $data['practice'] > 100)
+		{
+			$data['practice'] = date('Y') - $data['practice'];
 		}
 		if ($data['acl'])
 		{
@@ -81,6 +89,7 @@ class athlete extends so_sql
 			{
 				if ($acl & $n) $data['acl'][] = $n;
 			}
+			//echo "<p>athlete::db2data() acl=$acl=".print_r($data['acl'],true)."</p>\n";
 		}
 		if ($data['geb_date']) $data['geb_year'] = (int) $data['geb_date'];
 
@@ -111,11 +120,16 @@ class athlete extends so_sql
 			foreach($acl as $n)
 			{
 				$data['acl'] |= $n;
-			}			
+			}
+			//echo "<p>athlete::data2db() acl=".print_r($acl,true)."=$data[acl]</p>\n";
+		}
+		if ($data['practice'] && $data['practice'] < 100)
+		{
+			$data['practice'] = date('Y') - $data['practice'];
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}
@@ -266,5 +280,81 @@ class athlete extends so_sql
 		$this->db->select('Results','count(*)',array('PerId' => $PerId,'platz > 0'),__LINE__,__FILE__);
 		
 		return $this->db->next_record() && $this->db->f(0);
+	}
+	
+	/**
+	 * get the path of the picture
+	 *
+	 * @param string $rkey=null rkey of the athlete or null to use this->data[rkey]
+	 * @return string/boolean the path or false if the rkey is empty (NOT if the picture does NOT exist!)
+	 */
+	function picture_path($rkey=null)
+	{
+		if (is_null($rkey)) $rkey = $this->data['rkey'];
+		
+		return $rkey ? $this->picture_path.'/'.$rkey.'.jpg' : false;
+	}
+
+	/**
+	 * attach a picture to the athlete
+	 * 
+	 * @param string $fname filename of the picture to attach
+	 * @param string $rkey=null rkey of the athlete or null to use this->data[rkey]
+	 * @return boolean true on success, flase otherwise
+	 */
+	function attach_picture($fname,$rkey=null)
+	{
+		$path = $this->picture_path($rkey);
+
+		if (!$path || !file_exists($fname) || !is_readable($fname) || !is_writeable($this->picture_path)) return false;
+		
+		if (file_exists($path)) @unlink($path);
+		
+		return copy($fname,$path);
+	}
+	
+	/**
+	 * get the url of the picture
+	 *
+	 * @param string $rkey=null rkey of the athlete or null to use this->data[rkey]
+	 * @return string/boolean the url or false if picture does not exist
+	 */
+	function picture_url($rkey = null)
+	{
+		if (is_null($rkey)) $rkey = $this->data['rkey'];
+
+		$url = $this->picture_url.'/'.$this->data['rkey'].'.jpg';
+		$path = $this->picture_path($rkey);
+		
+		return file_exists($path) && is_readable($path) ? $url : false;
+	}
+	
+	/**
+	 * delete the picture
+	 *
+	 * @return boolean true on success, false otherwise
+	 */
+	function delete_picture()
+	{
+		return @delete($this->picture_path());
+	}
+	
+	/**
+	 * deletes athlete(s), see so_sql
+	 *
+	 * reimplemented to delete the picture too, works only if one athlete (specified by rkey or internal data) is deleted!
+	 *
+	 * @param array $keys=null see so_sql
+	 * @return int deleted rows or 0 on error
+	 */
+	function delete($keys=null)
+	{
+		$Ok = parent::delete($keys);
+
+		if ($Ok && (is_null($keys) || $keys['rkey']))
+		{
+			$this->delete_picture($keys['rkey']);
+		}
+		return $Ok;
 	}
 }
