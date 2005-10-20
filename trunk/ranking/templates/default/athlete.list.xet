@@ -28,7 +28,7 @@
 				</row>
 				<row class="nmr">
 					<description id="${row}[nation]" align="center" no_lang="1"/>
-					<description id="${row}[nachname]" no_lang="1"/>
+					<description id="${row}[nachname]" no_lang="1" class="lastname"/>
 					<description class="ml10" no_lang="1" id="${row}[vorname]"/>
 					<menulist>
 						<menupopup align="center" id="${row}[sex]" readonly="true"/>

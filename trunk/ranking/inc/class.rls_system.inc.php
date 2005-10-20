@@ -12,7 +12,7 @@
 
 /* $Id$ */
 
-require_once(PHPGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
+require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * rls_system object, a rls defines how the ranking is calculated
@@ -30,7 +30,7 @@ class rls_system extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['phpgw']->translation->charset();
+		$this->charset = $GLOBALS['egw']->translation->charset();
 	}
 
 	/**
@@ -46,7 +46,7 @@ class rls_system extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
 		}
 		return $data;
 	}
@@ -64,7 +64,7 @@ class rls_system extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}

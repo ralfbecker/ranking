@@ -18,6 +18,7 @@ class module_ranking extends sitemgr_module
 {
 	function module_ranking()
 	{
+		$this->arguments = array();
 		$this->title = lang('Ranking');
 		$this->description = lang('This module displays information from the ranking app.');
 		

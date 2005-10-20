@@ -368,4 +368,29 @@
 		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.009';
 		return $GLOBALS['setup_info']['ranking']['currentver'];
 	}
+
+
+	$test[] = '1.0.0.009';
+	function ranking_upgrade1_0_0_009()
+	{
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Wettkaempfe','judges',array(
+			'type' => 'varchar',
+			'precision' => '64'
+		));
+
+		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.010';
+		return $GLOBALS['setup_info']['ranking']['currentver'];
+	}
+
+
+	$test[] = '1.0.0.010';
+	function ranking_upgrade1_0_0_010()
+	{
+		$GLOBALS['phpgw_setup']->oProc->AddColumn('Personen','freetext',array(
+			'type' => 'longtext'
+		));
+
+		$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.011';
+		return $GLOBALS['setup_info']['ranking']['currentver'];
+	}
 ?>

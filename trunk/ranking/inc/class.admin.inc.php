@@ -35,7 +35,7 @@ class admin
 	 */
 	var $nations = array();
 	/**
-	 * @var acl-object $acl referenze to the global acl object, $GLOBALS['phpgw']->acl
+	 * @var acl-object $acl referenze to the global acl object, $GLOBALS['egw']->acl
 	 */
 	var $acl;
 
@@ -44,15 +44,15 @@ class admin
 	 */
 	function admin()
 	{
-		if (!$GLOBALS['phpgw_info']['user']['apps']['admin'])
+		if (!$GLOBALS['egw_info']['user']['apps']['admin'])
 		{
-			$GLOBALS['phpgw']->common->phpgw_header();
+			$GLOBALS['egw']->common->egw_header();
 			echo parse_navbar();
 			echo lang('permission denied !!!');
-			$GLOBALS['phpgw']->common->phpgw_footer();
-			$GLOBALS['phpgw']->common->phpgw_exit();
+			$GLOBALS['egw']->common->egw_footer();
+			$GLOBALS['egw']->common->egw_exit();
 		}
-		$this->acl =& $GLOBALS['phpgw']->acl;
+		$this->acl =& $GLOBALS['egw']->acl;
 	}
 
 	/**
@@ -99,11 +99,11 @@ class admin
 			{
 				if ($content['referer'])
 				{
-					$GLOBALS['phpgw']->redirect($content['referer']);
+					$GLOBALS['egw']->redirect($content['referer']);
 				}
 				else
 				{
-					$GLOBALS['phpgw']->redirect_link('/admin/index.php');
+					$GLOBALS['egw']->redirect_link('/admin/index.php');
 				}
 			}
 			$preserve = array(
@@ -149,7 +149,7 @@ class admin
 		$readonlys['delete['.$n.']'] = true;
 			
 		$tmpl =& CreateObject('etemplate.etemplate','ranking.admin.acl');
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nation ACL');
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nation ACL');
 		$tmpl->exec('ranking.admin.acl',$content,false,$readonlys,$preserve);
 	}
 }

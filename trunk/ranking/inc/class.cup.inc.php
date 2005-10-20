@@ -30,7 +30,7 @@ class cup extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['phpgw']->translation->charset();
+		$this->charset = $GLOBALS['egw']->translation->charset();
 		
 		foreach(array(
 				'cats'  => 'category',
@@ -59,7 +59,7 @@ class cup extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
 		}
 		if ($data['gruppen'])
 		{
@@ -118,7 +118,7 @@ class cup extends so_sql
 
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}

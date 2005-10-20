@@ -40,7 +40,7 @@ class result extends so_sql
 		
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['phpgw']->translation->charset();
+		$this->charset = $GLOBALS['egw']->translation->charset();
 
 		foreach(array(
 				'athlete'  => 'athlete',
@@ -137,17 +137,24 @@ class result extends so_sql
 		return parent::read($keys,$extra_cols,$join !== true ? $join : '');
 	}
 	
-	function &comps_with_startlist($keys=array())
+	function &comps_with_startlist($keys=array(),$registration_too=true)
 	{
+		//echo "<p>result::comps_with_startlist(".print_r($keys,true).")</p>\n";
 		$keys['platz'] = 0;
-		$keys[] = 'pkt > 64';
 		
-		if (isset($keys['nation']))		// nation is from the joined comp_table, it cant be quoted automatic
+		if ($registration_too)
 		{
-			if ($keys['nation'] == 'NULL') $keys['nation'] = null;
-			$keys[] = $this->db->expression($this->comp_table,array('nation' => $keys['nation']));
-			unset($keys['nation']);
+			$keys[] = $this->comp_table.'.datum >= '.$this->db->quote(date('Y-m-d'));
 		}
+		else
+		{
+			$keys[] = 'pkt > 64';
+		}
+		// nation is from the joined comp_table, it cant be quoted automatic
+		if ($keys['nation'] == 'NULL') $keys['nation'] = null;
+		$keys[] = $this->db->expression($this->comp_table,array('nation' => $keys['nation']));
+		unset($keys['nation']);
+
 		$comps = array();
 		foreach ((array)$this->search(array(),"DISTINCT $this->table_name.WetId AS WetId",$this->comp_table.'.datum DESC','','',false,'AND',false,$keys,
 			", $this->comp_table WHERE $this->table_name.WetId=$this->comp_table.WetId") as $row)
@@ -171,7 +178,7 @@ class result extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
 		}
 		return $data;
 	}
@@ -190,7 +197,7 @@ class result extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}
@@ -250,6 +257,7 @@ class result extends so_sql
 	/* not yet needed
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
+		//echo "<p>result::search(".print_r($criteria,true).",'$only_keys','$order_by',".print_r($extra_cols,true).",'$wildcard','$empty','$op',$start,".print_r($filter,true).",'$join')</p>\n";
 		//$this->debug = 1;
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}*/

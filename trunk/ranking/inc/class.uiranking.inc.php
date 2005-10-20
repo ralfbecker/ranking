@@ -120,7 +120,7 @@ class uiranking extends boranking
 			}			
 		}
 		//_debug_array($content);
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').($cup ? ': '.$cup['name'] : '').
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').($cup ? ': '.$cup['name'] : '').
 			($cat ? ': '.$cat['name'].($stand ? ': '.$stand : '') : '');
 		$tmpl->exec('ranking.uiranking.index',$content,$select_options,$readonly,$preserv);
 	}

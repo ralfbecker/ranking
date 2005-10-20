@@ -163,7 +163,11 @@ class uiregistration extends boranking
 			}
 		}
 		$comp     = $this->comp->read($content['comp']);
-
+		
+		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
+		{
+			$readonlys['calendar'] = $readonlys['comp'] = true;
+		}
 		if ($this->only_nation)
 		{
 			$calendar = $this->only_nation;
@@ -484,6 +488,10 @@ class uiregistration extends boranking
 		$comp     = $this->comp->read($content['comp']);
 		$cat      = $content['cat'];
 
+		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
+		{
+			$readonlys['calendar'] = $readonlys['comp'] = true;
+		}
 		if ($this->only_nation)
 		{
 			$calendar = $this->only_nation;
@@ -552,7 +560,7 @@ class uiregistration extends boranking
 					'ranking-points',
 				);
 				echo implode(';',$name2csv)."\n";
-				$charset = $GLOBALS['phpgw']->translation->charset();
+				$charset = $GLOBALS['egw']->translation->charset();
 				$c['GrpId'] = 0;
 				foreach($starters as $athlete)
 				{
@@ -601,7 +609,7 @@ class uiregistration extends boranking
 				}
 				$GLOBALS['egw']->common->egw_exit();
 			}
-			if (!$starters || !count($starters))
+			if (!$show || !$starters || !count($starters))
 			{
 				// if we have registrations, show them
 				if($this->result->read(array(

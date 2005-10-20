@@ -82,7 +82,7 @@ class category extends so_sql
 		
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['phpgw']->translation->charset();
+		$this->charset = $GLOBALS['egw']->translation->charset();
 	}
 
 	/**
@@ -98,7 +98,7 @@ class category extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
 		}
 		// setting up meta-groups, not yet saved int the db
 		$data['GrpIds'] = $data['GrpIds'] ? explode(',',$data['GrpIds']) : array();
@@ -128,7 +128,7 @@ class category extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['phpgw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}
@@ -283,11 +283,11 @@ class category extends so_sql
 		foreach((array) $this->all_names as $rkey => $name)
 		{
 			if (stristr( ",".$rexp.",",",".$rkey."," ) || $rexp && eregi( '^'.$rexp.'$',$rkey ) ||
-	       		(isset($this->cat2old[$rkey]) && (stristr( ",".$rexp.",",",".$this->cat2old[$rkey]."," ) || 
-	       		$rexp && eregi( '^'.$rexp.'$',$this->cat2old[$rkey] ))))
-	        {
-	        	$cats[] = $rkey;
-	        }
+				 		(isset($this->cat2old[$rkey]) && (stristr( ",".$rexp.",",",".$this->cat2old[$rkey]."," ) || 
+				 		$rexp && eregi( '^'.$rexp.'$',$this->cat2old[$rkey] ))))
+					{
+						$cats[] = $rkey;
+					}
 		}
 		//echo "<p>category::cat_rexp2rkeys('$rexp')=".print_r($cats,true)."</p>\n";
 		return $cats;

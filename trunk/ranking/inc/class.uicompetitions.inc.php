@@ -74,15 +74,15 @@ class uicompetitions extends boranking
 		}
 		else
 		{
-			$view = $content['view'];
-
-			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
-
 			//echo "<br>uicompetitions::edit: content ="; _debug_array($content);
 			$this->comp->data = $content['comp_data'];
 			$old_rkey = $content['comp_data']['rkey'];
 			unset($content['comp_data']);
 			
+			$view = $content['view'] && !($content['edit'] && $this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT));
+
+			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
+
 			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] && 
 				$this->cup->read(array('SerId' => $content['serie'])))
 			{
@@ -94,7 +94,7 @@ class uicompetitions extends boranking
 			$this->comp->data_merge($content);
 			//echo "<br>uicompetitions::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (($content['save'] || $content['apply']) && $this->acl_check($content['nation'],EGW_ACL_EDIT))
+			if (!$view  && ($content['save'] || $content['apply']) && $this->acl_check($content['nation'],EGW_ACL_EDIT))
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -160,7 +160,7 @@ class uicompetitions extends boranking
 			{
 				$this->tmpl->location(array('menuaction'=>'ranking.uicompetitions.index'));
 			}
-			if ($content['delete'] && in_array($content['nation'],$this->edit_rights))
+			if ($content['delete'] && ($this->is_admin || in_array($this->comp->data['nation'],$this->edit_rights)))
 			{
 				$this->index(array(
 					'nm' => array(
@@ -182,8 +182,10 @@ class uicompetitions extends boranking
 					lang('Error: removing the %1 !!!',$this->attachment_type[$type]);
 			}
 		}
+		$tabs = 'general|ranking|files|startlist|judges';
 		$content = $this->comp->data + array(
-			'msg' => $msg
+			'msg' => $msg,
+			$tabs => $content[$tabs],
 		);
 		foreach((array) $this->comp->attachments() as $type => $linkdata)
 		{
@@ -210,6 +212,7 @@ class uicompetitions extends boranking
 		$readonlys = array(
 			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
 			'nation' => !!$this->only_nation_edit,
+			'edit'   => !$view || !$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT),
 		);
 		foreach($this->attachment_type as $type => $label)
 		{
@@ -221,10 +224,10 @@ class uicompetitions extends boranking
 			{
 				$readonlys[$name] = true;
 			}
-			$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
+			$readonlys['save'] = $readonlys['apply'] = true;
 			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] = true;
 		}
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 		$this->tmpl->read('ranking.comp.edit');
 		$this->tmpl->exec('ranking.uicompetitions.edit',$content,
 			$sel_options,$readonlys,array(
@@ -242,7 +245,7 @@ class uicompetitions extends boranking
 	 */
 	function get_rows($query,&$rows,&$readonlys)
 	{
-		$GLOBALS['phpgw']->session->appsession('ranking','comp_state',$query);
+		$GLOBALS['egw']->session->appsession('ranking','comp_state',$query);
 		if (!$this->is_admin && !in_array($query['col_filter']['nation'],$this->read_rights))
 		{
 			$query['col_filter']['nation'] = $this->read_rights;
@@ -346,7 +349,7 @@ class uicompetitions extends boranking
 		}
 		$content = array();
 
-		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['phpgw']->session->appsession('ranking','comp_state');
+		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','comp_state');
 		
 		if (!is_array($content['nm']))
 		{
@@ -367,7 +370,7 @@ class uicompetitions extends boranking
 		$content['msg'] = $msg;
 
 		$this->tmpl->read('ranking.comp.list');
-		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 		$this->tmpl->exec('ranking.uicompetitions.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),

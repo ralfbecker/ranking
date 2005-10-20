@@ -12,12 +12,12 @@
 
 	/* $Id$ */
 
-require_once(PHPGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
+require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
-/*!
-@class pkt
-@abstract pktsystem object
-*/
+/**
+ * pktsystem object
+ *
+ */
 class pktsystem extends so_sql
 {
 	/* var $public_functions = array(
@@ -43,16 +43,16 @@ class pktsystem extends so_sql
 	var $pkte;
 */
 
-	/*!
-	@function pktsytem
-	@abstract pktsystem of the competition class
-	*/
+	/**
+	 * pktsystem of the competition class
+	 *
+	 */
 	function pktsystem($source_charset='',$db=null)
 	{
 		$this->so_sql('ranking','PktSysteme',$db);	// call constructor of derived class
 
 /*    not needed so far
-		$this->pkte = new so_sql;
+		$this->pkte =& new so_sql;
 		$this->pkte->db_name = $this->db_name_pkte;
 		$this->pkte->db_key_cols = $this->db_key_cols;
 		$this->pkte->db_data_cols = $this->db_data_cols_pkte;
@@ -60,10 +60,9 @@ class pktsystem extends so_sql
 */
 	}
 
-	/*!
-	@function names
-	@returns array with all PktSystems of form PktId => name
-	*/
+	/**
+	 * array with all PktSystems of form PktId => name
+	 */
 	function names()
 	{
 		$all = $this->search(array(),False,'rkey');
