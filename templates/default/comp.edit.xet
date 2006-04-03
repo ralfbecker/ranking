@@ -20,7 +20,7 @@
 				</row>
 				<row class="row">
 					<description value="Homepage" options=",,,homepage"/>
-					<textbox size="60" maxlength="60" id="homepage" statustext="used to preset a link in rankings and competition-calendar" span="all"/>
+					<textbox size="100" maxlength="128" id="homepage" statustext="used to preset a link in rankings and competition-calendar" span="all"/>
 				</row>
 			</rows>
 		</grid>
