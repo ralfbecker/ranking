@@ -64,7 +64,7 @@ class uicompetitions extends boranking
 		{
 			if (!$_GET['WetId'] && !$_GET['rkey'])
 			{
-				$this->comp->data['nation'] = $this->edit_rights[0];
+				$this->comp->data['nation'] = $this->only_nation_edit;
 			}
 			// we have no edit-rights for that nation
 			if (!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
@@ -160,7 +160,7 @@ class uicompetitions extends boranking
 			{
 				$this->tmpl->location(array('menuaction'=>'ranking.uicompetitions.index'));
 			}
-			if ($content['delete'] && ($this->is_admin || in_array($this->comp->data['nation'],$this->edit_rights)))
+			if ($content['delete'] && $this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
 			{
 				$this->index(array(
 					'nm' => array(
@@ -173,10 +173,10 @@ class uicompetitions extends boranking
 				));
 				return;
 			}
-			if ($content['remove'] && in_array($content['nation'],$this->edit_rights))
+			if ($content['remove'] && $this->acl_check($content['nation'],EGW_ACL_EDIT))
 			{
 				list($type) = each($content['remove']);
-				
+
 				$msg .= $this->comp->remove_attachment($type) ?
 					lang('Removed the %1',$this->attachment_type[$type]) :
 					lang('Error: removing the %1 !!!',$this->attachment_type[$type]);
@@ -331,7 +331,7 @@ class uicompetitions extends boranking
 					
 				case 'delete':
 					if (!$this->is_admin && $this->comp->read(array('WetId' => $id)) &&
-						!in_array($this->comp->data['nation'],$this->edit_rights))
+						!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
 					{
 						$msg = lang('Permission denied !!!');
 					}
