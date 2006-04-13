@@ -397,12 +397,14 @@ class competition extends so_sql
 			$vfs_path = $this->attachment_path($type);
 			
 			// check and evtl. create the year directory
+			$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
 			if (!$GLOBALS['egw']->vfs->file_exists($vfs_dir = array(
 					'string' => dirname($vfs_path),
 					'relatives' => RELATIVE_ROOT,
 				)) && !$GLOBALS['egw']->vfs->mkdir($vfs_dir)) 
 			{
 				$error_msg = lang("Can not create directory '%1' !!!",dirname($vfs_path));
+				$GLOBALS['egw']->vfs->override_acl = 0;
 				return false;
 			}
 			if (!$GLOBALS['egw']->vfs->mv(array(
@@ -412,8 +414,10 @@ class competition extends so_sql
 				)))
 			{
 				$error_msg = lang("Can not move '%1' to %2 !!!",$path,$vfs_path);
+				$GLOBALS['egw']->vfs->override_acl = 0;
 				return false;
 			}
+			$GLOBALS['egw']->vfs->override_acl = 0;
 		}
 		return true;
 	}
@@ -437,11 +441,11 @@ class competition extends so_sql
 			'string' => $this->attachment_path($type),
 			'relatives' => RELATIVE_ROOT,
 		);
-		if (!$GLOBALS['egw']->vfs->file_exists($vfs_path_arr) || !$GLOBALS['egw']->vfs->rm($vfs_path_arr)) 
-		{
-			return false;
-		}
-		return true;
+		$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
+		$Ok = $GLOBALS['egw']->vfs->file_exists($vfs_path_arr) && $GLOBALS['egw']->vfs->rm($vfs_path_arr);
+		$GLOBALS['egw']->vfs->override_acl = 0;
+
+		return $Ok;
 	}
 	
 	/**
@@ -449,6 +453,7 @@ class competition extends so_sql
 	 *
 	 * @param string $old_rkey
 	 * @param array $keys to read/use a given competitions, default use the already read one
+	 * @return boolean true on success, false otherwise
 	 */
 	function rename_attachments($old_rkey,$keys=null)
 	{
@@ -460,6 +465,7 @@ class competition extends so_sql
 			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
 		}
 		$ok = true;
+		$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
 			$old_path = $this->attachment_path($type,$old_rkey);
@@ -478,6 +484,8 @@ class competition extends so_sql
 				$ok = false;
 			}
 		}
+		$GLOBALS['egw']->vfs->override_acl = 0;
+
 		return $ok;
 	}
 }
