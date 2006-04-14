@@ -160,7 +160,7 @@ class uiathletes extends boranking
 				}
 				else
 				{
-					$msg .= lang('Permission denied').' ('.$this->athlete->data['nation'].')';
+					$msg .= lang('Permission denied !!!').' ('.$this->athlete->data['nation'].')';
 				}
 			}
 			if ($content['cancel'])
