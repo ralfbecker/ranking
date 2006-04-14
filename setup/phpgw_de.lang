@@ -1,4 +1,5 @@
 %1 deleted	ranking	de	%1 gelöscht
+%1 is an admin and has therefor all rights!	ranking	de	%1 ist ein Administrator und hat daher alle Rechte!
 %1 saved	ranking	de	%1 gespeichert
 %1, %2 deleted for category %3	ranking	de	%1, %2 gelöscht für Kategorie %3
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
@@ -60,8 +61,10 @@ duration or textual date	ranking	de	Dauer oder Text
 each new upload will overwrite the previous one	ranking	de	jeder neue Upload überschreibt den vorherigen
 edit %1	ranking	de	%1 bearbeiten
 edit athlete	ranking	de	Athlet bearbeiten
+edit competition	ranking	de	Wettkampf bearbeiten
 edit this athlete	ranking	de	Diesen Athleten bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
+edit this cup	ranking	de	Diesen Cup bearbeiten
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
@@ -224,6 +227,7 @@ view %1	ranking	de	%1 anzeigen
 view the attached pdf	ranking	de	Angehangenes PDF anzeigen
 view this athlete	ranking	de	Diesen Athleten anzeigen
 view this competition	ranking	de	Diesen Wettkampf anzeigen
+view this cup	ranking	de	Diesen Cup anzeigen
 weight (kg)	ranking	de	Gewicht (kg)
 weight in kilogram	ranking	de	Gewicht in Kilogram
 weight, size, hobbies, ...	ranking	de	Gewicht, Größe, Hobies, ...

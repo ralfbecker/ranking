@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.admin.user_acl" template="" lang="" group="0" version="1.2.002">
+		<grid spacing="0" padding="0">
+			<columns>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row valign="top">
+					<html id="admin_menu"/>
+					<vbox>
+						<description id="msg" class="redItalic" no_lang="1"/>
+						<grid>
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row class="th">
+									<description value="Nation"/>
+									<description value="Read competition"/>
+									<description value="Edit competition"/>
+									<description value="Edit athlete"/>
+									<description value="Registration"/>
+									<description value="Delete"/>
+								</row>
+								<row class="row">
+									<textbox no_lang="1" id="${row}[nation]" size="3" maxlength="3"/>
+									<checkbox id="${row}[read]" label="Read competition"/>
+									<checkbox id="${row}[edit]" label="Edit competition"/>
+									<checkbox id="${row}[athlets]" label="Edit athlete"/>
+									<checkbox id="${row}[register]" label="Registration"/>
+									<button image="delete" label="Delete" align="center" id="delete[$row]" onclick="return confirm('Delete all rights for that nation');"/>
+								</row>
+							</rows>
+						</grid>
+						<hbox>
+							<button label="Save" id="save"/>
+							<button id="apply" label="Apply"/>
+							<button id="cancel" label="Cancel"/>
+						</hbox>
+					</vbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

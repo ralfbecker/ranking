@@ -1,4 +1,5 @@
 %1 deleted	ranking	en	%1 deleted
+%1 is an admin and has therefor all rights!	ranking	en	%1 is an admin and has therefor all rights!
 %1 saved	ranking	en	%1 saved
 %1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
@@ -60,8 +61,10 @@ duration or textual date	ranking	en	Duration or textual date
 each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
 edit %1	ranking	en	edit %1
 edit athlete	ranking	en	Edit athlete
+edit competition	ranking	en	Edit competition
 edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
+edit this cup	ranking	en	Edit this cup
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
@@ -224,6 +227,7 @@ view %1	ranking	en	view %1
 view the attached pdf	ranking	en	View the attached PDF
 view this athlete	ranking	en	View this athlete
 view this competition	ranking	en	View this competition
+view this cup	ranking	en	View this cup
 weight (kg)	ranking	en	Weight (kg)
 weight in kilogram	ranking	en	weight in kilogram
 weight, size, hobbies, ...	ranking	en	Weight, size, hobbies, ...
