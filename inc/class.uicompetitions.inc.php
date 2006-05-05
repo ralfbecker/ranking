@@ -86,7 +86,7 @@ class uicompetitions extends boranking
 			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] && 
 				$this->cup->read(array('SerId' => $content['serie'])))
 			{
-				foreach($this->cup->data['presets']+array('gruppen' => $this->cup->data['gruppen']) as $key => $val)
+				foreach((array)$this->cup->data['presets']+array('gruppen' => $this->cup->data['gruppen']) as $key => $val)
 				{
 					$content[$key] = $val;
 				}
