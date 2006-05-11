@@ -69,6 +69,7 @@ class uiathletes extends boranking
 			{
 				// read the athletes results
 				$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
+				if ($this->athlete->data['comp']) array_unshift($this->athlete->data['comp'],false);	// reindex with 1
 			}
 			else
 			{
