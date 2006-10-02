@@ -14,7 +14,7 @@
 
 if (!defined('DR_PATH'))
 {
-	define('DR_PATH',realpath(strstr($_SERVER['DOCUMENT_ROOT'],'uiaaclimbing.com') ? $_SERVER['DOCUMENT_ROOT'].'/../../digitalrock.de/httpdocs' : $_SERVER['DOCUMENT_ROOT']));
+	define('DR_PATH',realpath(strstr($_SERVER['DOCUMENT_ROOT'],'uiaaclimbing.com') ? $_SERVER['DOCUMENT_ROOT'].'/../digitalrock.de' : $_SERVER['DOCUMENT_ROOT']));
 }
 class module_ranking_digitalrock extends Module 
 {
