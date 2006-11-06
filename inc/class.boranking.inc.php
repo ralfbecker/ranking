@@ -78,6 +78,12 @@ class boranking extends soranking
 	 * @var int $user account_id of user
 	 */
 	var $user;
+	/**
+	 * instance of the competition object
+	 *
+	 * @var competition
+	 */
+	var $comp;
 
 	var $public_functions = array(
 		'writeLangFile' => True

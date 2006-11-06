@@ -175,6 +175,23 @@ class cup extends so_sql
 		{
 			$cup =& $this->data;
 		}
-		return $cup['max_per_cat'][$cat_rkey] ? (int) $cup['max_per_cat'][$cat_rkey] : $cup['max_serie'];
+		$max = $cup['max_per_cat'][$cat_rkey] ? (int) $cup['max_per_cat'][$cat_rkey] : $cup['max_serie'];
+		
+		if ($max < 0)	// $max comps less then the total
+		{
+			if (!is_object($GLOBALS['egw']->comp))
+			{
+				$GLOBALS['egw']->comp =& CreateObject('ranking.competition',$this->source_charset,$this->db);
+			}
+			$wettks = $GLOBALS['egw']->comp->search(array(),true,'','','',false,'AND',false,array(
+				'nation' => $nation,
+				'serie'  => $cup['ser_id'],
+				$GLOBALS['egw']->comp->check_in_cats($cats),			
+			));
+			$anz_wettk = count($wettks);
+			//echo "<p>$sql: anz_wettk=$anz_wettk</p>\n";
+			return ($cup['max_serie'] + $anz_wettk)." (=$anz_wettk$cup[max_serie])";
+		}
+		return $max;
 	}
 }

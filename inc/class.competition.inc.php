@@ -237,11 +237,31 @@ class competition extends so_sql
 			'datum > '.$this->db->quote($date),
 			'datum <= '.$this->db->quote((int)$date.'-12-31'),
 			$cup ? 'serie='.(int)$cup : 'faktor > 0.0',
-			'('.implode(' OR ',$or_query).')',			
+			$this->check_in_cats($cats),			
 		));
 		if ($this->debug) echo "<p>competition::next_comp_this_year('$date',".print_r($cats,true).",'$nation',$cup) = '$ret[rkey]'</p>\n";
 		
 		return $ret ? $ret[0] : false;
+	}
+	
+	/**
+	 * SQL to check if competition has one of the given cats
+	 *
+	 * old competitions might have regular expressions of the cats attending them
+	 * 
+	 * @static
+	 * @param array $cats cat-rkeys
+	 * @return string
+	 */
+	function check_in_cats($cats)
+	{
+		$or_query = array();
+		foreach($cats as $rkey)
+		{
+			$or_query[] = 'find_in_set('.$this->db->quote($rkey).",IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen))";
+			$or_query[] = $this->db->quote($rkey). " REGEXP IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen)";
+		}
+		return '('.implode(' OR ',$or_query).')';
 	}
 
 	/**
