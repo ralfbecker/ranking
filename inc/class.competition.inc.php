@@ -150,7 +150,7 @@ class competition extends so_sql
 	 */
 	function read($keys,$extra_cols='',$join='')
 	{
-		if (!is_array($keys))
+		if ($keys && !is_array($keys))
 		{
 			$keys = is_numeric($keys) ? array('WetId' => (int) $keys) : array('rkey' => $keys);
 		}
