@@ -162,8 +162,8 @@ class uiregistration extends boranking
 				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
 			}
 		}
-		$comp     = $this->comp->read($content['comp']);
-		
+		if($content['comp']) $comp = $this->comp->read($content['comp']);
+
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
 			$readonlys['calendar'] = $readonlys['comp'] = true;
@@ -485,7 +485,7 @@ class uiregistration extends boranking
 				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
 			}
 		}
-		$comp     = $this->comp->read($content['comp']);
+		if ($content['comp']) $comp = $this->comp->read($content['comp']);
 		$cat      = $content['cat'];
 
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified

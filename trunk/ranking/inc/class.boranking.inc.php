@@ -548,7 +548,7 @@ class boranking extends soranking
 					$stand = $comp['datum'];
 					$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);
 					
-					foreach($ranking as $athlet)
+					foreach((array)$ranking as $athlet)
 					{
 						if ($athlet['platz'] > $comp['prequal_ranking']) break;
 						
