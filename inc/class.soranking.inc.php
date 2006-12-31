@@ -70,6 +70,9 @@ class soranking
 			$this->db =& new egw_db();
 			$this->db->connect($this->config['ranking_db_name'],$this->config['ranking_db_host'],
 				$this->config['ranking_db_port'],$this->config['ranking_db_user'],$this->config['ranking_db_pass']);
+			
+			if (!$this->config['ranking_db_charset']) $this->db->Link_ID->SetCharSet($GLOBALS['egw_info']['server']['system_charset']);
+
 		}
 		else 
 		{
