@@ -33,61 +33,72 @@ class boranking extends soranking
 	var $cat_names;
 	var $rls_names;
 	/**
-	 * @var array $ranking_nations Nations allowed to create rankings and competitions
+	 * Nations allowed to create rankings and competitions
+	 * 
+	 * @var array
 	 */
 	var $ranking_nations=array();
 	/**
-	 * @var string $only_nation nation if there's only one ranking-nation
+	 * nation if there's only one ranking-nation
+	 * 
+	 * @var string
 	 */
 	var $only_nation='';
 	/**
-	 * @var string $only_nation_edit nation if there's only one nation the user has edit-rights to
+	 * nation if there's only one nation the user has edit-rights to
+	 * 
+	 * @var string
 	 */
 	var $only_nation_edit='';
 	/**
-	 * @var string $only_nation_athlete nation if there's only one nation the user has athlet-rights to
+	 * nation if there's only one nation the user has athlet-rights to
+	 * 
+	 * @var string
 	 */
 	var $only_nation_athlete='';
 	/**
-	 * @var string $only_nation_register nation if there's only one nation the user has register-rights to
+	 * nation if there's only one nation the user has register-rights to
+	 * 
+	 * @var string
 	 */
 	var $only_nation_register='';
-	var $tmpl;
-	var $akt_grp; // selected cat to work on
 	/**
-	 * @var array $read_rights nations the user is allowed to see
+	 * nations the user is allowed to see
+	 * 
+	 * @var array
 	 */
 	var $read_rights = array();
 	/**
-	 * @var array $edit_rights nations the user is allowed to edit
+	 * nations the user is allowed to edit
+	 * 
+	 * @var array
 	 */
 	var $edit_rights = array();
 	/**
-	 * @var array $athlete_rights nations the user is allowed to edit athlets
+	 * nations the user is allowed to edit athlets
+	 * 
+	 * @var array
 	 */
 	var $athlete_rights = array();
 	/**
-	 * @var array $register_rights nations the user is allowed to register athlets for competitions
+	 * nations the user is allowed to register athlets for competitions
+	 * 
+	 * nations the user is allowed to register athlets for competitions
 	 */
 	var $register_rights = array();
 	/**
-	 * @var boolean $is_admin true if user is an administrator, implies all read- and edit-rights
+	 * true if user is an administrator, implies all read- and edit-rights
+	 * 
+	 * @var boolean
 	 */
 	var $is_admin = false;
 	/**
-	 * @var int $user account_id of user
+	 * account_id of user
+	 * 
+	 * @var int
 	 */
 	var $user;
-	/**
-	 * instance of the competition object
-	 *
-	 * @var competition
-	 */
-	var $comp;
 
-	var $public_functions = array(
-		'writeLangFile' => True
-	);
 	var $maxmatches = 12;
 	/**
 	 * @var array $european_nations 3-digit nation codes of nation in europe
@@ -814,15 +825,5 @@ class boranking extends soranking
 		unset($starters[$k]);
 		
 		if (++$route > $num_routes) $route = 1;
-	}
-
-	/**
-	 * writes langfile with all templates and messages registered here
-	 *
-	 * can be called via http://domain/egroupware/index.php?ranking.ranking.writeLangFile
-	 */
-	function writeLangFile()
-	{
-		$this->tmpl->writeLangFile('ranking','en',array_merge($this->split_by_places,$this->genders));
 	}
 }
