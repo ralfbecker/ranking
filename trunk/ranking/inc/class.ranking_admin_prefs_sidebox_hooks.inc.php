@@ -38,6 +38,8 @@ class ranking_admin_prefs_sidebox_hooks
 					'menuaction' => 'ranking.uiregistration.index' )),
 				'Startlists' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.startlist' )),
+				'Resultservice' => $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiresult.index' )),
 				'Results' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.result' )),
 				'Ranking' => $GLOBALS['egw']->link('/index.php',array(
@@ -84,14 +86,15 @@ class ranking_admin_prefs_sidebox_hooks
 	function hook_settings()
 	{
 		$ranking_views = array(
-			'ranking.uiranking.index'        => lang('Ranking'),
-			'ranking.uiregistration.results' => lang('Results'),
 			'ranking.uicompetitions.index'   => lang('Competitions'),
 			'ranking.uicups.index'           => lang('Cups'),
 		//	'ranking.uicats.index'           => lang('Categories'),
 			'ranking.uiathletes.index'       => lang('Athletes'),
 			'ranking.uiregistration.index'   => lang('Registration'),
 			'ranking.uiregistration.lists'   => lang('Startlists'),
+			'ranking.uiresult.index'         => lang('Resultservice'),
+			'ranking.uiregistration.result'  => lang('Results'),
+			'ranking.uiranking.index'        => lang('Ranking'),
 		);
 		create_select_box('Default ranking view','default_view',$ranking_views,
 			'Which view do you want to see, when you start the ranking app?');

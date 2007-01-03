@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.route" template="" lang="" group="0" version="1.3.001">
+		<grid>
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" align="center" id="msg" no_lang="1"/>
+					<description/>
+					<description/>
+				</row>
+				<row class="th">
+					<description value="Competition"/>
+					<menulist span="all">
+						<menupopup id="WetId" onchange="1" no_lang="1" readonly="true"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Category"/>
+					<menulist span="all">
+						<menupopup id="GrpId" no_lang="1" onchange="1" readonly="true"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Heat"/>
+					<menulist span="all">
+						<menupopup id="route" no_lang="1"/>
+					</menulist>
+				</row>
+				<row class="th">
+					<description value="Name"/>
+					<textbox id="route_name" size="64" maxlength="80" blur="Qualification, 1/2-Final, ..." span="all"/>
+				</row>
+				<row class="row">
+					<description value="Status"/>
+					<menulist span="all">
+						<menupopup id="route_status"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description options="route_iso_open" value="Isolation"/>
+					<hbox options="0,0">
+						<textbox id="route_iso_open" size="20" maxlength="40" blur="opens"/>
+						<textbox id="route_iso_close" size="20" maxlength="40" label="-" blur="closes"/>
+					</hbox>
+					<description/>
+				</row>
+				<row class="row">
+					<description options=",,,route_start" value="Start heat"/>
+					<textbox size="64" maxlength="64" id="route_start" blur="time" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Result official"/>
+					<textbox size="64" maxlength="80" id="route_result" blur="time" span="all"/>
+				</row>
+				<row class="row">
+					<description options=",,,route_judge" value="Judge"/>
+					<textbox size="64" maxlength="80" id="route_judge" blur="name(s)" span="all"/>
+				</row>
+				<row class="row" valign="top">
+					<description options=",,,route_comments" value="Comments"/>
+					<textbox multiline="true" rows="5" cols="64" id="route_comments" span="all"/>
+				</row>
+				<row>
+					<hbox span="2">
+						<button label="Save" id="button[save]" statustext="Save the changes"/>
+						<button id="button[apply]" label="Apply" statustext="Apply the changes"/>
+						<button id="button[cancel]" label="Cancel" statustext="Cannel without saving" onclick="window.close();"/>
+						<html id="js"/>
+					</hbox>
+					<button id="button[delete]" label="Delete" align="right" statustext="Delete this heat including all results" onclick="return confirm('Delete this heat including all results');"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

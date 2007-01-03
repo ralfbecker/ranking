@@ -15,41 +15,49 @@
 class soranking
 {
 	/**
-	 * @var array $config configuration
+	 * configuration
+	 * 
+	 * @var array
 	 */
 	var $config=array();	
 	/**
-	 * @var db-object $db db-object with connection to ranking database, might be different from eGW database
+	 * db-object with connection to ranking database, might be different from eGW database
+	 * 
+	 * @var egw_db
 	 */
 	var $db;
 	/**
-	 * @var pktsystem-object $pkte
+	 * @var pktsystem
 	 */
 	var $pkte;
 	/**
-	 * @var rls_system-object $rls
+	 * @var rls_system
 	 */
 	var $rls;
 	/**
-	 * @var category-object $cats
+	 * @var category
 	 */
 	var $cats;
 	/**
-	 * @var cup-object $cup
+	 * @var cup
 	 */
 	var $cup;
 	/**
-	 * @var competition-object $comp
+	 * @var competition
 	 */
 	var $comp;
 	/**
-	 * @var athlete-object $athlet
+	 * @var athlete
 	 */
 	var $athlete;
 	/**
-	 * @var result-object $athlet
+	 * @var result
 	 */
 	var $result;
+	/**
+	 * @var route
+	 */
+	var $route;
 	
 	/**
 	 * Constructor
@@ -86,9 +94,10 @@ class soranking
 				'comp'    => 'competition',
 				'athlete' => 'athlete',
 				'result'  => 'result',
+				'route'   => 'route',
 			) as $var => $class)
 		{
-			$egw_name = /*'ranking_'.*/$class;
+			$egw_name = $class;
 			if (!is_object($GLOBALS['egw']->$egw_name))
 			{
 				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);

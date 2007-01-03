@@ -185,5 +185,48 @@
 			'fk' => array(),
 			'ix' => array('nachname'),
 			'uc' => array('rkey')
+		),
+		'Routes' => array(
+			'fd' => array(
+				'WetId' => array('type' => 'int','precision' => '4'),
+				'GrpId' => array('type' => 'int','precision' => '4'),
+				'route_order' => array('type' => 'int','precision' => '2'),
+				'route_name' => array('type' => 'varchar','precision' => '80'),
+				'route_judge' => array('type' => 'varchar','precision' => '80'),
+				'route_status' => array('type' => 'int','precision' => '2'),
+				'route_type' => array('type' => 'int','precision' => '2'),
+				'route_modified' => array('type' => 'int','precision' => '8'),
+				'route_modifier' => array('type' => 'int','precision' => '4'),
+				'route_iso_open' => array('type' => 'varchar','precision' => '40'),
+				'route_iso_close' => array('type' => 'varchar','precision' => '40'),
+				'route_start' => array('type' => 'varchar','precision' => '64'),
+				'route_result' => array('type' => 'varchar','precision' => '80'),
+				'route_comments' => array('type' => 'text')
+			),
+			'pk' => array('WetId','GrpId','route_order'),
+			'fk' => array(),
+			'ix' => array(),
+			'uc' => array()
+		),
+		'RouteResults' => array(
+			'fd' => array(
+				'WetId' => array('type' => 'int','precision' => '4'),
+				'GrpId' => array('type' => 'int','precision' => '4'),
+				'route_order' => array('type' => 'int','precision' => '2'),
+				'PerId' => array('type' => 'int','precision' => '4'),
+				'result_height' => array('type' => 'int','precision' => '4'),
+				'result_plus' => array('type' => 'int','precision' => '2'),
+				'result_top_time' => array('type' => 'int','precision' => '4'),
+				'result_zone' => array('type' => 'int','precision' => '2'),
+				'result_detail' => array('type' => 'varchar','precision' => '255'),
+				'result_modified' => array('type' => 'int','precision' => '8'),
+				'result_modifier' => array('type' => 'int','precision' => '4'),
+				'start_order' => array('type' => 'int','precision' => '2'),
+				'start_number' => array('type' => 'int','precision' => '2')
+			),
+			'pk' => array('WetId','GrpId','route_order','PerId'),
+			'fk' => array(),
+			'ix' => array(),
+			'uc' => array()
 		)
 	);
