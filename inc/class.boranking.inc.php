@@ -809,6 +809,26 @@ class boranking extends soranking
 	}
 	
 	/**
+	 * Get the start- and route-number from the pkt field of a registration startlist
+	 *
+	 * @param int $pkt
+	 * @param int $only_route 1, 2, ... if only a certain route-number should be returned (returns false if no match)
+	 * @return string/ startnumber or false, if it's the wrong route
+	 */
+	function pkt2start($pkt,$only_route=null)
+	{
+		$route = 1+($pkt >> 14);
+		
+		$start = ($pkt >> 6) & 255;
+		
+		if (!$only_route)
+		{
+			return $route > 1 ? $route.': '.$start : $start;
+		}
+		return $route == $only_route ? $start : false;
+	}
+	
+	/**
 	 * move an athlete to the startlist and diveds them on $num_routes routes
 	 *
 	 * @internal 

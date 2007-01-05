@@ -577,7 +577,8 @@ class uiregistration extends boranking
 						switch($csv)
 						{
 							case 'startnumber':
-								$val = ($athlete['pkt'] >> 14 ? (1+($athlete['pkt'] >> 14)).': ' : '') .(($athlete['pkt'] >> 6) & 255);
+								//$val = ($athlete['pkt'] >> 14 ? (1+($athlete['pkt'] >> 14)).': ' : '') .(($athlete['pkt'] >> 6) & 255);
+								$val = $this->pkt2start($athlete['pkt']);
 								break;
 							case 'points':
 								$val = $athlete['pkt'];
