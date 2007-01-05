@@ -95,6 +95,7 @@ class soranking
 				'athlete' => 'athlete',
 				'result'  => 'result',
 				'route'   => 'route',
+				'route_result'  => 'route_result',
 			) as $var => $class)
 		{
 			$egw_name = $class;
