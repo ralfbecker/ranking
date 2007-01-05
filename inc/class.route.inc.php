@@ -65,4 +65,13 @@ class route extends so_sql
 		
 		return $this->db->next_record() ? $this->db->f(0) : null;
 	}
+/*	
+	function query_list($value_col,$key_cols='',$filter=array(),$order='')
+	{
+		echo "<p>query_list('$value_col','$key_cols',".print_r($filter,true).",'$order')</p>\n";
+		$list = parent::query_list($value_col,$key_cols,$filter,$order);
+		_debug_array($list);
+		return $list;
+	}
+*/
 }

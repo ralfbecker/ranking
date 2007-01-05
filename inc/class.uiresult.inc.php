@@ -12,10 +12,10 @@
 
 /* $Id$ */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 
-class uiresult extends boranking 
+class uiresult extends boresult
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -24,36 +24,10 @@ class uiresult extends boranking
 		'index' => true,
 		'route' => true,
 	);
-	/**
-	 * values and labels for route_order
-	 *
-	 * @var array
-	 */
-	var $order_nums;
-	/**
-	 * values and labels for route_status
-	 *
-	 * @var unknown_type
-	 */
-	var $stati = array(
-		0 => 'unpublished',
-		1 => 'startlist',
-		2 => 'provisional result',
-		3 => 'offical result',
-	);
 
 	function uiresult()
 	{
-		$this->boranking();
-		
-		$this->order_nums = array(
-			0 => lang('Qualification'),
-			1 => lang('2. Qualification'),
-		);
-		for($i = 2; $i <=5; ++$i)
-		{
-			$this->order_nums[$i] = lang('%1. Heat',$i);
-		}
+		$this->boresult();
 	}
 
 	/**
@@ -108,15 +82,15 @@ class uiresult extends boranking
 				'menuaction' => 'ranking.uiresult.index',
 				'comp'  => $content['WetId'],
 				'cat'   => $content['GrpId'],
-				'route' => $content['route_order'],
+				'route' => !is_numeric($content['route_order']) ? $content['route'] : $content['route_order'],
 				'msg'   => $msg,
 			))."';";
 			switch($button)
 			{
 				case 'save':
 				case 'apply':
+					//_debug_array($content);
 					if (!is_numeric($content['route_order'])) $content['route_order'] = $content['route'];
-					_debug_array($content);
 					if ($this->route->save($content) == 0)
 					{
 						$msg = lang('Route saved');
@@ -127,6 +101,11 @@ class uiresult extends boranking
 							'route' => $content['route_order'],
 							'msg'   => $msg,
 						))."';";
+						
+						if ($content['route_order'] < 2)	// Qualification --> get startlist from registration
+						{
+							$this->startlist_from_registration($comp,$cat,1+$content['route_order']);
+						}
 					}
 					else
 					{
@@ -136,7 +115,7 @@ class uiresult extends boranking
 					break;
 
 				case 'delete':
-					_debug_array($content);
+					//_debug_array($content);
 					if ($this->route->delete(array(
 						'WetId' =>$content['WetId'],
 						'GrpId' => $content['GrpId'],
@@ -187,18 +166,16 @@ class uiresult extends boranking
 			if ($content['route'] == 1)
 			{
 				$content['route'] = 2;	// show 2. heat, but allow to select 2. quali
-				_debug_array($sel_options['route']);
 				$sel_options['route'] = array_intersect_key($sel_options['route'],array(1=>1,2=>2));	// only 2. quali or 2. hear
-				_debug_array($sel_options['route']);
 			}
 			else
 			{
 				$readonlys['route'] = true;	// no selection possible
 				$preserv['route'] = $content['route'];
 			}
-			echo "<p>max=$max, route=$content[route], r/o=$readonlys[route]</p>\n";
+			//echo "<p>max=$max, route=$content[route], r/o=$readonlys[route]</p>\n";
 		}
-		_debug_array($content);
+		//_debug_array($content);
 		//_debug_array($sel_options);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.($content['route'] ? lang('Edit route') : lang('Add route'));
 		$tmpl->exec('ranking.uiresult.route',$content,$sel_options,$readonlys,$preserv,2);
@@ -213,9 +190,28 @@ class uiresult extends boranking
 	 */
 	function get_rows($query,&$rows,&$readonlys)
 	{
-		$GLOBALS['egw']->session->appsession('ranking','result_state',$query);
+		//echo "<p>uiresult::get_rows(".print_r($query,true).",,)</p>\n";
+		unset($query['rows']);
+		$GLOBALS['egw']->session->appsession('result','ranking',$query);
 
-		return $total;		
+		$query['col_filter']['WetId'] = $query['comp'];
+		$query['col_filter']['GrpId'] = $query['cat'];
+		$query['col_filter']['route_order'] = $query['route'];
+		
+		if ($query['order'] == 'result_height')
+		{
+			$query['order'] .= ' '.$query['sort'].',result_plus '.$query['sort'].',start_order';
+			$query['sort'] = 'ASC';
+		}
+		
+		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
+		$total = $this->route_result->get_rows($query,$rows,$readonlys);
+		//echo $total; _debug_array($rows);		
+		foreach($rows as $k => $row)
+		{
+			if (is_int($k)) $rows['set'][$row['PerId']] = $row;
+		}
+		return $total;
 	}
 
 	/**
@@ -231,49 +227,76 @@ class uiresult extends boranking
 		//_debug_array($content);
 		if (!is_array($content))
 		{
-			$content = $GLOBALS['egw']->session->appsession('result','ranking');
-			if (!$content) $content = array();
-			
-			if ($_GET['calendar']) $content['calendar'] = $_GET['calendar'];
-			if ($_GET['comp']) $content['comp'] = $_GET['comp'];
-			if ($_GET['cat']) $content['cat'] = $_GET['cat'];
-			if ($_GET['route']) $content['route'] = $_GET['route'];
+			$content = array('nm' => $GLOBALS['egw']->session->appsession('result','ranking'));
+			if (!is_array($content['nm']))
+			{
+				$content['nm'] = array(
+					'get_rows'   => 'ranking.uiresult.get_rows',
+					'no_cat'     => true,
+					'no_filter'  => true,
+					'no_filter2' => true,
+					'num_rows'   => 1000,
+					'order'      => 'start_order',
+					'sort'       => 'ASC',
+				);
+			}
+			if ($_GET['calendar']) $content['nm']['calendar'] = $_GET['calendar'];
+			if ($_GET['comp']) $content['nm']['comp'] = $_GET['comp'];
+			if ($_GET['cat']) $content['nm']['cat'] = $_GET['cat'];
+			if (is_numeric($_GET['route'])) $content['nm']['route'] = $_GET['route'];
 			if ($_GET['msg']) $msg = $_GET['msg'];
 		}
-		if($content['comp']) $comp = $this->comp->read($content['comp']);
+
+		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
 
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
-			$readonlys['calendar'] = $readonlys['comp'] = true;
+			$readonlys['nm[calendar]'] = $readonlys['nm[comp]'] = true;
 		}
 		if ($this->only_nation)
 		{
 			$calendar = $this->only_nation;
-			$tmpl->disable_cells('calendar');
+			$tmpl->disable_cells('nm[calendar]');
 		}
 		elseif ($comp)
 		{
 			$calendar = $comp['nation'] ? $comp['nation'] : 'NULL';
 		}
-		elseif ($content['calendar'])
+		elseif ($content['nm']['calendar'])
 		{
-			$calendar = $content['calendar'];
+			$calendar = $content['nm']['calendar'];
 		}
 		else
 		{
 			list($calendar) = each($this->ranking_nations);
 		}
-		if ($comp && ($cat = $content['cat']) && (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen'])))
+		if ($comp && ($cat = $content['nm']['cat']) && (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen'])))
 		{
 			$cat = '';
 			//$msg = lang('Unknown category or not a category of this competition');
 		}
+		if ($content['button'] && $comp && $cat && is_numeric($content['nm']['route']))
+		{
+			list($button) = @each($content['button']);
+			unset($content['button']);
+			//echo "<p align=right>$comp[rkey] ($comp[WetId]), $cat[rkey]/$cat[GrpId], {$content['nm']['route']}, button=$button</p>\n";
+
+			if ($button == 'apply' && $this->save_result(array(
+				'WetId' => $comp['WetId'],
+				'GrpId' => $cat['GrpId'],
+				'route_order' => $content['nm']['route'],
+			),$content['nm']['rows']['set']))
+			{
+				$msg = lang('Route updated');
+			}
+		}
+		list($button) = @each($content['button']);
 		
 		$sel_options = array(
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum >= '.$this->db->quote(date('Y-m-d',time())),
+				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*30*24*3600)),
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
@@ -281,18 +304,20 @@ class uiresult extends boranking
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
 			),'route_order') : array(),
+			'result_plus' => $this->plus,
 		);
-		$preserv = $content = array(
-			'calendar' => $calendar,
-			'comp'     => $comp ? $comp['WetId'] : null,
-			'cat'      => $cat ? $cat['GrpId'] : null,
-			'route'    => $content['route'],
-		);
+		//_debug_array($sel_options);
+		$content['nm']['calendar'] = $calendar;
+		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
+		$content['nm']['cat']      = $cat ? $cat['GrpId'] : null;
+		unset($content['nm']['rows']);
+
 		$content['msg'] = $msg;
-		//_debug_array($content);
-		$GLOBALS['egw']->session->appsession('result','ranking',$preserv);
+
+		$GLOBALS['egw']->session->appsession('result','ranking',$content['nm']);
+$content['nm']['template'] = 'ranking.result.index.rows_lead';
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.lang('Resultservice');
-		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,$preserv);
+		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 }

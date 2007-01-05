@@ -1,6 +1,46 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
+	<template id="ranking.result.index.rows_lead" template="" lang="" group="0" version="1.3.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column width="20%"/>
+				<column width="20%"/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-sortheader label="Rank" align="center" id="platz"/>
+					<nextmatch-sortheader label="Start order" id="start_order" align="center"/>
+					<nextmatch-sortheader label="Start number" id="start_number" align="center"/>
+					<nextmatch-sortheader label="Lastname" id="nachname"/>
+					<nextmatch-sortheader label="Firstname" id="vorname"/>
+					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
+					<description value="License" id="PerId" align="center"/>
+					<nextmatch-sortheader label="Height" id="result_height" span="2" align="center"/>
+				</row>
+				<row class="row">
+					<textbox id="{$row}[platz]" no_lang="1" class="platz" readonly="true" align="center"/>
+					<description align="center" id="{$row}[start_order]"/>
+					<textbox size="5" id="set[$row_cont[PerId]][start_number]" align="center"/>
+					<description id="{$row}[nachname]" no_lang="1"/>
+					<description id="{$row}[vorname]" no_lang="1"/>
+					<description align="center" id="{$row}[nation]" no_lang="1"/>
+					<description id="{$row}[PerId]" no_lang="1" align="center"/>
+					<textbox type="float" id="set[$row_cont[PerId]][result_height]" align="right" size="5" precision="%4.2lf" class="height"/>
+					<menulist>
+						<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1"/>
+					</menulist>
+				</row>
+			</rows>
+		</grid>
+	</template>
 	<template id="ranking.result.index" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%">
 			<columns>
@@ -13,63 +53,37 @@
 					<description/>
 				</row>
 				<row class="th">
-					<description options=",,,comp" value="Competition"/>
+					<description options=",,,comp" value="Competition" class="noPrint"/>
 					<hbox options="0,0">
-						<menulist>
-							<menupopup id="calendar" onchange="1" no_lang="1"/>
+						<menulist class="noPrint">
+							<menupopup id="nm[calendar]" onchange="1" no_lang="1"/>
 						</menulist>
 						<menulist>
-							<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
+							<menupopup id="nm[comp]" onchange="1" options="Select one" no_lang="1"/>
 						</menulist>
 					</hbox>
 				</row>
-				<row class="row_on" disabled="!@comp">
-					<description value="Category" options=",,,cat"/>
+				<row class="row_on" disabled="!@nm[comp]">
+					<description value="Category" options=",,,cat" class="noPrint"/>
 					<menulist>
-						<menupopup id="cat" no_lang="1" onchange="1" options="Select one"/>
+						<menupopup id="nm[cat]" no_lang="1" onchange="1" options="Select one"/>
 					</menulist>
 				</row>
-				<row class="th" disabled="!@cat">
-					<description value="Route"/>
+				<row class="th" disabled="!@nm[cat]">
+					<description value="Route" class="noPrint"/>
 					<hbox options="0,0">
 						<menulist>
-							<menupopup onchange="1" options="Select one" id="route" no_lang="1"/>
+							<menupopup onchange="1" options="Select one" id="nm[route]" no_lang="1"/>
 						</menulist>
-						<button label="Edit" statustext="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;route=$cont[route]'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5"/>
+						<button label="Edit" statustext="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5 noPrint"/>
 					</hbox>
 				</row>
-				<row disabled="!@route">
-					<grid>
-						<columns>
-							<column disabled="@cat"/>
-							<column width="80" disabled="@result"/>
-							<column disabled="!@result"/>
-							<column/>
-							<column/>
-							<column/>
-							<column/>
-						</columns>
-						<rows>
-							<row class="th">
-								<description value="Category"/>
-								<description value="Startnumber"/>
-								<description value="Place"/>
-								<description value="Lastname"/>
-								<description value="Firstname"/>
-								<description value="Birthyear"/>
-								<description value="Nation"/>
-							</row>
-							<row class="row">
-								<description id="rows[$row][cat_name]" no_lang="1"/>
-								<description id="rows[$row][start]" no_lang="1" class="place" align="center"/>
-								<description class="place" no_lang="1" id="rows[$row][platz]"/>
-								<description id="rows[$row][nachname]" no_lang="1" class="lastname"/>
-								<description id="rows[$row][vorname]" no_lang="1"/>
-								<description no_lang="1" id="rows[$row][year]" align="center"/>
-								<description no_lang="1" id="rows[$row][nation]" align="center"/>
-							</row>
-						</rows>
-					</grid>
+				<row disabled="!@nm[route]">
+					<nextmatch options="ranking.result.index.rows_lead" span="all" id="nm"/>
+				</row>
+				<row>
+					<button label="Apply" id="button[apply]" statustext="Apply the changes"/>
+					<description/>
 				</row>
 			</rows>
 		</grid>
