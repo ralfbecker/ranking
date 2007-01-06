@@ -28,7 +28,7 @@ class route_result extends so_sql
 	
 	var $athlete_join = 'JOIN Personen ON RouteResults.PerId=Personen.PerId';
 
-	var $platz_lead = "CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END";
+	var $rank_lead = "CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END";
 	
 	/**
 	 * constructor of the competition class
@@ -85,7 +85,7 @@ class route_result extends so_sql
 			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 			$extra_cols += array('vorname','nachname','nation','geb_date','verband','ort');
 			
-			$extra_cols[] = $this->platz_lead.' AS platz';
+//			$extra_cols[] = $this->rank_lead.' AS result_rank';
 		}
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
@@ -140,5 +140,36 @@ class route_result extends so_sql
 			unset($data['result_plus']);	// no plus without height
 		}
 		return $data;
+	}
+	
+	/**
+	 * Update the ranking of a given route
+	 *
+	 * @param array $keys values for keys WetId, GrpId and route_order
+	 * @param string $mode=null ranking-mode / sql to calculate the rank
+	 * @return int/boolean updated rows or false on error (no route specified in $keys)
+	 */
+	function update_ranking($keys,$mode=null)
+	{
+		//echo "<p>update_ranking(".print_r($keys,true),",'$mode')</p>\n";
+		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
+		
+		$keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
+
+		if (!$mode) $mode = $this->rank_lead;
+		
+		// the following sql does not work, as MySQL does not allow to use the target table in the subquery
+		// "UPDATE $this->table_name SET result_rank=($mode) WHERE ".$this->db->expression($this->table_name,$keys)
+		
+		$modified = 0;
+		foreach($this->search($keys,'PerId,result_rank','',$mode.' AS new_rank') as $data)
+		{
+			if ($data['result_rank'] != $data['new_rank'] &&
+				$this->db->update($this->table_name,array('result_rank'=>$data['new_rank']),$keys+array('PerId'=>$data['PerId']),__LINE__,__FILE__))
+			{
+				++$modified;	
+			}
+		}
+		return $modified;
 	}
 }

@@ -166,7 +166,7 @@ class boresult extends boranking
 				if ((!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) && 
 					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
-echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
+					echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
 					$data['result_modified'] = time();
 					$data['result_modifier'] = $this->user;
 
@@ -176,6 +176,12 @@ echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n
 					break;
 				}
 			}
+		}
+		if ($modified)	// update the ranking
+		{
+			unset($keys['PerId']);
+			$n = $this->route_result->update_ranking($keys);
+			echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		return $modified;
 	}

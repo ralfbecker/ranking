@@ -16,7 +16,7 @@
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-sortheader label="Rank" align="center" id="platz"/>
+					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
 					<nextmatch-sortheader label="Start order" id="start_order" align="center"/>
 					<nextmatch-sortheader label="Startnumber" id="start_number" align="center"/>
 					<nextmatch-sortheader label="Lastname" id="nachname"/>
@@ -26,7 +26,7 @@
 					<nextmatch-sortheader label="Height" id="result_height" span="2" align="center"/>
 				</row>
 				<row class="row">
-					<textbox id="{$row}[platz]" no_lang="1" class="platz" readonly="true" align="center"/>
+					<textbox id="{$row}[result_rank]" no_lang="1" class="platz" readonly="true" align="center"/>
 					<description align="center" id="{$row}[start_order]"/>
 					<textbox size="5" id="set[$row_cont[PerId]][start_number]" align="center"/>
 					<description id="{$row}[nachname]" no_lang="1"/>
