@@ -28,7 +28,7 @@ class route_result extends so_sql
 	
 	var $athlete_join = 'JOIN Personen ON RouteResults.PerId=Personen.PerId';
 
-	var $platz_lead = "CASE WHEN result_height IS NULL THEN '' ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus) END";
+	var $platz_lead = "CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END";
 	
 	/**
 	 * constructor of the competition class

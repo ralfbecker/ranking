@@ -13,20 +13,19 @@
 /* $Id$ */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
+require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.route_result.inc.php');
 
 /**
  * route object
  */
 class route extends so_sql
 {
-	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
-	);
 	var $charset,$source_charset;
 
 	/**
-	 * constructor of the competition class
+	 * constructor of the route class
 	 */
-	function route($source_charset='',$db=null,$vfs_pdf_dir='')
+	function route($source_charset='',$db=null)
 	{
 		//$this->debug = 1;
 		$this->so_sql('ranking','Routes',$db);	// call constructor of extended class
@@ -65,13 +64,25 @@ class route extends so_sql
 		
 		return $this->db->next_record() ? $this->db->f(0) : null;
 	}
-/*	
-	function query_list($value_col,$key_cols='',$filter=array(),$order='')
+	
+	/**
+	 * deletes row representing keys in internal data or the supplied $keys if != null
+	 *
+	 * @param array $keys if given array with col => value pairs to characterise the rows to delete
+	 * @return int affected rows, should be 1 if ok, 0 if an error
+	 */
+	function delete($keys=null)
 	{
-		echo "<p>query_list('$value_col','$key_cols',".print_r($filter,true).",'$order')</p>\n";
-		$list = parent::query_list($value_col,$key_cols,$filter,$order);
-		_debug_array($list);
-		return $list;
+		if (is_null($keys)) $keys = array_intersect_key($this->data,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));
+
+		if (($ret = parent::delete($keys)))
+		{
+			if (!is_object($GLOBALS['egw']->route_result))
+			{
+				$GLOBALS['egw']->route_result = new route_result($this->source_charset,$this->db);
+			}
+			$GLOBALS['egw']->route_result->delete($keys);
+		}
+		return $ret;
 	}
-*/
 }

@@ -18,7 +18,7 @@
 				<row class="th">
 					<nextmatch-sortheader label="Rank" align="center" id="platz"/>
 					<nextmatch-sortheader label="Start order" id="start_order" align="center"/>
-					<nextmatch-sortheader label="Start number" id="start_number" align="center"/>
+					<nextmatch-sortheader label="Startnumber" id="start_number" align="center"/>
 					<nextmatch-sortheader label="Lastname" id="nachname"/>
 					<nextmatch-sortheader label="Firstname" id="vorname"/>
 					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
@@ -73,7 +73,7 @@
 					<description value="Route" class="noPrint"/>
 					<hbox options="0,0">
 						<menulist>
-							<menupopup onchange="1" options="Select one" id="nm[route]" no_lang="1"/>
+							<menupopup onchange="1" options="Select or create one" id="nm[route]" no_lang="1"/>
 						</menulist>
 						<button label="Edit" statustext="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5 noPrint"/>
 					</hbox>
@@ -81,7 +81,7 @@
 				<row disabled="!@nm[route]">
 					<nextmatch options="ranking.result.index.rows_lead" span="all" id="nm"/>
 				</row>
-				<row>
+				<row disabled="!@nm[route]">
 					<button label="Apply" id="button[apply]" statustext="Apply the changes"/>
 					<description/>
 				</row>

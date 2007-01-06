@@ -34,7 +34,7 @@
 				</row>
 				<row class="th">
 					<description value="Name"/>
-					<textbox id="route_name" size="64" maxlength="80" blur="Qualification, 1/2-Final, ..." span="all"/>
+					<textbox id="route_name" size="64" maxlength="80" span="all" needed="1" statustext="Qualification, 1/2-Final, ..."/>
 				</row>
 				<row class="row">
 					<description value="Status"/>

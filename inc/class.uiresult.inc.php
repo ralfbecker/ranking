@@ -42,18 +42,19 @@ class uiresult extends boresult
 		
 		if (!is_array($content))
 		{
-			$content = array(
+			$content = $keys = array(
 				'WetId' => $_GET['comp'],
 				'GrpId' => $_GET['cat'],
 				'route_order' => $_GET['route'],
 			);
-			if ((int)$_GET['comp'] && (int)$_GET['cat'] && is_numeric($_GET['route']))
+			if ((int)$_GET['comp'] && (int)$_GET['cat'] && is_numeric($_GET['route']) &&
+				!($content = $this->route->read($content)))
 			{
-				$content = $this->route->read($content);
+				unset($keys['route_order']);
+				$content = $this->route->init($keys);
 			}
 		}
-		if (!is_array($content) ||
-			!($comp = $this->comp->read($content['WetId'])) ||
+		if (!($comp = $this->comp->read($content['WetId'])) ||
 			!($cat = $this->cats->read($content['GrpId'])) ||
 			!in_array($cat['rkey'],$comp['gruppen']))
 		{
@@ -109,7 +110,7 @@ class uiresult extends boresult
 					}
 					else
 					{
-						$msg = lang('Error saving the route!!!');
+						$msg = lang('Error: saving the route!!!');
 						$button = $js = '';	// dont exit the window
 					}
 					break;
@@ -121,11 +122,11 @@ class uiresult extends boresult
 						'GrpId' => $content['GrpId'],
 						'route_order' => $content['route_order'])))
 					{
-						$msg = lang('Route delete');
+						$msg = lang('Route deleted');
 					}
 					else
 					{
-						$msg = lang('Error delting the route!!!');
+						$msg = lang('Error: deleting the route!!!');
 						$js = $button = '';	// dont exit the window
 					}
 					break;
@@ -198,12 +199,16 @@ class uiresult extends boresult
 		$query['col_filter']['GrpId'] = $query['cat'];
 		$query['col_filter']['route_order'] = $query['route'];
 		
-		if ($query['order'] == 'result_height')
+		switch ($query['order'])
 		{
-			$query['order'] .= ' '.$query['sort'].',result_plus '.$query['sort'].',start_order';
-			$query['sort'] = 'ASC';
+			case 'platz':
+				$query['order'] = 'result_height IS NULL,platz '.$query['sort'].',start_order';
+				break;
+			case 'result_height':
+				$query['order'] = 'result_height '.$query['sort'].',result_plus '.$query['sort'].',start_order';
+				$query['sort'] = 'ASC';
+				break;
 		}
-		
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 		$total = $this->route_result->get_rows($query,$rows,$readonlys);
 		//echo $total; _debug_array($rows);		
@@ -248,7 +253,7 @@ class uiresult extends boresult
 		}
 
 		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
-
+//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name]</p>\n";
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
 			$readonlys['nm[calendar]'] = $readonlys['nm[comp]'] = true;
@@ -258,7 +263,7 @@ class uiresult extends boresult
 			$calendar = $this->only_nation;
 			$tmpl->disable_cells('nm[calendar]');
 		}
-		elseif ($comp)
+		elseif ($comp && !$content['nm']['calendar'])
 		{
 			$calendar = $comp['nation'] ? $comp['nation'] : 'NULL';
 		}
@@ -270,15 +275,32 @@ class uiresult extends boresult
 		{
 			list($calendar) = each($this->ranking_nations);
 		}
+		if ($comp && ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
+		{
+echo "<p>calendar changed to '$calendar', comp is '$comp[nation]' not fitting --> reset </p>\n";
+			$comp = false;
+		}
 		if ($comp && ($cat = $content['nm']['cat']) && (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen'])))
 		{
-			$cat = '';
+			$cat = false;
 			//$msg = lang('Unknown category or not a category of this competition');
 		}
-		if ($content['button'] && $comp && $cat && is_numeric($content['nm']['route']))
+		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || !$this->route->read(array(
+			'WetId' => $comp['WetId'],
+			'GrpId' => $cat['GrpId'],
+			'route_order' => $content['nm']['route'],
+		))))	// route not found
 		{
-			list($button) = @each($content['button']);
-			unset($content['button']);
+			unset($content['nm']['route']);
+			$content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
+		}
+echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
+		// check if user pressed a button
+		list($button) = @each($content['button']);
+		unset($content['button']);
+		
+		if ($button && $comp && $cat && is_numeric($content['nm']['route']))
+		{
 			//echo "<p align=right>$comp[rkey] ($comp[WetId]), $cat[rkey]/$cat[GrpId], {$content['nm']['route']}, button=$button</p>\n";
 
 			if ($button == 'apply' && $this->save_result(array(
@@ -290,8 +312,9 @@ class uiresult extends boresult
 				$msg = lang('Route updated');
 			}
 		}
-		list($button) = @each($content['button']);
+		unset($content['nm']['rows']);
 		
+		// create new view
 		$sel_options = array(
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
@@ -309,8 +332,7 @@ class uiresult extends boresult
 		//_debug_array($sel_options);
 		$content['nm']['calendar'] = $calendar;
 		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
-		$content['nm']['cat']      = $cat ? $cat['GrpId'] : null;
-		unset($content['nm']['rows']);
+		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
 
 		$content['msg'] = $msg;
 
