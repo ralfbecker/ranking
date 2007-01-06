@@ -3,11 +3,14 @@
 %1 saved	ranking	en	%1 saved
 %1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
+%1. heat	ranking	en	%1. Heat
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
+2. qualification	ranking	en	2. Qualification
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
 add a new athlete	ranking	en	add a new athlete
 add a new competition	ranking	en	add a new competition
+add route	ranking	en	Add route
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 apply the changes made	ranking	en	apply the changes made
 as of	ranking	en	As of
@@ -23,12 +26,15 @@ birthyears from	ranking	en	Birthyears from
 body height in centimeter	ranking	en	body height in centimeter
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
+cannel without saving	ranking	en	Cannel without saving
 cathegories	ranking	en	Cathegories
 cellphone	ranking	en	Cellphone
 city	ranking	en	City
 click to view	ranking	en	click to view
 climbing professional	ranking	en	Climbing professional
 climbing since (years)	ranking	en	climbing since (years)
+closes	ranking	en	closes
+comments	ranking	en	Comments
 competition	ranking	en	Competition
 competition calendar	ranking	en	Competition calendar
 competition has not yet a startlist	ranking	en	Competition has not yet a startlist
@@ -52,6 +58,8 @@ delete all rights for this nation	ranking	en	Delete all rights for this nation
 delete this athlete	ranking	en	Delete this athlete
 delete this competition	ranking	en	Delete this competition
 delete this cup	ranking	en	Delete this cup
+delete this heat including all results	ranking	en	Delete this heat including all results
+deletes this cup	ranking	en	deletes this cup
 deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
 digital rock	ranking	en	digital ROCK
@@ -62,6 +70,8 @@ each new upload will overwrite the previous one	ranking	en	each new upload will 
 edit %1	ranking	en	edit %1
 edit athlete	ranking	en	Edit athlete
 edit competition	ranking	en	Edit competition
+edit or add a route	ranking	en	Edit or add a route
+edit route	ranking	en	Edit route
 edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
@@ -69,11 +79,13 @@ entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
+error: deleting the route!!!	ranking	en	Error: deleting the route!!!
 error: generating startlist	ranking	en	Error: generating startlist
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
 error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
 error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
+error: saving the route!!!	ranking	en	Error: saving the route!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
 exists without saving the changes	ranking	en	exists without saving the changes
 factor	ranking	en	Factor
@@ -100,6 +112,7 @@ general	ranking	en	General
 generate all startlists together	ranking	en	Generate all startlists together
 generate startlist	ranking	en	Generate startlist
 grpid	ranking	en	GrpId
+heat	ranking	en	Heat
 hobbies	ranking	en	Hobbies
 homepage	ranking	en	Homepage
 host	admin	en	Host
@@ -114,6 +127,8 @@ in kilogram	ranking	en	in kilogram
 incl. nation-code	ranking	en	incl. nation-code
 information pdf	ranking	en	Information PDF
 internal key, leave it empty to have it automaticaly generated	ranking	en	internal key, leave it empty to have it automaticaly generated
+isolation	ranking	en	Isolation
+judge	ranking	en	Judge
 judges	ranking	en	Judges
 judges have the right to create startlists and results 2 weeks befor and after the competition	ranking	en	Judges have the right to create startlists and results 2 weeks befor and after the competition
 key must not be empty !!!	ranking	en	Key must not be empty !!!
@@ -125,6 +140,7 @@ last competition	ranking	en	Last competition
 license number	ranking	en	License number
 male	ranking	en	male
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
+name(s)	ranking	en	name(s)
 nation	ranking	en	Nation
 nation acl	common	en	Nation ACL
 nation if national competition or internatinal	ranking	en	nation if national competition or internatinal
@@ -136,8 +152,10 @@ no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking d
 not used at the moment	ranking	en	not used at the moment
 notice	ranking	en	Notice
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
+official result	ranking	en	official result
 on how many routes is the first round	ranking	en	On how many routes is the first round
 only fill values different from egw	admin	en	only fill values different from eGW
+opens	ranking	en	opens
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
 perid	ranking	en	PerId
@@ -160,6 +178,9 @@ presets for competitions	ranking	en	Presets for competitions
 previous rankingsystem	ranking	en	previous Rankingsystem
 professional	ranking	en	Professional
 profile	ranking	en	Profile
+provisional result	ranking	en	provisional result
+qualification	ranking	en	Qualification
+qualification, 1/2-final, ...	ranking	en	Qualification, 1/2-Final, ...
 quota	ranking	en	Quota
 ranglist	ranking	en	Ranglist
 rank	ranking	en	Rank
@@ -177,13 +198,20 @@ registration deadline	ranking	en	Registration deadline
 remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
+result official	ranking	en	Result official
 result pdf	ranking	en	Result PDF
 results	ranking	en	Results
+resultservice	ranking	en	Resultservice
+route	ranking	en	Route
+route deleted	ranking	en	Route deleted
+route saved	ranking	en	Route saved
+route updated	ranking	en	Route updated
 routes	ranking	en	Routes
 saves the changes made	ranking	en	saves the changes made
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
+select or create one	ranking	en	Select or create one
 serid	ranking	en	SerId
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
@@ -191,6 +219,8 @@ show athlets from all categories	ranking	en	show athlets from all categories
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
 squad	ranking	en	Squad
+start heat	ranking	en	Start heat
+start order	ranking	en	Start order
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
 startlist	ranking	en	Startlist
@@ -212,6 +242,7 @@ type of display	ranking	en	Type of display
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
+unpublished	ranking	en	unpublished
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
 upload a portrait picture for the profile	ranking	en	Upload a portrait picture for the profile
 uploaded picture is no jpeg !!!	ranking	en	Uploaded picture is no JPEG !!!

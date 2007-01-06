@@ -33,7 +33,7 @@ class boresult extends boranking
 		0 => 'unpublished',
 		1 => 'startlist',
 		2 => 'provisional result',
-		3 => 'offical result',
+		3 => 'official result',
 	);
 /*	var $plus = array(
 		0  => '',
@@ -163,8 +163,8 @@ class boresult extends boranking
 			foreach($data as $key => $val)
 			{
 				// something changed?
-				if ((string)$val !== '' && (!$old || (string)$old[$key] != (string)$val) && 
-					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS))
+				if ((!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) && 
+					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
 echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
 					$data['result_modified'] = time();
