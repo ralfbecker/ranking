@@ -13,7 +13,7 @@
 	/* $Id$ */
 
 	$setup_info['ranking']['name']      = 'ranking';
-	$setup_info['ranking']['version']   = '1.3.004';
+	$setup_info['ranking']['version']   = '1.3.006';
 	$setup_info['ranking']['app_order'] = 1;
 	$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults');
 	$setup_info['ranking']['enable']    = 1;
@@ -28,12 +28,14 @@
 	/* Dependacies for this app to work */
 	$setup_info['ranking']['depends'][] = array(
 		 'appname' => 'phpgwapi',
-		 'versions' => Array('1.0.0','1.0.1','1.2','1.3')
+		 'versions' => Array('1.2','1.3','1.4')
 	);
 	$setup_info['ranking']['depends'][] = array(
 		'appname' => 'etemplate',
-		'versions' => Array('1.0.0','1.0.1','1.2','1.3')
+		'versions' => Array('1.2','1.3','1.4')
 	);
+
+
 
 
 

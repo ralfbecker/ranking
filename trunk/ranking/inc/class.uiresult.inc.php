@@ -201,8 +201,8 @@ class uiresult extends boresult
 		
 		switch ($query['order'])
 		{
-			case 'platz':
-				$query['order'] = 'result_height IS NULL,platz '.$query['sort'].',start_order';
+			case 'result_rank':
+				$query['order'] = 'result_rank IS NULL '.$query['sort'].',result_rank '.$query['sort'].',start_order';
 				break;
 			case 'result_height':
 				$query['order'] = 'result_height '.$query['sort'].',result_plus '.$query['sort'].',start_order';
@@ -253,7 +253,7 @@ class uiresult extends boresult
 		}
 
 		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
-//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name]</p>\n";
+		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name]</p>\n";
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
 			$readonlys['nm[calendar]'] = $readonlys['nm[comp]'] = true;
@@ -277,7 +277,7 @@ class uiresult extends boresult
 		}
 		if ($comp && ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
 		{
-echo "<p>calendar changed to '$calendar', comp is '$comp[nation]' not fitting --> reset </p>\n";
+			//echo "<p>calendar changed to '$calendar', comp is '$comp[nation]' not fitting --> reset </p>\n";
 			$comp = false;
 		}
 		if ($comp && ($cat = $content['nm']['cat']) && (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen'])))
@@ -294,7 +294,7 @@ echo "<p>calendar changed to '$calendar', comp is '$comp[nation]' not fitting --
 			unset($content['nm']['route']);
 			$content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
 		}
-echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
+		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
 		// check if user pressed a button
 		list($button) = @each($content['button']);
 		unset($content['button']);

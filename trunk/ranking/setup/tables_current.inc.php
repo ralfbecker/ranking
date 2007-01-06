@@ -201,7 +201,8 @@
 				'route_iso_close' => array('type' => 'varchar','precision' => '40'),
 				'route_start' => array('type' => 'varchar','precision' => '64'),
 				'route_result' => array('type' => 'varchar','precision' => '80'),
-				'route_comments' => array('type' => 'text')
+				'route_comments' => array('type' => 'text'),
+				'route_quota' => array('type' => 'int','precision' => '2')
 			),
 			'pk' => array('WetId','GrpId','route_order'),
 			'fk' => array(),
@@ -222,7 +223,8 @@
 				'result_modified' => array('type' => 'int','precision' => '8'),
 				'result_modifier' => array('type' => 'int','precision' => '4'),
 				'start_order' => array('type' => 'int','precision' => '2'),
-				'start_number' => array('type' => 'int','precision' => '2')
+				'start_number' => array('type' => 'int','precision' => '2'),
+				'result_rank' => array('type' => 'int','precision' => '2')
 			),
 			'pk' => array('WetId','GrpId','route_order','PerId'),
 			'fk' => array(),

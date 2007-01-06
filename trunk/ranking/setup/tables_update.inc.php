@@ -489,4 +489,28 @@
 
 		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.004';
 	}
+
+
+	$test[] = '1.3.004';
+	function ranking_upgrade1_3_004()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_quota',array(
+			'type' => 'int',
+			'precision' => '2'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.005';
+	}
+
+
+	$test[] = '1.3.005';
+	function ranking_upgrade1_3_005()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('RouteResults','result_rank',array(
+			'type' => 'int',
+			'precision' => '2'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.006';
+	}
 ?>
