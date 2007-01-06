@@ -91,7 +91,7 @@ class uiresult extends boresult
 				case 'save':
 				case 'apply':
 					//_debug_array($content);
-					if (!is_numeric($content['route_order'])) $content['route_order'] = $content['route'];
+					if (($new_route = !is_numeric($content['route_order']))) $content['route_order'] = $content['route'];
 					if ($this->route->save($content) == 0)
 					{
 						$msg = lang('Route saved');
@@ -103,10 +103,8 @@ class uiresult extends boresult
 							'msg'   => $msg,
 						))."';";
 						
-						if ($content['route_order'] < 2)	// Qualification --> get startlist from registration
-						{
-							$this->startlist_from_registration($comp,$cat,1+$content['route_order']);
-						}
+						// if route is saved the first time, try getting a startlist (from registration or a previous heat)
+						if ($new_route) $this->generate_startlist($comp,$cat,$content['route_order']);
 					}
 					else
 					{
@@ -216,6 +214,8 @@ class uiresult extends boresult
 		{
 			if (is_int($k)) $rows['set'][$row['PerId']] = $row;
 		}
+		$rows['no_prev_heat'] = $query['route'] < 2;
+
 		return $total;
 	}
 
@@ -285,14 +285,14 @@ class uiresult extends boresult
 			$cat = false;
 			//$msg = lang('Unknown category or not a category of this competition');
 		}
-		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || !$this->route->read(array(
+		$keys = array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['nm']['route'],
-		))))	// route not found
+		);
+		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || !$this->route->read($keys)))	// route not found
 		{
-			unset($content['nm']['route']);
-			$content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
+			$keys['route_order'] = $content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
 		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
 		// check if user pressed a button
@@ -302,14 +302,21 @@ class uiresult extends boresult
 		if ($button && $comp && $cat && is_numeric($content['nm']['route']))
 		{
 			//echo "<p align=right>$comp[rkey] ($comp[WetId]), $cat[rkey]/$cat[GrpId], {$content['nm']['route']}, button=$button</p>\n";
-
-			if ($button == 'apply' && $this->save_result(array(
-				'WetId' => $comp['WetId'],
-				'GrpId' => $cat['GrpId'],
-				'route_order' => $content['nm']['route'],
-			),$content['nm']['rows']['set']))
+			switch($button)
 			{
-				$msg = lang('Route updated');
+				case 'apply':
+					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set']))
+					{
+						$msg = lang('Route updated');
+					}
+					break;
+					
+				case 'startlist':
+					if (!$this->has_results($keys) && $this->generate_startlist($comp,$cat,$content['nm']['route']))
+					{
+						$msg = lang('Startlist generated');
+					}
+					break;
 			}
 		}
 		unset($content['nm']['rows']);
@@ -326,7 +333,7 @@ class uiresult extends boresult
 			'route'    => $comp && $cat ? $this->route->query_list('route_name','route_order',array(
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
-			),'route_order') : array(),
+			),'route_order DESC') : array(),
 			'result_plus' => $this->plus,
 		);
 		//_debug_array($sel_options);
@@ -335,9 +342,11 @@ class uiresult extends boresult
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
 
 		$content['msg'] = $msg;
+		
+		$readonlys['button[startlist]'] = !$comp || !$cat || !is_numeric($content['nm']['route']) || $this->has_results($keys);
+		$readonlys['button[apply]'] = !$this->has_startlist($keys);
 
 		$GLOBALS['egw']->session->appsession('result','ranking',$content['nm']);
-$content['nm']['template'] = 'ranking.result.index.rows_lead';
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.lang('Resultservice');
 		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));

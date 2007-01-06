@@ -27,7 +27,7 @@ class boresult extends boranking
 	/**
 	 * values and labels for route_status
 	 *
-	 * @var unknown_type
+	 * @var array
 	 */
 	var $stati = array(
 		0 => 'unpublished',
@@ -35,11 +35,11 @@ class boresult extends boranking
 		2 => 'provisional result',
 		3 => 'official result',
 	);
-/*	var $plus = array(
-		0  => '',
-		1  => '+',
-		'-1' => '-',
-	);*/
+	/**
+	 * values and labels for route_plus
+	 *
+	 * @var array
+	 */
 	var $plus = array(
 		0  => '',
 		1  => '+ plus',
@@ -85,63 +85,106 @@ class boresult extends boranking
 			$this->order_nums[$i] = lang('%1. Heat',$i);
 		}
 	}
-
+		
 	/**
-	 * Generate a startlist for the given competition and category
-	 *
-	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
-	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
-	 * - startnumber in the next 8 bits (($pkt >> 6) & 255))
-	 * - route in the other bits ($pkt >> 14)
+	 * Generate a startlist for the given competition, category and heat (route_order)
+	 * 
+	 * reimplented from boranking to support startlist from further heats and to store the startlist via route_result
 	 *
 	 * @param int/array $comp WetId or complete comp array
 	 * @param int/array $cat GrpId or complete cat array
-	 * @param int $which_route=1 route to use, default 1, can be 2 if quali is done on 2 routes
+	 * @param int $route_order 0/1 for qualification, 2, 3, ... for further heats
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function startlist_from_registration($comp,$cat,$which_route=1)
+	function generate_startlist($comp,$cat,$route_order)
 	{
+		$keys = array(
+			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
+			'GrpId' => is_array($cat) ? $cat['GrpId'] : $cat,
+			'route_order' => $route_order,
+		);
+		if (!$comp || !$cat || !is_numeric($route_order) ||
+			!$this->route->read($keys) ||	// route does not exist
+			$this->has_results($keys))		// route already has a result
+		{
+			_debug_array($keys);
+			return false;
+		}
+		// delete existing starters
+		$this->route_result->delete($keys);
+		
+		if ($route_order >= 2)	// further heat --> startlist from result or previous heat
+		{
+			return $this->_startlist_from_previous_heat($keys);
+		}
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
 		
-		$keys = array(
-			'WetId'  => $comp['WetId'],
-			'GrpId'  => $cat['GrpId'],
-		);
-		if (!$this->result->has_startlist($keys)) return false;	// no startlist yet
-		
+		// read startlist from result-store or generate it with standard values
+		unset($keys['route_order']);
+		if (!$this->result->has_startlist($keys) || !parent::generate_startlist($comp,$cat,1+$route_order))
+		{
+			return false;
+		}
 		$starters =& $this->result->read($keys+array('platz=0 AND pkt > 64'),'',true,'GrpId,pkt,nachname,vorname');
-		
-		if (!$starters) return false;
-		
-		// delete existing starters
-		$this->route_result->delete($keys+array('route_order' => $which_route-1));
 		
 		foreach($starters as $starter)
 		{
-			if (!($start_order = $this->pkt2start($starter['pkt'],$which_route)))
+			if (!($start_order = $this->pkt2start($starter['pkt'],1+$route_order)))
 			{
 				continue;	// wrong route
 			}
-			$this->route_result->data = array(
+			$this->route_result->init(array(
 				'WetId' => $starter['WetId'],
 				'GrpId' => $starter['GrpId'],
-				'route_order' => $which_route-1,
+				'route_order' => $route_order,
 				'PerId' => $starter['PerId'],
 				'start_order' => $start_order,
 				'start_number' => $start_order,
-			);
+			));
 			$this->route_result->save();
 		}
 		return true;
 	}
 	
 	/**
+	 * Generate a startlist from the result of a previous heat
+	 * 
+	 * reimplented from boranking to support startlist from further heats and to store the startlist via route_result
+	 *
+	 * @internal use generate_startlist
+	 * @param array $keys values for WetId, GrpId and route_order
+	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
+	 */
+	function _startlist_from_previous_heat($keys)
+	{
+		$prev_keys = array(
+			'WetId' => $keys['WetId'],
+			'GrpId' => $keys['GrpId'],
+			'route_order' => $keys['route_order'] > 2 ? $keys['route_order']-1 : 0,
+		);
+		if (!($prev_route = $this->route->read($prev_keys)) || !$this->has_results($prev_keys))
+		{
+			return false;	// prev. route not found or no result
+		}
+		if ($prev_route['route_quota']) $prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
+		
+		$start_order = 1;
+		foreach($this->route_result->search($prev_keys,'PerId,start_number','result_rank DESC,RAND()') as $data)
+		{
+			$this->route_result->init($keys);
+			$data['start_order'] = $start_order++;
+			$this->route_result->save($data);
+		}
+		return true;
+	}
+
+	/**
 	 * Updates the result of the route specified in $keys
 	 *
 	 * @param array $keys WetId, GrpId, route_order
-	 * @param aray $results PerId => data pairs
+	 * @param array $results PerId => data pairs
 	 * @return boolean/int number of changed results or false on error
 	 */
 	function save_result($keys,$results)
@@ -177,12 +220,42 @@ class boresult extends boranking
 				}
 			}
 		}
-		if ($modified)	// update the ranking
+		if ($modified)	// update the ranking only if there are modifications
 		{
 			unset($keys['PerId']);
 			$n = $this->route_result->update_ranking($keys);
 			echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		return $modified;
+	}
+	
+	/**
+	 * Check if a route has a result or a startlist ($startlist_only == true)
+	 *
+	 * @param array $keys WetId, GrpId, route_order
+	 * @param boolean $startlist_only=false check of startlist only (not result)
+	 * @return boolean true if there's a at least particial result, false if thers none, null if $key is not valid
+	 */
+	function has_results($keys,$startlist_only=false)
+	{
+		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return null;
+		
+		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));
+
+		if (!$startlist_only) $keys[] = 'result_rank IS NOT NULL';
+		
+		return (boolean) $this->route_result->search($keys);
+	}
+	
+	/**
+	 * Check if a route has a startlist
+	 *
+	 * @param array $keys WetId, GrpId, route_order
+	 * @param boolean $startlist_only=false check of startlist only (not result)
+	 * @return boolean true if there's a at least particial result, false if thers none, null if $key is not valid
+	 */
+	function has_startlist($keys)
+	{
+		return $this->has_results($keys,true);
 	}
 }

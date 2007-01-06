@@ -55,6 +55,11 @@
 					<textbox size="64" maxlength="64" id="route_start" blur="time" span="all"/>
 				</row>
 				<row class="row">
+					<description options=",,,route_quota" value="Quota"/>
+					<int id="route_quota"/>
+					<description/>
+				</row>
+				<row class="row">
 					<description value="Result official"/>
 					<textbox size="64" maxlength="80" id="route_result" blur="time" span="all"/>
 				</row>
