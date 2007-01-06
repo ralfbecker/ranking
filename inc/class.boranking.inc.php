@@ -689,7 +689,7 @@ class boranking extends soranking
 	 * @param int $mode=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$mode=0)
+	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$mode=1)
 	{
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);

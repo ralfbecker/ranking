@@ -28,7 +28,9 @@ class route_result extends so_sql
 	
 	var $athlete_join = 'JOIN Personen ON RouteResults.PerId=Personen.PerId';
 
-	var $rank_lead = "CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END";
+	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
+	var $rank_lead_prev = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus OR RouteResults.result_height = r.result_height AND RouteResults.result_plus = r.result_plus AND rank_previous_heat > (SELECT result_rank FROM RouteResults rp WHERE p.WetId=rp.WetId AND p.GrpId=rp.GrpId AND (CASE p.route_order WHEN 2 THEN 0 ELSE p.route_order-1 END)=rp.route_order AND p.PerId=rp.PerId))) END';
+	var $rank_prev_heat = 'SELECT result_rank FROM RouteResults p WHERE RouteResults.WetId=p.WetId AND RouteResults.GrpId=p.GrpId AND (CASE RouteResults.route_order WHEN 2 THEN 0 ELSE RouteResults.route_order-1 END)=p.route_order AND RouteResults.PerId=p.PerId';
 	
 	/**
 	 * constructor of the competition class
@@ -85,7 +87,10 @@ class route_result extends so_sql
 			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 			$extra_cols += array('vorname','nachname','nation','geb_date','verband','ort');
 			
-//			$extra_cols[] = $this->rank_lead.' AS result_rank';
+			if ($criteria['route_order'] >= 2 || $filter['route_order'] >= 2)
+			{
+				$extra_cols[] = "($this->rank_prev_heat) AS rank_prev_heat";
+			}
 		}
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
@@ -158,17 +163,37 @@ class route_result extends so_sql
 
 		if (!$mode) $mode = $this->rank_lead;
 		
+		$extra_cols = array($mode.' AS new_rank');
+		$order_by = 'result_height IS NULL,new_rank ASC';
+
+		if ($keys['route_order'] >= 2)
+		{
+			$extra_cols[] = "($this->rank_prev_heat) AS rank_prev_heat";
+			$order_by .= ',rank_prev_heat ASC';
+		}
+		
 		// the following sql does not work, as MySQL does not allow to use the target table in the subquery
 		// "UPDATE $this->table_name SET result_rank=($mode) WHERE ".$this->db->expression($this->table_name,$keys)
+		$result = $this->search($keys,'PerId,result_rank','',$extra_cols);
 		
 		$modified = 0;
-		foreach($this->search($keys,'PerId,result_rank','',$mode.' AS new_rank') as $data)
+		$old_prev_rank = null;
+		foreach($this->search($keys,'PerId,result_rank',$order_by,$extra_cols) as $i => $data)
 		{
+			//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
+			if ($data['new_rank'] && $data['new_rank'] != $i+1 && $old_prev_rank)	// do we have a tie and a prev. heat
+			{
+				// use the previous heat to break the tie
+				$data['new_rank'] = $old_prev_rank < $data['rank_prev_heat'] ? $i+1 : $old_rank;
+				//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
+			}
 			if ($data['result_rank'] != $data['new_rank'] &&
 				$this->db->update($this->table_name,array('result_rank'=>$data['new_rank']),$keys+array('PerId'=>$data['PerId']),__LINE__,__FILE__))
 			{
 				++$modified;	
 			}
+			$old_prev_rank = $data['rank_prev_heat'];
+			$old_rank = $data['new_rank'];
 		}
 		return $modified;
 	}

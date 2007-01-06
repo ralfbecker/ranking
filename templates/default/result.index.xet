@@ -13,6 +13,7 @@
 				<column/>
 				<column/>
 				<column/>
+				<column disabled="@no_prev_heat"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -24,12 +25,13 @@
 					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
 					<description value="License" id="PerId" align="center"/>
 					<nextmatch-sortheader label="Height" id="result_height" span="2" align="center"/>
+					<nextmatch-sortheader label="previous heat" id="rank_prev_heat" align="center"/>
 				</row>
 				<row class="row">
-					<textbox id="{$row}[result_rank]" no_lang="1" class="platz" readonly="true" align="center"/>
+					<textbox id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
 					<description align="center" id="{$row}[start_order]"/>
 					<textbox size="5" id="set[$row_cont[PerId]][start_number]" align="center"/>
-					<description id="{$row}[nachname]" no_lang="1"/>
+					<description id="{$row}[nachname]" no_lang="1" class="lastname"/>
 					<description id="{$row}[vorname]" no_lang="1"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
@@ -37,6 +39,7 @@
 					<menulist>
 						<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1"/>
 					</menulist>
+					<description class="place" id="{$row}[rank_prev_heat]" align="center"/>
 				</row>
 			</rows>
 		</grid>
@@ -76,6 +79,7 @@
 							<menupopup onchange="1" options="Select or create one" id="nm[route]" no_lang="1"/>
 						</menulist>
 						<button label="Edit" statustext="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5 noPrint"/>
+						<button id="button[startlist]" label="Generate Startlist" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row disabled="!@nm[route]">
