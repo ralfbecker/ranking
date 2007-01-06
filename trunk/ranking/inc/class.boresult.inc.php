@@ -151,8 +151,6 @@ class boresult extends boranking
 	/**
 	 * Generate a startlist from the result of a previous heat
 	 * 
-	 * reimplented from boranking to support startlist from further heats and to store the startlist via route_result
-	 *
 	 * @internal use generate_startlist
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
@@ -169,9 +167,19 @@ class boresult extends boranking
 			return false;	// prev. route not found or no result
 		}
 		if ($prev_route['route_quota']) $prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
-		
+
+		if ($prev_route['route_quota'] == 1)	// superfinal
+		{
+			$order_by = 'start_order';			// --> same starting order as before !
+		}
+		else
+		{
+			$order_by = 'result_rank DESC';		// --> reversed result
+			// $order_by .= ',...';				// --> reverse of the ranking  ******** TO DO **********
+			$order_by .= ',RAND()';				// --> randomized
+		}
 		$start_order = 1;
-		foreach($this->route_result->search($prev_keys,'PerId,start_number','result_rank DESC,RAND()') as $data)
+		foreach($this->route_result->search($prev_keys,'PerId,start_number',$order_by) as $data)
 		{
 			$this->route_result->init($keys);
 			$data['start_order'] = $start_order++;
