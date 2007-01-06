@@ -192,7 +192,7 @@ class uiresult extends boresult
 		//echo "<p>uiresult::get_rows(".print_r($query,true).",,)</p>\n";
 		unset($query['rows']);
 		$GLOBALS['egw']->session->appsession('result','ranking',$query);
-
+		
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['GrpId'] = $query['cat'];
 		$query['col_filter']['route_order'] = $query['route'];
@@ -213,6 +213,8 @@ class uiresult extends boresult
 		foreach($rows as $k => $row)
 		{
 			if (is_int($k)) $rows['set'][$row['PerId']] = $row;
+
+			if ($row['geb_date']) $rows[$k]['birthyear'] = (int)$row['geb_date'];
 		}
 		$rows['no_prev_heat'] = $query['route'] < 2;
 
@@ -335,6 +337,7 @@ class uiresult extends boresult
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC') : array(),
 			'result_plus' => $this->plus,
+			'show_result' => array(1=>'Resultlist'),
 		);
 		//_debug_array($sel_options);
 		$content['nm']['calendar'] = $calendar;
@@ -345,7 +348,14 @@ class uiresult extends boresult
 		
 		$readonlys['button[startlist]'] = !$comp || !$cat || !is_numeric($content['nm']['route']) || $this->has_results($keys);
 		$readonlys['button[apply]'] = !$this->has_startlist($keys);
-
+		
+		if ($content['nm']['old_show'] != $content['nm']['show_result'])
+		{
+			$content['nm']['template'] = $content['nm']['show_result'] ? 'ranking.result.index.rows_lead' : 'ranking.result.index.rows_startlist';
+			$content['nm']['order'] = $content['nm']['show_result'] ? 'result_rank' : 'start_order';
+			$content['nm']['sort'] = 'ASC';
+			$content['nm']['old_show'] = $content['nm']['show_result'];
+		}
 		$GLOBALS['egw']->session->appsession('result','ranking',$content['nm']);
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.lang('Resultservice');

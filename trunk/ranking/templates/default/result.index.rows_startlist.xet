@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.index.rows_startlist" template="" lang="" group="0" version="1.3.001">
+		<grid width="100%">
+			<columns>
+				<column width="50"/>
+				<column width="50"/>
+				<column width="30%"/>
+				<column width="30%"/>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-sortheader label="Startnumber" id="start_order" align="center" span="2"/>
+					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
+					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
+					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
+					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
+					<description value="License" id="PerId" align="center"/>
+				</row>
+				<row class="row">
+					<textbox id="{$row}[start_order]" align="center" readonly="true"/>
+					<textbox size="5" id="set[$row_cont[PerId]][start_number]" align="center" no_lang="1"/>
+					<description id="{$row}[nachname]" no_lang="1" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" class="leftPad5"/>
+					<description no_lang="1" align="center" id="{$row}[birthyear]"/>
+					<description align="center" id="{$row}[nation]" no_lang="1"/>
+					<description id="{$row}[PerId]" no_lang="1" align="center"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

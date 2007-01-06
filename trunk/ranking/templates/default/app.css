@@ -10,3 +10,4 @@
 .lastname { text-transform:  uppercase; }
 .leftPad5 { padding-left: 5px; }
 .height { text-align: right; }
+.header { font-size: 110%; font-weight: bold; }

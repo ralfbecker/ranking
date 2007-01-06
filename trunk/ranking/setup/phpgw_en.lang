@@ -201,6 +201,7 @@ removed the %1	ranking	en	Removed the %1
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
 result official	ranking	en	Result official
 result pdf	ranking	en	Result PDF
+resultlist	ranking	en	Resultlist
 results	ranking	en	Results
 resultservice	ranking	en	Resultservice
 route	ranking	en	Route
@@ -226,6 +227,7 @@ startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
 startlist	ranking	en	Startlist
 startlist for category %1 generated	ranking	en	Startlist for category %1 generated
+startlist generated	ranking	en	Startlist generated
 startlist pdf	ranking	en	Startlist PDF
 startlists	ranking	en	Startlists
 startnumber	ranking	en	Startnumber

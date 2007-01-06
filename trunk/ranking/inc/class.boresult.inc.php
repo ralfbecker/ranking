@@ -228,7 +228,7 @@ class boresult extends boranking
 				}
 			}
 		}
-		if ($modified)	// update the ranking only if there are modifications
+//		if ($modified)	// update the ranking only if there are modifications
 		{
 			unset($keys['PerId']);
 			$n = $this->route_result->update_ranking($keys);
