@@ -201,6 +201,7 @@ removed the %1	ranking	de	Das %1 wurde gelöscht
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
 result official	ranking	de	Ergebnis offiziell
 result pdf	ranking	de	Ergebnis PDF
+resultlist	ranking	de	Ergebnisliste
 results	ranking	de	Ergebnisse
 resultservice	ranking	de	Ergebnisservice
 route	ranking	de	Route
@@ -226,6 +227,7 @@ startdate	ranking	de	Startdatum
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darf nicht leer sein)
 startlist	ranking	de	Startliste
 startlist for category %1 generated	ranking	de	Startliste für Kategorie %1 erzeugt
+startlist generated	ranking	de	Startliste erzeugt
 startlist pdf	ranking	de	Startlisten PDF
 startlists	ranking	de	Startlisten
 startnumber	ranking	de	Startnummer
