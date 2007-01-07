@@ -31,7 +31,7 @@
 					<nextmatch-sortheader label="@route_names[0]" id="result_rank0" align="center" no_lang="1"/>
 				</row>
 				<row class="row">
-					<textbox id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
+					<description id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
 					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>

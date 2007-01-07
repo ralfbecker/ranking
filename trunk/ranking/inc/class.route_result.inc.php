@@ -82,7 +82,15 @@ class route_result extends so_sql
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
-		$route_order =& $filter['route_order'] ? $filter['route_order'] : $criteria['route_order'];
+		if (isset($filter['route_order']))
+		{
+			$route_order =& $filter['route_order'];
+		}
+		else
+		{
+			$route_order =& $criteria['route_order'];
+		}
+		if ($route_order === 0) $route_order = '0';		// otherwise it get's ignored by so_sql;
 
 		if (!$only_keys && !$join || $route_order == -1) 
 		{
@@ -187,7 +195,7 @@ class route_result extends so_sql
 
 		foreach($route_names as $route_order => $label)
 		{
-			if (!$route_order) continue;	// no need to join the qualification
+			if (!$route_order || $route_order == -1) continue;	// no need to join the qualification
 
 			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.PerId=r$route_order.PerId";
 			foreach($result_cols as $col)
@@ -212,6 +220,9 @@ class route_result extends so_sql
 	 */
 	function db2data($data=0)
 	{
+		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
+		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
+		
 		static $plus2string = array(
 			-1 => '-',
 			0  => '',
@@ -228,7 +239,7 @@ class route_result extends so_sql
 			{
 				$data['result_height'.$suffix] = '';
 				$data['result_plus'.$suffix]   = TOP_PLUS;
-				$data['result'.$suffix]   = 'Top';
+				$data['result'.$suffix]   = lang('Top');
 			}
 			elseif ($data['result_height'.$suffix])
 			{

@@ -129,6 +129,8 @@ incl. nation-code	ranking	en	incl. nation-code
 information pdf	ranking	en	Information PDF
 internal key, leave it empty to have it automaticaly generated	ranking	en	internal key, leave it empty to have it automaticaly generated
 isolation	ranking	en	Isolation
+isolation zone	ranking	en	Isolation zone
+isolation zone and starting time	ranking	en	Isolation zone and starting time
 judge	ranking	en	Judge
 judges	ranking	en	Judges
 judges have the right to create startlists and results 2 weeks befor and after the competition	ranking	en	Judges have the right to create startlists and results 2 weeks befor and after the competition
@@ -141,6 +143,7 @@ last competition	ranking	en	Last competition
 license number	ranking	en	License number
 male	ranking	en	male
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
+minus	ranking	en	minus
 name(s)	ranking	en	name(s)
 nation	ranking	en	Nation
 nation acl	common	en	Nation ACL
@@ -168,6 +171,7 @@ picture attached	ranking	en	Picture attached
 picture resized to %1 pixel	ranking	en	Picture resized to %1 pixel
 place	ranking	en	Place
 place of birth	ranking	en	Place of birth
+plus	ranking	en	plus
 pointalocation	ranking	en	Pointalocation
 points	ranking	en	Points
 port	admin	en	Port
@@ -180,6 +184,7 @@ previous heat	ranking	en	previous heat
 previous rankingsystem	ranking	en	previous Rankingsystem
 professional	ranking	en	Professional
 profile	ranking	en	Profile
+provisional	ranking	en	provisional
 provisional result	ranking	en	provisional result
 qualification	ranking	en	Qualification
 qualification, 1/2-final, ...	ranking	en	Qualification, 1/2-Final, ...
@@ -213,8 +218,10 @@ routes	ranking	en	Routes
 saves the changes made	ranking	en	saves the changes made
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
+select calendar	ranking	en	Select calendar
+select competition	ranking	en	Select competition
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
-select or create one	ranking	en	Select or create one
+select or create route	ranking	en	Select or create route
 serid	ranking	en	SerId
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
@@ -226,6 +233,7 @@ start heat	ranking	en	Start heat
 start order	ranking	en	Start order
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
+starting time	ranking	en	Starting time
 startlist	ranking	en	Startlist
 startlist for category %1 generated	ranking	en	Startlist for category %1 generated
 startlist generated	ranking	en	Startlist generated
@@ -241,6 +249,7 @@ this module displays information from the ranking app.	ranking	en	This module di
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
 to year	ranking	en	to year
+top	ranking	en	Top
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
 type of display	ranking	en	Type of display
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'

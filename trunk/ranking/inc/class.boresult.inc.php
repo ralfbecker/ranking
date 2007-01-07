@@ -40,12 +40,7 @@ class boresult extends boranking
 	 *
 	 * @var array
 	 */
-	var $plus = array(
-		0  => '',
-		1  => '+ plus',
-		'-1' => '- minus',
-		TOP_PLUS => 'Top'
-	);
+	var $plus;
 	/**
 	 * Instance of the route object
 	 * 
@@ -84,6 +79,14 @@ class boresult extends boranking
 		{
 			$this->order_nums[$i] = lang('%1. Heat',$i);
 		}
+		$this->order_nums[-1] = lang('General result');
+
+		$this->plus = array(
+			0 =>    '',
+			1 =>    '+ '.lang('plus'),
+			'-1' => '- '.lang('minus'),
+			TOP_PLUS  => lang('Top'),
+		);
 	}
 		
 	/**
@@ -107,7 +110,7 @@ class boresult extends boranking
 			!$this->route->read($keys) ||	// route does not exist
 			$this->has_results($keys))		// route already has a result
 		{
-			_debug_array($keys);
+			//echo "failed to generate startlist"; _debug_array($keys);
 			return false;
 		}
 		// delete existing starters
@@ -141,7 +144,6 @@ class boresult extends boranking
 				'route_order' => $route_order,
 				'PerId' => $starter['PerId'],
 				'start_order' => $start_order,
-				'start_number' => $start_order,
 			));
 			$this->route_result->save();
 		}
@@ -164,6 +166,7 @@ class boresult extends boranking
 		);
 		if (!($prev_route = $this->route->read($prev_keys)) || !$this->has_results($prev_keys))
 		{
+			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
 			return false;	// prev. route not found or no result
 		}
 		if ($prev_route['route_quota']) $prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];

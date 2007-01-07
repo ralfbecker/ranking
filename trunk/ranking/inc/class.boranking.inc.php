@@ -112,6 +112,9 @@ class boranking extends soranking
 
 	function boranking()
 	{
+		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
+		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
+		
 		$this->soranking();	// calling the parent constructor
 
 		$this->pkt_names = $this->pkte->names();
