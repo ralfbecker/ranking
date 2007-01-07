@@ -85,4 +85,13 @@ class route extends so_sql
 		}
 		return $ret;
 	}
+	
+	function read($keys,$extra_cols='',$join='')
+	{
+		if (is_array($keys) && isset($keys['route_order']) && !is_null($keys['route_order']))
+		{
+			$keys['route_order'] = (string) $keys['route_order'];
+		}
+		return parent::read($keys,$extra_cols,$join);
+	}
 }

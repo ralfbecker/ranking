@@ -11,8 +11,7 @@
 				<column/>
 				<column/>
 				<column width="50"/>
-				<column/>
-				<column/>
+				<column width="15%"/>
 				<column disabled="@no_prev_heat"/>
 			</columns>
 			<rows>
@@ -24,76 +23,122 @@
 					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
 					<description value="License" id="PerId" align="center"/>
 					<nextmatch-sortheader label="Startnumber" id="start_order" align="center"/>
-					<nextmatch-sortheader label="Height" id="result_height" span="2" align="center"/>
+					<nextmatch-sortheader label="Height" id="result_height" align="center"/>
 					<nextmatch-sortheader label="previous heat" id="rank_prev_heat" align="center"/>
 				</row>
 				<row class="row">
-					<textbox id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
+					<description id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
 					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
-					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order] (%s)" no_lang="1"/>
-					<textbox type="float" id="set[$row_cont[PerId]][result_height]" align="right" size="5" precision="%4.2lf" class="height"/>
-					<menulist>
-						<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1"/>
-					</menulist>
+					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order]" no_lang="1"/>
+					<hbox align="center" options="0,0">
+						<description class="onlyPrint" no_lang="1" id="{$row}[result]" readonly="true"/>
+						<textbox type="float" id="set[$row_cont[PerId]][result_height]" size="5" precision="%4.2lf" class="noPrint"/>
+						<menulist class="noPrint leftPad5">
+							<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1"/>
+						</menulist>
+					</hbox>
 					<description class="place" id="{$row}[rank_prev_heat]" align="center"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.result.index" template="" lang="" group="0" version="1.3.001">
+	<template id="ranking.result.extra_startlist" template="" lang="" group="0" version="1.3.001">
+		<groupbox rows="1" cols="1" class="extra_startlist">
+			<caption label="Isolation zone and starting time"/>
+			<grid padding="5">
+				<columns>
+					<column/>
+					<column/>
+					<column/>
+				</columns>
+				<rows>
+					<row>
+						<description value="Isolation zone"/>
+						<description value="opens" id="route_iso_open" no_lang="1"/>
+						<description value="closes" id="route_iso_close" no_lang="1"/>
+					</row>
+					<row>
+						<description value="Starting time"/>
+						<description span="all" id="route_start" no_lang="1"/>
+					</row>
+				</rows>
+			</grid>
+		</groupbox>
+		<styles>
+			.extra_startlist { margin-top: 20px; }
+		</styles>
+	</template>
+	<template id="ranking.result.extra_result" template="" lang="" group="0" version="1.3.001">
+		<groupbox rows="1" cols="1" class="extra_result">
+			<caption label="Result official"/>
+			<grid>
+				<columns>
+					<column/>
+				</columns>
+				<rows>
+					<row>
+						<description id="route_result" no_lang="1"/>
+					</row>
+					<row>
+						<description no_lang="1" id="route_judge"/>
+					</row>
+				</rows>
+			</grid>
+		</groupbox>
+		<styles>
+			.extra_result { margin-top: 20px; }
+		</styles>
+	</template>
+	<template id="ranking.result.index" template="" lang="" group="0" version="1.3.002">
 		<grid width="100%">
 			<columns>
-				<column width="80"/>
 				<column/>
 			</columns>
 			<rows>
-				<row disabled="!@msg">
-					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
-					<description/>
-				</row>
-				<row class="th">
-					<description options=",,,comp" value="Competition" class="noPrint"/>
+				<row class="noPrint">
 					<hbox options="0,0">
-						<menulist class="noPrint">
-							<menupopup id="nm[calendar]" onchange="1" no_lang="1"/>
+						<menulist class="rightPad5">
+							<menupopup id="nm[calendar]" onchange="1" no_lang="1" statustext="Select calendar"/>
 						</menulist>
 						<menulist>
-							<menupopup id="nm[comp]" onchange="1" options="Select one" no_lang="1"/>
+							<menupopup id="nm[comp]" onchange="1" options="Select competition" no_lang="1"/>
 						</menulist>
 					</hbox>
 				</row>
-				<row class="row_on" disabled="!@nm[comp]">
-					<description value="Category" options=",,,cat" class="noPrint"/>
-					<menulist>
-						<menupopup id="nm[cat]" no_lang="1" onchange="1" options="Select one"/>
-					</menulist>
-				</row>
-				<row class="th" disabled="!@nm[cat]">
-					<description value="Route" class="noPrint"/>
-					<hbox options="0,0">
-						<menulist>
-							<menupopup onchange="1" options="Select or create one" id="nm[route]" no_lang="1"/>
+				<row class="noPrint" disabled="!@nm[comp]">
+					<hbox no_lang="1" onchange="1" options="0,0">
+						<menulist class="bold">
+							<menupopup id="nm[cat]" no_lang="1" options="Select category" onchange="1"/>
 						</menulist>
-						<button label="Edit" statustext="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5 noPrint"/>
-						<button id="button[startlist]" label="Generate Startlist" class="leftPad5"/>
+						<description id="msg" class="redItalic" align="right" no_lang="1"/>
 					</hbox>
 				</row>
-				<row disabled="!@nm[route]">
-					<menulist span="all" class="header">
-						<menupopup onchange="1" options="Startlist" id="nm[show_result]"/>
-					</menulist>
-					<description/>
+				<row class="noPrint" disabled="!@nm[cat]">
+					<hbox options="0,0">
+						<menulist span="all" class="header rightPad5">
+							<menupopup onchange="1" id="nm[show_result]" no_lang="1"/>
+						</menulist>
+						<menulist class="header">
+							<menupopup onchange="1" options="Select or create route" id="nm[route]" no_lang="1"/>
+						</menulist>
+						<button label="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5 noPrint" image="edit"/>
+					</hbox>
 				</row>
 				<row disabled="!@nm[route]">
 					<nextmatch options="ranking.result.index.rows_lead" span="all" id="nm"/>
 				</row>
-				<row disabled="!@nm[route]">
-					<button label="Apply" id="button[apply]" statustext="Apply the changes"/>
-					<description/>
+				<row class="noPrint" disabled="!@nm[route]">
+					<button label="Update" id="button[apply]" statustext="Apply the changes made"/>
+				</row>
+				<row class="onlyPrint" disabled="!@nm[show_result]=0">
+					<template span="all" id="ranking.result.extra_startlist"/>
+				</row>
+				<row class="onlyPrint" disabled="!@route_status=3">
+					<template span="all" id="ranking.result.extra_result"/>
 				</row>
 			</rows>
 		</grid>

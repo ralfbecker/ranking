@@ -129,6 +129,8 @@ incl. nation-code	ranking	de	einschl. Länderkennung
 information pdf	ranking	de	Informations PDF
 internal key, leave it empty to have it automaticaly generated	ranking	de	interner Schlüssel, leer lassen um ihn automatisch zu generieren
 isolation	ranking	de	Isolation
+isolation zone	ranking	de	Isolation
+isolation zone and starting time	ranking	de	Isolation und Startzeit
 judge	ranking	de	Schiedsrichter
 judges	ranking	de	Schiedsrichter
 judges have the right to create startlists and results 2 weeks befor and after the competition	ranking	de	Schiedsrichter haben das Recht 2 Wochen vor und nach dem Wettkampf Startlisten und Ergebnise zu ändern
@@ -141,6 +143,7 @@ last competition	ranking	de	Letzter Wettkampf
 license number	ranking	de	Lizenznummer
 male	ranking	de	männlich
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
+minus	ranking	de	minus
 name(s)	ranking	de	Namen
 nation	ranking	de	Nation
 nation acl	common	de	Nationen ACL
@@ -168,6 +171,7 @@ picture attached	ranking	de	Bild angehangen
 picture resized to %1 pixel	ranking	de	Bild auf %1 Pixel verkleinert
 place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
+plus	ranking	de	plus
 pointalocation	ranking	de	Punkteverteilung
 points	ranking	de	Punkte
 port	admin	de	Port
@@ -180,6 +184,7 @@ previous heat	ranking	de	Vorrunde
 previous rankingsystem	ranking	de	vorhergegendes Ranglistensystem
 professional	ranking	de	Profi
 profile	ranking	de	Profil
+provisional	ranking	de	provisorische
 provisional result	ranking	de	provisorisches Ergebnis
 qualification	ranking	de	Qualifikation
 qualification, 1/2-final, ...	ranking	de	Qualifikation, 1/2-Finale, ...
@@ -213,8 +218,10 @@ routes	ranking	de	Routen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
 select a cup for a cup-ranking	ranking	de	Einen Cup auswählen für eine Cup-Ranliste
 select a nation first	ranking	de	Zuerst Nation auswählen
+select calendar	ranking	de	Kalender auswählen
+select competition	ranking	de	Wettkampf auswählen
 select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
-select or create one	ranking	de	Eine auswählen oder anlegen
+select or create route	ranking	de	Route auswählen oder anlegen
 serid	ranking	de	SerId
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
@@ -226,6 +233,7 @@ start heat	ranking	de	Beginn Durchgang
 start order	ranking	de	Startreihenfolge
 startdate	ranking	de	Startdatum
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darf nicht leer sein)
+starting time	ranking	de	Startzeit
 startlist	ranking	de	Startliste
 startlist for category %1 generated	ranking	de	Startliste für Kategorie %1 erzeugt
 startlist generated	ranking	de	Startliste erzeugt
@@ -241,6 +249,7 @@ this module displays information from the ranking app.	ranking	de	Dieses Modul z
 this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
 to year	ranking	de	bis Jahr
+top	ranking	de	Top
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
 type of display	ranking	de	Typ der Anzeige
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
