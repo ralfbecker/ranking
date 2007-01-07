@@ -292,7 +292,7 @@ class uiresult extends boresult
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['nm']['route'],
 		);
-		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || !$this->route->read($keys)))	// route not found
+		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || $content['nm']['route'] != -1 && !$this->route->read($keys)))	// route not found
 		{
 			$keys['route_order'] = $content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
 		}
@@ -337,8 +337,12 @@ class uiresult extends boresult
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC') : array(),
 			'result_plus' => $this->plus,
-			'show_result' => array(1=>'Resultlist'),
+			'show_result' => array(0=>'Startlist',1=>'Resultlist'),
 		);
+		if (count($sel_options['route']) >= 2)	// show general result
+		{
+			$sel_options['route'] = array(-1 => lang('General result'))+$sel_options['route'];
+		}
 		//_debug_array($sel_options);
 		$content['nm']['calendar'] = $calendar;
 		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
@@ -349,10 +353,27 @@ class uiresult extends boresult
 		$readonlys['button[startlist]'] = !$comp || !$cat || !is_numeric($content['nm']['route']) || $this->has_results($keys);
 		$readonlys['button[apply]'] = !$this->has_startlist($keys);
 		
+		if ($content['nm']['route'] == -1)
+		{
+			$sel_options['show_result'] = array(2 => 'General result');
+			$readonlys['button[startlist]'] = $readonlys['nm[show_result]'] = true;
+		}
+		if (($content['nm']['route'] == -1) !== ($content['nm']['show_result'] == 2))
+		{
+			$content['nm']['show_result'] = $content['nm']['route'] == -1 ? 2 : 1;
+		}
 		if ($content['nm']['old_show'] != $content['nm']['show_result'])
 		{
-			$content['nm']['template'] = $content['nm']['show_result'] ? 'ranking.result.index.rows_lead' : 'ranking.result.index.rows_startlist';
-			$content['nm']['order'] = $content['nm']['show_result'] ? 'result_rank' : 'start_order';
+			if ($content['nm']['route'] == -1)	// general result
+			{
+				$content['nm']['template'] = 'ranking.result.index.rows_general';
+				$content['nm']['order'] = 'result_rank';
+			}
+			else
+			{
+				$content['nm']['template'] = $content['nm']['show_result'] ? 'ranking.result.index.rows_lead' : 'ranking.result.index.rows_startlist';
+				$content['nm']['order'] = $content['nm']['show_result'] ? 'result_rank' : 'start_order';
+			}
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
 		}
