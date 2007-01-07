@@ -126,13 +126,14 @@ class route_result extends so_sql
 				{
 					$row['result_rank0'] = $row['result_rank'];
 
-					// check of ties
+					// check for ties
 					$row['result_rank'] = $old['result_rank'];
 					foreach(array_reverse(array_keys($route_names)) as $route_order)
 					{
-						if (!$old || $old['result_rank'.$route_order] < $row['result_rank'.$route_order])
+						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
+							$old['result_rank'.$route_order] < $row['result_rank'.$route_order])	// or worse place then the previous
 						{
-							$row['result_rank'] = $n+1;
+							$row['result_rank'] = $n+1;						// --> set the place according to the position in the list
 							break;
 						}
 					}
