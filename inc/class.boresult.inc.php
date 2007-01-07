@@ -32,15 +32,14 @@ class boresult extends boranking
 	var $stati = array(
 		0 => 'unpublished',
 		1 => 'startlist',
-		2 => 'provisional result',
-		3 => 'official result',
+		2 => 'result official',
 	);
 	/**
 	 * values and labels for route_plus
 	 *
 	 * @var array
 	 */
-	var $plus;
+	var $plus,$plus_labels;
 	/**
 	 * Instance of the route object
 	 * 
@@ -81,11 +80,17 @@ class boresult extends boranking
 		}
 		$this->order_nums[-1] = lang('General result');
 
-		$this->plus = array(
+		$this->plus_labels = array(
 			0 =>    '',
 			1 =>    '+ '.lang('plus'),
 			'-1' => '- '.lang('minus'),
 			TOP_PLUS  => lang('Top'),
+		);
+		$this->plus = array(
+			0 =>    '',
+			1 =>    '+',
+			'-1' => '-',
+			TOP_PLUS => lang('Top'),
 		);
 	}
 		
@@ -107,6 +112,7 @@ class boresult extends boranking
 			'route_order' => $route_order,
 		);
 		if (!$comp || !$cat || !is_numeric($route_order) ||
+			!($this->is_admin || $this->is_judge($comp)) ||	// permission denied		
 			!$this->route->read($keys) ||	// route does not exist
 			$this->has_results($keys))		// route already has a result
 		{
@@ -202,6 +208,8 @@ class boresult extends boranking
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
 		
+		if (!$this->is_admin && !$this->is_judge($keys['WetId'])) return false; // permission denied
+		
 		//echo "<p>boresult::save_result(".print_r($keys,true).")</p>\n"; _debug_array($results);
 		$keys['PerId'] = array_keys($results);
 		$old_values = $this->route_result->search($keys,'*');
@@ -220,7 +228,7 @@ class boresult extends boranking
 				if ((!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) && 
 					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
-					echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
+					//echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
 					$data['result_modified'] = time();
 					$data['result_modifier'] = $this->user;
 
@@ -231,13 +239,14 @@ class boresult extends boranking
 				}
 			}
 		}
-//		if ($modified)	// update the ranking only if there are modifications
+		// always trying the update, to be able to eg. incorporate changes in the prev. heat
+		//if ($modified)	// update the ranking only if there are modifications
 		{
 			unset($keys['PerId']);
 			$n = $this->route_result->update_ranking($keys);
-			echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
+			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
-		return $modified;
+		return $modified ? $modified : $n;
 	}
 	
 	/**
@@ -267,6 +276,6 @@ class boresult extends boranking
 	 */
 	function has_startlist($keys)
 	{
-		return $this->has_results($keys,true);
+		return $keys['route_order'] == -1 ? false : $this->has_results($keys,true);
 	}
 }

@@ -80,7 +80,7 @@ error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
 error: deleting %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: deleting the route!!!	ranking	de	Fehler: beim Löschen der Route !!!
-error: generating startlist	ranking	de	Fehler: beim Erzeugen der Startliste
+error: generating startlist!!!	ranking	de	Fehler: beim Erzeugen der Startliste !!!
 error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlüssel '%1' existiert bereits, er muß eindeutig sein !!!
 error: registration	ranking	de	Fehler: Registrierung
 error: removing the %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
@@ -154,9 +154,9 @@ nation to use (empty = international)	ranking	de	Nation (leer = international)
 national team ranking	ranking	de	Nationen-Team-Rangliste
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
 not used at the moment	ranking	de	im Moment nicht benutzt
+nothing to update	ranking	de	Nichts zu aktualisieren
 notice	ranking	de	Notiz
 number of competitions counting for the cup (empty for all)	ranking	de	Anzahl Wettkämpfe die für den Cup zählen (leer für alle)
-official result	ranking	de	offizielles Ergebnis
 on how many routes is the first round	ranking	de	Auf wievielen Routen findet die erste Runde statt
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
 opens	ranking	de	öffnet
@@ -185,7 +185,6 @@ previous rankingsystem	ranking	de	vorhergegendes Ranglistensystem
 professional	ranking	de	Profi
 profile	ranking	de	Profil
 provisional	ranking	de	provisorische
-provisional result	ranking	de	provisorisches Ergebnis
 qualification	ranking	de	Qualifikation
 qualification, 1/2-final, ...	ranking	de	Qualifikation, 1/2-Finale, ...
 quota	ranking	de	Quote
