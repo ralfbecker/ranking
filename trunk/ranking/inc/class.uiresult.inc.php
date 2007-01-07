@@ -363,7 +363,7 @@ class uiresult extends boresult
 					}
 					else
 					{
-						$msg = lang('Nothing to updated');
+						$msg = lang('Nothing to update');
 					}
 					break;
 			}
@@ -383,7 +383,7 @@ class uiresult extends boresult
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC') : array(),
-			'result_plus' => $this->plus,
+			'result_plus' => $this->plus_labels,
 			'show_result' => array(
 				0 => lang('Startlist'),
 				1 => lang('Resultlist'),
@@ -410,8 +410,12 @@ class uiresult extends boresult
 
 		$content['msg'] = $msg;
 		
-		$readonlys['button[apply]'] = !$this->has_startlist($keys);
-		
+		// no startlist or no rights at all -->disable all update possebilities
+		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) || !($this->is_admin || $this->is_judge($comp))))
+		{
+			$readonlys['nm'] = true;
+			$sel_options['result_plus'] = $this->plus;
+		}
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
 		if (($content['nm']['route'] == -1) !== ($content['nm']['show_result'] == 2))
@@ -447,7 +451,7 @@ class uiresult extends boresult
 		}
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') : 
-			($content['nm']['show_result'] == '0' && $route['route_status'] == 0 || $content['nm']['show_result'] != '0' && $route['route_status'] < 3 ? lang('provisional').' ' : '').
+			($content['nm']['show_result'] == '0' && $route['route_status'] == 0 || $content['nm']['show_result'] != '0' && $route['route_status'] < 2 ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].': ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
 		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));

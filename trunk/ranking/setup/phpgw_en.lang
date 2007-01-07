@@ -80,7 +80,7 @@ error attaching the picture	ranking	en	Error attaching the picture
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
 error: deleting the route!!!	ranking	en	Error: deleting the route!!!
-error: generating startlist	ranking	en	Error: generating startlist
+error: generating startlist!!!	ranking	en	Error: generating startlist!!!
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
 error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
@@ -154,9 +154,9 @@ nation to use (empty = international)	ranking	en	Nation to use (empty = internat
 national team ranking	ranking	en	National team ranking
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 not used at the moment	ranking	en	not used at the moment
+nothing to update	ranking	en	Nothing to update
 notice	ranking	en	Notice
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
-official result	ranking	en	official result
 on how many routes is the first round	ranking	en	On how many routes is the first round
 only fill values different from egw	admin	en	only fill values different from eGW
 opens	ranking	en	opens
@@ -185,7 +185,6 @@ previous rankingsystem	ranking	en	previous Rankingsystem
 professional	ranking	en	Professional
 profile	ranking	en	Profile
 provisional	ranking	en	provisional
-provisional result	ranking	en	provisional result
 qualification	ranking	en	Qualification
 qualification, 1/2-final, ...	ranking	en	Qualification, 1/2-Final, ...
 quota	ranking	en	Quota
@@ -205,7 +204,7 @@ registration deadline	ranking	en	Registration deadline
 remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
-result official	ranking	en	Result official
+result official	ranking	en	result official
 result pdf	ranking	en	Result PDF
 resultlist	ranking	en	Resultlist
 results	ranking	en	Results
