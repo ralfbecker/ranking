@@ -104,7 +104,7 @@ class route_result extends so_sql
 			}
 			elseif ($route_order == -1)	// general result
 			{
-				$route_order = 0;		// use users from the qualification
+				$route_order = '0';		// use users from the qualification
 				
 				$result_cols = array('result_rank','result_height','result_plus');
 
