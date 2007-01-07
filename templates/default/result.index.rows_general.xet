@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.3.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column width="20%"/>
+				<column width="20%"/>
+				<column/>
+				<column/>
+				<column/>
+				<column disabled="!@route_names[4]"/>
+				<column disabled="!@route_names[3]"/>
+				<column disabled="!@route_names[2]"/>
+				<column disabled="!@route_names[1]"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
+					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
+					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
+					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
+					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
+					<description value="License" id="PerId" align="center"/>
+					<nextmatch-sortheader label="@route_names[4]" id="result_rank4" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[3]" id="result_rank3" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[2]" id="result_rank2" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[1]" id="result_rank1" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[0]" id="result_rank0" align="center" no_lang="1"/>
+				</row>
+				<row class="row">
+					<textbox id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
+					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1"/>
+					<description id="{$row}[vorname]" no_lang="1" class="leftPad5"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
+					<description align="center" id="{$row}[nation]" no_lang="1"/>
+					<description id="{$row}[PerId]" no_lang="1" align="center"/>
+					<description id="{$row}[result4]" no_lang="1" align="center"/>
+					<description id="{$row}[result3]" no_lang="1" align="center"/>
+					<description id="{$row}[result2]" no_lang="1" align="center"/>
+					<description id="{$row}[result1]" no_lang="1" align="center"/>
+					<description id="{$row}[result]" no_lang="1" align="center"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

@@ -13,6 +13,7 @@
 /* $Id$ */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
+require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.route.inc.php');
 
 define('TOP_PLUS',9999);
 define('TOP_HEIGHT',99999999);
@@ -81,18 +82,125 @@ class route_result extends so_sql
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
-		if (!$only_keys && !$join) 
+		$route_order =& $filter['route_order'] ? $filter['route_order'] : $criteria['route_order'];
+
+		if (!$only_keys && !$join || $route_order == -1) 
 		{
 			$join = $this->athlete_join;
 			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 			$extra_cols += array('vorname','nachname','nation','geb_date','verband','ort');
 			
-			if ($criteria['route_order'] >= 2 || $filter['route_order'] >= 2)
+			if ($route_order >= 2)
 			{
 				$extra_cols[] = "($this->rank_prev_heat) AS rank_prev_heat";
 			}
+			elseif ($route_order == -1)	// general result
+			{
+				$route_order = 0;		// use users from the qualification
+				
+				$result_cols = array('result_rank','result_height','result_plus');
+
+				$order_by_parts = split('[ ,]',$order_by);
+
+				$join .= $this->_general_result_join(array(
+					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
+					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
+				),$extra_cols,$order_by,$route_names,$result_cols);
+				
+				foreach($filter as $col => $val)
+				{
+					if (!is_numeric($col))
+					{
+						$filter[] = $this->table_name.'.'.$col.'='.(int)$val;
+						unset($filter[$col]);
+					}
+				}
+				$filter[] = $this->table_name.'.result_rank IS NOT NULL';
+				
+				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
+				
+				// the general result is always sorted by the overal rank (to get it)
+				// now we need to store that rank in result_rank
+				$old = null;
+				foreach($rows as $n => &$row)
+				{
+					$row['result_rank0'] = $row['result_rank'];
+
+					// check of ties
+					$row['result_rank'] = $old['result_rank'];
+					foreach(array_reverse(array_keys($route_names)) as $route_order)
+					{
+						if (!$old || $old['result_rank'.$route_order] < $row['result_rank'.$route_order])
+						{
+							$row['result_rank'] = $n+1;
+							break;
+						}
+					}
+					$old = $row;
+				}
+				// now we need to check if user wants to sort by something else
+				$order = array_shift($order_by_parts);
+				$sort  = array_pop($order_by_parts);
+				if ($order != 'result_rank')
+				{
+					// sort the rows now by the user's criteria
+					usort($rows,create_function('$a,$b',$func='return '.($sort == 'DESC' ? '-' : '').
+						($this->table_def['fd'][$order] == 'varchar' || in_array($order,array('nachname','vorname','nation','ort')) ? 
+						"strcasecmp(\$a['$order'],\$b['$order'])" : 
+						"(\$a['$order']-\$b['$order'])").';'));
+						//"(\$a['$order'] ? \$a['$order']-\$b['$order'] : -99999999)").';'));
+					//echo "<p>order='$order', sort='$sort', func=$func</p>\n";
+				}
+				elseif($sort == 'DESC')
+				{
+					$rows = array_reverse($rows);
+				}
+				$rows['route_names'] = $route_names;
+				
+				return $rows;
+			}
 		}
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
+	}
+	
+	/**
+	 * Return join and extra_cols for a general result
+	 *
+	 * @internal 
+	 * @param array $keys values for WetId and GrpId
+	 * @param array &$extra_cols
+	 * @param string &$order_by
+	 * @param array &$route_names route_order => route_name pairs
+	 * @param array $result_cols=array() result relevant col
+	 * @return string join
+	 */
+	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$result_cols=array())
+	{
+		if (!is_object($GLOBALS['egw']->route))
+		{
+			$GLOBALS['egw']->route =& new route($this->source_charset,$this->db);
+		}
+		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
+		
+		$order_by = array("$this->table_name.result_rank");	// Quali
+
+		foreach($route_names as $route_order => $label)
+		{
+			if (!$route_order) continue;	// no need to join the qualification
+
+			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.PerId=r$route_order.PerId";
+			foreach($result_cols as $col)
+			{
+				$extra_cols[] = "r$route_order.$col AS $col$route_order";
+			}
+			$order_by[] = "r$route_order.result_rank";
+			$order_by[] = "r$route_order.result_rank IS NULL";
+		}
+		$order_by = implode(',',array_reverse($order_by)).',nachname ASC,vorname ASC';
+
+		$extra_cols[] = $this->table_name.'.*';		// trick so_sql to return the cols from the quali as regular cols
+
+		return $join;
 	}
 	
 	/**
@@ -103,18 +211,31 @@ class route_result extends so_sql
 	 */
 	function db2data($data=0)
 	{
+		static $plus2string = array(
+			-1 => '-',
+			0  => '',
+			1  => '+',
+		);
 		if (!is_array($data))
 		{
 			$data =& $this->data;
 		}
-		if ($data['result_height'] == TOP_HEIGHT)
+		$suffix = '';	// general result can have route_order as suffix
+		while (isset($data['result_height'.$suffix]) || $suffix < 2)
 		{
-			$data['result_height'] = '';
-			$data['result_plus']   = TOP_PLUS;
-		}
-		elseif ($data['result_height'])
-		{
-			$data['result_height'] *= 0.001;
+			if ($data['result_height'.$suffix] == TOP_HEIGHT)
+			{
+				$data['result_height'.$suffix] = '';
+				$data['result_plus'.$suffix]   = TOP_PLUS;
+				$data['result'.$suffix]   = 'Top';
+			}
+			elseif ($data['result_height'.$suffix])
+			{
+				$data['result_height'.$suffix] *= 0.001;
+				$data['result'.$suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
+					$plus2string[$data['result_plus'.$suffix]];
+			}
+			++$suffix;
 		}
 		return $data;
 	}
