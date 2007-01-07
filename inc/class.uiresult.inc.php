@@ -292,12 +292,14 @@ class uiresult extends boresult
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['nm']['route'],
 		);
-		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || $content['nm']['route'] != -1 && !$this->route->read($keys)))	// route not found
+		if ($comp && $cat && $content['nm']['route'] != -1 && ($content['nm']['old_cat'] != $cat['GrpId'] || !($route = $this->route->read($keys))))	// route not found
 		{
 			$keys['route_order'] = $content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
+			$route = $this->route->read($keys);
 		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
-		// check if user pressed a button
+		
+		// check if user pressed a button and react on it
 		list($button) = @each($content['button']);
 		unset($content['button']);
 		
@@ -339,9 +341,14 @@ class uiresult extends boresult
 			'result_plus' => $this->plus,
 			'show_result' => array(0=>'Startlist',1=>'Resultlist'),
 		);
-		if (count($sel_options['route']) >= 2)	// show general result
+		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
 		{
 			$sel_options['route'] = array(-1 => lang('General result'))+$sel_options['route'];
+		}
+		elseif ($content['nm']['route'] == -1)	// general result with only one heat --> show quali if exist
+		{
+			$keys['route_order'] = $content['nm']['route'] = '0';
+			if (!($route = $this->route->read($keys))) $keys['route_order'] = $content['nm']['route'] = '';
 		}
 		//_debug_array($sel_options);
 		$content['nm']['calendar'] = $calendar;
@@ -358,6 +365,8 @@ class uiresult extends boresult
 			$sel_options['show_result'] = array(2 => 'General result');
 			$readonlys['button[startlist]'] = $readonlys['nm[show_result]'] = true;
 		}
+		// check if the type of the list to show changed: startlist, result or general result
+		// --> set template and default order
 		if (($content['nm']['route'] == -1) !== ($content['nm']['show_result'] == 2))
 		{
 			$content['nm']['show_result'] = $content['nm']['route'] == -1 ? 2 : 1;
@@ -377,9 +386,10 @@ class uiresult extends boresult
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
 		}
-		$GLOBALS['egw']->session->appsession('result','ranking',$content['nm']);
 
-		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.lang('Resultservice');
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.(!$comp ? lang('Resultservice') : 
+			lang($sel_options['show_result'][(int)$content['nm']['show_result']])).
+			($cat ? ': '.($route['route_name'] ? $route['route_name'].' ' : '').$cat['name'] : '');
 		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 }
