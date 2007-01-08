@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.isolation" template="" lang="" group="0" version="1.3.001">
+		<groupbox rows="1" cols="1" class="extra_startlist">
+			<caption label="Isolation zone and starting time"/>
+			<grid padding="5">
+				<columns>
+					<column/>
+					<column/>
+					<column/>
+				</columns>
+				<rows>
+					<row>
+						<description value="Isolation zone"/>
+						<description value="opens" id="route_iso_open" no_lang="1"/>
+						<description value="closes" id="route_iso_close" no_lang="1"/>
+					</row>
+					<row>
+						<description value="Starting time"/>
+						<description span="all" id="route_start" no_lang="1"/>
+					</row>
+				</rows>
+			</grid>
+		</groupbox>
+		<styles>
+			.extra_startlist { margin-top: 20px; }
+		</styles>
+	</template>
+</overlay>

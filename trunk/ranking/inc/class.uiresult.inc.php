@@ -54,19 +54,10 @@ class uiresult extends boresult
 				$keys['route_order'] = '0';
 				if(($content = $this->route->read($keys)))
 				{
-					if ($_GET['route'] == -1)
+					$keys['route_order'] = 1+$this->route->get_max_order($_GET['comp'],$_GET['cat']);
+					if ($keys['route_order'] == 1 && $content['route_type'] == ONE_QUALI)
 					{
-						$keys['route_order']  = -1;
-						$keys['route_name']   = lang('General result');
-						$keys['route_status'] = STATUS_STARTLIST;	// provisional
-					}
-					else
-					{
-						$keys['route_order'] = 1+$this->route->get_max_order($_GET['comp'],$_GET['cat']);
-						if ($keys['route_order'] == 1 && $content['route_type'] == ONE_QUALI)
-						{
-							$keys['route_order'] = 2;
-						}
+						$keys['route_order'] = 2;
 					}
 					$keys['route_type'] = $content['route_type'];
 				}
@@ -133,7 +124,12 @@ class uiresult extends boresult
 					// fall-throught
 				case 'startlist':
 					//_debug_array($content);
-					if (is_numeric($content['route_order']) && $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type']))
+					if ($this->has_results($content))
+					{
+						$param['msg'] = ($msg .= lang('Error: route already has a result!!!'));
+						$param['show_result'] = 1;
+					}
+					elseif (is_numeric($content['route_order']) && $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type']))
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
 
@@ -197,9 +193,8 @@ class uiresult extends boresult
 		{
 			unset($sel_options['route_status'][0]);
 		}
-		// cant delete general result or not yet saved routes, nor do we create startlists for them
-		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = $content['route_order'] == -1 || 
-			$content['new_route'] || $this->has_results($content);
+		// cant delete general result or not yet saved routes
+		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = $content['route_order'] == -1 || $content['new_route'];
 		
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->is_admin && !$this->is_judge($comp))
@@ -233,6 +228,8 @@ class uiresult extends boresult
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['GrpId'] = $query['cat'];
 		$query['col_filter']['route_order'] = $query['route'];
+		// this is to transport the route_type to route_result::search's filter param
+		$query['col_filter']['route_type'] = $query['route_type'];
 		
 		switch ($query['order'])
 		{
@@ -260,6 +257,12 @@ class uiresult extends boresult
 			if (is_int($k)) $rows['set'][$row['PerId']] = $row;
 
 			if ($row['geb_date']) $rows[$k]['birthyear'] = (int)$row['geb_date'];
+			
+			if (!$quota_line && $query['route_quota'] && $row['result_rank'] > $query['route_quota'])
+			{
+				$rows[$k]['quota_class'] = 'quota_line';
+				$quota_line = true;
+			}
 		}
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF);
@@ -342,9 +345,9 @@ class uiresult extends boresult
 			'route_order' => $content['nm']['route'],
 		);
 		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
-			!($route = $this->route->read($keys))) && $content['nm']['route'] != -1)	// route not found and no general result
+			!($route = $this->route->read($keys))))	// route not found and no general result
 		{
-			$keys['route_order'] = $content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
+			$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
 			$route = $this->route->read($keys);
 		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
@@ -410,6 +413,10 @@ class uiresult extends boresult
 		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
 		$content['nm']['route_type'] = $route['route_type'];
+		
+		// make competition and category data availible for print
+		$content['comp'] = $comp;
+		$content['cat']  = $cat;
 
 		$content['msg'] = $msg;
 		
@@ -452,11 +459,17 @@ class uiresult extends boresult
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
 		}
+		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_
+		$content['nm']['route_quota'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_quota'] : 0;
+		
+		// should we show the result offical footer?
+		$content['result_official'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL;
+
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') : 
 			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED || 
 			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
-			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].': ' : '').
+			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
 		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}

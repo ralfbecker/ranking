@@ -12,3 +12,4 @@
 .rightPad5 { padding-right: 5px; }
 .height { text-align: right; }
 .header { font-size: 110%; font-weight: bold; }
+.quota_line > td { border-top: 3px solid black; }

@@ -80,6 +80,11 @@ class route_result extends so_sql
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
+		if (is_array($filter) && array_key_exists('route_type',$filter))	// pseudo-filter to transport the route_type
+		{
+			$route_type = $filter['route_type'];
+			unset($filter['route_type']);
+		}
 		if (isset($filter['route_order']))
 		{
 			$route_order =& $filter['route_order'];
@@ -128,29 +133,29 @@ class route_result extends so_sql
 				// the general result is always sorted by the overal rank (to get it)
 				// now we need to store that rank in result_rank
 				$old = null;
-				$counting = array();
-				foreach(array_reverse(array_keys($route_names)) as $route_order)
-				{
-					if ($route_order >= 2) $counting[] = $route_order;
-				}
 				foreach($rows as $n => &$row)
 				{
 					$row['result_rank0'] = $row['result_rank'];
 
-					if ($row['route_order'] == 1)	// result is on the 2. Quali
-					{								// --> move it there for the display
-						$row['result'.$row['route_order']] = $row['result'];
+					if ($row['route_order'] == 1 && $route_type == TWO_QUALI_HALF)	// result is on the 2. Quali
+					{
+						$row['result'.$row['route_order']] = $row['result'];		// --> move it there for the display
 						unset($row['result']);
 					}
 					// check for ties
 					$row['result_rank'] = $old['result_rank'];
-					foreach($counting as $route_order)
+					foreach(array_reverse(array_keys($route_names)) as $route_order)
 					{
 						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
 							$old['result_rank'.$route_order] < $row['result_rank'.$route_order])	// or worse place then the previous
 						{
 							$row['result_rank'] = $n+1;						// --> set the place according to the position in the list
 							break;
+						}
+						// for quali on two routes with half quota, there's no countback to the quali only if there's a result for the 2. heat
+						if ($route_type == TWO_QUALI_HALF && $route_order == 2 && $row['result_rank2'])
+						{
+							break;	// --> not use countback
 						}
 					}
 					$old = $row;
