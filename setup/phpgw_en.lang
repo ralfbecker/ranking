@@ -158,6 +158,7 @@ nothing to update	ranking	en	Nothing to update
 notice	ranking	en	Notice
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
 on how many routes is the first round	ranking	en	On how many routes is the first round
+one qualification	ranking	en	one Qualification
 only fill values different from egw	admin	en	only fill values different from eGW
 opens	ranking	en	opens
 other sports	ranking	en	other sports
@@ -250,6 +251,8 @@ til place	ranking	en	til place
 to year	ranking	en	to year
 top	ranking	en	Top
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
+two qualification for all	ranking	en	two Qualification for all
+two qualification, half quota	ranking	en	two Qualification, half quota
 type of display	ranking	en	Type of display
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location

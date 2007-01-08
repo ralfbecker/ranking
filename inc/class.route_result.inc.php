@@ -30,8 +30,6 @@ class route_result extends so_sql
 	var $athlete_join = 'JOIN Personen ON RouteResults.PerId=Personen.PerId';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
-	var $rank_lead_prev = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus OR RouteResults.result_height = r.result_height AND RouteResults.result_plus = r.result_plus AND rank_previous_heat > (SELECT result_rank FROM RouteResults rp WHERE p.WetId=rp.WetId AND p.GrpId=rp.GrpId AND (CASE p.route_order WHEN 2 THEN 0 ELSE p.route_order-1 END)=rp.route_order AND p.PerId=rp.PerId))) END';
-	var $rank_prev_heat = 'SELECT result_rank FROM RouteResults p WHERE RouteResults.WetId=p.WetId AND RouteResults.GrpId=p.GrpId AND (CASE RouteResults.route_order WHEN 2 THEN 0 ELSE RouteResults.route_order-1 END)=p.route_order AND RouteResults.PerId=p.PerId';
 	
 	/**
 	 * constructor of the competition class
@@ -97,15 +95,15 @@ class route_result extends so_sql
 			$join = $this->athlete_join;
 			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 			$extra_cols += array('vorname','nachname','nation','geb_date','verband','ort');
-			
+
 			if ($route_order >= 2)
 			{
-				$extra_cols[] = "($this->rank_prev_heat) AS rank_prev_heat";
+				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order).') AS rank_prev_heat';
 			}
-			elseif ($route_order == -1)	// general result
+			elseif ($route_order == -1)			// general result
 			{
-				$route_order = '0';		// use users from the qualification
-				
+				$route_order = array(0,1);		// use users from the qualification(s)
+
 				$result_cols = array('result_rank','result_height','result_plus');
 
 				$order_by_parts = split('[ ,]',$order_by);
@@ -119,24 +117,34 @@ class route_result extends so_sql
 				{
 					if (!is_numeric($col))
 					{
-						$filter[] = $this->table_name.'.'.$col.'='.(int)$val;
+						$filter[] = $this->db->expression($this->table_name,$this->table_name.'.',array($col => $val));
 						unset($filter[$col]);
 					}
 				}
 				$filter[] = $this->table_name.'.result_rank IS NOT NULL';
 				
 				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
-				
+
 				// the general result is always sorted by the overal rank (to get it)
 				// now we need to store that rank in result_rank
 				$old = null;
+				$counting = array();
+				foreach(array_reverse(array_keys($route_names)) as $route_order)
+				{
+					if ($route_order >= 2) $counting[] = $route_order;
+				}
 				foreach($rows as $n => &$row)
 				{
 					$row['result_rank0'] = $row['result_rank'];
 
+					if ($row['route_order'] == 1)	// result is on the 2. Quali
+					{								// --> move it there for the display
+						$row['result'.$row['route_order']] = $row['result'];
+						unset($row['result']);
+					}
 					// check for ties
 					$row['result_rank'] = $old['result_rank'];
-					foreach(array_reverse(array_keys($route_names)) as $route_order)
+					foreach($counting as $route_order)
 					{
 						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
 							$old['result_rank'.$route_order] < $row['result_rank'.$route_order])	// or worse place then the previous
@@ -173,6 +181,18 @@ class route_result extends so_sql
 	}
 	
 	/**
+	 * Subquery to get the rank in the previous heat
+	 *
+	 * @param int $route_order
+	 * @return string
+	 */
+	function _sql_rank_prev_heat($route_order)
+	{
+		return 'SELECT result_rank FROM RouteResults p WHERE RouteResults.WetId=p.WetId AND RouteResults.GrpId=p.GrpId AND '.
+			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1)).' AND RouteResults.PerId=p.PerId';
+	}
+
+	/**
 	 * Return join and extra_cols for a general result
 	 *
 	 * @internal 
@@ -195,7 +215,7 @@ class route_result extends so_sql
 
 		foreach($route_names as $route_order => $label)
 		{
-			if (!$route_order || $route_order == -1) continue;	// no need to join the qualification
+			if ($route_order < 2) continue;	// no need to join the qualification or the general result
 
 			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.PerId=r$route_order.PerId";
 			foreach($result_cols as $col)
@@ -284,10 +304,11 @@ class route_result extends so_sql
 	 * Update the ranking of a given route
 	 *
 	 * @param array $keys values for keys WetId, GrpId and route_order
+	 * @param boolean $do_countback=true should we do a countback on further heats
 	 * @param string $mode=null ranking-mode / sql to calculate the rank
 	 * @return int/boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($keys,$mode=null)
+	function update_ranking($keys,$do_countback=true,$mode=null)
 	{
 		//echo "<p>update_ranking(".print_r($keys,true),",'$mode')</p>\n";
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
@@ -299,9 +320,9 @@ class route_result extends so_sql
 		$extra_cols = array($mode.' AS new_rank');
 		$order_by = 'result_height IS NULL,new_rank ASC';
 
-		if ($keys['route_order'] >= 2)
+		if ($do_countback && $keys['route_order'] > 0)
 		{
-			$extra_cols[] = "($this->rank_prev_heat) AS rank_prev_heat";
+			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order']).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
 		}
 		

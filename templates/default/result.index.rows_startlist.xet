@@ -23,7 +23,7 @@
 				<row class="row">
 					<hbox align="center" options="0,0">
 						<description class="onlyPrint" value="$row_cont[start_order]" id="{$row}[start_number]"/>
-						<description class="noPrint" id="{$row}[start_order]"/>
+						<description class="noPrint" id="{$row}[start_order]" no_lang="1"/>
 						<textbox size="5" id="set[$row_cont[PerId]][start_number]" no_lang="1" class="noPrint leftPad5"/>
 					</hbox>
 					<description id="{$row}[nachname]" no_lang="1" class="lastname leftPad5"/>

@@ -16,6 +16,16 @@ require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route_result.inc.php');
 
+define('ONE_QUALI',0);
+define('TWO_QUALI_HALF',1);
+define('TWO_QUALI_ALL',2);
+define('LEAD',4);
+define('BOULDER',8);
+define('SPEED',16);
+define('STATUS_UNPUBLISHED',0);
+define('STATUS_STARTLIST',1);
+define('STATUS_RESULT_OFFICIAL',2);
+
 class boresult extends boranking 
 {
 	/**
@@ -30,9 +40,22 @@ class boresult extends boranking
 	 * @var array
 	 */
 	var $stati = array(
-		0 => 'unpublished',
-		1 => 'startlist',
-		2 => 'result official',
+		STATUS_UNPUBLISHED     => 'unpublished',
+		STATUS_STARTLIST       => 'startlist',
+		STATUS_RESULT_OFFICIAL => 'result official',
+	);
+	/**
+	 * Different types of qualification
+	 *
+	 * @var array
+	 */
+	var $quali_types = array(
+		ONE_QUALI      => 'one Qualification',
+		TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
+		TWO_QUALI_ALL  => 'two Qualification for all',		// multiply the rank
+	);
+	var $disciplines = array(
+		
 	);
 	/**
 	 * values and labels for route_plus
@@ -102,9 +125,10 @@ class boresult extends boranking
 	 * @param int/array $comp WetId or complete comp array
 	 * @param int/array $cat GrpId or complete cat array
 	 * @param int $route_order 0/1 for qualification, 2, 3, ... for further heats
+	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$route_order)
+	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI)
 	{
 		$keys = array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
@@ -122,9 +146,10 @@ class boresult extends boranking
 		// delete existing starters
 		$this->route_result->delete($keys);
 		
-		if ($route_order >= 2)	// further heat --> startlist from result or previous heat
+		if ($route_order >= 2 || 	// further heat --> startlist from reverse result of previous heat
+			$route_order == 1 && $route_type == TWO_QUALI_ALL)	// 2. Quali uses same start-order
 		{
-			return $this->_startlist_from_previous_heat($keys);
+			return $this->_startlist_from_previous_heat($keys,$route_order >= 2);
 		}
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
@@ -132,7 +157,7 @@ class boresult extends boranking
 		
 		// read startlist from result-store or generate it with standard values
 		unset($keys['route_order']);
-		if (!$this->result->has_startlist($keys) || !parent::generate_startlist($comp,$cat,1+$route_order))
+		if (!$this->result->has_startlist($keys) && !parent::generate_startlist($comp,$cat,$route_type == TWO_QUALI_HALF ? 2 : 1))
 		{
 			return false;
 		}
@@ -161,9 +186,10 @@ class boresult extends boranking
 	 * 
 	 * @internal use generate_startlist
 	 * @param array $keys values for WetId, GrpId and route_order
+	 * @param boolean $reverse=true reverse of the result or same as the previous heat
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function _startlist_from_previous_heat($keys)
+	function _startlist_from_previous_heat($keys,$reverse=true)
 	{
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
@@ -175,9 +201,15 @@ class boresult extends boranking
 			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
 			return false;	// prev. route not found or no result
 		}
-		if ($prev_route['route_quota']) $prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
-
-		if ($prev_route['route_quota'] == 1)	// superfinal
+		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
+		{
+			$prev_keys['route_order'] = array(0,1);		// use both quali routes
+		}
+		if ($prev_route['route_quota'])
+		{
+			$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
+		}
+		if ($prev_route['route_quota'] == 1 || !$reverse)	// superfinal or 2. Quali
 		{
 			$order_by = 'start_order';			// --> same starting order as before !
 		}
@@ -188,7 +220,7 @@ class boresult extends boranking
 			$order_by .= ',RAND()';				// --> randomized
 		}
 		$start_order = 1;
-		foreach($this->route_result->search($prev_keys,'PerId,start_number',$order_by) as $data)
+		foreach($this->route_result->search('','PerId,start_number',$order_by,'','',false,'AND',false,$prev_keys) as $data)
 		{
 			$this->route_result->init($keys);
 			$data['start_order'] = $start_order++;
@@ -243,7 +275,16 @@ class boresult extends boranking
 		//if ($modified)	// update the ranking only if there are modifications
 		{
 			unset($keys['PerId']);
-			$n = $this->route_result->update_ranking($keys);
+			
+			$do_countback = $keys['route_order'] >= 2;
+			if ($keys['route_order'] == 2)	// check if we have a countback to the quali
+			{
+				if (($route = $this->route->read($keys)) && $route['route_type'] == TWO_QUALI_HALF)
+				{
+					$do_countback = false;
+				}
+			}
+			$n = $this->route_result->update_ranking($keys,$do_countback);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		return $modified ? $modified : $n;

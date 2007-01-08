@@ -47,19 +47,31 @@ class uiresult extends boresult
 				'GrpId' => $_GET['cat'],
 				'route_order' => $_GET['route'],
 			);
-			if ((int)$_GET['comp'] && (int)$_GET['cat'] && is_numeric($_GET['route']) &&
-				!($content = $this->route->read($content)))
+			if ((int)$_GET['comp'] && (int)$_GET['cat'] && (!is_numeric($_GET['route']) ||
+				!($content = $this->route->read($content))))
 			{
-				if ($keys['route_order'] != -1)
+				// read the 1. Quali (route_order=0), to get the route-type
+				$keys['route_order'] = '0';
+				if(($content = $this->route->read($keys)))
 				{
-					unset($keys['route_order']);
-				}
-				else
-				{
-					$keys['route_name'] = lang('General result');
-					$keys['route_status'] = 2;	// provisional
+					if ($_GET['route'] == -1)
+					{
+						$keys['route_order']  = -1;
+						$keys['route_name']   = lang('General result');
+						$keys['route_status'] = STATUS_STARTLIST;	// provisional
+					}
+					else
+					{
+						$keys['route_order'] = 1+$this->route->get_max_order($_GET['comp'],$_GET['cat']);
+						if ($keys['route_order'] == 1 && $content['route_type'] == ONE_QUALI)
+						{
+							$keys['route_order'] = 2;
+						}
+					}
+					$keys['route_type'] = $content['route_type'];
 				}
 				$content = $this->route->init($keys);
+				$content['new_route'] = true;
 			}
 		}
 		if (!($comp = $this->comp->read($content['WetId'])) ||
@@ -87,58 +99,51 @@ class uiresult extends boresult
 			unset($content['button']);
 			
 			// reload the parent window
-			$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',array(
+			$param = array(
 				'menuaction' => 'ranking.uiresult.index',
 				'comp'  => $content['WetId'],
 				'cat'   => $content['GrpId'],
-				'route' => !is_numeric($content['route_order']) ? $content['route'] : $content['route_order'],
+				'route' => $content['route_order'],
 				'msg'   => $msg,
-			))."';";
+			);
+			if ($content['new_route'] || $button == 'startlist')
+			{
+				$param['show_result'] = $content['route_order'] != -1 ? 0 : 2;
+			}
 			switch($button)
 			{
 				case 'save':
 				case 'apply':
 					//_debug_array($content);
-					if (($new_route = !is_numeric($content['route_order']))) $content['route_order'] = $content['route'];
-					if ($this->route->save($content) == 0)
-					{
-						$msg = lang('Route saved');
-						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',array(
-							'menuaction' => 'ranking.uiresult.index',
-							'comp'  => $content['WetId'],
-							'cat'   => $content['GrpId'],
-							'route' => $content['route_order'],
-							'msg'   => $msg,
-						))."';";
-						
-						// if route is saved the first time, try getting a startlist (from registration or a previous heat)
-						if ($new_route) $this->generate_startlist($comp,$cat,$content['route_order']);
-					}
-					else
+					if (!$this->route->save($content) == 0)
 					{
 						$msg = lang('Error: saving the route!!!');
 						$button = $js = '';	// dont exit the window
+						break;
 					}
-					break;
+					$param['msg'] = $msg = lang('Route saved');
+
+					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
 					
+					// if route is saved the first time, try getting a startlist (from registration or a previous heat)
+					if (!$content['new_route']) break;
+					
+					unset($content['new_route']);	// no longer new
+					$msg .= ', ';
+					// fall-throught
 				case 'startlist':
 					//_debug_array($content);
-					if (is_numeric($content['route_order']) && $this->generate_startlist($comp,$cat,$content['route_order']))
+					if (is_numeric($content['route_order']) && $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type']))
 					{
-						$msg = lang('Startlist generated');
-						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',array(
-							'menuaction' => 'ranking.uiresult.index',
-							'comp'  => $content['WetId'],
-							'cat'   => $content['GrpId'],
-							'route' => $content['route_order'],
-							'msg'   => $msg,
-						))."';";
-						$content['route_status'] = 1;	// startlist						
+						$param['msg'] = ($msg .= lang('Startlist generated'));
+
+						$content['route_status'] = STATUS_STARTLIST;	// startlist						
 					}
 					else
 					{
-						$msg = lang('Error: generating startlist!!!');
+						$param['msg'] = ($msg .= lang('Error: generating startlist!!!'));
 					}
+					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
 					break;
 
 				case 'delete':
@@ -148,7 +153,8 @@ class uiresult extends boresult
 						'GrpId' => $content['GrpId'],
 						'route_order' => $content['route_order'])))
 					{
-						$msg = lang('Route deleted');
+						$param['msg'] = lang('Route deleted');
+						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
 					}
 					else
 					{
@@ -168,48 +174,32 @@ class uiresult extends boresult
 			'msg' => $msg,
 			'js'  => $js ? "<script>$js</script>" : '',
 		);
-		$readonlys['button[delete]'] = is_null($content['route_order']) || $view;
+		$readonlys['button[delete]'] = $content['new_route'] || $view;
+		$readonlys['route_type'] = !!$content['route_order'];	// can only be set in the first route/quali
+
 		$content += ($preserv = array(
 			'WetId'       => $comp['WetId'],
 			'GrpId'       => $cat['GrpId'],
 			'route_order' => $content['route_order'],
 		));
-
+		foreach(array('new_route','route_type','route_order') as $name)
+		{
+			$preserv[$name] = $content[$name];
+		}
 		$sel_options = array(
 			'WetId' => array($comp['WetId'] => strip_tags($comp['name'])),
 			'GrpId' => array($cat['GrpId']  => $cat['name']),
-			'route' => $this->order_nums,
+			'route_order' => $this->order_nums,
 			'route_status' => $this->stati,
+			'route_type' => $this->quali_types,
 		);
 		if ($content['route_order'] == -1)
 		{
 			unset($sel_options['route_status'][0]);
-			unset($sel_options['route_status'][1]);
-		}
-		if (is_numeric($content['route_order']))	// already selected
-		{
-			$readonlys['route'] = true;
-			$preserv['route'] = $content['route'] = $content['route_order'];
-		}
-		elseif (!is_numeric($content['route']))
-		{
-			$max = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
-			$content['route'] = is_null($max) ? 0 : 1 + $max;
-			if ($content['route'] == 1)
-			{
-				$content['route'] = 2;	// show 2. heat, but allow to select 2. quali
-				$sel_options['route'] = array_intersect_key($sel_options['route'],array(1=>1,2=>2));	// only 2. quali or 2. hear
-			}
-			else
-			{
-				$readonlys['route'] = true;	// no selection possible
-				$preserv['route'] = $content['route'];
-			}
-			//echo "<p>max=$max, route=$content[route], r/o=$readonlys[route]</p>\n";
 		}
 		// cant delete general result or not yet saved routes, nor do we create startlists for them
 		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = $content['route_order'] == -1 || 
-			!is_numeric($content['route_order']) || $this->has_results($content);
+			$content['new_route'] || $this->has_results($content);
 		
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->is_admin && !$this->is_judge($comp))
@@ -223,7 +213,7 @@ class uiresult extends boresult
 		//_debug_array($content);
 		//_debug_array($sel_options);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.
-			(!is_numeric($content['route_order']) ? lang('Add route') : lang('Edit route'));
+			($content['new_route'] ? lang('Add route') : lang('Edit route'));
 		$tmpl->exec('ranking.uiresult.route',$content,$sel_options,$readonlys,$preserv,2);
 	}
 
@@ -247,11 +237,19 @@ class uiresult extends boresult
 		switch ($query['order'])
 		{
 			case 'result_rank':
-				$query['order'] = 'result_rank IS NULL '.$query['sort'].',result_rank '.$query['sort'].',start_order';
+				if ($query['route'] == -1)	// in general result we sort unranked at the end and then as the rest by name
+				{
+					$query['order'] = 'result_rank IS NULL '.$query['sort'];
+				}
+				else	// in route-results we want unranked sorted by start_order for easier result-entering
+				{
+					$query['order'] = 'CASE WHEN result_rank IS NULL THEN start_order ELSE 0 END '.$query['sort'];
+				}
+				$query['order'] .= ',result_rank '.$query['sort'].',nachname '.$query['sort'].',vorname';
 				break;
 			case 'result_height':
-				$query['order'] = 'result_height '.$query['sort'].',result_plus '.$query['sort'].',start_order';
-				$query['sort'] = 'ASC';
+				$query['order'] = 'CASE WHEN result_height IS NULL THEN -start_order ELSE 0 END '.$query['sort'].
+					',result_height '.$query['sort'].',result_plus '.$query['sort'].',nachname '.$query['sort'].',vorname';
 				break;
 		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
@@ -263,7 +261,8 @@ class uiresult extends boresult
 
 			if ($row['geb_date']) $rows[$k]['birthyear'] = (int)$row['geb_date'];
 		}
-		$rows['no_prev_heat'] = $query['route'] < 2;
+		// show previous heat only if it's counting
+		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF);
 
 		return $total;
 	}
@@ -292,6 +291,7 @@ class uiresult extends boresult
 					'num_rows'   => 1000,
 					'order'      => 'start_order',
 					'sort'       => 'ASC',
+					'show_result'=> 1,
 				);
 			}
 			if ($_GET['calendar']) $content['nm']['calendar'] = $_GET['calendar'];
@@ -299,6 +299,7 @@ class uiresult extends boresult
 			if ($_GET['cat']) $content['nm']['cat'] = $_GET['cat'];
 			if (is_numeric($_GET['route'])) $content['nm']['route'] = $_GET['route'];
 			if ($_GET['msg']) $msg = $_GET['msg'];
+			if (isset($_GET['show_result'])) $content['nm']['show_result'] = (int)$_GET['show_result'];
 		}
 
 		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
@@ -340,7 +341,8 @@ class uiresult extends boresult
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['nm']['route'],
 		);
-		if ($comp && $cat && $content['nm']['route'] != -1 && ($content['nm']['old_cat'] != $cat['GrpId'] || !($route = $this->route->read($keys))))	// route not found
+		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
+			!($route = $this->route->read($keys))) && $content['nm']['route'] != -1)	// route not found and no general result
 		{
 			$keys['route_order'] = $content['nm']['route'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
 			$route = $this->route->read($keys);
@@ -407,6 +409,7 @@ class uiresult extends boresult
 		$content['nm']['calendar'] = $calendar;
 		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
+		$content['nm']['route_type'] = $route['route_type'];
 
 		$content['msg'] = $msg;
 		
@@ -451,7 +454,8 @@ class uiresult extends boresult
 		}
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') : 
-			($content['nm']['show_result'] == '0' && $route['route_status'] == 0 || $content['nm']['show_result'] != '0' && $route['route_status'] < 2 ? lang('provisional').' ' : '').
+			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED || 
+			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].': ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
 		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
