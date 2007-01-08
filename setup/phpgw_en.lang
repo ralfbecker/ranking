@@ -85,6 +85,7 @@ error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%
 error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
 error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
+error: route already has a result!!!	ranking	en	Error: route already has a result!!!
 error: saving the route!!!	ranking	en	Error: saving the route!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
 exists without saving the changes	ranking	en	exists without saving the changes

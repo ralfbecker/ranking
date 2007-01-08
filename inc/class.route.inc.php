@@ -86,12 +86,40 @@ class route extends so_sql
 		return $ret;
 	}
 	
+	/**
+	 * reads row matched by key and puts all cols in the data array
+	 * 
+	 * Reimplemented to change the type of $keys['route_order'] to string, as it can be (int)0 and so_sql ignores (int)0.
+	 * Reimplemented to return a default general result, if it does not exist.
+	 *
+	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
+	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $join sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or 
+	 * @return array/boolean data if row could be retrived else False
+	 */
 	function read($keys,$extra_cols='',$join='')
 	{
 		if (is_array($keys) && isset($keys['route_order']) && !is_null($keys['route_order']))
 		{
 			$keys['route_order'] = (string) $keys['route_order'];
 		}
-		return parent::read($keys,$extra_cols,$join);
+		$ret = parent::read($keys,$extra_cols,$join);
+		
+		if (!$ret & $keys['route_order'] == -1)		// general result not found --> return a default one
+		{
+			$keys['route_order'] = 0;
+			if (($ret = parent::read($keys,$extra_cols,$join)))
+			{
+				$ret = $this->init(array(
+					'WetId' => $ret['WetId'],
+					'GrpId' => $ret['GrpId'],
+					'route_order' => -1,
+					'route_type'  => $ret['route_type'],
+					'route_name'  => lang('General result'),
+					'route_status'=> STATUS_STARTLIST,
+				));
+			}
+		}
+		return $ret;
 	}
 }

@@ -85,6 +85,7 @@ error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlü
 error: registration	ranking	de	Fehler: Registrierung
 error: removing the %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: renaming the attachments !!!	ranking	de	Fehler: beim Umbenennen der Anhänge !!!
+error: route already has a result!!!	ranking	de	Fehler: die Route hat bereits ein Ergebnis !!!
 error: saving the route!!!	ranking	de	Fehler: beim Speichern der Route !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
 exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
