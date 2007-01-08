@@ -109,8 +109,8 @@ class competition extends so_sql
 		$start = mktime(12,0,0,(int)$m,(int)$d,(int)$y);
 		$end = $start + $data['duration']*24*60*60;
 		$data['date_end'] = date('Y-m-d',$end);
-		$data['date_span'] = (int)$d.'. '.(date('m',$start) != $m ? lang(date('M',$m)) : '').
-			' - '.(int)date('d',$end).'. '.lang(date('M',$end)).' '.$y;
+		$data['date_span'] = (int)$d.'. '.(date('m',$start) != $m ? lang(date('F',$m)) : '').
+			' - '.(int)date('d',$end).'. '.lang(date('F',$end)).' '.$y;
 		
 		return $data;
 	}
