@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.route" template="" lang="" group="0" version="1.3.001">
+	<template id="ranking.result.route" template="" lang="" group="0" version="1.3.002">
 		<grid>
 			<columns>
-				<column/>
+				<column width="100"/>
 				<column/>
 				<column/>
 			</columns>
@@ -28,8 +28,11 @@
 				</row>
 				<row class="row">
 					<description value="Heat"/>
-					<menulist span="all">
-						<menupopup id="route" no_lang="1"/>
+					<menulist>
+						<menupopup id="route_order" no_lang="1" readonly="true"/>
+					</menulist>
+					<menulist>
+						<menupopup id="route_type" align="right"/>
 					</menulist>
 				</row>
 				<row class="th">
@@ -38,11 +41,14 @@
 				</row>
 				<row class="row">
 					<description value="Status"/>
-					<menulist span="all">
-						<menupopup id="route_status"/>
-					</menulist>
+					<hbox span="all" options="0,0">
+						<menulist>
+							<menupopup id="route_status"/>
+						</menulist>
+						<button id="button[startlist]" class="leftPad5" label="Generate Startlist"/>
+					</hbox>
 				</row>
-				<row class="row">
+				<row class="row" disabled="@route_order=-1">
 					<description options="route_iso_open" value="Isolation"/>
 					<hbox options="0,0">
 						<textbox id="route_iso_open" size="20" maxlength="40" blur="opens"/>
@@ -50,11 +56,11 @@
 					</hbox>
 					<description/>
 				</row>
-				<row class="row">
+				<row class="row" disabled="@route_order=-1">
 					<description options=",,,route_start" value="Start heat"/>
 					<textbox size="64" maxlength="64" id="route_start" blur="time" span="all"/>
 				</row>
-				<row class="row">
+				<row class="row" disabled="@route_order=-1">
 					<description options=",,,route_quota" value="Quota"/>
 					<int id="route_quota"/>
 					<description/>
@@ -73,8 +79,8 @@
 				</row>
 				<row>
 					<hbox span="2">
-						<button label="Save" id="button[save]" statustext="Save the changes"/>
-						<button id="button[apply]" label="Apply" statustext="Apply the changes"/>
+						<button label="Save" id="button[save]" statustext="Save the changes made"/>
+						<button id="button[apply]" label="Apply" statustext="Apply the changes made"/>
 						<button id="button[cancel]" label="Cancel" statustext="Cannel without saving" onclick="window.close();"/>
 						<html id="js"/>
 					</hbox>

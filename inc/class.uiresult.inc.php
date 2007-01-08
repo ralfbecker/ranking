@@ -133,7 +133,8 @@ class uiresult extends boresult
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
 
-						$content['route_status'] = STATUS_STARTLIST;	// startlist						
+						$content['route_status'] = STATUS_STARTLIST;	// set status to startlist
+						if ($this->route->read($content)) $this->route->save(array('route_status' => STATUS_STARTLIST));
 					}
 					else
 					{
@@ -205,6 +206,8 @@ class uiresult extends boresult
 			}
 			$readonlys['button[startlist]'] = $readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] = true;
 		}
+		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
+
 		//_debug_array($content);
 		//_debug_array($sel_options);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.
@@ -251,7 +254,8 @@ class uiresult extends boresult
 		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 		$total = $this->route_result->get_rows($query,$rows,$readonlys);
-		//echo $total; _debug_array($rows);		
+		//echo $total; _debug_array($rows);
+		
 		foreach($rows as $k => $row)
 		{
 			if (is_int($k)) $rows['set'][$row['PerId']] = $row;
@@ -266,6 +270,10 @@ class uiresult extends boresult
 		}
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF);
+		
+		// which result to show
+		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
+		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
 
 		return $total;
 	}
@@ -413,6 +421,7 @@ class uiresult extends boresult
 		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
 		$content['nm']['route_type'] = $route['route_type'];
+		$content['nm']['route_status'] = $route['route_status'];
 		
 		// make competition and category data availible for print
 		$content['comp'] = $comp;
@@ -420,8 +429,9 @@ class uiresult extends boresult
 
 		$content['msg'] = $msg;
 		
-		// no startlist or no rights at all -->disable all update possebilities
-		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) || !($this->is_admin || $this->is_judge($comp))))
+		// no startlist, no rights at all or result offical -->disable all update possebilities
+		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) || 
+			!($this->is_admin || $this->is_judge($comp)) || $route['route_status'] == STATUS_RESULT_OFFICIAL))
 		{
 			$readonlys['nm'] = true;
 			$sel_options['result_plus'] = $this->plus;

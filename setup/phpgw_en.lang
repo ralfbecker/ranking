@@ -10,6 +10,7 @@ aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
 add a new athlete	ranking	en	add a new athlete
 add a new competition	ranking	en	add a new competition
+add a new route	ranking	en	Add a new route
 add route	ranking	en	Add route
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 apply the changes made	ranking	en	apply the changes made
@@ -70,11 +71,10 @@ each new upload will overwrite the previous one	ranking	en	each new upload will 
 edit %1	ranking	en	edit %1
 edit athlete	ranking	en	Edit athlete
 edit competition	ranking	en	Edit competition
-edit or add a route	ranking	en	Edit or add a route
-edit route	ranking	en	Edit route
 edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
+edit this route	ranking	en	Edit this route
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!

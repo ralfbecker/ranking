@@ -13,3 +13,5 @@
 .height { text-align: right; }
 .header { font-size: 110%; font-weight: bold; }
 .quota_line > td { border-top: 3px solid black; }
+.displayNone { display: none; }
+.noWrap { white-space: nowrap; }
