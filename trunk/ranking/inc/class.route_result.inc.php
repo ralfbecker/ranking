@@ -249,8 +249,8 @@ class route_result extends so_sql
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
 		
 		static $plus2string = array(
-			-1 => '-',
-			0  => '',
+			-1 => ' -',
+			0  => ' &nbsp;',
 			1  => '+',
 		);
 		if (!is_array($data))
@@ -264,7 +264,7 @@ class route_result extends so_sql
 			{
 				$data['result_height'.$suffix] = '';
 				$data['result_plus'.$suffix]   = TOP_PLUS;
-				$data['result'.$suffix]   = lang('Top');
+				$data['result'.$suffix]   = lang('Top').'&nbsp;&nbsp;';
 			}
 			elseif ($data['result_height'.$suffix])
 			{

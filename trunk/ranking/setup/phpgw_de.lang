@@ -10,6 +10,7 @@ aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
 add a new athlete	ranking	de	einen neuen Athleten anlegen
 add a new competition	ranking	de	einen neuen Wettkampf anlegen
+add a new route	ranking	de	Neue Route anlegen
 add route	ranking	de	Route anlegen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 apply the changes made	ranking	de	vorgenommene Änderungen anwenden
@@ -70,11 +71,10 @@ each new upload will overwrite the previous one	ranking	de	jeder neue Upload übe
 edit %1	ranking	de	%1 bearbeiten
 edit athlete	ranking	de	Athlet bearbeiten
 edit competition	ranking	de	Wettkampf bearbeiten
-edit or add a route	ranking	de	Route bearbeiten oder anlegen
-edit route	ranking	de	Route bearbetien
 edit this athlete	ranking	de	Diesen Athleten bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
+edit this route	ranking	de	Diese Route bearbeiten
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
