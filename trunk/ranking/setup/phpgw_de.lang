@@ -158,6 +158,7 @@ nothing to update	ranking	de	Nichts zu aktualisieren
 notice	ranking	de	Notiz
 number of competitions counting for the cup (empty for all)	ranking	de	Anzahl Wettkämpfe die für den Cup zählen (leer für alle)
 on how many routes is the first round	ranking	de	Auf wievielen Routen findet die erste Runde statt
+one qualification	ranking	de	eine Qualifikation
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
 opens	ranking	de	öffnet
 other sports	ranking	de	Andere Sportarten
@@ -250,6 +251,8 @@ til place	ranking	de	bis Platz
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
+two qualification for all	ranking	de	zwei Qualifikationen für alle
+two qualification, half quota	ranking	de	zwei Qualifikationen, halbe Quote
 type of display	ranking	de	Typ der Anzeige
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort

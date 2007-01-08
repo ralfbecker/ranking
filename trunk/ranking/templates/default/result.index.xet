@@ -41,7 +41,7 @@
 							<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1"/>
 						</menulist>
 					</hbox>
-					<description class="place" id="{$row}[rank_prev_heat]" align="center"/>
+					<description class="place" id="{$row}[rank_prev_heat]" align="center" no_lang="1"/>
 				</row>
 			</rows>
 		</grid>
@@ -125,7 +125,7 @@
 						<menulist class="header">
 							<menupopup onchange="1" options="Select or create route" id="nm[route]" no_lang="1"/>
 						</menulist>
-						<button label="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5 noPrint" image="edit"/>
+						<button label="Edit or add a route" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'result_route','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;" class="leftPad5 noPrint" image="edit"/>
 					</hbox>
 				</row>
 				<row disabled="!@nm[route]">
