@@ -209,24 +209,75 @@ class boresult extends boranking
 		{
 			$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
 		}
+		$cols = 'PerId,start_number';
 		if ($prev_route['route_quota'] == 1 || !$reverse)	// superfinal or 2. Quali
 		{
 			$order_by = 'start_order';			// --> same starting order as before !
 		}
 		else
 		{
-			$order_by = 'result_rank DESC';		// --> reversed result
-			// $order_by .= ',...';				// --> reverse of the ranking  ******** TO DO **********
+			// quali on two routes with multiplied ranking
+			if($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
+			{
+				$join = " JOIN {$this->route_result->table_name} r2 ON {$this->route_result->table_name}.WetId=r2.WetId".
+					" AND {$this->route_result->table_name}.GrpId=r2.GrpId AND r2.route_order=1".
+					" AND {$this->route_result->table_name}.PerId=r2.PerId";
+
+				$order_by = $this->route_result->table_name.'.result_rank * r2.result_rank DESC';
+				// just the col-name is ambigues
+				foreach($prev_keys as $col => $val)
+				{
+					$prev_keys[] = $this->route_result->table_name.'.'.
+						$this->db->expression($this->route_result->table_name,array($col => $val));
+					unset($prev_keys[$col]);
+				}
+				$cols = array(
+					$this->route_result->table_name.'.PerId AS PerId',
+					$this->route_result->table_name.'.start_number AS start_number',
+				);
+			}
+			else
+			{
+				$order_by = 'result_rank DESC';		// --> reversed result
+			}
+			if (($comp = $this->comp->read($keys['WetId'])) &&
+				($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
+			{
+				$order_by .= ','.$ranking_sql.' DESC';	// --> reverse of the ranking
+			}
 			$order_by .= ',RAND()';				// --> randomized
 		}
 		$start_order = 1;
-		foreach($this->route_result->search('','PerId,start_number',$order_by,'','',false,'AND',false,$prev_keys) as $data)
+		foreach($this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join) as $data)
 		{
 			$this->route_result->init($keys);
 			$data['start_order'] = $start_order++;
 			$this->route_result->save($data);
 		}
 		return true;
+	}
+
+	/**
+	 * Get the ranking as an sql statement, to eg. order by it
+	 *
+	 * @param int/array $cat category
+	 * @param string $stand date of the ranking as Y-m-d string
+	 * @return string sql or null for no ranking
+	 */
+	function _ranking_sql($cat,$stand,$PerId='PerId')
+	{
+	 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$mode == 2 ? $comp['serie'] : '');
+		if (!$ranking) return null;
+		
+		$sql = 'CASE '.$PerId;	 	
+	 	foreach($ranking as $data)
+	 	{
+	 		$sql .= ' WHEN '.$data['PerId'].' THEN '.$data['platz'];
+	 	}
+	 	$sql .= ' ELSE 9999';	// unranked competitors should be behind the ranked ones
+		$sql .= ' END';
+
+	 	return $sql;
 	}
 
 	/**
@@ -276,15 +327,11 @@ class boresult extends boranking
 		{
 			unset($keys['PerId']);
 			
-			$do_countback = $keys['route_order'] >= 2;
-			if ($keys['route_order'] == 2)	// check if we have a countback to the quali
+			if ($keys['route_order'] == 2)	// check the route_type, to know if we have a countback to the quali
 			{
-				if (($route = $this->route->read($keys)) && $route['route_type'] == TWO_QUALI_HALF)
-				{
-					$do_countback = false;
-				}
+				$route = $this->route->read($keys);
 			}
-			$n = $this->route_result->update_ranking($keys,$do_countback);
+			$n = $this->route_result->update_ranking($keys,$route['route_type']);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		return $modified ? $modified : $n;

@@ -274,6 +274,8 @@ class uiresult extends boresult
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
+		$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
+			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 'ONE_QUALI');
 
 		return $total;
 	}
@@ -388,7 +390,7 @@ class uiresult extends boresult
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*30*24*3600)),
+				'datum >= '.$this->db->quote(date('Y-m-d',time()-10*24*3600)),
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
