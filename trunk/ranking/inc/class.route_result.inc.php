@@ -101,13 +101,13 @@ class route_result extends so_sql
 			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 			$extra_cols += array('vorname','nachname','nation','geb_date','verband','ort');
 
-			if ($route_order >= 2)
+			if ($route_order > 2 || $route_order == 2 && $route_type != TWO_QUALI_HALF)
 			{
-				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order).') AS rank_prev_heat';
+				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order,$route_type).') AS rank_prev_heat';
 			}
 			elseif ($route_order == -1)			// general result
 			{
-				$route_order = array(0,1);		// use users from the qualification(s)
+				$route_order = $route_type == TWO_QUALI_HALF ? array(0,1) : 0;		// use users from the qualification(s)
 
 				$result_cols = array('result_rank','result_height','result_plus');
 
@@ -116,7 +116,7 @@ class route_result extends so_sql
 				$join .= $this->_general_result_join(array(
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
 					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
-				),$extra_cols,$order_by,$route_names,$result_cols);
+				),$extra_cols,$order_by,$route_names,$route_type,$result_cols);
 				
 				foreach($filter as $col => $val)
 				{
@@ -189,12 +189,20 @@ class route_result extends so_sql
 	 * Subquery to get the rank in the previous heat
 	 *
 	 * @param int $route_order
+	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
 	 * @return string
 	 */
-	function _sql_rank_prev_heat($route_order)
+	function _sql_rank_prev_heat($route_order,$route_type)
 	{
-		return 'SELECT result_rank FROM RouteResults p WHERE RouteResults.WetId=p.WetId AND RouteResults.GrpId=p.GrpId AND '.
-			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1)).' AND RouteResults.PerId=p.PerId';
+		if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
+		{
+			return "SELECT p.result_rank * p2.result_rank FROM $this->table_name p".
+				" JOIN $this->table_name p2 ON p.WetId=p2.WetId AND p.GrpId=p2.GrpId AND p2.route_order=1 AND p.PerId=p2.PerId".
+				" WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND p.route_order=0".
+				" AND $this->table_name.PerId=p.PerId";
+		}
+		return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
+			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1))." AND $this->table_name.PerId=p.PerId";
 	}
 
 	/**
@@ -205,10 +213,11 @@ class route_result extends so_sql
 	 * @param array &$extra_cols
 	 * @param string &$order_by
 	 * @param array &$route_names route_order => route_name pairs
+	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @param array $result_cols=array() result relevant col
 	 * @return string join
 	 */
-	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$result_cols=array())
+	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$result_cols=array())
 	{
 		if (!is_object($GLOBALS['egw']->route))
 		{
@@ -220,15 +229,24 @@ class route_result extends so_sql
 
 		foreach($route_names as $route_order => $label)
 		{
-			if ($route_order < 2) continue;	// no need to join the qualification or the general result
+			if ($route_order < 2-(int)($route_type==TWO_QUALI_ALL)) continue;	// no need to join the qualification or the general result
 
 			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.PerId=r$route_order.PerId";
 			foreach($result_cols as $col)
 			{
 				$extra_cols[] = "r$route_order.$col AS $col$route_order";
 			}
-			$order_by[] = "r$route_order.result_rank";
-			$order_by[] = "r$route_order.result_rank IS NULL";
+			if ($route_order == 1)	// 2. Quali for route_type==TWO_QUALI_ALL
+			{
+				// only order is the product of the two quali. routes
+				$order_by = array($product = "$this->table_name.result_rank * r$route_order.result_rank");
+				$extra_cols[] = "$product AS quali_points";
+			}
+			else
+			{
+				$order_by[] = "r$route_order.result_rank";
+				$order_by[] = "r$route_order.result_rank IS NULL";
+			}
 		}
 		$order_by = implode(',',array_reverse($order_by)).',nachname ASC,vorname ASC';
 
@@ -274,6 +292,15 @@ class route_result extends so_sql
 			}
 			++$suffix;
 		}
+		if (array_key_exists('result_height1',$data) && array_key_exists('result_height',$data))
+		{
+			// quali on two routes for all --> add rank to result
+			foreach(array('',1) as $suffix)
+			{
+				$data['result'.$suffix] .= ($data['result_plus'.$suffix] == TOP_PLUS ? ' &nbsp;' : '').
+					' &nbsp; '.$data['result_rank'.$suffix].'.';
+			}
+		}
 		return $data;
 	}
 
@@ -310,10 +337,11 @@ class route_result extends so_sql
 	 *
 	 * @param array $keys values for keys WetId, GrpId and route_order
 	 * @param boolean $do_countback=true should we do a countback on further heats
+	 * @param int $route_type=ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
 	 * @param string $mode=null ranking-mode / sql to calculate the rank
 	 * @return int/boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($keys,$do_countback=true,$mode=null)
+	function update_ranking($keys,$route_type=ONE_QUALI,$mode=null)
 	{
 		//echo "<p>update_ranking(".print_r($keys,true),",'$mode')</p>\n";
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
@@ -325,9 +353,10 @@ class route_result extends so_sql
 		$extra_cols = array($mode.' AS new_rank');
 		$order_by = 'result_height IS NULL,new_rank ASC';
 
-		if ($do_countback && $keys['route_order'] > 0)
+		// do we have a countback
+		if ($keys['route_order'] > 2 || $keys['route_order'] == 2 && $route_type != TWO_QUALI_HALF)
 		{
-			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order']).') AS rank_prev_heat';
+			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
 		}
 		
