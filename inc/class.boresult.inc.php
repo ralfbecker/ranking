@@ -54,9 +54,6 @@ class boresult extends boranking
 		TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
 		TWO_QUALI_ALL  => 'two Qualification for all',		// multiply the rank
 	);
-	var $disciplines = array(
-		
-	);
 	/**
 	 * values and labels for route_plus
 	 *
@@ -97,7 +94,7 @@ class boresult extends boranking
 			0 => lang('Qualification'),
 			1 => lang('2. Qualification'),
 		);
-		for($i = 2; $i <=5; ++$i)
+		for($i = 2; $i <= 10; ++$i)
 		{
 			$this->order_nums[$i] = lang('%1. Heat',$i);
 		}
@@ -126,9 +123,10 @@ class boresult extends boranking
 	 * @param int/array $cat GrpId or complete cat array
 	 * @param int $route_order 0/1 for qualification, 2, 3, ... for further heats
 	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
+	 * @param int $discipline='lead' 'lead', 'speed', 'boulder'
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI)
+	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead')
 	{
 		$keys = array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
@@ -149,7 +147,7 @@ class boresult extends boranking
 		if ($route_order >= 2 || 	// further heat --> startlist from reverse result of previous heat
 			$route_order == 1 && $route_type == TWO_QUALI_ALL)	// 2. Quali uses same start-order
 		{
-			return $this->_startlist_from_previous_heat($keys,$route_order >= 2);
+			return $this->_startlist_from_previous_heat($keys,$route_order >= 2,$discipline == 'speed');
 		}
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
@@ -182,24 +180,58 @@ class boresult extends boranking
 	}
 	
 	/**
+	 * Startorder for the ko-system, first key is the total number of starters,
+	 * second key is the place with the startorder as value
+	 *
+	 * @var array
+	 */
+	var $ko_start_order=array(
+		16 => array(
+			1 => 1,  16 => 2,
+			8 => 3,  9  => 4,
+			4 => 5,  13 => 6,
+			5 => 7,  12 => 8,
+			2 => 9,  15 => 10,
+			7 => 11, 10 => 12,
+			3 => 13, 14 => 14,
+			6 => 15, 11 => 16,
+		),
+		8 => array(
+			1 => 1, 8 => 2,
+			4 => 3, 5 => 4,
+			2 => 5, 7 => 6,
+			3 => 7, 6 => 8,
+		),
+		4 => array(
+			1 => 1, 4 => 2,
+			2 => 3, 3 => 4,
+		),
+	);
+	/**
 	 * Generate a startlist from the result of a previous heat
 	 * 
 	 * @internal use generate_startlist
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @param boolean $reverse=true reverse of the result or same as the previous heat
+	 * @param boolean $ko_system=false use ko-system
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function _startlist_from_previous_heat($keys,$reverse=true)
+	function _startlist_from_previous_heat($keys,$reverse=true,$ko_system=false)
 	{
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
 			'route_order' => $keys['route_order'] > 2 ? $keys['route_order']-1 : 0,
 		);
-		if (!($prev_route = $this->route->read($prev_keys)) || !$this->has_results($prev_keys))
+		if (!($prev_route = $this->route->read($prev_keys)) || !$this->has_results($prev_keys) ||
+			$ko_system && !$prev_route['route_quota'])
 		{
-			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
-			return false;	// prev. route not found or no result
+			if (!$ko_system || !--$prev_keys['route_order'] || !($prev_route = $this->route->read($prev_keys)) ||
+				!$this->has_results($prev_keys))
+			{
+				echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
+				return false;	// prev. route not found or no result
+			}
 		}
 		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
 		{
@@ -207,17 +239,29 @@ class boresult extends boranking
 		}
 		if ($prev_route['route_quota'])
 		{
-			$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
+			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
+			{
+				$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
+			}
+			else	// small final
+			{
+				$prev_keys[] = 'result_rank > '.(int)$prev_route['route_quota'];
+			}
 		}
 		$cols = 'PerId,start_number';
-		if ($prev_route['route_quota'] == 1 || !$reverse)	// superfinal or 2. Quali
+		if ($prev_route['route_quota'] == 1 || !$reverse && !$ko_system || 	// superfinal or 2. Quali
+			$ko_system && $keys['route_order'] > 2)
 		{
 			$order_by = 'start_order';			// --> same starting order as before !
 		}
 		else
 		{
+			if ($ko_system)
+			{
+				$order_by = 'result_rank';
+			}
 			// quali on two routes with multiplied ranking
-			if($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
+			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
 			{
 				$join = " JOIN {$this->route_result->table_name} r2 ON {$this->route_result->table_name}.WetId=r2.WetId".
 					" AND {$this->route_result->table_name}.GrpId=r2.GrpId AND r2.route_order=1".
@@ -250,8 +294,16 @@ class boresult extends boranking
 		$start_order = 1;
 		foreach($this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join) as $data)
 		{
+			if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem
+			{
+				if (!isset($this->ko_start_order[$prev_route['route_quota']])) return false;
+				$data['start_order'] = $this->ko_start_order[$prev_route['route_quota']][$start_order++];
+			}
+			else
+			{
+				$data['start_order'] = $start_order++;
+			}
 			$this->route_result->init($keys);
-			$data['start_order'] = $start_order++;
 			$this->route_result->save($data);
 		}
 		return true;
@@ -285,15 +337,17 @@ class boresult extends boranking
 	 *
 	 * @param array $keys WetId, GrpId, route_order
 	 * @param array $results PerId => data pairs
+	 * @param int $route_type=null ONE_QUALI, TWO_QUALI_ALL, TWO_QUALI_HALF
+	 * @param string $discipline='lead' 'lead', 'speed', 'boulder'
 	 * @return boolean/int number of changed results or false on error
 	 */
-	function save_result($keys,$results)
+	function save_result($keys,$results,$route_type=null,$discipline='lead')
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
 		
 		if (!$this->is_admin && !$this->is_judge($keys['WetId'])) return false; // permission denied
 		
-		//echo "<p>boresult::save_result(".print_r($keys,true).")</p>\n"; _debug_array($results);
+		//echo "<p>boresult::save_result(".print_r($keys,true).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
 		$keys['PerId'] = array_keys($results);
 		$old_values = $this->route_result->search($keys,'*');
 
@@ -327,11 +381,12 @@ class boresult extends boranking
 		{
 			unset($keys['PerId']);
 			
-			if ($keys['route_order'] == 2)	// check the route_type, to know if we have a countback to the quali
+			if ($keys['route_order'] == 2 && is_null($route_type))	// check the route_type, to know if we have a countback to the quali
 			{
 				$route = $this->route->read($keys);
+				$route_type = $route['route_type'];
 			}
-			$n = $this->route_result->update_ranking($keys,$route['route_type']);
+			$n = $this->route_result->update_ranking($keys,$route_type,$discipline);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		return $modified ? $modified : $n;

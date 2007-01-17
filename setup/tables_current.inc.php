@@ -27,7 +27,8 @@
 				'prequal_ranking' => array('type' => 'int','precision' => '2'),
 				'prequal_comp' => array('type' => 'int','precision' => '2'),
 				'prequal_comps' => array('type' => 'varchar','precision' => '64'),
-				'judges' => array('type' => 'varchar','precision' => '64')
+				'judges' => array('type' => 'varchar','precision' => '64'),
+				'discipline' => array('type' => 'varchar','precision' => '8')
 			),
 			'pk' => array('WetId'),
 			'fk' => array(),
@@ -66,7 +67,8 @@
 				'rls' => array('type' => 'int','precision' => '2','nullable' => False),
 				'vor_rls' => array('type' => 'int','precision' => '2'),
 				'vor' => array('type' => 'int','precision' => '2'),
-				'extra' => array('type' => 'varchar','precision' => '40')
+				'extra' => array('type' => 'varchar','precision' => '40'),
+				'discipline' => array('type' => 'varchar','precision' => '8','default' => 'lead')
 			),
 			'pk' => array('GrpId'),
 			'fk' => array(),

@@ -25,6 +25,7 @@ birthday, shows only the year	ranking	en	birthday, shows only the year
 birthyear	ranking	en	Birthyear
 birthyears from	ranking	en	Birthyears from
 body height in centimeter	ranking	en	body height in centimeter
+boulder	ranking	en	boulder
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
 cannel without saving	ranking	en	Cannel without saving
@@ -98,6 +99,7 @@ fieldfactorpoints	ranking	en	Fieldfactorpoints
 file %1 not found (either type=%2 or dr_path=%3 wrong)	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)
 file '%1' successful attached as %2	ranking	en	File '%1' successful attached as %2
 file is not a pdf	ranking	en	File is not a PDF
+final	ranking	en	Final
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	en	First name of the athlete in Latin chars! Accents and umlauts are ok
 for internal use, not shown on the website.	ranking	en	For internal use, not shown on the website.
 free text	ranking	en	free text
@@ -141,6 +143,7 @@ key of the competition	ranking	en	Key of the competition
 key of the cup	ranking	en	Key of the cup
 key of the person	ranking	en	Key of the Person
 last competition	ranking	en	Last competition
+lead	ranking	en	lead
 license number	ranking	en	License number
 male	ranking	en	male
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
@@ -153,6 +156,7 @@ nation if national competition or none for an internatinal one	ranking	en	nation
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
 nation to use (empty = international)	ranking	en	Nation to use (empty = international)
 national team ranking	ranking	en	National team ranking
+no quota set in the previous heat!!!	ranking	en	No quota set in the previous heat!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 not used at the moment	ranking	en	not used at the moment
 nothing to update	ranking	en	Nothing to update
@@ -229,9 +233,12 @@ shortcut	ranking	en	Shortcut
 show athlets from all categories	ranking	en	show athlets from all categories
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
+small final	ranking	en	Small final
+speed	ranking	en	speed
 squad	ranking	en	Squad
 start heat	ranking	en	Start heat
 start order	ranking	en	Start order
+start- number	ranking	en	start- number
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
 starting time	ranking	en	Starting time
@@ -249,6 +256,7 @@ this module displays calendar, results and rankings	ranking	en	This module displ
 this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
+time	ranking	en	Time
 to year	ranking	en	to year
 top	ranking	en	Top
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.

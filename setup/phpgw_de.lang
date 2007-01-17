@@ -25,6 +25,7 @@ birthday, shows only the year	ranking	de	Geburtstag, zeigt nur das Jahr
 birthyear	ranking	de	Jahrgang
 birthyears from	ranking	de	Geburtsjahr von
 body height in centimeter	ranking	de	Körpergröße in Zentimeter
+boulder	ranking	de	Bouldern
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
 cannel without saving	ranking	de	Abbrechen ohne zu Speichern
@@ -98,6 +99,7 @@ fieldfactorpoints	ranking	de	Feldfaktorpunkte
 file %1 not found (either type=%2 or dr_path=%3 wrong)	ranking	de	Datei %1 nicht gefunden (entweder Typ=%2 oder DR_PATH=%3 falsch)
 file '%1' successful attached as %2	ranking	de	Datei '%1' erfolgreich als %2 angehangen
 file is not a pdf	ranking	de	Die Datei ist kein PDF
+final	ranking	de	Finale
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Vorname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 for internal use, not shown on the website.	ranking	de	Zur internen Benutzung, wird nicht auf der Webseite angezeigt.
 free text	ranking	de	freier Text
@@ -141,6 +143,7 @@ key of the competition	ranking	de	Schlüssel des Wettkampfes
 key of the cup	ranking	de	Schlüssel des Cups
 key of the person	ranking	de	Schlüssel des Athleten
 last competition	ranking	de	Letzter Wettkampf
+lead	ranking	de	Schwierigkeit
 license number	ranking	de	Lizenznummer
 male	ranking	de	männlich
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
@@ -153,6 +156,7 @@ nation if national competition or none for an internatinal one	ranking	de	Nation
 nation the athlete is competing for	ranking	de	Nation für die der Athlete startet
 nation to use (empty = international)	ranking	de	Nation (leer = international)
 national team ranking	ranking	de	Nationen-Team-Rangliste
+no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Route angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
 not used at the moment	ranking	de	im Moment nicht benutzt
 nothing to update	ranking	de	Nichts zu aktualisieren
@@ -229,9 +233,12 @@ shortcut	ranking	de	Abkürzung
 show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
 since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
 size (cm)	ranking	de	Größe (cm)
+small final	ranking	de	Kleines Finale
+speed	ranking	de	Geschwindigkeit
 squad	ranking	de	Kader
 start heat	ranking	de	Beginn Durchgang
 start order	ranking	de	Startreihenfolge
+start- number	ranking	de	Start- nummer
 startdate	ranking	de	Startdatum
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darf nicht leer sein)
 starting time	ranking	de	Startzeit
@@ -249,6 +256,7 @@ this module displays calendar, results and rankings	ranking	de	Dieses Module zei
 this module displays information from the ranking app.	ranking	de	Dieses Modul zeigt Informationen der Ranglisten Anwendung.
 this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
+time	ranking	de	Zeit
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
