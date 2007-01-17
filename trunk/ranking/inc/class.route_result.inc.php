@@ -30,11 +30,13 @@ class route_result extends so_sql
 	var $athlete_join = 'JOIN Personen ON RouteResults.PerId=Personen.PerId';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
+	var $rank_speed_quali = 'CASE WHEN result_top_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_top_time > r.result_top_time) END';
+	var $rank_speed_final = 'CASE WHEN result_top_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_top_time > r.result_top_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
 	
 	/**
 	 * constructor of the competition class
 	 */
-	function route_result($source_charset='',$db=null,$vfs_pdf_dir='')
+	function route_result($source_charset='',$db=null)
 	{
 		//$this->debug = 1;
 		$this->so_sql('ranking','RouteResults',$db);	// call constructor of extended class
@@ -85,6 +87,11 @@ class route_result extends so_sql
 			$route_type = $filter['route_type'];
 			unset($filter['route_type']);
 		}
+		if (is_array($filter) && array_key_exists('discipline',$filter))	// pseudo-filter to transport the discipline
+		{
+			$discipline = $filter['discipline'];
+			unset($filter['discipline']);
+		}
 		if (isset($filter['route_order']))
 		{
 			$route_order =& $filter['route_order'];
@@ -109,14 +116,27 @@ class route_result extends so_sql
 			{
 				$route_order = $route_type == TWO_QUALI_HALF ? array(0,1) : 0;		// use users from the qualification(s)
 
-				$result_cols = array('result_rank','result_height','result_plus');
-
+				$result_cols = array('result_rank');
+				switch($discipline)
+				{
+					default:
+					case 'lead':
+						$result_cols[] = 'result_height';
+						$result_cols[] = 'result_plus';
+						break;
+					case 'speed':
+						$result_cols[] = 'result_top_time';
+						break;
+					case 'boulder':
+						$result_cols[] = 'ToDo';
+						break;
+				}
 				$order_by_parts = split('[ ,]',$order_by);
 
 				$join .= $this->_general_result_join(array(
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
 					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
-				),$extra_cols,$order_by,$route_names,$route_type,$result_cols);
+				),$extra_cols,$order_by,$route_names,$route_type,$discipline,$result_cols);
 				
 				foreach($filter as $col => $val)
 				{
@@ -214,10 +234,11 @@ class route_result extends so_sql
 	 * @param string &$order_by
 	 * @param array &$route_names route_order => route_name pairs
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
-	 * @param array $result_cols=array() result relevant col
+	 * @param string $discipline 'lead', 'speed', 'boulder'
+	 * @param array $result_cols result relevant col
 	 * @return string join
 	 */
-	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$result_cols=array())
+	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols)
 	{
 		if (!is_object($GLOBALS['egw']->route))
 		{
@@ -292,6 +313,16 @@ class route_result extends so_sql
 			}
 			++$suffix;
 		}
+		$suffix = '';	// general result can have route_order as suffix
+		while (isset($data['result_top_time'.$suffix]) || $suffix < 2 || isset($data['result_top_time'.(1+$suffix)]))
+		{
+			if ($data['result_top_time'.$suffix])
+			{
+				$data['result_top_time'.$suffix] *= 0.001;
+				$data['result'.$suffix] = sprintf('%4.2lf',$data['result_top_time'.$suffix]);
+			}
+			++$suffix;
+		}
 		if (array_key_exists('result_height1',$data) && array_key_exists('result_height',$data))
 		{
 			// quali on two routes for all --> add rank to result
@@ -300,8 +331,38 @@ class route_result extends so_sql
 				$data['result'.$suffix] .= ($data['result_plus'.$suffix] == TOP_PLUS ? ' &nbsp;' : '').
 					' &nbsp; '.$data['result_rank'.$suffix].'.';
 			}
-		}
+		}		
+		$this->_shorten_name($data['nachname']);
+		$this->_shorten_name($data['vorname']);
+			
+		if ($data['geb_date']) $data['birthyear'] = (int)$data['geb_date'];	
+
 		return $data;
+	}
+	
+	/**
+	 * Appriviate the name to make it better printable
+	 *
+	 * @param string &$name
+	 * @param int $max=12 maximum length
+	 */
+	function _shorten_name(&$name,$max=13)
+	{
+		if (strlen($name) <= $max) return;
+
+		// add a space after each dash or comma, if there's none already
+		$name = preg_replace('/([-,]+ *)/','\\1 ',$name);
+		
+		// check all space separated parts for their length
+		$parts = explode(' ',$name);
+		foreach($parts as &$part)
+		{
+			if (strlen($part) > $max)
+			{
+				$part = substr($part,0,$max-1).'.';
+			}
+		}
+		$name = implode(' ',$parts);		
 	}
 
 	/**
@@ -329,6 +390,8 @@ class route_result extends so_sql
 		{
 			unset($data['result_plus']);	// no plus without height
 		}
+		if ($data['result_top_time']) $data['result_top_time'] = round(1000 * $data['result_top_time']);
+
 		return $data;
 	}
 	
@@ -338,36 +401,64 @@ class route_result extends so_sql
 	 * @param array $keys values for keys WetId, GrpId and route_order
 	 * @param boolean $do_countback=true should we do a countback on further heats
 	 * @param int $route_type=ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
-	 * @param string $mode=null ranking-mode / sql to calculate the rank
+	 * @param string $discipline='lead' 'lead', 'speed', 'boulder'
 	 * @return int/boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($keys,$route_type=ONE_QUALI,$mode=null)
+	function update_ranking($keys,$route_type=ONE_QUALI,$discipline='lead')
 	{
-		//echo "<p>update_ranking(".print_r($keys,true),",'$mode')</p>\n";
+		//echo "<p>update_ranking(".print_r($keys,true),",$route_type,'$discipline')</p>\n";
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
 		
 		$keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
 
-		if (!$mode) $mode = $this->rank_lead;
-		
-		$extra_cols = array($mode.' AS new_rank');
-		$order_by = 'result_height IS NULL,new_rank ASC';
+		$extra_cols = array();
+		switch($discipline)
+		{
+			default:
+			case 'lead':
+				$mode = $this->rank_lead;
+				$order_by = 'result_height IS NULL,new_rank ASC';
+				break;
+			case 'speed':
+				$order_by = 'result_top_time IS NULL,new_rank ASC';	
+				if ($keys['route_order'] < 2)
+				{
+					$mode = $this->rank_speed_quali;
+				}
+				else
+				{
+					$mode = $this->rank_speed_final;
+					$order_by .= ',result_top_time ASC';
+					$extra_cols[] = 'result_top_time';
+				}
+				break;
+			case 'boulder':
+				$mode = $this->rank_boulder;
+				$order_by = 'ToDo';
+		}
+		$extra_cols[] = $mode.' AS new_rank';
 
 		// do we have a countback
-		if ($keys['route_order'] > 2 || $keys['route_order'] == 2 && $route_type != TWO_QUALI_HALF)
+		if ($discipline != 'speed' && ($keys['route_order'] > 2 || $keys['route_order'] == 2 && $route_type != TWO_QUALI_HALF))
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
 		}
 		
-		// the following sql does not work, as MySQL does not allow to use the target table in the subquery
-		// "UPDATE $this->table_name SET result_rank=($mode) WHERE ".$this->db->expression($this->table_name,$keys)
-		$result = $this->search($keys,'PerId,result_rank','',$extra_cols);
-		
 		$modified = 0;
-		$old_prev_rank = null;
+		$old_time = $old_prev_rank = null;
 		foreach($this->search($keys,'PerId,result_rank',$order_by,$extra_cols) as $i => $data)
 		{
+			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
+			if ($discipline == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
+			{
+				$new_speed_rank = $data['new_rank'];
+				$data['new_rank'] = !$old_time || $old_time < $data['result_top_time'] ||
+					 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
+				//echo "<p>$i. $data[PerId]: time=$data[result_top_time], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
+				$old_time = $data['result_top_time'];
+				$old_speed_rank = $new_speed_rank;
+			}
 			//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			if ($data['new_rank'] && $data['new_rank'] != $i+1 && $old_prev_rank)	// do we have a tie and a prev. heat
 			{

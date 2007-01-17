@@ -50,16 +50,20 @@ class uiresult extends boresult
 			if ((int)$_GET['comp'] && (int)$_GET['cat'] && (!is_numeric($_GET['route']) ||
 				!($content = $this->route->read($content))))
 			{
-				// read the 1. Quali (route_order=0), to get the route-type
-				$keys['route_order'] = '0';
-				if(($content = $this->route->read($keys)))
+				// try reading the previous heat, to set some stuff from it
+				if (!is_null($keys['route_order'] = $this->route->get_max_order($_GET['comp'],$_GET['cat'])) &&
+					($previous = $this->route->read($keys)))
 				{
-					$keys['route_order'] = 1+$this->route->get_max_order($_GET['comp'],$_GET['cat']);
-					if ($keys['route_order'] == 1 && $content['route_type'] == ONE_QUALI)
+					++$keys['route_order'];
+					if ($keys['route_order'] == 1 && $previous['route_type'] == ONE_QUALI)
 					{
 						$keys['route_order'] = 2;
 					}
-					$keys['route_type'] = $content['route_type'];
+					$keys['route_type'] = $previous['route_type'];
+				}
+				else
+				{
+					$keys['route_order'] = '0';
 				}
 				$content = $this->route->init($keys);
 				$content['new_route'] = true;
@@ -129,7 +133,7 @@ class uiresult extends boresult
 						$param['msg'] = ($msg .= lang('Error: route already has a result!!!'));
 						$param['show_result'] = 1;
 					}
-					elseif (is_numeric($content['route_order']) && $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type']))
+					elseif (is_numeric($content['route_order']) && $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline']))
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
 
@@ -178,7 +182,32 @@ class uiresult extends boresult
 			'WetId'       => $comp['WetId'],
 			'GrpId'       => $cat['GrpId'],
 			'route_order' => $content['route_order'],
+			'discipline'  => $comp['discipline'] ? $comp['discipline'] : $cat['discipline'],
 		));
+		if ($previous)	// previous heat of a NEW route
+		{
+			if (!$previous['route_quota'] && ($content['discipline'] != 'speed' || $content['route_order'] <= 2))
+			{
+				$content['msg'] = lang('No quota set in the previous heat!!!');
+			}
+			elseif ($content['discipline'] == 'speed')
+			{
+				$content['route_quota'] = $previous['route_quota'] / 2;
+				if ($content['route_quota'] > 1)
+				{
+					$content['route_name'] = '1/'.$content['route_quota'].' - '.lang('Final');
+				}
+				elseif($content['route_quota'] == 1)
+				{
+					$content['route_quota'] = '';
+					$content['route_name'] = lang('Small final');					
+				}
+				else
+				{
+					$content['route_name'] = lang('Final');
+				}
+			}
+		}
 		foreach(array('new_route','route_type','route_order') as $name)
 		{
 			$preserv[$name] = $content[$name];
@@ -189,6 +218,7 @@ class uiresult extends boresult
 			'route_order' => $this->order_nums,
 			'route_status' => $this->stati,
 			'route_type' => $this->quali_types,
+			'discipline' => $this->disciplines,
 		);
 		if ($content['route_order'] == -1)
 		{
@@ -233,8 +263,9 @@ class uiresult extends boresult
 		$query['col_filter']['route_order'] = $query['route'];
 		// this is to transport the route_type to route_result::search's filter param
 		$query['col_filter']['route_type'] = $query['route_type'];
+		$query['col_filter']['discipline'] = $query['discipline'];
 		
-		switch ($query['order'])
+		switch (($order = $query['order']))
 		{
 			case 'result_rank':
 				if ($query['route'] == -1)	// in general result we sort unranked at the end and then as the rest by name
@@ -255,17 +286,29 @@ class uiresult extends boresult
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 		$total = $this->route_result->get_rows($query,$rows,$readonlys);
 		//echo $total; _debug_array($rows);
-		
+
 		foreach($rows as $k => $row)
 		{
-			if (is_int($k)) $rows['set'][$row['PerId']] = $row;
-
-			if ($row['geb_date']) $rows[$k]['birthyear'] = (int)$row['geb_date'];
+			if (!is_int($k)) continue;
 			
+			$rows['set'][$row['PerId']] = $row;
+
 			if (!$quota_line && $query['route_quota'] && $row['result_rank'] > $query['route_quota'])
 			{
 				$rows[$k]['quota_class'] = 'quota_line';
 				$quota_line = true;
+			}
+			$rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on'; 
+			if ($query['discipline'] == 'speed' && $query['route'] >= 2 && 
+				(strstr($query['template'],'startlist') && $order == 'start_order' || 
+				!strstr($query['template'],'startlist') && !$row['result_rank'] && $order == 'result_rank'))
+			{
+				if (!$unranked)
+				{
+					$unranked[$k & 2] = $rows[$k]['class'];
+					$unranked[2*!($k & 2)] = $rows[$k]['class'] == 'row_off' ? 'row_on' : 'row_off';	
+				}
+				$rows[$k]['class'] = $unranked[$k & 2];
 			}
 		}
 		// show previous heat only if it's counting
@@ -372,7 +415,7 @@ class uiresult extends boresult
 			switch($button)
 			{
 				case 'apply':
-					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set']))
+					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline']))
 					{
 						$msg = lang('Route updated');
 					}
@@ -424,6 +467,7 @@ class uiresult extends boresult
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
 		$content['nm']['route_type'] = $route['route_type'];
 		$content['nm']['route_status'] = $route['route_status'];
+		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
 		
 		// make competition and category data availible for print
 		$content['comp'] = $comp;
@@ -456,21 +500,20 @@ class uiresult extends boresult
 			$sel_options['show_result'] = array(-1 => '');
 			$readonlys['nm[show_result]'] = true;
 		}
-		if ($content['nm']['old_show'] != $content['nm']['show_result'])
+		if ((string)$content['nm']['old_show'] !== (string)$content['nm']['show_result'])
 		{
 			if ($content['nm']['route'] == -1)	// general result
 			{
-				$content['nm']['template'] = 'ranking.result.index.rows_general';
 				$content['nm']['order'] = 'result_rank';
 			}
 			else
 			{
-				$content['nm']['template'] = $content['nm']['show_result'] ? 'ranking.result.index.rows_lead' : 'ranking.result.index.rows_startlist';
 				$content['nm']['order'] = $content['nm']['show_result'] ? 'result_rank' : 'start_order';
 			}
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
 		}
+		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],$content['nm']['discipline']);
 		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_
 		$content['nm']['route_quota'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_quota'] : 0;
 		
@@ -484,5 +527,31 @@ class uiresult extends boresult
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
 		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
+	}
+	
+	/**
+	 * Get the template name depending on show_result and discipline
+	 *
+	 * @param int $show_result 0=startlist, 1=result, 2=general result
+	 * @param string $discipline 'lead', 'boulder', 'speed'
+	 * @return string
+	 */
+	function _template_name($show_result,$discipline='lead')
+	{
+		if ($show_result == 2)
+		{
+			return 'ranking.result.index.rows_general';
+		}
+		if ($show_result)
+		{
+			switch($discipline)
+			{
+				default:
+				case 'lead':    return 'ranking.result.index.rows_lead';
+				case 'speed':   return 'ranking.result.index.rows_speed';
+				case 'boulder': return 'ranking.result.index.rows_boulder';
+			}
+		}
+		return 'ranking.result.index.rows_startlist';
 	}
 }

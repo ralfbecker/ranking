@@ -10,6 +10,8 @@
 				<column/>
 				<column/>
 				<column/>
+				<column/>
+				<column/>
 				<column disabled="!@route_names[4]"/>
 				<column disabled="!@route_names[3]"/>
 				<column disabled="!@route_names[2]"/>
@@ -25,6 +27,8 @@
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
 					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
 					<description value="License" id="PerId" align="center"/>
+					<nextmatch-sortheader label="@route_names[6]" id="result_rank4" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[5]" id="result_rank4" align="center" no_lang="1"/>
 					<nextmatch-sortheader label="@route_names[4]" id="result_rank4" align="center" no_lang="1"/>
 					<nextmatch-sortheader label="@route_names[3]" id="result_rank3" align="center" no_lang="1"/>
 					<nextmatch-sortheader label="@route_names[2]" id="result_rank2" align="center" no_lang="1"/>
@@ -39,6 +43,8 @@
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
+					<description id="{$row}[result6]" no_lang="1" align="center"/>
+					<description id="{$row}[result5]" no_lang="1" align="center"/>
 					<description id="{$row}[result4]" no_lang="1" align="center"/>
 					<description id="{$row}[result3]" no_lang="1" align="center"/>
 					<description id="{$row}[result2]" no_lang="1" align="center"/>

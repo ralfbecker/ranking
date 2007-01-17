@@ -29,6 +29,11 @@ class boranking extends soranking
 		'male' => 'male',
 		'' => 'none'
 	);
+	var $disciplines = array(
+		'lead' => 'lead',
+		'boulder' => 'boulder',
+		'speed' => 'speed',
+	);
 	var $pkt_names;
 	var $cat_names;
 	var $rls_names;
@@ -114,6 +119,7 @@ class boranking extends soranking
 	{
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
+		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['Time'] = 'Zeit';
 		
 		$this->soranking();	// calling the parent constructor
 
@@ -771,11 +777,14 @@ class boranking extends soranking
 					$reset_data = false;
 				}
 			}
-// new modus: unranked starters at the end of the startlist
-			// reverse the startlists now, to have the first in the ranking at the end of the list
-			for ($route = 1; $route <= $num_routes; ++$route)
+			if ($cat['discipline'] != 'speed')
 			{
-				$startlist[$route] = array_reverse($startlist[$route]);	
+				// new modus, not for speed(!): unranked starters at the END of the startlist
+				// reverse the startlists now, to have the first in the ranking at the end of the list
+				for ($route = 1; $route <= $num_routes; ++$route)
+				{
+					$startlist[$route] = array_reverse($startlist[$route]);	
+				}
 			}
 		}
 		// now we randomly pick starters and devide them on the routes
@@ -787,12 +796,15 @@ class boranking extends soranking
 		// store the startlist in the database
 		for ($route = 1; $route <= $num_routes; ++$route)
 		{
-			// if we used a ranking, we have to reverse the startlist
-// old modus: unranked startes at the beginning
-//			if ($mode) 
-//			{
-//				$startlist[$route] = array_reverse($startlist[$route]);
-//			}
+			if ($cat['discipline'] == 'speed')
+			{
+				// if we used a ranking, we have to reverse the startlist
+				// old modus & speed: unranked startes at the beginning
+				if ($mode) 
+				{
+					$startlist[$route] = array_reverse($startlist[$route]);
+				}
+			}
 			foreach($startlist[$route] as $n => $athlete)
 			{
 				// we preserve the registration number in the last 6 bit's
