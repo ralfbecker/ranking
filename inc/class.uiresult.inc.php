@@ -65,6 +65,8 @@ class uiresult extends boresult
 				{
 					$keys['route_order'] = '0';
 				}
+				$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') : 
+					($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
 				$content = $this->route->init($keys);
 				$content['new_route'] = true;
 			}
@@ -204,6 +206,7 @@ class uiresult extends boresult
 				}
 				else
 				{
+					$content['route_quota'] = '';
 					$content['route_name'] = lang('Final');
 				}
 			}
@@ -283,15 +286,23 @@ class uiresult extends boresult
 					',result_height '.$query['sort'].',result_plus '.$query['sort'].',nachname '.$query['sort'].',vorname';
 				break;
 		}
+		if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
+		{
+			$query['order'] = 'result_rank';
+			$query['sort']  = 'ASC';
+		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 		$total = $this->route_result->get_rows($query,$rows,$readonlys);
 		//echo $total; _debug_array($rows);
 
+		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
+		$skip = count($rows) >= 16 ? 0 : (count($rows) >= 8 ? 1 : 2);
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
 			
-			$rows['set'][$row['PerId']] = $row;
+			// results for setting on regular routes (no general result)
+			if($query['route'] >= 0) $rows['set'][$row['PerId']] = $row;
 
 			if (!$quota_line && $query['route_quota'] && $row['result_rank'] > $query['route_quota'])
 			{
@@ -309,6 +320,24 @@ class uiresult extends boresult
 					$unranked[2*!($k & 2)] = $rows[$k]['class'] == 'row_off' ? 'row_on' : 'row_off';	
 				}
 				$rows[$k]['class'] = $unranked[$k & 2];
+			}
+			// for the speed graphic, we have to make the athlets availible by the startnumber of each heat
+			if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
+			{
+				for($suffix=2; $suffix <= 6; ++$suffix)
+				{
+					if (isset($row['start_order'.$suffix]))
+					{
+						$row['result'] = $row['result'.$suffix];
+						$rows['heat'.($suffix+$skip)][$row['start_order'.$suffix]] = $row;
+						unset($rows[$k]['result']);	// only used for winner and 3. place
+						// make final or small final winners availible as winner1 and winner3
+						if ($suffix+$skip >= 5 && $row['result'.$suffix] && $row['result_rank'.$suffix] == 1)
+						{
+							$rows['winner'.$row['result_rank']] = $row;
+						}
+					}
+				}
 			}
 		}
 		// show previous heat only if it's counting
@@ -395,7 +424,7 @@ class uiresult extends boresult
 		$keys = array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
-			'route_order' => $content['nm']['route'],
+			'route_order' => $content['nm']['route'] < 0 ? -1 : $content['nm']['route'],
 		);
 		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
 			!($route = $this->route->read($keys))))	// route not found and no general result
@@ -447,20 +476,6 @@ class uiresult extends boresult
 				1 => lang('Resultlist'),
 			),
 		);
-		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
-		{
-			$label =  isset($sel_options['route'][-1]) ? $sel_options['route'][-1] : lang('General result');
-			unset($sel_options['route'][-1]);
-			$sel_options['route'] = array(-1 => $label)+$sel_options['route'];
-			$sel_options['show_result'][2] = lang('General result');
-		}
-		elseif ($content['nm']['route'] == -1)	// general result with only one heat --> show quali if exist
-		{
-			$keys['route_order'] = $content['nm']['route'] = '0';
-			if (!($route = $this->route->read($keys))) $keys['route_order'] = $content['nm']['route'] = '';
-		}
-		//_debug_array($sel_options);
-
 		if (is_array($route)) $content += $route;
 		$content['nm']['calendar'] = $calendar;
 		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
@@ -475,6 +490,26 @@ class uiresult extends boresult
 
 		$content['msg'] = $msg;
 		
+		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
+		{
+			if ($content['nm']['discipline'] == 'speed')	// for speed include pairing graph
+			{
+				$sel_options['show_result'][3] = lang('Pairing speed final');
+				$sel_options['route'] = array(-2 => lang('Pairing speed final'))+$sel_options['route'];
+			}
+			$label =  isset($sel_options['route'][-1]) ? $sel_options['route'][-1] : lang('General result');
+			unset($sel_options['route'][-1]);
+			$sel_options['route'] = array(-1 => $label)+$sel_options['route'];
+			$sel_options['show_result'][2] = lang('General result');
+			
+		}
+		elseif ($content['nm']['route'] == -1)	// general result with only one heat --> show quali if exist
+		{
+			$keys['route_order'] = $content['nm']['route'] = '0';
+			if (!($route = $this->route->read($keys))) $keys['route_order'] = $content['nm']['route'] = '';
+		}
+		//_debug_array($sel_options);
+
 		// no startlist, no rights at all or result offical -->disable all update possebilities
 		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) || 
 			!($this->is_admin || $this->is_judge($comp)) || $route['route_status'] == STATUS_RESULT_OFFICIAL))
@@ -484,25 +519,26 @@ class uiresult extends boresult
 		}
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
-		if (($content['nm']['route'] == -1) !== ($content['nm']['show_result'] == 2))
+		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
 		{
-			if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
-			{
-				$content['nm']['route'] = -1;
-			}
-			else
-			{
-				$content['nm']['show_result'] = $content['nm']['route'] == -1 ? 2 : 1;
-			}		
+			$content['nm']['route'] = -1;
 		}
-		if ($content['nm']['route'] == -1)	// general result --> hide show_route selection
+		elseif ($content['nm']['show_result'] == 3 && $content['nm']['old_show'] != 3)
+		{
+			$content['nm']['route'] = -2;
+		}
+		elseif ($content['nm']['show_result'] || $content['nm']['route'] < 0)
+		{
+			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -1 ? 2 : 3) : 1;
+		}
+		if ($content['nm']['route'] < 0)	// general result --> hide show_route selection
 		{
 			$sel_options['show_result'] = array(-1 => '');
 			$readonlys['nm[show_result]'] = true;
 		}
 		if ((string)$content['nm']['old_show'] !== (string)$content['nm']['show_result'])
 		{
-			if ($content['nm']['route'] == -1)	// general result
+			if ($content['nm']['route'] < 0)	// general result
 			{
 				$content['nm']['order'] = 'result_rank';
 			}
@@ -538,6 +574,10 @@ class uiresult extends boresult
 	 */
 	function _template_name($show_result,$discipline='lead')
 	{
+		if ($show_result == 3 && $discipline == 'speed')
+		{
+			return 'ranking.result.index.speed_graph';
+		}
 		if ($show_result == 2)
 		{
 			return 'ranking.result.index.rows_general';

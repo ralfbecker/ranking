@@ -72,6 +72,7 @@ each new upload will overwrite the previous one	ranking	de	jeder neue Upload übe
 edit %1	ranking	de	%1 bearbeiten
 edit athlete	ranking	de	Athlet bearbeiten
 edit competition	ranking	de	Wettkampf bearbeiten
+edit route	ranking	de	Route bearbeiten
 edit this athlete	ranking	de	Diesen Athleten bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
@@ -168,6 +169,7 @@ only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von d
 opens	ranking	de	öffnet
 other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
+pairing speed final	ranking	de	Paarungen Speed Finale
 perid	ranking	de	PerId
 permission denied !!!	ranking	de	Zugriff verweigert !!!
 personal profile	ranking	de	Persönliches Profil

@@ -15,3 +15,6 @@
 .quota_line > td { border-top: 3px solid black; }
 .displayNone { display: none; }
 .noWrap { white-space: nowrap; }
+.speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; }
+@media print {.speed_athlete { padding: 1mm; } }
+.half_down { position: relative; top: 2.3em; }

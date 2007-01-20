@@ -221,8 +221,12 @@ class boresult extends boranking
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
-			'route_order' => $keys['route_order'] > 2 ? $keys['route_order']-1 : 0,
+			'route_order' => $keys['route_order']-1,
 		);
+		if ($prev_keys['route_order'] == 1 && !$this->route->read($prev_keys))
+		{
+			$prev_keys['route_order'] = 0;
+		}
 		if (!($prev_route = $this->route->read($prev_keys)) || !$this->has_results($prev_keys) ||
 			$ko_system && !$prev_route['route_quota'])
 		{
@@ -237,7 +241,7 @@ class boresult extends boranking
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
 		}
-		if ($prev_route['route_quota'])
+		if ($prev_route['route_quota'] && $prev_route['route_type'] != TWO_QUALI_ALL)
 		{
 			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
 			{
@@ -264,7 +268,7 @@ class boresult extends boranking
 			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
 			{
 				$join = " JOIN {$this->route_result->table_name} r2 ON {$this->route_result->table_name}.WetId=r2.WetId".
-					" AND {$this->route_result->table_name}.GrpId=r2.GrpId AND r2.route_order=1".
+					" AND {$this->route_result->table_name}.GrpId=r2.GrpId AND r2.route_order=0".
 					" AND {$this->route_result->table_name}.PerId=r2.PerId";
 
 				$order_by = $this->route_result->table_name.'.result_rank * r2.result_rank DESC';
@@ -279,6 +283,10 @@ class boresult extends boranking
 					$this->route_result->table_name.'.PerId AS PerId',
 					$this->route_result->table_name.'.start_number AS start_number',
 				);
+				if ($prev_route['route_quota'])		// otherwise we can not limit the number of starters
+				{
+					$cols[] = $this->route_result->table_name.'.result_rank * r2.result_rank AS quali_points';
+				}
 			}
 			else
 			{
@@ -292,8 +300,16 @@ class boresult extends boranking
 			$order_by .= ',RAND()';				// --> randomized
 		}
 		$start_order = 1;
-		foreach($this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join) as $data)
+		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
+		foreach($starters as $n => $data)
 		{
+			// applying a quota for TWO_QUALI_ALL, taking ties into account!
+			if (isset($data['quali_points']) && count($starters)-$n > $prev_route['route_quota'] && 
+				$data['quali_points'] > $starters[count($starters)-$prev_route['route_quota']]['quali_points'])
+			{
+				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$prev_route['route_quota'])."]['quali_points']=".$starters[count($starters)-$prev_route['route_quota']]['quali_points']."</p>\n";
+				continue;
+			}
 			if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem
 			{
 				if (!isset($this->ko_start_order[$prev_route['route_quota']])) return false;
