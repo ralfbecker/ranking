@@ -10,8 +10,8 @@
 				<column/>
 				<column/>
 				<column/>
-				<column/>
-				<column/>
+				<column disabled="!@route_names[6]"/>
+				<column disabled="!@route_names[5]"/>
 				<column disabled="!@route_names[4]"/>
 				<column disabled="!@route_names[3]"/>
 				<column disabled="!@route_names[2]"/>

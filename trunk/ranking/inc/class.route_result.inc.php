@@ -102,7 +102,7 @@ class route_result extends so_sql
 		}
 		if ($route_order === 0) $route_order = '0';		// otherwise it get's ignored by so_sql;
 
-		if (!$only_keys && !$join || $route_order == -1) 
+		if (!$only_keys && !$join || $route_order < 0) 
 		{
 			$join = $this->athlete_join;
 			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
@@ -112,7 +112,7 @@ class route_result extends so_sql
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order,$route_type).') AS rank_prev_heat';
 			}
-			elseif ($route_order == -1)			// general result
+			elseif ($route_order < 0)			// general result
 			{
 				$route_order = $route_type == TWO_QUALI_HALF ? array(0,1) : 0;		// use users from the qualification(s)
 
@@ -126,6 +126,7 @@ class route_result extends so_sql
 						break;
 					case 'speed':
 						$result_cols[] = 'result_top_time';
+						$result_cols[] = 'start_order';
 						break;
 					case 'boulder':
 						$result_cols[] = 'ToDo';

@@ -105,7 +105,7 @@ class route extends so_sql
 		}
 		$ret = parent::read($keys,$extra_cols,$join);
 		
-		if (!$ret & $keys['route_order'] == -1)		// general result not found --> return a default one
+		if (!$ret && $keys['route_order'] == -1)		// general result not found --> return a default one
 		{
 			$keys['route_order'] = 0;
 			if (($ret = parent::read($keys,$extra_cols,$join)))

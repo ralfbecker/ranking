@@ -72,6 +72,7 @@ each new upload will overwrite the previous one	ranking	en	each new upload will 
 edit %1	ranking	en	edit %1
 edit athlete	ranking	en	Edit athlete
 edit competition	ranking	en	Edit competition
+edit route	ranking	en	Edit route
 edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
@@ -168,6 +169,7 @@ only fill values different from egw	admin	en	only fill values different from eGW
 opens	ranking	en	opens
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
+pairing speed final	ranking	en	Pairing speed final
 perid	ranking	en	PerId
 permission denied !!!	ranking	en	Permission denied !!!
 personal profile	ranking	en	Personal profile
