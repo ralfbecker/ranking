@@ -186,6 +186,10 @@ class uiresult extends boresult
 			'route_order' => $content['route_order'],
 			'discipline'  => $comp['discipline'] ? $comp['discipline'] : $cat['discipline'],
 		));
+		if ($content['discipline'] != 'boulder')
+		{
+			$tmpl->disable_cells('route_num_problems');
+		}
 		if ($previous)	// previous heat of a NEW route
 		{
 			if (!$previous['route_quota'] && ($content['discipline'] != 'speed' || $content['route_order'] <= 2))
@@ -251,14 +255,16 @@ class uiresult extends boresult
 	/**
 	 * query the start or result list
 	 *
-	 * @param array $query
+	 * @param array &$query_in
 	 * @param array &$rows returned rows/cups
 	 * @param array &$readonlys eg. to disable buttons based on acl
 	 */
-	function get_rows($query,&$rows,&$readonlys)
+	function get_rows(&$query_in,&$rows,&$readonlys)
 	{
-		//echo "<p>uiresult::get_rows(".print_r($query,true).",,)</p>\n";
-		unset($query['rows']);
+		//echo "<p>uiresult::get_rows(".print_r($query_in,true).",,)</p>\n";
+		unset($query_in['return']);	// no need to save
+		$query = $query_in;
+		unset($query['rows']);		// no need to save, can not unset($query_in['rows']), as this is $rows !!!
 		$GLOBALS['egw']->session->appsession('result','ranking',$query);
 		
 		$query['col_filter']['WetId'] = $query['comp'];
@@ -284,6 +290,9 @@ class uiresult extends boresult
 			case 'result_height':
 				$query['order'] = 'CASE WHEN result_height IS NULL THEN -start_order ELSE 0 END '.$query['sort'].
 					',result_height '.$query['sort'].',result_plus '.$query['sort'].',nachname '.$query['sort'].',vorname';
+				break;
+			case 'result_top,result_zone':
+				$query['order'] = 'result_top IS NULL,result_top '.$query['sort'].',result_zone IS NULL,result_zone';
 				break;
 		}
 		if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
@@ -340,6 +349,9 @@ class uiresult extends boresult
 				}
 			}
 		}
+		// report the set-values at time of display back to index() for calling boresult::save_result
+		$query_in['return'] = $rows['set'];
+		
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF);
 		
@@ -348,6 +360,8 @@ class uiresult extends boresult
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
 		$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
 			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 'ONE_QUALI');
+		$rows['num_problems'] = $query['num_problems'];
+		$rows['no_delete'] = $readonlys === true;
 
 		return $total;
 	}
@@ -433,24 +447,39 @@ class uiresult extends boresult
 			$route = $this->route->read($keys);
 		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
-		
+
 		// check if user pressed a button and react on it
 		list($button) = @each($content['button']);
 		unset($content['button']);
-		
+		if (!$button && $content['nm']['rows']['delete'])
+		{
+			list($PerId) = @each($content['nm']['rows']['delete']);
+			$button = 'delete';
+		}
 		if ($button && $comp && $cat && is_numeric($content['nm']['route']))
 		{
 			//echo "<p align=right>$comp[rkey] ($comp[WetId]), $cat[rkey]/$cat[GrpId], {$content['nm']['route']}, button=$button</p>\n";
 			switch($button)
 			{
 				case 'apply':
-					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline']))
+					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$content['nm']['return']))
 					{
 						$msg = lang('Route updated');
 					}
 					else
 					{
 						$msg = lang('Nothing to update');
+					}
+					break;
+				case 'delete':
+					if (!is_numeric($PerId) || !($this->is_admin || $this->is_judge($comp)) ||
+						!$this->delete_participant($keys+array('PerId'=>$PerId)))
+					{
+						$msg = lang('Permission denied !!!');
+					}
+					else
+					{
+						$msg = lang('Participant deleted');
 					}
 					break;
 			}
@@ -476,6 +505,10 @@ class uiresult extends boresult
 				1 => lang('Resultlist'),
 			),
 		);
+		for($i=1; $i <= $route['route_num_problems']; ++$i)
+		{
+			$sel_options['zone'.$i] = array(lang('No'));
+		}
 		if (is_array($route)) $content += $route;
 		$content['nm']['calendar'] = $calendar;
 		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
@@ -483,6 +516,7 @@ class uiresult extends boresult
 		$content['nm']['route_type'] = $route['route_type'];
 		$content['nm']['route_status'] = $route['route_status'];
 		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		$content['nm']['num_problems'] = $route['route_num_problems'];
 		
 		// make competition and category data availible for print
 		$content['comp'] = $comp;
@@ -562,6 +596,7 @@ class uiresult extends boresult
 			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
+
 		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 	

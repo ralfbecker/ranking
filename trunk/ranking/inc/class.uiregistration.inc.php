@@ -289,7 +289,7 @@ class uiregistration extends boranking
 				}
 				else
 				{
-					$msg = lang('Error: generating startlist');
+					$msg = lang('Error: generating startlist!!!');
 				}
 			}
 			elseif ($content['download'])
