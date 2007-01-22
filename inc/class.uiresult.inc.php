@@ -305,7 +305,7 @@ class uiresult extends boresult
 		//echo $total; _debug_array($rows);
 
 		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
-		$skip = count($rows) >= 16 ? 0 : (count($rows) >= 8 ? 1 : 2);
+		$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
