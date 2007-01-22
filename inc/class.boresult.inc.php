@@ -355,18 +355,24 @@ class boresult extends boranking
 	 * @param array $results PerId => data pairs
 	 * @param int $route_type=null ONE_QUALI, TWO_QUALI_ALL, TWO_QUALI_HALF
 	 * @param string $discipline='lead' 'lead', 'speed', 'boulder'
+	 * @param array $old_values values at the time of display, to check if somethings changed
+	 * 		default is null, which causes save_result to read the results now. 
+	 * 		If multiple people are updating, you should provide the result of the time of display, 
+	 * 		to not accidently overwrite results entered by someone else!
 	 * @return boolean/int number of changed results or false on error
 	 */
-	function save_result($keys,$results,$route_type=null,$discipline='lead')
+	function save_result($keys,$results,$route_type=null,$discipline='lead',$old_values=null)
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
 		
 		if (!$this->is_admin && !$this->is_judge($keys['WetId'])) return false; // permission denied
 		
 		//echo "<p>boresult::save_result(".print_r($keys,true).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
-		$keys['PerId'] = array_keys($results);
-		$old_values = $this->route_result->search($keys,'*');
-
+		if (is_null($old_values))
+		{
+			$keys['PerId'] = array_keys($results);
+			$old_values = $this->route_result->search($keys,'*');
+		}
 		$modified = 0;
 		foreach($results as $PerId => $data)
 		{
@@ -375,13 +381,23 @@ class boresult extends boranking
 			foreach($old_values as $old) if ($old['PerId'] == $PerId) break;
 			if ($old['PerId'] != $PerId) unset($old);
 
+			// to also check the result_details
+			if ($data['result_details']) $data += $data['result_details'];
+			if ($old && $old['result_details']) $old += $old['result_details'];
+
 			foreach($data as $key => $val)
 			{
 				// something changed?
-				if ((!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) && 
+				if ($key != 'result_details' && (!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) && 
 					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
-					//echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
+					if ($key == 'start_number' && strchr($val,'+') !== false)
+					{
+						$this->set_start_number($keys,$val);
+						++$modified;
+						continue;
+					}
+					echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
 					$data['result_modified'] = time();
 					$data['result_modifier'] = $this->user;
 
@@ -407,7 +423,37 @@ class boresult extends boranking
 		}
 		return $modified ? $modified : $n;
 	}
-	
+
+	/**
+	 * Set start-number of a given and the following participants
+	 *
+	 * @param array $keys 'WetId','GrpId', 'route_order', 'PerId'
+	 * @param string $number [start]+increment
+	 */
+	function set_start_number($keys,$number)
+	{
+		$PerId = $keys['PerId'];
+		unset($keys['PerId']);
+		list($start,$increment) = explode('+',$number);
+		foreach($this->route_result->search($keys,false,'start_order') as $data)
+		{
+			if (!$PerId || $data['PerId'] == $PerId)
+			{
+				if ($data['PerId'] == $PerId && $start)
+				{
+					$data['start_number'] = $start;
+				}
+				else
+				{
+					$data['start_number'] = is_numeric($increment) ? $last + $increment : $last;
+				}
+				$this->route_result->save($data);
+				unset($PerId);
+			}
+			$last = $data['start_number'];
+		}
+	}
+
 	/**
 	 * Check if a route has a result or a startlist ($startlist_only == true)
 	 *
@@ -419,7 +465,7 @@ class boresult extends boranking
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return null;
 		
-		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));
+		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0,'PerId'=>0));
 
 		if (!$startlist_only) $keys[] = 'result_rank IS NOT NULL';
 		
@@ -436,5 +482,22 @@ class boresult extends boranking
 	function has_startlist($keys)
 	{
 		return $keys['route_order'] == -1 ? false : $this->has_results($keys,true);
+	}
+	
+	/**
+	 * Delete a participant from a route and renumber the starting-order of the following participants
+	 *
+	 * @param array $keys required 'WetId', 'PerId', possible 'GrpId', 'route_number'
+	 * @return boolean true if participant was successful deleted, false otherwise
+	 */
+	function delete_participant($keys)
+	{
+		if (!$keys['WetId'] || !$keys['PerId'] ||
+			!($this->is_admin || $this->is_judge($keys['WetId'])) ||
+			$this->has_results($keys))
+		{ 
+			return false; // permission denied
+		}
+		return $this->route_result->delete_participant($keys);
 	}
 }

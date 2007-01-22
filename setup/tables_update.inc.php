@@ -538,4 +538,45 @@
 
 		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.008';
 	}
+
+
+	$test[] = '1.3.008';
+	function ranking_upgrade1_3_008()
+	{
+		$GLOBALS['egw_setup']->oProc->AlterColumn('RouteResults','result_zone',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.009';
+	}
+
+
+	$test[] = '1.3.009';
+	function ranking_upgrade1_3_009()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_num_problems',array(
+			'type' => 'int',
+			'precision' => '2'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.010';
+	}
+
+
+	$test[] = '1.3.010';
+	function ranking_upgrade1_3_010()
+	{
+		$GLOBALS['egw_setup']->oProc->RenameColumn('RouteResults','result_top_time','result_time');
+		$GLOBALS['egw_setup']->oProc->AlterColumn('RouteResults','result_zone',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+		$GLOBALS['egw_setup']->oProc->AddColumn('RouteResults','result_detail',array(
+			'type' => 'varchar',
+			'precision' => '255'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.011';
+	}
 ?>

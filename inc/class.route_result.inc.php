@@ -30,8 +30,9 @@ class route_result extends so_sql
 	var $athlete_join = 'JOIN Personen ON RouteResults.PerId=Personen.PerId';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
-	var $rank_speed_quali = 'CASE WHEN result_top_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_top_time > r.result_top_time) END';
-	var $rank_speed_final = 'CASE WHEN result_top_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_top_time > r.result_top_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
+	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
+	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
+	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time > r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
 	
 	/**
 	 * constructor of the competition class
@@ -125,11 +126,12 @@ class route_result extends so_sql
 						$result_cols[] = 'result_plus';
 						break;
 					case 'speed':
-						$result_cols[] = 'result_top_time';
+						$result_cols[] = 'result_time';
 						$result_cols[] = 'start_order';
 						break;
 					case 'boulder':
-						$result_cols[] = 'ToDo';
+						$result_cols[] = 'result_top';
+						$result_cols[] = 'result_zone';
 						break;
 				}
 				$order_by_parts = split('[ ,]',$order_by);
@@ -297,42 +299,71 @@ class route_result extends so_sql
 		{
 			$data =& $this->data;
 		}
-		$suffix = '';	// general result can have route_order as suffix
-		while (isset($data['result_height'.$suffix]) || $suffix < 2)
+		if ($data['result_height'] || $data['result_height1'])	// lead result
 		{
-			if ($data['result_height'.$suffix] == TOP_HEIGHT)
+			$suffix = '';	// general result can have route_order as suffix
+			while (isset($data['result_height'.$suffix]) || $suffix < 2)
 			{
-				$data['result_height'.$suffix] = '';
-				$data['result_plus'.$suffix]   = TOP_PLUS;
-				$data['result'.$suffix]   = lang('Top').'&nbsp;&nbsp;';
+				if ($data['result_height'.$suffix] == TOP_HEIGHT)
+				{
+					$data['result_height'.$suffix] = '';
+					$data['result_plus'.$suffix]   = TOP_PLUS;
+					$data['result'.$suffix]   = lang('Top').'&nbsp;&nbsp;';
+				}
+				elseif ($data['result_height'.$suffix])
+				{
+					$data['result_height'.$suffix] *= 0.001;
+					$data['result'.$suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
+						$plus2string[$data['result_plus'.$suffix]];
+				}
+				++$suffix;
 			}
-			elseif ($data['result_height'.$suffix])
+			if (array_key_exists('result_height1',$data) && array_key_exists('result_height',$data))
 			{
-				$data['result_height'.$suffix] *= 0.001;
-				$data['result'.$suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
-					$plus2string[$data['result_plus'.$suffix]];
+				// quali on two routes for all --> add rank to result
+				foreach(array('',1) as $suffix)
+				{
+					$data['result'.$suffix] .= ($data['result_plus'.$suffix] == TOP_PLUS ? ' &nbsp;' : '').
+						' &nbsp; '.$data['result_rank'.$suffix].'.';
+				}
 			}
-			++$suffix;
 		}
-		$suffix = '';	// general result can have route_order as suffix
-		while (isset($data['result_top_time'.$suffix]) || $suffix < 2 || isset($data['result_top_time'.(1+$suffix)]))
+		if ($data['result_detail'])	// boulder result
 		{
-			if ($data['result_top_time'.$suffix])
+			$data += unserialize($data['result_detail']);
+			unset($data['result_detail']);
+			for($i=1; $i <= 6; ++$i)
 			{
-				$data['result_top_time'.$suffix] *= 0.001;
-				$data['result'.$suffix] = sprintf('%4.2lf',$data['result_top_time'.$suffix]);
+				$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
+					($data['zone'.$i] ? 'z'.$data['zone'.$i] : '');
 			}
-			++$suffix;
+			$suffix = '';	// general result can have route_order as suffix
+			while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
+			{
+				if (isset($data['result_zone'.$suffix]))
+				{
+					$tops = round($data['result_top'.$suffix] / 100);
+					$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
+					$zones = round($data['result_zone'.$suffix] / 100);
+					$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
+					$data['result'.$suffix] = $tops.'t'.$top_tries.' '.$zones.'z'.$zone_tries; 
+				}
+				++$suffix;
+			}
 		}
-		if (array_key_exists('result_height1',$data) && array_key_exists('result_height',$data))
+		if ($data['result_time'])	// speed result
 		{
-			// quali on two routes for all --> add rank to result
-			foreach(array('',1) as $suffix)
+			$suffix = '';	// general result can have route_order as suffix
+			while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]))
 			{
-				$data['result'.$suffix] .= ($data['result_plus'.$suffix] == TOP_PLUS ? ' &nbsp;' : '').
-					' &nbsp; '.$data['result_rank'.$suffix].'.';
+				if ($data['result_time'.$suffix])
+				{
+					$data['result_time'.$suffix] *= 0.001;
+					$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
+				}
+				++$suffix;
 			}
-		}		
+		}
 		$this->_shorten_name($data['nachname']);
 		$this->_shorten_name($data['vorname']);
 			
@@ -391,11 +422,57 @@ class route_result extends so_sql
 		{
 			unset($data['result_plus']);	// no plus without height
 		}
-		if ($data['result_top_time']) $data['result_top_time'] = round(1000 * $data['result_top_time']);
+		if ($data['result_time']) $data['result_time'] = round(1000 * $data['result_time']);
 
+		// saving the boulder results, if there are any
+		if (isset($data['top1']))
+		{
+			$data['result_top'] = $data['result_zone'] = $data['result_detail'] = null;
+			for($i = 1; $i <= 6; ++$i)
+			{
+				if ($data['top'.$i])
+				{
+					$data['result_top'] += 100 - $data['top'.$i];
+					$data['result_detail']['top'.$i] = $data['top'.$i];
+					// cant have top without zone or more tries for the zone --> setting zone as top
+					if (!$data['zone'.$i] || $data['zone'.$i] > $data['top'.$i]) $data['zone'.$i] = $data['top'.$i];
+				}
+				if (is_numeric($data['zone'.$i]))
+				{
+					if ($data['zone'.$i])
+					{
+						$data['result_zone'] += 100 - $data['zone'.$i];
+					}
+					elseif (is_null($zone))
+					{
+						$data['result_zone'] = 0;		// this is to recognice climbers with no zone at all
+					}
+					$data['result_detail']['zone'.$i] = $data['zone'.$i];
+				}
+			}
+			if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
+		}
 		return $data;
 	}
 	
+	/**
+	 * merges in new values from the given new data-array
+	 * 
+	 * Reimplemented to also merge top1-6 and zone1-6
+	 *
+	 * @param $new array in form col => new_value with values to set
+	 */
+	function data_merge($new)
+	{
+		parent::data_merge($new);
+		
+		for($i = 1; $i <= 6; ++$i)
+		{
+			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
+			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
+		}
+	}
+
 	/**
 	 * Update the ranking of a given route
 	 *
@@ -421,7 +498,7 @@ class route_result extends so_sql
 				$order_by = 'result_height IS NULL,new_rank ASC';
 				break;
 			case 'speed':
-				$order_by = 'result_top_time IS NULL,new_rank ASC';	
+				$order_by = 'result_time IS NULL,new_rank ASC';	
 				if ($keys['route_order'] < 2)
 				{
 					$mode = $this->rank_speed_quali;
@@ -429,13 +506,13 @@ class route_result extends so_sql
 				else
 				{
 					$mode = $this->rank_speed_final;
-					$order_by .= ',result_top_time ASC';
-					$extra_cols[] = 'result_top_time';
+					$order_by .= ',result_time ASC';
+					$extra_cols[] = 'result_time';
 				}
 				break;
 			case 'boulder':
 				$mode = $this->rank_boulder;
-				$order_by = 'ToDo';
+				$order_by = 'result_top IS NULL,result_top DESC,result_zone IS NULL,result_zone DESC';
 		}
 		$extra_cols[] = $mode.' AS new_rank';
 
@@ -454,10 +531,10 @@ class route_result extends so_sql
 			if ($discipline == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
 			{
 				$new_speed_rank = $data['new_rank'];
-				$data['new_rank'] = !$old_time || $old_time < $data['result_top_time'] ||
+				$data['new_rank'] = !$old_time || $old_time < $data['result_time'] ||
 					 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
-				//echo "<p>$i. $data[PerId]: time=$data[result_top_time], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
-				$old_time = $data['result_top_time'];
+				//echo "<p>$i. $data[PerId]: time=$data[result_time], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
+				$old_time = $data['result_time'];
 				$old_speed_rank = $new_speed_rank;
 			}
 			//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
@@ -476,5 +553,30 @@ class route_result extends so_sql
 			$old_rank = $data['new_rank'];
 		}
 		return $modified;
+	}
+
+	/**
+	 * Delete a participant from a route and renumber the starting-order of the following participants
+	 *
+	 * @param array $keys required 'WetId', 'PerId', possible 'GrpId', 'route_number'
+	 * @return boolean true if participant was successful deleted, false otherwise
+	 */
+	function delete_participant($keys)
+	{
+		$to_delete = $this->search($keys,true,'','start_order');
+
+		if (!$this->delete($keys)) return false;
+		
+		foreach($to_delete as $data)
+		{
+			$this->db->query("UPDATE $this->table_name SET start_order=start_order-1 WHERE ".
+				$this->db->expression($this->table_name,array(
+					'WetId' => $data['WetId'],
+					'GrpId' => $data['GrpId'],
+					'route_order' => $data['route_order'],
+					'start_order > '.(int)$data['start_order'],			
+				)),__LINE__,__FILE__);
+		}
+		return true;
 	}
 }

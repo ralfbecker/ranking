@@ -10,6 +10,7 @@ aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
 add a new athlete	ranking	de	einen neuen Athleten anlegen
 add a new competition	ranking	de	einen neuen Wettkampf anlegen
+add a new cup	ranking	de	Neue Serie anlegen
 add a new route	ranking	de	Neue Route anlegen
 add route	ranking	de	Route anlegen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
@@ -163,6 +164,7 @@ not used at the moment	ranking	de	im Moment nicht benutzt
 nothing to update	ranking	de	Nichts zu aktualisieren
 notice	ranking	de	Notiz
 number of competitions counting for the cup (empty for all)	ranking	de	Anzahl Wettkämpfe die für den Cup zählen (leer für alle)
+number of problems	ranking	de	Anzahl Probleme
 on how many routes is the first round	ranking	de	Auf wievielen Routen findet die erste Runde statt
 one qualification	ranking	de	eine Qualifikation
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
@@ -170,6 +172,7 @@ opens	ranking	de	öffnet
 other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
 pairing speed final	ranking	de	Paarungen Speed Finale
+participant deleted	ranking	de	Teilnehmer gelöscht
 perid	ranking	de	PerId
 permission denied !!!	ranking	de	Zugriff verweigert !!!
 personal profile	ranking	de	Persönliches Profil
@@ -252,6 +255,7 @@ startlists	ranking	de	Startlisten
 startnumber	ranking	de	Startnummer
 street	ranking	de	Straße
 street, postcode	ranking	de	Straße, Postleitzahl
+sum	ranking	de	Summe
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
 this module displays calendar, results and rankings	ranking	de	Dieses Module zeigt Kalender, Ergebnisse und Ranglisten an
@@ -261,6 +265,7 @@ til place	ranking	de	bis Platz
 time	ranking	de	Zeit
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
+top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
 two qualification for all	ranking	de	zwei Qualifikationen für alle
 two qualification, half quota	ranking	de	zwei Qualifikationen, halbe Quote
@@ -297,3 +302,5 @@ which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem 
 which view do you want to see, when you start the ranking app?	ranking	de	Welche Ansicht soll angezeigt werden, wenn sie die Ranglistenanwendung starten?
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
+zone	ranking	de	Zone
+zone: number of tries or no	ranking	de	Zone: Anzahl Versuche oder Nein

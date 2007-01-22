@@ -204,7 +204,8 @@
 				'route_start' => array('type' => 'varchar','precision' => '64'),
 				'route_result' => array('type' => 'varchar','precision' => '80'),
 				'route_comments' => array('type' => 'text'),
-				'route_quota' => array('type' => 'int','precision' => '2')
+				'route_quota' => array('type' => 'int','precision' => '2'),
+				'route_num_problems' => array('type' => 'int','precision' => '2')
 			),
 			'pk' => array('WetId','GrpId','route_order'),
 			'fk' => array(),
@@ -219,14 +220,15 @@
 				'PerId' => array('type' => 'int','precision' => '4'),
 				'result_height' => array('type' => 'int','precision' => '4'),
 				'result_plus' => array('type' => 'int','precision' => '2'),
-				'result_top_time' => array('type' => 'int','precision' => '4'),
-				'result_zone' => array('type' => 'int','precision' => '2'),
-				'result_detail' => array('type' => 'varchar','precision' => '255'),
+				'result_time' => array('type' => 'int','precision' => '4'),
+				'result_top' => array('type' => 'int','precision' => '4'),
+				'result_zone' => array('type' => 'int','precision' => '4'),
 				'result_modified' => array('type' => 'int','precision' => '8'),
 				'result_modifier' => array('type' => 'int','precision' => '4'),
 				'start_order' => array('type' => 'int','precision' => '2'),
 				'start_number' => array('type' => 'int','precision' => '2'),
-				'result_rank' => array('type' => 'int','precision' => '2')
+				'result_rank' => array('type' => 'int','precision' => '2'),
+				'result_detail' => array('type' => 'varchar','precision' => '255')
 			),
 			'pk' => array('WetId','GrpId','route_order','PerId'),
 			'fk' => array(),
