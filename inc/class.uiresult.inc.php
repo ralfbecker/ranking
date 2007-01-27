@@ -285,7 +285,7 @@ class uiresult extends boresult
 				{
 					$query['order'] = 'CASE WHEN result_rank IS NULL THEN start_order ELSE 0 END '.$query['sort'];
 				}
-				$query['order'] .= ',result_rank '.$query['sort'].',nachname '.$query['sort'].',vorname';
+				$query['order'] .= ',result_rank '.$query['sort'].',nachname IS NULL,nachname '.$query['sort'].',vorname';
 				break;
 			case 'result_height':
 				$query['order'] = 'CASE WHEN result_height IS NULL THEN -start_order ELSE 0 END '.$query['sort'].
@@ -305,7 +305,11 @@ class uiresult extends boresult
 		//echo $total; _debug_array($rows);
 
 		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
-		$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
+		if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
+		{
+			$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
+			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
+		}
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
@@ -504,7 +508,9 @@ class uiresult extends boresult
 				0 => lang('Startlist'),
 				1 => lang('Resultlist'),
 			),
+			'eliminated' => $this->eliminated_labels,
 		);
+		if ($content['nm']['route'] < 2) unset($sel_options['eliminated'][0]);
 		for($i=1; $i <= $route['route_num_problems']; ++$i)
 		{
 			$sel_options['zone'.$i] = array(lang('No'));

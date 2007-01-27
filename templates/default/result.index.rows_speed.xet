@@ -35,6 +35,9 @@
 					<hbox align="center" options="0,0">
 						<description class="$cont[ro_result]" no_lang="1" id="{$row}[result]" readonly="true"/>
 						<textbox type="float" id="set[$row_cont[PerId]][result_time]" size="5" precision="%4.2lf" class="$cont[rw_result]"/>
+						<menulist class="$cont[rw_result] leftPad5">
+							<menupopup id="set[$row_cont[PerId]][eliminated]"/>
+						</menulist>
 					</hbox>
 				</row>
 			</rows>

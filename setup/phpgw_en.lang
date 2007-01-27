@@ -5,7 +5,9 @@
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 %1. heat	ranking	en	%1. Heat
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
+1. place	ranking	en	1. place
 2. qualification	ranking	en	2. Qualification
+3. place	ranking	en	3. place
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
 add a new athlete	ranking	en	add a new athlete
@@ -78,6 +80,7 @@ edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
 edit this route	ranking	en	Edit this route
+eliminated	ranking	en	eliminated
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
@@ -300,6 +303,7 @@ which cathegories are competing	ranking	en	which cathegories are competing
 which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	en	which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used
 which rankingsystem was used before, if any	ranking	en	which rankingsystem was used before, if any
 which view do you want to see, when you start the ranking app?	ranking	en	Which view do you want to see, when you start the ranking app?
+wildcard	ranking	en	Wildcard
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
 zone	ranking	en	Zone

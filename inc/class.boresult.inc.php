@@ -54,6 +54,11 @@ class boresult extends boranking
 		TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
 		TWO_QUALI_ALL  => 'two Qualification for all',		// multiply the rank
 	);
+	var $eliminated_labels = array(
+		''=> '',
+		1 => 'eliminated',
+		0 => 'wildcard',
+	);
 	/**
 	 * values and labels for route_plus
 	 *
@@ -233,7 +238,7 @@ class boresult extends boranking
 			if (!$ko_system || !--$prev_keys['route_order'] || !($prev_route = $this->route->read($prev_keys)) ||
 				!$this->has_results($prev_keys))
 			{
-				echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
+				//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
 				return false;	// prev. route not found or no result
 			}
 		}
@@ -252,7 +257,7 @@ class boresult extends boranking
 				$prev_keys[] = 'result_rank > '.(int)$prev_route['route_quota'];
 			}
 		}
-		$cols = 'PerId,start_number';
+		$cols = 'PerId,start_number,result_rank';
 		if ($prev_route['route_quota'] == 1 || !$reverse && !$ko_system || 	// superfinal or 2. Quali
 			$ko_system && $keys['route_order'] > 2)
 		{
@@ -299,8 +304,14 @@ class boresult extends boranking
 			}
 			$order_by .= ',RAND()';				// --> randomized
 		}
-		$start_order = 1;
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
+		
+		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
+		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $prev_route['route_quota'])
+		{
+			$max_rank = $starters[count($starters)-1]['result_rank']-1;
+		}
+		$start_order = 1;
 		foreach($starters as $n => $data)
 		{
 			// applying a quota for TWO_QUALI_ALL, taking ties into account!
@@ -313,6 +324,14 @@ class boresult extends boranking
 			if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem
 			{
 				if (!isset($this->ko_start_order[$prev_route['route_quota']])) return false;
+				if ($max_rank)
+				{
+					if ($data['result_rank'] > $max_rank) break;
+					if ($start_order <= $prev_route['route_quota']-$max_rank)
+					{
+						$data['result_time'] = WILDCARD_TIME;
+					}
+				}
 				$data['start_order'] = $this->ko_start_order[$prev_route['route_quota']][$start_order++];
 			}
 			else
@@ -320,7 +339,20 @@ class boresult extends boranking
 				$data['start_order'] = $start_order++;
 			}
 			$this->route_result->init($keys);
+			unset($data['result_rank']);
 			$this->route_result->save($data);
+		}
+		if ($max_rank)	// fill up with wildcards
+		{
+			while($start_order <= $prev_route['route_quota'])
+			{
+				$this->route_result->init($keys);
+				$this->route_result->save(array(
+					'PerId' => -$start_order,	// has to be set and unique (per route) for each wildcard
+					'start_order' => $this->ko_start_order[$prev_route['route_quota']][$start_order++],
+					'result_time' => ELIMINATED_TIME,
+				));
+			}
 		}
 		return true;
 	}
@@ -399,7 +431,7 @@ class boresult extends boranking
 						++$modified;
 						continue;
 					}
-					echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
+					//echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
 					$data['result_modified'] = time();
 					$data['result_modifier'] = $this->user;
 

@@ -76,21 +76,21 @@
 					<template id="ranking.result.index.speed_graph.cell" class="half_down" content="heat3[4]"/>
 					<description/>
 					<description/>
-					<description/>
+					<description class="leftPad5"/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell" content="heat2[8]"/>
 					<description/>
 					<description/>
 					<description/>
-					<template content="winner1" class="half_down" id="ranking.result.index.speed_graph.cell"/>
+					<template content="winner1" class="half_down winner" id="ranking.result.index.speed_graph.cell"/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell" content="heat2[9]"/>
 					<template id="ranking.result.index.speed_graph.cell" class="half_down" content="heat3[5]"/>
 					<description/>
 					<description/>
-					<description/>
+					<description value="1. place" align="center"/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell" content="heat2[10]"/>
@@ -125,21 +125,21 @@
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" class="half_down" content="heat4[4]"/>
 					<description value="Small final" class="leftPad5"/>
-					<description/>
+					<description class="leftPad5"/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell" content="heat2[15]"/>
 					<template id="ranking.result.index.speed_graph.cell" class="half_down" content="heat3[8]"/>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat5[1]"/>
-					<template id="ranking.result.index.speed_graph.cell" class="half_down" content="winner3"/>
+					<template id="ranking.result.index.speed_graph.cell" class="half_down winner" content="winner3"/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell" content="heat2[16]"/>
 					<description/>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat5[2]"/>
-					<description/>
+					<description value="3. place" align="center"/>
 				</row>
 			</rows>
 		</grid>

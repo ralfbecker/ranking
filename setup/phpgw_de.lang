@@ -5,7 +5,9 @@
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
 %1. heat	ranking	de	%1. Runde
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
+1. place	ranking	de	1. Platz
 2. qualification	ranking	de	2. Qualifikation
+3. place	ranking	de	3. Platz
 aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
 add a new athlete	ranking	de	einen neuen Athleten anlegen
@@ -78,6 +80,7 @@ edit this athlete	ranking	de	Diesen Athleten bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
 edit this route	ranking	de	Diese Route bearbeiten
+eliminated	ranking	de	eliminiert
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
@@ -300,6 +303,7 @@ which cathegories are competing	ranking	de	Welche Kategorien nehmen teil
 which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	de	welche Punkteverteilung soll benützt werden um den Feldfaktor zu berechnen, normalerweise CUWR oder keiner, wenn kein Feldfaktor benutzt wird
 which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem wurde zuvor benützt, wenn überhaupt
 which view do you want to see, when you start the ranking app?	ranking	de	Welche Ansicht soll angezeigt werden, wenn sie die Ranglistenanwendung starten?
+wildcard	ranking	de	Wildcard
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
 zone	ranking	de	Zone

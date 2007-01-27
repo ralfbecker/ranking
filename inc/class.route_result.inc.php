@@ -17,6 +17,8 @@ require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.route.inc.php');
 
 define('TOP_PLUS',9999);
 define('TOP_HEIGHT',99999999);
+define('ELIMINATED_TIME',999999);
+define('WILDCARD_TIME',1);
 
 /**
  * route object
@@ -27,13 +29,13 @@ class route_result extends so_sql
 	);
 	var $charset,$source_charset;
 	
-	var $athlete_join = 'JOIN Personen ON RouteResults.PerId=Personen.PerId';
+	var $athlete_join = 'LEFT JOIN Personen ON RouteResults.PerId=Personen.PerId';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
 	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time > r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
-	
+
 	/**
 	 * constructor of the competition class
 	 */
@@ -359,10 +361,30 @@ class route_result extends so_sql
 				if ($data['result_time'.$suffix])
 				{
 					$data['result_time'.$suffix] *= 0.001;
-					$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
+					if ($data['result_time'.$suffix] == ELIMINATED_TIME)
+					{
+						$data['eliminated'] = 1;
+						$data['result_time'] = null;
+						$data['result'.$suffix] = lang('eliminated');
+					}
+					elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
+					{
+						$data['eliminated'] = 0;
+						$data['result_time'] = null;
+						$data['result'.$suffix] = lang('Wildcard');	
+					}
+					else
+					{
+						$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
+					}
 				}
 				++$suffix;
 			}
+		}
+		if (!$data['PerId'])	// Wildcard
+		{
+			$data['PerId'] = -$data['start_order'];
+			$data['nachname'] = '-- '.lang('Wildcard').' --';
 		}
 		$this->_shorten_name($data['nachname']);
 		$this->_shorten_name($data['vorname']);
@@ -422,6 +444,14 @@ class route_result extends so_sql
 		{
 			unset($data['result_plus']);	// no plus without height
 		}
+		if (isset($data['eliminated']))
+		{
+			switch($data['eliminated'])
+			{
+				case '1': $data['result_time'] = ELIMINATED_TIME; break;
+				case '0': $data['result_time'] = WILDCARD_TIME; break;
+			}
+		}
 		if ($data['result_time']) $data['result_time'] = round(1000 * $data['result_time']);
 
 		// saving the boulder results, if there are any
@@ -471,6 +501,7 @@ class route_result extends so_sql
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
 		}
+		if (isset($new['eliminated'])) $this->data['eliminated'] = $new['eliminated'];
 	}
 
 	/**
@@ -530,6 +561,7 @@ class route_result extends so_sql
 			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
 			if ($discipline == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
 			{
+				if ($data['eliminated']) $data['result_time'] = ELIMINATED_TIME;
 				$new_speed_rank = $data['new_rank'];
 				$data['new_rank'] = !$old_time || $old_time < $data['result_time'] ||
 					 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
