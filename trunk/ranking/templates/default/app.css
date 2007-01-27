@@ -18,3 +18,4 @@
 .speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; }
 @media print {.speed_athlete { padding: 1mm; } }
 .half_down { position: relative; top: 2.3em; }
+.winner { font-weight: bold; }
