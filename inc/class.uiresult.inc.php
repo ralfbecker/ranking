@@ -82,7 +82,7 @@ class uiresult extends boresult
 			$GLOBALS['egw']->common->egw_exit();
 		}
 		// check if user has NO edit rights
-		if (($view = !$this->is_admin && !$this->is_judge($comp)))
+		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)))
 		{
 			foreach($content as $name => $value)
 			{
@@ -235,7 +235,7 @@ class uiresult extends boresult
 		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = $content['route_order'] == -1 || $content['new_route'];
 		
 		// no judge rights --> make everything readonly and disable all buttons but cancel
-		if (!$this->is_admin && !$this->is_judge($comp))
+		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
 			foreach($this->route->db_cols as $col)
 			{
@@ -472,7 +472,7 @@ class uiresult extends boresult
 					}
 					break;
 				case 'delete':
-					if (!is_numeric($PerId) || !($this->is_admin || $this->is_judge($comp)) ||
+					if (!is_numeric($PerId) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 						!$this->delete_participant($keys+array('PerId'=>$PerId)))
 					{
 						$msg = lang('Permission denied !!!');
@@ -546,7 +546,7 @@ class uiresult extends boresult
 
 		// no startlist, no rights at all or result offical -->disable all update possebilities
 		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) || 
-			!($this->is_admin || $this->is_judge($comp)) || $route['route_status'] == STATUS_RESULT_OFFICIAL))
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || $route['route_status'] == STATUS_RESULT_OFFICIAL))
 		{
 			$readonlys['nm'] = true;
 			$sel_options['result_plus'] = $this->plus;

@@ -134,7 +134,7 @@ class boresult extends boranking
 			'route_order' => $route_order,
 		);
 		if (!$comp || !$cat || !is_numeric($route_order) ||
-			!($this->is_admin || $this->is_judge($comp)) ||	// permission denied		
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||	// permission denied		
 			!$this->route->read($keys) ||	// route does not exist
 			$this->has_results($keys))		// route already has a result
 		{
@@ -363,10 +363,12 @@ class boresult extends boranking
 	 */
 	function save_result($keys,$results,$route_type=null,$discipline='lead',$old_values=null)
 	{
-		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
-		
-		if (!$this->is_admin && !$this->is_judge($keys['WetId'])) return false; // permission denied
-		
+		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||		
+			!($comp = $this->comp->read($keys['WetId'])) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
+		{
+			return false;
+		}
 		//echo "<p>boresult::save_result(".print_r($keys,true).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
 		if (is_null($old_values))
 		{
@@ -493,7 +495,8 @@ class boresult extends boranking
 	function delete_participant($keys)
 	{
 		if (!$keys['WetId'] || !$keys['PerId'] ||
-			!($this->is_admin || $this->is_judge($keys['WetId'])) ||
+			!($comp = $this->comp->read($keys['WetId'])) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 			$this->has_results($keys))
 		{ 
 			return false; // permission denied
