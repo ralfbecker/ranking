@@ -20,6 +20,11 @@
 						<description value="Starting time"/>
 						<description span="all" id="route_start" no_lang="1"/>
 					</row>
+					<row>
+						<description value="Observation time"/>
+						<description id="route_observation_time" no_lang="1"/>
+						<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+					</row>
 				</rows>
 			</grid>
 		</groupbox>

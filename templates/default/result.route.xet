@@ -68,6 +68,13 @@
 					<textbox size="64" maxlength="64" id="route_start" blur="time" span="all"/>
 				</row>
 				<row class="row" disabled="@route_order=-1">
+					<description value="Observation time" options=",,,route_observation_time"/>
+					<hbox options="0,0" span="all">
+						<textbox size="20" maxlength="40" id="route_observation_time"/>
+						<textbox id="route_climbing_time" size="20" maxlength="40" class="leftPad5" label="Climbing time"/>
+					</hbox>
+				</row>
+				<row class="row" disabled="@route_order=-1">
 					<description options=",,,route_quota" value="Quota"/>
 					<int id="route_quota"/>
 					<description/>

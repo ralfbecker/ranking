@@ -205,7 +205,9 @@
 				'route_result' => array('type' => 'varchar','precision' => '80'),
 				'route_comments' => array('type' => 'text'),
 				'route_quota' => array('type' => 'int','precision' => '2'),
-				'route_num_problems' => array('type' => 'int','precision' => '2')
+				'route_num_problems' => array('type' => 'int','precision' => '2'),
+				'route_observation_time' => array('type' => 'varchar','precision' => '40'),
+				'route_climbing_time' => array('type' => 'varchar','precision' => '40')
 			),
 			'pk' => array('WetId','GrpId','route_order'),
 			'fk' => array(),

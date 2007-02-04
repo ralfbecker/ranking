@@ -10,6 +10,7 @@
 				<column/>
 				<column/>
 				<column/>
+				<column disabled="@no_ranking"/>
 				<column disabled="@no_delete"/>
 			</columns>
 			<rows>
@@ -20,6 +21,7 @@
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
 					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
 					<description value="License" id="PerId" align="center"/>
+					<description value="Ranking" align="center"/>
 					<description class="noPrint" value="Delete" align="center"/>
 				</row>
 				<row class="x $row_cont[class]">
@@ -33,6 +35,7 @@
 					<description no_lang="1" align="center" id="{$row}[birthyear]"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
+					<description value="$row_cont[ranking_place]." no_lang="1" id="${row}[ranking_points]" align="center"/>
 					<button image="delete" class="noPrint" label="Delete" align="center" id="delete[$row_cont[PerId]]" onclick="return confirm('Delete this participant (can NOT be undone)');"/>
 				</row>
 			</rows>

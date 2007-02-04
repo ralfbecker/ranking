@@ -442,6 +442,7 @@ class uiregistration extends boranking
 		}
 		// save calendar, competition & nation between calls in the session
 		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
+		$this->set_ui_state($perserv['calendar'],$preserv['comp'],$preserv['cat']);
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
 			($nation && $nation != 'NULL' ? ': '.$nation : '');
@@ -659,6 +660,7 @@ class uiregistration extends boranking
 		);
 		// save calendar, competition & cat between calls in the session
 		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
+		$this->set_ui_state($perserv['calendar'],$preserv['comp'],$preserv['cat']);
 		
 		$select_options = array(
 			'calendar' => $this->ranking_nations,

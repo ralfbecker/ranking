@@ -28,6 +28,8 @@ birthday, shows only the year	ranking	de	Geburtstag, zeigt nur das Jahr
 birthyear	ranking	de	Jahrgang
 birthyears from	ranking	de	Geburtsjahr von
 body height in centimeter	ranking	de	Körpergröße in Zentimeter
+bonus	ranking	de	Bonus
+bonus: number of tries or no	ranking	de	Bonus: Anzahl Versuche oder Nein
 boulder	ranking	de	Bouldern
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
@@ -38,6 +40,7 @@ city	ranking	de	Stadt
 click to view	ranking	de	anklicken zum Anzeigen
 climbing professional	ranking	de	Profi
 climbing since (years)	ranking	de	klettert seit (Jahren)
+climbing time	ranking	de	Kletterzeit
 closes	ranking	de	schließt
 comments	ranking	de	Kommentare
 competition	ranking	de	Wettkampf
@@ -68,6 +71,7 @@ deletes this cup	ranking	de	Löscht diesen Cup
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
 deny public display of the checked information	ranking	de	öffentlichen Anzeige der ausgewählte Informationen verweigern
 digital rock	ranking	de	digital ROCK
+display ranking	ranking	de	Rangliste anzeigen
 download	ranking	de	Herunterladen
 duration in days or textual competition-date like 'mid july'	ranking	de	Dauer in Tagen oder Text für Wettkampfdatum wie 'Mitte Juli'
 duration or textual date	ranking	de	Dauer oder Text
@@ -168,6 +172,7 @@ nothing to update	ranking	de	Nichts zu aktualisieren
 notice	ranking	de	Notiz
 number of competitions counting for the cup (empty for all)	ranking	de	Anzahl Wettkämpfe die für den Cup zählen (leer für alle)
 number of problems	ranking	de	Anzahl Probleme
+observation time	ranking	de	Besichtigungszeit
 on how many routes is the first round	ranking	de	Auf wievielen Routen findet die erste Runde statt
 one qualification	ranking	de	eine Qualifikation
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
@@ -306,5 +311,3 @@ which view do you want to see, when you start the ranking app?	ranking	de	Welche
 wildcard	ranking	de	Wildcard
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
-zone	ranking	de	Zone
-zone: number of tries or no	ranking	de	Zone: Anzahl Versuche oder Nein
