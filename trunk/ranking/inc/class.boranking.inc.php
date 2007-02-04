@@ -866,4 +866,24 @@ class boranking extends soranking
 		
 		if (++$route > $num_routes) $route = 1;
 	}
+	
+	/**
+	 * Set the state (selected competition & cat) of the UI
+	 *
+	 * @param string $calendar
+	 * @param int $comp
+	 * @param int $cat=null
+	 */
+	function set_ui_state($calendar,$comp,$cat=null)
+	{
+		foreach(array('registration','result') as $type)
+		{
+			$data = $GLOBALS['egw']->session->appsession($type,'ranking');
+			foreach(array('calendar','comp','cat') as $name)
+			{
+				$data[$name] = $$name;
+			}
+			$GLOBALS['egw']->session->appsession($type,'ranking',$data);
+		}
+	}
 }

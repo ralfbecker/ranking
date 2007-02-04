@@ -142,7 +142,7 @@ class route_result extends so_sql
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
 					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
 				),$extra_cols,$order_by,$route_names,$route_type,$discipline,$result_cols);
-				
+
 				foreach($filter as $col => $val)
 				{
 					if (!is_numeric($col))
@@ -337,7 +337,7 @@ class route_result extends so_sql
 			for($i=1; $i <= 6; ++$i)
 			{
 				$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
-					($data['zone'.$i] ? 'z'.$data['zone'.$i] : '');
+					($data['zone'.$i] ? 'b'.$data['zone'.$i] : '');
 			}
 			$suffix = '';	// general result can have route_order as suffix
 			while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
@@ -348,7 +348,7 @@ class route_result extends so_sql
 					$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
 					$zones = round($data['result_zone'.$suffix] / 100);
 					$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
-					$data['result'.$suffix] = $tops.'t'.$top_tries.' '.$zones.'z'.$zone_tries; 
+					$data['result'.$suffix] = $tops.'t'.$top_tries.' '.$zones.'b'.$zone_tries; 
 				}
 				++$suffix;
 			}
@@ -465,7 +465,7 @@ class route_result extends so_sql
 					$data['result_top'] += 100 - $data['top'.$i];
 					$data['result_detail']['top'.$i] = $data['top'.$i];
 					// cant have top without zone or more tries for the zone --> setting zone as top
-					if (!$data['zone'.$i] || $data['zone'.$i] > $data['top'.$i]) $data['zone'.$i] = $data['top'.$i];
+					//if (!$data['zone'.$i] || $data['zone'.$i] > $data['top'.$i]) $data['zone'.$i] = $data['top'.$i];
 				}
 				if (is_numeric($data['zone'.$i]))
 				{
@@ -473,7 +473,7 @@ class route_result extends so_sql
 					{
 						$data['result_zone'] += 100 - $data['zone'.$i];
 					}
-					elseif (is_null($zone))
+					elseif (is_null($data['result_zone']))
 					{
 						$data['result_zone'] = 0;		// this is to recognice climbers with no zone at all
 					}

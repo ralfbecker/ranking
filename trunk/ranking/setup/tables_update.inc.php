@@ -579,4 +579,20 @@
 
 		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.011';
 	}
+
+
+	$test[] = '1.3.011';
+	function ranking_upgrade1_3_011()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_observation_time',array(
+			'type' => 'varchar',
+			'precision' => '40'
+		));
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_climbing_time',array(
+			'type' => 'varchar',
+			'precision' => '40'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.012';
+	}
 ?>

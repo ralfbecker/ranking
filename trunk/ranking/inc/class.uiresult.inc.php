@@ -310,6 +310,12 @@ class uiresult extends boresult
 			$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
 			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
 		}
+		if ($query['ranking'] && strstr($query['template'],'startlist') &&
+			($comp = $this->comp->read($query['comp'])) && ($cat = $this->cats->read($query['cat'])))
+		{
+			$stand = $comp['datum'];
+ 			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
+		}
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
@@ -321,6 +327,11 @@ class uiresult extends boresult
 			{
 				$rows[$k]['quota_class'] = 'quota_line';
 				$quota_line = true;
+			}
+			if ($ranking)
+			{
+				$rows[$k]['ranking_place'] = $ranking[$row['PerId']]['platz'];
+				$rows[$k]['ranking_points'] = $ranking[$row['PerId']]['pkt'];
 			}
 			$rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on'; 
 			if ($query['discipline'] == 'speed' && $query['route'] >= 2 && 
@@ -366,6 +377,7 @@ class uiresult extends boresult
 			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 'ONE_QUALI');
 		$rows['num_problems'] = $query['num_problems'];
 		$rows['no_delete'] = $readonlys === true;
+		$rows['no_ranking'] = !$ranking;
 
 		return $total;
 	}
@@ -380,7 +392,7 @@ class uiresult extends boresult
 	{
 		$tmpl =& new etemplate('ranking.result.index');
 		
-		//_debug_array($content);
+		//_debug_array($content);exit;
 		if (!is_array($content))
 		{
 			$content = array('nm' => $GLOBALS['egw']->session->appsession('result','ranking'));
@@ -474,6 +486,21 @@ class uiresult extends boresult
 					{
 						$msg = lang('Nothing to update');
 					}
+					if ($this->error)
+					{
+						foreach($this->error as $PerId => $data)
+						{
+							foreach($data as $field => $error)
+							{
+								$tmpl->set_validation_error("nm[rows][set][$PerId][$field]",$error);					
+								$errors[$error] = $error;
+							}
+						}
+						$msg = lang('Error').': '.implode(', ',$errors);
+					}
+					break;
+				case 'download':
+					$this->download($keys);
 					break;
 				case 'delete':
 					if (!is_numeric($PerId) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
@@ -523,6 +550,7 @@ class uiresult extends boresult
 		$content['nm']['route_status'] = $route['route_status'];
 		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
 		$content['nm']['num_problems'] = $route['route_num_problems'];
+		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
 		
 		// make competition and category data availible for print
 		$content['comp'] = $comp;
@@ -557,6 +585,8 @@ class uiresult extends boresult
 			$readonlys['nm'] = true;
 			$sel_options['result_plus'] = $this->plus;
 		}
+		$readonlys['button[download]'] = !$this->has_startlist($keys);
+
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
 		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
@@ -588,6 +618,10 @@ class uiresult extends boresult
 			}
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
+		}
+		if ($content['nm']['show_result'])
+		{
+			$tmpl->disable_cells('nm[ranking]');
 		}
 		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],$content['nm']['discipline']);
 		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_

@@ -25,15 +25,18 @@ class ranking_admin_prefs_sidebox_hooks
 
 		if ($location == 'sidebox_menu')
 		{
+			// add ranking version to the eGW version
+			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
+			
 			$file = array(
+				'Athletes' => $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiathletes.index' )),
 				'Competitions' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uicompetitions.index' )),
 				'Cups' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uicups.index' )),
 				/*'Categories' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.ranking.cat_edit' )),*/
-				'Athletes' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiathletes.index' )),
 				'Registration' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.index' )),
 				'Startlists' => $GLOBALS['egw']->link('/index.php',array(

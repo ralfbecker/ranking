@@ -395,11 +395,13 @@ class boresult extends boranking
 	 */
 	function save_result($keys,$results,$route_type=null,$discipline='lead',$old_values=null)
 	{
+		$this->error = null;
+
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||		
 			!($comp = $this->comp->read($keys['WetId'])) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
 		{
-			return false;
+			return $this->error = false;
 		}
 		//echo "<p>boresult::save_result(".print_r($keys,true).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
 		if (is_null($old_values))
@@ -418,6 +420,17 @@ class boresult extends boranking
 			// to also check the result_details
 			if ($data['result_details']) $data += $data['result_details'];
 			if ($old && $old['result_details']) $old += $old['result_details'];
+			
+			if (isset($data['top1']))	// boulder result
+			{
+				for ($i=1; $i <= 6 && isset($data['top'.$i]); ++$i)
+				{
+					if ($data['top'.$i] && (int)$data['top'.$i] < (int)$data['zone'.$i])
+					{
+						$this->error[$PerId]['zone'.$i] = lang('Can NOT be higher as top!');
+					}
+				}
+			}
 
 			foreach($data as $key => $val)
 			{
@@ -534,5 +547,85 @@ class boresult extends boranking
 			return false; // permission denied
 		}
 		return $this->route_result->delete_participant($keys);
+	}
+	
+	function download($keys)
+	{
+		if (($route = $this->route->read($keys)) &&
+			($cat = $this->cats->read($keys['GrpId'])) &&
+			($comp = $this->comp->read($keys['comp'])))
+		{
+			$keys['route_type'] = $route['route_type'];
+			$keys['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+			$result = $this->has_results($keys);
+			$athletes =& $this->route_result->search('',false,$result ? 'result_rank' : 'start_order','','',false,'AND',false,$keys);
+			//_debug_array($athletes); return;
+			
+			$stand = $comp['datum'];
+ 			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
+
+			$browser =& CreateObject('phpgwapi.browser');
+			$browser->content_header($cat['name'].' - '.$route['route_name'].'.csv','text/comma-separated-values');
+			$name2csv = array(
+				'WetId'    => 'comp',
+				'GrpId'    => 'cat',
+				'route_order' => 'heat',
+				'PerId'    => 'athlete',
+				'result_rank'    => 'place',
+				'category',
+				'route',	
+				'start_order' => 'startorder',
+				'nachname' => 'lastname',
+				'vorname'  => 'firstname',
+				'nation'   => 'nation',
+				'birthyear' => 'birthyear',
+				'ranking',
+				'ranking-points',
+				'start_number' => 'startnumber',
+				'result' => 'result',
+			);
+			if ($route['route_num_problems'])	// results of each boulder
+			{
+				for ($i = 1; $i <= $route['route_num_problems']; ++$i)
+				{
+					$name2csv['boulder'.$i] = 'boulder'.$i;
+				}
+			}
+			echo implode(';',$name2csv)."\n";
+			$charset = $GLOBALS['egw']->translation->charset();
+			foreach($athletes as $athlete)
+			{
+				$values = array();
+				foreach($name2csv as $name => $csv)
+				{
+					switch($csv)
+					{
+						case 'category':
+							$val = $cat['name'];
+							break;
+						case 'ranking':
+							$val = $ranking[$athlete['PerId']]['platz'];
+							break;
+						case 'ranking-points':
+							$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2lf',$ranking[$athlete['PerId']]['pkt']) : '';
+							break;
+						case 'route':
+							$val = $route['route_name'];
+							break;
+						default:
+							$val = $athlete[$name];
+					}
+					if (strchr($val,';') !== false)
+					{
+						$val = '"'.str_replace('"','',$val).'"';
+					}
+					$values[$csv] = $val;
+				}
+				// convert by default to iso-8859-1, as this seems to be the default of excel
+				echo $GLOBALS['egw']->translation->convert(implode(';',$values),$charset,
+					$_GET['charset'] ? $_GET['charset'] : 'iso-8859-1')."\n";
+			}
+			$GLOBALS['egw']->common->egw_exit();
+		}
 	}
 }

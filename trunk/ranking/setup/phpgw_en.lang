@@ -28,6 +28,8 @@ birthday, shows only the year	ranking	en	birthday, shows only the year
 birthyear	ranking	en	Birthyear
 birthyears from	ranking	en	Birthyears from
 body height in centimeter	ranking	en	body height in centimeter
+bonus	ranking	en	Bonus
+bonus: number of tries or no	ranking	en	Bonus: Number of tries or no
 boulder	ranking	en	boulder
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
@@ -38,6 +40,7 @@ city	ranking	en	City
 click to view	ranking	en	click to view
 climbing professional	ranking	en	Climbing professional
 climbing since (years)	ranking	en	climbing since (years)
+climbing time	ranking	en	Climbing time
 closes	ranking	en	closes
 comments	ranking	en	Comments
 competition	ranking	en	Competition
@@ -68,6 +71,7 @@ deletes this cup	ranking	en	deletes this cup
 deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
 digital rock	ranking	en	digital ROCK
+display ranking	ranking	en	display ranking
 download	ranking	en	Download
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
 duration or textual date	ranking	en	Duration or textual date
@@ -168,6 +172,7 @@ nothing to update	ranking	en	Nothing to update
 notice	ranking	en	Notice
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
 number of problems	ranking	en	Number of problems
+observation time	ranking	en	Observation time
 on how many routes is the first round	ranking	en	On how many routes is the first round
 one qualification	ranking	en	one Qualification
 only fill values different from egw	admin	en	only fill values different from eGW
@@ -306,5 +311,3 @@ which view do you want to see, when you start the ranking app?	ranking	en	Which 
 wildcard	ranking	en	Wildcard
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
-zone	ranking	en	Zone
-zone: number of tries or no	ranking	en	Zone: Number of tries or no
