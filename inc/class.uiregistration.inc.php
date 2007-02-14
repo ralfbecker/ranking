@@ -56,9 +56,17 @@ class uiregistration extends boranking
 			}
 		}
 		$total = $this->athlete->get_rows($query,$rows,$readonlys,$query['show_all'] ? true : $query['cat']);
+		
+		$readonlys = array();
+		foreach($rows as $row)
+		{
+			// allow only to register athletes with applied or confirmed licenses
+			$readonlys["register[$row[PerId]]"] = $row['license'] == 'n';
+		}
 		$rows['sel_options'] =& $sel_options;
 		$rows['comp'] = $query['comp'];
 		$rows['cat']  = $query['cat'];
+		$rows['license_year'] = $this->license_year;
 
 		if ($this->debug)
 		{
@@ -124,6 +132,7 @@ class uiregistration extends boranking
 
 		$select_options = array(
 			'cat' => $this->cats->names(array('rkey' => $comp['gruppen']),0),
+			'license' => $this->license_labels,
 		);
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Register');

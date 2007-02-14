@@ -35,6 +35,17 @@ class athlete extends so_sql
 	
 	var $picture_url = '/jpgs';
 	var $picture_path = '../../../jpgs';
+	var $pkt2license = array(
+		''  => 'n',
+		'1' => 'a',
+		'2' => 'c',
+	);
+	/**
+	 * year we check the license for
+	 *
+	 * @var int
+	 */
+	var $license_year;
 
 	/**
 	 * constructor of the athlete class
@@ -59,6 +70,8 @@ class athlete extends so_sql
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
 		$this->picture_path = $_SERVER['DOCUMENT_ROOT'].'/jpgs';
+
+		$this->license_year = (int) date('Y');
 	}
 
 	/**
@@ -93,6 +106,10 @@ class athlete extends so_sql
 		}
 		if ($data['geb_date']) $data['geb_year'] = (int) $data['geb_date'];
 
+		if (array_key_exists('license',$data))
+		{
+			$data['license'] = $this->pkt2license[(string)$data['license']];
+		}
 		return $data;
 	}
 
@@ -170,26 +187,59 @@ class athlete extends so_sql
 		}
 		if ($join === true || is_numeric($join))
 		{
+			if ($extra_cols) $extra_cols = explode(',',$extra_cols);
 			if (is_numeric($join))	// add join to filter for a category
 			{
 				$cat = (int) $join;
-				$join = ", $this->result_table WHERE GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+				$join = "JOIN $this->result_table ON GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
 				
 				// if cat uses an age-group only show athlets in that age-group
 				if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
 				{
 					$join .= " AND $from_year <= YEAR(geb_date) AND YEAR(geb_date) <= $to_year";
 				}
+				$extra_cols[] = "MAX($this->result_table.datum) AS last_comp";
+				$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
+				
 			}
 			else	// LEFT JOIN to get latest competition 
 			{
-				$join = "LEFT JOIN $this->result_table ON ($this->table_name.PerId=$this->result_table.PerId AND platz > 0)";
+				$extra_cols[] = "(SELECT MAX(datum) FROM $this->result_table WHERE $this->result_table.PerId=$this->table_name.PerId AND platz > 0) AS last_comp";
+				$join = '';
 			}
-			if ($extra_cols) $extra_cols = explode(',',$extra_cols);
-			$extra_cols[] = 'MAX(datum) AS last_comp';
+		}
+		$join .= " LEFT JOIN $this->result_table l ON l.PerId=$this->table_name.PerId AND l.WetId=-$this->license_year AND l.GrpId=0";
+		$extra_cols[] = 'l.pkt AS license';
+		if ($filter['license'])
+		{
+			if (is_array($filter['license']))
+			{
+				foreach($filter['license'] as $key => $val)
+				{
+					$filter['license'][$key] = array_search($val,$this->pkt2license);
+				}
+			}
+			else
+			{
+				$filter['license'] = array_search($filter['license'],$this->pkt2license);
+			}
+			$filter[] = !$filter['license'] ? 'l.pkt IS NULL' : 
+				$this->db->expression($this->result_table,'l.',array('pkt'=>$filter['license']));
+			unset($filter['license']);
+		}
+		if ($join && strstr($join,'PerId') !== false)	// this column would be ambigues
+		{
+			if ($criteria['PerId'])
+			{
+				$criteria[] = $this->db->expression($this->table_name,$this->table_name.'.',array('PerId'=>$criteria['PerId']));
+				unset($criteria['PerId']);
+			}
+			if ($filter['PerId'])
+			{
+				$filter[] = $this->db->expression($this->table_name,$this->table_name.'.',array('PerId'=>$filter['PerId']));
+				unset($filter['PerId']);
+			}
 			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// LEFT JOIN'ed Results.PerId is NULL if there's no result
-			unset($criteria['PerId']);	// this column would be ambigues
-			$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
 		}
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
@@ -355,6 +405,77 @@ class athlete extends so_sql
 		{
 			$this->delete_picture($keys['rkey']);
 		}
+		if ($Ok && (is_null($keys) || $keys['PerId']))
+		{
+			// delete licenses
+			$this->db->delete($this->result_table,array(
+				'PerId' => is_null($keys) ? $this->data['PerId'] : $keys['PerId'],
+				'GrpId' => 0,
+			),__LINE__,__FILE__);
+		}
 		return $Ok;
+	}
+
+	/**
+	 * reads row matched by key and puts all cols in the data array
+	 *
+	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
+	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $join sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or 
+	 * @return array/boolean data if row could be retrived else False
+	 */
+	function read($keys,$extra_cols='',$join='')
+	{
+		if (is_numeric($join))
+		{
+			$join = "LEFT JOIN $this->result_table ON $this->table_name.PerId=$this->result_table.PerId AND $this->result_table.WetId=-$join AND $this->result_table.GrpId=0";
+			if (!is_array($extra_cols))
+			{
+				$extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
+			}
+			$extra_cols[] = $this->result_table.'.pkt AS license';
+			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
+		}
+		return parent::read($keys,$extra_cols,$join);
+	}
+	
+	/**
+	 * Set the license for a given year
+	 *
+	 * @param int $year
+	 * @param string $status 'n' = none, 'a' = applied, 'c' = confirmed
+	 * @param int $PerId=null else use $this->data[PerId]
+	 * @return boolean/int false on wrong parameter or number of affected rows
+	 */
+	function set_license($year,$status='c',$PerId=null)
+	{
+		if (is_null($PerId)) $PerId = $this->data['PerId'];
+
+		if (!(int)$PerId || $year <= 0) return false;
+		
+		if (!in_array($status,$this->pkt2license) || $status == 'n')
+		{
+			$this->db->delete($this->result_table,array(
+				'PerId' => $PerId,
+				'WetId' => -$year,
+				'GrpId' => 0,
+			),__LINE__,__FILE__);
+		}
+		else
+		{
+			$this->db->insert($this->result_table,array(
+				'pkt' => array_search($status,$this->pkt2license),
+				'platz' => 0,
+			),array(
+				'PerId' => $PerId,
+				'WetId' => -$year,
+				'GrpId' => 0,
+				'datum' => date('Y-m-d'),
+			),__LINE__,__FILE__);
+		}
+		if ($PerId == $this->data['PerId']) $this->data['license'] = $status;
+		//echo "athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
+		
+		return $this->db->affected_rows();
 	}
 }

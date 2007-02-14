@@ -16,6 +16,10 @@ add a new cup	ranking	en	add a new cup
 add a new route	ranking	en	Add a new route
 add route	ranking	en	Add route
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
+applied	ranking	en	applied
+applied for a %1 license	ranking	en	Applied for a %1 license
+applies for the license and downloads the necessary form to mail to the office	ranking	en	Applies for the license and downloads the necessary form to mail to the office
+apply for	ranking	en	Apply for
 apply the changes made	ranking	en	apply the changes made
 as of	ranking	en	As of
 athlete	ranking	en	Athlete
@@ -31,6 +35,7 @@ body height in centimeter	ranking	en	body height in centimeter
 bonus	ranking	en	Bonus
 bonus: number of tries or no	ranking	en	Bonus: Number of tries or no
 boulder	ranking	en	boulder
+can not be higher as top!	ranking	en	Can NOT be higher as top!
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
 cannel without saving	ranking	en	Cannel without saving
@@ -52,6 +57,7 @@ competitions	ranking	en	competitions
 competitions counting	ranking	en	competitions counting
 complete profile	ranking	en	complete profile
 complimentary	ranking	en	Complimentary
+confirmed	ranking	en	confirmed
 contact	ranking	en	Contact
 counting for rankings	ranking	en	counting for rankings
 cup	ranking	en	Cup
@@ -247,6 +253,7 @@ show athlets from all categories	ranking	en	show athlets from all categories
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
 small final	ranking	en	Small final
+someone already applied for a %1 license!	ranking	en	Someone already applied for a %1 license!
 speed	ranking	en	speed
 squad	ranking	en	Squad
 start heat	ranking	en	Start heat

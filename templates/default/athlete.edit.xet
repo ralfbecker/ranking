@@ -79,19 +79,10 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%" height="210">
-			<columns>
-				<column/>
-			</columns>
-			<rows>
-				<row>
-					<htmlarea data="" rows="1" cols="1" id="freetext" statustext="This text will be shown in the profil on the website." style="width: 100%; height: 200px;"/>
-				</row>
-			</rows>
-		</grid>
+	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.3.001">
+		<htmlarea rows="1" cols="1" style="extended" plugins="210px,100%,true" id="freetext" statustext="This text will be shown in the profil on the website."/>
 	</template>
-	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
 			<columns>
 				<column width="100"/>
@@ -102,7 +93,7 @@
 			<rows>
 				<row class="row" valign="top">
 					<description options=",,,acl" value="deny public access to"/>
-					<listbox rows="5" id="acl" statustext="deny public display of the checked information" span="all" no_lang="1"/>
+					<listbox rows="7" id="acl" statustext="deny public display of the checked information" span="all" no_lang="1"/>
 				</row>
 				<row class="row" disabled="!@is_admin">
 					<description options=",,,rkey" value="Key"/>
@@ -157,12 +148,13 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
 				<column width="20%"/>
 				<column width="12%"/>
+				<column/>
 				<column/>
 			</columns>
 			<rows>
@@ -174,6 +166,13 @@
 					<textbox size="20" maxlength="20" id="nachname" needed="1" statustext="Family name of the athlete in latin chars! Accents and umlauts are ok"/>
 					<description options=",,,vorname" value="First name"/>
 					<textbox size="20" maxlength="20" id="vorname" needed="1" statustext="First name of the athlete in Latin chars! Accents and umlauts are ok"/>
+					<hbox align="right">
+						<description value="License" id="license_year" no_lang="1"/>
+						<menulist>
+							<menupopup id="license"/>
+						</menulist>
+						<button id="apply_license" label="Apply for" onclick="return confirm('You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue');" statustext="Applies for the license and downloads the necessary form to mail to the office"/>
+					</hbox>
 				</row>
 				<row class="row">
 					<description options=",,,nation" value="Nation"/>
@@ -181,7 +180,7 @@
 						<menupopup options="none" id="nation" statustext="nation the athlete is competing for" no_lang="1"/>
 					</menulist>
 					<description options=",,,sex" value="Gender"/>
-					<menulist>
+					<menulist span="all">
 						<menupopup options="none" id="sex" statustext="gender of the athlete"/>
 					</menulist>
 				</row>
@@ -189,11 +188,11 @@
 					<description options=",,,geb_date" value="Birthdate"/>
 					<date options="Y-m-d" id="geb_date" statustext="use access control to deny display on the website"/>
 					<description options=",,,geb_ort" value="Place of birth"/>
-					<textbox size="35" maxlength="35" id="geb_ort" statustext="where is the athlete born (incl. nation)"/>
+					<textbox size="35" maxlength="35" id="geb_ort" statustext="where is the athlete born (incl. nation)" span="all"/>
 				</row>
 				<row class="row">
 					<description options=",,,verband" value="Federation"/>
-					<textbox size="60" maxlength="60" span="3" id="verband"/>
+					<textbox size="60" maxlength="60" span="all" id="verband"/>
 				</row>
 				<row>
 					<tabbox span="all">
@@ -216,7 +215,7 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox span="3">
+					<hbox span="4">
 						<button id="edit" label="Edit" statustext="Edit this athlete"/>
 						<button label="Save" id="save" statustext="Saves the changes made"/>
 						<button label="Apply" id="apply" statustext="Applies the changes made"/>

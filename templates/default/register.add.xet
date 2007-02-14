@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.register.add.rows" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.register.add.rows" template="" lang="" group="0" version="1.3.001">
 		<grid>
 			<columns>
+				<column/>
 				<column/>
 				<column/>
 				<column/>
@@ -18,6 +19,7 @@
 					<nextmatch-sortheader label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader label="Last competition" id="last_comp"/>
+					<description value="License" id="license_year" no_lang="1"/>
 					<description value="Action" align="center"/>
 				</row>
 				<row class="row">
@@ -26,6 +28,9 @@
 					<date id="${row}[geb_date]" readonly="true" options="Y-m-d" align="center"/>
 					<description no_lang="1" id="${row}[ort]"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d" align="center"/>
+					<menulist>
+						<menupopup id="${row}[license]" readonly="true"/>
+					</menulist>
 					<button class="small" label="Register" id="register[$row_cont[PerId]]" statustext="Register this athlete for the selected category" onclick="opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;"/>
 				</row>
 			</rows>

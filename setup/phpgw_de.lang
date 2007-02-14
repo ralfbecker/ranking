@@ -16,6 +16,10 @@ add a new cup	ranking	de	Neue Serie anlegen
 add a new route	ranking	de	Neue Route anlegen
 add route	ranking	de	Route anlegen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
+applied	ranking	de	beantragt
+applied for a %1 license	ranking	de	%1 Lizenz beantragt
+applies for the license and downloads the necessary form to mail to the office	ranking	de	Beantragt eine Lizenz und lädt das notwendige Forumlar herunter damit es an das Büro geschickt werden kann
+apply for	ranking	de	Beantragen
 apply the changes made	ranking	de	vorgenommene Änderungen anwenden
 as of	ranking	de	Stand
 athlete	ranking	de	Athlet
@@ -31,6 +35,7 @@ body height in centimeter	ranking	de	Körpergröße in Zentimeter
 bonus	ranking	de	Bonus
 bonus: number of tries or no	ranking	de	Bonus: Anzahl Versuche oder Nein
 boulder	ranking	de	Bouldern
+can not be higher as top!	ranking	de	Kann nicht höher als Top sein!
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
 cannel without saving	ranking	de	Abbrechen ohne zu Speichern
@@ -52,6 +57,7 @@ competitions	ranking	de	Wettkämpfe
 competitions counting	ranking	de	zählende Wettkämpfe
 complete profile	ranking	de	komplettes Profil
 complimentary	ranking	de	Zusätzlich
+confirmed	ranking	de	bestätigt
 contact	ranking	de	Kontakt
 counting for rankings	ranking	de	zählend für die Rangliste
 cup	ranking	de	Cup
@@ -247,6 +253,7 @@ show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
 since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
 size (cm)	ranking	de	Größe (cm)
 small final	ranking	de	Kleines Finale
+someone already applied for a %1 license!	ranking	de	Jemand hat bereits die %1 Lizenz beantragt!
 speed	ranking	de	Geschwindigkeit
 squad	ranking	de	Kader
 start heat	ranking	de	Beginn Durchgang
