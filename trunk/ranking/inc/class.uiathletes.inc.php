@@ -65,7 +65,7 @@ class uiathletes extends boranking
 	{
 		if ($_GET['rkey'] || $_GET['PerId']) 
 		{
-			if ($this->athlete->read($_GET))
+			if ($this->athlete->read($_GET,'',$this->license_year))
 			{
 				// read the athletes results
 				$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
@@ -96,14 +96,14 @@ class uiathletes extends boranking
 			if (!$view && $this->only_nation_athlete) $content['nation'] = $this->only_nation_athlete;
 
 			//echo "<br>uiathletes::edit: content ="; _debug_array($content);
-			$this->athlete->data =& $content['athlete_data'];
-			unset($content['athlete_data']);
+			$this->athlete->init($content['athlete_data']);
+			$this->athlete->data['license'] = $content['athlete_data']['license'];
 			$old_geb_date = $this->athlete->data['geb_date'];
 
 			$this->athlete->data_merge($content);
 			//echo "<br>uiathletes::edit: athlete->data ="; _debug_array($this->athlete->data);
 
-			if (($content['save'] || $content['apply']))
+			if (($content['save'] || $content['apply']) || $content['apply_license'])
 			{
 				if ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights))
 				{
@@ -157,6 +157,25 @@ class uiathletes extends boranking
 									lang('Picture attached') : lang('Error attaching the picture'));
 							}
 						}
+						if ($content['apply_license'])
+						{
+							// ToDo: check for necessary data
+							if ($content['athlete_data']['license'] != 'a')
+							{
+								$this->athlete->set_license($this->license_year,'a');
+								$msg .= ', '.lang('Applied for a %1 license',$this->license_year);
+							}
+							else
+							{
+								$msg .= ', '.lang('Someone already applied for a %1 license!',$this->license_year);
+							}
+							// ToDo download form
+						}
+						elseif ($content['athlete_data']['license'] != $content['license'] && 
+							$this->acl_check('NULL',EGW_ACL_ADD))	// you need int. athlete rights
+						{
+							$this->athlete->set_license($this->license_year,$content['license']);
+						}
 					}
 				}
 				else
@@ -188,16 +207,20 @@ class uiathletes extends boranking
 			'is_admin' => $this->is_admin,
 			$tabs => !$content[$tabs] && !$view && $this->tmpl->html->user_agent == 'mozilla' ? 'ranking.athlete.edit.freetext' : $content[$tabs],
 			'foto' => $this->athlete->picture_url().'?'.time(),
+			'license_year' => $this->license_year,
 		);
 		$sel_options = array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'sex'    => $this->genders,
 			'acl'    => $this->acl_deny_labels,
+			'license'=> $this->license_labels,
 		);
 		$readonlys = array(
 			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]],
 			'nation' => !!$this->only_nation_athlete,
 			'edit'   => !($view && ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights))),
+			'apply_license' => $content['license'] == 'c' || !$this->acl_check($content['nation'],EGW_ACL_ADD),
+			'license'=> !$this->acl_check('NULL',EGW_ACL_ADD),
 		);
 		// dont allow non-admins to change sex and nation, once it's been set
 		if ($this->athlete->data['PerId'] && !$this->is_admin)
@@ -253,6 +276,8 @@ class uiathletes extends boranking
 		{
 			unset($query['col_filter']['sex']);	// no filtering
 		}
+		if ($query['filter2']) $query['col_filter']['license'] = $query['filter2'];
+
 		foreach(array('vorname','nachname') as $name)
 		{
 			if ($query['col_filter']['nation'])
@@ -293,6 +318,8 @@ class uiathletes extends boranking
 			}
 		}
 		$rows['sel_options'] =& $sel_options;
+		$rows['no_license'] = $query['filter2'] != '';
+		$rows['license_year'] = $this->license_year;
 
 		if ($this->debug)
 		{
@@ -367,9 +394,9 @@ class uiathletes extends boranking
 				'get_rows'       =>	'ranking.uiathletes.get_rows',
 				'filter_no_lang' => True,
 				'filter_label'   => lang('Category'),
-				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
+				'filter2_label'  => 'License',
 				'no_cat'         => True,// I  disable the cat-selectbox
-				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
+//				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
 				'order'          =>	'nachname',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 			);
@@ -385,6 +412,8 @@ class uiathletes extends boranking
 		$this->tmpl->exec('ranking.uiathletes.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
+			'filter2'=> array('' => 'All')+$this->license_labels,
+			'license'=> $this->license_labels,
 		));
 	}
 }

@@ -114,7 +114,28 @@ class boranking extends soranking
 		'KAZ','LAT','LUX','MKD','NED','NOR','POL','POR',
 		'ROM','RUS','SCG','SLO','SUI','SVK','SWE','UKR',
 	);
+	/**
+	 * year we check the license for
+	 *
+	 * @var int
+	 */
+	var $license_year;
+	/**
+	 * Various license states
+	 *
+	 * @var array
+	 */
+	var $license_labels = array(
+		'n' => 'none',
+		'a' => 'applied',
+		'c' => 'confirmed',
+	);
 
+	/**
+	 * Constructor
+	 *
+	 * @return boranking
+	 */
 	function boranking()
 	{
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
@@ -191,6 +212,7 @@ class boranking extends soranking
 			}
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
 		}
+		$this->license_year = (int) date('Y');
 	}
 	
 	/**

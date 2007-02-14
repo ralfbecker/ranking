@@ -119,7 +119,7 @@ class uicompetitions extends boranking
 				{
 					$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->comp->data['rkey']);
 				}
-				elseif ($this->comp->save())
+				if ($this->comp->save())
 				{
 					$msg .= lang('Error: while saving !!!');
 				}
