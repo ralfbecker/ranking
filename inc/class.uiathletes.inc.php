@@ -13,6 +13,7 @@
 /* $Id$ */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 
 class uiathletes extends boranking 
 {
@@ -22,18 +23,25 @@ class uiathletes extends boranking
 	var $public_functions = array(
 		'index' => true,
 		'edit'  => true,
-		'view'  => true,
+		'licenseform' => true,
 	);
 	/**
 	 * @var array $acl_deny_lables
 	 */
 	var $acl_deny_labels = array();
+	/**
+	 * Instance of etemplate
+	 *
+	 * @var etemplate
+	 */
+	var $tmpl;
+	var $license_form_name;
 
 	function uiathletes()
 	{
 		$this->boranking();
 
-		$this->tmpl =& CreateObject('etemplate.etemplate');
+		$this->tmpl =& new etemplate;
 		
 		$this->acl_deny_labels = array(
 			ACL_DENY_BIRTHDAY	=> lang('birthday, shows only the year'),
@@ -44,15 +52,8 @@ class uiathletes extends boranking
 			ACL_DENY_STREET		=> lang('street, postcode'),
 			ACL_DENY_CITY		=> lang('city'),
 			ACL_DENY_PROFILE	=> lang('complete profile'),
-		);			
-	}
-
-	/**
-	 * View a cup
-	 */
-	function view()
-	{
-		$this->edit(null,'',true);
+		);				
+		$this->license_form_name = $_SERVER['DOCUMENT_ROOT'].'/'.$this->license_year.'/license_'.$this->license_year.'.rtf';
 	}
 
 	/**
@@ -63,6 +64,7 @@ class uiathletes extends boranking
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
+		$tabs = 'contact|profile|freetext|other|pictures|results';
 		if ($_GET['rkey'] || $_GET['PerId']) 
 		{
 			if ($this->athlete->read($_GET,'',$this->license_year))
@@ -88,10 +90,17 @@ class uiathletes extends boranking
 			{
 				$view = true;
 			}
+			$content['referer'] = preg_match('/menuaction=([^&]+)/',$_SERVER['HTTP_REFERER'],$matches) ? 
+				$matches[1] : 'ranking.uiathletes.index';
+
+			if ($content['referer'] == 'ranking.uiregistration.add' || $_GET['apply_license'])
+			{
+				$js = "document.getElementById('exec[apply_license]').click();";
+			}
 		}
 		else
 		{
-			$view = $content['view'] && !($content['edit'] && ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights)));
+			$view = $content['view'];
 
 			if (!$view && $this->only_nation_athlete) $content['nation'] = $this->only_nation_athlete;
 
@@ -128,8 +137,6 @@ class uiathletes extends boranking
 					{
 						$msg .= lang('%1 saved',lang('Athlete'));
 	
-						if ($content['save']) $content['cancel'] = true;	// leave dialog now
-
 						if (is_array($content['foto']) && $content['foto']['tmp_name'] && $content['foto']['name'] && is_uploaded_file($content['foto']['tmp_name']))
 						{
 							//_debug_array($content['foto']);
@@ -143,7 +150,7 @@ class uiathletes extends boranking
 								if ($height > 250 && ($src = @imagecreatefromjpeg($content['foto']['tmp_name'])))	// we need to scale the picture down
 								{
 									$dst_w = (int) round(250.0 * $width / $height);
-									echo "<p>{$content['foto']['name']}: $width x $height ==> $dst_w x 250</p>\n";
+									//echo "<p>{$content['foto']['name']}: $width x $height ==> $dst_w x 250</p>\n";
 									$dst = imagecreatetruecolor($dst_w,250);
 									if (imagecopyresampled($dst,$src,0,0,0,0,$dst_w,250,$width,$height))
 									{
@@ -159,17 +166,43 @@ class uiathletes extends boranking
 						}
 						if ($content['apply_license'])
 						{
-							// ToDo: check for necessary data
 							if ($content['athlete_data']['license'] != 'a')
 							{
-								$this->athlete->set_license($this->license_year,'a');
-								$msg .= ', '.lang('Applied for a %1 license',$this->license_year);
+								// check for required data
+								static $required_for_license = array(
+									'vorname','nachname','nation','geb_date','sex',
+									'verband','ort','strasse','plz',
+									'email','tel','mobil'
+								);
+								foreach($required_for_license as $name)
+								{
+									if (!$this->athlete->data[$name])
+									{
+										if (!$required_missing) $msg .= ', '.lang('Required information missing, application rejected!');
+										$this->tmpl->set_validation_error($name,lang('Field must not be empty !!!'));
+										$content[$tabs] = 'contact';
+										$required_missing = $name;
+									}
+								}
+								if (!$required_missing)
+								{
+									$this->athlete->set_license($this->license_year,'a');
+									$msg .= ', '.lang('Applied for a %1 license',$this->license_year);
+								}
 							}
 							else
 							{
 								$msg .= ', '.lang('Someone already applied for a %1 license!',$this->license_year);
 							}
-							// ToDo download form
+							// download form
+							if (file_exists($this->license_form_name) && !$required_missing)
+							{
+								$link = $GLOBALS['egw']->link('/index.php',array(
+									'menuaction' => 'ranking.uiathletes.licenseform',
+									'PerId' => $this->athlete->data['PerId'],
+								));
+								$js .= "window.location='$link';";
+							}
 						}
 						elseif ($content['athlete_data']['license'] != $content['license'] && 
 							$this->acl_check('NULL',EGW_ACL_ADD))	// you need int. athlete rights
@@ -182,32 +215,43 @@ class uiathletes extends boranking
 				{
 					$msg .= lang('Permission denied !!!').' ('.$this->athlete->data['nation'].')';
 				}
-			}
-			if ($content['cancel'])
-			{
-				$this->tmpl->location(array('menuaction'=>'ranking.uiathletes.index'));
-			}
-			if ($content['delete'] && in_array($content['nation'],$this->athlete_rights))
-			{
-				$this->index(array(
-					'nm' => array(
-						'rows' => array(
-							'delete' => array(
-								$this->athlete->data['PerId'] => 'delete'
-							)
-						)
-					)
+				$link = $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => $content['referer'],//'ranking.uiathletes.index',
+					'msg' => $msg,
 				));
-				return;
+				$js = "window.opener.location='$link'; $js";
+			}
+			if ($content['delete'])
+			{
+				if (in_array($content['nation'],$this->athlete_rights))
+				{
+					$link = $GLOBALS['egw']->link('/index.php',array(
+						'menuaction' => 'ranking.uiathletes.index',
+						'delete' => $this->athlete->data['PerId'],
+					));
+				}
+				else
+				{
+					$link = $GLOBALS['egw']->link('/index.php',array(
+						'menuaction' => 'ranking.uiathletes.index',
+						'msg' => lang('Permission denied!!!'),
+					));
+				}
+				$js = "window.opener.location='$link';";
+			}
+			if ($content['save'] || $content['delete'] || $content['cancel'])
+			{
+				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
+				$GLOBALS['egw']->common->egw_exit();
 			}
 		}
-		$tabs = 'contact|profile|freetext|other|pictures|results';
 		$content = $this->athlete->data + array(
 			'msg' => $msg,
 			'is_admin' => $this->is_admin,
-			$tabs => !$content[$tabs] && !$view && $this->tmpl->html->user_agent == 'mozilla' ? 'ranking.athlete.edit.freetext' : $content[$tabs],
+			$tabs => $content[$tabs],
 			'foto' => $this->athlete->picture_url().'?'.time(),
 			'license_year' => $this->license_year,
+			'referer' => $content['referer'],
 		);
 		$sel_options = array(
 			'nation' => $this->athlete->distinct_list('nation'),
@@ -240,13 +284,23 @@ class uiathletes extends boranking
 		{
 			$readonlys['delete'] = true;
 		}
+		if ($js)
+		{
+			if (!is_object($GLOBALS['egw']->js))
+			{
+				include_once(EGW_API_INC.'/class.javascript.inc.php');
+				$GLOBALS['egw']->js =& new javascript();
+			}
+			$GLOBALS['egw']->js->set_onload($js);
+		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$this->tmpl->read('ranking.athlete.edit');
 		$this->tmpl->exec('ranking.uiathletes.edit',$content,
 			$sel_options,$readonlys,array(
 				'athlete_data' => $this->athlete->data,
 				'view' => $view,
-			));
+				'referer' => $content['referer'],
+			),2);
 	}
 
 	/**
@@ -308,14 +362,12 @@ class uiathletes extends boranking
 
 		foreach($rows as $row)
 		{
-			if (!$this->acl_check($row['nation'],EGW_ACL_ADD))
-			{
-				$readonlys["edit[$row[PerId]]"] = $readonlys["delete[$row[PerId]]"] = true;
-			}
 			if ($row['last_comp'])
 			{
 				$readonlys["delete[$row[PerId]]"] = true;
 			}
+			$readonlys["apply_license[$row[PerId]]"] = $row['license'] != 'n' || 
+				!($this->is_admin || in_array($row['nation'],$this->athlete_rights));
 		}
 		$rows['sel_options'] =& $sel_options;
 		$rows['no_license'] = $query['filter2'] != '';
@@ -337,55 +389,34 @@ class uiathletes extends boranking
 	 */
 	function index($content=null,$msg='')
 	{
-		$content = $content['nm']['rows'];
-		
-		if ($content['view'] || $content['edit'] || $content['delete'])
+		if ($_GET['delete'] || is_array($content['nm']['rows']['delete']))
 		{
-			foreach(array('view','edit','delete') as $action)
+			if (is_array($content['nm']['rows']['delete']))
 			{
-				if ($content[$action])
-				{
-					list($id) = each($content[$action]);
-					break;
-				}
+				list($id) = each($content['nm']['rows']['delete']);
 			}
-			//echo "<p>uiathletes::inddex() action='$action', id='$id'</p>\n";
-			switch($action)
+			else
 			{
-				case 'view':
-					$this->tmpl->location(array(
-						'menuaction' => 'ranking.uiathletes.view',
-						'PerId'      => $id,
-					));
-					break;
-					
-				case 'edit':
-					$this->tmpl->location(array(
-						'menuaction' => 'ranking.uiathletes.edit',
-						'PerId'      => $id,
-					));
-					break;
-					
-				case 'delete':
-					if (!$this->is_admin && $this->athlete->read(array('PerId' => $id)) &&
-						!in_array($this->athlete->data['nation'],$this->athlete_rights))
-					{
-						$msg = lang('Permission denied !!!');
-					}
-					elseif ($this->athlete->has_results($id))
-					{
-						$msg = lang('You need to delete the results first !!!');
-					}
-					else
-					{
-						$msg = $this->athlete->delete(array('PerId' => $id)) ? 
-							lang('%1 deleted',lang('Athlete')) : lang('Error: deleting %1 !!!',lang('Athlete'));
-					}
-					break;
-			}						
+				$id = $_GET['delete'];
+			}
+			if (!$this->is_admin && $this->athlete->read(array('PerId' => $id)) &&
+				!in_array($this->athlete->data['nation'],$this->athlete_rights))
+			{
+				$msg = lang('Permission denied !!!');
+			}
+			elseif ($this->athlete->has_results($id))
+			{
+				$msg = lang('You need to delete the results first !!!');
+			}
+			else
+			{
+				$msg = $this->athlete->delete(array('PerId' => $id)) ? 
+					lang('%1 deleted',lang('Athlete')) : lang('Error: deleting %1 !!!',lang('Athlete'));
+			}
 		}
-		$content = array();
-
+		$content = array(
+			'msg' => $msg ? $msg : $_GET['msg'],
+		);
 		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','athlete_state');
 		
 		if (!is_array($content['nm']))
@@ -396,7 +427,6 @@ class uiathletes extends boranking
 				'filter_label'   => lang('Category'),
 				'filter2_label'  => 'License',
 				'no_cat'         => True,// I  disable the cat-selectbox
-//				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
 				'order'          =>	'nachname',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 			);
@@ -405,15 +435,40 @@ class uiathletes extends boranking
 				$content['nm']['col_filter']['nation'] = $this->athlete_rights[0];
 			}
 		}
-		$content['msg'] = $msg;
-
 		$this->tmpl->read('ranking.athlete.list');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
+		$this->set_ui_state();
 		$this->tmpl->exec('ranking.uiathletes.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'filter2'=> array('' => 'All')+$this->license_labels,
 			'license'=> $this->license_labels,
 		));
+	}
+	
+	/**
+	 * Download the personaliced application form
+	 *
+	 */
+	function licenseform()
+	{
+		if (!$this->athlete->read($_GET) ||
+			!($form = file_get_contents($this->license_form_name)))
+		{
+			$GLOBALS['egw']->common->egw_exit();
+		}
+		$egw_charset = $GLOBALS['egw']->translation->charset();
+		foreach($this->athlete->data as $name => $value)
+		{
+			// the rtf seems to use iso-8859-1
+			$value = $GLOBALS['egw']->translation->convert($value,'egw_charset','iso-8859-1');
+			$form = str_replace('$$'.$name.'$$',$value,$form);
+		}
+		include_once(EGW_API_INC.'/class.browser.inc.php');
+		$browser = new browser();
+		$file = 'License '.$this->license_year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
+		$browser->content_header($file,'text/rtf');
+		echo $form;
+		$GLOBALS['egw']->common->egw_exit();
 	}
 }

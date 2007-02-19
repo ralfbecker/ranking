@@ -396,9 +396,10 @@ class uiresult extends boresult
 		if (!is_array($content))
 		{
 			$content = array('nm' => $GLOBALS['egw']->session->appsession('result','ranking'));
-			if (!is_array($content['nm']))
+			if (!is_array($content['nm']) || !$content['nm']['get_rows'])
 			{
-				$content['nm'] = array(
+				if (!is_array($content['nm'])) $content['nm'] = array();
+				$content['nm'] += array(
 					'get_rows'   => 'ranking.uiresult.get_rows',
 					'no_cat'     => true,
 					'no_filter'  => true,

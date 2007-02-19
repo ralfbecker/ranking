@@ -159,7 +159,7 @@
 			</columns>
 			<rows>
 				<row>
-					<description span="3" class="redItalic" id="msg" no_lang="1"/>
+					<description span="4" class="redItalic" id="msg" no_lang="1"/>
 				</row>
 				<row class="th">
 					<description options=",,,nachname" value="Last name"/>
@@ -216,10 +216,9 @@
 				</row>
 				<row>
 					<hbox span="4">
-						<button id="edit" label="Edit" statustext="Edit this athlete"/>
 						<button label="Save" id="save" statustext="Saves the changes made"/>
 						<button label="Apply" id="apply" statustext="Applies the changes made"/>
-						<button label="Cancel" id="cancel" statustext="exists without saving the changes"/>
+						<button label="Cancel" id="cancel" statustext="exists without saving the changes" onclick="window.close();"/>
 					</hbox>
 					<button label="Delete" align="right" id="delete" statustext="Delete this athlete" onclick="return confirm('Delete this athlete');"/>
 				</row>

@@ -228,6 +228,7 @@ registration	ranking	en	Registration
 registration deadline	ranking	en	Registration deadline
 remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
+required information missing, application rejected!	ranking	en	Required information missing, application rejected!
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
 result official	ranking	en	result official
 result pdf	ranking	en	Result PDF
@@ -318,3 +319,4 @@ which view do you want to see, when you start the ranking app?	ranking	en	Which 
 wildcard	ranking	en	Wildcard
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
+you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	en	You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue

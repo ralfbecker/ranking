@@ -20,7 +20,10 @@
 	));
 	include('../header.inc.php');
 
-	$default_view = $GLOBALS['egw_info']['user']['preferences']['ranking']['default_view'];
-	ExecMethod($default_view ? $default_view : 'ranking.uiranking.index');
+	if (!($view = $GLOBALS['egw']->session->appsession('menuaction','ranking')))
+	{
+		$view = $GLOBALS['egw_info']['user']['preferences']['ranking']['default_view'];
+	}
+	ExecMethod($view ? $view : 'ranking.uiranking.index');
 
 	$GLOBALS['egw']->common->egw_footer();
