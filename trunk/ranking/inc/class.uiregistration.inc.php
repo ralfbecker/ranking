@@ -62,6 +62,7 @@ class uiregistration extends boranking
 		{
 			// allow only to register athletes with applied or confirmed licenses
 			$readonlys["register[$row[PerId]]"] = $row['license'] == 'n';
+			$readonlys["apply_license[$row[PerId]]"] = !$readonlys["register[$row[PerId]]"];
 		}
 		$rows['sel_options'] =& $sel_options;
 		$rows['comp'] = $query['comp'];
@@ -85,11 +86,19 @@ class uiregistration extends boranking
 	{
 		if (!is_array($content))
 		{
-			$content = array(
-				'comp'     => $_GET['comp'],
-				'nation'   => $_GET['nation'],
-				'cat'      => $_GET['cat'],
-			);
+			if ($_GET['comp'] && $_GET['nation'] && $_GET['cat'])
+			{
+				$content = array(
+					'comp'     => $_GET['comp'],
+					'nation'   => $_GET['nation'],
+					'cat'      => $_GET['cat'],
+				);
+			}
+			else
+			{
+				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
+			}
+			if ($_GET['msg']) $msg = $_GET['msg'];
 		}
 		$nation = $content['nation'];
 		$comp   = $content['comp'];
@@ -159,12 +168,13 @@ class uiregistration extends boranking
 					'calendar' => $_GET['calendar'],
 					'comp'     => $_GET['comp'],
 					'nation'   => $_GET['nation'],
+					'cat'      => $_GET['cat'],
 				);
 				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'])))
 				{
 					$content['nation'] = $athlete['nation'];
-					$content['cat']    = $_GET['cat'];
 				}
+				$GLOBALS['egw']->session->appsession('registration','ranking',$content);
 			}
 			else
 			{
@@ -350,6 +360,7 @@ class uiregistration extends boranking
 							'register_button' => $register_button,
 						);
 						$readonlys[$registered ? $delete_button : $register_button] = false;	// re-enable the button
+						if ($athlete['license'] == 'n') $readonlys[$register_button] = true;	// no register without license
 					}
 					if (count($athletes) > $prequal_lines)
 					{

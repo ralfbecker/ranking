@@ -28,7 +28,7 @@
 					<description value="License" id="license_year" no_lang="1" class="leftPad5"/>
 					<description value="Action" align="center"/>
 				</row>
-				<row class="nmr">
+				<row class="row">
 					<description id="${row}[PerId]" align="center" no_lang="1" value="$row_cont[nation]"/>
 					<description id="${row}[nachname]" no_lang="1" class="lastname leftPad5"/>
 					<description class="ml10 leftPad5" no_lang="1" id="${row}[vorname]"/>
@@ -39,12 +39,14 @@
 					<description no_lang="1" id="${row}[ort]"/>
 					<description id="${row}[verband]" no_lang="1"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
-					<menulist class="leftPad5">
-						<menupopup id="${row}[license]" readonly="true"/>
-					</menulist>
-					<hbox align="center">
-						<button id="view[$row_cont[PerId]]" image="view" label="View" statustext="View this athlete"/>
-						<button label="Edit" align="center" id="edit[$row_cont[PerId]]" image="edit" statustext="Edit this athlete"/>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup id="${row}[license]" readonly="true"/>
+						</menulist>
+						<button class="small" label="Apply for" id="apply_license[$row_cont[PerId]]" statustext="Applies for the license and downloads the necessary form to mail to the office" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+					</hbox>
+					<hbox options="0,0">
+						<button label="Edit" id="edit[$row_cont[PerId]]" image="edit" statustext="Edit this athlete" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
 						<button id="delete[$row_cont[PerId]]" image="delete" label="Delete" onclick="return confirm('Delete this athlete');" statustext="Delete this athlete"/>
 					</hbox>
 				</row>
@@ -67,7 +69,7 @@
 					<nextmatch options="ranking.athlete.list.rows" id="nm"/>
 				</row>
 				<row>
-					<button label="Add" id="nm[rows][edit][0]" statustext="add a new athlete"/>
+					<button label="Add" id="nm[rows][edit][0]" statustext="add a new athlete" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
 				</row>
 			</rows>
 		</grid>

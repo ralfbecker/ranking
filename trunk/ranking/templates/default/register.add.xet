@@ -28,10 +28,15 @@
 					<date id="${row}[geb_date]" readonly="true" options="Y-m-d" align="center"/>
 					<description no_lang="1" id="${row}[ort]"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d" align="center"/>
-					<menulist>
-						<menupopup id="${row}[license]" readonly="true"/>
-					</menulist>
-					<button class="small" label="Register" id="register[$row_cont[PerId]]" statustext="Register this athlete for the selected category" onclick="opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;"/>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup id="${row}[license]" readonly="true"/>
+						</menulist>
+						<button class="small" label="Apply for" id="apply_license[$row_cont[PerId]]" statustext="Applies for the license and downloads the necessary form to mail to the office" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+					</hbox>
+					<hbox options="0,0">
+						<button class="small" label="Register" id="register[$row_cont[PerId]]" statustext="Register this athlete for the selected category" onclick="opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;"/>
+					</hbox>
 				</row>
 			</rows>
 		</grid>

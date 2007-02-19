@@ -228,6 +228,7 @@ registration	ranking	de	Registrierung
 registration deadline	ranking	de	Anmeldeschuss für die Registrierung
 remove the attached pdf	ranking	de	Das angehangene PDF löschen
 removed the %1	ranking	de	Das %1 wurde gelöscht
+required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
 result official	ranking	de	Ergebnis offiziell
 result pdf	ranking	de	Ergebnis PDF
@@ -318,3 +319,4 @@ which view do you want to see, when you start the ranking app?	ranking	de	Welche
 wildcard	ranking	de	Wildcard
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
+you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden! Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (Sie können einge für den öffentlichen Zugrif gesperrt werden). Fortfahren

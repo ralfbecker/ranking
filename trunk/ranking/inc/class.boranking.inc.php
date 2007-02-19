@@ -896,16 +896,18 @@ class boranking extends soranking
 	 * @param int $comp
 	 * @param int $cat=null
 	 */
-	function set_ui_state($calendar,$comp,$cat=null)
+	function set_ui_state($calendar=null,$comp=null,$cat=null)
 	{
+		//echo "<p>boranking::set_ui_state(calendar='$calendar',comp=$comp,cat=$cat) menuaction=$_GET[menuaction]</p>\n";
 		foreach(array('registration','result') as $type)
 		{
 			$data = $GLOBALS['egw']->session->appsession($type,'ranking');
 			foreach(array('calendar','comp','cat') as $name)
 			{
-				$data[$name] = $$name;
+				if (!is_null($$name)) $data[$name] = $$name;
 			}
 			$GLOBALS['egw']->session->appsession($type,'ranking',$data);
 		}
+		if ($_GET['menuaction']) $GLOBALS['egw']->session->appsession('menuaction','ranking',$_GET['menuaction']);
 	}
 }
