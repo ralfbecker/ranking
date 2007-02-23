@@ -631,6 +631,12 @@ class uiregistration extends boranking
 				}
 				$GLOBALS['egw']->common->egw_exit();
 			}
+			if ($content['upload'] && is_uploaded_file($content['file']['tmp_name']))
+			{
+				$msg = $this->upload(array('WetId'=>$content['comp'],'GrpId'=>$content['cat']),$content['file']['tmp_name']);
+				// re-read the starters
+				$starters =& $this->result->read($keys,'',true,$order);
+			}
 			if (!$show || !$starters || !count($starters))
 			{
 				// if we have registrations, show them
@@ -677,6 +683,7 @@ class uiregistration extends boranking
 			'rows'     => $rows,
 			'msg'      => $msg,
 			'result'   => $athlete['platz'] > 0,
+			'no_upload' => !$comp || !$cat || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp),
 		);
 		// save calendar, competition & cat between calls in the session
 		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
@@ -706,10 +713,32 @@ class uiregistration extends boranking
 		// anyway include the used competition
 		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
 		{
-			$select_options['comp'] = array_merge(array(
+			$select_options['comp'] = array(
 				$comp['WetId']	=> $comp['name']
-			),$select_options['comp']);
+			)+$select_options['comp'];
 		}
 		return $tmpl->exec('ranking.uiregistration.lists',$content,$select_options,$readonlys,$preserv);
+	}
+	
+	/**
+	 * Upload a result as csv file
+	 *
+	 * @param array $keys WetId, GrpId, route_order
+	 * @param string $file uploaded file
+	 * @param string/int error message or number of lines imported
+	 */
+	function upload($keys,$file)
+	{
+		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] ||
+			!($comp = $this->comp->read($keys['WetId'])) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
+		{
+			return lang('Permission denied !!!');
+		}
+		$csv = $this->parse_csv($keys,$file,true);
+		
+		if (!is_array($csv)) return $csv;
+		
+		return $this->import_ranking($keys,$csv);
 	}
 }

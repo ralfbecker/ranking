@@ -297,7 +297,7 @@ class boresult extends boranking
 			{
 				$order_by = 'result_rank DESC';		// --> reversed result
 			}
-			if (($comp = $this->comp->read($keys['WetId'])) &&
+			if (($comp = $this->comp->read($keys['WetId'])) && 
 				($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
 			{
 				$order_by .= ','.$ranking_sql.' DESC';	// --> reverse of the ranking
@@ -549,11 +549,16 @@ class boresult extends boranking
 		return $this->route_result->delete_participant($keys);
 	}
 	
+	/**
+	 * Download a route as csv file
+	 *
+	 * @param array $keys WetId, GrpId, route_order
+	 */
 	function download($keys)
 	{
 		if (($route = $this->route->read($keys)) &&
 			($cat = $this->cats->read($keys['GrpId'])) &&
-			($comp = $this->comp->read($keys['comp'])))
+			($comp = $this->comp->read($keys['WetId'])))
 		{
 			$keys['route_type'] = $route['route_type'];
 			$keys['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
@@ -627,5 +632,126 @@ class boresult extends boranking
 			}
 			$GLOBALS['egw']->common->egw_exit();
 		}
+	}
+
+	/**
+	 * Upload a route as csv file
+	 *
+	 * @param array $keys WetId, GrpId, route_order
+	 * @param string $file uploaded file
+	 * @param string/int error message or number of lines imported
+	 */
+	function upload($keys,$file)
+	{
+		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) // permission denied
+		{
+			return lang('Permission denied !!!');
+		}
+		$csv = $this->parse_csv($keys,$file);
+		
+		if (!is_array($csv)) return $csv;
+		
+		$this->route_result->delete(array(
+			'WetId'    => $keys['WetId'],
+			'GrpId'    => $keys['GrpId'],
+			'route_order' => $keys['route_order'],
+		));
+		//_debug_array($lines);
+		foreach($lines as $line)
+		{
+			$this->route_result->init($line);
+			$this->route_result->save(array(
+				'result_modifier' => $this->user,
+				'result_modified' => time(),
+			));
+		}
+		return count($lines);
+	}
+	
+	/**
+	 * Convert a result-string into array values, as used in our results
+	 *
+	 * @internal 
+	 * @param array $arr result, boulder1, ..., boulderN
+	 * @param string $discipline lead, speed or boulder
+	 * @return array
+	 */
+	function _csv2result($arr,$discipline)
+	{
+		$result = array();
+		
+		$str = trim(str_replace(',','.',$arr['result']));		// remove space and allow to use comma instead of dot as decimal del.
+		
+		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climed so far
+		
+		switch($discipline)
+		{
+			case 'lead':
+				if (strstr(strtoupper($str),'TOP'))
+				{
+					$result['result_plus'] = TOP_PLUS;
+					$result['result_height'] = TOP_HEIGHT;
+				}
+				else
+				{
+					$result['result_height'] = (double) $str;
+					switch(substr($str,-1))
+					{
+						case '+': $result['result_plus'] = 1; break;
+						case '-': $result['result_plus'] = -1; break;
+						default:  $result['result_plus'] = 0; break;
+					}
+				}
+				break;
+			
+			case 'speed':
+				$result['result_time'] = is_numeric($str) ? (double) $str : ELIMINATED_TIME;
+				break;
+				
+			case 'boulder':	// #t# #b#
+				list($top,$bonus) = explode(' ',$str);
+				list($top,$top_tries) = explode('t',$top);
+				list($bonus,$bonus_tries) = explode('b',$bonus);
+				$result['result_top'] = $top ? 100 * $top - $top_tries : null;
+				$result['result_zone'] = 100 * $bonus - $bonus_tries;
+				for($i = 1; $i <= 6 && array_key_exists('boulder'.$i,$arr); ++$i)
+				{
+					if (!($boulder = $arr['boulder'.$i])) continue;
+					if ($boulder{0} == 't')
+					{
+						$result['top'.$i] = (int) substr($boulder,1);
+						list(,$boulder) = explode(' ',$boulder);
+					}
+					$result['zone'.$i] = (int) substr($boulder,1);
+				}
+				break;
+		}
+		return $result;
+	}
+	
+	/**
+	 * Import the general result of a competition into the ranking
+	 *
+	 * @param array $keys WetId, GrpId, discipline, route_type, route_order=-1
+	 * @return string message
+	 */
+	function import_ranking($keys)
+	{
+		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']))
+		{
+			return false;
+		}
+		foreach($this->route_result->search('',false,'result_rank','','',false,'AMD',false,array(
+			'WetId' => $keys['WetId'],
+			'GrpId' => $keys['GrpId'],
+			'route_order' => $keys['route_order'],
+			'discipline' => $keys['discipline'],
+			'route_type' => $keys['route_type'],
+		)) as $row)
+		{
+			if ($row['result_rank']) $result[$row['PerId']] = $row['result_rank'];
+		}
+		//_debug_array($result);
+		return parent::import_ranking($keys,$result);
 	}
 }

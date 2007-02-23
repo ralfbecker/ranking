@@ -112,7 +112,7 @@ class uiresult extends boresult
 				case 'save':
 				case 'apply':
 					//_debug_array($content);
-					if (!$this->route->save($content) == 0)
+					if ($this->route->save($content) != 0)
 					{
 						$msg = lang('Error: saving the route!!!');
 						$button = $js = '';	// dont exit the window
@@ -164,6 +164,42 @@ class uiresult extends boresult
 						$msg = lang('Error: deleting the route!!!');
 						$js = $button = '';	// dont exit the window
 					}
+					break;
+					
+				case 'upload':
+					if ($content['new_route'])
+					{
+						if ($this->route->save($content) != 0)
+						{
+							$msg = lang('Error: saving the route!!!');
+							$button = $js = '';	// dont exit the window
+							break;
+						}
+						$param['msg'] = $msg = lang('Route saved').', ';
+						unset($content['new_route']);
+					}
+					if ($this->has_results($content))
+					{
+						$param['msg'] = $msg = lang('Error: route already has a result!!!');
+						$param['show_result'] = 1;
+					}
+					elseif (!$content['file']['tmp_name'] || !is_uploaded_file($content['file']['tmp_name']))
+					{
+						$param['msg'] = ($msg .= lang('Error: no file to upload selected'));
+					}
+					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'])))
+					{
+						$param['msg'] = ($msg .= lang('%1 participants imported',$imported));
+						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
+					}
+					else
+					{
+						$param['msg'] = ($msg .= $imported);
+					}
+					break;
+					
+				case 'ranking':
+					$param['msg'] = $msg = $this->import_ranking($content);
 					break;
 			}
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent
@@ -232,7 +268,8 @@ class uiresult extends boresult
 			unset($sel_options['route_status'][0]);
 		}
 		// cant delete general result or not yet saved routes
-		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = $content['route_order'] == -1 || $content['new_route'];
+		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = 
+			$content['route_order'] == -1 || $content['new_route'];
 		
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
@@ -241,7 +278,19 @@ class uiresult extends boresult
 			{
 				$readonlys[$col] = true;
 			}
-			$readonlys['button[startlist]'] = $readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] = true;
+			$readonlys['button[upload]'] = $readonlys['button[ranking]'] = $readonlys['button[startlist]'] = $readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] = true;
+			$content['no_upload'] = true;
+		}
+		else
+		{
+			if ($content['route_status'] != STATUS_RESULT_OFFICIAL || $content['new_route'] || $content['route_order'] != -1)
+			{
+				$readonlys['button[ranking]'] = true;	// only offical results can be commited into the ranking
+			}
+			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
+			{
+				$content['no_upload'] = $readonlys['button[upload]'] = true;	// no upload if result offical or general result
+			}
 		}
 		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
 
@@ -500,9 +549,11 @@ class uiresult extends boresult
 						$msg = lang('Error').': '.implode(', ',$errors);
 					}
 					break;
+					
 				case 'download':
 					$this->download($keys);
 					break;
+					
 				case 'delete':
 					if (!is_numeric($PerId) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 						!$this->delete_participant($keys+array('PerId'=>$PerId)))
@@ -587,6 +638,7 @@ class uiresult extends boresult
 			$sel_options['result_plus'] = $this->plus;
 		}
 		$readonlys['button[download]'] = !$this->has_startlist($keys);
+		$readonlys['button[new]'] = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp);
 
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.register.lists" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.register.lists" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%">
 			<columns>
 				<column width="83"/>
@@ -14,7 +14,7 @@
 				</row>
 				<row class="th">
 					<description options=",,,comp" value="Competition"/>
-					<hbox orient=",0,0">
+					<hbox options="0,0">
 						<menulist>
 							<menupopup id="calendar" onchange="1" no_lang="1"/>
 						</menulist>
@@ -25,11 +25,18 @@
 				</row>
 				<row class="th" disabled="!@comp">
 					<description value="Category" options=",,,cat"/>
-					<hbox orient=",0,0">
+					<hbox options="0,0">
 						<menulist>
 							<menupopup id="cat" no_lang="1" onchange="1" options="All"/>
 						</menulist>
-						<button label="Download" id="download"/>
+						<button label="Download" id="download" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row class="row" disabled="@no_upload">
+					<description value="Import file"/>
+					<hbox options="0,0">
+						<file id="file"/>
+						<button id="upload" label="Upload" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row disabled="!@comp">

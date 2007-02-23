@@ -1,5 +1,6 @@
 %1 deleted	ranking	en	%1 deleted
 %1 is an admin and has therefor all rights!	ranking	en	%1 is an admin and has therefor all rights!
+%1 participants imported	ranking	en	%1 participants imported
 %1 saved	ranking	en	%1 saved
 %1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
@@ -94,13 +95,20 @@ eliminated	ranking	en	eliminated
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
+error: dataline %1 contains %2 instead of %3 columns !!!	ranking	en	Error: dataline %1 contains %2 instead of %3 columns !!!
+error: dataline %1 contains not existing athlete id #%2 !!!	ranking	en	Error: dataline %1 contains not existing athlete id #%2 !!!
+error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!	ranking	en	Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!
+error: dataline %1, athlete %2 has wrong gender '%3' !!!	ranking	en	Error: dataline %1, athlete %2 has wrong gender '%3' !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
 error: deleting the route!!!	ranking	en	Error: deleting the route!!!
 error: generating startlist!!!	ranking	en	Error: generating startlist!!!
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
+error: no file to upload selected	ranking	en	Error: no file to upload selected
+error: no line with column names, eg. delemiter is not ;	ranking	en	Error: no line with column names, eg. delemiter is not ;
 error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
 error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
+error: required column %1 not found !!!	ranking	en	Error: required column %1 not found !!!
 error: route already has a result!!!	ranking	en	Error: route already has a result!!!
 error: saving the route!!!	ranking	en	Error: saving the route!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
@@ -142,6 +150,9 @@ how many athletes from the complimentary list of each nation should be used	rank
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
+import file	ranking	en	Import file
+import into ranking	ranking	en	Import into ranking
+import the result into the ranking	ranking	en	Import the result into the ranking
 in kilogram	ranking	en	in kilogram
 incl. nation-code	ranking	en	incl. nation-code
 information pdf	ranking	en	Information PDF
@@ -183,6 +194,7 @@ on how many routes is the first round	ranking	en	On how many routes is the first
 one qualification	ranking	en	one Qualification
 only fill values different from egw	admin	en	only fill values different from eGW
 opens	ranking	en	opens
+or	ranking	en	or
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
 pairing speed final	ranking	en	Pairing speed final
@@ -234,6 +246,7 @@ result official	ranking	en	result official
 result pdf	ranking	en	Result PDF
 resultlist	ranking	en	Resultlist
 results	ranking	en	Results
+results of %1 participants imported into the ranking, feldfactor: %2	ranking	en	results of %1 participants imported into the ranking, feldfactor: %2
 resultservice	ranking	en	Resultservice
 route	ranking	en	Route
 route deleted	ranking	en	Route deleted

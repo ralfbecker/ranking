@@ -95,7 +95,7 @@ class route_result extends so_sql
 			$discipline = $filter['discipline'];
 			unset($filter['discipline']);
 		}
-		if (isset($filter['route_order']))
+		if (is_array($filter) && isset($filter['route_order']))
 		{
 			$route_order =& $filter['route_order'];
 		}
@@ -339,19 +339,19 @@ class route_result extends so_sql
 				$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
 					($data['zone'.$i] ? 'b'.$data['zone'.$i] : '');
 			}
-			$suffix = '';	// general result can have route_order as suffix
-			while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
+		}
+		$suffix = '';	// general result can have route_order as suffix
+		while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
+		{
+			if (isset($data['result_zone'.$suffix]))
 			{
-				if (isset($data['result_zone'.$suffix]))
-				{
-					$tops = round($data['result_top'.$suffix] / 100);
-					$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
-					$zones = round($data['result_zone'.$suffix] / 100);
-					$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
-					$data['result'.$suffix] = $tops.'t'.$top_tries.' '.$zones.'b'.$zone_tries; 
-				}
-				++$suffix;
+				$tops = round($data['result_top'.$suffix] / 100);
+				$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
+				$zones = round($data['result_zone'.$suffix] / 100);
+				$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
+				$data['result'.$suffix] = $tops.'t'.$top_tries.' '.$zones.'b'.$zone_tries; 
 			}
+			++$suffix;
 		}
 		if ($data['result_time'])	// speed result
 		{

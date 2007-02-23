@@ -234,7 +234,7 @@ class uiathletes extends boranking
 				{
 					$link = $GLOBALS['egw']->link('/index.php',array(
 						'menuaction' => 'ranking.uiathletes.index',
-						'msg' => lang('Permission denied!!!'),
+						'msg' => lang('Permission denied !!!'),
 					));
 				}
 				$js = "window.opener.location='$link';";
