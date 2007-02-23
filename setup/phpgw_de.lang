@@ -1,5 +1,6 @@
 %1 deleted	ranking	de	%1 gelöscht
 %1 is an admin and has therefor all rights!	ranking	de	%1 ist ein Administrator und hat daher alle Rechte!
+%1 participants imported	ranking	de	%1 Teilnehmer importiert
 %1 saved	ranking	de	%1 gespeichert
 %1, %2 deleted for category %3	ranking	de	%1, %2 gelöscht für Kategorie %3
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
@@ -94,13 +95,20 @@ eliminated	ranking	de	eliminiert
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
+error: dataline %1 contains %2 instead of %3 columns !!!	ranking	de	Fehler: Datenzeile %1 enthält %2 statt %3 Spalten !!!
+error: dataline %1 contains not existing athlete id #%2 !!!	ranking	de	Fehler: Datenzeile %1 enthält nicht existierende Athleten Id #%2 !!!
+error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!	ranking	de	Fehler: Datenzeile %1 enthält falsche %2 Id #%3 statt #%4 !!!
+error: dataline %1, athlete %2 has wrong gender '%3' !!!	ranking	de	Fehler: Datenzeile %1, Athlete %2 hat falsches Geschlecht '%3' !!!
 error: deleting %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: deleting the route!!!	ranking	de	Fehler: beim Löschen der Route !!!
 error: generating startlist!!!	ranking	de	Fehler: beim Erzeugen der Startliste !!!
 error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlüssel '%1' existiert bereits, er muß eindeutig sein !!!
+error: no file to upload selected	ranking	de	Fehler: keine Datei zum Hochladen ausgewählt
+error: no line with column names, eg. delemiter is not ;	ranking	de	Fehler: keine Zeile mit den Spaltennamen, zB. Trennzeichen ist nicht ;
 error: registration	ranking	de	Fehler: Registrierung
 error: removing the %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: renaming the attachments !!!	ranking	de	Fehler: beim Umbenennen der Anhänge !!!
+error: required column %1 not found !!!	ranking	de	Fehler: benötigte Splaten %1 nicht gefunden !!!
 error: route already has a result!!!	ranking	de	Fehler: die Route hat bereits ein Ergebnis !!!
 error: saving the route!!!	ranking	de	Fehler: beim Speichern der Route !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
@@ -142,6 +150,9 @@ how many athletes from the complimentary list of each nation should be used	rank
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athleten des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
+import file	ranking	de	Datei importieren
+import into ranking	ranking	de	Ranglistenimport
+import the result into the ranking	ranking	de	Importiert die Ergebnisse in die Rangliste
 in kilogram	ranking	de	in Kilogram
 incl. nation-code	ranking	de	einschl. Länderkennung
 information pdf	ranking	de	Informations PDF
@@ -183,6 +194,7 @@ on how many routes is the first round	ranking	de	Auf wievielen Routen findet die
 one qualification	ranking	de	eine Qualifikation
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
 opens	ranking	de	öffnet
+or	ranking	de	oder
 other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
 pairing speed final	ranking	de	Paarungen Speed Finale
@@ -234,6 +246,7 @@ result official	ranking	de	Ergebnis offiziell
 result pdf	ranking	de	Ergebnis PDF
 resultlist	ranking	de	Ergebnisliste
 results	ranking	de	Ergebnisse
+results of %1 participants imported into the ranking, feldfactor: %2	ranking	de	Ergebnis von %1 Teilnehmern in die Rangliste importiert, Feldfaktor: %2
 resultservice	ranking	de	Ergebnisservice
 route	ranking	de	Route
 route deleted	ranking	de	Route gelöscht

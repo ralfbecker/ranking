@@ -360,4 +360,21 @@ class result extends so_sql
 		//echo "<p>result::ranking_results(".print_r($cats,true).",'$stand','$start',$from_year,$to_year) count(\$results)=".count($results).", time=".sprintf('%0.2lf',$e_time-$s_time)."<br>$sql</p>\n";
 		return $results;
 	}
+	
+	/**
+	 * Save a calculated fieldfactor
+	 *
+	 * @param int/array $comp
+	 * @param int/array $cat
+	 * @param double $factor
+	 */
+	function save_feldfactor($comp,$cat,$factor)
+	{
+		$this->db->insert($this->ff_table,array(
+			'ff' => $factor,
+		),array(
+			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
+			'GrpId' => is_array($cat) ? $cat['GrpId'] : $cat,
+		),__LINE__,__FILE__);
+	}
 }

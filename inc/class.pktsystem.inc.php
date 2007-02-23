@@ -42,6 +42,7 @@ class pktsystem extends so_sql
 	);
 	var $pkte;
 */
+	var $pkte_table = 'PktSystemPkte';
 
 	/**
 	 * pktsystem of the competition class
@@ -76,5 +77,27 @@ class pktsystem extends so_sql
 			$arr[$data['PktId']] = $data['rkey'].': '.$data['name'];
 		}
 		return $arr;
+	}
+	
+	/**
+	 * Get points per place of a given point-system
+	 *
+	 * @param int/string $PktId PktId or rkey
+	 * @param array &$pkte on return array with points indexed by place
+	 * @return double sum of all points
+	 */
+	function get_pkte ($PktId,&$pkte) 
+	{
+		if (!is_numeric($PktId) && $this->read(array('rkey'=>$PktId)))
+		{
+			$PktId = $this->data['PktId'];
+		}
+		$this->db->select($this->pkte_table,'platz,pkt',array('PktId'=>$PktId),__LINE__,__FILE__,false,'ORDER BY platz');
+		while (($row = $this->db->row(true)))
+		{
+			$max_pkte += ($pkte[$row['platz']] = $row['pkt']);
+		}
+		//echo "<p>pktsystem::get_pkte($PktId,) = $max_pkte</p>\n";
+		return $max_pkte;
 	}
 };

@@ -910,4 +910,248 @@ class boranking extends soranking
 		}
 		if ($_GET['menuaction']) $GLOBALS['egw']->session->appsession('menuaction','ranking',$_GET['menuaction']);
 	}
+
+	/**
+	 * Calculate the feldfactor of a competition
+	 * 
+	 * For the fieldfactor the ranking of the day before the competition starts has to be used!
+	 *
+	 * @param int/array $comp competition id or array
+	 * @param int/array $cat category id or array
+	 * @param array $starters with athltets (PerId's)
+	 * @return double 1.0 for no feldfactor!
+	 */
+	function feldfactor($comp,$cat,$starters)
+	{
+		if (!is_array($comp) && !($comp = $this->comp->read($comp))) return false;
+		if (!is_array($cat) && !($cat = $this->cats->read($cat))) return false;
+		
+		$rls = $cat['vor'] && $comp['datum'] < $cat['vor'] ? $cat['vor_rls'] : $cat['rls'];
+		$has_feldfakt = $rls && $comp['feld_pkte'] && $comp['faktor'] && $cat['rkey'] != "OMEN";
+		
+		if (!$has_feldfakt) return 'no fieldfactor';//1.0;
+		
+		// we have to use the ranking of the day before the competition starts
+		$stand = explode('-',$comp['datum']);
+		$stand = date('Y-m-d',mktime(0,0,0,$stand[1],$stand[2]-1,$stand[0]));
+		if (!$this->ranking($cat,$stand,$start,$nul,$ranglist,$rls,$nul,$nul))
+		{
+			return 'no ranking';//1.0;
+		}
+		$max_pkte = $this->pkte->get_pkte($comp['feld_pkte'],$pkte);
+		
+		$feldfakt = 0.0;
+		
+		foreach($starters as $PerId)
+		{
+			if (isset($ranglist[$PerId]))
+			{
+				$feldfakt += $pkte[$ranglist[$PerId]['platz']];
+			}
+		}
+		$feldfakt = round($feldfakt / $max_pkte,2);
+		//echo "<p>boresult::feldfactor('$comp[rkey]','$cat[rkey]')==$feldfakt</p>\n";
+		return $feldfakt;
+	}
+	
+	/**
+	 * Import a result of a competition into the ranking
+	 *
+	 * @param array $keys WetId, GrpId
+	 * @param array $result PerId => platz pairs
+	 * @return string message
+	 */
+	function import_ranking($keys,$result)
+	{
+		if (!$keys['WetId'] || !$keys['GrpId'] ||
+			!($comp = $this->comp->read($keys['WetId'])) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
+		{
+			return false;
+		}
+		//_debug_array($result);
+		$feldfactor = $this->feldfactor($comp,$keys['GrpId'],array_keys($result));
+		
+		$this->result->delete(array(
+			'WetId' => $keys['WetId'],
+			'GrpId' => $keys['GrpId'],
+		));
+		$this->result->init(array(
+			'WetId' => $keys['WetId'],
+			'GrpId' => $keys['GrpId'],
+			'datum' => date('Y-m-d'),
+		));
+		$this->pkte->get_pkte($comp['pkte'],$pkte);
+
+		foreach($result as $PerId => $place)
+		{
+			if (is_array($place)) $place = $place['result_rank'];
+			
+			$this->result->save(array(
+				'PerId' => $PerId,
+				'platz' => $place,
+				'pkt'   => round(100.0 * $feldfactor * $comp['faktor'] * $pkte[$place]),
+			));
+		}
+		// not sure if the new code still uses that, but it does not hurt ;-)
+		$this->result->save_feldfactor($keys['WetId'],$keys['GrpId'],$feldfactor);
+
+		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2lf',$feldfactor));		
+	}
+	/**
+	 * Parse a csv file
+	 *
+	 * @param array $keys WetId, GrpId, route_order
+	 * @param string $file uploaded file
+	 * @param boolean $result_only true = only results allowed, false = startlists too
+	 * @return string/array error message or result lines
+	 */
+	function parse_csv($keys,$file,$result_only=false)
+	{
+		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || 	
+			!($comp = $this->comp->read($keys['WetId'])) ||
+			!($cat = $this->cats->read($keys['GrpId'])) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
+		{
+			return lang('Permission denied !!!');
+		}
+		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+
+		if (!($fp = fopen($file,'rb')) || !($labels = fgetcsv($fp,null,';')) || count($labels) <= 1)
+		{
+			return lang('Error: no line with column names, eg. delemiter is not ;');
+		}
+		if (!in_array('athlete',$labels))
+		{
+			return lang('Error: required column %1 not found !!!',"'athlete'");
+		}
+		if (!in_array('place',$labels) && (!in_array('startorder',$labels) || $result_only))
+		{
+			return lang('Error: required column %1 not found !!!',$result_only ? "'place'" : "'place' ".lang('or')." 'startorder'");
+		}
+
+		$n = 1;
+		while (($line = fgetcsv($fp,null,';')))
+		{
+			if (count($line) != count($labels))
+			{
+				return lang('Error: dataline %1 contains %2 instead of %3 columns !!!',$n,count($line),count($labels));
+			}
+			$line = array_combine($labels,$line);
+			
+			if (in_array('comp',$labels) && $keys['WetId'] != $line['comp'])
+			{
+				return lang('Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!',
+					$n,lang('competition'),$line['comp'],$keys['WetId']);
+			}
+			if (in_array('cat',$labels) && $keys['GrpId'] != $line['cat'])
+			{
+				// we ignore lines of the wrong category and give only a warning if no line has the right category
+				if (!$cat_warning)
+				{
+					$cat_warning = lang('Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!',
+						$n,lang('category'),$line['cat'],$keys['GrpId']);
+				}
+				continue;
+			}
+			if (in_array('heat',$labels) && isset($keys['route_order']) && $keys['route_order'] != $line['heat'])
+			{
+				return lang('Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!',
+				$n,lang('heat'),$line['heat'],$keys['route_order']);
+			}
+			if ($discipline == 'speed' && $keys['route_order'] == 2 && $line['athlete'] < 0)
+			{
+				// speed final uses neg. id's for wildcards!
+			}
+			else
+			{
+				if (!($athlete = $this->athlete->read($line['athlete'])))
+				{
+					return lang('Error: dataline %1 contains not existing athlete id #%2 !!!',$n,$line['athlete']);
+				}
+				if ($athlete['sex'] != $cat['sex'])
+				{
+					return lang("Error: dataline %1, athlete %2 has wrong gender '%3' !!!",$n,
+						$athlete['nachname'].' '.$athlete['vorname'].' ('.$athlete['nation'].') #'.$line['athlete'],$athlete['sex']);
+				}
+			}
+			$lines[$line['athlete']] = array(
+				'WetId'    => $keys['WetId'],
+				'GrpId'    => $keys['GrpId'],
+				'route_order' => $keys['route_order'],
+				'PerId'    => $line['athlete'],
+				'result_rank'    => $line['place'] ? $line['place'] : null,
+				'start_order' => $line['startorder'] ? $line['startorder'] : $n,
+				'start_number' => $line['startnumber'] ? $line['startnumber'] : null,
+			)+$this->_csv2result($line,$discipline);
+			
+			++$n;
+		}
+		if (!$lines && $cat_warning)
+		{
+			return $cat_warning;
+		}
+		return $lines;
+	}
+	
+	/**
+	 * Convert a result-string into array values, as used in our results
+	 *
+	 * @internal 
+	 * @param array $arr result, boulder1, ..., boulderN
+	 * @param string $discipline lead, speed or boulder
+	 * @return array
+	 */
+	function _csv2result($arr,$discipline)
+	{
+		$result = array();
+		
+		$str = trim(str_replace(',','.',$arr['result']));		// remove space and allow to use comma instead of dot as decimal del.
+		
+		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climed so far
+		
+		switch($discipline)
+		{
+			case 'lead':
+				if (strstr(strtoupper($str),'TOP'))
+				{
+					$result['result_plus'] = TOP_PLUS;
+					$result['result_height'] = TOP_HEIGHT;
+				}
+				else
+				{
+					$result['result_height'] = (double) $str;
+					switch(substr($str,-1))
+					{
+						case '+': $result['result_plus'] = 1; break;
+						case '-': $result['result_plus'] = -1; break;
+						default:  $result['result_plus'] = 0; break;
+					}
+				}
+				break;
+			
+			case 'speed':
+				$result['result_time'] = is_numeric($str) ? (double) $str : ELIMINATED_TIME;
+				break;
+				
+			case 'boulder':	// #t# #b#
+				list($top,$bonus) = explode(' ',$str);
+				list($top,$top_tries) = explode('t',$top);
+				list($bonus,$bonus_tries) = explode('b',$bonus);
+				$result['result_top'] = $top ? 100 * $top - $top_tries : null;
+				$result['result_zone'] = 100 * $bonus - $bonus_tries;
+				for($i = 1; $i <= 6 && array_key_exists('boulder'.$i,$arr); ++$i)
+				{
+					if (!($boulder = $arr['boulder'.$i])) continue;
+					if ($boulder{0} == 't')
+					{
+						$result['top'.$i] = (int) substr($boulder,1);
+						list(,$boulder) = explode(' ',$boulder);
+					}
+					$result['zone'.$i] = (int) substr($boulder,1);
+				}
+				break;
+		}
+		return $result;
+	}
 }
