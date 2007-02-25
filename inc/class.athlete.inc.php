@@ -150,6 +150,21 @@ class athlete extends so_sql
 		}
 		return $data;
 	}
+	
+	function init($arr=array())
+	{
+		parent::init($arr);
+		
+		// switching everything off, but the city
+		$this->data['acl'] = array(
+			ACL_DENY_BIRTHDAY,
+			ACL_DENY_CELLPHONE,
+			ACL_DENY_EMAIL,
+			ACL_DENY_FAX,
+			ACL_DENY_PHONE,
+			ACL_DENY_STREET,
+		);
+	}
 
 	/**
 	 * Search for athletes, joins by default with the Result table to show the last competition and to filter by a category

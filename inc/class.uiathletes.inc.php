@@ -83,6 +83,7 @@ class uiathletes extends boranking
 		{
 			if (!$_GET['PerId'] && !$_GET['rkey'])
 			{
+				$this->athlete->init();
 				$this->athlete->data['nation'] = $this->athlete_rights[0];
 			}
 			// we have no edit-rights for that nation
