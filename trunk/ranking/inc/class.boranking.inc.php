@@ -213,6 +213,9 @@ class boranking extends soranking
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
 		}
 		$this->license_year = (int) date('Y');
+		
+		// makeing the boranking object availible for other objects
+		$GLOBALS['boranking'] =& $this;
 	}
 	
 	/**
