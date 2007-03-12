@@ -40,12 +40,28 @@ class athlete extends so_sql
 		'1' => 'a',
 		'2' => 'c',
 	);
+	var $acl2clear = array(
+		ACL_DENY_BIRTHDAY  => array('geb_date'),
+		ACL_DENY_EMAIL     => array('email'),
+		ACL_DENY_PHONE     => array('telefon'),
+		ACL_DENY_FAX       => array('fax'),
+		ACL_DENY_CELLPHONE => array('cellphone'),
+		ACL_DENY_STREET    => array('strasse','plz'),
+		ACL_DENY_CITY      => array('ort'),
+		ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','nation','verband','license','acl','last_comp'),
+	);
 	/**
 	 * year we check the license for
 	 *
 	 * @var int
 	 */
 	var $license_year;
+	/**
+	 * Reference to the boranking instance
+	 *
+	 * @var boranking
+	 */
+	var $boranking;
 
 	/**
 	 * constructor of the athlete class
@@ -94,6 +110,12 @@ class athlete extends so_sql
 		{
 			$data['practice'] = date('Y') - $data['practice'];
 		}
+		if ($data['geb_date']) $data['geb_year'] = (int) $data['geb_date'];
+
+		if (array_key_exists('license',$data))
+		{
+			$data['license'] = $this->pkt2license[(string)$data['license']];
+		}
 		if ($data['acl'])
 		{
 			$acl = $data['acl'];
@@ -103,13 +125,29 @@ class athlete extends so_sql
 				if ($acl & $n) $data['acl'][] = $n;
 			}
 			//echo "<p>athlete::db2data() acl=$acl=".print_r($data['acl'],true)."</p>\n";
-		}
-		if ($data['geb_date']) $data['geb_year'] = (int) $data['geb_date'];
 
-		if (array_key_exists('license',$data))
-		{
-			$data['license'] = $this->pkt2license[(string)$data['license']];
-		}
+			// blank out the acl'ed fields, if user has no athletes rights
+			if (is_object($GLOBALS['boranking']) && !$GLOBALS['boranking']->acl_check($data['nation'],EGW_ACL_ADD))
+			{
+				foreach($this->acl2clear as $deny => $to_clear)
+				{
+					if ($acl & $deny)
+					{
+						if ($to_clear[0] == '!')
+						{
+							$data = array_intersect_key($data,array_flip($to_clear));
+						}
+						else
+						{
+							foreach($to_clear as $name)
+							{
+								unset($data[$name]);
+							}
+						}
+					}
+				}
+			}
+		}		
 		return $data;
 	}
 
