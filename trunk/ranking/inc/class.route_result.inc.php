@@ -613,4 +613,21 @@ class route_result extends so_sql
 		}
 		return true;
 	}
+	
+	/**
+	 * Determine the highest existing route_order for $comp and $cat
+	 *
+	 * @param int $comp WetId
+	 * @param int $cat GrpId
+	 * @return int route_order or null
+	 */
+	function get_max_order($comp,$cat)
+	{
+		$this->db->select($this->table_name,'MAX(route_order)',array(
+			'WetId' => $comp,
+			'GrpId' => $cat,
+		),__LINE__,__FILE__);
+		
+		return $this->db->next_record() ? $this->db->f(0) : null;
+	}
 }
