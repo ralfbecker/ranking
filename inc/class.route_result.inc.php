@@ -155,6 +155,8 @@ class route_result extends so_sql
 				
 				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 
+				if (!$rows) return $rows;
+
 				// the general result is always sorted by the overal rank (to get it)
 				// now we need to store that rank in result_rank
 				$old = null;
