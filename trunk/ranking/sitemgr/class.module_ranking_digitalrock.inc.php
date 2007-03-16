@@ -96,22 +96,22 @@ class module_ranking_digitalrock extends Module
 				break;
 				
 			case 'pstambl':
-				if (!$GLOBALS['dr_config']['params']['person'])
+				if (!$GLOBALS['dr_config']['params']['person'] || !$GLOBALS['dr_config']['params']['cat'])
 				{
-					return '';	// otherwise we get a fatal error
+					return '<p>'.lang('No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!')."</p>\n";	// otherwise we get a fatal error
 				}
 				break;
 				
 			case 'nat_team_ranking':
 				if (!$GLOBALS['dr_config']['params']['comp'] && !$GLOBALS['dr_config']['params']['cup'])
 				{
-					return '';	// otherwise we get a fatal error
+					return '<p>'.lang('No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!')."</p>\n";	// otherwise we get a fatal error
 				}
 				break;
 		}
 		if (!file_exists($file = DR_PATH.'/'.$file.'.php'))
 		{
-			return lang('File %1 not found (either type=%2 or DR_PATH=%3 wrong)',$file,$arguments['type'],DR_PATH);
+			return '<p>'.lang('File %1 not found (either type=%2 or DR_PATH=%3 wrong)!',$file,$arguments['type'],DR_PATH)."</p>\n";
 		}
 		ob_start();
 		include($file);

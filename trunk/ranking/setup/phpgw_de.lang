@@ -119,7 +119,7 @@ fax	ranking	de	Fax
 federation	ranking	de	Verband
 female	ranking	de	weiblich
 fieldfactorpoints	ranking	de	Feldfaktorpunkte
-file %1 not found (either type=%2 or dr_path=%3 wrong)	ranking	de	Datei %1 nicht gefunden (entweder Typ=%2 oder DR_PATH=%3 falsch)
+file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	de	Datei %1 nicht gefunden (entweder Typ=%2 oder DR_PATH=%3 falsch)!
 file '%1' successful attached as %2	ranking	de	Datei '%1' erfolgreich als %2 angehangen
 file is not a pdf	ranking	de	Die Datei ist kein PDF
 final	ranking	de	Finale
@@ -182,8 +182,12 @@ nation if national competition or none for an internatinal one	ranking	de	Nation
 nation the athlete is competing for	ranking	de	Nation für die der Athlete startet
 nation to use (empty = international)	ranking	de	Nation (leer = international)
 national team ranking	ranking	de	Nationen-Team-Rangliste
+no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
+no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	de	Kein Wettkampf (&comp=XYZ) und kein Cup (&cup=XYZ) über die URL ausgewählt!
 no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Route angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
+no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
+no startlist or result yet!	ranking	de	Bisher keine Startliste oder Ergebnis!
 not used at the moment	ranking	de	im Moment nicht benutzt
 nothing to update	ranking	de	Nichts zu aktualisieren
 notice	ranking	de	Notiz
@@ -197,6 +201,7 @@ opens	ranking	de	öffnet
 or	ranking	de	oder
 other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
+pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Athletenprofile
 pairing speed final	ranking	de	Paarungen Speed Finale
 participant deleted	ranking	de	Teilnehmer gelöscht
 perid	ranking	de	PerId
@@ -289,6 +294,7 @@ teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
 this module displays calendar, results and rankings	ranking	de	Dieses Module zeigt Kalender, Ergebnisse und Ranglisten an
 this module displays information from the ranking app.	ranking	de	Dieses Modul zeigt Informationen der Ranglisten Anwendung.
+this module displays information from the resultservice of the ranking app.	ranking	de	Dieses Modul zeigt Informationen des Ergebnisservice der Ranglisten Anwendung.
 this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
 time	ranking	de	Zeit

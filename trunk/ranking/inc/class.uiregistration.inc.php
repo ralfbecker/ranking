@@ -492,6 +492,10 @@ class uiregistration extends boranking
 
 		$tmpl =& new etemplate('ranking.register.lists');
 		
+		if ($tmpl->sitemgr && !count($this->ranking_nations))
+		{
+			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
+		}
 		if (!is_array($content))
 		{
 			if ($_GET['calendar'] || $_GET['comp'])

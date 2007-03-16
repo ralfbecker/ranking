@@ -144,6 +144,7 @@ class admin
 			);
 		}
 		$readonlys = $content = array();
+		unset($rights);
 		if ($account_id)
 		{
 			if (!$account_is_admin)
@@ -176,7 +177,6 @@ class admin
 				{
 					$content[$n][$name] = !!($rights[$nation] & $right) || $account_is_admin;
 					$readonlys[$n.'['.$name.']'] = $content[$n][$name] && !($own_rights[$nation] & $right) || $account_is_admin;
-					$readonlys['delete['.$n.']'] = $account_is_admin;
 				}
 				else
 				{
@@ -204,7 +204,8 @@ class admin
 		$readonlys['delete['.$n.']'] = true;
 		
 		$tmpl =& CreateObject('etemplate.etemplate',$account_id ? 'ranking.admin.user_acl' : 'ranking.admin.acl');
-		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nation ACL');
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nation ACL').
+			($account_id ? ': '.$GLOBALS['egw']->common->grab_owner_name($account_id) : '');
 		$tmpl->exec('ranking.admin.acl',$content,false,$readonlys,$preserve);
 	}
 	

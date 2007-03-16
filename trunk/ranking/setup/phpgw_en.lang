@@ -119,7 +119,7 @@ fax	ranking	en	Fax
 federation	ranking	en	Federation
 female	ranking	en	female
 fieldfactorpoints	ranking	en	Fieldfactorpoints
-file %1 not found (either type=%2 or dr_path=%3 wrong)	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)
+file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)!
 file '%1' successful attached as %2	ranking	en	File '%1' successful attached as %2
 file is not a pdf	ranking	en	File is not a PDF
 final	ranking	en	Final
@@ -182,8 +182,12 @@ nation if national competition or none for an internatinal one	ranking	en	nation
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
 nation to use (empty = international)	ranking	en	Nation to use (empty = international)
 national team ranking	ranking	en	National team ranking
+no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	en	No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!
+no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	en	No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous heat!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
+no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	en	No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!
+no startlist or result yet!	ranking	en	No startlist or result yet!
 not used at the moment	ranking	en	not used at the moment
 nothing to update	ranking	en	Nothing to update
 notice	ranking	en	Notice
@@ -197,6 +201,7 @@ opens	ranking	en	opens
 or	ranking	en	or
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
+pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete profiles
 pairing speed final	ranking	en	Pairing speed final
 participant deleted	ranking	en	Participant deleted
 perid	ranking	en	PerId
@@ -289,6 +294,7 @@ teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
 this module displays calendar, results and rankings	ranking	en	This module displays calendar, results and rankings
 this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
+this module displays information from the resultservice of the ranking app.	ranking	en	This module displays information from the resultservice of the ranking app.
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
 time	ranking	en	Time

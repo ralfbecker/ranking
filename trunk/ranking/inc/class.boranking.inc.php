@@ -736,9 +736,8 @@ class boranking extends soranking
 			'GrpId'  => $cat['GrpId'],
 			'platz = 0',		// savegard against an already exsiting result
 		),'',true,'nation,reg_nr');
-		//_debug_array($starters);
 		
-		if (!count($starters)) return false;	// no starters, or eg. already a result
+		if (!is_array($starters) || !count($starters)) return false;	// no starters, or eg. already a result
 		
 		for ($route = 1; $route <= $num_routes; ++$route)
 		{
