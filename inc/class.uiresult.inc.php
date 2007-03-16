@@ -520,7 +520,7 @@ class uiresult extends boresult
 		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
 			!($route = $this->route->read($keys))))	// route not found and no general result
 		{
-			$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
+			$content['nm']['route'] = $keys['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
 			if (!is_numeric($keys['route_order']))
 			{
 				$msg = lang('No startlist or result yet!');
