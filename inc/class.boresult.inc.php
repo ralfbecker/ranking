@@ -166,7 +166,7 @@ class boresult extends boranking
 		}
 		$starters =& $this->result->read($keys+array('platz=0 AND pkt > 64'),'',true,'GrpId,pkt,nachname,vorname');
 		
-		foreach($starters as $starter)
+		foreach((array)$starters as $starter)
 		{
 			if (!($start_order = $this->pkt2start($starter['pkt'],1+$route_order)))
 			{

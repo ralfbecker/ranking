@@ -412,6 +412,11 @@ class uiresult extends boresult
 					}
 				}
 			}
+			if ($query['pstambl'])
+			{
+				list($page_name,$target) = explode(',',$query['pstambl']);
+				$rows[$k]['link'] = ',index.php?page_name='.$page_name.'&person='.$row['PerId'].'&cat='.$query['cat']['GrpId'].',,,'.$target;
+			}
 		}
 		// report the set-values at time of display back to index() for calling boresult::save_result
 		$query_in['return'] = $rows['set'];
@@ -425,9 +430,9 @@ class uiresult extends boresult
 		$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
 			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 'ONE_QUALI');
 		$rows['num_problems'] = $query['num_problems'];
-		$rows['no_delete'] = $readonlys === true;
+		$rows['no_delete'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
-
+		
 		return $total;
 	}
 
@@ -437,10 +442,14 @@ class uiresult extends boresult
 	 * @param array $content=null
 	 * @param string $msg=''
 	 */
-	function index($content=null,$msg='')
+	function index($content=null,$msg='',$pstambl='')
 	{
 		$tmpl =& new etemplate('ranking.result.index');
 		
+		if ($tmpl->sitemgr && !count($this->ranking_nations))
+		{
+			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
+		}
 		//_debug_array($content);exit;
 		if (!is_array($content))
 		{
@@ -465,6 +474,8 @@ class uiresult extends boresult
 			if (is_numeric($_GET['route'])) $content['nm']['route'] = $_GET['route'];
 			if ($_GET['msg']) $msg = $_GET['msg'];
 			if (isset($_GET['show_result'])) $content['nm']['show_result'] = (int)$_GET['show_result'];
+			
+			$content['nm']['pstambl'] = $pstambl;
 		}
 
 		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
@@ -510,7 +521,19 @@ class uiresult extends boresult
 			!($route = $this->route->read($keys))))	// route not found and no general result
 		{
 			$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
-			$route = $this->route->read($keys);
+			if (!is_numeric($keys['route_order']))
+			{
+				$msg = lang('No startlist or result yet!');
+			}
+			elseif ($keys['route_order'] > 0)	// more then the quali --> show the general result
+			{
+				$content['nm']['route'] = $keys['route_order'] = -1;
+			}
+			else	// only quali --> show result if availible, else startlist
+			{
+				$content['nm']['show_result'] = $this->has_results($keys) ? '1' : '0';
+			}
+			if (is_numeric($keys['route_order'])) $route = $this->route->read($keys);
 		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
 
@@ -636,10 +659,24 @@ class uiresult extends boresult
 		{
 			$readonlys['nm'] = true;
 			$sel_options['result_plus'] = $this->plus;
+			$content['nm']['readonly'] = true;
 		}
-		$readonlys['button[download]'] = !$this->has_startlist($keys);
-		$readonlys['button[new]'] = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp);
-
+		else
+		{
+			unset($content['nm']['readonly']);
+		}
+		$readonlys['button[download]'] = $keys['route_order'] < 0 || !$this->has_startlist($keys);
+		$content['no_route_selection'] = !$cat; 	// no cat selected
+		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
+		{
+			$readonlys['button[edit]'] = $readonlys['button[new]'] = true;
+			
+			if (!is_numeric($keys['route_order']) || !$sel_options['route']) $content['no_route_selection'] = true;	// no route yet
+		}
+		elseif (!is_numeric($keys['route_order']) || !$sel_options['route'])	// no route yet
+		{
+			$readonlys['nm[route]'] = $readonlys['button[edit]'] = true;
+		}
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
 		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
@@ -672,9 +709,9 @@ class uiresult extends boresult
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
 		}
-		if ($content['nm']['show_result'])
+		if ($content['nm']['show_result'] || $tmpl->sitemgr)
 		{
-			$tmpl->disable_cells('nm[ranking]');
+			$tmpl->disable_cells('nm[ranking]');	// dont show ranking in result of via sitemgr
 		}
 		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],$content['nm']['discipline']);
 		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_
@@ -690,7 +727,7 @@ class uiresult extends boresult
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
 
-		$tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
+		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 	
 	/**

@@ -19,7 +19,6 @@
 								<column/>
 								<column/>
 								<column/>
-								<column/>
 							</columns>
 							<rows>
 								<row class="th">
@@ -28,7 +27,6 @@
 									<description value="Edit competition"/>
 									<description value="Edit athlete"/>
 									<description value="Registration"/>
-									<description value="Delete"/>
 								</row>
 								<row class="row">
 									<textbox no_lang="1" id="${row}[nation]" size="3" maxlength="3"/>
@@ -36,7 +34,6 @@
 									<checkbox id="${row}[edit]" label="Edit competition"/>
 									<checkbox id="${row}[athlets]" label="Edit athlete"/>
 									<checkbox id="${row}[register]" label="Registration"/>
-									<button image="delete" label="Delete" align="center" id="delete[$row]" onclick="return confirm('Delete all rights for that nation');"/>
 								</row>
 							</rows>
 						</grid>
