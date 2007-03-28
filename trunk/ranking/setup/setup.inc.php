@@ -47,6 +47,8 @@ $setup_info['ranking']['hooks']['settings']     = 'ranking.ranking_admin_prefs_s
 $setup_info['ranking']['hooks']['admin']        = 'ranking.ranking_admin_prefs_sidebox_hooks.all_hooks';
 $setup_info['ranking']['hooks']['sidebox_menu'] = 'ranking.ranking_admin_prefs_sidebox_hooks.all_hooks';
 $setup_info['ranking']['hooks']['edit_user']    = 'ranking.admin.edit_user';
+$setup_info['ranking']['hooks'][] = 'config';
+$setup_info['ranking']['hooks'][] = 'config_validate';
 
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
