@@ -13,9 +13,23 @@
 
 /* $Id$ */
 
-if (isset($_SERVER['DOCUMENT_ROOT'])) die('Commanline only!!!');
+#if (isset($_SERVER['DOCUMENT_ROOT'])) die('Commanline only!!!');
 
 $rock_db_path = '/usr/rock_db';
+
+if (!function_exists('array_combine'))
+{
+	function array_combine($keys,$values)
+	{
+		$combined = array();
+		$values = array_values($values);
+		foreach(array_values($keys) as $n => $key)
+		{
+			$combined[$key] = $values[$n];
+	    	}
+		return $combined;
+	}
+}
 
 if ($_SERVER['argc'] <= 2)
 {
@@ -35,11 +49,11 @@ if (!($f = @fopen($csv_file,'r')))
 	die("Usage: csv2rock [csv-file [route.wand]]\n");
 }
 
-if (!($csv_fields = fgetcsv($f,null,';')) || count($csv_fields) <= 1)
+if (!($csv_fields = fgetcsv($f,1024,';')) || count($csv_fields) <= 1)
 {
 	die("File '$csv_file' is NO csv file!!!\n");
 }
-print_r($csv_fields);
+//print_r($csv_fields);
 
 if (!($fr = @fopen($rock_file,'w')))
 {
@@ -53,7 +67,7 @@ if (in_array('boulder4',$csv_fields))
 }
 
 $max_place = 0;
-while(($line = fgetcsv($f,null,';')))
+while(($line = fgetcsv($f,1024,';')))
 {
 	$lines[] = $line = array_combine($csv_fields,$line);
 	if ($line['place'] > $max_place) $max_place = $line['place'];
@@ -68,7 +82,7 @@ foreach($lines as $key => $line)
 }
 
 usort($lines,create_function('$a,$b','return $a["startorder"]-$b["startorder"];'));
-print_r($lines);
+//print_r($lines);
 
 foreach($lines as $line)
 {
