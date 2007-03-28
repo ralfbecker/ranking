@@ -754,4 +754,165 @@ class boresult extends boranking
 		//_debug_array($result);
 		return parent::import_ranking($keys,$result);
 	}
+	
+	/**
+	 * Gets called via the async service if an automatic import from the rock programms is configured
+	 *
+	 * @param array $hook_data
+	 */
+	function import_from_rock($hook_data)
+	{
+		//echo "import_from_rock"; _debug_array($this->config);
+		
+		if (!$this->config['rock_import_comp'] || !($comp = $this->comp->read($this->config['rock_import_comp'])))
+		{
+			$error .= "no competition configured or competition not found!\n";
+			return;
+		}
+		
+		for ($n = 1; $n <= 2; ++$n)
+		{
+			if (!($rroute = $this->config['rock_import'.$n]))
+			{
+				$error .= "$n: No route configured!\n";
+				continue;
+			}
+			
+			list(,$rcomp) = explode('.',$rroute);
+			$year = 2000 + (int) $rcomp;
+			$file = $this->config['rock_import_path'].'/'.$year.'/'.$rcomp.'/'.$rroute.'.php';
+			
+			unset($route); unset($tn);
+			if (!file_exists($file))
+			{
+				$error .= "$n: File '$file' not found!\n";
+				continue;
+			}
+			include($file);
+
+			if (!is_array($route) || !$route['teilnehmer'])
+			{
+				$error .= "$n: File '$file' does not include a rock route or participants!\n";
+				continue;
+			}
+			
+			if (!$this->config['rock_import_cat'.$n] || !($cat = $this->cats->read($this->config['rock_import_cat'.$n])) ||
+				!in_array($cat['rkey'],$comp['gruppen']) || $route['GrpId'] != $cat['GrpId'])
+			{
+				//_debug_array($cat);
+				//_debug_array($comp);
+				//$route['teilnehmer'] = 'not shown'; _debug_array($route);
+				$error .= "$n: Category not configured, not belonging to the competition or not found!\n";
+				continue;
+			}
+			$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+			$route_imported = $this->_rock2route($route);
+
+			if (!$this->route->read($keys = array(
+				'WetId' => $comp['WetId'],
+				'GrpId' => $cat['GrpId'],
+				'route_order' => (int)$this->config['rock_import_route'.$n],
+			)))
+			{
+				// create a new route
+				$this->route->init($keys);
+				$this->route->save($route_imported);
+				//_debug_array($this->route->data);
+			}
+			elseif($this->route->data['route_status'] == STATUS_RESULT_OFFICIAL)
+			{
+				$error .= "$n: Result already offical!\n";
+				continue;	// we dont change the result if it's offical!
+			}
+			else
+			{
+				// incorporate changes, not sure if we should do that automatic ???
+				unset($route_imported['route_type']);
+				unset($route_imported['route_name']);
+				$this->route->save($route_imported);
+				//_debug_array($this->route->data);
+			}
+			$this->route_result->delete($keys);
+			foreach($route['teilnehmer'] as $PerId => $data)
+			{
+				$keys['PerId'] = $PerId;
+				$this->route_result->init($keys);
+				$this->route_result->save($this->_rock2result($data,$discipline));
+			}
+		}
+		//echo $error ? $error : 'both routes imported!';
+	}
+	
+	/**
+	 * translate a rock participant into a result-service result
+	 *
+	 * @param array $rdata rock participant data
+	 * @param string $discipline lead, speed or boulder
+	 * @return array
+	 */
+	function _rock2result($rdata,$discipline)
+	{
+		list($PerId,$GrpId) = explode('+',$rdata['key']);
+		
+		$data = array(
+			'PerId' => $PerId,
+			'GrpId' => $GrpId,
+			'start_order' => $rdata['startfolgenr'],
+			'start_number' => $rdata['startfolgenr'] != $rdata['startnummer'] ? $rdata['startnummer'] : null,
+			'result_rank' =>  $rdata['platz'] ? (int)$rdata['platz'] : null,
+			'result_height' => $discipline == 'lead' ? (strstr($rdata['hoehe'],'Top') ? TOP_HEIGHT : 100*substr($rdata['hoehe'],0,-1)) : null,
+			'result_plus' => $discipline == 'lead' ? (strstr($rdata['hoehe'],'Top') ? TOP_PLUS : (int)(substr($rdata['hoehe'],-1).'1')) : null,
+			'result_time' => $discipline == 'speed' && $rdata['time'][0] ? 100*$rdata['time'][0] : null,
+		);
+		
+		if ($discipline == 'boulder')
+		{
+			if ($rdata['boulder'][0])
+			{
+				$data['top1'] = '';		// otherwise the result is not recogniced as a boulder result!
+				for($i = 1; $i <= 6; ++$i)
+				{
+					$result = trim($rdata['boulder'][$i]);
+					if ($result{0} == 't')
+					{
+						list(,$data['top'.$i],,$data['zone'.$i]) = split('[tzb ]',$result);
+					}
+					else
+					{
+						$data['zone'.$i] = (string)(int)substr($result,1);
+					}
+				}
+			}
+			else
+			{
+				unset($data['result_rank']);	// otherwise not climbed athlets are already ranked
+			}
+		}
+		return $data;
+	}
+	
+	/**
+	 * translate a rock route into a result-service route
+	 *
+	 * @param array $route rock route-data
+	 * @return array
+	 */
+	function _rock2route($route)
+	{
+		list($iso_open,$iso_close) = preg_split('/ ?- ?/',$route['isolation'],2);
+
+		return array(
+			'route_name' => $route['bezeichnung'],
+			'route_judge' => $route['jury'][0],
+			'route_status' => $route['frei_str'] ? STATUS_RESULT_OFFICIAL : STATUS_STARTLIST,
+			'route_type' => ONE_QUALI,	// ToDo: set it from the erge_modus
+			'route_iso_open' => $iso_open,
+			'route_iso_open' => $iso_close,
+			'route_start' => $route['start'],
+			'route_result' => $route['frei_str'],
+			'route_quota' => $route['quote'],
+			'route_num_problems' => substr($route['erge_modus'],0,9) == 'BoulderZ:' ?
+				count(explode('+',substr($route['erge_modus'],9))) : null,
+		);
+	}
 }
