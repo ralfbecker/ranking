@@ -77,6 +77,13 @@ class boresult extends boranking
 	 * @var route_result
 	 */
 	var $route_result;
+	/**
+	 * Logfile for the bridge to the rock programms running via async service
+	 * Set to null to switch it of.
+	 *
+	 * @var string
+	 */
+	var $rock_bridge_log = '/tmp/rock_bridge.log';
 
 	function boresult()
 	{
@@ -152,7 +159,10 @@ class boresult extends boranking
 		if ($route_order >= 2 || 	// further heat --> startlist from reverse result of previous heat
 			$route_order == 1 && $route_type == TWO_QUALI_ALL)	// 2. Quali uses same start-order
 		{
-			return $this->_startlist_from_previous_heat($keys,$route_order >= 2,$discipline == 'speed');
+			return $this->_startlist_from_previous_heat($keys,
+				$discipline == 'boulder' && $route_order == 2 ? 'result' :	// boulder 1/2-final --> by quali result
+				($route_order >= 2 ? 'reverse' : 'previous'),	// after quali reversed result, otherwise as previous heat
+				$discipline == 'speed');						// speed --> use ko-system for the final
 		}
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
@@ -217,11 +227,11 @@ class boresult extends boranking
 	 * 
 	 * @internal use generate_startlist
 	 * @param array $keys values for WetId, GrpId and route_order
-	 * @param boolean $reverse=true reverse of the result or same as the previous heat
+	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
 	 * @param boolean $ko_system=false use ko-system
 	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function _startlist_from_previous_heat($keys,$reverse=true,$ko_system=false)
+	function _startlist_from_previous_heat($keys,$start_order='reverse',$ko_system=false)
 	{
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
@@ -258,16 +268,17 @@ class boresult extends boranking
 			}
 		}
 		$cols = 'PerId,start_number,result_rank';
-		if ($prev_route['route_quota'] == 1 || !$reverse && !$ko_system || 	// superfinal or 2. Quali
-			$ko_system && $keys['route_order'] > 2)
+		if ($prev_route['route_quota'] == 1 || 				// superfinal
+			$start_order == 'previous' && !$ko_system || 	// 2. Quali uses same startorder
+			$ko_system && $keys['route_order'] > 2)			// speed-final
 		{
-			$order_by = 'start_order';			// --> same starting order as before !
+			$order_by = 'start_order';						// --> same starting order as previous heat!
 		}
 		else
 		{
-			if ($ko_system)
+			if ($ko_system || $start_order == 'result')		// first speed final or start_order by result (eg. boulder 1/2-f)
 			{
-				$order_by = 'result_rank';
+				$order_by = 'result_rank';					// --> use result of previous heat
 			}
 			// quali on two routes with multiplied ranking
 			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
@@ -300,9 +311,9 @@ class boresult extends boranking
 			if (($comp = $this->comp->read($keys['WetId'])) && 
 				($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
 			{
-				$order_by .= ','.$ranking_sql.' DESC';	// --> reverse of the ranking
+				$order_by .= ','.$ranking_sql.($start_order != 'result' ? ' DESC' : '');	// --> use the (reversed) ranking
 			}
-			$order_by .= ',RAND()';				// --> randomized
+			$order_by .= ',RAND()';					// --> randomized
 		}
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
 		
@@ -763,10 +774,12 @@ class boresult extends boranking
 	function import_from_rock($hook_data)
 	{
 		//echo "import_from_rock"; _debug_array($this->config);
+		$this->_bridge_log("**** bridge run started");
+		foreach($this->config as $name => $value) if (substr($name,0,11)=='rock_import') $this->_bridge_log("config[$name]='$value'");
 		
 		if (!$this->config['rock_import_comp'] || !($comp = $this->comp->read($this->config['rock_import_comp'])))
 		{
-			$error .= "no competition configured or competition not found!\n";
+			$this->_bridge_log("no competition configured or competition ({$this->config['rock_import_comp']}) not found!");
 			return;
 		}
 		
@@ -774,7 +787,7 @@ class boresult extends boranking
 		{
 			if (!($rroute = $this->config['rock_import'.$n]))
 			{
-				$error .= "$n: No route configured!\n";
+				$this->_bridge_log("$n: No route configured!");
 				continue;
 			}
 			
@@ -785,14 +798,14 @@ class boresult extends boranking
 			unset($route); unset($tn);
 			if (!file_exists($file))
 			{
-				$error .= "$n: File '$file' not found!\n";
+				$this->_bridge_log("$n: File '$file' not found!");
 				continue;
 			}
 			include($file);
 
 			if (!is_array($route) || !$route['teilnehmer'])
 			{
-				$error .= "$n: File '$file' does not include a rock route or participants!\n";
+				$this->_bridge_log("$n: File '$file' does not include a rock route or participants!");
 				continue;
 			}
 			
@@ -802,7 +815,7 @@ class boresult extends boranking
 				//_debug_array($cat);
 				//_debug_array($comp);
 				//$route['teilnehmer'] = 'not shown'; _debug_array($route);
-				$error .= "$n: Category not configured, not belonging to the competition or not found!\n";
+				$this->_bridge_log("$n: Category not configured, not belonging to the competition or not found!\n");
 				continue;
 			}
 			$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
@@ -839,8 +852,9 @@ class boresult extends boranking
 				$this->route_result->init($keys);
 				$this->route_result->save($this->_rock2result($data,$discipline));
 			}
+			$this->_bridge_log("$n: number of participants imported: ".count($route['teilnehmer']));
 		}
-		//echo $error ? $error : 'both routes imported!';
+		$this->_bridge_log("**** bridge run finished");
 	}
 	
 	/**
@@ -914,5 +928,14 @@ class boresult extends boranking
 			'route_num_problems' => substr($route['erge_modus'],0,9) == 'BoulderZ:' ?
 				count(explode('+',substr($route['erge_modus'],9))) : null,
 		);
+	}
+	
+	function _bridge_log($str)
+	{
+		if ($this->rock_bridge_log && ($f = @fopen($this->rock_bridge_log,'a+')))
+		{
+			fwrite ($f,date('Y-m-d H:i:s: ').$str."\n");
+			fclose($f);
+		}
 	}
 }
