@@ -981,7 +981,7 @@ class boranking extends soranking
 		$this->result->init(array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
-			'datum' => date('Y-m-d'),
+			'datum' => $comp['datum'],	// has to be the date of the competition, NOT the actual date!
 		));
 		$this->pkte->get_pkte($comp['pkte'],$pkte);
 
