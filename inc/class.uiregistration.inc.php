@@ -213,7 +213,7 @@ class uiregistration extends boranking
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum >= '.$this->db->quote(date('Y-m-d',time())),
+				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days go or further in future
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 		);
