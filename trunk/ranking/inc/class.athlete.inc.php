@@ -43,12 +43,12 @@ class athlete extends so_sql
 	var $acl2clear = array(
 		ACL_DENY_BIRTHDAY  => array('geb_date'),
 		ACL_DENY_EMAIL     => array('email'),
-		ACL_DENY_PHONE     => array('telefon'),
+		ACL_DENY_PHONE     => array('tel'),
 		ACL_DENY_FAX       => array('fax'),
-		ACL_DENY_CELLPHONE => array('cellphone'),
+		ACL_DENY_CELLPHONE => array('mobil'),
 		ACL_DENY_STREET    => array('strasse','plz'),
 		ACL_DENY_CITY      => array('ort'),
-		ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','nation','verband','license','acl','last_comp'),
+		ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','sex','nation','verband','license','acl','last_comp'),
 	);
 	/**
 	 * year we check the license for
@@ -124,7 +124,7 @@ class athlete extends so_sql
 			{
 				if ($acl & $n) $data['acl'][] = $n;
 			}
-			//echo "<p>athlete::db2data() acl=$acl=".print_r($data['acl'],true)."</p>\n";
+			// echo "<p>athlete::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
 
 			// blank out the acl'ed fields, if user has no athletes rights
 			if (is_object($GLOBALS['boranking']) && !$GLOBALS['boranking']->acl_check($data['nation'],EGW_ACL_ADD))
@@ -133,16 +133,9 @@ class athlete extends so_sql
 				{
 					if ($acl & $deny)
 					{
-						if ($to_clear[0] == '!')
+						foreach($to_clear[0] == '!' ? array_diff(array_keys($data),$to_clear) : $to_clear as $name)
 						{
-							$data = array_intersect_key($data,array_flip($to_clear));
-						}
-						else
-						{
-							foreach($to_clear as $name)
-							{
-								unset($data[$name]);
-							}
+							$data[$name] = $name == 'geb_date' && $data['geb_date'] ? (int)$data['geb_date'] : '';
 						}
 					}
 				}
