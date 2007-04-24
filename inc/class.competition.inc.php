@@ -94,6 +94,10 @@ class competition extends so_sql
 		{
 			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
 		}
+		if ($data['name'])
+		{
+			$data['name'] = strip_tags($data['name']);	// some use tags for calendar formatting
+		}
 		list($data['gruppen'],$data['duration']) = explode('@',$data['gruppen']);
 		if ($data['gruppen'])
 		{
