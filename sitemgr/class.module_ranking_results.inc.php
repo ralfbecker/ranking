@@ -30,4 +30,15 @@ class module_ranking_results extends sitemgr_module
 		
 		$this->etemplate_method = 'ranking.uiresult.index';
 	}
+	
+	function get_content(&$arguments,$properties)
+	{
+		$content = parent::get_content($arguments,$properties);
+		
+		if ($GLOBALS['egw_info']['flags']['app_header'])
+		{
+			$GLOBALS['page']->title = $GLOBALS['egw_info']['flags']['app_header'];
+		}
+		return $content;
+	}
 }
