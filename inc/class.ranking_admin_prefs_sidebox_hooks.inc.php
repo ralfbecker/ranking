@@ -55,18 +55,18 @@ class ranking_admin_prefs_sidebox_hooks
 		{
 			$file = array(
 				'Preferences'     => $GLOBALS['egw']->link('/preferences/preferences.php','appname='.$appname),
-				array(
-					'text'   => 'Manual',
-					'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
-					'target' => 'docs'
-				),
 			);
 			if ($location == 'preferences')
 			{
 				display_section($appname,$file);
 			}
 			else
-			{
+			{	
+				$file[] = array(
+					'text'   => 'Manual',
+					'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
+					'target' => 'docs'
+				);
 				display_sidebox($appname,lang('Preferences'),$file);
 			}
 		}
