@@ -668,7 +668,7 @@ class boresult extends boranking
 			'route_order' => $keys['route_order'],
 		));
 		//_debug_array($lines);
-		foreach($lines as $line)
+		foreach($csv as $line)
 		{
 			$this->route_result->init($line);
 			$this->route_result->save(array(
@@ -676,7 +676,7 @@ class boresult extends boranking
 				'result_modified' => time(),
 			));
 		}
-		return count($lines);
+		return count($csv);
 	}
 	
 	/**
