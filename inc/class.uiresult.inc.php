@@ -520,10 +520,11 @@ class uiresult extends boresult
 		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
 			!($route = $this->route->read($keys))))	// route not found and no general result
 		{
-			$content['nm']['route'] = $keys['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
-			if (!is_numeric($keys['route_order']))
+			$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
+			if (!is_numeric($keys['route_order']) || !$this->has_startlist($keys))
 			{
 				$msg = lang('No startlist or result yet!');
+				$content['nm']['show_result'] = '0';
 			}
 			elseif ($keys['route_order'] > 0)	// more then the quali --> show the general result
 			{
@@ -534,6 +535,11 @@ class uiresult extends boresult
 				$content['nm']['show_result'] = $this->has_results($keys) ? '1' : '0';
 			}
 			if (is_numeric($keys['route_order'])) $route = $this->route->read($keys);
+		}
+		elseif ($comp && $cat && !$this->has_startlist($keys))
+		{
+			$msg = lang('No startlist or result yet!');
+			$content['nm']['show_result'] = '0';
 		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
 
