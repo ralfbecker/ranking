@@ -536,7 +536,7 @@ class uiresult extends boresult
 			}
 			if (is_numeric($keys['route_order'])) $route = $this->route->read($keys);
 		}
-		elseif ($comp && $cat && !$this->has_startlist($keys))
+		elseif ($comp && $cat && $keys['route_order'] >= 0 && !$this->has_startlist($keys))
 		{
 			$msg = lang('No startlist or result yet!');
 			$content['nm']['show_result'] = '0';
