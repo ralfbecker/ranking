@@ -477,21 +477,10 @@ class uiresult extends boresult
 			
 			$content['nm']['pstambl'] = $pstambl;
 		}
-		// check if the type of the list to show changed: startlist, result or general result
-		// --> set template and default order
-		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
+		elseif ($content['nm']['show_result'] < 0)
 		{
 			$content['nm']['route'] = -1;
 		}
-		elseif ($content['nm']['show_result'] == 3 && $content['nm']['old_show'] != 3)
-		{
-			$content['nm']['route'] = -2;
-		}
-		elseif ($content['nm']['show_result'] || $content['nm']['route'] < 0)
-		{
-			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -1 ? 2 : 3) : 1;
-		}
-
 		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name]</p>\n";
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
@@ -697,6 +686,20 @@ class uiresult extends boresult
 		{
 			$readonlys['nm[route]'] = $readonlys['button[edit]'] = true;
 		}
+		// check if the type of the list to show changed: startlist, result or general result
+		// --> set template and default order
+		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
+		{
+			$content['nm']['route'] = -1;
+		}
+		elseif ($content['nm']['show_result'] == 3 && $content['nm']['old_show'] != 3)
+		{
+			$content['nm']['route'] = -2;
+		}
+		elseif ($content['nm']['show_result'] || $content['nm']['route'] < 0)
+		{
+			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -1 ? 2 : 3) : 1;
+		}
 		if ($content['nm']['route'] < 0)	// general result --> hide show_route selection
 		{
 			$sel_options['show_result'] = array(-1 => '');
@@ -729,7 +732,7 @@ class uiresult extends boresult
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') : 
 			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED || 
-			 $content['nm']['show_result'] != '0' && $route['route_status'] == STATUS_RESULT_OFFICIAL ? '' : lang('provisional').' ').
+			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
 
