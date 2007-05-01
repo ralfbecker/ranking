@@ -108,14 +108,17 @@ class competition extends so_sql
 		
 		if ($data['judges']) $data['judges'] = explode(',',$data['judges']);
 		
-		// calculate an end-date as Y-m-d and a printable span like 1. - 3. Januar 2007
-		list($y,$m,$d) = explode('-',$data['datum']);
-		$start = mktime(12,0,0,(int)$m,(int)$d,(int)$y);
-		$end = $start + $data['duration']*24*60*60;
-		$data['date_end'] = date('Y-m-d',$end);
-		$data['date_span'] = (int)$d.'. '.(date('m',$start) != $m ? lang(date('F',$m)) : '').
-			' - '.(int)date('d',$end).'. '.lang(date('F',$end)).' '.$y;
-		
+		if ($data['datum'])
+		{
+			// calculate an end-date as Y-m-d and a printable span like 1. - 3. Januar 2007
+			list($y,$m,$d) = explode('-',$data['datum']);
+			$start = mktime(12,0,0,(int)$m,(int)$d,(int)$y);
+			$end = $start + ($data['duration']-1)*24*60*60;
+			$data['date_end'] = date('Y-m-d',$end);
+			$data['date_span'] = (int)$d.'. '.(date('m',$start) != $m ? lang(date('F',$m)) : '').
+				($data['duration'] > 1 ? ' - '.(int)date('d',$end).'. ' : '').lang(date('F',$end)).' '.$y;
+			//echo "<p>y=$y, m=$m, d=$d, duration=$data[duration], start=$start, end=$end=$data[date_end], span=$data[date_span]</p>\n";
+		}
 		return $data;
 	}
 
