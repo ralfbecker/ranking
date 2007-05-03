@@ -40,6 +40,18 @@ class uiresult extends boresult
 	{
 		$tmpl = new etemplate('ranking.result.route');
 		
+		if (!($comp = $this->comp->read($_GET['comp'] ? $_GET['comp'] : $content['WetId'])) ||
+			!($cat = $this->cats->read($_GET['cat'] ? $_GET['cat'] : $content['GrpId'])) ||
+			!in_array($cat['rkey'],$comp['gruppen']))
+		{
+			$msg = lang('Permission denied !!!');
+			$js = "alert('".addslashes($msg)."'); window.close();";
+			$GLOBALS['egw']->common->egw_header();
+			echo "<html><head><script>".$js."</script></head></html>\n";
+			$GLOBALS['egw']->common->egw_exit();
+		}
+		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+
 		if (!is_array($content))
 		{
 			$content = $keys = array(
@@ -51,8 +63,8 @@ class uiresult extends boresult
 				!($content = $this->route->read($content))))
 			{
 				// try reading the previous heat, to set some stuff from it
-				if (!is_null($keys['route_order'] = $this->route->get_max_order($_GET['comp'],$_GET['cat'])) &&
-					($previous = $this->route->read($keys)))
+				if (($keys['route_order'] = $this->route->get_max_order($_GET['comp'],$_GET['cat'])) >= 0 &&
+					($previous = $this->route->read($prev_keys=$keys)))
 				{
 					++$keys['route_order'];
 					if ($keys['route_order'] == 1 && $previous['route_type'] == ONE_QUALI)
@@ -67,19 +79,18 @@ class uiresult extends boresult
 				}
 				$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') : 
 					($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
+
+				if ($discipline != 'speed') 
+				{
+					$keys['route_quota'] = $this->default_quota($discipline,$keys['route_order']);
+				}
+				elseif ($previous && $previous['route_quota'] > 2)
+				{
+					$keys['route_quota'] = $previous['route_quota'] / 2;
+				}
 				$content = $this->route->init($keys);
 				$content['new_route'] = true;
 			}
-		}
-		if (!($comp = $this->comp->read($content['WetId'])) ||
-			!($cat = $this->cats->read($content['GrpId'])) ||
-			!in_array($cat['rkey'],$comp['gruppen']))
-		{
-			$msg = lang('Permission denied !!!');
-			$js = "alert('".addslashes($msg)."'); window.close();";
-			$GLOBALS['egw']->common->egw_header();
-			echo "<html><head><script>".$js."</script></head></html>\n";
-			$GLOBALS['egw']->common->egw_exit();
 		}
 		// check if user has NO edit rights
 		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)))
@@ -118,7 +129,7 @@ class uiresult extends boresult
 						$button = $js = '';	// dont exit the window
 						break;
 					}
-					$param['msg'] = $msg = lang('Route saved');
+					$param['msg'] = $msg = lang('Heat saved');
 
 					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
 					
@@ -132,15 +143,22 @@ class uiresult extends boresult
 					//_debug_array($content);
 					if ($this->has_results($content))
 					{
-						$param['msg'] = ($msg .= lang('Error: route already has a result!!!'));
+						$param['msg'] = ($msg .= lang('Error: heat already has a result!!!'));
 						$param['show_result'] = 1;
 					}
-					elseif (is_numeric($content['route_order']) && $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline']))
+					elseif (is_numeric($content['route_order']) && 
+						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'])))
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
-
-						$content['route_status'] = STATUS_STARTLIST;	// set status to startlist
-						if ($this->route->read($content)) $this->route->save(array('route_status' => STATUS_STARTLIST));
+						
+						$to_set = array();
+						$to_set['route_status'] = $content['route_status'] = STATUS_STARTLIST;	// set status to startlist
+						if (!$content['route_quota'])
+						{
+							$content['route_quota'] = $to_set['route_quota'] = 
+								$this->default_quota($discipline,$content['route_order'],$content['quali_type'],$num);
+						}
+						if ($this->route->read($content)) $this->route->save($to_set);
 					}
 					else
 					{
@@ -151,17 +169,22 @@ class uiresult extends boresult
 
 				case 'delete':
 					//_debug_array($content);
-					if ($this->route->delete(array(
-						'WetId' =>$content['WetId'],
+					if ($content['route_order'] < $this->route->get_max_order($content['WetId'],$content['GrpId']))
+					{
+						$msg = lang('You can only delete the last heat, not one in between!');
+						$js = $button = '';	// dont exit the window
+					}
+					elseif ($this->route->delete(array(
+						'WetId' => $content['WetId'],
 						'GrpId' => $content['GrpId'],
 						'route_order' => $content['route_order'])))
 					{
-						$param['msg'] = lang('Route deleted');
+						$param['msg'] = lang('Heat deleted');
 						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
 					}
 					else
 					{
-						$msg = lang('Error: deleting the route!!!');
+						$msg = lang('Error: deleting the heat!!!');
 						$js = $button = '';	// dont exit the window
 					}
 					break;
@@ -171,11 +194,11 @@ class uiresult extends boresult
 					{
 						if ($this->route->save($content) != 0)
 						{
-							$msg = lang('Error: saving the route!!!');
+							$msg = lang('Error: saving the heat!!!');
 							$button = $js = '';	// dont exit the window
 							break;
 						}
-						$param['msg'] = $msg = lang('Route saved').', ';
+						$param['msg'] = $msg = lang('Heat saved').', ';
 						unset($content['new_route']);
 					}
 					if ($this->has_results($content))
@@ -220,9 +243,9 @@ class uiresult extends boresult
 			'WetId'       => $comp['WetId'],
 			'GrpId'       => $cat['GrpId'],
 			'route_order' => $content['route_order'],
-			'discipline'  => $comp['discipline'] ? $comp['discipline'] : $cat['discipline'],
+			'discipline'  => $discipline,
 		));
-		if ($content['discipline'] != 'boulder')
+		if ($discipline != 'boulder')
 		{
 			$tmpl->disable_cells('route_num_problems');
 		}
@@ -297,7 +320,7 @@ class uiresult extends boresult
 		//_debug_array($content);
 		//_debug_array($sel_options);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.
-			($content['new_route'] ? lang('Add route') : lang('Edit route'));
+			($content['new_route'] ? lang('Add heat') : lang('Edit heat'));
 		$tmpl->exec('ranking.uiresult.route',$content,$sel_options,$readonlys,$preserv,2);
 	}
 
@@ -563,7 +586,7 @@ class uiresult extends boresult
 				case 'apply':
 					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$content['nm']['return']))
 					{
-						$msg = lang('Route updated');
+						$msg = lang('Heat updated');
 					}
 					else
 					{
@@ -690,6 +713,18 @@ class uiresult extends boresult
 		{
 			$readonlys['nm[route]'] = $readonlys['button[edit]'] = true;
 		}
+		elseif ($comp && $cat)	// check if the highest heat has a result
+		{
+			$last_heat = $keys;
+			$last_heat['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
+			if (!$this->has_results($last_heat))
+			{
+				$last_heat = $this->route->read($last_heat);
+				$tmpl->set_cell_attribute('button[new]','onclick',"alert('".
+					addslashes(lang("You can only create a new heat, if the previous one '%1' has a result!",$last_heat['route_name'])).
+					"'); return false;");
+			}
+		}
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
 		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
@@ -722,7 +757,7 @@ class uiresult extends boresult
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
 		}
-		if ($content['nm']['show_result'] || $tmpl->sitemgr)
+		if ($content['nm']['show_result'] || $tmpl->sitemgr || !$this->has_startlist($keys))
 		{
 			$tmpl->disable_cells('nm[ranking]');	// dont show ranking in result of via sitemgr
 		}

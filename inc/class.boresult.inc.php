@@ -136,7 +136,7 @@ class boresult extends boranking
 	 * @param int $route_order 0/1 for qualification, 2, 3, ... for further heats
 	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @param int $discipline='lead' 'lead', 'speed', 'boulder'
-	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
+	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 */
 	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead')
 	{
@@ -176,6 +176,7 @@ class boresult extends boranking
 		}
 		$starters =& $this->result->read($keys+array('platz=0 AND pkt > 64'),'',true,'GrpId,pkt,nachname,vorname');
 		
+		$num = 0;
 		foreach((array)$starters as $starter)
 		{
 			if (!($start_order = $this->pkt2start($starter['pkt'],1+$route_order)))
@@ -189,9 +190,9 @@ class boresult extends boranking
 				'PerId' => $starter['PerId'],
 				'start_order' => $start_order,
 			));
-			$this->route_result->save();
+			if ($this->route_result->save() == 0) $num++;
 		}
-		return true;
+		return $num;
 	}
 	
 	/**
@@ -229,7 +230,7 @@ class boresult extends boranking
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
 	 * @param boolean $ko_system=false use ko-system
-	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
+	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
 	 */
 	function _startlist_from_previous_heat($keys,$start_order='reverse',$ko_system=false)
 	{
@@ -365,7 +366,7 @@ class boresult extends boranking
 				));
 			}
 		}
-		return true;
+		return $start_order-1;
 	}
 
 	/**
@@ -984,7 +985,7 @@ class boresult extends boranking
 				}
 				break;				
 		}
-		echo "<p>boresult::default_quota($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
+		//echo "<p>boresult::default_quota($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
 		return $quota;
 	}
 }

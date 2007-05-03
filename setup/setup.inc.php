@@ -53,11 +53,11 @@ $setup_info['ranking']['hooks'][] = 'config_validate';
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
 	 'appname' => 'phpgwapi',
-	 'versions' => Array('1.2','1.3','1.4')
+	 'versions' => Array('1.3','1.4','1.5')
 );
 $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
-	'versions' => Array('1.2','1.3','1.4')
+	'versions' => Array('1.3','1.4','1.5')
 );
 
 

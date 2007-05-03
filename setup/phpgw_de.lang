@@ -14,8 +14,8 @@ access control, key	ranking	de	Zugriffskontrolle, Schlüssel
 add a new athlete	ranking	de	einen neuen Athleten anlegen
 add a new competition	ranking	de	einen neuen Wettkampf anlegen
 add a new cup	ranking	de	Neue Serie anlegen
-add a new route	ranking	de	Neue Route anlegen
-add route	ranking	de	Route anlegen
+add a new heat	ranking	de	Neue Runde anlegen
+add heat	ranking	de	Runde anlegen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 applied	ranking	de	beantragt
 applied for a %1 license	ranking	de	%1 Lizenz beantragt
@@ -86,11 +86,11 @@ each new upload will overwrite the previous one	ranking	de	jeder neue Upload übe
 edit %1	ranking	de	%1 bearbeiten
 edit athlete	ranking	de	Athlet bearbeiten
 edit competition	ranking	de	Wettkampf bearbeiten
-edit route	ranking	de	Route bearbeiten
+edit heat	ranking	de	Runde bearbeiten
 edit this athlete	ranking	de	Diesen Athleten bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
-edit this route	ranking	de	Diese Route bearbeiten
+edit this heat	ranking	de	Diese Runde bearbeiten
 eliminated	ranking	de	eliminiert
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
@@ -100,8 +100,9 @@ error: dataline %1 contains not existing athlete id #%2 !!!	ranking	de	Fehler: D
 error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!	ranking	de	Fehler: Datenzeile %1 enthält falsche %2 Id #%3 statt #%4 !!!
 error: dataline %1, athlete %2 has wrong gender '%3' !!!	ranking	de	Fehler: Datenzeile %1, Athlete %2 hat falsches Geschlecht '%3' !!!
 error: deleting %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
-error: deleting the route!!!	ranking	de	Fehler: beim Löschen der Route !!!
+error: deleting the heat!!!	ranking	de	Fehler: beim Löschen der Runde !!!
 error: generating startlist!!!	ranking	de	Fehler: beim Erzeugen der Startliste !!!
+error: heat already has a result!!!	ranking	de	Fehler: die Runde hat bereits ein Ergebnis !!!
 error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlüssel '%1' existiert bereits, er muß eindeutig sein !!!
 error: no file to upload selected	ranking	de	Fehler: keine Datei zum Hochladen ausgewählt
 error: no line with column names, eg. delemiter is not ;	ranking	de	Fehler: keine Zeile mit den Spaltennamen, zB. Trennzeichen ist nicht ;
@@ -109,8 +110,7 @@ error: registration	ranking	de	Fehler: Registrierung
 error: removing the %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: renaming the attachments !!!	ranking	de	Fehler: beim Umbenennen der Anhänge !!!
 error: required column %1 not found !!!	ranking	de	Fehler: benötigte Splaten %1 nicht gefunden !!!
-error: route already has a result!!!	ranking	de	Fehler: die Route hat bereits ein Ergebnis !!!
-error: saving the route!!!	ranking	de	Fehler: beim Speichern der Route !!!
+error: saving the heat!!!	ranking	de	Fehler: beim Speichern der Runde !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
 exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
 factor	ranking	de	Faktor
@@ -140,6 +140,9 @@ generate all startlists together	ranking	de	Erzeugt alle Startlisten  auf ein ma
 generate startlist	ranking	de	Startliste erzeugen
 grpid	ranking	de	GrpId
 heat	ranking	de	Runde
+heat deleted	ranking	de	Runde gelöscht
+heat saved	ranking	de	Runde gespeichert
+heat updated	ranking	de	Runde aktualisiert
 hobbies	ranking	de	Hobies
 homepage	ranking	de	Internetadresse
 host	admin	de	Rechner
@@ -184,7 +187,7 @@ nation to use (empty = international)	ranking	de	Nation (leer = international)
 national team ranking	ranking	de	Nationen-Team-Rangliste
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	de	Kein Wettkampf (&comp=XYZ) und kein Cup (&cup=XYZ) über die URL ausgewählt!
-no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Route angegeben!!!
+no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Runde angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
 no startlist or result yet!	ranking	de	Bisher keine Startliste oder Ergebnis!
@@ -254,17 +257,15 @@ results	ranking	de	Ergebnisse
 results of %1 participants imported into the ranking, feldfactor: %2	ranking	de	Ergebnis von %1 Teilnehmern in die Rangliste importiert, Feldfaktor: %2
 resultservice	ranking	de	Ergebnisservice
 route	ranking	de	Route
-route deleted	ranking	de	Route gelöscht
-route saved	ranking	de	Route gespeichert
-route updated	ranking	de	Route aktualisiert
 routes	ranking	de	Routen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
 select a cup for a cup-ranking	ranking	de	Einen Cup auswählen für eine Cup-Ranliste
 select a nation first	ranking	de	Zuerst Nation auswählen
 select calendar	ranking	de	Kalender auswählen
 select competition	ranking	de	Wettkampf auswählen
+select heat	ranking	de	Runde auswählen
 select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
-select or create route	ranking	de	Route auswählen oder anlegen
+select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 serid	ranking	de	SerId
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
@@ -337,5 +338,7 @@ which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem 
 which view do you want to see, when you start the ranking app?	ranking	de	Welche Ansicht soll angezeigt werden, wenn sie die Ranglistenanwendung starten?
 wildcard	ranking	de	Wildcard
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
+you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
+you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden! Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (Sie können einge für den öffentlichen Zugrif gesperrt werden). Fortfahren
