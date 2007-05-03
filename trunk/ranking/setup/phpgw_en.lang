@@ -14,8 +14,8 @@ access control, key	ranking	en	access control, key
 add a new athlete	ranking	en	add a new athlete
 add a new competition	ranking	en	add a new competition
 add a new cup	ranking	en	add a new cup
-add a new route	ranking	en	Add a new route
-add route	ranking	en	Add route
+add a new heat	ranking	en	Add a new heat
+add heat	ranking	en	Add heat
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 applied	ranking	en	applied
 applied for a %1 license	ranking	en	Applied for a %1 license
@@ -86,11 +86,11 @@ each new upload will overwrite the previous one	ranking	en	each new upload will 
 edit %1	ranking	en	edit %1
 edit athlete	ranking	en	Edit athlete
 edit competition	ranking	en	Edit competition
-edit route	ranking	en	Edit route
+edit heat	ranking	en	Edit heat
 edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
-edit this route	ranking	en	Edit this route
+edit this heat	ranking	en	Edit this heat
 eliminated	ranking	en	eliminated
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
@@ -100,8 +100,9 @@ error: dataline %1 contains not existing athlete id #%2 !!!	ranking	en	Error: da
 error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!	ranking	en	Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!
 error: dataline %1, athlete %2 has wrong gender '%3' !!!	ranking	en	Error: dataline %1, athlete %2 has wrong gender '%3' !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
-error: deleting the route!!!	ranking	en	Error: deleting the route!!!
+error: deleting the heat!!!	ranking	en	Error: deleting the heat!!!
 error: generating startlist!!!	ranking	en	Error: generating startlist!!!
+error: heat already has a result!!!	ranking	en	Error: heat already has a result!!!
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
 error: no file to upload selected	ranking	en	Error: no file to upload selected
 error: no line with column names, eg. delemiter is not ;	ranking	en	Error: no line with column names, eg. delemiter is not ;
@@ -109,8 +110,7 @@ error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
 error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
 error: required column %1 not found !!!	ranking	en	Error: required column %1 not found !!!
-error: route already has a result!!!	ranking	en	Error: route already has a result!!!
-error: saving the route!!!	ranking	en	Error: saving the route!!!
+error: saving the heat!!!	ranking	en	Error: saving the heat!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
 exists without saving the changes	ranking	en	exists without saving the changes
 factor	ranking	en	Factor
@@ -140,6 +140,9 @@ generate all startlists together	ranking	en	Generate all startlists together
 generate startlist	ranking	en	Generate startlist
 grpid	ranking	en	GrpId
 heat	ranking	en	Heat
+heat deleted	ranking	en	Heat deleted
+heat saved	ranking	en	Heat saved
+heat updated	ranking	en	Heat updated
 hobbies	ranking	en	Hobbies
 homepage	ranking	en	Homepage
 host	admin	en	Host
@@ -254,17 +257,15 @@ results	ranking	en	Results
 results of %1 participants imported into the ranking, feldfactor: %2	ranking	en	results of %1 participants imported into the ranking, feldfactor: %2
 resultservice	ranking	en	Resultservice
 route	ranking	en	Route
-route deleted	ranking	en	Route deleted
-route saved	ranking	en	Route saved
-route updated	ranking	en	Route updated
 routes	ranking	en	Routes
 saves the changes made	ranking	en	saves the changes made
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
 select calendar	ranking	en	Select calendar
 select competition	ranking	en	Select competition
+select heat	ranking	en	Select heat
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
-select or create route	ranking	en	Select or create route
+select type of list to show	ranking	en	Select type of list to show
 serid	ranking	en	SerId
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
@@ -337,5 +338,7 @@ which rankingsystem was used before, if any	ranking	en	which rankingsystem was u
 which view do you want to see, when you start the ranking app?	ranking	en	Which view do you want to see, when you start the ranking app?
 wildcard	ranking	en	Wildcard
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
+you can only create a new heat, if the previous one '%1' has a result!	ranking	en	You can only create a new heat, if the previous one '%1' has a result!
+you can only delete the last heat, not one in between!	ranking	en	You can only delete the last heat, not one in between!
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	en	You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue
