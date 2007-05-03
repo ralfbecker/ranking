@@ -520,8 +520,9 @@ class uiresult extends boresult
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['nm']['route'] < 0 ? -1 : $content['nm']['route'],
 		);
-		if ($comp && $cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
-			!($route = $this->route->read($keys))))	// route not found and no general result
+		if ($comp && ($content['nm']['old_comp'] != $comp['WetId'] ||		// comp changed or
+			$cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
+			!($route = $this->route->read($keys)))))	// route not found and no general result
 		{
 			$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
 			if (!is_numeric($keys['route_order']) || !$this->has_startlist($keys))
@@ -606,9 +607,10 @@ class uiresult extends boresult
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum >= '.$this->db->quote(date('Y-m-d',time()-10*24*3600)),
+				'datum < '.$this->db->quote(date('Y-m-d',time()+5*24*3600)),	// starting 5 days from now
+				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
-			),0,'datum ASC'),
+			),0,'datum DESC'),
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
 			'route'    => $comp && $cat ? $this->route->query_list('route_name','route_order',array(
 				'WetId' => $comp['WetId'],
@@ -621,6 +623,8 @@ class uiresult extends boresult
 			),
 			'eliminated' => $this->eliminated_labels,
 		);
+		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
+
 		if ($content['nm']['route'] < 2) unset($sel_options['eliminated'][0]);
 		for($i=1; $i <= $route['route_num_problems']; ++$i)
 		{
@@ -628,7 +632,7 @@ class uiresult extends boresult
 		}
 		if (is_array($route)) $content += $route;
 		$content['nm']['calendar'] = $calendar;
-		$content['nm']['comp']     = $comp ? $comp['WetId'] : null;
+		$content['nm']['comp']     = $content['nm']['old_comp']= $comp ? $comp['WetId'] : null;
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
 		$content['nm']['route_type'] = $route['route_type'];
 		$content['nm']['route_status'] = $route['route_status'];
