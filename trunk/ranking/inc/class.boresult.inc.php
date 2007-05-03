@@ -628,6 +628,9 @@ class boresult extends boranking
 						case 'route':
 							$val = $route['route_name'];
 							break;
+						case 'result':
+							$val = str_replace(array('&nbsp;',' '),'',$athlete['result']);
+							break;
 						default:
 							$val = $athlete[$name];
 					}
@@ -937,5 +940,51 @@ class boresult extends boranking
 			fwrite ($f,date('Y-m-d H:i:s: ').$str."\n");
 			fclose($f);
 		}
+	}
+	
+	/**
+	 * Get the default quota for a given disciplin, route_order and optional quali_type or participants number
+	 *
+	 * @param string $discipline 'speed', 'lead' or 'boulder'
+	 * @param int $route_order
+	 * @param int $quali_type=null TWO_QUALI_ALL, TWO_QUALI_HALF, ONE_QUALI
+	 * @param int $num_participants=null
+	 * @return int
+	 */
+	function default_quota($discipline,$route_order,$quali_type=null,$num_participants=null)
+	{
+		$quota = null;
+
+		switch($discipline)
+		{
+			case 'speed':
+				if (!is_numeric($num_participants)) break;
+				for($n = 16; $n > 1; $n /= 2) if ($num_participants > $n || !$route_order && $num_participants >= $n)
+				{
+					$quota = $n;
+					break;
+				}
+				break;
+				
+			case 'lead':
+				switch($route_order)
+				{
+					case 0: $quota = $quali_type == TWO_QUALI_HALF ? 13 : 26; break;	// quali
+					case 1: $quota = 13; break;		// 2. quali
+					case 2: $quota = 8;  break;		// 1/2-final
+				}
+				break;
+				
+			case 'boulder':
+				switch($route_order)
+				{
+					case 0: $quota = $quali_type == TWO_QUALI_HALF ? 10 : 20; break;	// quali
+					case 1: $quota = 10; break;		// 2. quali
+					case 2: $quota = 6;  break;		// 1/2-final
+				}
+				break;				
+		}
+		echo "<p>boresult::default_quota($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
+		return $quota;
 	}
 }
