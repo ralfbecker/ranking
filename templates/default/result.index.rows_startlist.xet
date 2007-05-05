@@ -26,16 +26,20 @@
 				</row>
 				<row class="x $row_cont[class]">
 					<hbox align="center" options="0,0">
-						<description class="onlyPrint" value="$row_cont[start_order]" id="{$row}[start_number]" no_lang="1"/>
-						<description class="noPrint" id="{$row}[start_order]" no_lang="1"/>
-						<textbox size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[PerId]][start_number]" no_lang="1" class="noPrint leftPad5"/>
+						<description class="onlyPrint" id="{$row}[start_order]" no_lang="1" align="center"/>
+						<description class="onlyPrint" id="{$row}[start_number]" no_lang="1" align="center"/>
+						<description class="noPrint leftPad5" id="{$row}[start_order]" no_lang="1" align="center"/>
+						<textbox size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[PerId]][start_number]" no_lang="1" class="noPrint rightPad5" align="right"/>
 					</hbox>
 					<description id="{$row}[nachname]" no_lang="1" class="lastname leftPad5" options="$row_cont[link]"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description no_lang="1" align="center" id="{$row}[birthyear]"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
-					<description value="$row_cont[ranking_place]." no_lang="1" id="${row}[ranking_points]" align="center"/>
+					<hbox no_lang="1" options="0,0">
+						<description no_lang="1" id="${row}[ranking_place]" class="place"/>
+						<description no_lang="1" id="${row}[ranking_points]" align="right"/>
+					</hbox>
 					<button image="delete" class="noPrint" label="Delete" align="center" id="delete[$row_cont[PerId]]" onclick="return confirm('Delete this participant (can NOT be undone)');"/>
 				</row>
 			</rows>

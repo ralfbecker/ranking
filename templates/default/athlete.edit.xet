@@ -80,7 +80,7 @@
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.3.001">
-		<htmlarea rows="1" cols="1" style="extended" plugins="210px,100%,true" id="freetext" statustext="This text will be shown in the profil on the website."/>
+		<htmlarea rows="1" cols="1" mode="extended" height="210px" width="100%" toolbar="true" id="freetext" statustext="This text will be shown in the profil on the website."/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -177,11 +177,11 @@
 				<row class="row">
 					<description options=",,,nation" value="Nation"/>
 					<menulist>
-						<menupopup options="none" id="nation" statustext="nation the athlete is competing for" no_lang="1"/>
+						<menupopup options="Select one" id="nation" statustext="nation the athlete is competing for" no_lang="1" needed="1"/>
 					</menulist>
 					<description options=",,,sex" value="Gender"/>
 					<menulist span="all">
-						<menupopup options="none" id="sex" statustext="gender of the athlete"/>
+						<menupopup options="Select one" id="sex" statustext="gender of the athlete" needed="1"/>
 					</menulist>
 				</row>
 				<row class="row">
