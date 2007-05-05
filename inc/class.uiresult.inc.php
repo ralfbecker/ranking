@@ -550,7 +550,7 @@ class uiresult extends boresult
 			$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
 			if (!is_numeric($keys['route_order']) || !$this->has_startlist($keys))
 			{
-				$msg = lang('No startlist or result yet!');
+				if ($cat) $msg = lang('No startlist or result yet!');
 				$content['nm']['show_result'] = '0';
 			}
 			elseif ($keys['route_order'] > 0)	// more then the quali --> show the general result
