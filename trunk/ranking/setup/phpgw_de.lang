@@ -16,6 +16,7 @@ add a new competition	ranking	de	einen neuen Wettkampf anlegen
 add a new cup	ranking	de	Neue Serie anlegen
 add a new heat	ranking	de	Neue Runde anlegen
 add heat	ranking	de	Runde anlegen
+all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 applied	ranking	de	beantragt
 applied for a %1 license	ranking	de	%1 Lizenz beantragt
@@ -50,6 +51,7 @@ climbing time	ranking	de	Kletterzeit
 closes	ranking	de	schließt
 comments	ranking	de	Kommentare
 competition	ranking	de	Wettkampf
+competition already has a result for this category!	ranking	de	Der Wettkampf hat bereits ein Ergebnis für diese Kategorie!
 competition calendar	ranking	de	Wettkampfkalender
 competition has not yet a startlist	ranking	de	Wettkampf hat noch keine Startliste
 competition name	ranking	de	Wettkampfname
@@ -80,6 +82,7 @@ deny public display of the checked information	ranking	de	öffentlichen Anzeige d
 digital rock	ranking	de	digital ROCK
 display ranking	ranking	de	Rangliste anzeigen
 download	ranking	de	Herunterladen
+download all	ranking	de	Alle herunterladen
 duration in days or textual competition-date like 'mid july'	ranking	de	Dauer in Tagen oder Text für Wettkampfdatum wie 'Mitte Juli'
 duration or textual date	ranking	de	Dauer oder Text
 each new upload will overwrite the previous one	ranking	de	jeder neue Upload überschreibt den vorherigen
@@ -216,6 +219,7 @@ picture attached	ranking	de	Bild angehangen
 picture resized to %1 pixel	ranking	de	Bild auf %1 Pixel verkleinert
 place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
+please do not capitalise all words and names!	ranking	de	Bitte Worte und Namen NICHT KOMPLETT mit großen Buchstaben schreiben!
 plus	ranking	de	plus
 pointalocation	ranking	de	Punkteverteilung
 points	ranking	de	Punkte

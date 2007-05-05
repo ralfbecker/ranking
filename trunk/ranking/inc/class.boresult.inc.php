@@ -136,9 +136,10 @@ class boresult extends boranking
 	 * @param int $route_order 0/1 for qualification, 2, 3, ... for further heats
 	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @param int $discipline='lead' 'lead', 'speed', 'boulder'
+	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
 	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead')
+	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999)
 	{
 		$keys = array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
@@ -153,31 +154,88 @@ class boresult extends boranking
 			//echo "failed to generate startlist"; _debug_array($keys);
 			return false;
 		}
-		// delete existing starters
-		$this->route_result->delete($keys);
-		
 		if ($route_order >= 2 || 	// further heat --> startlist from reverse result of previous heat
 			$route_order == 1 && $route_type == TWO_QUALI_ALL)	// 2. Quali uses same start-order
 		{
+			// delete existing starters
+			$this->route_result->delete($keys);
 			return $this->_startlist_from_previous_heat($keys,
 				$discipline == 'boulder' && $route_order == 2 ? 'result' :	// boulder 1/2-final --> by quali result
 				($route_order >= 2 ? 'reverse' : 'previous'),	// after quali reversed result, otherwise as previous heat
 				$discipline == 'speed');						// speed --> use ko-system for the final
 		}
+		// from now on only quali startlist from registration
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
-		
-		// read startlist from result-store or generate it with standard values
-		unset($keys['route_order']);
-		if (!$this->result->has_startlist($keys) && !parent::generate_startlist($comp,$cat,$route_type == TWO_QUALI_HALF ? 2 : 1))
+
+		// depricated startlist stored in the result
+		if ($this->result->has_startlist(array(
+			'WetId' => $keys['WetId'],
+			'GrpId' => $keys['Grpid'],
+		)))
+		{
+			// delete existing starters
+			$this->route_result->delete($keys);
+
+			$starters =& $this->result->read(array(
+				'WetId' => $keys['WetId'],
+				'GrpId' => $keys['Grpid'],
+				'platz=0 AND pkt > 64'
+			),'',true,'GrpId,pkt,nachname,vorname');
+			
+			return $this->_store_startlist($starters,$route_order);
+		}
+		// preserv an existing quali-startorder (not ranked competitiors)
+		$old_startlist = array();
+		if ($route_type == TWO_QUALI_HALF) $keys['route_order'] = array(0,1);
+		foreach((array)$this->route_result->search($keys,'PerId,start_order,start_number,route_order','start_order ASC,route_order ASC') as $starter)
+		{
+			if ($starter['PerId']) $old_startlist[$starter['PerId']] = $starter;
+		}
+		// delete existing starters
+		$this->route_result->delete($keys);
+
+		// generate a startlist, without storing it in the result store
+		// ToDo: make the number of athletes from the complementary list configurable
+		$starters =& parent::generate_startlist($comp,$cat,$route_type == TWO_QUALI_HALF ? 2 : 1,$max_compl,1,$old_startlist);
+
+		$num = $this->_store_startlist($starters[1],$route_type == TWO_QUALI_HALF ? 0 : $route_order);
+			
+		if ($route_type == TWO_QUALI_HALF)	// automatically generate 2. quali
+		{
+			$keys['route_order'] = 1;
+			if (!$this->route->read($keys))
+			{
+				$keys['route_order'] = 0;
+				$route = $this->route->read($keys);
+				$this->route->save(array(
+					'route_name'   => '2. '.$route['route_name'],
+					'route_order'  => 1,
+					'route_status' => STATUS_STARTLIST,
+				));
+			}
+			$this->_store_startlist($starters[2],1);
+		}
+		return $num;
+	}
+	
+	/**
+	 * Store a startlist in route_result table
+	 *
+	 * @internal 
+	 * @param array $starters
+	 * @param int $route_order if set only these starters get stored
+	 * @return int num starters stored
+	 */
+	function _store_startlist($starters,$route_order)
+	{
+		if (!$starters || !is_array($starters))
 		{
 			return false;
 		}
-		$starters =& $this->result->read($keys+array('platz=0 AND pkt > 64'),'',true,'GrpId,pkt,nachname,vorname');
-		
 		$num = 0;
-		foreach((array)$starters as $starter)
+		foreach($starters as $starter)
 		{
 			if (!($start_order = $this->pkt2start($starter['pkt'],1+$route_order)))
 			{
@@ -189,7 +247,9 @@ class boresult extends boranking
 				'route_order' => $route_order,
 				'PerId' => $starter['PerId'],
 				'start_order' => $start_order,
-			));
+			)+(isset($starter['start_number']) ? array(
+				'start_number' => $starter['start_number'],
+			) : array()));
 			if ($this->route_result->save() == 0) $num++;
 		}
 		return $num;

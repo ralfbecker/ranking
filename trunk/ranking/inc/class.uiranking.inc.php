@@ -71,7 +71,7 @@ class uiranking extends boranking
 			'stand_rkey' => $this->comp->names(array(
 				'nation' => $nation,
 				'serie'  => $cup['SerId'],
-				'datum <= '.$this->db->quote(date('Y-m-d')),
+				'datum <= '.$this->db->quote(date('Y-m-d',time()+7*24*3600)),
 				'datum > '.$this->db->quote((date('Y')-1).'-01-01'),
 			),1),
 		);

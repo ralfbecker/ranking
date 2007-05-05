@@ -39,8 +39,6 @@ class ranking_admin_prefs_sidebox_hooks
 					'menuaction' => 'ranking.ranking.cat_edit' )),*/
 				'Registration' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiregistration.index' )),
-				'Startlists' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiregistration.startlist' )),
 				'Resultservice' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiresult.index' )),
 				'Results' => $GLOBALS['egw']->link('/index.php',array(
@@ -99,7 +97,6 @@ class ranking_admin_prefs_sidebox_hooks
 		//	'ranking.uicats.index'           => lang('Categories'),
 			'ranking.uiathletes.index'       => lang('Athletes'),
 			'ranking.uiregistration.index'   => lang('Registration'),
-			'ranking.uiregistration.lists'   => lang('Startlists'),
 			'ranking.uiresult.index'         => lang('Resultservice'),
 			'ranking.uiregistration.result'  => lang('Results'),
 			'ranking.uiranking.index'        => lang('Ranking'),

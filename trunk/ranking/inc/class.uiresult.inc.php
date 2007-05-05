@@ -88,6 +88,20 @@ class uiresult extends boresult
 				{
 					$keys['route_quota'] = $previous['route_quota'] / 2;
 				}
+				if ($previous && $previous['route_judge'])
+				{
+					$keys['route_judge'] = $previous['route_judge'];
+				}
+				else	// set judges from the competition
+				{
+					$keys['route_judge'] = array();
+					foreach($comp['judges'] as $uid)
+					{
+						$keys['route_judge'][] = $GLOBALS['egw']->common->grab_owner_name($uid);
+					}
+					$keys['route_judge'] = implode(', ',$keys['route_judge']);
+				}
+				
 				$content = $this->route->init($keys);
 				$content['new_route'] = true;
 			}
@@ -147,7 +161,8 @@ class uiresult extends boresult
 						$param['show_result'] = 1;
 					}
 					elseif (is_numeric($content['route_order']) && 
-						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'])))
+						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'],
+							$content['max_compl']!=='' ? $content['max_compl'] : 999)))
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
 						
@@ -293,7 +308,11 @@ class uiresult extends boresult
 		// cant delete general result or not yet saved routes
 		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = 
 			$content['route_order'] == -1 || $content['new_route'];
-		
+		// disable max. complimentary selection if no quali.
+		if ($content['route_order'] > (int)($content['route_type']==TWO_QUALI_HALF))
+		{
+			$tmpl->disable_cells('max_compl');
+		}
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
@@ -630,7 +649,7 @@ class uiresult extends boresult
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum < '.$this->db->quote(date('Y-m-d',time()+5*24*3600)),	// starting 5 days from now
+				'datum < '.$this->db->quote(date('Y-m-d',time()+7*24*3600)),	// starting 5 days from now
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
@@ -717,7 +736,7 @@ class uiresult extends boresult
 		{
 			$last_heat = $keys;
 			$last_heat['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
-			if (!$this->has_results($last_heat))
+			if (!$this->has_results($last_heat) && $content['route_order'] >= 2)
 			{
 				$last_heat = $this->route->read($last_heat);
 				$tmpl->set_cell_attribute('button[new]','onclick',"alert('".

@@ -57,12 +57,24 @@ class uiregistration extends boranking
 		}
 		$total = $this->athlete->get_rows($query,$rows,$readonlys,$query['show_all'] ? true : $query['cat']);
 		
+		// admins and judges are allowed to EXECPTIONAL register athletes without license
+		$allow_no_license_register = $this->is_admin || $this->is_judge($query['comp']);
+
 		$readonlys = array();
-		foreach($rows as $row)
+		foreach($rows as &$row)
 		{
-			// allow only to register athletes with applied or confirmed licenses
-			$readonlys["register[$row[PerId]]"] = $row['license'] == 'n';
-			$readonlys["apply_license[$row[PerId]]"] = !$readonlys["register[$row[PerId]]"];
+			if ($row['license'] == 'n')	// athlete has NO license
+			{
+				if ($allow_no_license_register)	// admins or judges have to confirm the registration
+				{
+					$row['confirm'] = "if(confirm('This athlete has NO license! Are you sure you want to make an EXCEPTION')) ";
+				}
+				else	// others are denied to register
+				{
+					$readonlys["register[$row[PerId]]"] = true;
+				}
+			}
+			$readonlys["apply_license[$row[PerId]]"] = $row['license'] != 'n';
 		}
 		$rows['sel_options'] =& $sel_options;
 		$rows['comp'] = $query['comp'];
@@ -170,7 +182,7 @@ class uiregistration extends boranking
 					'nation'   => $_GET['nation'],
 					'cat'      => $_GET['cat'],
 				);
-				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'])))
+				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'],'',$this->license_year)))
 				{
 					$content['nation'] = $athlete['nation'];
 				}
@@ -205,7 +217,7 @@ class uiregistration extends boranking
 			list($calendar) = each($this->ranking_nations);
 		}
 		$nation = $athlete ? $athlete['nation'] : $content['nation'];
-		if ($this->only_nation_register && !$this->is_judge($comp))
+		if (is_null($nation) && $this->only_nation_register && !$this->is_judge($comp))
 		{
 			$nation = $this->only_nation_register;
 		}
@@ -213,7 +225,7 @@ class uiregistration extends boranking
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days go or further in future
+				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 		);
@@ -243,7 +255,7 @@ class uiregistration extends boranking
 			//_debug_array($cat2col);
 			if (!$this->registration_check($comp,$nation))	// user allowed to register that nation
 			{
-				echo "<h1>user not allowed to register nation '$nation'</h1>\n";
+				//echo "<h1>user not allowed to register nation '$nation'</h1>\n";
 				$nation = '';
 			}
 			// athlete to register
@@ -258,13 +270,19 @@ class uiregistration extends boranking
 					
 					list($athlete) = $content['register'] ? each($content['register']) : each($content['delete']);
 					list($cat,$athlete) = explode('/',$athlete);
-					$athlete = $this->athlete->read($athlete);
+					$athlete = $this->athlete->read($athlete,'',$this->license_year);
 				}
-				if (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']))
+				if (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']) ||
+					$cat['sex'] && $athlete['sex'] != $cat['sex'] ||
+					$athlete['license'] == 'n' && !$this->is_admin && !$this->is_judge($comp))
 				{
 					//_debug_array($cat);
 					//_debug_array($comp);
 					$msg = lang('Permission denied !!!');
+				}
+				elseif (!$this->registration_check($comp,$nation,$cat['GrpId']))
+				{
+					$msg = lang('Competition already has a result for this category!');
 				}
 				elseif($content['delete'])
 				{
@@ -413,7 +431,7 @@ class uiregistration extends boranking
 					'class' => $nation && $i >= $quota ? 'complimentary' : 'registered',
 					'delete_button' => $delete_button,
 				);
-				$readonlys[$delete_button] = !$nation;	// re-enable the button
+				$readonlys[$delete_button] = !($this->is_admin || $this->is_judge($comp) || in_array($starter['nation'],$this->register_rights));	// re-enable the button
 			}
 			$cats = array();
 			foreach((array)$cat2col as $cat => $col)

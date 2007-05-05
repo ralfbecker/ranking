@@ -16,6 +16,7 @@ add a new competition	ranking	en	add a new competition
 add a new cup	ranking	en	add a new cup
 add a new heat	ranking	en	Add a new heat
 add heat	ranking	en	Add heat
+all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 applied	ranking	en	applied
 applied for a %1 license	ranking	en	Applied for a %1 license
@@ -50,6 +51,7 @@ climbing time	ranking	en	Climbing time
 closes	ranking	en	closes
 comments	ranking	en	Comments
 competition	ranking	en	Competition
+competition already has a result for this category!	ranking	en	Competition already has a result for this category!
 competition calendar	ranking	en	Competition calendar
 competition has not yet a startlist	ranking	en	Competition has not yet a startlist
 competition name	ranking	en	Competition name
@@ -80,6 +82,7 @@ deny public display of the checked information	ranking	en	deny public display of
 digital rock	ranking	en	digital ROCK
 display ranking	ranking	en	display ranking
 download	ranking	en	Download
+download all	ranking	en	Download all
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
 duration or textual date	ranking	en	Duration or textual date
 each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
@@ -216,6 +219,7 @@ picture attached	ranking	en	Picture attached
 picture resized to %1 pixel	ranking	en	Picture resized to %1 pixel
 place	ranking	en	Place
 place of birth	ranking	en	Place of birth
+please do not capitalise all words and names!	ranking	en	Please do NOT capitalise all words and names!
 plus	ranking	en	plus
 pointalocation	ranking	en	Pointalocation
 points	ranking	en	Points

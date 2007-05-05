@@ -130,6 +130,13 @@ class boranking extends soranking
 		'a' => 'applied',
 		'c' => 'confirmed',
 	);
+	/**
+	 * How many days before and after a competition a judge has rights on the competition and
+	 * to create new athletes for the competition
+	 *
+	 * @var int
+	 */
+	var $judge_right_days = 7;
 
 	/**
 	 * Constructor
@@ -176,13 +183,16 @@ class boranking extends soranking
 		$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
 		$this->user = $GLOBALS['egw_info']['user']['account_id'];
 
+		$this->athlete_rights = array_merge($this->athlete_rights,$this->judge_athlete_rights());
 		if (in_array('NULL',$this->athlete_rights) || $this->is_admin)
 		{ 
-			$this->athlete_rights = array_values($this->athlete->distinct_list('nation'));
+			$this->athlete_rights = array_merge($this->athlete_rights,array_values($this->athlete->distinct_list('nation')));
 		}
+		$this->athlete_rights = array_unique($this->athlete_rights);
+
 		if (in_array('NULL',$this->register_rights) || $this->is_admin)
 		{ 
-			$this->register_rights = array_values($this->athlete->distinct_list('nation'));
+			$this->register_rights = array_merge($this->register_rights,array_values($this->athlete->distinct_list('nation')));
 		}
 		
 		// setup list with nations we rank and intersect it with the read_rights
@@ -201,8 +211,8 @@ class boranking extends soranking
 			{
 				$this->only_nation_edit = $this->edit_rights[0];
 			}
-			if (in_array('NULL',$this->athlete_rights)) 
-			if (count($this->athlete_rights) == 1)
+			// international ahtlete rights are for all nation's athletes
+			if (!in_array('NULL',$this->athlete_rights) && count($this->athlete_rights) == 1)
 			{
 				$this->only_nation_athlete = $this->athlete_rights[0];
 			}
@@ -210,7 +220,7 @@ class boranking extends soranking
 			{
 				$this->only_nation_register = $this->register_rights[0];
 			}
-			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation'</p>\n";
+			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation', only_nation_athlete='$this->only_nation_athlete', athlete_rights=".print_r($this->athlete_rights,true)."</p>\n";
 		}
 		$this->license_year = (int) date('Y');
 		
@@ -291,31 +301,52 @@ class boranking extends soranking
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = abs(mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
 		
-		return $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) && $distance < 15;
+		return $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) && $distance <= $this->judge_right_days;
+	}
+	
+	/**
+	 * Get the nations of all competitions for which the current user has NOW judge-rights and therefor can add athletes
+	 * nation='NULL' means international --> all nations
+	 *
+	 * @return array with nations
+	 */
+	function judge_athlete_rights()
+	{
+		if (!($comps = $this->comp->search(array(),'nation','nation','','',false,'AND',false,array(
+			$this->comp->db->concat("','",'judges',"','").' LIKE '.$this->db->quote('%,'.$this->user.',%'),
+			"datum <= '".date('Y-m-d',time()+$this->judge_right_days*24*3600)."'",
+			"datum >= '".date('Y-m-d',time()-$this->judge_right_days*24*3600)."'",
+		))))
+		{
+			return array();
+		}
+		$nations = array();
+		foreach($comps as $comp)
+		{
+			$nation = $comp['nation'] ? $comp['nation'] : 'NULL';
+			if (!in_array($nation,$nations)) $nations[] = $nation;
+		}
+		return $nations;
 	}
 		
 	/**
 	 * Check if user is allowed to register athlets for $comp and $nation
 	 *
-	 * ToDo taking a deadline and competition judges into account !!!
-	 *
 	 * @param int/array $comp WetId or complete competition array
 	 * @param string $nation='' nation of the athlets to register, if empty do a general check independent of nation
+	 * @param int GrpId=null if set check only for a given cat
 	 */
-	function registration_check($comp,$nation='')
+	function registration_check($comp,$nation='',$cat=null)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
 			return false;	// comp not found
 		}
-		// check if user is a judge of the competition or has the necessary registration rights for $nation
-		$ret = $this->is_judge($comp) || (!$nation || $this->acl_check($nation,EGW_ACL_REGISTER)) && 
-			// check if comp already has a result
-			!$this->comp->has_results($comp) &&
-			// check if comp already happend or registration deadline over, 
-			// only checked for non-admins and people without result-rights for that calendar
-			(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) || 
-			 $this->is_admin || $this->acl_check($comp['nation'],EGW_ACL_RESULT));
+		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
+			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
+			((!$nation || $this->acl_check($nation,EGW_ACL_REGISTER)) && 	// ( user has the necessary registration rights for $nation AND
+			(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
+			 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
 		//echo "<p>boranking::registration_check(".print_r($comp,true).",'$nation') = $ret</p>\n";
 		
@@ -324,8 +355,8 @@ class boranking extends soranking
 	
 	/** 
 	 * calculates a ranking of type $rls->window_type:
-	 *  monat = $rls->window_anz Monate z�hlen f�r Rangl.
-	 *  wettk = $rls->window_anz Wettk�mpfe ---- " -----
+	 *  monat = $rls->window_anz Monate zaehlen faer Rangl.
+	 *  wettk = $rls->window_anz Wettkaempfe ---- " -----
 	 * It uses, if defined, only the $rls->best_wettk best resutls.
 	 *
 	 * @param mixed &$cat GrpId, rkey or cat as array, on return: cat-array
@@ -345,7 +376,7 @@ class boranking extends soranking
 	 *             - $rls->min_wettk, dh. min. Anzahl Wettk. um gewertet zu werden
 	 *             - $comp->open, dh. nur bessere Erg. von. Wettk. und Open verw.
 	 *             - $cup->max_rang, dh. max. Anz. Wettk. der Serie in Rangliste
-	 *             - $cup->faktor, dh. Faktor f�r Serienpunkte
+	 *             - $cup->faktor, dh. Faktor faer Serienpunkte
 	 *            Diese Parameter werden im Moment von keiner Rangliste mehr verw.
 	 *
 	 * 01.05.2001:	Jahrgänge berücksichtigen, dh. wenn in Gruppe from_year und
@@ -721,9 +752,10 @@ class boranking extends soranking
 	 * @param int $num_routes=1 number of routes, default 1
 	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
 	 * @param int $mode=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first
-	 * @return boolean true if the startlist has been successful generated AND saved, false otherwise
+	 * @param array $old_startlist=null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
+	 * @return boolean/array true or array with starters (if is_array($old_startlist) if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$mode=1)
+	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$mode=1,$old_startlist=null)
 	{
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
@@ -778,7 +810,8 @@ class boranking extends soranking
 				}
 			}
 		}
-		$reset_data = true;
+		$reset_data = 1;
+		$ranked = array();
 		// do we use a ranking, if yes calculate it and place the ranked competitors at the end of the startlist
 		if ($mode)
 		{
@@ -799,6 +832,7 @@ class boranking extends soranking
 				{
 					$this->move_to_startlist($starters,$athlete['PerId'],$startlist,$num_routes,$reset_data);
 					$reset_data = false;
+					$ranked[$athlete['PerId']] = true;
 				}
 			}
 			if ($cat['discipline'] != 'speed')
@@ -811,29 +845,53 @@ class boranking extends soranking
 				}
 			}
 		}
+		// if we have a startorder to preserv, we use these competitior first
+		if ($old_startlist)
+		{
+			if ($cat['discipline'] == 'speed' && $mode)	// reversed order
+			{
+				$old_startlist = array_reverse($old_startlist);
+			}
+			foreach(array_diff_key($old_startlist,$ranked) as $PerId => $starter)
+			{
+				if(isset($starters[$PerId])) $this->move_to_startlist($starters,$PerId,$startlist,$num_routes,1+$starter['route_order']);
+			}
+			// make sure both routes get equaly filled up
+			if ($num_routes == 2) $reset_data = 1+(int)(count($startlist[1]) > count($startlist[2]));
+		}
 		// now we randomly pick starters and devide them on the routes
 		while(count($starters))
 		{
 			$this->move_to_startlist($starters,array_rand($starters),$startlist,$num_routes,$reset_data);
 			$reset_data = false;
 		}
-		// store the startlist in the database
+		// reverse the startlist if neccessary
 		for ($route = 1; $route <= $num_routes; ++$route)
 		{
-			if ($cat['discipline'] == 'speed')
+			if ($cat['discipline'] == 'speed' && $mode)
 			{
 				// if we used a ranking, we have to reverse the startlist
 				// old modus & speed: unranked startes at the beginning
-				if ($mode) 
-				{
-					$startlist[$route] = array_reverse($startlist[$route]);
-				}
+				$startlist[$route] = array_reverse($startlist[$route]);
 			}
 			foreach($startlist[$route] as $n => $athlete)
 			{
+				$startlist[$route][$n]['start_order'] = 1+$n;
+				// preserv the start_number if given
+				if ($old_startlist) $startlist[$route][$n]['start_number'] = $old_startlist[$athlete['PerId']]['start_number'];
 				// we preserve the registration number in the last 6 bit's
-				$num = (($route-1) << 14) + ((1+$n) << 6) + ($athlete['pkt'] & 63);
-
+				$startlist[$route][$n]['pkt'] = (($route-1) << 14) + ((1+$n) << 6) + ($athlete['pkt'] & 63);
+			}
+		}
+		if (is_array($old_startlist))
+		{
+			return $startlist;
+		}
+		// store the startlist in the database
+		for ($route = 1; $route <= $num_routes; ++$route)
+		{
+			foreach($startlist[$route] as $n => $athlete)
+			{
 				if ($this->debug) echo ($n+1).": $athlete[nachname], $athlete[vorname] ($athlete[nation]) $num=".($num >> 6).":".($num % 64)."<br>\n";
 
 				if($this->result->save(array(
@@ -841,7 +899,7 @@ class boranking extends soranking
 					'WetId' => $athlete['WetId'],
 					'GrpId' => $athlete['GrpId'],
 					'platz' => 0,
-					'pkt'   => $num,
+					'pkt'   => $athlete['pkt'],
 					'datum' => $athlete['datum'] ? $athlete['datum'] : date('Y-m-d'),
 				)) != 0)
 				{
@@ -877,10 +935,10 @@ class boranking extends soranking
 	 *
 	 * @internal 
 	 */
-	function move_to_startlist(&$starters,$k,&$startlist,$num_routes,$reset_data=false)
+	function move_to_startlist(&$starters,$k,&$startlist,$num_routes,$reset_data=null)
 	{
 		static $route = 1;
-		if ($reset_data)  $route = 1;
+		if ($reset_data)  $route = $reset_data;
 		//echo "<p>boranking::check_move_to_startlist(,$k,,$num_routes,$reset_data) route=$route, athlete=".$starters[$k]['nachname'].', '.$starters[$k]['vorname']."</p>\n";
 
 		$athlete =& $starters[$k];

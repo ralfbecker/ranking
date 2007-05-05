@@ -321,10 +321,11 @@ class competition extends so_sql
 	/**
 	 * checks if a competition already has results recorded
 	 *
-	 * @param int/array $keys WetId or array with keys of competition to check, default null = use keys in data
+	 * @param int/array $keys WetId or array with keys of competition to check
+	 * @param int $GrpId=null optional GrpId to only check for a certain category
 	 * @return boolean 
 	 */
-	function has_results($keys=null)
+	function has_results($keys,$GrpId=null)
 	{
 		if (is_array($keys) || !$keys['WetId'])
 		{
@@ -341,9 +342,12 @@ class competition extends so_sql
 		
 		static $has_results = array();	// little bit of caching
 		
-		if (isset($has_results[$WetId])) return $has_results[$WetId];
+		if (isset($has_results[$WetId][(string)$GrpId])) return $has_results[$WetId][(string)$GrpId];
 		
-		return $has_results[$WetId] = ExecMethod('ranking.result.has_results',array('WetId' => $WetId));
+		$check = array('WetId' => $WetId);
+		if ($GrpId) $check['GrpId'] = $GrpId;
+		
+		return $has_results[$WetId][(string)$GrpId] = ExecMethod('ranking.result.has_results',$check);
 	}
 	
 	/**

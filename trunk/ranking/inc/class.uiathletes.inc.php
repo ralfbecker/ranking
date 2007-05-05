@@ -84,7 +84,7 @@ class uiathletes extends boranking
 			if (!$_GET['PerId'] && !$_GET['rkey'])
 			{
 				$this->athlete->init();
-				$this->athlete->data['nation'] = $this->athlete_rights[0];
+				$this->athlete->data['nation'] = $this->only_nation_athlete;
 			}
 			// we have no edit-rights for that nation
 			if (!$this->is_admin && !in_array($this->athlete->data['nation'] ? $this->athlete->data['nation'] : 'NULL',$this->athlete_rights))
@@ -98,6 +98,7 @@ class uiathletes extends boranking
 			{
 				$js = "document.getElementById('exec[apply_license]').click();";
 			}
+			$msg = lang('Please do NOT capitalise all words and names!');
 		}
 		else
 		{
@@ -363,7 +364,7 @@ class uiathletes extends boranking
 
 		foreach($rows as $row)
 		{
-			if ($row['last_comp'])
+			if ($row['last_comp'] || !in_array($row['nation'],$this->athlete_rights))
 			{
 				$readonlys["delete[$row[PerId]]"] = true;
 			}
@@ -436,6 +437,8 @@ class uiathletes extends boranking
 				$content['nm']['col_filter']['nation'] = $this->athlete_rights[0];
 			}
 		}
+		$readonlys['nm[rows][edit][0]'] = !count($this->athlete_rights);
+
 		$this->tmpl->read('ranking.athlete.list');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
 		$this->set_ui_state();
@@ -444,7 +447,7 @@ class uiathletes extends boranking
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'filter2'=> array('' => 'All')+$this->license_labels,
 			'license'=> $this->license_labels,
-		));
+		),$readonlys);
 	}
 	
 	/**

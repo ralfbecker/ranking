@@ -40,7 +40,7 @@
 						<menupopup id="route_order" no_lang="1" readonly="true"/>
 					</menulist>
 					<menulist class="noWrap">
-						<menupopup id="route_type" align="right"/>
+						<menupopup id="route_type" align="right" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;"/>
 					</menulist>
 				</row>
 				<row class="th">
@@ -51,9 +51,12 @@
 					<description value="Status"/>
 					<hbox span="all" options="0,0">
 						<menulist>
-							<menupopup id="route_status"/>
+							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
 						</menulist>
 						<button id="button[startlist]" class="leftPad5" label="Generate Startlist"/>
+						<menulist class="leftPad5">
+							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10"/>
+						</menulist>
 						<button id="button[ranking]" label="Import into ranking" statustext="Import the result into the ranking" class="leftPad5"/>
 					</hbox>
 				</row>
