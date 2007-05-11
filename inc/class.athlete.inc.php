@@ -48,7 +48,8 @@ class athlete extends so_sql
 		ACL_DENY_CELLPHONE => array('mobil'),
 		ACL_DENY_STREET    => array('strasse','plz'),
 		ACL_DENY_CITY      => array('ort'),
-		ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','sex','nation','verband','license','acl','last_comp'),
+		ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','sex','nation','verband','license','acl','last_comp',
+			'platz','pkt','WetId','GrpId'),		// otherwise the get no points in the ranking!
 	);
 	/**
 	 * year we check the license for
