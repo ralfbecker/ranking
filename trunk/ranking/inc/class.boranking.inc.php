@@ -112,7 +112,7 @@ class boranking extends soranking
 		'AUT','BEL','BLS','BUL','CRO','CZE','DEN','ESP',
 		'FIN','FRA','GBR','GER','GRE','HUN','IRL','ITA',
 		'KAZ','LAT','LUX','MKD','NED','NOR','POL','POR',
-		'ROM','RUS','SCG','SLO','SUI','SVK','SWE','UKR',
+		'ROM','RUS','SBR','SLO','SUI','SVK','SWE','UKR',
 	);
 	/**
 	 * year we check the license for
