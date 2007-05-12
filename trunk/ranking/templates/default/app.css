@@ -1,4 +1,15 @@
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - css
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$ 
+ */
+
 .gray { color: gray; }
 .redItalic { color: red; font-style: italic; }
 .bold { font-weight: bold; }

@@ -1,16 +1,15 @@
 <?php
-/**************************************************************************\
-* eGroupWare - digital ROCK Rankings - result UI                           *
-* http://www.egroupware.org, http://www.digitalROCK.de                     *
-* Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
-* --------------------------------------------                             *
-*  This program is free software; you can redistribute it and/or modify it *
-*  under the terms of the GNU General Public License as published by the   *
-*  Free Software Foundation; either version 2 of the License, or (at your  *
-*  option) any later version.                                              *
-\**************************************************************************/
-
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - result UI
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$ 
+ */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
@@ -787,6 +786,13 @@ class uiresult extends boresult
 		// should we show the result offical footer?
 		$content['result_official'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL;
 
+		if (!is_object($GLOBALS['egw']->js))
+		{
+			require_once(EGW_API_INC.'/class.javascript.inc.php');
+			$GLOBALS['egw']->js =& new javascript();
+		}
+		$GLOBALS['egw']->js->validate_file('.','ranking','ranking',false);
+		
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') : 
 			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED || 

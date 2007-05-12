@@ -1,16 +1,16 @@
 <?php
-  /**************************************************************************\
-  * eGroupWare - Setup                                                       *
-  * http://www.eGroupWare.org                                                *
-  * Created by eTemplates DB-Tools written by ralfbecker@outdoor-training.de *
-  * --------------------------------------------                             *
-  * This program is free software; you can redistribute it and/or modify it  *
-  * under the terms of the GNU General Public License as published by the    *
-  * Free Software Foundation; either version 2 of the License, or (at your   *
-  * option) any later version.                                               *
-  \**************************************************************************/
+/**
+ * eGroupWare digital ROCK Rankings - setup
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$ 
+ */
 
-  /* $Id$ */
 
 	$test[] = '0.9.13.001';
 	function ranking_upgrade0_9_13_001()

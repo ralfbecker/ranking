@@ -1,16 +1,15 @@
 <?php
-	/**************************************************************************\
-	* eGroupWare - digital ROCK Rankings - Cup Object                          *
-	* http://www.egroupware.org, http://www.digitalROCK.de                     *
-	* Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
-	* --------------------------------------------                             *
-	*  This program is free software; you can redistribute it and/or modify it *
-	*  under the terms of the GNU General Public License as published by the   *
-	*  Free Software Foundation; either version 2 of the License, or (at your  *
-	*  option) any later version.                                              *
-	\**************************************************************************/
-
-	/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - cup storage object
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$ 
+ */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 

@@ -1,16 +1,15 @@
 <?php
-/**************************************************************************\
-* phpGroupWare - Editable Templates                                        *
-* http://www.phpgroupware.org                                              *
-" Written by Ralf Becker <RalfBecker@outdoor-training.de>                  *
-* --------------------------------------------                             *
-*  This program is free software; you can redistribute it and/or modify it *
-*  under the terms of the GNU General Public License as published by the   *
-*  Free Software Foundation; either version 2 of the License, or (at your  *
-*  option) any later version.                                              *
-\**************************************************************************/
-
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - setup
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$ 
+ */
 
 $setup_info['ranking']['name']      = 'ranking';
 $setup_info['ranking']['version']   = '1.3.012';
@@ -23,7 +22,7 @@ $setup_info['ranking']['maintainer'] = array(
 	'name'  => 'Ralf Becker',
 	'email' => 'RalfBecker@digitalROCK.de',
 );
-//$setup_info['ranking']['license']  = 'GPL';
+$setup_info['ranking']['license']  = 'GPL';
 
 $setup_info['ranking']['description'] =
 	"<p>Calendar-, result- and ranking-service on this site is provided by digital ROCK.</p>
