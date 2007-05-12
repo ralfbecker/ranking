@@ -1,4 +1,15 @@
 <?php
+/**
+ * eGroupWare digital ROCK Rankings - setup
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$ 
+ */
 
 	$phpgw_baseline = array(
 		'Wettkaempfe' => array(
