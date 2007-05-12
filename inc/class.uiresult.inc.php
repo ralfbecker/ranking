@@ -735,7 +735,7 @@ class uiresult extends boresult
 		{
 			$last_heat = $keys;
 			$last_heat['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
-			if (!$this->has_results($last_heat) && $content['route_order'] >= 2)
+			if (!$this->has_results($last_heat))
 			{
 				$last_heat = $this->route->read($last_heat);
 				$tmpl->set_cell_attribute('button[new]','onclick',"alert('".
