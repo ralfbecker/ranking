@@ -76,17 +76,21 @@ class uiathletes extends boranking
 			{
 				$msg .= lang('Entry not found !!!');
 			}
-		}
+		}			
+		$nations = $this->athlete->distinct_list('nation');
+
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
 		{
-			if (!$_GET['PerId'] && !$_GET['rkey'])
+			if (!$_GET['PerId'] && !$_GET['rkey'] || !$this->athlete->data['PerId'])
 			{
 				$this->athlete->init();
 				$this->athlete->data['nation'] = $this->only_nation_athlete;
+				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
 			}
 			// we have no edit-rights for that nation
-			if (!$this->is_admin && !in_array($this->athlete->data['nation'] ? $this->athlete->data['nation'] : 'NULL',$this->athlete_rights))
+			if (!$this->is_admin && (!count($this->athlete_rights) || $this->athlete->data['nation'] && 
+				!in_array($this->athlete->data['nation'],$this->athlete_rights) && !in_array('NULL',$this->athlete_rights)))
 			{
 				$view = true;
 			}
@@ -255,7 +259,7 @@ class uiathletes extends boranking
 			'referer' => $content['referer'],
 		);
 		$sel_options = array(
-			'nation' => $this->athlete->distinct_list('nation'),
+			'nation' => $nations,
 			'sex'    => $this->genders,
 			'acl'    => $this->acl_deny_labels,
 			'license'=> $this->license_labels,
