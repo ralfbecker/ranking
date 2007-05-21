@@ -104,7 +104,7 @@ class route_result extends so_sql
 		}
 		if ($route_order === 0) $route_order = '0';		// otherwise it get's ignored by so_sql;
 
-		if (!$only_keys && !$join || $route_order < 0) 
+		if (!$only_keys && !$join || $route_order < 0)
 		{
 			$join = $this->athlete_join;
 			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
@@ -222,10 +222,15 @@ class route_result extends so_sql
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
 		{
-			return "SELECT p.result_rank * p2.result_rank FROM $this->table_name p".
-				" JOIN $this->table_name p2 ON p.WetId=p2.WetId AND p.GrpId=p2.GrpId AND p2.route_order=1 AND p.PerId=p2.PerId".
-				" WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND p.route_order=0".
-				" AND $this->table_name.PerId=p.PerId";
+			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
+			$r = 'r1';
+			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
+			$r = 'r2';
+			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
+			return "SELECT ROUND(SQRT((($c1)+2*r1.result_rank-1)/2 * (($c2)+2*r2.result_rank-1)/2),2) FROM $this->table_name r1".
+				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.PerId=r2.PerId".
+				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
+				" AND $this->table_name.PerId=r1.PerId";
 		}
 		return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
 			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1))." AND $this->table_name.PerId=p.PerId";
@@ -265,8 +270,9 @@ class route_result extends so_sql
 			}
 			if ($route_order == 1)	// 2. Quali for route_type==TWO_QUALI_ALL
 			{
-				// only order is the product of the two quali. routes
-				$order_by = array($product = "$this->table_name.result_rank * r$route_order.result_rank");
+				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
+				$product = '('.$this->_sql_rank_prev_heat(2,TWO_QUALI_ALL).')';
+				$order_by = array($product);
 				$extra_cols[] = "$product AS quali_points";
 			}
 			else
@@ -294,8 +300,8 @@ class route_result extends so_sql
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
 		
 		static $plus2string = array(
-			-1 => ' -',
-			0  => ' &nbsp;',
+			-1 => '-',
+			0  => '&nbsp;',
 			1  => '+',
 		);
 		if (!is_array($data))
