@@ -353,12 +353,14 @@ class competition extends so_sql
 	 * path of a pdf attachment of a certain type for the competition in data
 	 *
 	 * @param string $type 'info', 'startlist', 'result'
+	 * @param array $data competition
 	 * @param string $rkey rkey to use, default ''=use the one from our internal data
 	 * @return string the path
 	 */	 
-	function attachment_path($type,$rkey='')
+	function attachment_path($type,$data=null,$rkey='')
 	{
-		if (!$rkey) $rkey = $this->data['rkey'];
+		if (!$data) $data =& $this->data;
+		if (!$rkey) $rkey = $data['rkey'];
 
 		if (is_numeric(substr($rkey,0,2)))
 		{
@@ -368,7 +370,7 @@ class competition extends so_sql
 		{
 			$year = substr($this->data['datum'],0,4);
 		}
-		return $this->vfs_pdf_dir.'/'.$year.'/'.$this->attachment_prefixes[$type].$rkey.'.pdf';
+		return $this->vfs_pdf_dir.$data['nation'].'/'.$year.'/'.$this->attachment_prefixes[$type].$rkey.'.pdf';
 	}		
 		
 	/**
@@ -380,7 +382,7 @@ class competition extends so_sql
 	 */
 	function attachments($data=null,$return_link=false)
 	{
-		$rkey = is_array($data) ? $data['rkey'] : $this->data['rkey'];
+		if (!$data) $data =& $this->data;
 			
 		if (!is_object($GLOBALS['egw']->vfs))
 		{
@@ -389,7 +391,7 @@ class competition extends so_sql
 		$attachments = false;
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
-			$vfs_path = $this->attachment_path($type,$rkey);
+			$vfs_path = $this->attachment_path($type,$data);
 			if ($GLOBALS['egw']->vfs->file_exists(array(
 					'string' => $vfs_path,
 					'relatives' => RELATIVE_ROOT,
@@ -403,7 +405,15 @@ class competition extends so_sql
 					'path'       => base64_encode($path),
 					'file'       => base64_encode($file),
 				);
-				$attachments[$type] = $return_link ? $GLOBALS['egw']->link('/index.php',$linkdata) : $linkdata;
+				if ($return_link)
+				{
+					$linkdata = $GLOBALS['egw']->link('/index.php',$linkdata);
+					if ($linkdata{0} == '/')
+					{
+						$linkdata = ($_SERVER['HTTPS'] ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].$linkdata;
+					}
+				}
+				$attachments[$type] = $linkdata;
 			}
 		}
 		return $attachments;
@@ -506,7 +516,7 @@ class competition extends so_sql
 		$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
-			$old_path = $this->attachment_path($type,$old_rkey);
+			$old_path = $this->attachment_path($type,null,$old_rkey);
 			$new_path = $this->attachment_path($type);
 			//echo "$old_path --> $new_path<br>\n";
 

@@ -269,12 +269,12 @@ class uicompetitions extends boranking
 		$readonlys = array();
 		foreach($rows as $n => $row)
 		{
-			foreach((array) $this->comp->attachments($row) as $type => $linkdata)
+			foreach((array) $this->comp->attachments($row,true) as $type => $linkdata)
 			{
 				$rows[$n]['pdf'][$type] = array(
 					'icon' => $type,
-					'file' => $this->comp->attachment_path($type),
-					'link' => $linkdata,
+					'file' => $this->comp->attachment_path($type,$row),
+					'link' => $linkdata.',_blank',
 					'label'=> $this->attachment_type[$type],
 				);
 			}
