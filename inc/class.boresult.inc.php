@@ -393,7 +393,7 @@ class boresult extends boranking
 			if (isset($data['quali_points']) && count($starters)-$n > $prev_route['route_quota'] && 
 				$data['quali_points'] > $starters[count($starters)-$prev_route['route_quota']]['quali_points'])
 			{
-				echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$prev_route['route_quota'])."]['quali_points']=".$starters[count($starters)-$prev_route['route_quota']]['quali_points']."</p>\n";
+				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$prev_route['route_quota'])."]['quali_points']=".$starters[count($starters)-$prev_route['route_quota']]['quali_points']."</p>\n";
 				continue;
 			}
 			if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem
