@@ -54,7 +54,7 @@ class ranking_admin_prefs_sidebox_hooks
 					include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
 					$GLOBALS['uiresult']->display =& new ranking_display($GLOBALS['uiresult']->db);
 				}
-				if (($displays = $GLOBALS['uiresult']->display->displays()))
+				if (($displays = $GLOBALS['uiresult']->display->displays()) || $GLOBALS['egw_info']['user']['apps']['admin'])
 				{
 					$file = array();
 					foreach($displays as $dsp_id => $dsp_name)
@@ -69,6 +69,19 @@ class ranking_admin_prefs_sidebox_hooks
 							'no_lang' => true,
 							'link' => false
 						);
+					}
+					if ($GLOBALS['egw_info']['user']['apps']['admin'])
+					{
+						$file[] = array(
+							'text' => '<a class="textSidebox" href="'.$GLOBALS['egw']->link('/index.php',array(
+									'menuaction' => 'ranking.ranking_display_ui.display',
+								)).
+								'" onclick="window.open(this.href,\'_blank\',\'dependent=yes,width=640,height=480,scrollbars=yes,status=yes\'); 
+								return false;">'.lang('Add').'</a>',
+							'no_lang' => true,
+							'link' => false
+						);
+						
 					}
 					display_sidebox($appname,lang('Displays'),$file);
 				}

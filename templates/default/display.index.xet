@@ -66,10 +66,11 @@
 					</grid>
 				</row>
 				<row>
-					<hbox span="all">
+					<hbox span="2">
 						<buttononly label="Add" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_display_ui.edit&amp;dsp_id=$cont[dsp_id]'),'_blank','dependent=yes,width=600,height=450,scrollbars=yes,status=yes'); return false;" span="2"/>
 						<buttononly label="Update" onclick="window.location='$cont[self]';"/>
 					</hbox>
+					<buttononly label="Edit" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_display_ui.display&amp;dsp_id={$cont['display']['dsp_id']}'),'_blank','dependent=yes,width=600,height=450,scrollbars=yes,status=yes'); return false;" align="right"/>
 				</row>
 			</rows>
 		</grid>
