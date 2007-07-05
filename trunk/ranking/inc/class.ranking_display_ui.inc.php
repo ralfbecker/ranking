@@ -24,6 +24,7 @@ class ranking_display_ui extends ranking_display_bo
 	var $public_functions = array(
 		'index' => true,
 		'edit' => true,
+		'display' => true,
 	);
 	
 	/**
@@ -443,6 +444,67 @@ class ranking_display_ui extends ranking_display_bo
 
 		$tpl = new etemplate('ranking.display.edit');
 		$tpl->exec('ranking.ranking_display_ui.edit',$content,array('frm_heat'=>$this->get_heats($frm['WetId'])),$readonlys,$preserv,2);
+	}
+	
+	/**
+	 * Add/edit a display
+	 *
+	 * @param array $content=null
+	 */
+	function display($content=null)
+	{
+		if (!$GLOBALS['egw_info']['user']['apps']['admin']) $this->popup_die();
+
+		if (!is_array($content))
+		{
+			if ($_GET['dsp_id'] && !$this->display->read($_GET['dsp_id']))
+			{
+				$msg = lang('Display #%1 not found!!!',$_GET['dsp_id']);
+			}
+		}
+		else
+		{
+			list($button) = @each($content['button']);
+			unset($content['button']);
+			
+			switch($button)
+			{
+				case 'apply':
+				case 'save':
+					if (($err = $this->display->update($content)))
+					{
+						$msg = lang('Error saving display!');
+						$button = '';
+					}
+					else
+					{
+						$msg = lang('Display saved');
+					}
+					$script = "opener.location = opener.location.href+'&msg=".addslashes($msg).
+						"&dsp_id='+opener.document.getElementById('exec[display][dsp_id]').value;";
+					if ($button == 'save')	// close popup and update caller
+					{
+						echo "<html>\n<head>\n<script>$script window.close();</script>\n</head>\n</html>\n";
+						$GLOBALS['egw']->framework->egw_exit();
+					}
+					$GLOBALS['egw_info']['flags']['java_script'] .= "<script>$script</script>\n";
+					break;
+			}
+		}
+		$content = $this->display->as_array();
+		$content['msg'] = $msg;
+		$sel_options = array(
+			'dsp_clone_of' => $this->display->displays(),
+		);
+		if ($this->display->dsp_id)
+		{
+			unset($sel_options['dsp_clone_of'][$this->display->dsp_id]);
+		
+			$GLOBALS['egw_info']['flags']['app_header'] = $this->display->dsp_name.
+				($this->display->ip ? ' ('.$this->display->ip.($this->display->dsp_port?':'.$this->display->dsp_port:'').')' : '');
+		}
+		$tpl = new etemplate('ranking.display.display');
+		$tpl->exec('ranking.ranking_display_ui.display',$content,$sel_options,$readonlys,array('dsp_id'=>$this->display->dsp_id),2);		
 	}
 	
 	/**

@@ -51,7 +51,9 @@ click to view	ranking	de	anklicken zum Anzeigen
 climbing professional	ranking	de	Profi
 climbing since (years)	ranking	de	klettert seit (Jahren)
 climbing time	ranking	de	Kletterzeit
+clone of	ranking	de	Klone von
 closes	ranking	de	schließt
+columns	ranking	de	Spalten
 comments	ranking	de	Kommentare
 competition	ranking	de	Wettkampf
 competition already has a result for this category!	ranking	de	Der Wettkampf hat bereits ein Ergebnis für diese Kategorie!
@@ -87,6 +89,7 @@ digital rock	ranking	de	digital ROCK
 display	ranking	de	Anzeige
 display #%1 not found!!!	ranking	de	Anzeige #%1 nicht gefunden!!!
 display ranking	ranking	de	Rangliste anzeigen
+display saved	ranking	de	Anzeige gespeichert
 displays	ranking	de	Anzeigen
 down	ranking	de	Nach unten
 download	ranking	de	Herunterladen
@@ -103,11 +106,13 @@ edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
 edit this heat	ranking	de	Diese Runde bearbeiten
 eliminated	ranking	de	eliminiert
+encoding	ranking	de	Zeichensatz
 end	ranking	de	Ende
-entry not found !!!	ranking	de	Eintrag nicht gefunden
+entry not found !!!	ranking	de	Eintrag nicht gefunden !!!
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
-error deleting format!	ranking	de	Fehler beim Löschen des Formats
-error saving format!	ranking	de	Fehler beim Speichern des Formats
+error deleting format!	ranking	de	Fehler beim Löschen des Formats!
+error saving display!	ranking	de	Fehler beim Speichern der Anzeige!
+error saving format!	ranking	de	Fehler beim Speichern des Formats!
 error writing to display!!!	ranking	de	Fehler beim Schreiben zur Anzeige!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
 error: dataline %1 contains %2 instead of %3 columns !!!	ranking	de	Fehler: Datenzeile %1 enthält %2 statt %3 Spalten !!!
@@ -169,6 +174,7 @@ homepage	ranking	de	Internetadresse
 host	admin	de	Rechner
 host nation	ranking	de	durchführende Nation
 host quota	ranking	de	Quote durchf. Nation
+host/ip	ranking	de	Rechner/IP
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	de	wie wird der Schlüssel für den Cup dieser Kategorie gebildet, zB. '??_WC' für den Weltcup (?? wird durch das Jahr ersetzt)
 how many athletes from the complimentary list of each nation should be used	ranking	de	Wie viele Athleten der Komplimentärliste sollen von jeder Nation zugelassen werden
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
@@ -284,6 +290,7 @@ results of %1 participants imported into the ranking, feldfactor: %2	ranking	de	
 resultservice	ranking	de	Ergebnisservice
 route	ranking	de	Route
 routes	ranking	de	Routen
+rows	ranking	de	Zeilen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
 select a cup for a cup-ranking	ranking	de	Einen Cup auswählen für eine Cup-Ranliste
 select a nation first	ranking	de	Zuerst Nation auswählen

@@ -203,7 +203,7 @@ class ranking_display extends so_sql2
 		{
 			$data['dsp_athletes'] = serialize($data['dsp_athletes']);
 		}
-		if (isset($data['dsp_access']))
+		if (isset($data['dsp_access']) && is_array($data['dsp_access']))
 		{
 			$data['dsp_access'] = implode(',',$data['dsp_access']);
 		}

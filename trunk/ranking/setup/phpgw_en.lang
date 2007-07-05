@@ -51,7 +51,9 @@ click to view	ranking	en	click to view
 climbing professional	ranking	en	Climbing professional
 climbing since (years)	ranking	en	climbing since (years)
 climbing time	ranking	en	Climbing time
+clone of	ranking	en	Clone of
 closes	ranking	en	closes
+columns	ranking	en	Columns
 comments	ranking	en	Comments
 competition	ranking	en	Competition
 competition already has a result for this category!	ranking	en	Competition already has a result for this category!
@@ -87,6 +89,7 @@ digital rock	ranking	en	digital ROCK
 display	ranking	en	Display
 display #%1 not found!!!	ranking	en	Display #%1 not found!!!
 display ranking	ranking	en	display ranking
+display saved	ranking	en	Display saved
 displays	ranking	en	Displays
 down	ranking	en	Down
 download	ranking	en	Download
@@ -103,10 +106,12 @@ edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
 edit this heat	ranking	en	Edit this heat
 eliminated	ranking	en	eliminated
+encoding	ranking	en	Encoding
 end	ranking	en	End
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
 error deleting format!	ranking	en	Error deleting format!
+error saving display!	ranking	en	Error saving display!
 error saving format!	ranking	en	Error saving format!
 error writing to display!!!	ranking	en	Error writing to display!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
@@ -169,6 +174,7 @@ homepage	ranking	en	Homepage
 host	admin	en	Host
 host nation	ranking	en	Host nation
 host quota	ranking	en	Host quota
+host/ip	ranking	en	Host/IP
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	en	how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year
 how many athletes from the complimentary list of each nation should be used	ranking	en	How many athletes from the complimentary list of each nation should be used
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
@@ -284,6 +290,7 @@ results of %1 participants imported into the ranking, feldfactor: %2	ranking	en	
 resultservice	ranking	en	Resultservice
 route	ranking	en	Route
 routes	ranking	en	Routes
+rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first

@@ -86,8 +86,6 @@ class boranking extends soranking
 	var $athlete_rights = array();
 	/**
 	 * nations the user is allowed to register athlets for competitions
-	 * 
-	 * nations the user is allowed to register athlets for competitions
 	 */
 	var $register_rights = array();
 	/**
