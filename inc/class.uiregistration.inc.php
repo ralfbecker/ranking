@@ -228,6 +228,10 @@ class uiregistration extends boranking
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 		);
+		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
+		{
+			$select_options['comp'][$comp['WetId']] = $comp['name'];
+		}
 		foreach($this->is_judge($comp) ? $this->athlete->distinct_list('nation') : $this->register_rights as $nat)
 		{
 			$select_options['nation'][$nat] = $nat;
