@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.display.index" template="" lang="" group="0" version="1.4.001">
+		<grid width="100%">
+			<columns>
+				<column width="20"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" id="msg" readonly="true" align="center"/>
+					<description/>
+					<description/>
+				</row>
+				<row valign="bottom">
+					<textbox id="display[frm_line]" align="center" class="currentLine" size="-2" readonly="true"/>
+					<textbox multiline="true" class="display" id="display[dsp_current]" rows="1" cols="18,$cont[display][dsp_rows],$cont[display][dsp_cols]" readonly="true"/>
+					<vbox options="0,0" align="right">
+						<menulist class="selboxesRight">
+							<menupopup align="right" onchange="1" id="display[dsp_id]" label="Display"/>
+						</menulist>
+						<menulist class="selboxesRight">
+							<menupopup id="display[WetId]" align="right" label="Competition" onchange="window.clearTimeout(timeout); xajax_doXMLHTTP('ranking.ranking_display_ui.ajax_ask_copy_formats',$cont[dsp_id],this.value);"/>
+						</menulist>
+					</vbox>
+				</row>
+				<row>
+					<grid width="100%" id="rows">
+						<columns>
+							<column width="20"/>
+							<column width="25%"/>
+							<column/>
+							<column width="30"/>
+							<column width="20"/>
+							<column width="20"/>
+							<column width="50"/>
+						</columns>
+						<rows>
+							<row class="th">
+								<description value="#" align="center"/>
+								<description value="Heat"/>
+								<description value="Format"/>
+								<description value="Time"/>
+								<description value="Go"/>
+								<description value="Max"/>
+								<buttononly label="Add" align="center" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_display_ui.edit&amp;dsp_id=$cont[dsp_id]'),'_blank','dependent=yes,width=600,height=450,scrollbars=yes,status=yes'); return false;"/>
+							</row>
+							<row class="row">
+								<description id="${row}[frm_line]" no_lang="1" align="center" onclick="window.clearTimeout(timeout); xajax_doXMLHTTP('ranking.ranking_display_ui.ajax_activate',getElementById('exec[display][dsp_id]').value,$row_cont[frm_line])" class="clickable"/>
+								<menulist class="fullWidth">
+									<menupopup onchange="1" options="None" id="${row}[frm_heat]" readonly="true"/>
+								</menulist>
+								<description id="${row}[frm_content]" class="clickableMono" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_display_ui.edit&amp;frm_id=$row_cont[frm_id]'),'_blank','dependent=yes,width=600,height=450,scrollbars=yes,status=yes'); return false;"/>
+								<int id="${row}[frm_showtime]" readonly="true" align="center"/>
+								<int id="${row}[frm_go]" readonly="true" align="center"/>
+								<int id="${row}[frm_max]" readonly="true" align="center"/>
+								<hbox options="0,0" align="center">
+									<button image="up_kde" label="Up" id="action[up][$row_cont[frm_id]]" align="center"/>
+									<button image="down_kde" label="Down" id="action[down][$row_cont[frm_id]]" align="center"/>
+									<button id="action[delete][$row_cont[frm_id]]" image="delete" label="Delete" onclick="return confirm('Delete this line');" align="center"/>
+								</hbox>
+							</row>
+						</rows>
+					</grid>
+				</row>
+				<row>
+					<hbox span="all">
+						<buttononly label="Add" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_display_ui.edit&amp;dsp_id=$cont[dsp_id]'),'_blank','dependent=yes,width=600,height=450,scrollbars=yes,status=yes'); return false;" span="2"/>
+						<buttononly label="Update" onclick="window.location='$cont[self]';"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.fullWidth select { width: 100%; }
+.selboxesRight select { width: 200px; }
+.popupManual { display: none; }
+.currentLine input { 
+	width: 20px;
+	border: none;
+	text-align: center;
+	color: black;
+	font-weight: bold;
+}
+.display textarea {
+	font-family: monospace; 
+	font-weight: bold;
+	font-size: 150%;
+}
+.clickable,.clickableMono {
+	cursor: pointer;
+}
+.clickable:hover,.clickableMono:hover {
+	font-weight: bold;
+}
+.clickableMono {
+	font-family: monospace; 
+}
+		</styles>
+	</template>
+</overlay>

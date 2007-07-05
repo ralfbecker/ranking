@@ -26,7 +26,9 @@ class uiresult extends boresult
 
 	function uiresult()
 	{
+		$start = microtime(true);
 		$this->boresult();
+		error_log("boresult constructor took ".sprintf('%4.2lf s',microtime(true)-$start));
 	}
 
 	/**
@@ -38,7 +40,7 @@ class uiresult extends boresult
 	function route($content=null,$msg='')
 	{
 		$tmpl = new etemplate('ranking.result.route');
-		
+
 		if (!($comp = $this->comp->read($_GET['comp'] ? $_GET['comp'] : $content['WetId'])) ||
 			!($cat = $this->cats->read($_GET['cat'] ? $_GET['cat'] : $content['GrpId'])) ||
 			!in_array($cat['rkey'],$comp['gruppen']))
@@ -63,7 +65,7 @@ class uiresult extends boresult
 			{
 				// try reading the previous heat, to set some stuff from it
 				if (($keys['route_order'] = $this->route->get_max_order($_GET['comp'],$_GET['cat'])) >= 0 &&
-					($previous = $this->route->read($prev_keys=$keys)))
+					($previous = $this->route->read($keys)))
 				{
 					++$keys['route_order'];
 					if ($keys['route_order'] == 1 && $previous['route_type'] == ONE_QUALI)
@@ -94,11 +96,14 @@ class uiresult extends boresult
 				else	// set judges from the competition
 				{
 					$keys['route_judge'] = array();
-					foreach($comp['judges'] as $uid)
+					if ($comp['judges'])
 					{
-						$keys['route_judge'][] = $GLOBALS['egw']->common->grab_owner_name($uid);
+						foreach($comp['judges'] as $uid)
+						{
+							$keys['route_judge'][] = $GLOBALS['egw']->common->grab_owner_name($uid);
+						}
+						$keys['route_judge'] = implode(', ',$keys['route_judge']);
 					}
-					$keys['route_judge'] = implode(', ',$keys['route_judge']);
 				}
 				
 				$content = $this->route->init($keys);
@@ -135,10 +140,20 @@ class uiresult extends boresult
 			{
 				case 'save':
 				case 'apply':
+					if (isset($content['frm_line']))	// if a frm_line is given translate it back to a frm_id
+					{
+						include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
+						$format = new ranking_display_format($this->db);
+						$content['frm_id'] = $format->read(array(
+							'dsp_id' => $content['dsp_clone_of'] ? $content['dsp_clone_of'] : $content['dsp_id'],
+							'WetId'  => $content['WetId'],
+							'frm_line' => $content['frm_line'],
+						)) ? $format->frm_id : 0;
+					}
 					//_debug_array($content);
 					if ($this->route->save($content) != 0)
 					{
-						$msg = lang('Error: saving the route!!!');
+						$msg = lang('Error: saving the heat!!!');
 						$button = $js = '';	// dont exit the window
 						break;
 					}
@@ -258,6 +273,7 @@ class uiresult extends boresult
 			'GrpId'       => $cat['GrpId'],
 			'route_order' => $content['route_order'],
 			'discipline'  => $discipline,
+			'no_display'  => true,		// we enable it later, for some cases (judge and display-rights)
 		));
 		if ($discipline != 'boulder')
 		{
@@ -288,7 +304,7 @@ class uiresult extends boresult
 				}
 			}
 		}
-		foreach(array('new_route','route_type','route_order') as $name)
+		foreach(array('new_route','route_type','route_order','dsp_id','frm_id') as $name)
 		{
 			$preserv[$name] = $content[$name];
 		}
@@ -331,6 +347,29 @@ class uiresult extends boresult
 			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
 			{
 				$content['no_upload'] = $readonlys['button[upload]'] = true;	// no upload if result offical or general result
+			}
+			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
+			$display =& new ranking_display($this->db);
+			// display selection, only if user has rights on the displays
+			if (($sel_options['dsp_id'] = $display->displays()))
+			{
+				$content['no_display'] = false;
+				if ($content['dsp_id'] && $display->read($content['dsp_id']))
+				{
+					$preserv['dsp_clone_of'] = $display->dsp_clone_of;
+					
+					include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
+					$format = new ranking_display_format($this->db);
+					if ($content['frm_id'] && $format->read($content['frm_id']))
+					{
+						$content['frm_line'] = $format->frm_line;
+					}
+					$content['max_line'] = $format->max_line(array(
+						'dsp_id' => $display->dsp_clone_of ? $display->dsp_clone_of : $display->dsp_id,
+						'WetId'  => $content['WetId'],
+					));
+				}
+				if (!$content['max_line']) $content['max_line'] = 1;					
 			}
 		}
 		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
@@ -742,6 +781,7 @@ class uiresult extends boresult
 					addslashes(lang("You can only create a new heat, if the previous one '%1' has a result!",$last_heat['route_name'])).
 					"'); return false;");
 			}
+			$GLOBALS['egw_info']['flags']['include_xajax'] = true;
 		}
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
@@ -799,8 +839,102 @@ class uiresult extends boresult
 			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
-
+		
 		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
+	}
+	
+	/**
+	 * Update a result of a single participant
+	 *
+	 * @param string $request_id eTemplate request id
+	 * @param string $name can be repeated multiple time together with value
+	 * @param string $value
+	 * @return string
+	 */
+	function ajax_update($request_id,$name,$value)
+	{
+		//$start = microtime(true);
+		$response = new xajaxResponse();
+		
+		require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate_request.inc.php');
+		if (!($request =& etemplate_request::read($request_id)))
+		{
+			$response->addAlert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
+		}
+		else
+		{
+			$params = func_get_args();
+			array_shift($params);	// request_id
+			$content = $to_process = array();
+			while(($name = array_shift($params)))
+			{
+				if (!isset($request->to_process[$name])) continue;
+				$to_process[$name] = $request->to_process[$name];
+
+				etemplate::set_array($content,$name,$value=array_shift($params));
+				//$args .= ",$name='$value'";
+			}
+			//$response->addAlert("ajax_update('$request_id',$PerId$args)");
+		
+			//_debug_array($request->preserv); exit;
+			$content = $content['exec'];
+			$tpl = new etemplate();	// process_show is NOT static
+			if ($tpl->process_show($content,$to_process,'exec'))
+			{
+				// validation errors
+				$response->addAlert(implode("\n",$GLOBALS['egw_info']['etemplate']['validation_errors']));
+			}
+			else
+			{
+				$keys = array(
+					'WetId' => $request->preserv['nm']['comp'],
+					'GrpId' => $request->preserv['nm']['cat'],
+					'route_order' => $request->preserv['nm']['route'] < 0 ? -1 : $request->preserv['nm']['route'],
+				);
+				list($athlete) = each($content['nm']['rows']['set']);
+				$old_result = $this->route_result->read($keys+array('PerId'=>$athlete));
+
+				if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],
+					$request->preserv['nm']['route_type'],$request->preserv['nm']['discipline']))
+				{
+					$new_result = $this->route_result->read($keys+array('PerId'=>$athlete));
+					$msg = lang('Heat updated');
+				}
+				else
+				{
+					$msg = lang('Nothing to update');
+				}
+				if ($this->error)
+				{
+					foreach($this->error as $PerId => $data)
+					{
+						foreach($data as $field => $error)
+						{
+							$errors[$error] = $error;
+						}
+					}
+					$response->addAlert(lang('Error').': '.implode(', ',$errors));
+					$msg = '';
+				}
+				else
+				{
+					if($this->route->read($keys) && ($dsp_id=$this->route->data['dsp_id']) && ($frm_id=$this->route->data['frm_id']))
+					{
+						// add display update(s)
+						include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
+						$display = new ranking_display($this->db);
+						$display->activate($frm_id,$athlete,$dsp_id);
+					}
+					if ($new_result && $new_result['result_rank'] != $old_result['result_rank'])	// the ranking has changed
+					{
+						$response->addScript('document.eTemplate.submit();');						// --> submit the form to reload the page
+					}
+				}
+				//if ($msg) $response->addAlert($msg);
+			}
+		}
+		//error_log("processing of ajax_update took ".sprintf('%4.2lf s',microtime(true)-$start));
+		return $response->getXML();
 	}
 	
 	/**

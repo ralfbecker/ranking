@@ -19,6 +19,19 @@ define('TOP_HEIGHT',99999999);
 define('ELIMINATED_TIME',999999);
 define('WILDCARD_TIME',1);
 
+if (!defined('ONE_QUALI'))
+{
+	define('ONE_QUALI',0);
+	define('TWO_QUALI_HALF',1);
+	define('TWO_QUALI_ALL',2);
+	define('LEAD',4);
+	define('BOULDER',8);
+	define('SPEED',16);
+	define('STATUS_UNPUBLISHED',0);
+	define('STATUS_STARTLIST',1);
+	define('STATUS_RESULT_OFFICIAL',2);
+}
+
 /**
  * route object
  */
@@ -45,7 +58,7 @@ class route_result extends so_sql
 		
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = is_object($GLOBALS['egw']->translation) ? $GLOBALS['egw']->translation->charset() : 'iso-8859-1';
 /*
 		foreach(array(
 				'athlete'  => 'athlete',

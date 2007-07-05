@@ -23,6 +23,12 @@ class competition extends so_sql
 	);
 	var $charset,$source_charset;
 	/**
+	 * reference to the category object
+	 *
+	 * @var category
+	 */
+	var $cats;
+	/**
 	 * @var array $attachment_prefixes prefixes of the rkey for the different attachments
 	 */
 	var $attachment_prefixes = array(

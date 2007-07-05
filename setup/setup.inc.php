@@ -12,9 +12,10 @@
  */
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '1.3.012';
+$setup_info['ranking']['version']   = '1.4';
 $setup_info['ranking']['app_order'] = 1;
-$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults');
+$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','Displays','DisplayFormats');
+$setup_info['mydms']['only_db']     = array('mysql','postgres');
 $setup_info['ranking']['enable']    = 1;
 
 $setup_info['ranking']['author'] = 
@@ -58,6 +59,9 @@ $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
 	'versions' => Array('1.3','1.4','1.5')
 );
+
+
+
 
 
 

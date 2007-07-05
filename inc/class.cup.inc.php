@@ -19,6 +19,12 @@ require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 class cup extends so_sql
 {
 	var $charset,$source_charset;
+	/**
+	 * reference to the category object
+	 *
+	 * @var category
+	 */
+	var $cats;
 
 	/**
 	 * constructor of the cup class

@@ -1,0 +1,644 @@
+<?php
+/**
+ * eGroupWare digital ROCK Rankings - display format object
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$ 
+ */
+
+require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.so_sql2.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
+
+class ranking_display_format extends so_sql2
+{
+	/**
+	 * Reference to the global boresult object
+	 *
+	 * @var boresult
+	 */
+	var $result;
+	/**
+	 * all cols in data which are not (direct)in the db, for data_merge
+	 * 
+	 * @var array
+	 */
+	var $non_db_cols = array('frm_heat');
+
+	/**
+	 * Constructor
+	 *
+	 * @param egw_db $db=null
+	 * @return ranking_display_format
+	 */
+	function __construct(egw_db $db=null)
+	{
+		if (!is_object($GLOBALS['boresult']))
+		{
+			$GLOBALS['boresult'] =& new boresult();
+		}
+		$this->result =& $GLOBALS['boresult'];
+
+		if (is_null($db)) $db = $GLOBALS['boresult']->db;
+		
+		$this->so_sql('ranking','DisplayFormats',$db);	// calling the constructor of so_sql for DisplayFormats table
+	}
+	
+	/**
+	 * Get the content of a format line (printed format string)
+	 *
+	 * @param int &$showtime on return show_time in sec
+	 * @param int &$line sub-line
+	 * @param boolean $next_line=false should be advance to the next line (before getting the content)
+	 * @param int/array $athlete athlete data or per-id
+	 * @param int $center=18 center shorter strings for a $center chars wide display by leftpadding them
+	 * @return string
+	 */
+	function get_content(&$showtime,&$line,$next_line=false,$athlete=null,$center=18)
+	{
+		$showtime = null;
+		
+		if ($next_line) $line++;
+
+		while(!isset($format))
+		{
+			$lines = explode("\r\n",$this->frm_content);
+		
+			if ($line >= count($lines)-1)				// last line or behind
+			{
+				$format = $lines[count($lines)-1];		// use the format of the last line
+				$reread_list = $line == count($lines)-1;	// only read list once at the start of the list
+
+				if (strpos($format,'%P') !== false || strpos($format,'%Q') !== false)		// result list
+				{
+					if (!($athlete = $this->_get_athlete('result_rank',1+$line-count($lines),$reread_list))) unset($format);
+				}
+				elseif (strpos($format,'%S') !== false || strpos($format,'%s') !== false)	// startlist
+				{
+					if (!($athlete = $this->_get_athlete('start_order',1+$line-count($lines),$reread_list))) unset($format);
+				}
+				elseif ($line >= count($lines))			// no list and behind the last line
+				{
+					unset($format);						// --> go to next format
+				}
+			}
+			if ($next_line && !isset($format) && $line >= count($lines))		// no more lines --> advance to the next format
+			{
+				$line = 0;
+				if ($this->frm_go_frm_id && !$this->read($this->frm_go_frm_id))
+				{
+					$showtime = 2;
+					return lang('Format #%1 not found!',$this-frm_id);
+				}
+				continue;
+			}
+			if (!isset($format)) $format = 0 <= $line && $line < count($lines) ? $lines[$line] : $lines[0];
+		}
+		list($format,$showtime) = explode('|',$format);	// separate showtime
+		if (!(int)$showtime) $showtime = $this->frm_showtime;
+
+		//echo "<p>ranking_display_format::get_content($showtime,$line,$next_line,$athlete) format='$format'</p>\n";
+		$str = $this->_print_line($format,$athlete);
+		
+		if ($center && ($pad=$center-strlen($str)) > 1) $str = str_repeat(' ',floor($pad/2)).$str;
+		
+		return $str;
+	}
+	
+	/**
+	 * Get the data of the athlete at startlist position $num
+	 *
+	 * @param string $list_type 'start_order' or 'result_rank'
+	 * @param int $pos position in the list
+	 * @param boolean $reread_list=true should we use the cached list or read it again
+	 * @param int $athlete=null get this athlete (PerId) and NOT $pos
+	 * @return array/boolean array with athlete data or false if not found in list
+	 */
+	function _get_athlete($list_type,$pos,$reread_list=true,$athlete=null)
+	{
+		static $list_cache;
+		if ($reread_list) $list_cache = null;
+		//echo "<p>ranking_display_format::_get_athlete('$list_type',$pos,$reread_list) list_cache=$list_cache</p>\n";
+
+		if ($pos < 0 || $this->frm_max && $pos >= $this->frm_max && $list_type == 'start_order' ||	// start_order stops direct if over max
+			!($keys = $this->route_keys(true)) || !in_array($list_type,array('start_order','result_rank')) ||
+			(is_null($list_cache) && !($list_cache = $this->result->route_result->search('',false,$list_type,'','*',false,'AND',false,$keys))) || 
+			$pos >= count($list_cache))
+		{
+			return false;
+		}
+		if ($athlete)
+		{
+			foreach($list_cache as $row)
+			{
+				if ($row['PerId'] == $athlete) return $row;
+			}
+			return false;
+		}
+		// check if we have a max number to show only, but dont break as long as we have ex. aquos
+		if ($this->frm_max && $pos >= $this->frm_max && $list_cache[$pos-1]['result_rank'] != $list_cache[$pos]['result_rank'])
+		{
+			return false;
+		}
+		return $list_cache[$pos];
+	}
+
+	/**
+	 * get the content for a whole display line
+	 *
+	 * @param string $format
+	 * 	1. char:    % = athlete, & = co athlete, $ = winner
+	 *  2. char:   value type, see _get_value
+	 *  last char: % = left, & = right, $ = center justified
+	 * @param int/array $athlete=null
+	 * @return string
+	 */
+	function _print_line($format,$athlete=null)
+	{
+		//echo "<p>ranking_display_format::_print_line('$format',$PerId)</p>\n";
+		if (preg_match_all('/([%&$]{1})([a-zA-Z0-9]+)[^%&$#]*([%&$#]{1})/',$format,$parts))
+		{
+			list($fulls,$starts,$types,$ends) = $parts;
+			
+			foreach($types as $n => $type)
+			{
+				switch($starts[$n])
+				{
+					case '%':	// athlete himself
+						break;
+					case '&':	// co athlete, next in start-order
+						$athlete = $this->_get_co($PerId,$WetId,$GrpId,$route_order);
+						break;
+					case '$':	// winner
+						$athlete = $this->_get_winner($PerId,$WetId,$GrpId,$route_order);
+						break;
+				}
+				$len = strlen($fulls[$n]);
+				$str = $this->_get_value($type,$len,$athlete);
+				//echo "<p>ranking_display_format::_get_value($type,$len,$athlete)='$str', strlen('$str')=".strlen($str)."</p>\n";
+				if (($l = strlen($str)) > $len)
+				{
+					// shorten the too long string with a dot, if there's no space, dash or dot direct before, otherwise just cut it off
+					$str = !in_array(substr($str,$len-2,1),array(' ','-','.')) ? substr($str,0,$len-1).'.' : substr($str,0,$len);
+				}
+				elseif (($pad = $len-$l))
+				{
+					switch($ends[$n])
+					{
+						case '%':	// left
+							$str .= str_repeat(' ',$pad);
+							break;
+						case '&':	// right
+							$str = str_repeat(' ',$pad).$str;
+							break;
+						case '$':	// centered
+							$pad /= 2;
+							$str = str_repeat(' ',floor($pad)).$str.str_repeat(' ',ceil($pad));
+							//echo "<p>centered: pad=$len-($l=strlen(str)), pad/2=$pad, floor($pad)=".floor($pad).", ceil($pad)=".ceil($pad).", str='$str', strlen('$str')=".strlen($str)."</p>\n";
+							break;
+					}
+				}
+				$format = str_replace($fulls[$n],$str,$format);
+			}
+		}
+		return $format;
+	}
+
+	/**
+	 * get the value for type $type
+	 *
+	 * @param string $type
+	 * @param int $len requested length of the value
+	 * @param int/array $athlete=null
+	 * @return string
+	 */
+	function _get_value($type,$len,&$athlete)
+	{
+		//echo "<p>ranking_display_format::_get_value('$type',$len,$PerId)</p>\n";
+		switch($type{0})
+		{
+			case 'D':	// Date
+				$format = $GLOBALS['egw_info']['user']['preferences']['common']['dateformat'];
+				if ($len <= 8) $format = str_replace('Y','y',$format);
+				// fall through
+			case 'd':	// Time
+				if ($type == 'd')
+				{
+					$format = $GLOBALS['egw_info']['user']['preferences']['common']['timeformat'] == 12 ? 'h:i a' : 'H:i:s';
+				}
+				return date($format,time()+$GLOBALS['egw_info']['user']['preferences']['common']['tzoffset']*3600);
+
+			case 'W':	// comp long
+			case 'w':	// comp short
+				return $this->_get_comp_value($type,$len);
+			
+			case 'c':	// category
+			case 'R':	// category: heat
+			case 'r':	// heat
+			case 'F':	// result offical line or "provisional result"
+			case 'j':	// jury-namen
+			case 'J':	// times (0=Isolation open, 1=Isolation close, 2=Begin heat)
+				return $this->_get_heat_value($type,$len);
+			
+			case 'V':	// firstname lastname
+			case 'v':	// firstname
+			case 'N':	// lastname, firstname
+			case 'n':	// lastname
+			case 'O':	// city
+			case 'L':	// nation 3-letter
+			//case 'M':	// nation long
+			case 'S':	// start number
+			case 's':	// start order
+			case 'P':	// place/rank (empty for ex aquo)
+			case 'p':	// place/rank
+			case 'Q':	// place/rank
+			case 'h':	// height without comma (3-char)
+			case 'H':	// height with 2 digits behind the comma (6-char)
+/*
+			       P = Platzierung (zB. "1") \
+			       Q = wie P nur kein ex aquo  \
+			       b = Lizenznummer               /
+			       S = Startnummer (zB. "1")     /
+			       s = StartreihenfolgeNr       /
+			       Z = Startzeit (zB. " 9.00") /
+			       i = NatZeit (!ex aquo)    \
+			       I = NatZeit (zB. "SSS.Z")   \
+			       H = Kletterh�he (zB."100.50 " \
+			       h = Kletterh�he (zB. "10.50 ")  \
+			       p = Platzierung (zB. "1.")       > T.-Ergebnisse
+			       q = Platzierung von ex aquo gemittelt
+			       e = H�he in Prozent der Toph�he
+			       B = Boulderwertung " 5t10 6z8 " | "t3 z2 "
+			       U = UIAA-Pkte
+			       z = Kletterzeit (zB. "MM:SS")   /
+			       t = Kletterzeit (zB. "SS.Z")  /
+			       A = NatH�he (zB. "100.50")  /
+			       a = NatH�he (!ex aquo)    /
+*/
+				return $this->_get_athlete_value($type,$len,$athlete);
+		};
+		return '?'.$type.'?';
+	}
+	
+	/**
+	 * Get a competition specific value
+	 *
+	 * @param string $type
+	 * @param int $len=null requested length of the value
+	 * @return string
+	 */
+	function _get_comp_value($type,$len)
+	{
+		static $comp;
+		
+		if (!(int)$this->WetId || (!is_array($comp) || $comp['WetId'] != $this->WetId) && !($comp = $this->result->comp->read($this->WetId)))
+		{
+			return false;
+		}
+		switch($type{0})
+		{
+			case 'W':	// comp long
+				return $comp['name'];
+				
+			case 'w':	// comp short
+				return $comp['dru_bez'];
+		}
+		return '?'.$type.'?';
+	}
+	
+	/**
+	 * Get a heat specific value
+	 *
+	 * @param string $type
+	 * @param int $len=null requested length of the value
+	 * @return string
+	 */
+	function _get_heat_value($type,$len)
+	{
+		static $route;
+		
+		if (!($keys = $this->route_keys()) ||
+			(!is_array($route) || $route['WetId'] != $this->WetId || $route['GrpId'] != $this->GrpId || $route['route_order'] != $this->route_order) && 
+			!($route = $this->result->route->read($keys)))
+		{
+			return false;
+		}
+		switch($type{0})
+		{
+			case 'R':	// heat category
+				$str = $route['route_name'].' ';
+				// fall through
+			case 'c':	// category
+				$cat = $this->result->cats->read($this->GrpId);
+				$str .= $cat['name'];
+				return $str;
+
+			case 'r':	// heat
+				return $route['route_name'];
+
+			case 'F':	// result offical line
+				return $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_result'] : lang('provisional result');
+
+			case 'j':	// jury-namen
+				return $route['route_judge'];
+
+			case 'J0':	// Isolation opens
+				return $route['route_iso_open'];
+
+			case 'J1':	// Isolation closes
+				return $route['route_iso_close'];
+				
+			case 'J':
+			case 'J2':	// Begin of heat
+				return $route['route_start'];
+		}
+		return '?'.$type.'?';
+	}
+	
+	/**
+	 * Get a athlete specific value
+	 *
+	 * @param string $type
+	 * @param int $len requested lenght of the value
+	 * @param int/array &$athlete
+	 * @return string
+	 */
+	function _get_athlete_value($type,$len,&$athlete)
+	{
+		//echo "<p>ranking_display_format::_get_athlete_value('$type',$len,$athlete)</p>\n";
+		static $type2col = array(
+			'v' => 'vorname',
+			'n' => 'nachname',
+			'L' => 'nation',
+			'O' => 'ort',
+			//'geb_date',
+			//'birthyear',
+			//'verband',
+			'S' => 'start_number',
+			's' => 'start_order',
+		);
+		// try reading athlete from the result, if $type contains result data and only an id is given or the array contains no result data
+		if ($athlete && in_array($type{0},array('P','p','Q','h','H','S')) && (!is_array($athlete) || !isset($athlete['start_order'])))
+		{
+			if (($a = $this->_get_athlete('result_rank',0,true,$athlete))) $athlete = $a;
+		}
+		// if only an athlete id given, read him from the athlets table
+		if (!$athlete || !is_array($athlete) && !($athlete = $this->result->athlete->read($athlete)))
+		{
+			return false;
+		}
+		switch($type{0})
+		{
+			case 'V':
+			case 'N':
+				$lastname = $athlete['nachname'];
+				if (strlen($lastname)+2 >= $len)	// we need at least 2 char for the first name
+				{
+					return $lastname;	// no space for the first name
+				}
+				$firstname = $athlete['vorname'];
+				if (strlen($lastname)+strlen($firstname) >= $len)
+				{
+					$firstname = $firstname{0}.'.';
+				}
+				$str = $type{0} == 'V' ? $firstname.' '.$lastname : $lastname.', '.$firstname;
+				if (strlen($str) == $len+1) $str_replace(array('. ',', '),array('.',','),$str);
+				return $str;
+				
+			case 'h':
+			case 'H':
+				if (!$athlete['result_rank']) return '';
+				return $athlete['result_plus'] == TOP_PLUS ? 'Top' : sprintf($type{0}=='H'?'%5.2lf%s':'%s%s',
+					$athlete['result_height'],$athlete['result_plus'] ? ($athlete['result_plus']==1?'+':'-'):'');
+				
+			case 'P':
+			case 'p':
+			case 'Q':
+				return $athlete['result_rank'] ? $athlete['result_rank'].'.' : '';
+				
+			default:
+				if (isset($type2col[$type])) return $athlete[$type2col[$type]];
+				break;
+		}
+		return '?'.$type.'?';
+	}
+	
+	/**
+	 * Get the keys of a route selected for this format
+	 *
+	 * @param $set_type_discipline=false set additionally route type and discipline
+	 * @return array/false array with keys or false if keys are obviously not valid or set
+	 */
+	function route_keys($set_type_discipline=false)
+	{
+		if (!(int)$this->WetId || !(int)$this->GrpId || !is_numeric($this->route_order) || $this->route_order < -1)
+		{
+			return false;
+		}
+		$keys = array(
+			'WetId' => $this->WetId,
+			'GrpId' => $this->GrpId,
+			'route_order' => $this->route_order,
+		);
+		if ($set_type_discipline)
+		{
+			if (!($route = $this->result->route->read($keys))) return false;
+			
+			$keys['route_type'] = $route['route_type'];
+			
+			if (!($comp = $this->result->comp->read($this->WetId)))
+			{
+				return false;
+			}
+			elseif ($comp['discipline'])
+			{
+				$keys['discipline'] = $comp['discipline'];
+			}
+			elseif (!($cat = $this->result->cats->read($this->GrpId)))
+			{
+				return false;
+			}
+			else
+			{
+				$keys['discipline'] = $comp['discipline'];
+			}
+		}
+		return $keys;
+	}
+	
+	/**
+	 * Update line-numbers to be continues starting with 1, while ignoring a given frm_id
+	 * 
+	 * @param int $ignore_id=null if given, id to be ignored
+	 * @param int $ignore_line=null if given, line-number to be skiped
+	 * @return int number of lines updated
+	 */
+	function update_lines($ignore_id=null,$ignore_line=null)
+	{
+		$rows = $this->search(array(
+			'dsp_id' => $this->dsp_id,
+			'WetId'  => $this->WetId,
+		),false,'frm_line');
+
+		$updated = 0;
+		$line = 1;
+		foreach($rows as &$row)
+		{
+			if ($ignore_id && $ignore_id == $row['frm_id']) continue;	// skit the given row/id
+			if ($ignore_line && $line == $ignore_line) $line++;			// skip the given line
+
+			if ($row['frm_line'] != $line)
+			{
+				$this->init(array('frm_id' => $row['frm_id']));
+				$this->save(array(
+					'frm_line' => $line,
+					'frm_updated' => time(),
+				));
+				$updated++;
+			}
+			$line++;
+		}
+		return $updated;
+	}
+	
+	/**
+	 * Get the maximum line number of a given display (dsp_id) and competition (WetId), ignoring an optional given id
+	 *
+	 * @param array $frm=null if null, use $this->data
+	 * @return int
+	 */
+	function max_line($frm=null)
+	{
+		if (is_null($frm)) $frm =& $this->data;
+		
+		$where = array(
+			'dsp_id' => $frm['dsp_id'],
+			'WetId'  => $frm['WetId'],
+		);
+		if ((int)$frm['frm_id']) $where[] = 'frm_id!='.(int)$frm['frm_id'];
+
+		$this->db->select($this->table_name,'MAX(frm_line)',$where,__LINE__,__FILE__);
+
+		return $this->db->next_record() ? (int)$this->db->f(0) : 0;
+	}
+
+	/**
+	 * Get the lastest update time of a given display (dsp_id) and competition (WetId)
+	 *
+	 * @param array $frm=null if null, use $this->data
+	 * @return int unix timestamp
+	 */
+	function last_updated($frm=null)
+	{
+		if (is_null($frm)) $frm =& $this->data;
+		
+		$this->db->select($this->table_name,'MAX(frm_updated)',array(
+			'dsp_id' => $frm['dsp_id'],
+			'WetId'  => $frm['WetId'],
+		),__LINE__,__FILE__);
+		
+		return $this->db->next_record() ? (int)$this->db->from_timestamp($this->db->f(0)) : 0;
+	}
+	
+	/**
+	 * changes the data from the db-format to your work-format
+	 *
+	 * it gets called everytime when data is read from the db
+	 * This function needs to be reimplemented in the derived class
+	 *
+	 * @param array $data if given works on that array and returns result, else works on internal data-array
+	 */
+	function db2data(array $data=null)
+	{
+		if (!is_array($data))
+		{
+			$data = &$this->data;
+		}
+		if ($data['GrpId'])
+		{
+			$data['frm_heat'] = $data['GrpId'].':'.$data['route_order'];
+		}
+		if ($data['frm_updated'] && !is_numeric($data['frm_updated']))
+		{
+			$data['frm_updated'] = $this->db->from_timestamp($data['frm_updated']);
+		}
+		return $data;
+	}
+
+	/**
+	 * changes the data from your work-format to the db-format
+	 *
+	 * It gets called everytime when data gets writen into db or on keys for db-searches
+	 * this needs to be reimplemented in the derived class
+	 *
+	 * @param array $data if given works on that array and returns result, else works on internal data-array
+	 */
+	function data2db(array $data=null)
+	{
+		if ($intern = !is_array($data))
+		{
+			$data = &$this->data;
+		}
+		if (isset($data['frm_heat']))
+		{
+			list($data['GrpId'],$data['route_order']) = explode(':',$data['frm_heat']);
+		}
+		return $data;
+	}
+	
+	/**
+	 * Copy all formats of the current competition (or $from_comp) to a new one
+	 *
+	 * @param int $to_comp
+	 * @param int $from_comp=null use current competition if null
+	 * @param int $dsp_id=null use current display if null
+	 */
+	function copyall($to_comp,$from_comp=null,$dsp_id=null)
+	{
+		if (is_null($from_comp)) $from_comp = $this->WetId;
+		if (is_null($dsp_id)) $dsp_id = $this->dsp_id;
+		//echo "<p>ranking_display_format::copyall($to_comp,$from_comp,$dsp_id)</p>\n";
+
+		if (!(int)$to_comp || !(int)$from_comp || !(int)$dsp_id) return false;
+		
+		$rows = $this->search(array(),false,'frm_line','','',false,'AND',false,array(
+			'dsp_id' => $dsp_id,
+			'WetId'  => $from_comp,
+		));
+		
+		if (!$rows) return false;
+
+		$id2line = array();
+		foreach($rows as $row)
+		{
+			$id2line[$row['frm_id']] = $row['frm_line'];
+		}
+		$line2id = $go2line = array();
+		foreach($rows as $row)
+		{
+			unset($row['frm_heat']);
+			unset($row['GrpId']);
+			unset($row['route_order']);
+			unset($row['frm_id']);
+			$this->init($row);
+			$this->WetId = $to_comp;
+			$this->frm_updated = time();
+			$this->save();
+			if ($id2line[$this->frm_go_frm_id]) $go2line[$this->frm_id] = $id2line[$this->frm_go_frm_id];
+			$line2id[$this->frm_line] = $this->frm_id;
+		}
+		// update the go's with the now know frm_id's
+		foreach($go2line as $id => $line)
+		{
+			$this->update(array(
+				'frm_go_frm_id' => $line2id[$line],
+				'frm_id' => $id,
+			),false);
+		}
+		return true;
+	}
+}

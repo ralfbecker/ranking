@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.headerNULL" template="" lang="" group="0" version="1.3.001">
+		<box rows="2" cols="1">
+			<description id="comp[name]" class="comp_name" no_lang="1"/>
+			<description id="comp[date_span]" class="comp_date" no_lang="1"/>
+			<image class="icc_logo" src="uiaaclimbing.gif"/>
+		</box>
+		<styles>
+			@media print
+{
+.icc_logo {
+ position: absolute;
+ top: 0px;
+ right: 0px;
+}
+
+.comp_name {
+ position: absolute;
+ top: 20px;
+ left: 10px;
+ font-size: 150%;
+ font-weight: bold;
+}
+
+.comp_date {
+ position: absolute;
+ top: 50px;
+ left: 10px;
+ font-size: 150%;
+}
+
+#divAppboxHeader {
+ position: absolute;
+ top: 75px;
+ left: 10px;
+ font-size: 150%;
+ font-weigh: normal;
+}
+
+#divAppbox {
+ margin-top: 100px;
+}
+}
+		</styles>
+	</template>
+</overlay>

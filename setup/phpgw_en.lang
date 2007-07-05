@@ -11,6 +11,7 @@
 3. place	ranking	en	3. place
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
+actions	ranking	en	Actions
 add a new athlete	ranking	en	add a new athlete
 add a new competition	ranking	en	add a new competition
 add a new cup	ranking	en	add a new cup
@@ -23,6 +24,7 @@ applied for a %1 license	ranking	en	Applied for a %1 license
 applies for the license and downloads the necessary form to mail to the office	ranking	en	Applies for the license and downloads the necessary form to mail to the office
 apply for	ranking	en	Apply for
 apply the changes made	ranking	en	apply the changes made
+apply the changes of this athlete only	ranking	en	Apply the changes of this athlete only
 as of	ranking	en	As of
 athlete	ranking	en	Athlete
 athletes	ranking	en	Athletes
@@ -40,6 +42,7 @@ boulder	ranking	en	boulder
 can not be higher as top!	ranking	en	Can NOT be higher as top!
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
+can't open connection to display %1 (%2:%3)!!!	ranking	en	Can't open connection to display %1 (%2:%3)!!!
 cannel without saving	ranking	en	Cannel without saving
 cathegories	ranking	en	Cathegories
 cellphone	ranking	en	Cellphone
@@ -62,6 +65,7 @@ complete profile	ranking	en	complete profile
 complimentary	ranking	en	Complimentary
 confirmed	ranking	en	confirmed
 contact	ranking	en	Contact
+copy current formats to the new competition, which does not have any formats yet?	ranking	en	Copy current formats to the new competition, which does not have any formats yet?
 counting for rankings	ranking	en	counting for rankings
 cup	ranking	en	Cup
 cuppattern	ranking	en	Cuppattern
@@ -80,7 +84,11 @@ deletes this cup	ranking	en	deletes this cup
 deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
 digital rock	ranking	en	digital ROCK
+display	ranking	en	Display
+display #%1 not found!!!	ranking	en	Display #%1 not found!!!
 display ranking	ranking	en	display ranking
+displays	ranking	en	Displays
+down	ranking	en	Down
 download	ranking	en	Download
 download all	ranking	en	Download all
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
@@ -95,8 +103,12 @@ edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
 edit this heat	ranking	en	Edit this heat
 eliminated	ranking	en	eliminated
+end	ranking	en	End
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
+error deleting format!	ranking	en	Error deleting format!
+error saving format!	ranking	en	Error saving format!
+error writing to display!!!	ranking	en	Error writing to display!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: dataline %1 contains %2 instead of %3 columns !!!	ranking	en	Error: dataline %1 contains %2 instead of %3 columns !!!
 error: dataline %1 contains not existing athlete id #%2 !!!	ranking	en	Error: dataline %1 contains not existing athlete id #%2 !!!
@@ -113,6 +125,7 @@ error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
 error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
 error: required column %1 not found !!!	ranking	en	Error: required column %1 not found !!!
+error: route already has a result!!!	ranking	en	Error: route already has a result!!!
 error: saving the heat!!!	ranking	en	Error: saving the heat!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
 exists without saving the changes	ranking	en	exists without saving the changes
@@ -128,6 +141,10 @@ file is not a pdf	ranking	en	File is not a PDF
 final	ranking	en	Final
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	en	First name of the athlete in Latin chars! Accents and umlauts are ok
 for internal use, not shown on the website.	ranking	en	For internal use, not shown on the website.
+format	ranking	en	Format
+format #%1 not found!	ranking	en	Format #%1 not found!
+format deleted	ranking	en	Format deleted
+format saved	ranking	en	Format saved
 free text	ranking	en	free text
 from other competitions	ranking	en	from other competitions
 from the ranking	ranking	en	from the ranking
@@ -141,6 +158,7 @@ general	ranking	en	General
 general result	ranking	en	General result
 generate all startlists together	ranking	en	Generate all startlists together
 generate startlist	ranking	en	Generate startlist
+go	ranking	en	Go
 grpid	ranking	en	GrpId
 heat	ranking	en	Heat
 heat deleted	ranking	en	Heat deleted
@@ -177,7 +195,9 @@ key of the person	ranking	en	Key of the Person
 last competition	ranking	en	Last competition
 lead	ranking	en	lead
 license number	ranking	en	License number
+line	ranking	en	Line
 male	ranking	en	male
+max	ranking	en	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
 minus	ranking	en	minus
 name(s)	ranking	en	name(s)
@@ -234,6 +254,7 @@ previous rankingsystem	ranking	en	previous Rankingsystem
 professional	ranking	en	Professional
 profile	ranking	en	Profile
 provisional	ranking	en	provisional
+provisional result	ranking	en	provisional result
 qualification	ranking	en	Qualification
 qualification, 1/2-final, ...	ranking	en	Qualification, 1/2-Final, ...
 quota	ranking	en	Quota
@@ -254,6 +275,7 @@ remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
 required information missing, application rejected!	ranking	en	Required information missing, application rejected!
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
+result form is timed out, please reload the form by clicking on the application icon.	ranking	en	Result form is timed out, please reload the form by clicking on the application icon.
 result official	ranking	en	result official
 result pdf	ranking	en	Result PDF
 resultlist	ranking	en	Resultlist
@@ -315,6 +337,7 @@ unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, l
 unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
 unpublished	ranking	en	unpublished
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
+up	ranking	en	Up
 upload a portrait picture for the profile	ranking	en	Upload a portrait picture for the profile
 uploaded picture is no jpeg !!!	ranking	en	Uploaded picture is no JPEG !!!
 url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. http://domain.com

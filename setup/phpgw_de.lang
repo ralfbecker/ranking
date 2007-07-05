@@ -11,6 +11,7 @@
 3. place	ranking	de	3. Platz
 aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
+actions	ranking	de	Befehle
 add a new athlete	ranking	de	einen neuen Athleten anlegen
 add a new competition	ranking	de	einen neuen Wettkampf anlegen
 add a new cup	ranking	de	Neue Serie anlegen
@@ -23,6 +24,7 @@ applied for a %1 license	ranking	de	%1 Lizenz beantragt
 applies for the license and downloads the necessary form to mail to the office	ranking	de	Beantragt eine Lizenz und lädt das notwendige Forumlar herunter damit es an das Büro geschickt werden kann
 apply for	ranking	de	Beantragen
 apply the changes made	ranking	de	vorgenommene Änderungen anwenden
+apply the changes of this athlete only	ranking	de	Nur Änderungen an diesem Athleten anwenden
 as of	ranking	de	Stand
 athlete	ranking	de	Athlet
 athletes	ranking	de	Athleten
@@ -40,6 +42,7 @@ boulder	ranking	de	Bouldern
 can not be higher as top!	ranking	de	Kann nicht höher als Top sein!
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
+can't open connection to display %1 (%2:%3)!!!	ranking	de	Kann keine Verbindung zu Anzeige %1 (%2:%3) aufbauen!!!
 cannel without saving	ranking	de	Abbrechen ohne zu Speichern
 cathegories	ranking	de	Kategorien
 cellphone	ranking	de	Mobiltelefon
@@ -62,6 +65,7 @@ complete profile	ranking	de	komplettes Profil
 complimentary	ranking	de	Zusätzlich
 confirmed	ranking	de	bestätigt
 contact	ranking	de	Kontakt
+copy current formats to the new competition, which does not have any formats yet?	ranking	de	Sollen die aktuellen Formate zum neuen Wettkampf, der noch keine Formate hat, kopiert werden?
 counting for rankings	ranking	de	zählend für die Rangliste
 cup	ranking	de	Cup
 cuppattern	ranking	de	Muster des Cups
@@ -80,7 +84,11 @@ deletes this cup	ranking	de	Löscht diesen Cup
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
 deny public display of the checked information	ranking	de	öffentlichen Anzeige der ausgewählte Informationen verweigern
 digital rock	ranking	de	digital ROCK
+display	ranking	de	Anzeige
+display #%1 not found!!!	ranking	de	Anzeige #%1 nicht gefunden!!!
 display ranking	ranking	de	Rangliste anzeigen
+displays	ranking	de	Anzeigen
+down	ranking	de	Nach unten
 download	ranking	de	Herunterladen
 download all	ranking	de	Alle herunterladen
 duration in days or textual competition-date like 'mid july'	ranking	de	Dauer in Tagen oder Text für Wettkampfdatum wie 'Mitte Juli'
@@ -95,8 +103,12 @@ edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
 edit this heat	ranking	de	Diese Runde bearbeiten
 eliminated	ranking	de	eliminiert
+end	ranking	de	Ende
 entry not found !!!	ranking	de	Eintrag nicht gefunden
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
+error deleting format!	ranking	de	Fehler beim Löschen des Formats
+error saving format!	ranking	de	Fehler beim Speichern des Formats
+error writing to display!!!	ranking	de	Fehler beim Schreiben zur Anzeige!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
 error: dataline %1 contains %2 instead of %3 columns !!!	ranking	de	Fehler: Datenzeile %1 enthält %2 statt %3 Spalten !!!
 error: dataline %1 contains not existing athlete id #%2 !!!	ranking	de	Fehler: Datenzeile %1 enthält nicht existierende Athleten Id #%2 !!!
@@ -113,6 +125,7 @@ error: registration	ranking	de	Fehler: Registrierung
 error: removing the %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: renaming the attachments !!!	ranking	de	Fehler: beim Umbenennen der Anhänge !!!
 error: required column %1 not found !!!	ranking	de	Fehler: benötigte Splaten %1 nicht gefunden !!!
+error: route already has a result!!!	ranking	de	Fehler: die Route hat bereits ein Ergebnis !!!
 error: saving the heat!!!	ranking	de	Fehler: beim Speichern der Runde !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
 exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
@@ -128,6 +141,10 @@ file is not a pdf	ranking	de	Die Datei ist kein PDF
 final	ranking	de	Finale
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Vorname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 for internal use, not shown on the website.	ranking	de	Zur internen Benutzung, wird nicht auf der Webseite angezeigt.
+format	ranking	de	Format
+format #%1 not found!	ranking	de	Format #%1 nicht gefunden!
+format deleted	ranking	de	Format gelöscht
+format saved	ranking	de	Format gespeichert
 free text	ranking	de	freier Text
 from other competitions	ranking	de	von anderen Wettkämpfen
 from the ranking	ranking	de	von der Rangliste
@@ -141,6 +158,7 @@ general	ranking	de	Allgemein
 general result	ranking	de	Gesamtergebnis
 generate all startlists together	ranking	de	Erzeugt alle Startlisten  auf ein mal.
 generate startlist	ranking	de	Startliste erzeugen
+go	ranking	de	Go
 grpid	ranking	de	GrpId
 heat	ranking	de	Runde
 heat deleted	ranking	de	Runde gelöscht
@@ -177,7 +195,9 @@ key of the person	ranking	de	Schlüssel des Athleten
 last competition	ranking	de	Letzter Wettkampf
 lead	ranking	de	Schwierigkeit
 license number	ranking	de	Lizenznummer
+line	ranking	de	Zeile
 male	ranking	de	männlich
+max	ranking	de	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
 minus	ranking	de	minus
 name(s)	ranking	de	Namen
@@ -234,6 +254,7 @@ previous rankingsystem	ranking	de	vorhergegendes Ranglistensystem
 professional	ranking	de	Profi
 profile	ranking	de	Profil
 provisional	ranking	de	provisorische
+provisional result	ranking	de	provisorisches Ergebnis
 qualification	ranking	de	Qualifikation
 qualification, 1/2-final, ...	ranking	de	Qualifikation, 1/2-Finale, ...
 quota	ranking	de	Quote
@@ -254,6 +275,7 @@ remove the attached pdf	ranking	de	Das angehangene PDF löschen
 removed the %1	ranking	de	Das %1 wurde gelöscht
 required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
+result form is timed out, please reload the form by clicking on the application icon.	ranking	de	Das Ergebnis Formular ist nicht mehr gültig (zu lange nicht aktualisiert), bitte aktualisieren Sie es durch Anklicken des Anwendungsicons.
 result official	ranking	de	Ergebnis offiziell
 result pdf	ranking	de	Ergebnis PDF
 resultlist	ranking	de	Ergebnisliste
@@ -315,6 +337,7 @@ unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, l
 unknown category or not a category of this competition	ranking	de	Unbekannte Kategorie oder nicht eine Kategorie dieses Wettkampfes
 unpublished	ranking	de	unveröffentlicht
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt
+up	ranking	de	Nach oben
 upload a portrait picture for the profile	ranking	de	Ein Protrait Bild für das Profil hochladen
 uploaded picture is no jpeg !!!	ranking	de	Hochgeladenes Bild ist kein JPEG !!!
 url to own homepage, eg. http://domain.com	ranking	de	URL zu eigener Homepage, zB. http://climbing.de

@@ -31,7 +31,7 @@ class route extends so_sql
 		
 		if ($source_charset) $this->source_charset = $source_charset;
 		
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = is_object($GLOBALS['egw']->translation) ? $GLOBALS['egw']->translation->charset() : 'iso-8859-1';
 /*
 		foreach(array(
 				'athlete'  => 'athlete',
