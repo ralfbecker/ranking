@@ -752,7 +752,7 @@ class boranking extends soranking
 	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
 	 * @param int $mode=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first
 	 * @param array $old_startlist=null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
-	 * @return boolean/array true or array with starters (if is_array($old_startlist) if the startlist has been successful generated AND saved, false otherwise
+	 * @return boolean/array true or array with starters (if is_array($old_startlist)) if the startlist has been successful generated AND saved, false otherwise
 	 */
 	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$mode=1,$old_startlist=null)
 	{
@@ -762,11 +762,13 @@ class boranking extends soranking
 		
 		if ($this->debug) echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$mode)</p>\n";
 		
-		$starters = $this->result->read(array(
+		$filter = array(
 			'WetId'  => $comp['WetId'],
 			'GrpId'  => $cat['GrpId'],
-			'platz = 0',		// savegard against an already exsiting result
-		),'',true,'nation,reg_nr');
+		);
+		if (!is_array($old_startlist)) $filter[] = 'platz = 0';		// savegard against an already exsiting result
+		
+		$starters = $this->result->read($filter,'',true,'nation,reg_nr');
 		
 		if (!is_array($starters) || !count($starters)) return false;	// no starters, or eg. already a result
 		
@@ -952,7 +954,7 @@ class boranking extends soranking
 		// new mode: 1, 2, 2, 1, 1, 2, 2, ...
 		$last = $last_route;
 		$last_route = $route;
-		if ($last == $route) $route = $route == 1 ? 2 : 1;
+		if ($last == $route && $num_routes == 2) $route = $route == 1 ? 2 : 1;
 	}
 	
 	/**
