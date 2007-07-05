@@ -595,4 +595,78 @@
 
 		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.012';
 	}
-?>
+
+
+	$test[] = '1.3.012';
+	function ranking_upgrade1_3_012()
+	{
+		$GLOBALS['egw_setup']->oProc->CreateTable('Displays',array(
+			'fd' => array(
+				'dsp_id' => array('type' => 'auto'),
+				'dsp_name' => array('type' => 'varchar','precision' => '80'),
+				'WetId' => array('type' => 'int','precision' => '4'),
+				'dsp_current' => array('type' => 'varchar','precision' => '255'),
+				'frm_id' => array('type' => 'int','precision' => '4'),
+				'dsp_ip' => array('type' => 'varchar','precision' => '64'),
+				'dsp_port' => array('type' => 'int','precision' => '4'),
+				'dsp_format' => array('type' => 'varchar','precision' => '128'),
+				'dsp_rows' => array('type' => 'int','precision' => '4','default' => '1'),
+				'dsp_cols' => array('type' => 'int','precision' => '4','default' => '20'),
+				'dsp_remark' => array('type' => 'text'),
+				'dsp_timeout' => array('type' => 'decimal','precision' => '12','scale' => '2'),
+				'dsp_line' => array('type' => 'int','precision' => '4'),
+				'dsp_athletes' => array('type' => 'varchar','precision' => '255'),
+				'dsp_charset' => array('type' => 'varchar','precision' => '32'),
+				'dsp_clone_of' => array('type' => 'int','precision' => '4'),
+				'dsp_access' => array('type' => 'varchar','precision' => '255'),
+			),
+			'pk' => array('dsp_id'),
+			'fk' => array(),
+			'ix' => array(),
+			'uc' => array()
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.013';
+	}
+
+
+	$test[] = '1.3.013';
+	function ranking_upgrade1_3_013()
+	{
+		$GLOBALS['egw_setup']->oProc->CreateTable('DisplayFormats',array(
+			'fd' => array(
+				'frm_id' => array('type' => 'auto'),
+				'dsp_id' => array('type' => 'int','precision' => '4','nullable' => False),
+				'frm_line' => array('type' => 'int','precision' => '4','nullable' => False),
+				'WetId' => array('type' => 'int','precision' => '4','nullable' => False),
+				'GrpId' => array('type' => 'int','precision' => '4'),
+				'route_order' => array('type' => 'int','precision' => '4'),
+				'frm_updated' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
+				'frm_content' => array('type' => 'varchar','precision' => '255'),
+				'frm_showtime' => array('type' => 'int','precision' => '4'),
+				'frm_go_frm_id' => array('type' => 'int','precision' => '4'),
+				'frm_max' => array('type' => 'int','precision' => '4')
+			),
+			'pk' => array('frm_id'),
+			'fk' => array(),
+			'ix' => array(array('dsp_id','WetId','frm_line')),
+			'uc' => array()
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.3.014';
+	}
+
+	$test[] = '1.3.014';
+	function ranking_upgrade1_3_014()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','dsp_id',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','frm_id',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4';
+	}

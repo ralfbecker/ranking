@@ -1047,4 +1047,18 @@ class boresult extends boranking
 		//echo "<p>boresult::default_quota($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
 		return $quota;
 	}
+	
+	/**
+	 * Singleton to get a boresult instance
+	 *
+	 * @return boresult
+	 */
+	static public function getInstance()
+	{
+		if (!is_object($GLOBALS['boresult']))
+		{
+			$GLOBALS['boresult'] = new boresult;
+		}
+		return $GLOBALS['boresult'];
+	}
 }

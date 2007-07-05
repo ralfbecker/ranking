@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.display.edit" template="" lang="" group="0" version="1.4.001">
+		<grid width="100%">
+			<columns>
+				<column width="50"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" id="msg" align="center"/>
+					<description/>
+					<description/>
+				</row>
+				<row class="th">
+					<description value="Line"/>
+					<menulist span="2">
+						<menupopup type="select-number" options="End,1,100" id="frm_line"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Heat"/>
+					<menulist span="2">
+						<menupopup options="None" id="frm_heat"/>
+					</menulist>
+				</row>
+				<row class="row" valign="top">
+					<description value="Format"/>
+					<textbox multiline="true" rows="5" cols="20" span="2" class="display" id="frm_content"/>
+				</row>
+				<row class="row">
+					<description value="Time"/>
+					<menulist span="2">
+						<menupopup type="select-number" options=",1,60" id="frm_showtime"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Go"/>
+					<menulist>
+						<menupopup type="select-number" options="No,1,100" id="frm_go"/>
+					</menulist>
+					<description/>
+				</row>
+				<row class="row">
+					<description value="Max"/>
+					<menulist span="all">
+						<menupopup type="select-number" options="All,1,20" id="frm_max"/>
+					</menulist>
+				</row>
+				<row>
+					<hbox span="2">
+						<button label="Save" id="button[save]"/>
+						<button label="Apply" id="button[apply]"/>
+						<buttononly id="button[cancel]" label="Cancel" onclick="window.close();"/>
+					</hbox>
+					<button id="button[delete]" label="Delete" align="right"/>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.popupManual { display: none; }
+
+		</styles>
+	</template>
+</overlay>

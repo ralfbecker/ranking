@@ -105,4 +105,18 @@ class soranking
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
 	}
+	
+	/**
+	 * Get an instance of the ranking_so object
+	 *
+	 * @return ranking_so
+	 */
+	public static function getInstance()
+	{
+		if (!is_object($GLOBALS['soranking']))
+		{
+			$GLOBALS['soranking'] = new ranking_so();
+		}
+		return $GLOBALS['soranking'];
+	}
 }

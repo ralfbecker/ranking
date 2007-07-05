@@ -46,6 +46,33 @@ class ranking_admin_prefs_sidebox_hooks
 					'menuaction' => 'ranking.uiranking.index' )),
 			);
 			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
+
+			if (is_object($GLOBALS['uiresult']))	// we show the displays menu only if we are in the result-service
+			{
+				if (!is_object($GLOBALS['uiresult']->display))
+				{
+					include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
+					$GLOBALS['uiresult']->display =& new ranking_display($GLOBALS['uiresult']->db);
+				}
+				if (($displays = $GLOBALS['uiresult']->display->displays()))
+				{
+					$file = array();
+					foreach($displays as $dsp_id => $dsp_name)
+					{
+						$file[] = array(
+							'text' => '<a class="textSidebox" href="'.$GLOBALS['egw']->link('/index.php',array(
+									'menuaction' => 'ranking.ranking_display_ui.index',
+									'dsp_id' => $dsp_id,
+								)).
+								'" onclick="window.open(this.href,\'display'.$dsp_id.'\',\'dependent=yes,width=700,height=580,scrollbars=yes,status=yes\'); 
+								return false;">'.$dsp_name.'</a>',
+							'no_lang' => true,
+							'link' => false
+						);
+					}
+					display_sidebox($appname,lang('Displays'),$file);
+				}
+			}
 		}
 
 		if ($GLOBALS['egw_info']['user']['apps']['preferences'] && $location != 'admin')
