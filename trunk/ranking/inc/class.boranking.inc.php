@@ -11,7 +11,7 @@
  * @version $Id$ 
  */
 
-include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
 
 define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
 define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
@@ -937,6 +937,7 @@ class boranking extends soranking
 	function move_to_startlist(&$starters,$k,&$startlist,$num_routes,$reset_data=null)
 	{
 		static $route = 1;
+		static $last_route = 1;
 		if ($reset_data)  $route = $reset_data;
 		//echo "<p>boranking::check_move_to_startlist(,$k,,$num_routes,$reset_data) route=$route, athlete=".$starters[$k]['nachname'].', '.$starters[$k]['vorname']."</p>\n";
 
@@ -945,7 +946,13 @@ class boranking extends soranking
 		$startlist[$route][] =& $starters[$k];
 		unset($starters[$k]);
 		
-		if (++$route > $num_routes) $route = 1;
+		// previous mode: simply alternating
+		//if (++$route > $num_routes) $route = 1;
+
+		// new mode: 1, 2, 2, 1, 1, 2, 2, ...
+		$last = $last_route;
+		$last_route = $route;
+		if ($last == $route) $route = $route == 1 ? 2 : 1;
 	}
 	
 	/**
