@@ -259,10 +259,10 @@ class route_result extends so_sql
 	 * @param array &$route_names route_order => route_name pairs
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @param string $discipline 'lead', 'speed', 'boulder'
-	 * @param array $result_cols result relevant col
+	 * @param array $result_cols=array() result relevant col
 	 * @return string join
 	 */
-	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols)
+	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array())
 	{
 		if (!is_object($GLOBALS['egw']->route))
 		{

@@ -161,7 +161,7 @@ class boresult extends boranking
 			return $this->_startlist_from_previous_heat($keys,
 				$discipline == 'boulder' && $route_order == 2 ? 'result' :	// boulder 1/2-final --> by quali result
 				($route_order >= 2 ? 'reverse' : 'previous'),	// after quali reversed result, otherwise as previous heat
-				$discipline == 'speed');						// speed --> use ko-system for the final
+				$discipline == 'speed',$discipline);						// speed --> use ko-system for the final
 		}
 		// from now on only quali startlist from registration
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
@@ -289,9 +289,10 @@ class boresult extends boranking
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
 	 * @param boolean $ko_system=false use ko-system
+	 * @param string $discipline
 	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function _startlist_from_previous_heat($keys,$start_order='reverse',$ko_system=false)
+	function _startlist_from_previous_heat($keys,$start_order='reverse',$ko_system=false,$discipline='lead')
 	{
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
@@ -343,11 +344,16 @@ class boresult extends boranking
 			// quali on two routes with multiplied ranking
 			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
 			{
-				$join = " JOIN {$this->route_result->table_name} r2 ON {$this->route_result->table_name}.WetId=r2.WetId".
-					" AND {$this->route_result->table_name}.GrpId=r2.GrpId AND r2.route_order=0".
-					" AND {$this->route_result->table_name}.PerId=r2.PerId";
+				$cols = array();
+				$prev_keys['route_order'] = 0;
+				$join = $this->route_result->_general_result_join(array(
+					'WetId' => $keys['WetId'],
+					'GrpId' => $keys['GrpId'],
+				),$cols,$order_by,$route_names,$prev_route['route_type'],$discipline,array());
+				
+				$order_by = str_replace(',nachname ASC,vorname ASC','',$order_by);	// we dont want to order alphabetical, we have to add RAND()
+				$order_by .= ' DESC';	// we need reverse order
 
-				$order_by = $this->route_result->table_name.'.result_rank * r2.result_rank DESC';
 				// just the col-name is ambigues
 				foreach($prev_keys as $col => $val)
 				{
@@ -355,14 +361,12 @@ class boresult extends boranking
 						$this->db->expression($this->route_result->table_name,array($col => $val));
 					unset($prev_keys[$col]);
 				}
-				$cols = array(
-					$this->route_result->table_name.'.PerId AS PerId',
-					$this->route_result->table_name.'.start_number AS start_number',
-				);
-				if ($prev_route['route_quota'])		// otherwise we can not limit the number of starters
+				foreach($cols as $key => $col)
 				{
-					$cols[] = $this->route_result->table_name.'.result_rank * r2.result_rank AS quali_points';
+					if (strpos($col,'quali_points')===false) unset($cols[$key]);	// remove all cols but the quali_points
 				}
+				$cols[] = $this->route_result->table_name.'.PerId AS PerId';
+				$cols[] = $this->route_result->table_name.'.start_number AS start_number';
 			}
 			else
 			{
@@ -376,7 +380,7 @@ class boresult extends boranking
 			$order_by .= ',RAND()';					// --> randomized
 		}
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
-		
+
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
 		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $prev_route['route_quota'])
 		{
@@ -389,7 +393,7 @@ class boresult extends boranking
 			if (isset($data['quali_points']) && count($starters)-$n > $prev_route['route_quota'] && 
 				$data['quali_points'] > $starters[count($starters)-$prev_route['route_quota']]['quali_points'])
 			{
-				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$prev_route['route_quota'])."]['quali_points']=".$starters[count($starters)-$prev_route['route_quota']]['quali_points']."</p>\n";
+				echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$prev_route['route_quota'])."]['quali_points']=".$starters[count($starters)-$prev_route['route_quota']]['quali_points']."</p>\n";
 				continue;
 			}
 			if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem
