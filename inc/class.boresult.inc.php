@@ -387,6 +387,7 @@ class boresult extends boranking
 			$max_rank = $starters[count($starters)-1]['result_rank']-1;
 		}
 		$start_order = 1;
+		$half_starters = count($starters)/2;
 		foreach($starters as $n => $data)
 		{
 			// applying a quota for TWO_QUALI_ALL, taking ties into account!
@@ -408,6 +409,19 @@ class boresult extends boranking
 					}
 				}
 				$data['start_order'] = $this->ko_start_order[$prev_route['route_quota']][$start_order++];
+			}
+			// EYS non-onsight modus: 2. half first
+			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 1)
+			{
+				if ($start_order <= floor($half_starters))
+				{
+					$data['start_order'] = $start_order+ceil($half_starters);
+				}
+				else
+				{
+					$data['start_order'] = $start_order-floor($half_starters);
+				}
+				++$start_order;
 			}
 			else
 			{
