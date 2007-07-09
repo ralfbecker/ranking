@@ -1131,9 +1131,9 @@ class boranking extends soranking
 			}
 			else
 			{
-/* code to create not existing athletes, eg. as offline backup solution
 				if (!($athlete = $this->athlete->read($line['athlete'])))
 				{
+/* code to create not existing athletes, eg. as offline backup solution
 					static $gender;
 					if (is_null($gender))
 					{
