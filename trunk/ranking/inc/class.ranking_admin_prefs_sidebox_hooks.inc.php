@@ -56,6 +56,7 @@ class ranking_admin_prefs_sidebox_hooks
 				}
 				if (($displays = $GLOBALS['uiresult']->display->displays()) || $GLOBALS['egw_info']['user']['apps']['admin'])
 				{
+					if (!is_array($displays)) $displays = array();
 					$file = array();
 					foreach($displays as $dsp_id => $dsp_name)
 					{

@@ -91,6 +91,7 @@ class ranking_display extends so_sql2
 	 */
 	function activate($frm_id,$athlete=null,$dsp_id=null)
 	{
+		//echo "activate($frm_id,$athlete,$dsp_id)";
 		if ($dsp_id && $dsp_id != $this->dsp_id)
 		{
 			$backup = $this->data;
@@ -117,13 +118,13 @@ class ranking_display extends so_sql2
 		);
 		if (!is_null($athlete) && $format->GrpId && is_numeric($format->route_order))
 		{
+			if (!is_array($this->dsp_athletes)) $this->dsp_athletes = array();
 			$this->dsp_athletes[$format->GrpId][$format->route_order] = $athlete;
 			$dsp['dsp_athletes'] = $this->dsp_athletes;
 		}
 		$dsp['dsp_current'] = $format->get_content($showtime,$line=0,false,$this->dsp_athletes[$format->GrpId][$format->route_order]);
 		$dsp['dsp_timeout'] = microtime(true) + $showtime;
 		$dsp['dsp_line']    = $line;
-
 		$this->update($dsp);
 
 		if ($backup) $this->data = $backup;

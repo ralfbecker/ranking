@@ -122,12 +122,24 @@ class ranking_display_format extends so_sql2
 	{
 		static $list_cache;
 		if ($reread_list) $list_cache = null;
-		//echo "<p>ranking_display_format::_get_athlete('$list_type',$pos,$reread_list) list_cache=$list_cache</p>\n";
+		if (!$_SERVER['HTTP_HOST']) echo "<p>ranking_display_format::_get_athlete('$list_type',$pos,$reread_list,$athlete) list_cache=$list_cache</p>\n";
 
 		if ($pos < 0 || $this->frm_max && $pos >= $this->frm_max && $list_type == 'start_order' ||	// start_order stops direct if over max
 			!($keys = $this->route_keys(true)) || !in_array($list_type,array('start_order','result_rank')) ||
-			(is_null($list_cache) && !($list_cache = $this->result->route_result->search('',false,$list_type,'','*',false,'AND',false,$keys))) || 
-			$pos >= count($list_cache))
+			(is_null($list_cache) && !($list_cache = $this->result->route_result->search('',false,$list_type,'','*',false,'AND',false,$keys))))
+		{
+			return false;
+		}
+		if ($pos == 0 && $list_type == 'result_rank')	// remove non-ranked
+		{
+			foreach($list_cache as $key => $row)
+			{
+				if (!$row['result_rank']) unset($list_cache[$key]);
+			}
+			$list_cache = array_values($list_cache);
+			//_debug_array($list_cache);
+		}
+		if ($pos >= count($list_cache))
 		{
 			return false;
 		}
@@ -384,7 +396,7 @@ class ranking_display_format extends so_sql2
 		// try reading athlete from the result, if $type contains result data and only an id is given or the array contains no result data
 		if ($athlete && in_array($type{0},array('P','p','Q','h','H','S')) && (!is_array($athlete) || !isset($athlete['start_order'])))
 		{
-			if (($a = $this->_get_athlete('result_rank',0,true,$athlete))) $athlete = $a;
+			if (($a = $this->_get_athlete('start_order',0,true,$athlete))) $athlete = $a;
 		}
 		// if only an athlete id given, read him from the athlets table
 		if (!$athlete || !is_array($athlete) && !($athlete = $this->result->athlete->read($athlete)))
