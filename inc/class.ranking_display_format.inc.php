@@ -171,6 +171,13 @@ class ranking_display_format extends so_sql2
 	 */
 	function _print_line($format,$athlete=null)
 	{
+		// show name & nation, instead rank, name & height for not yet ranked competitors
+		if ($athlete && !is_array($athlete) && ($athlete = $this->_get_athlete('start_order',0,true,$athlete)) &&
+			!$athlete['result_rank'])
+		{
+			$format = str_replace(array('%p%%V.........$%h$','%p%%V.......$%h$'),
+				array('%V............%%L&','%V..........%%L&'),$format);
+		}		
 		//echo "<p>ranking_display_format::_print_line('$format',$PerId)</p>\n";
 		if (preg_match_all('/([%&$]{1})([a-zA-Z0-9]+)[^%&$#]*([%&$#]{1})/',$format,$parts))
 		{
