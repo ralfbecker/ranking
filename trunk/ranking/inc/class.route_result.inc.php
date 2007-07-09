@@ -291,8 +291,8 @@ class route_result extends so_sql
 			else
 			{
 				$order_by[] = "r$route_order.result_rank";
-				$order_by[] = "r$route_order.result_rank IS NULL";
 			}
+			$order_by[] = "r$route_order.result_rank IS NULL";
 		}
 		$order_by = implode(',',array_reverse($order_by)).',nachname ASC,vorname ASC';
 
@@ -330,12 +330,13 @@ class route_result extends so_sql
 				{
 					$data['result_height'.$suffix] = '';
 					$data['result_plus'.$suffix]   = TOP_PLUS;
-					$data['result'.$suffix]   = lang('Top').'&nbsp;&nbsp;';
+					$data['result'.$suffix]   = lang('Top');
 				}
 				elseif ($data['result_height'.$suffix])
 				{
 					$data['result_height'.$suffix] *= 0.001;
-					$data['result'.$suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
+//					$data['result'.$suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
+					$data['result'.$suffix] = $data['result_height'.$suffix].
 						$plus2string[$data['result_plus'.$suffix]];
 				}
 				++$suffix;
@@ -345,8 +346,7 @@ class route_result extends so_sql
 				// quali on two routes for all --> add rank to result
 				foreach(array('',1) as $suffix)
 				{
-					$data['result'.$suffix] .= ($data['result_plus'.$suffix] == TOP_PLUS ? ' &nbsp;' : '').
-						' &nbsp; '.$data['result_rank'.$suffix].'.';
+					$data['result'.$suffix] .= ' &nbsp; '.$data['result_rank'.$suffix].'.';
 				}
 			}
 		}
