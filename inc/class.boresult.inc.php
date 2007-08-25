@@ -317,7 +317,7 @@ class boresult extends boranking
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
 		}
-		if ($prev_route['route_quota'] && $prev_route['route_type'] != TWO_QUALI_ALL)
+		if ($prev_route['route_quota'] && ($prev_route['route_type'] != TWO_QUALI_ALL || $keys['route_order'] > 2))
 		{
 			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
 			{
@@ -346,6 +346,7 @@ class boresult extends boranking
 			{
 				$cols = array();
 				$prev_keys['route_order'] = 0;
+				$prev_keys[] = 'result_rank IS NOT NULL';	// otherwise not started athletes qualify too
 				$join = $this->route_result->_general_result_join(array(
 					'WetId' => $keys['WetId'],
 					'GrpId' => $keys['GrpId'],
