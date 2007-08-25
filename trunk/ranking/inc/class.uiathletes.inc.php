@@ -101,7 +101,7 @@ class uiathletes extends boranking
 			{
 				$js = "document.getElementById('exec[apply_license]').click();";
 			}
-			$msg = lang('Please do NOT capitalise all words and names!');
+			$msg = lang('Please use ONLY a first capital letter for names, do NOT capitalise the whole word!');
 		}
 		else
 		{
