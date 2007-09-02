@@ -295,19 +295,5 @@
 			'fk' => array(),
 			'ix' => array(array('dsp_id','WetId','frm_line')),
 			'uc' => array()
-		),
-		'TimeMeasurement' => array(
-			'fd' => array(
-				'time_id' => array('type' => 'auto','nullable' => False),
-				'time_channel' => array('type' => 'int','precision' => '2'),
-				'time_time' => array('type' => 'decimal','precision' => '10','scale' => '4','nullable' => False),
-				'time_ts' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
-				'time_sequenz' => array('type' => 'int','precision' => '4','nullable' => False),
-				'time_raw' => array('type' => 'varchar','precision' => '32','nullable' => False)
-			),
-			'pk' => array('time_id'),
-			'fk' => array(),
-			'ix' => array('time_channel',array('time_ts','time_time')),
-			'uc' => array()
 		)
 	);
