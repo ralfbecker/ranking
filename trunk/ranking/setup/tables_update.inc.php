@@ -670,3 +670,40 @@
 
 		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4';
 	}
+
+	$test[] = '1.4';
+	function ranking_upgrade1_4()
+	{
+		$GLOBALS['egw_setup']->oProc->CreateTable('TimeMeasurement',array(
+			'fd' => array(
+				'time_id' => array('type' => 'auto','nullable' => False),
+				'time_channel' => array('type' => 'int','precision' => '2'),
+				'time_time' => array('type' => 'decimal','precision' => '10','scale' => '4','nullable' => False),
+				'time_ts' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
+				'time_sequenz' => array('type' => 'int','precision' => '4','nullable' => False),
+				'time_raw' => array('type' => 'varchar','precision' => '32','nullable' => False)
+			),
+			'pk' => array('time_id'),
+			'fk' => array(),
+			'ix' => array('time_channel',array('time_ts','time_time')),
+			'uc' => array()
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4.001';
+	}
+
+	$test[] = '1.4.001';
+	function ranking_upgrade1_4_001()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_time_host',array(
+			'type' => 'varchar',
+			'precision' => '64'
+		));
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_time_port',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4.002';
+	}
+?>

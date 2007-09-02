@@ -18,6 +18,7 @@ require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route_result.inc.php');
 define('ONE_QUALI',0);
 define('TWO_QUALI_HALF',1);
 define('TWO_QUALI_ALL',2);
+define('TWO_QUALI_SPEED',3);
 define('LEAD',4);
 define('BOULDER',8);
 define('SPEED',16);

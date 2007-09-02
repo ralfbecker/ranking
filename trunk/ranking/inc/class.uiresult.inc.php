@@ -68,11 +68,14 @@ class uiresult extends boresult
 					($previous = $this->route->read($keys)))
 				{
 					++$keys['route_order'];
-					if ($keys['route_order'] == 1 && $previous['route_type'] == ONE_QUALI)
+					if ($keys['route_order'] == 1 && in_array($previous['route_type'],array(ONE_QUALI,TWO_QUALI_SPEED)))
 					{
 						$keys['route_order'] = 2;
 					}
-					$keys['route_type'] = $previous['route_type'];
+					foreach(array('route_type','dsp_id','frm_id','route_time_host','route_time_port') as $name)
+					{
+						$keys[$name] = $previous[$name];
+					}
 				}
 				else
 				{
@@ -105,9 +108,13 @@ class uiresult extends boresult
 						$keys['route_judge'] = implode(', ',$keys['route_judge']);
 					}
 				}
-				
 				$content = $this->route->init($keys);
 				$content['new_route'] = true;
+			}
+			// speed uses a different type for quali on two routes
+			if ($content['route_type'] == TWO_QUALI_SPEED)
+			{
+				$content['route_type'] = TWO_QUALI_ALL;
 			}
 		}
 		// check if user has NO edit rights
@@ -151,7 +158,11 @@ class uiresult extends boresult
 						)) ? $format->frm_id : 0;
 					}
 					//_debug_array($content);
-					if ($this->route->save($content) != 0)
+					// speed uses a different type for quali on two routes
+					if ($discipline == 'speed' && $content['route_type'] == TWO_QUALI_ALL) $content['route_type'] = TWO_QUALI_SPEED;
+					$err = $this->route->save($content);
+					if ($discipline == 'speed' && $content['route_type'] == TWO_QUALI_SPEED) $content['route_type'] = TWO_QUALI_ALL;
+					if ($err)
 					{
 						$msg = lang('Error: saving the heat!!!');
 						$button = $js = '';	// dont exit the window
@@ -509,9 +520,11 @@ class uiresult extends boresult
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
 		$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
 			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 'ONE_QUALI');
+		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'];
 		$rows['num_problems'] = $query['num_problems'];
 		$rows['no_delete'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
+		$rows['time_measurement'] = $query['time_measurement'];
 		
 		return $total;
 	}
@@ -702,10 +715,12 @@ class uiresult extends boresult
 				1 => lang('Resultlist'),
 			),
 			'eliminated' => $this->eliminated_labels,
+			'eliminated_r' => $this->eliminated_labels,
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
 
 		if ($content['nm']['route'] < 2) unset($sel_options['eliminated'][0]);
+		unset($sel_options['eliminated_r'][0]);
 		for($i=1; $i <= $route['route_num_problems']; ++$i)
 		{
 			$sel_options['zone'.$i] = array(lang('No'));
@@ -718,6 +733,7 @@ class uiresult extends boresult
 		$content['nm']['route_status'] = $route['route_status'];
 		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
 		$content['nm']['num_problems'] = $route['route_num_problems'];
+		$content['nm']['time_measurement'] = $route['route_time_host'] && $route['route_status'] != STATUS_RESULT_OFFICIAL;
 		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
 		
 		// make competition and category data availible for print
@@ -965,5 +981,228 @@ class uiresult extends boresult
 			}
 		}
 		return 'ranking.result.index.rows_startlist';
+	}
+	
+	/**
+	 * Start the time measurement for $PerId
+	 *
+	 * @param string $request_id
+	 * @param int $PerId
+	 * @return string
+	 */
+	function ajax_time_measurement($request_id,$PerId)
+	{
+		//$start = microtime(true);
+		$response = new xajaxResponse();
+		
+		require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate_request.inc.php');
+		if (!($request =& etemplate_request::read($request_id)))
+		{
+			$response->addAlert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
+			return $this->_stop_time_measurement($response);
+		}
+		$keys = array(
+			'WetId' => $request->preserv['nm']['comp'],
+			'GrpId' => $request->preserv['nm']['cat'],
+			'route_order' => $request->preserv['nm']['route'],
+		);
+		if (!($route = $this->route->read($keys)) ||
+			!($old_result = $this->route_result->read($keys+array('PerId'=>$PerId))) ||
+			!($PerId < 0 && $route['route_order'] >= 2) && !($athlete = $this->athlete->read($PerId)))
+		{
+			$response->addAlert("internal error: ".__FILE__.': '.__LINE__);
+			return $this->_stop_time_measurement($response);
+		}
+		require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_time_measurement.inc.php');
+		$timy =& new ranking_time_measurement($route['route_time_host'],$route['route_time_port']);
+		
+		if (!$timy->is_connected())
+		{
+			$response->addAlert(lang("Can't connect to time controll program at '%1': %2",$route['route_time_host'].':'.$route['route_time_port'],$timy->error));
+			return $this->_stop_time_measurement($response);
+		}
+		// allow the request to run max. 15min and close the session, to not block other request from that session
+		set_time_limit(900);
+		$GLOBALS['egw']->session->commit_session();
+
+		// check if we measure two participants (quali on two routes or final) or just one (quali on one route)
+		if ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI)
+		{
+			if ($athlete && (string)$old_result['eliminated_r'] === '')	// real athlete, no wildcard and not eliminated
+			{
+				$side = '';		// we do both sides
+				$side1 = 'l';
+				$side2 = 'r';
+			}
+			else	// wildcard left
+			{
+				$side = $side2 = 'r';
+				$athlete = null;
+			}
+			// find out the other participant
+			if ($route['route_order'] < 2 && $old_result['result_time'])	// quali and already measured
+			{
+				$side1 = 'r'; 
+				$side2 = 'l';
+				$other_sorder = $old_result['start_order'] + 1;
+			}
+			else
+			{
+				$other_sorder = $old_result['start_order'] + ($route['route_order'] >= 2 ? ($old_result['start_order']&1 ? 1 : -1) : -1);
+			}
+			list($old_other) = $this->route_result->search($keys+array('start_order'=>$other_sorder),false);
+			if (!$old_other)
+			{
+				if ($route['route_order'] < 2)
+				{
+					// last participant starting on right
+					$side1 = $side = 'r';
+				}
+				else
+				{
+					// other participant not found --> error
+					$response->addAlert(lang("Can't find co-participant!"));
+					$timy->close();
+					return $this->_stop_time_measurement($response);
+				}
+			}
+			elseif ($old_other['PerId'] > 0 && (string)$old_other['elimitated'] === '')	// real other participant and not eliminated
+			{
+				if (!($other_athlete = $this->athlete->read($other_PerId=$old_other['PerId'])))
+				{
+					// other participant not found --> error
+					$response->addAlert(lang("Can't find co-participant!"));
+					$timy->close();
+					return $this->_stop_time_measurement($response);					
+				}
+			}
+			elseif ($old_other['PerId'] < 0)	// wildcard as other participant
+			{
+				$side = $side1;
+				$old_other = null;
+			}
+		}
+		else
+		{
+			$side1 = $side = 'l';	// only one side, maybe this should be configurable in future
+		}
+		$startnr = $old_result['start_number'] ? $old_result['start_number'] : $old_result['start_order'];
+		if ($athlete)
+		{
+			$timy->send("start:$side1:$startnr:".$old_result['time_sum'].':'.$athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+		}
+		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI)	// two routes with only one climber, set other to 0
+		{
+			$timy->send("start:l:0");	
+		}
+		if ($old_other)
+		{
+			$time = is_numeric($old_result['time_sum']) ? $old_result['time_sum'] : '';
+			$other_snr = $old_other['start_number'] ? $old_other['start_number'] : $old_other['start_order'];
+			$timy->send("start:$side2:$other_snr:".$old_other['time_sum'].':'.$other_athlete['nachname'].', '.$other_athlete['vorname'].' ('.$other_athlete['nation'].')');	
+		}
+		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI)	// two routes with only one climber, set other to 0
+		{
+			$s = $side1 == 'l' ? 'r' : 'l';
+			$timy->send("start:$s:0");	
+		}
+		$timy->send('notify:'.$side);
+		
+		if(($dsp_id=$route->data['dsp_id']) && ($frm_id=$route->data['frm_id']))
+		{
+			// add display update(s)
+			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
+			$display = new ranking_display($this->db);
+			$display->activate($frm_id,$PerId,$dsp_id);
+		}
+		//error_log("***** waiting for Timy responses ...");
+		$stop = $ranking_changed = false;
+		while (!$stop)
+		{
+			if (!($str = $timy->receive()) && !$timy->is_connected()) break;
+
+			list($event_side,$event,$time) = explode(':',trim($str));
+			//error_log("timy->receive()=$side:$event:$time");
+
+			switch($event)
+			{
+				case 'start':
+					if (!$side && $event_side == 'l') continue;	// ignore 2. start event
+					if (is_object($display))
+					{
+						$display->activate($frm_id,$PerId,$dsp_id);
+						if ($other_athlete) $display->activate($frm_id,$other_PerId,$dsp_id);
+					}
+					break;
+					
+				case 'stop':
+					$result = $event_side == 'l' ? 'result_time' : 'result_time_r';
+					if ($event_side == $side1)	// one side only or side1
+					{
+						$this->save_result($keys,array($PerId=>array(
+							$result => $time,
+						)),$route['route_type'],'speed');
+						$new_result = $this->route_result->read($keys+array('PerId'=>$PerId));
+						$response->addAssign("exec[nm][rows][set][$PerId][$result]",'value',$time);
+						$response->addAssign("set[$PerId][time_sum]",'innerHTML',$new_result['time_sum']);
+						if ($new_result && $new_result['result_rank'] != $old_result['result_rank'])	// the ranking has changed
+						{
+							$ranking_changed = true;
+						}
+						if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id);
+					}
+					else	// other participant
+					{
+						$this->save_result($keys,array($other_PerId=>array(
+							$result => $time,
+						)),$route['route_type'],'speed');
+						$new_other_result = $this->route_result->read($keys+array('PerId'=>$other_PerId));
+						$response->addAssign("exec[nm][rows][set][$other_PerId][$result]",'value',$time);
+						$response->addAssign("set[$other_PerId][time_sum]",'innerHTML',$new_other_result['time_sum']);
+						if ($new_other_result && $new_other_result['result_rank'] != $old_other['result_rank'])	// the ranking has changed
+						{
+							$ranking_changed = true;
+						}
+						if (is_object($display)) $display->activate($frm_id,$other_PerId,$dsp_id);
+					}
+					if ($side || isset($new_result) && isset($new_other_result))	// all athletes measured
+					{
+						if ($ranking_changed)  $response->addScript('document.eTemplate.submit();');	// --> submit the form to reload the page
+						$stop = true;
+					}
+					break;
+					
+				case 'false':
+					// ToDo handle it ...
+					if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id);
+					$response->addAlert(lang('False start %1: %2',$event_side=='r'?lang('right'):lang('left'),$time));
+					$stop = true;
+					break;
+			}
+		}
+		//error_log("***** closing connection to Timy: stop=$stop");
+		$timy->close();
+
+		if (!$stop)
+		{
+			return $this->_stop_time_measurement($response,lang('Measurement aborted!'));
+		}
+		//error_log("processing of ajax_time_measurement took ".sprintf('%4.2lf s',microtime(true)-$start));
+		return $this->_stop_time_measurement($response,lang('Time measured'));
+	}
+	
+	/**
+	 * Stop the running time measurement ON CLIENT SIDE
+	 * 
+	 * @access private
+	 * @param xajaxResponse $response response object with preset responses
+	 * @return string
+	 */
+	function _stop_time_measurement(&$response,$msg = '')
+	{
+		$response->addScript("set_style_by_class('td','ajax-loader','display','none'); document.getElementById('msg').innerHTML='".
+			htmlspecialchars($msg)."';");
+
+		return $response->getXML();
 	}
 }

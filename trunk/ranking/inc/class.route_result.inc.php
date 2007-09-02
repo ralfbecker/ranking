@@ -350,7 +350,7 @@ class route_result extends so_sql
 				}
 			}
 		}
-		if ($data['result_detail'])	// boulder result
+		if ($data['result_detail'] && !$data['result_time'])	// boulder result
 		{
 			$data += unserialize($data['result_detail']);
 			unset($data['result_detail']);
@@ -375,30 +375,70 @@ class route_result extends so_sql
 		}
 		if ($data['result_time'])	// speed result
 		{
-			$suffix = '';	// general result can have route_order as suffix
-			while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]))
+			if (!array_key_exists('result_time2',$data))
 			{
-				if ($data['result_time'.$suffix])
+				if ($data['result_detail'])
 				{
-					$data['result_time'.$suffix] *= 0.001;
-					if ($data['result_time'.$suffix] == ELIMINATED_TIME)
+					foreach(unserialize($data['result_detail']) as $name => $value)
+					{
+						$data[$name] = $value;
+					}
+					unset($data['result_detail']);
+				}
+				if ($data['result_time'])
+				{
+					$data['result_time'] *= 0.001;
+					if ($data['result_time'] == ELIMINATED_TIME)
 					{
 						$data['eliminated'] = 1;
 						$data['result_time'] = null;
-						$data['result'.$suffix] = lang('eliminated');
+						$data['time_sum'] = $data['result'] = lang('eliminated');
 					}
-					elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
+					elseif ($data['result_time'] == WILDCARD_TIME)
 					{
 						$data['eliminated'] = 0;
 						$data['result_time'] = null;
-						$data['result'.$suffix] = lang('Wildcard');	
+						$data['time_sum'] = $data['result'] = lang('Wildcard');	
 					}
 					else
 					{
-						$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
+						$data['time_sum'] = $data['result'] = sprintf('%4.2lf',$data['result_time']);
 					}
 				}
-				++$suffix;
+				if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
+				{
+					$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) : 
+						($data['eliminated_l'] ? lang('eliminated') : lang('Wildcard'));
+					$data['result_time'] = $data['result_time_l'];
+					$data['eliminated'] = $data['eliminated_l'];
+					$data['result_r'] = (string)$data['eliminated_r'] === '' ? 
+						($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') : 
+						($data['eliminated_r'] ? lang('eliminated') : lang('Wildcard'));
+				}
+			}
+			else
+			{
+				$suffix = '';	// general result can have route_order as suffix
+				while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]))
+				{
+					if ($data['result_time'.$suffix])
+					{
+						$data['result_time'.$suffix] *= 0.001;
+						if ($data['result_time'.$suffix] == ELIMINATED_TIME)
+						{
+							$data['result'.$suffix] = lang('eliminated');
+						}
+						elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
+						{
+							$data['result'.$suffix] = lang('Wildcard');						
+						}
+						else
+						{
+							$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
+						}
+					}
+					++$suffix;
+				}
 			}
 		}
 		if (!$data['PerId'])	// Wildcard
@@ -464,16 +504,41 @@ class route_result extends so_sql
 		{
 			unset($data['result_plus']);	// no plus without height
 		}
-		if (isset($data['eliminated']))
+		// speed
+		if ($data['result_time_r'] || isset($data['eliminated_r']))	// result on 2. speed route
 		{
-			switch($data['eliminated'])
+			$data['result_detail'] = array(
+				'result_time_l' => $data['result_time'] ? number_format($data['result_time'],3) : '',
+				'eliminated_l'  => $data['eliminated'],
+				'result_time_r' => $data['result_time_r'] ? number_format($data['result_time_r'],3) : '',
+				'eliminated_r'  => $data['eliminated_r'],
+			);
+			if ((string)$data['eliminated'] !== '' || (string)$data['eliminated_r'] !== '')
+			{
+				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ? 
+					($data['eliminated'] ? ELIMINATED_TIME : WILDCARD_TIME) : ELIMINATED_TIME));
+			}
+			else
+			{
+				$data['result_time'] = round(1000 * ($data['result_time']+$data['result_time_r']));
+			}
+		}
+		elseif ($data['result_time'] || isset($data['eliminated']))	// speed with result on only one route
+		{
+			$data['result_detail'] = array(
+				'result_time_l' => $data['result_time'] ? number_format($data['result_time'],3) : '',
+				'eliminated_l'  => $data['eliminated'],
+			);
+			switch((string)$data['eliminated'])
 			{
 				case '1': $data['result_time'] = ELIMINATED_TIME; break;
 				case '0': $data['result_time'] = WILDCARD_TIME; break;
 			}
+			if ($data['result_time'])
+			{
+				$data['result_time'] = round(1000 * $data['result_time']);
+			}
 		}
-		if ($data['result_time']) $data['result_time'] = round(1000 * $data['result_time']);
-
 		// saving the boulder results, if there are any
 		if (isset($data['top1']))
 		{
@@ -500,8 +565,9 @@ class route_result extends so_sql
 					$data['result_detail']['zone'.$i] = $data['zone'.$i];
 				}
 			}
-			if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
 		}
+		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
+
 		return $data;
 	}
 	
@@ -521,7 +587,10 @@ class route_result extends so_sql
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
 		}
-		if (isset($new['eliminated'])) $this->data['eliminated'] = $new['eliminated'];
+		foreach(array('eliminated','result_time_r','eliminated_r') as $name)
+		{
+			if (isset($new[$name])) $this->data[$name] = $new[$name];
+		}
 	}
 
 	/**

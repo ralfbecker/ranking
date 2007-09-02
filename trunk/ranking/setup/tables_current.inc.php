@@ -220,7 +220,9 @@
 				'route_observation_time' => array('type' => 'varchar','precision' => '40'),
 				'route_climbing_time' => array('type' => 'varchar','precision' => '40'),
 				'dsp_id' => array('type' => 'int','precision' => '4'),
-				'frm_id' => array('type' => 'int','precision' => '4')
+				'frm_id' => array('type' => 'int','precision' => '4'),
+				'route_time_host' => array('type' => 'varchar','precision' => '64'),
+				'route_time_port' => array('type' => 'int','precision' => '4')
 			),
 			'pk' => array('WetId','GrpId','route_order'),
 			'fk' => array(),
@@ -292,6 +294,20 @@
 			'pk' => array('frm_id'),
 			'fk' => array(),
 			'ix' => array(array('dsp_id','WetId','frm_line')),
+			'uc' => array()
+		),
+		'TimeMeasurement' => array(
+			'fd' => array(
+				'time_id' => array('type' => 'auto','nullable' => False),
+				'time_channel' => array('type' => 'int','precision' => '2'),
+				'time_time' => array('type' => 'decimal','precision' => '10','scale' => '4','nullable' => False),
+				'time_ts' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
+				'time_sequenz' => array('type' => 'int','precision' => '4','nullable' => False),
+				'time_raw' => array('type' => 'varchar','precision' => '32','nullable' => False)
+			),
+			'pk' => array('time_id'),
+			'fk' => array(),
+			'ix' => array('time_channel',array('time_ts','time_time')),
 			'uc' => array()
 		)
 	);

@@ -26,3 +26,11 @@ function handle_plus(height,plus_sel_id)
 		height.value = height.value.replace(/(.*)(t|top|\+|\-)$/i,'$1');
 	}
 }
+
+function start_time_measurement(button,athlete)
+{
+	set_style_by_class('td','ajax-loader','display','inline'); 
+	document.getElementById('msg').innerHTML='Time measurement'; 
+	
+	xajax_doXMLHTTP('ranking.uiresult.ajax_time_measurement',button.form.etemplate_exec_id.value,athlete);
+}
