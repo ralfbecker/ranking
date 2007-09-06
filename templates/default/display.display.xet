@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.display.display" template="" lang="" group="0" version="1.4.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description span="all" class="redItalic" id="msg" align="center"/>
+					<description/>
+				</row>
+				<row class="th">
+					<description value="Display" id="dsp_id"/>
+					<textbox size="80" maxlength="80" id="dsp_name" span="2"/>
+				</row>
+				<row class="row">
+					<description value="Host/IP"/>
+					<textbox size="64" maxlength="64" id="dsp_ip"/>
+				</row>
+				<row class="row" valign="top">
+					<description value="Port"/>
+					<int options="1" id="dsp_port"/>
+				</row>
+				<row class="row">
+					<description value="Format"/>
+					<textbox size="80" maxlength="255" id="dsp_format" span="2"/>
+				</row>
+				<row class="row">
+					<description value="Rows"/>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup type="select-number" options=",1,10" id="dsp_rows"/>
+						</menulist>
+						<menulist class="leftPad5">
+							<menupopup type="select-number" options=",4,40" id="dsp_cols" label="Columns"/>
+						</menulist>
+					</hbox>
+				</row>
+				<row class="row">
+					<description value="Encoding"/>
+					<textbox size="32" maxlength="32" span="all" id="dsp_charset"/>
+				</row>
+				<row class="row">
+					<description value="Clone of"/>
+					<menulist>
+						<menupopup options="None,1,10" id="dsp_clone_of"/>
+					</menulist>
+				</row>
+				<row class="row" valign="top">
+					<description value="Access"/>
+					<listbox type="select-account" rows="8" id="dsp_access"/>
+				</row>
+				<row>
+					<hbox span="2">
+						<button label="Save" id="button[save]"/>
+						<button label="Apply" id="button[apply]"/>
+						<buttononly id="button[cancel]" label="Cancel" onclick="window.close();"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.popupManual { display: none; }
+
+		</styles>
+	</template>
+</overlay>
