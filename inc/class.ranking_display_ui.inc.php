@@ -81,7 +81,7 @@ class ranking_display_ui extends ranking_display_bo
 							'frm_id' => $frm_id,
 						)))
 						{
-							$this->format->update_lines();
+							$this->format->update_lines(null,null,$dsp_id,$content['display']['WetId']);
 							$msg = lang('Format deleted');
 						}
 						else
@@ -373,7 +373,7 @@ class ranking_display_ui extends ranking_display_bo
 					if ($frm['frm_id'] && $frm['frm_line'] != $frm['old_line'] ||
 						!$frm['frm_id'] && $frm['frm_line'])
 					{
-						$this->format->update_lines($frm['frm_id'],$frm['frm_line']);
+						$this->format->update_lines($frm['frm_id'],$frm['frm_line'],$dsp_id,$frm['WetId']);
 					}
 					// replace go-line with frm_id
 					if ($frm['frm_go'] && ($go = $this->format->read(array(
@@ -407,7 +407,7 @@ class ranking_display_ui extends ranking_display_bo
 				case 'delete':
 					if ($this->format->delete($frm))
 					{
-						$this->format->update_lines();
+						$this->format->update_lines(null,null,$dsp_id,$frm['WetId']);
 						$msg = lang('Format deleted');
 					}
 					else

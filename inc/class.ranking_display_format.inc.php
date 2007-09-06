@@ -563,16 +563,28 @@ class ranking_display_format extends so_sql2
 	/**
 	 * Update line-numbers to be continues starting with 1, while ignoring a given frm_id
 	 * 
+	 * You need to specify $dsp_id and $WetId, if they are not set in the internal data (there's no read before)!
+	 * 
 	 * @param int $ignore_id=null if given, id to be ignored
 	 * @param int $ignore_line=null if given, line-number to be skiped
+	 * @param int $dsp_id=null display to use or null to use the display of the current format
+	 * @param int $WetId=null competition to use or null to use the competition of the current format
 	 * @return int number of lines updated
 	 */
-	function update_lines($ignore_id=null,$ignore_line=null)
+	function update_lines($ignore_id=null,$ignore_line=null,$dsp_id=null,$WetId=null)
 	{
+		if (is_null($dsp_id)) $dsp_id = $this->dsp_id;
+		if (is_null($WetId))  $WetId = $this->WetId;
+
+		if (!$dsp_id || !$WetId)
+		{
+			echo "<p>called display_format::update_lines($ignore_id,$ignore_line) with !dsp_id or !WetId!</p>\n".function_backtrace();
+			return false;
+		}
 		$rows = $this->search(array(
-			'dsp_id' => $this->dsp_id,
-			'WetId'  => $this->WetId,
-		),false,'frm_line');
+			'dsp_id' => $dsp_id,
+			'WetId'  => $WetId,
+		),'frm_id,frm_line');
 
 		$updated = 0;
 		$line = 1;
@@ -583,10 +595,11 @@ class ranking_display_format extends so_sql2
 
 			if ($row['frm_line'] != $line)
 			{
-				$this->init(array('frm_id' => $row['frm_id']));
-				$this->save(array(
+				//echo "<p>frm_id=$row[frm_id], dsp_id=$row[dsp_id], WetId=$row[WetId]: frm_line=$row[frm_line]-->$line</p>\n";
+				$this->update(array(
 					'frm_line' => $line,
 					'frm_updated' => time(),
+					'frm_id' => $row['frm_id'],
 				));
 				$updated++;
 			}
