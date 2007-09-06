@@ -16,7 +16,7 @@
 				</row>
 				<row valign="bottom">
 					<textbox id="display[frm_line]" align="center" class="currentLine" size="-2" readonly="true"/>
-					<textbox multiline="true" class="display" id="display[dsp_current]" rows="1" cols="18,$cont[display][dsp_rows],$cont[display][dsp_cols]" readonly="true"/>
+					<textbox multiline="true" class="display" id="display[dsp_current]" rows="{$cont[display][dsp_rows]}" cols="{$cont[display][dsp_cols]}" readonly="true"/>
 					<vbox options="0,0" align="right">
 						<menulist class="selboxesRight">
 							<menupopup align="right" onchange="1" id="display[dsp_id]" label="Display"/>

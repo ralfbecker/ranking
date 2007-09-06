@@ -126,7 +126,18 @@ while(true)
 	{
 		$line = $bo->display->dsp_line;		// it seems php can NOT set as __set() class var via a var param!
 		$athlete = $bo->display->dsp_athletes[$bo->format->GrpId][$bo->format->route_order];
-		$show = $bo->format->get_content($timeout,$line,$next_line,$athlete);
+		if (!$bo->format->GrpId && $bo->display->dsp_athletes['current']['GrpId'])
+		{
+			$GrpId = $bo->display->dsp_athletes['current']['GrpId'];
+			$route_order = $bo->display->dsp_athletes['current']['route_order'];
+		}
+		else
+		{
+			$GrpId = $bo->format->GrpId;
+			$route_order = $bo->format->route_order;
+		}
+		$show = $bo->format->get_content($timeout,$line,$next_line,$athlete,$GrpId,$route_order,
+			$bo->display->dsp_cols,$bo->display->dsp_rows);
 	}
 	$sleep_until = $time + $timeout;
 
@@ -137,6 +148,7 @@ while(true)
 		'dsp_line'    => $line,
 		'dsp_id'      => $dsp_id,
 	));
+	$etag = $bo->display->dsp_etag + 1;
 
 	// output content to display
 	$bo->display->output($show);
@@ -155,9 +167,10 @@ while(true)
 			echo lang('Display #%1 not found!!!',$dsp_id)."\n\n";
 			die_usage();
 		}
-		if ($bo->display->frm_id != $bo->format->frm_id ||	// someone externally changed our current format or athlete --> update display
-			$athlete != $bo->display->dsp_athletes[$bo->format->GrpId][$bo->format->route_order] ||
-			$line != $bo->display->dsp_line)
+		if ($etag != $bo->display->dsp_etag || $bo->display->frm_id != $bo->format->frm_id ||	// someone externally changed our current format or athlete --> update display
+			$athlete != $bo->display->dsp_athletes[$bo->format->GrpId][$bo->format->route_order] /*||
+			$line != $bo->display->dsp_line ||
+			$sleep_until != $bo->display->sleep_until*/)
 		{
 			$next_line = false;
 			break;

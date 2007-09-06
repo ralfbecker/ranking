@@ -55,38 +55,48 @@ class ranking_display_format extends so_sql2
 	 * @param int &$line sub-line
 	 * @param boolean $next_line=false should be advance to the next line (before getting the content)
 	 * @param int/array $athlete athlete data or per-id
-	 * @param int $center=18 center shorter strings for a $center chars wide display by leftpadding them
+	 * @param int $GrpId=null cat to use if format contains none
+	 * @param int $route_order=null route to use if format contains none
+	 * @param int $center=18 center shorter strings for a $center chars wide display by leftpadding them, only if dsp_lines==1
+	 * @param int $dsp_lines=1 number of lines of the display
 	 * @return string
 	 */
-	function get_content(&$showtime,&$line,$next_line=false,$athlete=null,$center=18)
+	function get_content(&$showtime,&$line,$next_line=false,$athlete=null,$GrpId=null,$route_order=null,$center=18,$dsp_lines=1)
 	{
 		$showtime = null;
 		
 		if ($next_line) $line++;
-
+		
+		if (!$this->GrpId && $GrpId)
+		{
+			$this->GrpId = $GrpId;
+			$this->route_order = $route_order;
+		}
 		while(!isset($format))
 		{
 			$lines = explode("\r\n",$this->frm_content);
+			$count_lines = count($lines)/$dsp_lines;
 		
-			if ($line >= count($lines)-1)				// last line or behind
+			if ($line >= $count_lines-1)				// last line or behind
 			{
-				$format = $lines[count($lines)-1];		// use the format of the last line
-				$reread_list = $line == count($lines)-1;	// only read list once at the start of the list
+				$format = implode("\n",array_slice($lines,$dsp_lines*($count_lines-1),$dsp_lines));
+//				$format = $lines[count($lines)-1];		// use the format of the last line
+				$reread_list = $line == $count_lines-1;	// only read list once at the start of the list
 
 				if (strpos($format,'%P') !== false || strpos($format,'%Q') !== false)		// result list
 				{
-					if (!($athlete = $this->_get_athlete('result_rank',1+$line-count($lines),$reread_list))) unset($format);
+					if (!($athlete = $this->_get_athlete('result_rank',1+$line-$count_lines,$reread_list))) unset($format);
 				}
 				elseif (strpos($format,'%S') !== false || strpos($format,'%s') !== false)	// startlist
 				{
-					if (!($athlete = $this->_get_athlete('start_order',1+$line-count($lines),$reread_list))) unset($format);
+					if (!($athlete = $this->_get_athlete('start_order',1+$line-$count_lines,$reread_list))) unset($format);
 				}
-				elseif ($line >= count($lines))			// no list and behind the last line
+				elseif ($line >= $count_lines)			// no list and behind the last line
 				{
 					unset($format);						// --> go to next format
 				}
 			}
-			if ($next_line && !isset($format) && $line >= count($lines))		// no more lines --> advance to the next format
+			if ($next_line && !isset($format) && $line >= $count_lines)		// no more lines --> advance to the next format
 			{
 				$line = 0;
 				if ($this->frm_go_frm_id && !$this->read($this->frm_go_frm_id))
@@ -96,7 +106,11 @@ class ranking_display_format extends so_sql2
 				}
 				continue;
 			}
-			if (!isset($format)) $format = 0 <= $line && $line < count($lines) ? $lines[$line] : $lines[0];
+			if (!isset($format))
+			{
+				$format = implode("\n",array_slice($lines,$dsp_lines*(0 <= $line && $line < $count_lines ? $line : 0),$dsp_lines));	
+				//$format = 0 <= $line && $line < $count_lines ? $lines[$line] : $lines[0];
+			}
 		}
 		list($format,$showtime) = explode('|',$format);	// separate showtime
 		if (!(int)$showtime) $showtime = $this->frm_showtime;
@@ -104,8 +118,16 @@ class ranking_display_format extends so_sql2
 		//echo "<p>ranking_display_format::get_content($showtime,$line,$next_line,$athlete) format='$format'</p>\n";
 		$str = $this->_print_line($format,$athlete);
 		
-		if ($center && ($pad=$center-strlen($str)) > 1) $str = str_repeat(' ',floor($pad/2)).$str;
-		
+		if ($center && $dsp_lines == 1)
+		{
+			if (($pad=$center-strlen($str)) > 1) $str = str_repeat(' ',floor($pad/2)).$str;
+			//$str = explode("\n",$str);
+			//foreach($str as &$s)
+			//{
+			//	if (($pad=$center-strlen($s)) > 1) $s = str_repeat(' ',floor($pad/2)).$s;
+			//}
+			//$str = implode("\n",$str);
+		}
 		return $str;
 	}
 	
@@ -118,7 +140,7 @@ class ranking_display_format extends so_sql2
 	 * @param int $athlete=null get this athlete (PerId) and NOT $pos
 	 * @return array/boolean array with athlete data or false if not found in list
 	 */
-	function _get_athlete($list_type,$pos,$reread_list=true,$athlete=null)
+	function _get_athlete($list_type,$pos,$reread_list=true,$athlete=null,$GrpId=null,$route_order=null)
 	{
 		static $list_cache;
 		if ($reread_list) $list_cache = null;
@@ -277,6 +299,7 @@ class ranking_display_format extends so_sql2
 			case 'Q':	// place/rank
 			case 'h':	// height without comma (3-char)
 			case 'H':	// height with 2 digits behind the comma (6-char)
+			case 't':	// time
 /*
 			       P = Platzierung (zB. "1") \
 			       Q = wie P nur kein ex aquo  \
@@ -401,7 +424,7 @@ class ranking_display_format extends so_sql2
 			's' => 'start_order',
 		);
 		// try reading athlete from the result, if $type contains result data and only an id is given or the array contains no result data
-		if ($athlete && in_array($type{0},array('P','p','Q','h','H','S')) && (!is_array($athlete) || !isset($athlete['start_order'])))
+		if ($athlete && in_array($type{0},array('P','p','Q','h','H','S','t')) && (!is_array($athlete) || !isset($athlete['start_order'])))
 		{
 			if (($a = $this->_get_athlete('start_order',0,true,$athlete))) $athlete = $a;
 		}
@@ -434,6 +457,23 @@ class ranking_display_format extends so_sql2
 				return $athlete['result_plus'] == TOP_PLUS ? 'Top' : sprintf($type{0}=='H'?'%5.2lf%s':'%s%s',
 					$athlete['result_height'],$athlete['result_plus'] ? ($athlete['result_plus']==1?'+':'-'):'');
 				
+			case 't':
+				switch($type{1})
+				{
+					case '1':
+					case 'l':
+						$time = $athlete['result_time'];
+						break;
+					case '2':
+					case 'r':
+						$time = $athlete['result_time_r'];
+						break;
+					default:
+						$time = $athlete['time_sum'];
+						break;
+				}
+				return number_format($time,2);
+
 			case 'P':
 			case 'p':
 			case 'Q':

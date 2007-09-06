@@ -76,9 +76,14 @@ class ranking_time_measurement
 		return true;
 	}
 	
+	/**
+	 * Receive one line from the time device
+	 *
+	 * @return str without "\n"
+	 */
 	function receive()
 	{
-		return fread($this->socket,256);
+		return trim(fgets($this->socket));
 	}
 	
 	/**

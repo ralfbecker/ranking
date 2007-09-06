@@ -222,7 +222,9 @@
 				'dsp_id' => array('type' => 'int','precision' => '4'),
 				'frm_id' => array('type' => 'int','precision' => '4'),
 				'route_time_host' => array('type' => 'varchar','precision' => '64'),
-				'route_time_port' => array('type' => 'int','precision' => '4')
+				'route_time_port' => array('type' => 'int','precision' => '4'),
+				'dsp_id2' => array('type' => 'int','precision' => '4'),
+				'frm_id2' => array('type' => 'int','precision' => '4')
 			),
 			'pk' => array('WetId','GrpId','route_order'),
 			'fk' => array(),
@@ -261,7 +263,7 @@
 				'frm_id' => array('type' => 'int','precision' => '4'),
 				'dsp_ip' => array('type' => 'varchar','precision' => '64'),
 				'dsp_port' => array('type' => 'int','precision' => '4'),
-				'dsp_format' => array('type' => 'varchar','precision' => '128'),
+				'dsp_format' => array('type' => 'varchar','precision' => '255'),
 				'dsp_rows' => array('type' => 'int','precision' => '4','default' => '1'),
 				'dsp_cols' => array('type' => 'int','precision' => '4','default' => '20'),
 				'dsp_remark' => array('type' => 'text'),
@@ -270,7 +272,8 @@
 				'dsp_athletes' => array('type' => 'varchar','precision' => '255'),
 				'dsp_charset' => array('type' => 'varchar','precision' => '32'),
 				'dsp_clone_of' => array('type' => 'int','precision' => '4'),
-				'dsp_access' => array('type' => 'varchar','precision' => '255')
+				'dsp_access' => array('type' => 'varchar','precision' => '255'),
+				'dsp_etag' => array('type' => 'int','precision' => '4','default' => '0')
 			),
 			'pk' => array('dsp_id'),
 			'fk' => array(),
