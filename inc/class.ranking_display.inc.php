@@ -114,7 +114,7 @@ class ranking_display extends so_sql2
 	 */
 	function activate($frm_id,$athlete=null,$dsp_id=null,$GrpId=null,$route_order=null)
 	{
-		error_log("ranking_display::activate($frm_id,$athlete,$dsp_id)");
+		error_log("ranking_display::activate($frm_id,$athlete,$dsp_id,$GrpId,$route_order)");
 		if ($dsp_id && $dsp_id != $this->dsp_id)
 		{
 			$backup = $this->data;
@@ -133,13 +133,17 @@ class ranking_display extends so_sql2
 			require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
 			$format =& new ranking_display_format($this->db);
 		}
+		if (!$format->read($frm_id))
+		{
+			if ($backup) $this->data = $backup;
+			return false;
+		}
+
 		if (!($set_current = ($GrpId && is_numeric($route_order) && !$format->GrpId)))
 		{
 			$GrpId = $format->GrpId;
 			$route_order = $format->route_order;
 		}
-		if (!$format->read($frm_id)) return false;
-
 		$dsp = array(
 			'frm_id'      => $format->frm_id,
 			'dsp_id'      => $this->dsp_id,
@@ -163,6 +167,7 @@ class ranking_display extends so_sql2
 			$GrpId,$route_order,$this->dsp_cols,$this->dsp_rows);
 		$dsp['dsp_timeout'] = microtime(true) + $showtime;
 		$dsp['dsp_line']    = $line;
+error_log("display::activate() calling update(".print_r($dsp,true).")");
 		$this->update($dsp);
 
 		if ($backup) $this->data = $backup;

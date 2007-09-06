@@ -1124,8 +1124,16 @@ class uiresult extends boresult
 			// add display update(s)
 			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
 			$display = new ranking_display($this->db);
-			$dsp_id2 = $route['dsp_id2'] ? $route['dsp_id2'] : $route['dsp_id'];
-			$frm_id2 = $route['frm_id2'] ? $route['frm_id2'] : $route['frm_id'];
+			if ($route['dsp_id2'] && $route['frm_id2'])
+			{
+				$dsp_id2 = $route['dsp_id2'];
+				$frm_id2 = $route['frm_id2'];
+			}
+			else
+			{
+				$dsp_id2 = $route['dsp_id'];
+				$frm_id2 = $route['frm_id'];
+			}
 			$display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
 			if ($other_athlete) $display->activate($frm_id2,$other_PerId,$dsp_id2,$keys['GrpId'],$keys['route_order']);
 		}
