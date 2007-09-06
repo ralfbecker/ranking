@@ -674,6 +674,22 @@
 	$test[] = '1.4';
 	function ranking_upgrade1_4()
 	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_time_host',array(
+			'type' => 'varchar',
+			'precision' => '64'
+		));
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_time_port',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+		
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4.001';
+	}
+	
+
+	$test[] = '1.4.001';
+	function ranking_upgrade1_4_001()
+	{
 		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','dsp_id2',array(
 			'type' => 'int',
 			'precision' => '4'
@@ -688,7 +704,7 @@
 	
 
 	$test[] = '1.4.002';
-	function ranking_upgrade1_4_001()
+	function ranking_upgrade1_4_002()
 	{
 		$GLOBALS['egw_setup']->oProc->AddColumn('Displays','dsp_etag',array(
 			'type' => 'int',
