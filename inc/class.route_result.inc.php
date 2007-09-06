@@ -520,7 +520,8 @@ class route_result extends so_sql
 			}
 			else
 			{
-				$data['result_time'] = round(1000 * ($data['result_time']+$data['result_time_r']));
+				$data['result_time'] = $data['result_time']+$data['result_time_r'] ? 
+					round(1000 * ($data['result_time']+$data['result_time_r'])) : null;
 			}
 		}
 		elseif ($data['result_time'] || isset($data['eliminated']))	// speed with result on only one route

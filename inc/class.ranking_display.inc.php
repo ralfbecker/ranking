@@ -15,6 +15,8 @@ require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.so_sql2.inc.php');
 
 class ranking_display extends so_sql2
 {
+	var $content;
+
 	/**
 	 * Constructor
 	 *
@@ -72,14 +74,33 @@ class ranking_display extends so_sql2
 					break;
 			}
 		}
+		// allow for more addvanded replacements then print: {{line:start:length}}
+		$this->content = $str;
+		$format = preg_replace_callback('/{{(\d+):(\d+):(\d+)}}/',array($this,'replace_content'),$dsp_format);
+
 		// output content to display
-		if (!fprintf($fdisplay,$dsp_format,$str))
+		if (!fprintf($fdisplay,$format,$str))
 		{
 			echo lang('Error writing to display!!!')."\n";
 			$fdisplay = null;	// try reconnect
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * callback for preg_replace_callback to do replacements for {{line:start:length}}
+	 * 
+	 * The content to replace is in the class-var $this->content!
+	 *
+	 * @param array $matches array('{{line:start:length}}',line,start,length)
+	 * @return string
+	 */
+	function replace_content($matches)
+	{
+		$lines = explode("\n",$this->content);
+		
+		return substr($lines[(int)$matches[1]],$matches[2],$matches[3]);
 	}
 
 	/**
@@ -88,10 +109,12 @@ class ranking_display extends so_sql2
 	 * @param int/array $frm_id id or keys of the format to activate
 	 * @param int $athlete=null athlete for the active line
 	 * @param int $dsp_id=null display id if not this display
+	 * @param int $GrpId=null default null = use category from format
+	 * @param int $route_order=null default null = use route from format
 	 */
-	function activate($frm_id,$athlete=null,$dsp_id=null)
+	function activate($frm_id,$athlete=null,$dsp_id=null,$GrpId=null,$route_order=null)
 	{
-		//echo "activate($frm_id,$athlete,$dsp_id)";
+		error_log("ranking_display::activate($frm_id,$athlete,$dsp_id)");
 		if ($dsp_id && $dsp_id != $this->dsp_id)
 		{
 			$backup = $this->data;
@@ -110,19 +133,34 @@ class ranking_display extends so_sql2
 			require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
 			$format =& new ranking_display_format($this->db);
 		}
+		if (!($set_current = ($GrpId && is_numeric($route_order) && !$format->GrpId)))
+		{
+			$GrpId = $format->GrpId;
+			$route_order = $format->route_order;
+		}
 		if (!$format->read($frm_id)) return false;
 
 		$dsp = array(
 			'frm_id'      => $format->frm_id,
 			'dsp_id'      => $this->dsp_id,
 		);
-		if (!is_null($athlete) && $format->GrpId && is_numeric($format->route_order))
+		if (!is_null($athlete) && $GrpId && is_numeric($route_order))
 		{
-			if (!is_array($this->dsp_athletes)) $this->dsp_athletes = array();
-			$this->dsp_athletes[$format->GrpId][$format->route_order] = $athlete;
+			// $this->dsp_athletes[$format->GrpId][$format->route_order] = $athlete; does NOT work in php5.2 on SuSE10.2!
 			$dsp['dsp_athletes'] = $this->dsp_athletes;
+			if (!is_array($dsp['dsp_athletes'])) $dsp['dsp_athletes'] = array();
+			$dsp['dsp_athletes'][$format->GrpId][$format->route_order] = $athlete;
+			if ($set_current)
+			{
+				$dsp['dsp_athletes']['current'] = array(
+					'GrpId' => $GrpId,
+					'route_order' => $route_order,
+				);
+			}
+			$this->dsp_athletes = $dsp['dsp_athletes'];
 		}
-		$dsp['dsp_current'] = $format->get_content($showtime,$line=0,false,$this->dsp_athletes[$format->GrpId][$format->route_order]);
+		$dsp['dsp_current'] = $format->get_content($showtime,$line=0,false,$this->dsp_athletes[$format->GrpId][$format->route_order],
+			$GrpId,$route_order,$this->dsp_cols,$this->dsp_rows);
 		$dsp['dsp_timeout'] = microtime(true) + $showtime;
 		$dsp['dsp_line']    = $line;
 		$this->update($dsp);
@@ -209,5 +247,19 @@ class ranking_display extends so_sql2
 			$data['dsp_access'] = implode(',',$data['dsp_access']);
 		}
 		return $data;
+	}
+	
+	/**
+	 * Reimplemented to always increment a column 'dsp_etag' as modification counter
+	 *
+	 * @param array $keys=null
+	 * @return int 0 on success, errno != 0 otherwise
+	 */
+	function save($keys=null)
+	{
+		if (!$keys) $keys = array();
+		$keys[] = 'dsp_etag=dsp_etag+1';
+		
+		return parent::save($keys);
 	}
 }

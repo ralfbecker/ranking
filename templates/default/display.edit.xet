@@ -28,7 +28,7 @@
 				</row>
 				<row class="row" valign="top">
 					<description value="Format"/>
-					<textbox multiline="true" rows="5" cols="20" span="2" class="display" id="frm_content"/>
+					<textbox multiline="true" rows="6" cols="28" span="2" class="display" id="frm_content"/>
 				</row>
 				<row class="row">
 					<description value="Time"/>

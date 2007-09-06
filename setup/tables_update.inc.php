@@ -691,3 +691,36 @@
 
 		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4.001';
 	}
+
+	$test[] = '1.4.001';
+	function ranking_upgrade1_4_001()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','dsp_id2',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','frm_id2',array(
+			'type' => 'int',
+			'precision' => '4'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4.002';
+	}
+	
+
+	$test[] = '1.4.002';
+	function ranking_upgrade1_4_001()
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Displays','dsp_etag',array(
+			'type' => 'int',
+			'precision' => '4',
+			'default' => '0'
+		));
+		$GLOBALS['egw_setup']->oProc->AlterColumn('Displays','dsp_format',array(
+			'type' => 'varchar',
+			'precision' => '255'
+		));
+
+		return $GLOBALS['setup_info']['ranking']['currentver'] = '1.4.003';
+	}
+?>

@@ -72,7 +72,7 @@ class uiresult extends boresult
 					{
 						$keys['route_order'] = 2;
 					}
-					foreach(array('route_type','dsp_id','frm_id','route_time_host','route_time_port') as $name)
+					foreach(array('route_type','dsp_id','frm_id','dsp_id2','frm_id2','route_time_host','route_time_port') as $name)
 					{
 						$keys[$name] = $previous[$name];
 					}
@@ -155,6 +155,11 @@ class uiresult extends boresult
 							'dsp_id' => $content['dsp_clone_of'] ? $content['dsp_clone_of'] : $content['dsp_id'],
 							'WetId'  => $content['WetId'],
 							'frm_line' => $content['frm_line'],
+						)) ? $format->frm_id : 0;
+						$content['frm_id2'] = $format->read(array(
+							'dsp_id' => $content['dsp_clone_of2'] ? $content['dsp_clone_of2'] : $content['dsp_id2'],
+							'WetId'  => $content['WetId'],
+							'frm_line' => $content['frm_line2'],
 						)) ? $format->frm_id : 0;
 					}
 					//_debug_array($content);
@@ -315,7 +320,7 @@ class uiresult extends boresult
 				}
 			}
 		}
-		foreach(array('new_route','route_type','route_order','dsp_id','frm_id') as $name)
+		foreach(array('new_route','route_type','route_order','dsp_id','frm_id','dsp_id2','frm_id2') as $name)
 		{
 			$preserv[$name] = $content[$name];
 		}
@@ -362,25 +367,31 @@ class uiresult extends boresult
 			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
 			$display =& new ranking_display($this->db);
 			// display selection, only if user has rights on the displays
-			if (($sel_options['dsp_id'] = $display->displays()))
+			if (($sel_options['dsp_id'] = $sel_options['dsp_id2'] = $display->displays()))
 			{
 				$content['no_display'] = false;
-				if ($content['dsp_id'] && $display->read($content['dsp_id']))
+				foreach(array('','2') as $num)
 				{
-					$preserv['dsp_clone_of'] = $display->dsp_clone_of;
-					
-					include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
-					$format = new ranking_display_format($this->db);
-					if ($content['frm_id'] && $format->read($content['frm_id']))
+					if ($content['dsp_id'.$num] && $display->read($content['dsp_id'.$num]))
 					{
-						$content['frm_line'] = $format->frm_line;
+						$preserv['dsp_clone_of'.$num] = $display->dsp_clone_of;
+						
+						if (is_null($format))
+						{
+							include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
+							$format = new ranking_display_format($this->db);
+						}
+						if ($content['frm_id'.$num] && $format->read($content['frm_id'.$num]))
+						{
+							$content['frm_line'.$num] = $format->frm_line;
+						}
+						$content['max_line'.$num] = $format->max_line(array(
+							'dsp_id' => $display->dsp_clone_of ? $display->dsp_clone_of : $display->dsp_id,
+							'WetId'  => $content['WetId'],
+						));
 					}
-					$content['max_line'] = $format->max_line(array(
-						'dsp_id' => $display->dsp_clone_of ? $display->dsp_clone_of : $display->dsp_id,
-						'WetId'  => $content['WetId'],
-					));
+					if (!$content['max_line'.$num]) $content['max_line'.$num] = 1;
 				}
-				if (!$content['max_line']) $content['max_line'] = 1;					
 			}
 		}
 		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
@@ -939,11 +950,11 @@ class uiresult extends boresult
 						// add display update(s)
 						include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
 						$display = new ranking_display($this->db);
-						$display->activate($frm_id,$athlete,$dsp_id);
+						$display->activate($frm_id,$athlete,$dsp_id,$keys['GrpId'],$keys['route_order']);
 					}
 					if ($new_result && $new_result['result_rank'] != $old_result['result_rank'])	// the ranking has changed
 					{
-						$response->addScript('document.eTemplate.submit();');						// --> submit the form to reload the page
+						$this->_update_ranks($keys,$response,$request);
 					}
 				}
 				//if ($msg) $response->addAlert($msg);
@@ -1050,13 +1061,13 @@ class uiresult extends boresult
 			{
 				$other_sorder = $old_result['start_order'] + ($route['route_order'] >= 2 ? ($old_result['start_order']&1 ? 1 : -1) : -1);
 			}
-			list($old_other) = $this->route_result->search($keys+array('start_order'=>$other_sorder),false);
+			if ($other_sorder) list($old_other) = $this->route_result->search($keys+array('start_order'=>$other_sorder),false);
 			if (!$old_other)
 			{
 				if ($route['route_order'] < 2)
 				{
 					// last participant starting on right
-					$side1 = $side = 'r';
+					$side1 = $side = $other_sorder ? 'r' : 'l';
 				}
 				else
 				{
@@ -1108,12 +1119,15 @@ class uiresult extends boresult
 		}
 		$timy->send('notify:'.$side);
 		
-		if(($dsp_id=$route->data['dsp_id']) && ($frm_id=$route->data['frm_id']))
+		if(($dsp_id=$route['dsp_id']) && ($frm_id=$route['frm_id']))
 		{
 			// add display update(s)
 			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
 			$display = new ranking_display($this->db);
-			$display->activate($frm_id,$PerId,$dsp_id);
+			$dsp_id2 = $route['dsp_id2'] ? $route['dsp_id2'] : $route['dsp_id'];
+			$frm_id2 = $route['frm_id2'] ? $route['frm_id2'] : $route['frm_id'];
+			$display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
+			if ($other_athlete) $display->activate($frm_id2,$other_PerId,$dsp_id2,$keys['GrpId'],$keys['route_order']);
 		}
 		//error_log("***** waiting for Timy responses ...");
 		$stop = $ranking_changed = false;
@@ -1121,8 +1135,8 @@ class uiresult extends boresult
 		{
 			if (!($str = $timy->receive()) && !$timy->is_connected()) break;
 
-			list($event_side,$event,$time) = explode(':',trim($str));
-			//error_log("timy->receive()=$side:$event:$time");
+			list($event_side,$event,$time,$time2) = explode(':',$str);
+			error_log("timy->receive()=".$str);
 
 			switch($event)
 			{
@@ -1130,14 +1144,14 @@ class uiresult extends boresult
 					if (!$side && $event_side == 'l') continue;	// ignore 2. start event
 					if (is_object($display))
 					{
-						$display->activate($frm_id,$PerId,$dsp_id);
-						if ($other_athlete) $display->activate($frm_id,$other_PerId,$dsp_id);
+						$display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
+						if ($other_athlete) $display->activate($frm_id2,$other_PerId,$dsp_id2,$keys['GrpId'],$keys['route_order']);
 					}
 					break;
 					
 				case 'stop':
 					$result = $event_side == 'l' ? 'result_time' : 'result_time_r';
-					if ($event_side == $side1)	// one side only or side1
+					if ($event_side == $side1)	// side1
 					{
 						$this->save_result($keys,array($PerId=>array(
 							$result => $time,
@@ -1149,7 +1163,7 @@ class uiresult extends boresult
 						{
 							$ranking_changed = true;
 						}
-						if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id);
+						if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
 					}
 					else	// other participant
 					{
@@ -1163,19 +1177,22 @@ class uiresult extends boresult
 						{
 							$ranking_changed = true;
 						}
-						if (is_object($display)) $display->activate($frm_id,$other_PerId,$dsp_id);
+						if (is_object($display)) $display->activate($frm_id2,$other_PerId,$dsp_id2,$keys['GrpId'],$keys['route_order']);
 					}
 					if ($side || isset($new_result) && isset($new_other_result))	// all athletes measured
 					{
-						if ($ranking_changed)  $response->addScript('document.eTemplate.submit();');	// --> submit the form to reload the page
+						if ($ranking_changed)
+						{
+							$this->_update_ranks($keys,$response,$request);
+						}
 						$stop = true;
 					}
 					break;
 					
 				case 'false':
-					// ToDo handle it ...
-					if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id);
-					$response->addAlert(lang('False start %1: %2',$event_side=='r'?lang('right'):lang('left'),$time));
+					$response->addAlert(lang('False start %1: %2',$event_side != 'r' ? lang('left') : lang('right'),
+						$event_side != 'b' ? $time : $time2).($event_side == 'b' ? ', '.lang('right').': '.$time : ''));
+					//if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
 					$stop = true;
 					break;
 			}
@@ -1189,6 +1206,24 @@ class uiresult extends boresult
 		}
 		//error_log("processing of ajax_time_measurement took ".sprintf('%4.2lf s',microtime(true)-$start));
 		return $this->_stop_time_measurement($response,lang('Time measured'));
+	}
+	
+	function _update_ranks(array $keys,xajaxResponse &$response,etemplate_request &$request)
+	{
+error_log("content[order]=".$request->content['nm']['order'].", changes[order]=".$request->changes['nm']['order']);
+		$order = $request->changes['nm']['order'] ? $request->changes['nm']['order'] : $request->content['nm']['order'];
+
+		if ($order != 'result_rank')	// --> update only the rank-values
+		{
+			foreach($this->route_result->search($keys,array('PerId','result_rank'),'','','',false,'AND',false,$keys) as $data)
+			{
+				$response->addAssign("set[$data[PerId]][result_rank]",'innerHTML',$data['result_rank']);
+			}
+		}
+		else							// --> submit the form to reload the page
+		{
+			$response->addScript('document.eTemplate.submit();');
+		}
 	}
 	
 	/**

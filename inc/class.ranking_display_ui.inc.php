@@ -263,7 +263,7 @@ class ranking_display_ui extends ranking_display_bo
 
 		if (is_null($display) && ($display = $this->display) && !$display->read($dsp_id))
 		{
-			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes(lang('Display #%1 not found!!!',$dsp_id))."';");
+			$response->addAssign('exec[display][dsp_current]','value',lang('Display #%1 not found!!!',$dsp_id));
 		}
 		else
 		{
@@ -282,8 +282,8 @@ class ranking_display_ui extends ranking_display_bo
 			// calculate how long the javascript timeout can be (in ms)
 			$sleep = $this->_calc_sleep_time($display);			
 			$line = $display->frm_id && $this->format->read($display->frm_id) ? $this->format->frm_line : '';
-			$response->addScript("document.getElementById('exec[display][frm_line]').value='".addslashes($line)."';");
-			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes($display->dsp_current)."';");
+			$response->addAssign('exec[display][frm_line]','value',$line);
+			$response->addAssign('exec[display][dsp_current]','value',$display->dsp_current);
 			$response->addScript("timeout=window.setTimeout('xajax_doXMLHTTP(\"ranking.ranking_display_ui.ajax_update\",$dsp_id,$lu);',$sleep);");
 		}
 		return $response->getXML();

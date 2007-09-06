@@ -222,6 +222,7 @@ function handle_time($str)
 {
 	global $timy,$times,$left_sequence, $right_sequence, $left_mstart, $right_mstart;
 	static $left_fstart, $right_fstart, $left_false, $right_false;
+	global $left_notify, $right_notify,$precision;
 
 	if (is_numeric($str{0})) return;	// ignore 1/10s timestamp of pc-timer mode
 	
@@ -262,64 +263,77 @@ function handle_time($str)
 	if (is_numeric($channel))	// $channel===null, matches 0 otherwise!
 	switch($channel)
 	{
-		case 0:	// right start
-			$right_mstart = microtime(true);
-			$right_fstart = $time;
-			if ($right_false && $right_false < $right_fstart && $right_fstart-$right_false < FALSE_START_DISTANCE)
+		case 3:	// left start (reported after right)
+			if ($left_notify == $right_notify) break;	// both channel are used by same client --> ignore left/second start
+			// fall through
+		case 0:	// right start (reported first)
+			$false_starts = array();
+			if ($channel == 0 || $left_notify == $right_notify)
 			{
-				notify_clients(true,'false',$time = timy_round($right_false-$right_fstart));
-				$right_fstart = $right_mstart = null;
-				$times[_sequence2startnr($sequence)] = $time;
-				fwrite($timy,'DTP '.$sequence.'lSZ  '.$t_str."\n");	// print start-time
-				fwrite($timy,'DTP'._sequence2startnr($sequence).': false right '.$time."\n");
+				$right_mstart = microtime(true);
+				$right_fstart = $time;
+				if ($right_false && $right_false < $right_fstart && $right_fstart-$right_false < FALSE_START_DISTANCE)
+				{
+					$times[_sequence2startnr($sequence)] = $ftime = timy_round($right_false-$right_fstart);
+					$right_fstart = $right_mstart = null;
+					fwrite($timy,'DTP '.$sequence.'lSZ  '.$t_str."\n");	// print start-time
+					fwrite($timy,'DTP'._sequence2startnr($sequence).': false right '.number_format($ftime,$precision)."\n");
+					$false_starts['r'] = $ftime;
+				}
+				else
+				{
+					notify_clients('right','start',$time);
+				}
 			}
-			else
+			if ($channel == 3 || $left_notify == $right_notify)
 			{
-				notify_clients(true,'start',$time);
+				if ($channel != 3) $sequence = $left_sequence;
+				$left_mstart = $right_mstart ? $right_mstart : microtime(true);
+				$left_fstart = $time;
+				if ($left_false && $left_false < $left_fstart && $left_fstart-$left_false < FALSE_START_DISTANCE)
+				{
+					$times[_sequence2startnr($sequence)] = $ftime = timy_round($left_false-$left_fstart);
+					$left_fstart = $left_mstart = null;
+					fwrite($timy,'DTP '.$sequence.'rSZ  '.$t_str."\n");	// print start-time
+					fwrite($timy,'DTP'._sequence2startnr($sequence).': false left '.number_format($ftime,$precision)."\n");
+					$false_starts['l'] = $ftime;
+				}
+				else
+				{
+					notify_clients('left','start',$time);
+				}
 			}
-			break;
-		
-		case 3:	// left start
-			$left_mstart = $right_mstart ? $right_mstart : microtime(true);
-			$left_fstart = $time;
-			if ($left_false && $left_false < $left_fstart && $left_fstart-$left_false < FALSE_START_DISTANCE)
+			if ($false_starts)
 			{
-				notify_clients(false,'false',$time = timy_round($left_false-$left_fstart));
-				$left_fstart = $left_mstart = null;
-				$times[_sequence2startnr($sequence)] = $time;
-				fwrite($timy,'DTP '.$sequence.'rSZ  '.$t_str."\n");	// print start-time
-				fwrite($timy,'DTP'._sequence2startnr($sequence).': false left '.$time."\n");
-			}
-			else
-			{
-				notify_clients($channel==0,'start',$time);
+				$which = count($false_starts) == 2 ? 'both' : (isset($false_starts['r']) ? true : false);
+				notify_clients($which,'false',$which ? $false_starts['r'] : $false_starts['l'],$false_starts['l']);
 			}
 			break;
 		
 		case 1:		// right stop
 			$time = timy_round($time - $right_fstart);
 			$times[_sequence2startnr($sequence)] += $time;
-			notify_clients(true,'stop',$time);
+			notify_clients('right','stop',$time);
 			$right_fstart = $right_mstart = null;
 			break;
 			
 		case 4:	// left stop
 			$time = timy_round($time - $left_fstart);
 			$times[_sequence2startnr($sequence)] += $time;
-			notify_clients(false,'stop',$time);
+			notify_clients('left','stop',$time);
 			$left_fstart = $left_mstart = null;
 			break;
 /*
 		case 22:	// right time (DUAL TIMER programm)
 			$times[_sequence2startnr($sequence)] += $time;
 			$right_fstart = $right_mstart = null;
-			notify_clients(true,'stop',$time);
+			notify_clients('right','stop',$time);
 			break;
 
 		case 23:	// left time (DUAL TIMER programm)
 			$times[_sequence2startnr($sequence)] += $time;
 			$left_fstart = $left_mstart = null;
-			notify_clients(false,'stop',$time);
+			notify_clients('left','stop',$time);
 			break;
 */	
 		case 2:	// right false start
@@ -462,22 +476,23 @@ function _get_free_sequence($snr)
 /**
  * Notify subscribed clients
  *
- * @param boolean $right true: right, false: left
+ * @param string $which "left", "right" or "both"
  * @param string $event eg. start, stop, false
  * @param double $time
+ * @param double $time2=null left time if $which == 'both'
  * @return int/boolean number of bytes written to client, false on eof
  */
-function notify_clients($right,$event,$time)
+function notify_clients($which,$event,$time,$time2=null)
 {
 	// clients to notify on finished or aborted measurements
 	global $left_notify, $right_notify;
 	global $precision;
 	
-	if ($right)
+	if ($which !== 'left')	// right or both
 	{
 		$client =& $right_notify;
 	}
-	else
+	else	// left
 	{
 		$client =& $left_notify;	
 	}
@@ -488,7 +503,11 @@ function notify_clients($right,$event,$time)
 		$client = null;
 		return false;
 	}
-	return fwrite($client,($right ? 'r' : 'l').':'.$event.':'.$time."\n");
+	$str = $which{0}.':'.$event.':'.number_format($time,$precision).($which == 'both' ? ':'.number_format($time2,$precision) : '');
+	
+	echo "notify_clients($which,$event,$time,$time2): $str\n";
+
+	return fwrite($client,$str."\n");
 }
 
 /**
