@@ -123,6 +123,7 @@ class ranking_display_format extends so_sql2
 					{
 						break;	// no format select --> leave foreach loop
 					}
+					$reread_list = false;
 				}
 				if ($multiline_advanced) $line--;			// we need to go back one, as we are at the end of the format
 
