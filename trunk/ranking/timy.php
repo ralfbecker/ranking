@@ -305,7 +305,7 @@ function handle_time($str)
 			}
 			if ($false_starts)
 			{
-				$which = count($false_starts) == 2 ? 'both' : (isset($false_starts['r']) ? true : false);
+				$which = count($false_starts) == 2 ? 'both' : (isset($false_starts['r']) ? 'right' : 'left');
 				notify_clients($which,'false',$which ? $false_starts['r'] : $false_starts['l'],$false_starts['l']);
 			}
 			break;
