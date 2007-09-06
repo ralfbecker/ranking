@@ -63,6 +63,7 @@ class ranking_display_format extends so_sql2
 	 */
 	function get_content(&$showtime,&$line,$next_line=false,$athlete=null,$GrpId=null,$route_order=null,$center=18,$dsp_lines=1)
 	{
+		//echo "display_format::get_content(,line=$line,next_line=$next_line,$athlete,$GrpId,$route_order,$center,$dsp_lines)\n";
 		$showtime = null;
 		
 		if ($next_line) $line++;
@@ -79,21 +80,60 @@ class ranking_display_format extends so_sql2
 		
 			if ($line >= $count_lines-1)				// last line or behind
 			{
-				$format = implode("\n",array_slice($lines,$dsp_lines*($count_lines-1),$dsp_lines));
-//				$format = $lines[count($lines)-1];		// use the format of the last line
 				$reread_list = $line == $count_lines-1;	// only read list once at the start of the list
+				foreach($all=array_slice($lines,$dsp_lines*($count_lines-1),$dsp_lines) as $format)
+				{
+					$multiline_advanced = false;
+	
+					if (strpos($format,'%P') !== false || strpos($format,'%Q') !== false)		// result list
+					{
+						if (!($athlete = $this->_get_athlete('result_rank',1+$line-$count_lines,$reread_list)))
+						{
+							unset($format);
+						}
+						elseif ($dsp_lines > 1)		// on multiline we need to advance to the next line anyway
+						{
+							$line++;
+							$multiline_advanced = true;
+						}
+					}
+					elseif (strpos($format,'%S') !== false || strpos($format,'%s') !== false)	// startlist
+					{
+						if (!($athlete = $this->_get_athlete('start_order',1+$line-$count_lines,$reread_list)))
+						{
+							unset($format);
+						}
+						elseif ($dsp_lines > 1)		// on multiline we need to advance to the next line anyway
+						{
+							$line++;
+							$multiline_advanced = true;
+						}
+					}
+					elseif ($line >= $count_lines &&			// no list and behind the last line
+							($dsp_lines == 1 || $line >= 99999 || !preg_match('/%[SsPQ]./',implode("\n",$all))))
+					{
+						unset($format);					// --> go to next format
+					}
+					if (isset($format))
+					{
+						list($format,$showtime) = explode('|',$format);	// separate showtime
+						$str[] = $this->_print_line($format,$athlete);
+					}
+					else
+					{
+						break;	// no format select --> leave foreach loop
+					}
+				}
+				if ($multiline_advanced) $line--;			// we need to go back one, as we are at the end of the format
 
-				if (strpos($format,'%P') !== false || strpos($format,'%Q') !== false)		// result list
+				if ($str)									// do we have some content (on multiline we can have content AND !isset($format)
 				{
-					if (!($athlete = $this->_get_athlete('result_rank',1+$line-$count_lines,$reread_list))) unset($format);
-				}
-				elseif (strpos($format,'%S') !== false || strpos($format,'%s') !== false)	// startlist
-				{
-					if (!($athlete = $this->_get_athlete('start_order',1+$line-$count_lines,$reread_list))) unset($format);
-				}
-				elseif ($line >= $count_lines)			// no list and behind the last line
-				{
-					unset($format);						// --> go to next format
+					$str = implode("\n",$str);
+					if (!isset($format))					// we run out of athlets in a multiline, but already had some content
+					{
+						$format = false;					// --> we need to display this first
+						$line = 99999;						// --> the next "line"/display we need to go to the next format
+					}
 				}
 			}
 			if ($next_line && !isset($format) && $line >= $count_lines)		// no more lines --> advance to the next format
@@ -109,24 +149,15 @@ class ranking_display_format extends so_sql2
 			if (!isset($format))
 			{
 				$format = implode("\n",array_slice($lines,$dsp_lines*(0 <= $line && $line < $count_lines ? $line : 0),$dsp_lines));	
-				//$format = 0 <= $line && $line < $count_lines ? $lines[$line] : $lines[0];
+				list($format,$showtime) = explode('|',$format);	// separate showtime
+				$str = $this->_print_line($format,$athlete);
 			}
 		}
-		list($format,$showtime) = explode('|',$format);	// separate showtime
 		if (!(int)$showtime) $showtime = $this->frm_showtime;
 
-		//echo "<p>ranking_display_format::get_content($showtime,$line,$next_line,$athlete) format='$format'</p>\n";
-		$str = $this->_print_line($format,$athlete);
-		
-		if ($center && $dsp_lines == 1)
+		if ($center && $dsp_lines == 1 && ($pad=$center-strlen($str)) > 1)	// we center only single line displays!
 		{
-			if (($pad=$center-strlen($str)) > 1) $str = str_repeat(' ',floor($pad/2)).$str;
-			//$str = explode("\n",$str);
-			//foreach($str as &$s)
-			//{
-			//	if (($pad=$center-strlen($s)) > 1) $s = str_repeat(' ',floor($pad/2)).$s;
-			//}
-			//$str = implode("\n",$str);
+			$str = str_repeat(' ',floor($pad/2)).$str;
 		}
 		return $str;
 	}
