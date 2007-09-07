@@ -94,13 +94,13 @@ class ranking_display extends so_sql2
 	 * The content to replace is in the class-var $this->content!
 	 *
 	 * @param array $matches array('{{line:start:length}}',line,start,length)
-	 * @return string
+	 * @return string padded to length chars!
 	 */
 	function replace_content($matches)
 	{
 		$lines = explode("\n",$this->content);
 		
-		return substr($lines[(int)$matches[1]],$matches[2],$matches[3]);
+		return substr($lines[(int)$matches[1]].str_repeat(' ',$this->dsp_cols),$matches[2],$matches[3]);
 	}
 
 	/**
@@ -114,7 +114,7 @@ class ranking_display extends so_sql2
 	 */
 	function activate($frm_id,$athlete=null,$dsp_id=null,$GrpId=null,$route_order=null)
 	{
-		error_log("ranking_display::activate($frm_id,$athlete,$dsp_id,$GrpId,$route_order)");
+		//error_log("ranking_display::activate($frm_id,$athlete,$dsp_id,$GrpId,$route_order)");
 		if ($dsp_id && $dsp_id != $this->dsp_id)
 		{
 			$backup = $this->data;
@@ -167,7 +167,7 @@ class ranking_display extends so_sql2
 			$GrpId,$route_order,$this->dsp_cols,$this->dsp_rows);
 		$dsp['dsp_timeout'] = microtime(true) + $showtime;
 		$dsp['dsp_line']    = $line;
-error_log("display::activate() calling update(".print_r($dsp,true).")");
+
 		$this->update($dsp);
 
 		if ($backup) $this->data = $backup;
