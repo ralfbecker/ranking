@@ -22,7 +22,6 @@ error_reporting(E_ALL & ~E_NOTICE);
 if (!extension_loaded('mbstring')) dl('mbstring.so');
 if (ini_get('mbstring.func_overload') != 7) echo "mbstring.func_overload=7 required!!!\n\n";
 
-//$_SERVER['argc']=3; $_SERVER['argv']=array('display.php','ralf','ralbec32');
 if (isset($_SERVER['HTTP_HOST']))	// security precaution: forbit calling Timy demon as web-page
 {
 	die('<h1>timy.php must NOT be called as web-page --> exiting !!!</h1>');
@@ -125,10 +124,10 @@ if (preg_match('/^RR([0-2].)/',fgets($timy),$matches)) $precision = (int) $match
 echo "Timy configured for precision $precision (digits behind the dot) and rounding mode $rounding (0=floor, 1=ceil, 2=round)\n";
 
 define('DIAG_DISPLAY',"\r%04d: %7.{$precision}lfs  %04d: %7.{$precision}lfs");
-//gestopt: A016C        5:18.02
-//laufend: B015.        7:45
-//zwisch.: B015A        7:13.60
-define('DISPLAY_FORMAT',($display_interface=='php://stdout'?"\n":'')."A%03d%s       %2.2s %s\nB%03d%s       %2.2s %s\n");
+//stoped:       A016C        5:18.02
+//running:      B015.        7:45
+//intermediate: B015A        7:13.60        
+define('DISPLAY_FORMAT',"A%03d%s       %2.2s:%s   \rB%03d%s       %2.2s:%s   \r");
 
 // event loop
 global $times,$left_sequence, $right_sequence, $left_mstart, $right_mstart;
@@ -306,7 +305,7 @@ function handle_time($str)
 			if ($false_starts)
 			{
 				$which = count($false_starts) == 2 ? 'both' : (isset($false_starts['r']) ? 'right' : 'left');
-				notify_clients($which,'false',$which ? $false_starts['r'] : $false_starts['l'],$false_starts['l']);
+				notify_clients($which,'false',$which != 'left' ? $false_starts['r'] : $false_starts['l'],$false_starts['l']);
 			}
 			break;
 		
@@ -378,9 +377,9 @@ function handle_display()
 		//$ltime = number_format($ltime + $now - $left_mstart,$precision);
 		$ltime = number_format($ltime + $now - $left_mstart,1).str_repeat(' ',$precision-1);
 		//$ltime = round($ltime + $now - $left_mstart).'.'.str_repeat(' ',$precision);
-		$ltype = '.';
+		// supresses tenth! $ltype = '.';
 	}
-	$lsec = substr($ltime,-3-$precision);		// 2-digit seconds plus precsion
+	$lsec = substr('  '.$ltime,-3-$precision);		// 2-digit seconds plus precsion
 	$lmin = substr('  '.$ltime,-3-$precision-2,2);	// 2-digit "minutes" hundred+thausend seconds
 
 	$rsnr = _sequence2startnr($right_sequence);
@@ -391,17 +390,18 @@ function handle_display()
 		//$rtime = number_format($rtime + $now - $right_mstart,$precision);
 		$rtime = number_format($rtime + $now - $right_mstart,1).str_repeat(' ',$precision-1);
 		//$rtime = round($rtime + $now - $right_mstart).'.'.str_repeat(' ',$precision);
-		$rtype = '.';
+		// supresses tenth! $rtype = '.';
 	}
-	$rsec = substr($rtime,-3-$precision);	// 2-digit seconds plus precsion
+	$rsec = substr('  '.$rtime,-3-$precision);	// 2-digit seconds plus precsion
 	$rmin = substr('  '.$rtime,-3-$precision-2,2);	// 2-digit "minutes" hundred+thausend seconds
 
 	if (DIAG_DISPLAY)
 	{
 		printf(DIAG_DISPLAY,$left_sequence,$ltime,$right_sequence,$rtime);
 	}
-//define('DISPLAY_FORMAT',"A%03d%s       %2.2s %s\nB%03d%s       %2.2s %s\n");
+	//define('DISPLAY_FORMAT',"A%03d%s       %2.2s:%s   \rB%03d%s       %2.2s:%s   \r");
 	$str = sprintf(DISPLAY_FORMAT,$rsnr,$rtype,$rmin,$rsec,$lsnr,$ltype,$lmin,$lsec);
+
 	foreach($displays as $display)
 	{
 		fwrite($display,$str);
@@ -505,7 +505,7 @@ function notify_clients($which,$event,$time,$time2=null)
 	}
 	$str = $which{0}.':'.$event.':'.number_format($time,$precision).($which == 'both' ? ':'.number_format($time2,$precision) : '');
 	
-	echo "notify_clients($which,$event,$time,$time2): $str\n";
+	//echo "notify_clients($which,$event,$time,$time2): $str\n";
 
 	return fwrite($client,$str."\n");
 }
