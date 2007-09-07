@@ -26,7 +26,7 @@
 				</row>
 				<row class="row">
 					<description value="Format"/>
-					<textbox size="80" maxlength="255" id="dsp_format" span="2"/>
+					<textbox size="80" id="dsp_format" span="2"/>
 				</row>
 				<row class="row">
 					<description value="Rows"/>
