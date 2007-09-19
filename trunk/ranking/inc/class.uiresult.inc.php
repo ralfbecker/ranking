@@ -524,13 +524,15 @@ class uiresult extends boresult
 		$query_in['return'] = $rows['set'];
 		
 		// show previous heat only if it's counting
-		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF);
+		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF)+
+			2*(int)($query['route_type']==TWOxTWO_QUALI);
 		
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
 		$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
-			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 'ONE_QUALI');
+			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 
+			($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
 		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'];
 		$rows['num_problems'] = $query['num_problems'];
 		$rows['no_delete'] = $query['readonly'];
@@ -801,7 +803,7 @@ class uiresult extends boresult
 		{
 			$last_heat = $keys;
 			$last_heat['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
-			if (!$this->has_results($last_heat))
+			if (!$this->has_results($last_heat) && ($last_heat['route_order'] >= 3 || $route['route_type'] != TWOxTWO_QUALI))
 			{
 				$last_heat = $this->route->read($last_heat);
 				$tmpl->set_cell_attribute('button[new]','onclick',"alert('".

@@ -19,6 +19,7 @@ define('ONE_QUALI',0);
 define('TWO_QUALI_HALF',1);
 define('TWO_QUALI_ALL',2);
 define('TWO_QUALI_SPEED',3);
+define('TWOxTWO_QUALI',4);		// two quali rounds on two routes each
 define('LEAD',4);
 define('BOULDER',8);
 define('SPEED',16);
@@ -53,6 +54,7 @@ class boresult extends boranking
 		ONE_QUALI      => 'one Qualification',
 		TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
 		TWO_QUALI_ALL  => 'two Qualification for all',		// multiply the rank
+		TWOxTWO_QUALI  => 'two * two Qualification',		// multiply the rank of 2 quali rounds on two routes each
 	);
 	var $eliminated_labels = array(
 		''=> '',
@@ -318,7 +320,11 @@ class boresult extends boranking
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
 		}
-		if ($prev_route['route_quota'] && ($prev_route['route_type'] != TWO_QUALI_ALL || $keys['route_order'] > 2))
+		if ($prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
+		{
+			$prev_keys['route_order'] = array(0,1);		// use both 1. quali routes and only the quali points
+		}
+		elseif ($prev_route['route_quota'] && ($prev_route['route_type'] != TWO_QUALI_ALL || $keys['route_order'] > 2))
 		{
 			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
 			{
@@ -343,10 +349,11 @@ class boresult extends boranking
 				$order_by = 'result_rank';					// --> use result of previous heat
 			}
 			// quali on two routes with multiplied ranking
-			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
+			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2 ||
+				$prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
 			{
 				$cols = array();
-				$prev_keys['route_order'] = 0;
+				if ($prev_route['route_type'] == TWO_QUALI_ALL) $prev_keys['route_order'] = 0;
 				$prev_keys[] = 'result_rank IS NOT NULL';	// otherwise not started athletes qualify too
 				$join = $this->route_result->_general_result_join(array(
 					'WetId' => $keys['WetId'],
