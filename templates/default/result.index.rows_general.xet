@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.3.003">
+	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.4.003">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -17,7 +17,7 @@
 				<column disabled="!@route_names[2]"/>
 				<column/>
 				<column disabled="!@route_names[1]"/>
-				<column disabled="!@route_type=TWO_QUALI_ALL"/>
+				<column disabled="!@route_type=/(TWO_QUALI_ALL|TWOxTWO_QUALI)/"/>
 			</columns>
 			<rows>
 				<row class="th">

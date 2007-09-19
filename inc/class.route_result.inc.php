@@ -24,6 +24,8 @@ if (!defined('ONE_QUALI'))
 	define('ONE_QUALI',0);
 	define('TWO_QUALI_HALF',1);
 	define('TWO_QUALI_ALL',2);
+	define('TWO_QUALI_SPEED',3);
+	define('TWOxTWO_QUALI',4);		// two quali rounds on two routes each
 	define('LEAD',4);
 	define('BOULDER',8);
 	define('SPEED',16);
@@ -97,15 +99,19 @@ class route_result extends so_sql
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
+		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
+
 		if (is_array($filter) && array_key_exists('route_type',$filter))	// pseudo-filter to transport the route_type
 		{
 			$route_type = $filter['route_type'];
 			unset($filter['route_type']);
+			$extra_cols[] = $route_type.' AS route_type';
 		}
 		if (is_array($filter) && array_key_exists('discipline',$filter))	// pseudo-filter to transport the discipline
 		{
 			$discipline = $filter['discipline'];
 			unset($filter['discipline']);
+			$extra_cols[] = "'$discipline' AS discipline";
 		}
 		if (is_array($filter) && isset($filter['route_order']))
 		{
@@ -120,16 +126,17 @@ class route_result extends so_sql
 		if (!$only_keys && !$join || $route_order < 0)
 		{
 			$join = $this->athlete_join;
-			if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
-			$extra_cols += array('vorname','nachname','nation','geb_date','verband','ort');
+			$extra_cols = array_merge($extra_cols,array('vorname','nachname','nation','geb_date','verband','ort'));
 
-			if ($route_order > 2 || $route_order == 2 && $route_type != TWO_QUALI_HALF)
+			if ($route_type == TWO_QUALI_HALF && $route_order > 2 ||
+				$route_type == TWOxTWO_QUALI && $route_order > 3 ||
+				!in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)) && $route_order >= 2)
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order,$route_type).') AS rank_prev_heat';
 			}
 			elseif ($route_order < 0)			// general result
 			{
-				$route_order = $route_type == TWO_QUALI_HALF ? array(0,1) : 0;		// use users from the qualification(s)
+				$route_order = in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)) ? array(0,1) : 0;		// use users from the qualification(s)
 
 				$result_cols = array('result_rank');
 				switch($discipline)
@@ -176,7 +183,7 @@ class route_result extends so_sql
 				{
 					$row['result_rank0'] = $row['result_rank'];
 
-					if ($row['route_order'] == 1 && $route_type == TWO_QUALI_HALF)	// result is on the 2. Quali
+					if ($row['route_order'] == 1 && in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)))	// result is on the 2. Quali
 					{
 						$row['result'.$row['route_order']] = $row['result'];		// --> move it there for the display
 						unset($row['result']);
@@ -192,7 +199,7 @@ class route_result extends so_sql
 							break;
 						}
 						// for quali on two routes with half quota, there's no countback to the quali only if there's a result for the 2. heat
-						if ($route_type == TWO_QUALI_HALF && $route_order == 2 && $row['result_rank2'])
+						if (in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)) && $route_order == 2 && $row['result_rank2'])
 						{
 							break;	// --> not use countback
 						}
@@ -240,10 +247,36 @@ class route_result extends so_sql
 			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
 			$r = 'r2';
 			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
-			return "SELECT ROUND(SQRT((($c1)+2*r1.result_rank-1)/2 * (($c2)+2*r2.result_rank-1)/2),2) FROM $this->table_name r1".
+			$r = 'r1';
+			$r1 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
+			$r = 'r2';
+			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
+			return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.PerId=r2.PerId".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
 				" AND $this->table_name.PerId=r1.PerId";
+//			return "SELECT ROUND(SQRT((($c1)+2*r1.result_rank-1)/2 * (($c2)+2*r2.result_rank-1)/2),2) FROM $this->table_name r1".
+//				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.PerId=r2.PerId".
+//				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
+//				" AND $this->table_name.PerId=r1.PerId";
+		}
+		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
+		{
+			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
+			$r = 'r1';
+			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND c$r.route_order IN (0,1) AND $r.result_rank=c$r.result_rank";
+			$r = 'r2';
+			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND c$r.route_order IN (2,3) AND $r.result_rank=c$r.result_rank";
+			$r = 'r1';
+			$r1 = "(1+(SELECT COUNT(*) FROM $this->table_name r$r WHERE $r.WetId=r$r.WetId AND $r.GrpId=r$r.GrpId AND r$r.route_order IN (0,1) AND $r.result_rank>r$r.result_rank))";
+			$r1 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r1 END)";
+			$r = 'r2';
+			$r2 = "(1+(SELECT COUNT(*) FROM $this->table_name r$r WHERE $r.WetId=r$r.WetId AND $r.GrpId=r$r.GrpId AND r$r.route_order IN (2,3) AND $r.result_rank>r$r.result_rank))";
+			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r2 END)";
+			return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
+				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order IN (2,3) AND r1.PerId=r2.PerId".
+				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order IN (0,1)".
+				" AND $this->table_name.PerId=r1.PerId";			
 		}
 		return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
 			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1))." AND $this->table_name.PerId=p.PerId";
@@ -281,18 +314,20 @@ class route_result extends so_sql
 			{
 				$extra_cols[] = "r$route_order.$col AS $col$route_order";
 			}
-			if ($route_order == 1)	// 2. Quali for route_type==TWO_QUALI_ALL
+			if ($route_type == TWO_QUALI_ALL && $route_order == 1 ||
+				$route_type == TWOxTWO_QUALI && $route_order == 3)
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
-				$product = '('.$this->_sql_rank_prev_heat(2,TWO_QUALI_ALL).')';
+				$product = '('.$this->_sql_rank_prev_heat(1+$route_order,$route_type).')';
 				$order_by = array($product);
 				$extra_cols[] = "$product AS quali_points";
+				
 			}
 			else
 			{
 				$order_by[] = "r$route_order.result_rank";
 			}
-			$order_by[] = "r$route_order.result_rank IS NULL";
+			if (!($route_type == TWOxTWO_QUALI && $route_order == 3)) $order_by[] = "r$route_order.result_rank IS NULL";
 		}
 		$order_by = implode(',',array_reverse($order_by)).',nachname ASC,vorname ASC';
 
@@ -323,8 +358,9 @@ class route_result extends so_sql
 		}
 		if ($data['result_height'] || $data['result_height1'])	// lead result
 		{
+			if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
 			$suffix = '';	// general result can have route_order as suffix
-			while (isset($data['result_height'.$suffix]) || $suffix < 2)
+			while (isset($data['result_height'.$suffix]) || array_key_exists('result_height'.(1+$suffix),$data))
 			{
 				if ($data['result_height'.$suffix] == TOP_HEIGHT)
 				{
@@ -341,12 +377,12 @@ class route_result extends so_sql
 				}
 				++$suffix;
 			}
-			if (array_key_exists('result_height1',$data) && array_key_exists('result_height',$data))
+			if (in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI)))
 			{
 				// quali on two routes for all --> add rank to result
-				foreach(array('',1) as $suffix)
+				foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
 				{
-					$data['result'.$suffix] .= ' &nbsp; '.$data['result_rank'.$suffix].'.';
+					if ($data['result'.$suffix]) $data['result'.$suffix] .= ' &nbsp; '.$data['result_rank'.$suffix].'.';
 				}
 			}
 		}
@@ -449,7 +485,7 @@ class route_result extends so_sql
 		$this->_shorten_name($data['nachname']);
 		$this->_shorten_name($data['vorname']);
 			
-		if ($data['geb_date']) $data['birthyear'] = (int)$data['geb_date'];	
+		if ($data['geb_date']) $data['birthyear'] = (int)$data['geb_date'];
 
 		return $data;
 	}
@@ -638,7 +674,8 @@ class route_result extends so_sql
 		$extra_cols[] = $mode.' AS new_rank';
 
 		// do we have a countback
-		if ($discipline != 'speed' && ($keys['route_order'] > 2 || $keys['route_order'] == 2 && $route_type != TWO_QUALI_HALF))
+		if ($discipline != 'speed' && ($keys['route_order'] > 3 || $keys['route_order'] > 2 && $route_type != TWOxTWO_QUALI || 
+			$keys['route_order'] == 2 && !in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI))))
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
