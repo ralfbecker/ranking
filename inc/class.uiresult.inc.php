@@ -524,8 +524,8 @@ class uiresult extends boresult
 		$query_in['return'] = $rows['set'];
 		
 		// show previous heat only if it's counting
-		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF)+
-			2*(int)($query['route_type']==TWOxTWO_QUALI);
+		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
+			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4;
 		
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';

@@ -322,9 +322,9 @@ class boresult extends boranking
 		}
 		if ($prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
 		{
-			$prev_keys['route_order'] = array(0,1);		// use both 1. quali routes and only the quali points
+			$prev_keys['route_order'] = array(2,3);		// use both quali groups
 		}
-		elseif ($prev_route['route_quota'] && ($prev_route['route_type'] != TWO_QUALI_ALL || $keys['route_order'] > 2))
+		if ($prev_route['route_quota'] && ($prev_route['route_type'] != TWO_QUALI_ALL || $keys['route_order'] > 2))
 		{
 			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
 			{
@@ -349,8 +349,8 @@ class boresult extends boranking
 				$order_by = 'result_rank';					// --> use result of previous heat
 			}
 			// quali on two routes with multiplied ranking
-			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2 ||
-				$prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
+			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2/* ||
+				$prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4*/)
 			{
 				$cols = array();
 				if ($prev_route['route_type'] == TWO_QUALI_ALL) $prev_keys['route_order'] = 0;

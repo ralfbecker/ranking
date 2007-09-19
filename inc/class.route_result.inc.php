@@ -128,16 +128,26 @@ class route_result extends so_sql
 			$join = $this->athlete_join;
 			$extra_cols = array_merge($extra_cols,array('vorname','nachname','nation','geb_date','verband','ort'));
 
-			if ($route_type == TWO_QUALI_HALF && $route_order > 2 ||
-				$route_type == TWOxTWO_QUALI && $route_order > 3 ||
-				!in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)) && $route_order >= 2)
+			if ($route_order >= 2+(int)($route_type == TWO_QUALI_HALF))
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order,$route_type).') AS rank_prev_heat';
 			}
 			elseif ($route_order < 0)			// general result
 			{
-				$route_order = in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)) ? array(0,1) : 0;		// use users from the qualification(s)
-
+				$extra_cols[] = "1 AS general_result";
+				// use users from the qualification(s)
+				if ($route_type == TWOxTWO_QUALI)
+				{
+					$route_order = array(2,3);	// only use the second quali, containing the rank of both
+				}
+				elseif ($route_type == TWO_QUALI_HALF)
+				{
+					$route_order = array(0,1);
+				}
+				else
+				{
+					$route_order = 0;
+				}
 				$result_cols = array('result_rank');
 				switch($discipline)
 				{
@@ -181,20 +191,15 @@ class route_result extends so_sql
 				$old = null;
 				foreach($rows as $n => &$row)
 				{
-					$row['result_rank0'] = $row['result_rank'];
-
-					if ($row['route_order'] == 1 && in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)))	// result is on the 2. Quali
-					{
-						$row['result'.$row['route_order']] = $row['result'];		// --> move it there for the display
-						unset($row['result']);
-					}
+					$row['org_rank'] = $row['result_rank'.$row['route_order']];
 					// check for ties
 					$row['result_rank'] = $old['result_rank'];
 					foreach(array_reverse(array_keys($route_names)) as $route_order)
 					{
-						if ($route_type == TWOxTWO_QUALI && $route_order == 3)
+						if ($route_type == TWOxTWO_QUALI && $route_order == 3 ||
+							$route_type == TWO_QUALI_HALF && $route_order == 1)
 						{
-							if ($old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
+							if (!$old || $old['org_rank'] < $row['org_rank']) $row['result_rank'] = $n+1;
 							break;		// no further countback
 						}
 						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
@@ -204,7 +209,8 @@ class route_result extends so_sql
 							break;
 						}
 						// for quali on two routes with half quota, there's no countback to the quali only if there's a result for the 2. heat
-						if (in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI)) && $route_order == 2 && $row['result_rank2'])
+						if ($route_type == TWO_QUALI_HALF && $route_order == 2 && $row['result_rank2'] ||
+							$route_type == TWOxTWO_QUALI  && $route_order == 4 && $row['result_rank4'] )
 						{
 							break;	// --> not use countback
 						}
@@ -265,7 +271,7 @@ class route_result extends so_sql
 //				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
 //				" AND $this->table_name.PerId=r1.PerId";
 		}
-		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
+/*		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
 		{
 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
 			$r = 'r1';
@@ -282,6 +288,11 @@ class route_result extends so_sql
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order IN (2,3) AND r1.PerId=r2.PerId".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order IN (0,1)".
 				" AND $this->table_name.PerId=r1.PerId";			
+		}*/
+		elseif($route_type == TWOxTWO_QUALI && in_array($route_order,array(2,3)))
+		{
+			return "SELECT result_detail FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
+				'p.route_order='.(int)($route_order-2)." AND $this->table_name.PerId=p.PerId";
 		}
 		return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
 			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1))." AND $this->table_name.PerId=p.PerId";
@@ -312,27 +323,32 @@ class route_result extends so_sql
 
 		foreach($route_names as $route_order => $label)
 		{
-			if ($route_order < 2-(int)($route_type==TWO_QUALI_ALL)) continue;	// no need to join the qualification or the general result
+			if ($route_order < 0) continue;	// general result
+			if ($route_type == TWOxTWO_QUALI)
+			{
+				if (in_array($route_order,array(2,3))) continue;	// base of the query, no need to join
+			}
+			elseif ($route_order < 2-(int)($route_type==TWO_QUALI_ALL)) continue;	// no need to join the qualification
 
 			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.PerId=r$route_order.PerId";
 			foreach($result_cols as $col)
 			{
 				$extra_cols[] = "r$route_order.$col AS $col$route_order";
 			}
-			if ($route_type == TWO_QUALI_ALL && $route_order == 1 ||
-				$route_type == TWOxTWO_QUALI && $route_order == 3)
+			if ($route_type == TWOxTWO_QUALI && $route_order < 2) continue;	// dont order by the 1. quali
+
+			if ($route_type == TWO_QUALI_ALL && $route_order == 1)
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order,$route_type).')';
 				$order_by = array($product);
 				$extra_cols[] = "$product AS quali_points";
-				
 			}
 			else
 			{
 				$order_by[] = "r$route_order.result_rank";
 			}
-			if (!($route_type == TWOxTWO_QUALI && $route_order == 3)) $order_by[] = "r$route_order.result_rank IS NULL";
+			$order_by[] = "r$route_order.result_rank IS NULL";
 		}
 		$order_by = implode(',',array_reverse($order_by)).',nachname ASC,vorname ASC';
 
@@ -361,131 +377,199 @@ class route_result extends so_sql
 		{
 			$data =& $this->data;
 		}
-		if ($data['result_height'] || $data['result_height1'])	// lead result
+		if (!$data['discipline'])	// get's only set by search method
 		{
-			if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
-			$suffix = '';	// general result can have route_order as suffix
-			while (isset($data['result_height'.$suffix]) || array_key_exists('result_height'.(1+$suffix),$data))
+			if ($data['result_height'] || $data['result_height1'])	// lead result
 			{
-				if ($data['result_height'.$suffix] == TOP_HEIGHT)
-				{
-					$data['result_height'.$suffix] = '';
-					$data['result_plus'.$suffix]   = TOP_PLUS;
-					$data['result'.$suffix]   = lang('Top');
-				}
-				elseif ($data['result_height'.$suffix])
-				{
-					$data['result_height'.$suffix] *= 0.001;
-//					$data['result'.$suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
-					$data['result'.$suffix] = $data['result_height'.$suffix].
-						$plus2string[$data['result_plus'.$suffix]];
-				}
-				++$suffix;
+				$data['discipline'] = 'lead';
 			}
-			if (in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI)))
+			elseif ($data['result_time'])	// speed result
 			{
-				// quali on two routes for all --> add rank to result
-				foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
-				{
-					if ($data['result'.$suffix]) $data['result'.$suffix] .= ' &nbsp; '.$data['result_rank'.$suffix].'.';
-				}
+				$data['discipline'] = 'speed';
+			}
+			elseif ($data['result_detail'])
+			{
+				$data['discipline'] = 'boulder';
 			}
 		}
-		if ($data['result_detail'] && !$data['result_time'])	// boulder result
+		switch($data['discipline'])
 		{
-			$data += unserialize($data['result_detail']);
-			unset($data['result_detail']);
-			for($i=1; $i <= 6; ++$i)
-			{
-				$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
-					($data['zone'.$i] ? 'b'.$data['zone'.$i] : '');
-			}
-		}
-		$suffix = '';	// general result can have route_order as suffix
-		while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
-		{
-			if (isset($data['result_zone'.$suffix]))
-			{
-				$tops = round($data['result_top'.$suffix] / 100);
-				$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
-				$zones = round($data['result_zone'.$suffix] / 100);
-				$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
-				$data['result'.$suffix] = $tops.'t'.$top_tries.' '.$zones.'b'.$zone_tries; 
-			}
-			++$suffix;
-		}
-		if ($data['result_time'])	// speed result
-		{
-			if (!array_key_exists('result_time2',$data))
-			{
+			default:
+			case 'lead':
+				if ($data['result_height'] || $data['result_height1'])	// lead result
+				{
+					if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
+					foreach($data['general_result'] ? array(1,2,3,'',0,4,5,6) : array('') as $suffix)
+					{
+						$to_suffix = $suffix;
+						if ($data['general_result'] && $suffix === '' && $data['route_order'])
+						{
+							$to_suffix = $data['route_order'];
+						}
+						elseif($suffix === 0)
+						{
+							$to_suffix = '';
+						}
+						if ($data['result_height'.$suffix] == TOP_HEIGHT)
+						{
+							$data['result_height'.$to_suffix] = '';
+							$data['result_plus'.$to_suffix]   = TOP_PLUS;
+							$data['result'.$to_suffix]   = lang('Top');
+						}
+						elseif ($data['result_height'.$suffix])
+						{
+							$data['result_height'.$to_suffix] = 0.001 * $data['result_height'.$suffix];
+		//					$data['result'.$to_suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
+							$data['result'.$to_suffix] = $data['result_height'.$to_suffix].
+								$plus2string[$data['result_plus'.$suffix]];
+							$data['result_plus'.$to_suffix] = $data['result_plus'.$suffix];
+						}
+						if ($suffix !== $to_suffix)
+						{
+							$data['result_rank'.$to_suffix] = $data['result_rank'.$suffix];
+							unset($data['result_rank'.$suffix]);
+							unset($data['result_height'.$suffix]);
+							unset($data['result_plus'.$suffix]);
+						}
+					}
+					if (in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI)))
+					{
+						// quali on two routes for all --> add rank to result
+						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
+						{
+							if ($data['result'.$suffix]) $data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
+						}
+					}
+				}
 				if ($data['result_detail'])
 				{
-					foreach(unserialize($data['result_detail']) as $name => $value)
-					{
-						$data[$name] = $value;
-					}
+					$data += unserialize($data['result_detail']);
 					unset($data['result_detail']);
+					if ($data['qoints'] && !$data['general_result']) $data['result'] .= '&nbsp;&nbsp;'.sprintf('%4.2lf',$data['qoints']);
 				}
-				if ($data['result_time'])
+				if ($data['other_detail'])
 				{
-					$data['result_time'] *= 0.001;
-					if ($data['result_time'] == ELIMINATED_TIME)
-					{
-						$data['eliminated'] = 1;
-						$data['result_time'] = null;
-						$data['time_sum'] = $data['result'] = lang('eliminated');
-					}
-					elseif ($data['result_time'] == WILDCARD_TIME)
-					{
-						$data['eliminated'] = 0;
-						$data['result_time'] = null;
-						$data['time_sum'] = $data['result'] = lang('Wildcard');	
-					}
-					else
-					{
-						$data['time_sum'] = $data['result'] = sprintf('%4.2lf',$data['result_time']);
-					}
+					$data['other_detail'] = unserialize($data['other_detail']);
 				}
-				if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
+				if ($data['rank_prev_heat'] && $data['route_type'] == TWOxTWO_QUALI && in_array($data['route_order'],array(2,3)))
 				{
-					$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) : 
-						($data['eliminated_l'] ? lang('eliminated') : lang('Wildcard'));
-					$data['result_time'] = $data['result_time_l'];
-					$data['eliminated'] = $data['eliminated_l'];
-					$data['result_r'] = (string)$data['eliminated_r'] === '' ? 
-						($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') : 
-						($data['eliminated_r'] ? lang('eliminated') : lang('Wildcard'));
+					$data['rank_prev_heat'] = unserialize($data['rank_prev_heat']);
+					$data['rank_prev_heat'] = sprintf('%4.2lf',$data['rank_prev_heat']['qoints']);					
 				}
-			}
-			else
-			{
+				break;
+
+			case 'boulder':
+				if ($data['result_detail'])	// boulder result
+				{
+					$data += unserialize($data['result_detail']);
+					unset($data['result_detail']);
+					for($i=1; $i <= 6; ++$i)
+					{
+						$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
+							($data['zone'.$i] ? 'b'.$data['zone'.$i] : '');
+					}
+				}
 				$suffix = '';	// general result can have route_order as suffix
-				while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]))
+				while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
 				{
-					if ($data['result_time'.$suffix])
+					if (isset($data['result_zone'.$suffix]))
 					{
-						$data['result_time'.$suffix] *= 0.001;
-						if ($data['result_time'.$suffix] == ELIMINATED_TIME)
+						$to_suffix = $suffix;
+						if ($data['general_result'] && $suffix === '' && $data['route_order'])
 						{
-							$data['result'.$suffix] = lang('eliminated');
+							$to_suffix = $data['route_order'];
 						}
-						elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
+						$tops = round($data['result_top'.$suffix] / 100);
+						$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
+						$zones = round($data['result_zone'.$suffix] / 100);
+						$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
+						$data['result'.$to_suffix] = $tops.'t'.$top_tries.' '.$zones.'b'.$zone_tries;
+						if ($suffix !== $to_suffix)
 						{
-							$data['result'.$suffix] = lang('Wildcard');						
+							$data['result_rank'.$to_suffix] = $data['result_rank'.$suffix];
+							unset($data['result_rank'.$suffix]);
 						}
-						else
-						{
-							$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
-						}
+						if (!$data['route_order']) $data['result_rank0'] = $data['result_rank'];
 					}
 					++$suffix;
 				}
-			}
-		}
-		if (!$data['PerId'])	// Wildcard
-		{
-			$data['PerId'] = -$data['start_order'];
-			$data['nachname'] = '-- '.lang('Wildcard').' --';
+				break;
+			
+			case 'speed':
+				if ($data['result_time'])	// speed result
+				{
+					if (!array_key_exists('result_time2',$data))
+					{
+						if ($data['result_detail'])
+						{
+							foreach(unserialize($data['result_detail']) as $name => $value)
+							{
+								$data[$name] = $value;
+							}
+							unset($data['result_detail']);
+						}
+						if ($data['result_time'])
+						{
+							$data['result_time'] *= 0.001;
+							if ($data['result_time'] == ELIMINATED_TIME)
+							{
+								$data['eliminated'] = 1;
+								$data['result_time'] = null;
+								$data['time_sum'] = $data['result'] = lang('eliminated');
+							}
+							elseif ($data['result_time'] == WILDCARD_TIME)
+							{
+								$data['eliminated'] = 0;
+								$data['result_time'] = null;
+								$data['time_sum'] = $data['result'] = lang('Wildcard');	
+							}
+							else
+							{
+								$data['time_sum'] = $data['result'] = sprintf('%4.2lf',$data['result_time']);
+							}
+						}
+						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
+						{
+							$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) : 
+								($data['eliminated_l'] ? lang('eliminated') : lang('Wildcard'));
+							$data['result_time'] = $data['result_time_l'];
+							$data['eliminated'] = $data['eliminated_l'];
+							$data['result_r'] = (string)$data['eliminated_r'] === '' ? 
+								($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') : 
+								($data['eliminated_r'] ? lang('eliminated') : lang('Wildcard'));
+						}
+					}
+					else
+					{
+						$suffix = '';	// general result can have route_order as suffix
+						while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]))
+						{
+							if ($data['result_time'.$suffix])
+							{
+								$data['result_time'.$suffix] *= 0.001;
+								if ($data['result_time'.$suffix] == ELIMINATED_TIME)
+								{
+									$data['result'.$suffix] = lang('eliminated');
+								}
+								elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
+								{
+									$data['result'.$suffix] = lang('Wildcard');						
+								}
+								else
+								{
+									$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
+								}
+							}
+							++$suffix;
+						}
+					}
+				}
+				if (!$data['PerId'])	// Wildcard
+				{
+					$data['PerId'] = -$data['start_order'];
+					$data['nachname'] = '-- '.lang('Wildcard').' --';
+				}
+				break;
 		}
 		$this->_shorten_name($data['nachname']);
 		$this->_shorten_name($data['vorname']);
@@ -679,16 +763,53 @@ class route_result extends so_sql
 		$extra_cols[] = $mode.' AS new_rank';
 
 		// do we have a countback
-		if ($discipline != 'speed' && ($keys['route_order'] > 3 || $keys['route_order'] > 2 && $route_type != TWOxTWO_QUALI || 
-			$keys['route_order'] == 2 && !in_array($route_type,array(TWO_QUALI_HALF,TWOxTWO_QUALI))))
+		if ($route_type == TWOxTWO_QUALI && in_array($keys['route_order'],array(2,3)))
+		{
+			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS other_detail';
+		}
+		elseif ($discipline != 'speed' && ($keys['route_order'] >= 2+(int)$route_type == TWO_QUALI_HALF))
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
 		}
-		
+		$result = $this->search($keys,'PerId,result_rank,result_detail',$order_by,$extra_cols);
+
+		if ($route_type == TWO_QUALI_ALL && $keys['route_order'] < 2 ||		// calculate the points
+			$route_type == TWOxTWO_QUALI && $keys['route_order'] < 4)
+		{
+			$places = array();
+			foreach($result as &$data)
+			{
+				$places[$data['new_rank']]++;
+			}
+			foreach($result as &$data)
+			{
+				// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
+				$data['new_qoints'] = ($places[$data['new_rank']] + 2*$data['new_rank'] - 1)/2;
+				if ($data['other_detail'])
+				{
+					$data['new_quali_points'] = $data['new_qoints'] ? sprintf('%4.2lf',round(sqrt($data['other_detail']['qoints'] * $data['new_qoints']),2)) : 
+						$data['other_detail']['qoints']+10000;
+				}
+			}
+			if ($route_type == TWOxTWO_QUALI && in_array($keys['route_order'],array(2,3)))
+			{
+				usort($result,create_function('$a,$b','return round(100*$a["new_quali_points"])-round(100*$b["new_quali_points"]);'));
+				$old = null;
+				foreach($result as $i => &$data)
+				{
+					$data['new_rank'] = $old['new_rank'];
+					if (!$old || $old['new_quali_points'] < $data['new_quali_points'])
+					{
+						$data['new_rank'] = $i+1;
+					}
+					$old = $data;
+				}
+			}
+		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
-		foreach($this->search($keys,'PerId,result_rank',$order_by,$extra_cols) as $i => $data)
+		foreach($result as $i => &$data)
 		{
 			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
 			if ($discipline == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
@@ -706,12 +827,23 @@ class route_result extends so_sql
 			{
 				// use the previous heat to break the tie
 				$data['new_rank'] = $old_prev_rank < $data['rank_prev_heat'] ? $i+1 : $old_rank;
-				//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
+				echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			}
-			if ($data['result_rank'] != $data['new_rank'] &&
-				$this->db->update($this->table_name,array('result_rank'=>$data['new_rank']),$keys+array('PerId'=>$data['PerId']),__LINE__,__FILE__))
+			$to_update = array();
+			if ($places)	// calculate the quali-points of the single heat
 			{
-				++$modified;	
+				if ($data['new_qoints'] != $data['qoints'] || $data['new_quali_points'] != $data['quali_points'])
+				{
+echo "<p>qoints: $data[qoints] --> $qoints</p>\n";
+					$to_update['result_detail'] = serialize(array('qoints' => $data['new_qoints'],'quali_points' =>  $data['new_quali_points']));
+				}
+			}
+			if ($data['new_rank'] != $data['result_rank']) $to_update['result_rank'] = $data['new_rank'];
+
+			if ($to_update && $this->db->update($this->table_name,$to_update,$keys+array('PerId'=>$data['PerId']),__LINE__,__FILE__))
+			{
+_debug_array($to_update+array('PerId'=>$data['PerId']));
+				++$modified;
 			}
 			$old_prev_rank = $data['rank_prev_heat'];
 			$old_rank = $data['new_rank'];
