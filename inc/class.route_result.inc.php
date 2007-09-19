@@ -192,6 +192,11 @@ class route_result extends so_sql
 					$row['result_rank'] = $old['result_rank'];
 					foreach(array_reverse(array_keys($route_names)) as $route_order)
 					{
+						if ($route_type == TWOxTWO_QUALI && $route_order == 3)
+						{
+							if ($old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
+							break;		// no further countback
+						}
 						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
 							$old['result_rank'.$route_order] < $row['result_rank'.$route_order])	// or worse place then the previous
 						{
