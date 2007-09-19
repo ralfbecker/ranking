@@ -834,7 +834,7 @@ class route_result extends so_sql
 			{
 				if ($data['new_qoints'] != $data['qoints'] || $data['new_quali_points'] != $data['quali_points'])
 				{
-echo "<p>qoints: $data[qoints] --> $qoints</p>\n";
+					//echo "<p>qoints: $data[qoints] --> $qoints</p>\n";
 					$to_update['result_detail'] = serialize(array('qoints' => $data['new_qoints'],'quali_points' =>  $data['new_quali_points']));
 				}
 			}
@@ -842,7 +842,7 @@ echo "<p>qoints: $data[qoints] --> $qoints</p>\n";
 
 			if ($to_update && $this->db->update($this->table_name,$to_update,$keys+array('PerId'=>$data['PerId']),__LINE__,__FILE__))
 			{
-_debug_array($to_update+array('PerId'=>$data['PerId']));
+				//_debug_array($to_update+array('PerId'=>$data['PerId']));
 				++$modified;
 			}
 			$old_prev_rank = $data['rank_prev_heat'];
