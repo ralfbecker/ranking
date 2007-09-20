@@ -614,7 +614,7 @@ class boresult extends boranking
 
 		if (!$startlist_only) $keys[] = 'result_rank IS NOT NULL';
 		
-		return (boolean) $this->route_result->search($keys);
+		return (boolean) $this->route_result->search($keys,false);
 	}
 	
 	/**
