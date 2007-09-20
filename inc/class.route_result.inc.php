@@ -202,6 +202,11 @@ class route_result extends so_sql
 							if (!$old || $old['org_rank'] < $row['org_rank']) $row['result_rank'] = $n+1;
 							break;		// no further countback
 						}
+						if ($route_type == TWO_QUALI_ALL && $route_order == 1)
+						{
+							if (!$old || $old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
+							break;		// no further countback
+						}
 						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
 							$old['result_rank'.$route_order] < $row['result_rank'.$route_order])	// or worse place then the previous
 						{
@@ -426,7 +431,7 @@ class route_result extends so_sql
 						}
 						if ($suffix !== $to_suffix)
 						{
-							$data['result_rank'.$to_suffix] = $data['result_rank'.$suffix];
+							if (isset($data['result_rank'.$suffix])) $data['result_rank'.$to_suffix] = $data['result_rank'.$suffix];
 							unset($data['result_rank'.$suffix]);
 							unset($data['result_height'.$suffix]);
 							unset($data['result_plus'.$suffix]);
