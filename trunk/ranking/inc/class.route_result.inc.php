@@ -567,6 +567,7 @@ class route_result extends so_sql
 							}
 							++$suffix;
 						}
+						if (!$data['route_order']) $data['result_rank0'] = $data['result_rank'];
 					}
 				}
 				if (!$data['PerId'])	// Wildcard
