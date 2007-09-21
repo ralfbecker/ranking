@@ -349,8 +349,7 @@ class boresult extends boranking
 				$order_by = 'result_rank';					// --> use result of previous heat
 			}
 			// quali on two routes with multiplied ranking
-			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2/* ||
-				$prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4*/)
+			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
 			{
 				$cols = array();
 				if ($prev_route['route_type'] == TWO_QUALI_ALL) $prev_keys['route_order'] = 0;
@@ -359,8 +358,8 @@ class boresult extends boranking
 					'WetId' => $keys['WetId'],
 					'GrpId' => $keys['GrpId'],
 				),$cols,$order_by,$route_names,$prev_route['route_type'],$discipline,array());
-				
-				$order_by = str_replace(',nachname ASC,vorname ASC','',$order_by);	// we dont want to order alphabetical, we have to add RAND()
+				$order_by = str_replace(array('r2.result_rank IS NULL,r2.result_rank,r1.result_rank IS NULL,',
+					',nachname ASC,vorname ASC'),'',$order_by);	// we dont want to order alphabetical, we have to add RAND()
 				$order_by .= ' DESC';	// we need reverse order
 
 				// just the col-name is ambigues
@@ -614,7 +613,7 @@ class boresult extends boranking
 
 		if (!$startlist_only) $keys[] = 'result_rank IS NOT NULL';
 		
-		return (boolean) $this->route_result->search($keys,false);
+		return (boolean) $this->route_result->search($keys);//,false);
 	}
 	
 	/**
