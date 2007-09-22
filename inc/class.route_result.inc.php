@@ -769,11 +769,14 @@ class route_result extends so_sql
 		$extra_cols[] = $mode.' AS new_rank';
 
 		// do we have a countback
-		if ($route_type == TWOxTWO_QUALI && in_array($keys['route_order'],array(2,3)))
+		if ($route_type == TWOxTWO_QUALI && $keys['route_order'] <= 4)	// 2x2 til 1/2-Final incl.
 		{
-			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS other_detail';
+			if (in_array($keys['route_order'],array(2,3)))
+			{
+				$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS other_detail';
+			}
 		}
-		elseif ($discipline != 'speed' && ($keys['route_order'] >= 2+(int)$route_type == TWO_QUALI_HALF))
+		elseif ($discipline != 'speed' && $keys['route_order'] >= (2+(int)$route_type == TWO_QUALI_HALF))
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
@@ -833,7 +836,7 @@ class route_result extends so_sql
 			{
 				// use the previous heat to break the tie
 				$data['new_rank'] = $old_prev_rank < $data['rank_prev_heat'] ? $i+1 : $old_rank;
-				echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
+				//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			}
 			$to_update = array();
 			if ($places)	// calculate the quali-points of the single heat
