@@ -776,7 +776,7 @@ class route_result extends so_sql
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS other_detail';
 			}
 		}
-		elseif ($discipline != 'speed' && $keys['route_order'] >= (2+(int)$route_type == TWO_QUALI_HALF))
+		elseif ($discipline != 'speed' && $keys['route_order'] >= (2+(int)($route_type == TWO_QUALI_HALF)))
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
