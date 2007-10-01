@@ -181,7 +181,7 @@ class route_result extends so_sql
 					}
 				}
 				$filter[] = $this->table_name.'.result_rank IS NOT NULL';
-				
+
 				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 
 				if (!$rows) return $rows;
@@ -192,6 +192,8 @@ class route_result extends so_sql
 				foreach($rows as $n => &$row)
 				{
 					$row['org_rank'] = $row['result_rank'.$row['route_order']];
+					if ($row['route_order'] == 0) $row['result_rank0'] = $row['result_rank'];
+
 					// check for ties
 					$row['result_rank'] = $old['result_rank'];
 					foreach(array_reverse(array_keys($route_names)) as $route_order)
@@ -538,7 +540,7 @@ class route_result extends so_sql
 							$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) : 
 								($data['eliminated_l'] ? lang('eliminated') : lang('Wildcard'));
 							$data['result_time'] = $data['result_time_l'];
-							$data['eliminated'] = $data['eliminated_l'];
+							$data['eliminated'] = $data['eliminated_l'] || $data['eliminated_r'];
 							$data['result_r'] = (string)$data['eliminated_r'] === '' ? 
 								($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') : 
 								($data['eliminated_r'] ? lang('eliminated') : lang('Wildcard'));
@@ -823,12 +825,12 @@ class route_result extends so_sql
 			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
 			if ($discipline == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
 			{
-				if ($data['eliminated']) $data['result_time'] = ELIMINATED_TIME;
+				if ($data['eliminated']) $data['time_sum'] = ELIMINATED_TIME;
 				$new_speed_rank = $data['new_rank'];
-				$data['new_rank'] = !$old_time || $old_time < $data['result_time'] ||
+				$data['new_rank'] = !$old_time || $old_time < $data['time_sum'] ||
 					 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
-				//echo "<p>$i. $data[PerId]: time=$data[result_time], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
-				$old_time = $data['result_time'];
+				//echo "<p>$i. $data[PerId]: time=$data[time_sum], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
+				$old_time = $data['time_sum'];
 				$old_speed_rank = $new_speed_rank;
 			}
 			//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
