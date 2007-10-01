@@ -530,9 +530,12 @@ class uiresult extends boresult
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
-		$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
-			($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 
-			($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
+		if ($query['discipline'] == 'lead')
+		{
+			$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
+				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 
+				($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
+		}
 		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'];
 		$rows['num_problems'] = $query['num_problems'];
 		$rows['no_delete'] = $query['readonly'];
