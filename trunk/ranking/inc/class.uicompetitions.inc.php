@@ -360,6 +360,7 @@ class uicompetitions extends boranking
 				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
 				'order'          =>	'datum',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
+				'csv_fields'     => false,
 			);
 			if (count($this->read_rights) == 1)
 			{

@@ -137,6 +137,7 @@ class uiregistration extends boranking
 					'nation' => $nation,
 				),
 				'comp'           => $comp['WetId'],
+				'csv_fields'     => false,
 			),
 		);
 		$content += array(

@@ -434,6 +434,7 @@ class uiathletes extends boranking
 				'no_cat'         => True,// I  disable the cat-selectbox
 				'order'          =>	'nachname',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
+				'csv_fields'     => false,
 			);
 			if (count($this->athlete_rights) == 1)
 			{
