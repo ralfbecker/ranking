@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
@@ -98,9 +98,9 @@ class soranking
 			) as $var => $class)
 		{
 			$egw_name = $class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
+			if (!isset($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
