@@ -310,7 +310,7 @@ class boranking extends soranking
 	function judge_athlete_rights()
 	{
 		if (!($comps = $this->comp->search(array(),'nation','nation','','',false,'AND',false,array(
-			$this->comp->db->concat("','",'judges',"','").' LIKE '.$this->db->quote('%,'.$this->user.',%'),
+			$this->db->concat("','",'judges',"','").' LIKE '.$this->db->quote('%,'.$this->user.',%'),
 			"datum <= '".date('Y-m-d',time()+$this->judge_right_days*24*3600)."'",
 			"datum >= '".date('Y-m-d',time()-$this->judge_right_days*24*3600)."'",
 		))))
