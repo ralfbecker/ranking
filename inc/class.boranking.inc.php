@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
@@ -126,6 +126,7 @@ class boranking extends soranking
 		'n' => 'none',
 		'a' => 'applied',
 		'c' => 'confirmed',
+		's' => 'suspended',		// no registration for competitions possible
 	);
 	/**
 	 * How many days before and after a competition a judge has rights on the competition and

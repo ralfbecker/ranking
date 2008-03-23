@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
@@ -101,7 +101,14 @@ class uiathletes extends boranking
 			{
 				$js = "document.getElementById('exec[apply_license]').click();";
 			}
-			$msg = lang('Please use ONLY a first capital letter for names, do NOT capitalise the whole word!');
+			if ($this->athlete->data['license'] == 's')
+			{
+				$msg = lang('Athlete is suspended !!!');
+			}
+			else
+			{
+				$msg = lang('Please use ONLY a first capital letter for names, do NOT capitalise the whole word!');
+			}
 		}
 		else
 		{
@@ -171,7 +178,11 @@ class uiathletes extends boranking
 						}
 						if ($content['apply_license'])
 						{
-							if ($content['athlete_data']['license'] != 'a')
+							if ($content['athlete_data']['license'] == 's')
+							{
+								$msg .= ', '.lang('Athlete is suspended !!!');
+							}
+							elseif ($content['athlete_data']['license'] != 'a')
 							{
 								// check for required data
 								static $required_for_license = array(
@@ -200,7 +211,7 @@ class uiathletes extends boranking
 								$msg .= ', '.lang('Someone already applied for a %1 license!',$this->license_year);
 							}
 							// download form
-							if (file_exists($this->license_form_name) && !$required_missing)
+							if (file_exists($this->license_form_name) && !$required_missing && $content['athlete_data']['license'] == 's')
 							{
 								$link = $GLOBALS['egw']->link('/index.php',array(
 									'menuaction' => 'ranking.uiathletes.licenseform',
@@ -268,7 +279,7 @@ class uiathletes extends boranking
 			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]],
 			'nation' => !!$this->only_nation_athlete,
 			'edit'   => !($view && ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights))),
-			'apply_license' => $content['license'] == 'c' || !$this->acl_check($content['nation'],EGW_ACL_ADD),
+			'apply_license' => in_array($content['license'],array('s','c')) || !$this->acl_check($content['nation'],EGW_ACL_ADD),
 			'license'=> !$this->acl_check('NULL',EGW_ACL_ADD),
 		);
 		// dont allow non-admins to change sex and nation, once it's been set

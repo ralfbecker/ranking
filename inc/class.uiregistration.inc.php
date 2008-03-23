@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
@@ -72,6 +72,10 @@ class uiregistration extends boranking
 				{
 					$readonlys["register[$row[PerId]]"] = true;
 				}
+			}
+			elseif ($row['license'] == 's')	// suspended athlets can NOT be registered
+			{
+				$readonlys["register[$row[PerId]]"] = true;
 			}
 			$readonlys["apply_license[$row[PerId]]"] = $row['license'] != 'n';
 		}
@@ -271,7 +275,6 @@ class uiregistration extends boranking
 				}
 				else
 				{
-					
 					list($athlete) = $content['register'] ? each($content['register']) : each($content['delete']);
 					list($cat,$athlete) = explode('/',$athlete);
 					$athlete = $this->athlete->read($athlete,'',$this->license_year);
@@ -293,6 +296,10 @@ class uiregistration extends boranking
 					$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete['PerId'],2) ?
 						lang('%1, %2 deleted for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
 						lang('Error: registration');
+				}
+				elseif($athlete['license'] == 's')
+				{
+					$msg = lang('Athlete is suspended !!!');
 				}
 				else // register
 				{
