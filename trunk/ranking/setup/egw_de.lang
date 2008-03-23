@@ -27,6 +27,7 @@ apply the changes made	ranking	de	vorgenommene Änderungen anwenden
 apply the changes of this athlete only	ranking	de	Nur Änderungen an diesem Athleten anwenden
 as of	ranking	de	Stand
 athlete	ranking	de	Athlet
+athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athletes	ranking	de	Athleten
 before	ranking	de	vor
 before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)
@@ -246,6 +247,7 @@ picture resized to %1 pixel	ranking	de	Bild auf %1 Pixel verkleinert
 place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
 please do not capitalise all words and names!	ranking	de	Bitte Worte und Namen NICHT KOMPLETT mit großen Buchstaben schreiben!
+please use only a first capital letter for names, do not capitalise the whole word!	ranking	de	Bitte NUR einen ersten Großbuchstaben verwenden, NICHT das ganze Wort großschreiben!
 plus	ranking	de	plus
 pointalocation	ranking	de	Punkteverteilung
 points	ranking	de	Punkte
@@ -324,8 +326,10 @@ startnumber	ranking	de	Startnummer
 street	ranking	de	Straße
 street, postcode	ranking	de	Straße, Postleitzahl
 sum	ranking	de	Summe
+suspended	ranking	de	gesperrt
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
+this athlete has no license! are you sure you want to make an exception	ranking	de	Dieser Athlete hat KEINE Lizenz! Sind Sie sicher, dass Sie eine AUSNAHME machen wollen
 this module displays calendar, results and rankings	ranking	de	Dieses Module zeigt Kalender, Ergebnisse und Ranglisten an
 this module displays information from the ranking app.	ranking	de	Dieses Modul zeigt Informationen der Ranglisten Anwendung.
 this module displays information from the resultservice of the ranking app.	ranking	de	Dieses Modul zeigt Informationen des Ergebnisservice der Ranglisten Anwendung.

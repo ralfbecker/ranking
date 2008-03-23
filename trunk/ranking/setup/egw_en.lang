@@ -27,6 +27,7 @@ apply the changes made	ranking	en	apply the changes made
 apply the changes of this athlete only	ranking	en	Apply the changes of this athlete only
 as of	ranking	en	As of
 athlete	ranking	en	Athlete
+athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athletes	ranking	en	Athletes
 before	ranking	en	before
 before which year the old system was used (first year of new system)	ranking	en	before which year the old system was used (first year of new system)
@@ -246,6 +247,7 @@ picture resized to %1 pixel	ranking	en	Picture resized to %1 pixel
 place	ranking	en	Place
 place of birth	ranking	en	Place of birth
 please do not capitalise all words and names!	ranking	en	Please do NOT capitalise all words and names!
+please use only a first capital letter for names, do not capitalise the whole word!	ranking	en	Please use ONLY a first capital letter for names, do NOT capitalise the whole word!
 plus	ranking	en	plus
 pointalocation	ranking	en	Pointalocation
 points	ranking	en	Points
@@ -324,8 +326,10 @@ startnumber	ranking	en	Startnumber
 street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
 sum	ranking	en	Sum
+suspended	ranking	en	suspended
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
+this athlete has no license! are you sure you want to make an exception	ranking	en	This athlete has NO license! Are you sure you want to make an EXCEPTION
 this module displays calendar, results and rankings	ranking	en	This module displays calendar, results and rankings
 this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
 this module displays information from the resultservice of the ranking app.	ranking	en	This module displays information from the resultservice of the ranking app.

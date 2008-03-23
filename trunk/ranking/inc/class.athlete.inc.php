@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
@@ -38,6 +38,7 @@ class athlete extends so_sql
 		''  => 'n',
 		'1' => 'a',
 		'2' => 'c',
+		'3' => 's',
 	);
 	var $acl2clear = array(
 		ACL_DENY_BIRTHDAY  => array('geb_date'),
