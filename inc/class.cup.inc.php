@@ -42,11 +42,11 @@ class cup extends so_sql
 			) as $var => $class)
 		{
 			$egw_name = /*'ranking_'.*/$class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
+			if (!isset($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$this->source_charset,$this->db);
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
 			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
+			$this->$var = $GLOBALS['egw']->$egw_name;
 		}
 	}
 
@@ -184,13 +184,16 @@ class cup extends so_sql
 		
 		if ($max < 0)	// $max comps less then the total
 		{
-			if (!is_object($GLOBALS['egw']->comp))
+			if (!isset($GLOBALS['egw']->comp))
 			{
-				$GLOBALS['egw']->comp =& CreateObject('ranking.competition',$this->source_charset,$this->db);
+				$GLOBALS['egw']->comp = CreateObject('ranking.competition',$this->source_charset,$this->db);
 			}
+			$cats = array($cat_rkey);
+			// ToDo: add mgroups
+
 			$wettks = $GLOBALS['egw']->comp->search(array(),true,'','','',false,'AND',false,array(
-				'nation' => $nation,
-				'serie'  => $cup['ser_id'],
+				'nation' => $cup['nation'],
+				'serie'  => $cup['SerId'],
 				$GLOBALS['egw']->comp->check_in_cats($cats),			
 			));
 			$anz_wettk = count($wettks);

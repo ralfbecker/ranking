@@ -80,9 +80,9 @@ class athlete extends so_sql
 			) as $var => $class)
 		{
 			$egw_name = /*'ranking_'.*/$class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
+			if (!isset($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
