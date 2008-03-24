@@ -106,10 +106,12 @@ class boranking extends soranking
 	 * @var array $european_nations 3-digit nation codes of nation in europe
 	 */
 	var $european_nations = array(
-		'AUT','BEL','BLS','BUL','CRO','CZE','DEN','ESP',
-		'FIN','FRA','GBR','GER','GRE','HUN','IRL','ITA',
-		'KAZ','LAT','LUX','MKD','NED','NOR','POL','POR',
-		'ROM','RUS','SBR','SLO','SUI','SVK','SWE','UKR',
+		'ALB','AND','ARM','AUT','AZE','BLR','BEL','BIH','BUL',
+		'CRO','CYP','CZE','DEN','EST','ESP','FIN','FRA','GBR',
+		'GEO','GER','GRE','HUN','IRL','ISL','ISR','ITA','LAT',
+		'LIE','LTU','LUX','MDA','MKD','MLT','MON','NED','NOR',
+		'POL','POR','ROU','RUS','SRB','SLO','SMR','SUI','SVK',
+		'SWE','TUR','UKR'
 	);
 	/**
 	 * year we check the license for
