@@ -56,11 +56,11 @@ class competition extends so_sql
 			) as $var => $class)
 		{
 			$egw_name = /*'ranking_'.*/$class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
+			if (!isset($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$this->source_charset,$this->db);
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
 			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
+			$this->$var = $GLOBALS['egw']->$egw_name;
 		}
 		if ($vfs_pdf_dir) $this->vfs_pdf_dir = $vfs_pdf_dir;
 	}
@@ -270,13 +270,13 @@ class competition extends so_sql
 	 * old competitions might have regular expressions of the cats attending them
 	 * 
 	 * @static
-	 * @param array $cats cat-rkeys
+	 * @param array/string $cats cat-rkeys
 	 * @return string
 	 */
 	function check_in_cats($cats)
 	{
 		$or_query = array();
-		foreach($cats as $rkey)
+		foreach((array)$cats as $rkey)
 		{
 			$or_query[] = 'find_in_set('.$this->db->quote($rkey).",IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen))";
 			$or_query[] = $this->db->quote($rkey). " REGEXP IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen)";
@@ -390,9 +390,9 @@ class competition extends so_sql
 	{
 		if (!$data) $data =& $this->data;
 			
-		if (!is_object($GLOBALS['egw']->vfs))
+		if (!isset($GLOBALS['egw']->vfs))
 		{
-			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
 		}
 		$attachments = false;
 		foreach($this->attachment_prefixes as $type => $prefix)
@@ -437,9 +437,9 @@ class competition extends so_sql
 	{
 		if ($keys && !$this->read($keys)) return false;
 		
-		if (!is_object($GLOBALS['egw']->vfs))
+		if (!isset($GLOBALS['egw']->vfs))
 		{
-			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
 		}
 		foreach($files as $type => $path)
 		{
@@ -487,9 +487,9 @@ class competition extends so_sql
 	{
 		if ($keys && !$this->read($keys)) return false;
 		
-		if (!is_object($GLOBALS['egw']->vfs))
+		if (!isset($GLOBALS['egw']->vfs))
 		{
-			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
 		}
 		$vfs_path_arr = array(
 			'string' => $this->attachment_path($type),
@@ -514,9 +514,9 @@ class competition extends so_sql
 		//echo "<p>competitions::rename_attachments('$old_rkey',".print_r($keys,true).") data[rkey]='".$this->data['rkey']."'</p>\n";
 		if (!$old_rkey || $keys && !$this->read($keys)) return false;
 		
-		if (!is_object($GLOBALS['egw']->vfs))
+		if (!isset($GLOBALS['egw']->vfs))
 		{
-			$GLOBALS['egw']->vfs =& CreateObject('phpgwapi.vfs');
+			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
 		}
 		$ok = true;
 		$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
