@@ -119,6 +119,6 @@ class module_ranking_digitalrock extends Module
 		
 		//$content = preg_replace('/<html>.*<body>(.*)<\\/body>.*<\\/html>/i','\\1',$content);
 		
-		return $GLOBALS['egw']->translation->convert($content,'iso-8859-1');
+		return $content;
 	}
 }
