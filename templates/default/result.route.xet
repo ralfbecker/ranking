@@ -97,11 +97,10 @@
 				</row>
 				<row class="row" disabled="@no_upload">
 					<description value="Import file"/>
-					<hbox options="0,0">
+					<hbox options="0,0" span="all">
 						<file id="file"/>
 						<button id="button[upload]" label="Upload" class="leftPad5"/>
 					</hbox>
-					<description/>
 				</row>
 				<row class="row" disabled="@no_display">
 					<description value="Display"/>

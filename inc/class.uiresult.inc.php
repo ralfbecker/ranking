@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
@@ -61,11 +61,11 @@ class uiresult extends boresult
 				'route_order' => $_GET['route'],
 			);
 			if ((int)$_GET['comp'] && (int)$_GET['cat'] && (!is_numeric($_GET['route']) ||
-				!($content = $this->route->read($content))))
+				!($content = $this->route->read($content,true))))
 			{
 				// try reading the previous heat, to set some stuff from it
 				if (($keys['route_order'] = $this->route->get_max_order($_GET['comp'],$_GET['cat'])) >= 0 &&
-					($previous = $this->route->read($keys)))
+					($previous = $this->route->read($keys,true)))
 				{
 					++$keys['route_order'];
 					if ($keys['route_order'] == 1 && in_array($previous['route_type'],array(ONE_QUALI,TWO_QUALI_SPEED)))
@@ -203,7 +203,7 @@ class uiresult extends boresult
 							$content['route_quota'] = $to_set['route_quota'] = 
 								$this->default_quota($discipline,$content['route_order'],$content['quali_type'],$num);
 						}
-						if ($this->route->read($content)) $this->route->save($to_set);
+						if ($this->route->read($content,true)) $this->route->save($to_set);
 					}
 					else
 					{
@@ -806,7 +806,7 @@ class uiresult extends boresult
 		{
 			$last_heat = $keys;
 			$last_heat['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
-			if (!$this->has_results($last_heat) && ($last_heat['route_order'] >= 3 || $route['route_type'] != TWOxTWO_QUALI))
+			if (!$this->has_results($last_heat) && ($last_heat['route_order'] >= 3 || !in_array($route['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI))))
 			{
 				$last_heat = $this->route->read($last_heat);
 				$tmpl->set_cell_attribute('button[new]','onclick',"alert('".

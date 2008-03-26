@@ -7,25 +7,13 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route_result.inc.php');
-
-define('ONE_QUALI',0);
-define('TWO_QUALI_HALF',1);
-define('TWO_QUALI_ALL',2);
-define('TWO_QUALI_SPEED',3);
-define('TWOxTWO_QUALI',4);		// two quali rounds on two routes each
-define('LEAD',4);
-define('BOULDER',8);
-define('SPEED',16);
-define('STATUS_UNPUBLISHED',0);
-define('STATUS_STARTLIST',1);
-define('STATUS_RESULT_OFFICIAL',2);
 
 class boresult extends boranking 
 {
@@ -53,7 +41,9 @@ class boresult extends boranking
 	var $quali_types = array(
 		ONE_QUALI      => 'one Qualification',
 		TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
-		TWO_QUALI_ALL  => 'two Qualification for all',		// multiply the rank
+		TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
+		TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
+		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, on sight',				// lead on 2 routes for all on sight
 		TWOxTWO_QUALI  => 'two * two Qualification',		// multiply the rank of 2 quali rounds on two routes each
 	);
 	var $eliminated_labels = array(
@@ -136,7 +126,7 @@ class boresult extends boranking
 	 * @param int/array $comp WetId or complete comp array
 	 * @param int/array $cat GrpId or complete cat array
 	 * @param int $route_order 0/1 for qualification, 2, 3, ... for further heats
-	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
+	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL*
 	 * @param int $discipline='lead' 'lead', 'speed', 'boulder'
 	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
 	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
@@ -157,7 +147,7 @@ class boresult extends boranking
 			return false;
 		}
 		if ($route_order >= 2 || 	// further heat --> startlist from reverse result of previous heat
-			$route_order == 1 && $route_type == TWO_QUALI_ALL)	// 2. Quali uses same start-order
+			$route_order == 1 && in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER)))	// 2. Quali uses same start-order
 		{
 			// delete existing starters
 			$this->route_result->delete($keys);
@@ -195,29 +185,33 @@ class boresult extends boranking
 		{
 			if ($starter['PerId']) $old_startlist[$starter['PerId']] = $starter;
 		}
+		// generate a startlist, without storing it in the result store
+		// old reverse ranking: $starters =& parent::generate_startlist($comp,$cat,$route_type == TWO_QUALI_HALF ? 2 : 1,$max_compl,1,$old_startlist);
+		$starters =& parent::generate_startlist($comp,$cat,
+			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
+			in_array($route_type,array(TWO_QUALI_HALF,TWO_QUALI_ALL_SEED_STAGGER,TWOxTWO_QUALI)) ? 3 : 0,		// 3 = distribution by ranking, 0 = random
+			$route_type == TWO_QUALI_ALL_SEED_STAGGER,															// true = stagger, false = no stagger
+			$old_startlist);
+
 		// delete existing starters
 		$this->route_result->delete($keys);
 
-		// generate a startlist, without storing it in the result store
-		// ToDo: make the number of athletes from the complementary list configurable
-		$starters =& parent::generate_startlist($comp,$cat,$route_type == TWO_QUALI_HALF ? 2 : 1,$max_compl,1,$old_startlist);
-
 		$num = $this->_store_startlist($starters[1],$route_type == TWO_QUALI_HALF ? 0 : $route_order);
 			
-		if ($route_type == TWO_QUALI_HALF)	// automatically generate 2. quali
+		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL)))	// automatically generate 2. quali
 		{
 			$keys['route_order'] = 1;
 			if (!$this->route->read($keys))
 			{
 				$keys['route_order'] = 0;
-				$route = $this->route->read($keys);
+				$route = $this->route->read($keys,true);
 				$this->route->save(array(
 					'route_name'   => '2. '.$route['route_name'],
 					'route_order'  => 1,
 					'route_status' => STATUS_STARTLIST,
 				));
 			}
-			$this->_store_startlist($starters[2],1);
+			$this->_store_startlist(isset($starters[2]) ? $starters[2] : $starters[1],1,isset($starters[2]));
 		}
 		return $num;
 	}
@@ -230,7 +224,7 @@ class boresult extends boranking
 	 * @param int $route_order if set only these starters get stored
 	 * @return int num starters stored
 	 */
-	function _store_startlist($starters,$route_order)
+	function _store_startlist($starters,$route_order,$use_order=true)
 	{
 		if (!$starters || !is_array($starters))
 		{
@@ -239,7 +233,7 @@ class boresult extends boranking
 		$num = 0;
 		foreach($starters as $starter)
 		{
-			if (!($start_order = $this->pkt2start($starter['pkt'],1+$route_order)))
+			if (!($start_order = $this->pkt2start($starter['pkt'],!$use_order ? 1 : 1+$route_order)))
 			{
 				continue;	// wrong route
 			}
@@ -297,6 +291,7 @@ class boresult extends boranking
 	 */
 	function _startlist_from_previous_heat($keys,$start_order='reverse',$ko_system=false,$discipline='lead')
 	{
+		//echo "<p>".__METHOD__."(".print_r($keys,true).",$start_order,$ko_system,$discipline)</p>\n";
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
@@ -306,10 +301,11 @@ class boresult extends boranking
 		{
 			$prev_keys['route_order'] = 0;
 		}
-		if (!($prev_route = $this->route->read($prev_keys)) || !$this->has_results($prev_keys) ||
+		if (!($prev_route = $this->route->read($prev_keys,true)) || 
+			$start_order != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
 			$ko_system && !$prev_route['route_quota'])
 		{
-			if (!$ko_system || !--$prev_keys['route_order'] || !($prev_route = $this->route->read($prev_keys)) ||
+			if (!$ko_system || !--$prev_keys['route_order'] || !($prev_route = $this->route->read($prev_keys,true)) ||
 				!$this->has_results($prev_keys))
 			{
 				//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
@@ -324,7 +320,8 @@ class boresult extends boranking
 		{
 			$prev_keys['route_order'] = array(2,3);		// use both quali groups
 		}
-		if ($prev_route['route_quota'] && ($prev_route['route_type'] != TWO_QUALI_ALL || $keys['route_order'] > 2))
+		if ($prev_route['route_quota'] && 
+			(!self::is_two_quali_all($prev_route['route_type']) || $keys['route_order'] > 2))
 		{
 			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
 			{
@@ -349,10 +346,10 @@ class boresult extends boranking
 				$order_by = 'result_rank';					// --> use result of previous heat
 			}
 			// quali on two routes with multiplied ranking
-			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 2)
+			elseif(self::is_two_quali_all($prev_route['route_type']) && $keys['route_order'] == 2)
 			{
 				$cols = array();
-				if ($prev_route['route_type'] == TWO_QUALI_ALL) $prev_keys['route_order'] = 0;
+				if (self::is_two_quali_all($prev_route['route_type'])) $prev_keys['route_order'] = 0;
 				$prev_keys[] = 'result_rank IS NOT NULL';	// otherwise not started athletes qualify too
 				$join = $this->route_result->_general_result_join(array(
 					'WetId' => $keys['WetId'],
@@ -418,8 +415,8 @@ class boresult extends boranking
 				}
 				$data['start_order'] = $this->ko_start_order[$prev_route['route_quota']][$start_order++];
 			}
-			// EYS non-onsight modus: 2. half first
-			elseif($prev_route['route_type'] == TWO_QUALI_ALL && $keys['route_order'] == 1)
+			// 2. quali is stagger'ed of 1. quali (50-100,1-49)
+			elseif(in_array($prev_route['route_type'],array(TWO_QUALI_ALL,TWO_QUALI_ALL_SEED_STAGGER)) && $keys['route_order'] == 1)
 			{
 				if ($start_order <= floor($half_starters))
 				{
@@ -452,6 +449,17 @@ class boresult extends boranking
 			}
 		}
 		return $start_order-1;
+	}
+	
+	/**
+	 * Check if given type is one of the TWO_QUALI_ALL* types
+	 *
+	 * @param int $route_type
+	 * @return boolean
+	 */
+	static function is_two_quali_all($route_type)
+	{
+		return in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER));
 	}
 
 	/**

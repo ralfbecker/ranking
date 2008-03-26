@@ -19,20 +19,19 @@ define('TOP_HEIGHT',99999999);
 define('ELIMINATED_TIME',999999);
 define('WILDCARD_TIME',1);
 
-if (!defined('ONE_QUALI'))
-{
-	define('ONE_QUALI',0);
-	define('TWO_QUALI_HALF',1);
-	define('TWO_QUALI_ALL',2);
-	define('TWO_QUALI_SPEED',3);
-	define('TWOxTWO_QUALI',4);		// two quali rounds on two routes each
-	define('LEAD',4);
-	define('BOULDER',8);
-	define('SPEED',16);
-	define('STATUS_UNPUBLISHED',0);
-	define('STATUS_STARTLIST',1);
-	define('STATUS_RESULT_OFFICIAL',2);
-}
+define('ONE_QUALI',0);
+define('TWO_QUALI_HALF',1);
+define('TWO_QUALI_ALL',2);				// EYS (and all TWO_QUALI_ALL*, if route::read($keys,false) is used)
+define('TWO_QUALI_SPEED',3);
+define('TWOxTWO_QUALI',4);				// two quali rounds on two routes each
+define('TWO_QUALI_ALL_SEED_STAGGER',5);	// lead on 2 routes for all on flash
+define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
+define('LEAD',4);
+define('BOULDER',8);
+define('SPEED',16);
+define('STATUS_UNPUBLISHED',0);
+define('STATUS_STARTLIST',1);
+define('STATUS_RESULT_OFFICIAL',2);
 
 /**
  * route object
@@ -266,8 +265,12 @@ class route_result extends so_sql
 			$r = 'r2';
 			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
 			$r = 'r1';
+			//$unranked = "(SELECT MAX($r.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
+			//$r1 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
 			$r1 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
 			$r = 'r2';
+			//$unranked = "(SELECT MAX($r.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
+			//$r2 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
 			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
 			return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.PerId=r2.PerId".

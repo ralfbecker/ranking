@@ -92,17 +92,16 @@ class route extends so_sql
 	 * Reimplemented to return a default general result, if it does not exist.
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
-	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $join sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or 
+	 * @param boolean $split_two_quali_all=false should the diverse TWO_QUALI_ALL* types be read as they are or all as TWO_QUALI_ALL
 	 * @return array/boolean data if row could be retrived else False
 	 */
-	function read($keys,$extra_cols='',$join='')
+	function read($keys,$split_two_quali_all=false)
 	{
 		if (is_array($keys) && isset($keys['route_order']) && !is_null($keys['route_order']))
 		{
 			$keys['route_order'] = (string) $keys['route_order'];
 		}
-		$ret = parent::read($keys,$extra_cols,$join);
+		$ret = parent::read($keys);
 		
 		if (!$ret && $keys['route_order'] == -1)		// general result not found --> return a default one
 		{
@@ -118,6 +117,10 @@ class route extends so_sql
 					'route_status'=> STATUS_STARTLIST,
 				));
 			}
+		}
+		if (!$split_two_quali_all && in_array($ret['route_type'],array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER)))
+		{
+			$ret['route_type'] = TWO_QUALI_ALL;
 		}
 		return $ret;
 	}
