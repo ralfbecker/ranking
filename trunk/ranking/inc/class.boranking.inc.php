@@ -751,17 +751,19 @@ class boranking extends soranking
 	 * @param int/array $cat GrpId or complete cat array
 	 * @param int $num_routes=1 number of routes, default 1
 	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
-	 * @param int $mode=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first
+	 * @param int $use_ranking=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first, 
+	 * 	new random order but distribution on multiple routes by 3: ranking or 4: cup
+	 * @param boolean $stagger=false insert starters of other route behind
 	 * @param array $old_startlist=null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
 	 * @return boolean/array true or array with starters (if is_array($old_startlist)) if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$mode=1,$old_startlist=null)
+	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$use_ranking=0,$stagger=false,$old_startlist=null)
 	{
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
 		
-		if ($this->debug) echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$mode)</p>\n";
+		/*if ($this->debug)*/ echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$use_ranking,$stagger)</p>\n";
 		
 		$filter = array(
 			'WetId'  => $comp['WetId'],
@@ -812,21 +814,22 @@ class boranking extends soranking
 				}
 			}
 		}
+		// index starters with their PerId
+		$starters2 = array();
+		foreach($starters as $k => $athlete)
+		{
+			$starters2[$athlete['PerId']] =& $starters[$k];
+		}
+		$starters =& $starters2; unset($starters2);
+
 		$reset_data = 1;
 		$ranked = array();
 		// do we use a ranking, if yes calculate it and place the ranked competitors at the end of the startlist
-		if ($mode)
+		if ($use_ranking)
 		{
 			$stand = $comp['datum'];
-		 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$mode == 2 ? $comp['serie'] : '');
+		 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$use_ranking == 2 || $use_ranking == 4 ? $comp['serie'] : '');
 
-			// index starters with their PerId
-			$starters2 = array();
-			foreach($starters as $k => $athlete)
-			{
-				$starters2[$athlete['PerId']] =& $starters[$k];
-			}
-			$starters =& $starters2; unset($starters2);
 			// we generate the startlist starting from the end = first of the ranking
 			foreach((array) $ranking as $athlete)
 			{
@@ -848,9 +851,9 @@ class boranking extends soranking
 			}
 		}
 		// if we have a startorder to preserv, we use these competitior first
-		if ($old_startlist)
+		if ($old_startlist && in_array($use_ranking,array(1,2)))
 		{
-			if ($cat['discipline'] == 'speed' && $mode)	// reversed order
+			if ($cat['discipline'] == 'speed' && $use_ranking)	// reversed order
 			{
 				$old_startlist = array_reverse($old_startlist);
 			}
@@ -867,10 +870,53 @@ class boranking extends soranking
 			$this->move_to_startlist($starters,array_rand($starters),$startlist,$num_routes,$reset_data);
 			$reset_data = false;
 		}
+		// we have an old startlist --> try to keep the position
+		if ($old_startlist && !in_array($use_ranking,array(1,2)))
+		{
+			// reindex startlist's by PerId in $starters
+			foreach($startlist as $num => $startlist_num)
+			{
+				foreach($startlist_num as $starter)
+				{
+					$starters[$num][$starter['PerId']] = $starter;
+				}
+			}
+			// move (reindexed) starters in their old order into the new routes
+			$startlist[2] = $startlist[1] = array();
+			foreach($old_startlist as $PerId => $starter)
+			{
+				if (isset($starters[1][$PerId]))
+				{
+					$this->move_to_startlist($starters[1],$PerId,$startlist,$num_routes,1);
+				}
+				elseif (isset($starters[2][$PerId]))
+				{
+					$this->move_to_startlist($starters[2],$PerId,$startlist,$num_routes,2);
+				}
+			}
+			// add the new athlets (not in old_startlist) after the existing ones
+			$startlist[1] = array_merge($startlist[1],$starters[1]);
+			$startlist[2] = array_merge($startlist[2],$starters[2]);
+			unset($starters);
+		}
+		elseif ($use_ranking >= 3)
+		{
+			// randomize after seeding (distribution in 2 routes) by ranking
+			shuffle($startlist[1]);
+			shuffle($startlist[2]);
+		}
+		if ($stagger)
+		{
+			// 2. half of each route is the other list
+			$x = $startlist[1];
+			$startlist[1] = array_merge($startlist[1],$startlist[2]);
+			$startlist[2] = array_merge($startlist[2],$x);
+			unset($x);
+		}
 		// reverse the startlist if neccessary
 		for ($route = 1; $route <= $num_routes; ++$route)
 		{
-			if ($cat['discipline'] == 'speed' && $mode)
+			if ($cat['discipline'] == 'speed' && $use_ranking)
 			{
 				// if we used a ranking, we have to reverse the startlist
 				// old modus & speed: unranked startes at the beginning
