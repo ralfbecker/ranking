@@ -254,25 +254,26 @@ class athlete extends so_sql
 				$extra_cols[] = "(SELECT MAX(datum) FROM $this->result_table WHERE $this->result_table.PerId=$this->table_name.PerId AND platz > 0) AS last_comp";
 				$join = '';
 			}
-		}
-		$join .= " LEFT JOIN $this->result_table l ON l.PerId=$this->table_name.PerId AND l.WetId=-$this->license_year AND l.GrpId=0";
-		$extra_cols[] = 'l.pkt AS license';
-		if ($filter['license'])
-		{
-			if (is_array($filter['license']))
+
+			$join .= " LEFT JOIN $this->result_table l ON l.PerId=$this->table_name.PerId AND l.WetId=-$this->license_year AND l.GrpId=0";
+			$extra_cols[] = 'l.pkt AS license';
+			if ($filter['license'])
 			{
-				foreach($filter['license'] as $key => $val)
+				if (is_array($filter['license']))
 				{
-					$filter['license'][$key] = array_search($val,$this->pkt2license);
+					foreach($filter['license'] as $key => $val)
+					{
+						$filter['license'][$key] = array_search($val,$this->pkt2license);
+					}
 				}
+				else
+				{
+					$filter['license'] = array_search($filter['license'],$this->pkt2license);
+				}
+				$filter[] = !$filter['license'] ? 'l.pkt IS NULL' : 
+					$this->db->expression($this->result_table,'l.',array('pkt'=>$filter['license']));
+				unset($filter['license']);
 			}
-			else
-			{
-				$filter['license'] = array_search($filter['license'],$this->pkt2license);
-			}
-			$filter[] = !$filter['license'] ? 'l.pkt IS NULL' : 
-				$this->db->expression($this->result_table,'l.',array('pkt'=>$filter['license']));
-			unset($filter['license']);
 		}
 		if ($join && strstr($join,'PerId') !== false)	// this column would be ambigues
 		{
@@ -300,8 +301,8 @@ class athlete extends so_sql
 	 */
 	function distinct_list($column,$keys='')
 	{
-		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),")</p>\n";
-		
+		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),")</p>\n"; $start = microtime(true);
+
 		static $cache;
 		$cache_key = $column.'-'.serialize($keys);
 		
@@ -319,6 +320,7 @@ class athlete extends so_sql
 			$val = $data[$column];
 			$values[$val] = $val;
 		}
+		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),") took ".round(1000*(microtime(true)-$start))."ms</p>\n";
 		return $cache[$cache_key] =& $values;
 	}
 	
