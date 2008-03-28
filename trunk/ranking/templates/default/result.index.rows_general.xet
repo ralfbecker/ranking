@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.4.003">
+	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.4.004">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -50,7 +50,7 @@
 					<description id="{$row}[result2]" no_lang="1" align="center"/>
 					<description id="{$row}[result]" no_lang="1" align="center"/>
 					<description id="{$row}[result1]" no_lang="1" align="center"/>
-					<description id="{$row}[quali_points]" no_lang="1" align="center"/>
+					<textbox type="float" id="{$row}[quali_points]" no_lang="1" align="center" precision="%4.2lf" readonly="true"/>
 				</row>
 			</rows>
 		</grid>

@@ -340,7 +340,10 @@ to year	ranking	en	to year
 top	ranking	en	Top
 top: number of tries or no	ranking	en	Top: number of tries or no
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
-two qualification for all	ranking	en	two Qualification for all
+two * two qualification	ranking	en	two * two Qualification
+two qualification for all, flash one after the other	ranking	en	two Qualification for all, flash one after the other
+two qualification for all, flash simultaniously	ranking	en	two Qualification for all, flash simultaniously
+two qualification for all, on sight	ranking	en	two Qualification for all, on sight
 two qualification, half quota	ranking	en	two Qualification, half quota
 type of display	ranking	en	Type of display
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'

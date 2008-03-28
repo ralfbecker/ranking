@@ -127,7 +127,12 @@ class route_result extends so_sql
 			$join = $this->athlete_join;
 			$extra_cols = array_merge($extra_cols,array('vorname','nachname','nation','geb_date','verband','ort'));
 
-			if ($route_order >= 2+(int)($route_type == TWO_QUALI_HALF))
+			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
+			if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
+			{
+				$extra_cols[] = 'ROUND(('.$this->_sql_rank_prev_heat($route_order,$route_type).'),2) AS rank_prev_heat';
+			}
+			elseif ($route_order >= 2+(int)($route_type == TWO_QUALI_HALF))
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order,$route_type).') AS rank_prev_heat';
 			}
@@ -179,8 +184,14 @@ class route_result extends so_sql
 						unset($filter[$col]);
 					}
 				}
-				$filter[] = $this->table_name.'.result_rank IS NOT NULL';
-
+				if ($route_type == TWO_QUALI_ALL)
+				{
+					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL OR r1.result_rank IS NOT NULL)';
+				}
+				else
+				{
+					$filter[] = $this->table_name.'.result_rank IS NOT NULL';
+				}
 				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 
 				if (!$rows) return $rows;
@@ -261,25 +272,28 @@ class route_result extends so_sql
 		{
 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
 			$r = 'r1';
-			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
+			// result_rank == NULL is counted wrong if we do: $r.result_rank=c$r.result_rank
+			$rank_equal = "(CASE WHEN $r.result_rank IS NULL THEN c$r.result_rank IS NULL ELSE $r.result_rank=c$r.result_rank END)";
+			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $rank_equal";
+			//pre 2008: $c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
 			$r = 'r2';
-			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
+			$rank_equal = "(CASE WHEN $r.result_rank IS NULL THEN c$r.result_rank IS NULL ELSE $r.result_rank=c$r.result_rank END)";
+			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $rank_equal";
+			//pre 2008: $c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
 			$r = 'r1';
-			//$unranked = "(SELECT MAX($r.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
-			//$r1 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
-			$r1 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
+			// athlets not climbined in one quali, get ranked last in that quali
+			$unranked = "(SELECT MAX($this->table_name.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
+			$r1 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
+			//pre 2008: $r1 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
 			$r = 'r2';
-			//$unranked = "(SELECT MAX($r.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
-			//$r2 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
-			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
-			return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
+			$unranked = "(SELECT MAX($this->table_name.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
+			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
+			//pre 2008: $r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
+			//pre 2008: rounding to 2 digits: return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
+			return "SELECT SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2) FROM $this->table_name r1".
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.PerId=r2.PerId".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
 				" AND $this->table_name.PerId=r1.PerId";
-//			return "SELECT ROUND(SQRT((($c1)+2*r1.result_rank-1)/2 * (($c2)+2*r2.result_rank-1)/2),2) FROM $this->table_name r1".
-//				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.PerId=r2.PerId".
-//				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
-//				" AND $this->table_name.PerId=r1.PerId";
 		}
 /*		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
 		{
@@ -358,7 +372,11 @@ class route_result extends so_sql
 			{
 				$order_by[] = "r$route_order.result_rank";
 			}
-			$order_by[] = "r$route_order.result_rank IS NULL";
+			// not participating in one qualification (order 0 or 1) of TWO_QUALI_ALL is ok
+			if ($route_type != TWO_QUALI_ALL || $route_order >= 2)
+			{
+				$order_by[] = "r$route_order.result_rank IS NULL";
+			}
 		}
 		$order_by = implode(',',array_reverse($order_by)).',nachname ASC,vorname ASC';
 
