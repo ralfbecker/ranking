@@ -340,7 +340,10 @@ to year	ranking	de	bis Jahr
 top	ranking	de	Top
 top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
-two qualification for all	ranking	de	zwei Qualifikationen für alle
+two * two qualification	ranking	de	zwei * zwei Qualifikationen für alle
+two qualification for all, flash one after the other	ranking	de	zwei Qualifikationen für alle, Flash nacheinander
+two qualification for all, flash simultaniously	ranking	de	zwei Qualifikationen für alle, Flash gleichzeitig
+two qualification for all, on sight	ranking	de	zwei Qualifikationen für alle, on sight
 two qualification, half quota	ranking	de	zwei Qualifikationen, halbe Quote
 type of display	ranking	de	Typ der Anzeige
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
