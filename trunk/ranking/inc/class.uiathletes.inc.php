@@ -235,7 +235,7 @@ class uiathletes extends boranking
 					'menuaction' => $content['referer'],//'ranking.uiathletes.index',
 					'msg' => $msg,
 				));
-				$js = "window.opener.location='$link'; $js";
+				if (!$required_missing) $js = "window.opener.location='$link'; $js";
 			}
 			if ($content['delete'])
 			{
