@@ -211,7 +211,7 @@ class uiathletes extends boranking
 								$msg .= ', '.lang('Someone already applied for a %1 license!',$this->license_year);
 							}
 							// download form
-							if (file_exists($this->license_form_name) && !$required_missing && $content['athlete_data']['license'] == 's')
+							if (file_exists($this->license_form_name) && !$required_missing && $content['athlete_data']['license'] != 's')
 							{
 								$link = $GLOBALS['egw']->link('/index.php',array(
 									'menuaction' => 'ranking.uiathletes.licenseform',
