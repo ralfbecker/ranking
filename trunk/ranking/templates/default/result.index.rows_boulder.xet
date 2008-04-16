@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.4.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column width="50"/>
+				<column/>
+				<column/>
+				<column/>
+				<column disabled="@num_problems=/[12]/"/>
+				<column disabled="@num_problems=/[123]/"/>
+				<column disabled="@num_problems=/[1234]/"/>
+				<column disabled="!@num_problems=6"/>
+				<column disabled="@no_prev_heat"/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
+					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
+					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
+					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
+					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
+					<description value="License" id="PerId" align="center"/>
+					<nextmatch-sortheader label="Start- number" id="start_order" align="center"/>
+					<nextmatch-sortheader label="Sum" id="result_top,result_zone" align="center"/>
+					<description value="1" class="place" align="center"/>
+					<description value="2" class="place"/>
+					<description value="3" class="place"/>
+					<description value="4" no_lang="1" class="place"/>
+					<description value="5" class="place"/>
+					<description value="6" class="place"/>
+					<nextmatch-sortheader label="previous heat" id="rank_prev_heat" align="center"/>
+				</row>
+				<row class="row $row_cont[quota_class]">
+					<description id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
+					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1" options="$row_cont[link]"/>
+					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
+					<description align="center" id="{$row}[nation]" no_lang="1"/>
+					<description id="{$row}[PerId]" no_lang="1" align="center"/>
+					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order]" no_lang="1"/>
+					<description id="{$row}[result]" no_lang="1" align="center"/>
+					<vbox options="0,0">
+						<menulist class="noPrint noWrap">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top1]" label="Top" align="right"/>
+						</menulist>
+						<menulist class="noPrint noWrap">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone1]" label="Bonus" align="right"/>
+						</menulist>
+						<description id="{$row}[boulder1]" class="onlyPrint" no_lang="1"/>
+					</vbox>
+					<box options="0,0">
+						<menulist class="noPrint">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top2]"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone2]"/>
+						</menulist>
+						<description id="{$row}[boulder2]" class="onlyPrint" no_lang="1"/>
+					</box>
+					<box options="0,0">
+						<menulist class="noPrint">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top3]"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone3]"/>
+						</menulist>
+						<description id="{$row}[boulder3]" class="onlyPrint" no_lang="1"/>
+					</box>
+					<box options="0,0">
+						<menulist class="noPrint">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top4]"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone4]"/>
+						</menulist>
+						<description id="{$row}[boulder4]" class="onlyPrint" no_lang="1"/>
+					</box>
+					<box options="0,0">
+						<menulist class="noPrint">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top5]"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone5]"/>
+						</menulist>
+						<description id="{$row}[boulder5]" class="onlyPrint" no_lang="1"/>
+					</box>
+					<box options="0,0">
+						<menulist class="noPrint">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top6]"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone6]"/>
+						</menulist>
+						<description id="{$row}[boulder6]" class="onlyPrint" no_lang="1"/>
+					</box>
+					<description class="place" id="{$row}[rank_prev_heat]" align="center" no_lang="1"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
