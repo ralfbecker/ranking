@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
@@ -16,7 +16,7 @@ require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
 define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
 define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
 
-class boranking extends soranking 
+class boranking extends soranking
 {
 	var $split_by_places = array(
 		'no' => 'No never',
@@ -38,49 +38,49 @@ class boranking extends soranking
 	var $rls_names;
 	/**
 	 * Nations allowed to create rankings and competitions
-	 * 
+	 *
 	 * @var array
 	 */
 	var $ranking_nations=array();
 	/**
 	 * nation if there's only one ranking-nation
-	 * 
+	 *
 	 * @var string
 	 */
 	var $only_nation='';
 	/**
 	 * nation if there's only one nation the user has edit-rights to
-	 * 
+	 *
 	 * @var string
 	 */
 	var $only_nation_edit='';
 	/**
 	 * nation if there's only one nation the user has athlet-rights to
-	 * 
+	 *
 	 * @var string
 	 */
 	var $only_nation_athlete='';
 	/**
 	 * nation if there's only one nation the user has register-rights to
-	 * 
+	 *
 	 * @var string
 	 */
 	var $only_nation_register='';
 	/**
 	 * nations the user is allowed to see
-	 * 
+	 *
 	 * @var array
 	 */
 	var $read_rights = array();
 	/**
 	 * nations the user is allowed to edit
-	 * 
+	 *
 	 * @var array
 	 */
 	var $edit_rights = array();
 	/**
 	 * nations the user is allowed to edit athlets
-	 * 
+	 *
 	 * @var array
 	 */
 	var $athlete_rights = array();
@@ -90,13 +90,13 @@ class boranking extends soranking
 	var $register_rights = array();
 	/**
 	 * true if user is an administrator, implies all read- and edit-rights
-	 * 
+	 *
 	 * @var boolean
 	 */
 	var $is_admin = false;
 	/**
 	 * account_id of user
-	 * 
+	 *
 	 * @var int
 	 */
 	var $user;
@@ -148,14 +148,14 @@ class boranking extends soranking
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['Time'] = 'Zeit';
-		
+
 		$this->soranking();	// calling the parent constructor
 
 		$this->pkt_names = $this->pkte->names();
 		$this->cat_names = $this->cats->names();
 		$this->rls_names = $this->rls->names();
-		
-		if ((int) $GLOBALS['egw_info']['user']['preferences']['common']['maxmatchs']) 
+
+		if ((int) $GLOBALS['egw_info']['user']['preferences']['common']['maxmatchs'])
 		{
 			$this->maxmatches = (int) $GLOBALS['egw_info']['user']['preferences']['common']['maxmatchs'];
 		}
@@ -185,16 +185,16 @@ class boranking extends soranking
 
 		$this->athlete_rights = array_merge($this->athlete_rights,$this->judge_athlete_rights());
 		if (in_array('NULL',$this->athlete_rights) || $this->is_admin)
-		{ 
+		{
 			$this->athlete_rights = array_merge($this->athlete_rights,array_values($this->athlete->distinct_list('nation')));
 		}
 		$this->athlete_rights = array_unique($this->athlete_rights);
 
 		if (in_array('NULL',$this->register_rights) || $this->is_admin)
-		{ 
+		{
 			$this->register_rights = array_merge($this->register_rights,array_values($this->athlete->distinct_list('nation')));
 		}
-		
+
 		// setup list with nations we rank and intersect it with the read_rights
 		$this->ranking_nations = array('NULL'=>lang('international'))+$this->comp->nations();
 		if (!$this->is_admin)
@@ -223,11 +223,11 @@ class boranking extends soranking
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation', only_nation_athlete='$this->only_nation_athlete', athlete_rights=".print_r($this->athlete_rights,true)."</p>\n";
 		}
 		$this->license_year = (int) date('Y');
-		
+
 		// makeing the boranking object availible for other objects
 		$GLOBALS['boranking'] =& $this;
 	}
-	
+
 	/**
 	 * Checks if the user is admin or has ACL-settings for a required right and a nation
 	 *
@@ -243,15 +243,15 @@ class boranking extends soranking
 	function acl_check($nation,$required,$comp=null)
 	{
 		static $acl_cache = array();
-		
+
 		if ($this->is_admin) return true;
-		
+
 		if (!isset($acl_cache[$nation][$required]))
-		{		
+		{
 			// Result ACL requires _both_ EDIT AND REGISTER rights, acl::check cant check both at once!
 			if($required == EGW_ACL_RESULT)
 			{
-				$acl_cache[$nation][$required] = $this->acl_check($nation,EGW_ACL_EDIT) && 
+				$acl_cache[$nation][$required] = $this->acl_check($nation,EGW_ACL_EDIT) &&
 					$this->acl_check($nation,EGW_ACL_REGISTER|1024);	// |1024 prevents int. registrations rights to be sufficent for national calendars
 			}
 			else
@@ -263,7 +263,7 @@ class boranking extends soranking
 		// check competition specific judges rights for REGISTER and RESULT too
 		return $acl_cache[$nation][$required] || $comp && in_array($required,array(EGW_ACL_REGISTER,EGW_ACL_RESULT)) && $this->is_judge($comp);
 	}
-	
+
 	/**
 	 * Checks if a given date is "over": today > $date
 	 *
@@ -273,11 +273,11 @@ class boranking extends soranking
 	function date_over($date)
 	{
 		$now = explode('-',date('Y-m-d'));
-		
+
 		$over = false;	// same date ==> not over
-		foreach(explode('-',$date) as $i => $n) 
+		foreach(explode('-',$date) as $i => $n)
 		{
-			if ((int) $n != (int) $now[$i]) 
+			if ((int) $n != (int) $now[$i])
 			{
 				$over = $n < $now[$i];
 				break;
@@ -300,10 +300,10 @@ class boranking extends soranking
 		}
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = abs(mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
-		
+
 		return $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) && $distance <= $this->judge_right_days;
 	}
-	
+
 	/**
 	 * Get the nations of all competitions for which the current user has NOW judge-rights and therefor can add athletes
 	 * nation='NULL' means international --> all nations
@@ -328,7 +328,7 @@ class boranking extends soranking
 		}
 		return $nations;
 	}
-		
+
 	/**
 	 * Check if user is allowed to register athlets for $comp and $nation
 	 *
@@ -349,18 +349,18 @@ class boranking extends soranking
 			 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
 		//echo "<p>boranking::registration_check(".print_r($comp,true).",'$nation') = $ret</p>\n";
-		
+
 		return $ret;
 	}
-	
-	/** 
+
+	/**
 	 * calculates a ranking of type $rls->window_type:
 	 *  monat = $rls->window_anz Monate zaehlen faer Rangl.
 	 *  wettk = $rls->window_anz Wettkaempfe ---- " -----
 	 * It uses, if defined, only the $rls->best_wettk best resutls.
 	 *
 	 * @param mixed &$cat GrpId, rkey or cat as array, on return: cat-array
-	 * @param string &$stand  rkey or WetId of a comp, Date YYYY-MM-DD or '.'=todays date, 
+	 * @param string &$stand  rkey or WetId of a comp, Date YYYY-MM-DD or '.'=todays date,
 	 *	on return: date of last comp. of the rankin
 	 * @param string &$start on return: start-date of the ranking = date of the oldest comp. in the ranking
 	 * @param array &$comp on return: comp. as array to whichs date the ranking is calculated ($stand)
@@ -400,7 +400,7 @@ class boranking extends soranking
 		if (!$stand || $stand == '.')	// last comp. before today
 		{
 			$stand = date ('Y-m-d',time());
-			
+
 			$comp = $this->comp->last_comp($stand,$cat['GrpIds'],$cat['nation'],$cup['SerId']);
 		}
 		elseif (!preg_match('/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/',$stand))
@@ -418,20 +418,20 @@ class boranking extends soranking
 		{
 			$comp = false;
 		}
-		if ($comp) 
+		if ($comp)
 		{
 			$stand = $comp['datum'];
-	
+
 			$cats = array($cat['rkey']);
 			if ($this->cats->cat2old[$cat['rkey']]) $cats[] = $this->cats->cat2old[$cat['rkey']];
-			
+
 			if (!$this->comp->next_comp_this_year($comp['datum'],$cats,$cat['nation'],$cup['SerId']))
 			{
 				$stand = (int)$comp['datum'] . '-12-31';	// no further comp. -> stand 31.12.
 			}
 		}
 		if ($this->debug) echo "<p>boranking::ranking: stand='$stand', comp='$comp[rkey]'</p>\n";
-		
+
 		if ($cup)
 		{
 			$max_comp = $this->cup->get_max_comps($cat['rkey'],$cup);
@@ -440,19 +440,19 @@ class boranking extends soranking
 			{
 				return false;			// no cup (ranking) defined for that group
 			}
-		} 
-		else 
-		{ 				
+		}
+		else
+		{
 			// $rls = used ranking-system
 			$rls = $cat['vor'] && $stand < $cat['vor'] ? $cat['vor_rls'] : $cat['rls'];
-	
+
 			if (!$rls || !($rls = $this->rls->read(array('RlsId' => $rls))))
 			{
 				return false; 		// no (valid) ranking definiert
-			}			
+			}
 			$max_comp = $rls['best_wettk'];
-	
-			switch ($rls['window_type']) 
+
+			switch ($rls['window_type'])
 			{
 				case 'monat':			// ranking using a given number of month
 					list($year,$month,$day) = explode('-',$stand);
@@ -467,7 +467,7 @@ class boranking extends soranking
 					if (!($first_comp = $this->comp->last_comp($stand,$cats,$cat['nation'],0,$rls['window_anz'])))
 					{
 						return false;	// not enough competitions
-					}					
+					}
 					$start = $first_comp['datum'];
 					unset($first_comp);
 					break;
@@ -475,12 +475,12 @@ class boranking extends soranking
 		}
 		if ($this->debug) echo "<p>boranking::ranking: start='$start'</p>\n";
 
-		if ($cup) 
+		if ($cup)
 		{
 			$results =& $this->result->cup_results($cup['SerId'],$cup['pkte'],$cat['GrpIds'],$stand,
 				stristr($cup['rkey'],'EYC') ? $this->european_nations : false);
-		} 
-		else 
+		}
+		else
 		{
 			if (!($rls['window_type'] != 'wettk_athlet' && $rls['end_pflicht_tol'] &&
 				$this->cats->age_group($cat,$stand,$from_year,$to_year)))
@@ -491,7 +491,7 @@ class boranking extends soranking
 		}
 		$pers = false;
 		$pkte = $anz = $platz = array();
-		foreach($results as $result) 
+		foreach($results as $result)
 		{
 			$id = $result['PerId'];
 			if (!isset($pers[$id]))		// Person neu --> anlegen
@@ -507,7 +507,7 @@ class boranking extends soranking
 				$anz[$id]++;
 				++$platz[$result['platz']][$id];
 			}
-			else 
+			else
 			{
 				$not_counting[$id][$result['WetId']][$result['GrpId']] = $result['pkt'];
 				if ($cup['split_by_places'] != 'only_counting')
@@ -521,7 +521,7 @@ class boranking extends soranking
 			return ($pers);
 		}
 		arsort ($pkte);
-	
+
 		if ($cup['SerId'] == 60)	// EYC 2003. not sure what this is for, why only 2003?
 		{
 			switch($cup['split_by_places'])
@@ -566,16 +566,16 @@ class boranking extends soranking
 			$abs_pl++;
 			$last_pkte = $pers[$id]['pkt'] = $pkt;
 			$rang[sprintf("%04d%s%s",$pers[$id]['platz'],$pers[$id]['nachname'],$pers[$id]['vorname'])] =& $pers[$id];
-		} 
+		}
 		ksort ($rang);			// array $rang contains now the ranking, sorted by points, lastname, firstname
-	
+
 		$ret_ex_aquo =& $ex_aquo;
 		$ret_pers = $pers;
 		$not_counting =& $not_counting;
-	
+
 		return $rang;
 	}
-	
+
 	/**
 	 * Calculate the prequalified athlets for a given competition
 	 *
@@ -593,7 +593,7 @@ class boranking extends soranking
 		}
 		foreach($do_cat ? array($do_cat) : $comp['gruppen'] as $cat)
 		{
-			//echo "boranking::prequalified($comp[rkey],$do_cat) cat='$cat($cat[rkey])'<br>\n"; 
+			//echo "boranking::prequalified($comp[rkey],$do_cat) cat='$cat($cat[rkey])'<br>\n";
 			if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 			{
 				return false;
@@ -619,15 +619,15 @@ class boranking extends soranking
 					$prequalified[$cat_id] = $this->result->prequalified($comp,$cat_id);
 				}
 				// get athlets prequalified by ranking
-				if ($comp['prequal_ranking'])	
+				if ($comp['prequal_ranking'])
 				{
 					$stand = $comp['datum'];
 					$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);
-					
+
 					foreach((array)$ranking as $athlet)
 					{
 						if ($athlet['platz'] > $comp['prequal_ranking']) break;
-						
+
 						if (!in_array($athlet['PerId'],$prequalified[$cat_id]))
 						{
 							$prequalified[$cat_id][] = $athlet['PerId'];
@@ -640,7 +640,7 @@ class boranking extends soranking
 		//echo "prequalifed($comp[rkey],$do_cat$do_cat[rkey]) ="; _debug_array($prequalified);
 		return $do_cat ? $prequalified[$cat_id] : $prequalified;
 	}
-	
+
 	/**
 	 * get all prequalifed athlets of one nation for a given competition in all categories
 	 *
@@ -651,7 +651,7 @@ class boranking extends soranking
 	function national_prequalified($comp,$nation)
 	{
 		if (!($prequalified = $this->prequalified($comp))) return false;
-		
+
 		$all_cats = $nat_prequals = array();
 		foreach($prequalified as $cat => $prequals)
 		{
@@ -659,7 +659,7 @@ class boranking extends soranking
 			$nat_prequals[$cat] = array();
 		}
 		$all_cats = array_unique($all_cats);
-		
+
 		if (count($all_cats))
 		{
 			foreach((array)$this->athlete->search(array(),false,'','','',false,'AND',false,array(
@@ -673,12 +673,12 @@ class boranking extends soranking
 					{
 						$nat_prequals[$cat][$athlete['PerId']] = $athlete;
 					}
-				}					
+				}
 			}
 		}
 		return $nat_prequals;
 	}
-	
+
 	/**
 	 * (de-)register an athlete for a competition and category
 	 *
@@ -697,7 +697,7 @@ class boranking extends soranking
 	{
 		//echo "<p>boranking::register($comp,$cat,$athlete$athlete[PerId],$mode)</p>\n";
 		if (!$comp || !$cat || !$athlete) return false;
-		
+
 		if ((int)$mode == 2)	// de-register
 		{
 			return !!$this->result->delete(array(
@@ -738,7 +738,7 @@ class boranking extends soranking
 			'datum' => date('Y-m-d'),
 		));
 	}
-	
+
 	/**
 	 * Generate a startlist for the given competition and category
 	 *
@@ -751,7 +751,7 @@ class boranking extends soranking
 	 * @param int/array $cat GrpId or complete cat array
 	 * @param int $num_routes=1 number of routes, default 1
 	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
-	 * @param int $use_ranking=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first, 
+	 * @param int $use_ranking=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first,
 	 * 	new random order but distribution on multiple routes by 3: ranking or 4: cup
 	 * @param boolean $stagger=false insert starters of other route behind
 	 * @param array $old_startlist=null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
@@ -762,19 +762,19 @@ class boranking extends soranking
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
-		
-		/*if ($this->debug)*/ echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$use_ranking,$stagger)</p>\n";
-		
+
+		if ($this->debug) echo "<p>boranking::generate_startlist($comp[rkey],$cat[rkey],$num_routes,$max_compl,$use_ranking,$stagger)</p>\n";
+
 		$filter = array(
 			'WetId'  => $comp['WetId'],
 			'GrpId'  => $cat['GrpId'],
 		);
 		if (!is_array($old_startlist)) $filter[] = 'platz = 0';		// savegard against an already exsiting result
-		
+
 		$starters = $this->result->read($filter,'',true,'nation,reg_nr');
-		
+
 		if (!is_array($starters) || !count($starters)) return false;	// no starters, or eg. already a result
-		
+
 		for ($route = 1; $route <= $num_routes; ++$route)
 		{
 			$startlist[$route] = array();
@@ -810,7 +810,7 @@ class boranking extends soranking
 							'datum' => $athlete['datum'] ? $athlete['datum'] : date('Y-m-d'),
 						));
 					}
-					unset($starters[$k]);							
+					unset($starters[$k]);
 				}
 			}
 		}
@@ -846,7 +846,7 @@ class boranking extends soranking
 				// reverse the startlists now, to have the first in the ranking at the end of the list
 				for ($route = 1; $route <= $num_routes; ++$route)
 				{
-					$startlist[$route] = array_reverse($startlist[$route]);	
+					$startlist[$route] = array_reverse($startlist[$route]);
 				}
 			}
 		}
@@ -957,7 +957,7 @@ class boranking extends soranking
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Get the start- and route-number from the pkt field of a registration startlist
 	 *
@@ -968,20 +968,20 @@ class boranking extends soranking
 	function pkt2start($pkt,$only_route=null)
 	{
 		$route = 1+($pkt >> 14);
-		
+
 		$start = ($pkt >> 6) & 255;
-		
+
 		if (!$only_route)
 		{
 			return $route > 1 ? $route.': '.$start : $start;
 		}
 		return $route == $only_route ? $start : false;
 	}
-	
+
 	/**
 	 * move an athlete to the startlist and diveds them on $num_routes routes
 	 *
-	 * @internal 
+	 * @internal
 	 */
 	function move_to_startlist(&$starters,$k,&$startlist,$num_routes,$reset_data=null)
 	{
@@ -991,10 +991,10 @@ class boranking extends soranking
 		//echo "<p>boranking::check_move_to_startlist(,$k,,$num_routes,$reset_data) route=$route, athlete=".$starters[$k]['nachname'].', '.$starters[$k]['vorname']."</p>\n";
 
 		$athlete =& $starters[$k];
-	
+
 		$startlist[$route][] =& $starters[$k];
 		unset($starters[$k]);
-		
+
 		// previous mode: simply alternating
 		//if (++$route > $num_routes) $route = 1;
 
@@ -1003,7 +1003,7 @@ class boranking extends soranking
 		$last_route = $route;
 		if ($last == $route && $num_routes == 2) $route = $route == 1 ? 2 : 1;
 	}
-	
+
 	/**
 	 * Set the state (selected competition & cat) of the UI
 	 *
@@ -1028,7 +1028,7 @@ class boranking extends soranking
 
 	/**
 	 * Calculate the feldfactor of a competition
-	 * 
+	 *
 	 * For the fieldfactor the ranking of the day before the competition starts has to be used!
 	 *
 	 * @param int/array $comp competition id or array
@@ -1040,12 +1040,12 @@ class boranking extends soranking
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp))) return false;
 		if (!is_array($cat) && !($cat = $this->cats->read($cat))) return false;
-		
+
 		$rls = $cat['vor'] && $comp['datum'] < $cat['vor'] ? $cat['vor_rls'] : $cat['rls'];
 		$has_feldfakt = $rls && $comp['feld_pkte'] && $comp['faktor'] && $cat['rkey'] != "OMEN";
-		
+
 		if (!$has_feldfakt) return 'no fieldfactor';//1.0;
-		
+
 		// we have to use the ranking of the day before the competition starts
 		$stand = explode('-',$comp['datum']);
 		$stand = date('Y-m-d',mktime(0,0,0,$stand[1],$stand[2]-1,$stand[0]));
@@ -1054,9 +1054,9 @@ class boranking extends soranking
 			return 'no ranking';//1.0;
 		}
 		$max_pkte = $this->pkte->get_pkte($comp['feld_pkte'],$pkte);
-		
+
 		$feldfakt = 0.0;
-		
+
 		foreach($starters as $PerId)
 		{
 			if (isset($ranglist[$PerId]))
@@ -1068,7 +1068,7 @@ class boranking extends soranking
 		//echo "<p>boresult::feldfactor('$comp[rkey]','$cat[rkey]')==$feldfakt</p>\n";
 		return $feldfakt;
 	}
-	
+
 	/**
 	 * Import a result of a competition into the ranking
 	 *
@@ -1086,7 +1086,7 @@ class boranking extends soranking
 		}
 		//_debug_array($result);
 		$feldfactor = $this->feldfactor($comp,$keys['GrpId'],array_keys($result));
-		
+
 		$this->result->delete(array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
@@ -1101,7 +1101,7 @@ class boranking extends soranking
 		foreach($result as $PerId => $place)
 		{
 			if (is_array($place)) $place = $place['result_rank'];
-			
+
 			$this->result->save(array(
 				'PerId' => $PerId,
 				'platz' => $place,
@@ -1111,7 +1111,7 @@ class boranking extends soranking
 		// not sure if the new code still uses that, but it does not hurt ;-)
 		$this->result->save_feldfactor($keys['WetId'],$keys['GrpId'],$feldfactor);
 
-		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2lf',$feldfactor));		
+		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2lf',$feldfactor));
 	}
 	/**
 	 * Parse a csv file
@@ -1123,7 +1123,7 @@ class boranking extends soranking
 	 */
 	function parse_csv($keys,$file,$result_only=false)
 	{
-		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || 	
+		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
 			!($cat = $this->cats->read($keys['GrpId'])) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
@@ -1153,7 +1153,7 @@ class boranking extends soranking
 				return lang('Error: dataline %1 contains %2 instead of %3 columns !!!',$n,count($line),count($labels));
 			}
 			$line = array_combine($labels,$line);
-			
+
 			if (in_array('comp',$labels) && $keys['WetId'] != $line['comp'])
 			{
 				return lang('Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!',
@@ -1218,7 +1218,7 @@ class boranking extends soranking
 				'start_order' => $line['startorder'] ? $line['startorder'] : $n,
 				'start_number' => $line['startnumber'] ? $line['startnumber'] : null,
 			)+$this->_csv2result($line,$discipline);
-			
+
 			++$n;
 		}
 		if (!$lines && $cat_warning)
@@ -1227,11 +1227,11 @@ class boranking extends soranking
 		}
 		return $lines;
 	}
-	
+
 	/**
 	 * Convert a result-string into array values, as used in our results
 	 *
-	 * @internal 
+	 * @internal
 	 * @param array $arr result, boulder1, ..., boulderN
 	 * @param string $discipline lead, speed or boulder
 	 * @return array
@@ -1239,11 +1239,11 @@ class boranking extends soranking
 	function _csv2result($arr,$discipline)
 	{
 		$result = array();
-		
+
 		$str = trim(str_replace(',','.',$arr['result']));		// remove space and allow to use comma instead of dot as decimal del.
-		
+
 		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climed so far
-		
+
 		switch($discipline)
 		{
 			case 'lead':
@@ -1263,11 +1263,11 @@ class boranking extends soranking
 					}
 				}
 				break;
-			
+
 			case 'speed':
 				$result['result_time'] = is_numeric($str) ? (double) $str : ELIMINATED_TIME;
 				break;
-				
+
 			case 'boulder':	// #t# #b#
 				list($top,$bonus) = explode(' ',$str);
 				list($top,$top_tries) = explode('t',$top);
