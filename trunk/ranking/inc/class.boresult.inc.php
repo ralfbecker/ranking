@@ -8,14 +8,14 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route_result.inc.php');
 
-class boresult extends boranking 
+class boresult extends boranking
 {
 	/**
 	 * values and labels for route_order
@@ -59,13 +59,13 @@ class boresult extends boranking
 	var $plus,$plus_labels;
 	/**
 	 * Instance of the route object
-	 * 
+	 *
 	 * @var route
 	 */
 	var $route;
 	/**
 	 * Instance of the route-result object
-	 * 
+	 *
 	 * @var route_result
 	 */
 	var $route_result;
@@ -80,7 +80,7 @@ class boresult extends boranking
 	function boresult()
 	{
 		$this->boranking();
-/* doch in soranking, da es sonst nicht tut ;-)		
+/* doch in soranking, da es sonst nicht tut ;-)
 		foreach(array(
 				'route' => 'route',
 				'route_result'  => 'route_result',
@@ -117,10 +117,10 @@ class boresult extends boranking
 			TOP_PLUS => lang('Top'),
 		);
 	}
-		
+
 	/**
 	 * Generate a startlist for the given competition, category and heat (route_order)
-	 * 
+	 *
 	 * reimplented from boranking to support startlist from further heats and to store the startlist via route_result
 	 *
 	 * @param int/array $comp WetId or complete comp array
@@ -139,7 +139,7 @@ class boresult extends boranking
 			'route_order' => $route_order,
 		);
 		if (!$comp || !$cat || !is_numeric($route_order) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||	// permission denied		
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||	// permission denied
 			!$this->route->read($keys) ||	// route does not exist
 			$this->has_results($keys))		// route already has a result
 		{
@@ -152,7 +152,6 @@ class boresult extends boranking
 			// delete existing starters
 			$this->route_result->delete($keys);
 			return $this->_startlist_from_previous_heat($keys,
-				$discipline == 'boulder' && $route_order == 2 ? 'result' :	// boulder 1/2-final --> by quali result
 				($route_order >= 2 ? 'reverse' : 'previous'),	// after quali reversed result, otherwise as previous heat
 				$discipline == 'speed',$discipline);						// speed --> use ko-system for the final
 		}
@@ -175,7 +174,7 @@ class boresult extends boranking
 				'GrpId' => $keys['Grpid'],
 				'platz=0 AND pkt > 64'
 			),'',true,'GrpId,pkt,nachname,vorname');
-			
+
 			return $this->_store_startlist($starters,$route_order);
 		}
 		// preserv an existing quali-startorder (not ranked competitiors)
@@ -197,7 +196,7 @@ class boresult extends boranking
 		$this->route_result->delete($keys);
 
 		$num = $this->_store_startlist($starters[1],$route_type == TWO_QUALI_HALF ? 0 : $route_order);
-			
+
 		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL)))	// automatically generate 2. quali
 		{
 			$keys['route_order'] = 1;
@@ -215,11 +214,11 @@ class boresult extends boranking
 		}
 		return $num;
 	}
-	
+
 	/**
 	 * Store a startlist in route_result table
 	 *
-	 * @internal 
+	 * @internal
 	 * @param array $starters
 	 * @param int $route_order if set only these starters get stored
 	 * @return int num starters stored
@@ -250,7 +249,7 @@ class boresult extends boranking
 		}
 		return $num;
 	}
-	
+
 	/**
 	 * Startorder for the ko-system, first key is the total number of starters,
 	 * second key is the place with the startorder as value
@@ -281,7 +280,7 @@ class boresult extends boranking
 	);
 	/**
 	 * Generate a startlist from the result of a previous heat
-	 * 
+	 *
 	 * @internal use generate_startlist
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
@@ -301,7 +300,7 @@ class boresult extends boranking
 		{
 			$prev_keys['route_order'] = 0;
 		}
-		if (!($prev_route = $this->route->read($prev_keys,true)) || 
+		if (!($prev_route = $this->route->read($prev_keys,true)) ||
 			$start_order != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
 			$ko_system && !$prev_route['route_quota'])
 		{
@@ -320,7 +319,7 @@ class boresult extends boranking
 		{
 			$prev_keys['route_order'] = array(2,3);		// use both quali groups
 		}
-		if ($prev_route['route_quota'] && 
+		if ($prev_route['route_quota'] &&
 			(!self::is_two_quali_all($prev_route['route_type']) || $keys['route_order'] > 2))
 		{
 			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
@@ -377,7 +376,7 @@ class boresult extends boranking
 			{
 				$order_by = 'result_rank DESC';		// --> reversed result
 			}
-			if (($comp = $this->comp->read($keys['WetId'])) && 
+			if (($comp = $this->comp->read($keys['WetId'])) &&
 				($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
 			{
 				$order_by .= ','.$ranking_sql.($start_order != 'result' ? ' DESC' : '');	// --> use the (reversed) ranking
@@ -396,7 +395,7 @@ class boresult extends boranking
 		foreach($starters as $n => $data)
 		{
 			// applying a quota for TWO_QUALI_ALL, taking ties into account!
-			if (isset($data['quali_points']) && count($starters)-$n > $prev_route['route_quota'] && 
+			if (isset($data['quali_points']) && count($starters)-$n > $prev_route['route_quota'] &&
 				$data['quali_points'] > $starters[count($starters)-$prev_route['route_quota']]['quali_points'])
 			{
 				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$prev_route['route_quota'])."]['quali_points']=".$starters[count($starters)-$prev_route['route_quota']]['quali_points']."</p>\n";
@@ -450,7 +449,7 @@ class boresult extends boranking
 		}
 		return $start_order-1;
 	}
-	
+
 	/**
 	 * Check if given type is one of the TWO_QUALI_ALL* types
 	 *
@@ -473,8 +472,8 @@ class boresult extends boranking
 	{
 	 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$mode == 2 ? $comp['serie'] : '');
 		if (!$ranking) return null;
-		
-		$sql = 'CASE '.$PerId;	 	
+
+		$sql = 'CASE '.$PerId;
 	 	foreach($ranking as $data)
 	 	{
 	 		$sql .= ' WHEN '.$data['PerId'].' THEN '.$data['platz'];
@@ -493,8 +492,8 @@ class boresult extends boranking
 	 * @param int $route_type=null ONE_QUALI, TWO_QUALI_ALL, TWO_QUALI_HALF
 	 * @param string $discipline='lead' 'lead', 'speed', 'boulder'
 	 * @param array $old_values values at the time of display, to check if somethings changed
-	 * 		default is null, which causes save_result to read the results now. 
-	 * 		If multiple people are updating, you should provide the result of the time of display, 
+	 * 		default is null, which causes save_result to read the results now.
+	 * 		If multiple people are updating, you should provide the result of the time of display,
 	 * 		to not accidently overwrite results entered by someone else!
 	 * @return boolean/int number of changed results or false on error
 	 */
@@ -502,7 +501,7 @@ class boresult extends boranking
 	{
 		$this->error = null;
 
-		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||		
+		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
 		{
@@ -518,14 +517,14 @@ class boresult extends boranking
 		foreach($results as $PerId => $data)
 		{
 			$keys['PerId'] = $PerId;
-			
+
 			foreach($old_values as $old) if ($old['PerId'] == $PerId) break;
 			if ($old['PerId'] != $PerId) unset($old);
 
 			// to also check the result_details
 			if ($data['result_details']) $data += $data['result_details'];
 			if ($old && $old['result_details']) $old += $old['result_details'];
-			
+
 			if (isset($data['top1']))	// boulder result
 			{
 				for ($i=1; $i <= 6 && isset($data['top'.$i]); ++$i)
@@ -540,7 +539,7 @@ class boresult extends boranking
 			foreach($data as $key => $val)
 			{
 				// something changed?
-				if ($key != 'result_details' && (!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) && 
+				if ($key != 'result_details' && (!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) &&
 					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
 					if ($key == 'start_number' && strchr($val,'+') !== false)
@@ -564,7 +563,7 @@ class boresult extends boranking
 		//if ($modified)	// update the ranking only if there are modifications
 		{
 			unset($keys['PerId']);
-			
+
 			if ($keys['route_order'] == 2 && is_null($route_type))	// check the route_type, to know if we have a countback to the quali
 			{
 				$route = $this->route->read($keys);
@@ -616,14 +615,14 @@ class boresult extends boranking
 	function has_results($keys,$startlist_only=false)
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return null;
-		
+
 		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0,'PerId'=>0));
 
 		if (!$startlist_only) $keys[] = 'result_rank IS NOT NULL';
-		
+
 		return (boolean) $this->route_result->search($keys);//,false);
 	}
-	
+
 	/**
 	 * Check if a route has a startlist
 	 *
@@ -635,7 +634,7 @@ class boresult extends boranking
 	{
 		return $keys['route_order'] == -1 ? false : $this->has_results($keys,true);
 	}
-	
+
 	/**
 	 * Delete a participant from a route and renumber the starting-order of the following participants
 	 *
@@ -648,12 +647,12 @@ class boresult extends boranking
 			!($comp = $this->comp->read($keys['WetId'])) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 			$this->has_results($keys))
-		{ 
+		{
 			return false; // permission denied
 		}
 		return $this->route_result->delete_participant($keys);
 	}
-	
+
 	/**
 	 * Download a route as csv file
 	 *
@@ -670,7 +669,7 @@ class boresult extends boranking
 			$result = $this->has_results($keys);
 			$athletes =& $this->route_result->search('',false,$result ? 'result_rank' : 'start_order','','',false,'AND',false,$keys);
 			//_debug_array($athletes); return;
-			
+
 			$stand = $comp['datum'];
  			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
 
@@ -683,7 +682,7 @@ class boresult extends boranking
 				'PerId'    => 'athlete',
 				'result_rank'    => 'place',
 				'category',
-				'route',	
+				'route',
 				'start_order' => 'startorder',
 				'nachname' => 'lastname',
 				'vorname'  => 'firstname',
@@ -756,9 +755,9 @@ class boresult extends boranking
 			return lang('Permission denied !!!');
 		}
 		$csv = $this->parse_csv($keys,$file);
-		
+
 		if (!is_array($csv)) return $csv;
-		
+
 		$this->route_result->delete(array(
 			'WetId'    => $keys['WetId'],
 			'GrpId'    => $keys['GrpId'],
@@ -775,11 +774,11 @@ class boresult extends boranking
 		}
 		return count($csv);
 	}
-	
+
 	/**
 	 * Convert a result-string into array values, as used in our results
 	 *
-	 * @internal 
+	 * @internal
 	 * @param array $arr result, boulder1, ..., boulderN
 	 * @param string $discipline lead, speed or boulder
 	 * @return array
@@ -787,11 +786,11 @@ class boresult extends boranking
 	function _csv2result($arr,$discipline)
 	{
 		$result = array();
-		
+
 		$str = trim(str_replace(',','.',$arr['result']));		// remove space and allow to use comma instead of dot as decimal del.
-		
+
 		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climed so far
-		
+
 		switch($discipline)
 		{
 			case 'lead':
@@ -811,11 +810,11 @@ class boresult extends boranking
 					}
 				}
 				break;
-			
+
 			case 'speed':
 				$result['result_time'] = is_numeric($str) ? (double) $str : ELIMINATED_TIME;
 				break;
-				
+
 			case 'boulder':	// #t# #b#
 				list($top,$bonus) = explode(' ',$str);
 				list($top,$top_tries) = explode('t',$top);
@@ -836,7 +835,7 @@ class boresult extends boranking
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * Import the general result of a competition into the ranking
 	 *
@@ -862,7 +861,7 @@ class boresult extends boranking
 		//_debug_array($result);
 		return parent::import_ranking($keys,$result);
 	}
-	
+
 	/**
 	 * Gets called via the async service if an automatic import from the rock programms is configured
 	 *
@@ -873,13 +872,13 @@ class boresult extends boranking
 		//echo "import_from_rock"; _debug_array($this->config);
 		$this->_bridge_log("**** bridge run started");
 		foreach($this->config as $name => $value) if (substr($name,0,11)=='rock_import') $this->_bridge_log("config[$name]='$value'");
-		
+
 		if (!$this->config['rock_import_comp'] || !($comp = $this->comp->read($this->config['rock_import_comp'])))
 		{
 			$this->_bridge_log("no competition configured or competition ({$this->config['rock_import_comp']}) not found!");
 			return;
 		}
-		
+
 		for ($n = 1; $n <= 2; ++$n)
 		{
 			if (!($rroute = $this->config['rock_import'.$n]))
@@ -887,11 +886,11 @@ class boresult extends boranking
 				$this->_bridge_log("$n: No route configured!");
 				continue;
 			}
-			
+
 			list(,$rcomp) = explode('.',$rroute);
 			$year = 2000 + (int) $rcomp;
 			$file = $this->config['rock_import_path'].'/'.$year.'/'.$rcomp.'/'.$rroute.'.php';
-			
+
 			unset($route); unset($tn);
 			if (!file_exists($file))
 			{
@@ -905,7 +904,7 @@ class boresult extends boranking
 				$this->_bridge_log("$n: File '$file' does not include a rock route or participants!");
 				continue;
 			}
-			
+
 			if (!$this->config['rock_import_cat'.$n] || !($cat = $this->cats->read($this->config['rock_import_cat'.$n])) ||
 				!in_array($cat['rkey'],$comp['gruppen']) || $route['GrpId'] != $cat['GrpId'])
 			{
@@ -953,7 +952,7 @@ class boresult extends boranking
 		}
 		$this->_bridge_log("**** bridge run finished");
 	}
-	
+
 	/**
 	 * translate a rock participant into a result-service result
 	 *
@@ -964,7 +963,7 @@ class boresult extends boranking
 	function _rock2result($rdata,$discipline)
 	{
 		list($PerId,$GrpId) = explode('+',$rdata['key']);
-		
+
 		$data = array(
 			'PerId' => $PerId,
 			'GrpId' => $GrpId,
@@ -975,7 +974,7 @@ class boresult extends boranking
 			'result_plus' => $discipline == 'lead' ? (strstr($rdata['hoehe'],'Top') ? TOP_PLUS : (int)(substr($rdata['hoehe'],-1).'1')) : null,
 			'result_time' => $discipline == 'speed' && $rdata['time'][0] ? 100*$rdata['time'][0] : null,
 		);
-		
+
 		if ($discipline == 'boulder')
 		{
 			if ($rdata['boulder'][0])
@@ -1001,7 +1000,7 @@ class boresult extends boranking
 		}
 		return $data;
 	}
-	
+
 	/**
 	 * translate a rock route into a result-service route
 	 *
@@ -1026,7 +1025,7 @@ class boresult extends boranking
 				count(explode('+',substr($route['erge_modus'],9))) : null,
 		);
 	}
-	
+
 	function _bridge_log($str)
 	{
 		if ($this->rock_bridge_log && ($f = @fopen($this->rock_bridge_log,'a+')))
@@ -1035,7 +1034,7 @@ class boresult extends boranking
 			fclose($f);
 		}
 	}
-	
+
 	/**
 	 * Get the default quota for a given disciplin, route_order and optional quali_type or participants number
 	 *
@@ -1059,7 +1058,7 @@ class boresult extends boranking
 					break;
 				}
 				break;
-				
+
 			case 'lead':
 				switch($route_order)
 				{
@@ -1068,7 +1067,7 @@ class boresult extends boranking
 					case 2: $quota = 8;  break;		// 1/2-final
 				}
 				break;
-				
+
 			case 'boulder':
 				switch($route_order)
 				{
@@ -1076,12 +1075,12 @@ class boresult extends boranking
 					case 1: $quota = 10; break;		// 2. quali
 					case 2: $quota = 6;  break;		// 1/2-final
 				}
-				break;				
+				break;
 		}
 		//echo "<p>boresult::default_quota($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
 		return $quota;
 	}
-	
+
 	/**
 	 * Singleton to get a boresult instance
 	 *
