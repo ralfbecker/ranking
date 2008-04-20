@@ -6,8 +6,11 @@
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 %1. heat	ranking	en	%1. Heat
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
+1. display	ranking	en	1. Display
 1. place	ranking	en	1. place
+2. display	ranking	en	2. Display
 2. qualification	ranking	en	2. Qualification
+2. time	ranking	en	2. Time
 3. place	ranking	en	3. place
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
@@ -16,7 +19,10 @@ add a new athlete	ranking	en	add a new athlete
 add a new competition	ranking	en	add a new competition
 add a new cup	ranking	en	add a new cup
 add a new heat	ranking	en	Add a new heat
+add athletes	ranking	en	add athletes
 add heat	ranking	en	Add heat
+add not existing athletes to the database, use with caution!	ranking	en	add not existing athletes to the database, use with caution!
+all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 applied	ranking	en	applied
@@ -79,6 +85,8 @@ default ranking view	ranking	en	Default ranking view
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
 delete all rights for this nation	ranking	en	Delete all rights for this nation
+delete an eventually existing result withour further confirmation	ranking	en	Delete an eventually existing result withour further confirmation
+delete result	ranking	en	delete result
 delete this athlete	ranking	en	Delete this athlete
 delete this competition	ranking	en	Delete this competition
 delete this cup	ranking	en	Delete this cup
@@ -176,6 +184,7 @@ host	admin	en	Host
 host nation	ranking	en	Host nation
 host quota	ranking	en	Host quota
 host/ip	ranking	en	Host/IP
+hostname or ip the timy control program is running, eg. localhost	ranking	en	Hostname or IP the Timy control program is running, eg. localhost
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	en	how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year
 how many athletes from the complimentary list of each nation should be used	ranking	en	How many athletes from the complimentary list of each nation should be used
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
@@ -300,6 +309,7 @@ select calendar	ranking	en	Select calendar
 select competition	ranking	en	Select competition
 select heat	ranking	en	Select heat
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
+select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
 serid	ranking	en	SerId
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
@@ -311,6 +321,7 @@ small final	ranking	en	Small final
 someone already applied for a %1 license!	ranking	en	Someone already applied for a %1 license!
 speed	ranking	en	speed
 squad	ranking	en	Squad
+start	ranking	en	Start
 start heat	ranking	en	Start heat
 start order	ranking	en	Start order
 start- number	ranking	en	start- number
@@ -336,6 +347,7 @@ this module displays information from the resultservice of the ranking app.	rank
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
 time	ranking	en	Time
+time measurement	ranking	en	Time measurement
 to year	ranking	en	to year
 top	ranking	en	Top
 top: number of tries or no	ranking	en	Top: number of tries or no

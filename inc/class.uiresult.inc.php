@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
@@ -81,10 +81,10 @@ class uiresult extends boresult
 				{
 					$keys['route_order'] = '0';
 				}
-				$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') : 
+				$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') :
 					($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
 
-				if ($discipline != 'speed') 
+				if ($discipline != 'speed')
 				{
 					$keys['route_quota'] = $this->default_quota($discipline,$keys['route_order']);
 				}
@@ -130,7 +130,7 @@ class uiresult extends boresult
 		{
 			list($button) = each($content['button']);
 			unset($content['button']);
-			
+
 			// reload the parent window
 			$param = array(
 				'menuaction' => 'ranking.uiresult.index',
@@ -176,10 +176,10 @@ class uiresult extends boresult
 					$param['msg'] = $msg = lang('Heat saved');
 
 					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
-					
+
 					// if route is saved the first time, try getting a startlist (from registration or a previous heat)
 					if (!$content['new_route']) break;
-					
+
 					unset($content['new_route']);	// no longer new
 					$msg .= ', ';
 					// fall-throught
@@ -190,17 +190,17 @@ class uiresult extends boresult
 						$param['msg'] = ($msg .= lang('Error: heat already has a result!!!'));
 						$param['show_result'] = 1;
 					}
-					elseif (is_numeric($content['route_order']) && 
+					elseif (is_numeric($content['route_order']) &&
 						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'],
 							$content['max_compl']!=='' ? $content['max_compl'] : 999)))
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
-						
+
 						$to_set = array();
 						$to_set['route_status'] = $content['route_status'] = STATUS_STARTLIST;	// set status to startlist
 						if (!$content['route_quota'])
 						{
-							$content['route_quota'] = $to_set['route_quota'] = 
+							$content['route_quota'] = $to_set['route_quota'] =
 								$this->default_quota($discipline,$content['route_order'],$content['quali_type'],$num);
 						}
 						if ($this->route->read($content,true)) $this->route->save($to_set);
@@ -233,7 +233,7 @@ class uiresult extends boresult
 						$js = $button = '';	// dont exit the window
 					}
 					break;
-					
+
 				case 'upload':
 					if ($content['new_route'])
 					{
@@ -246,7 +246,7 @@ class uiresult extends boresult
 						$param['msg'] = $msg = lang('Heat saved').', ';
 						unset($content['new_route']);
 					}
-					if ($this->has_results($content))
+					if (!$content['delete_result'] && $this->has_results($content))
 					{
 						$param['msg'] = $msg = lang('Error: route already has a result!!!');
 						$param['show_result'] = 1;
@@ -257,7 +257,36 @@ class uiresult extends boresult
 					}
 					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'])))
 					{
+						// set number of problems from csv file
+						if ($content['route_num_problems'])
+						{
+							list($line1) = file($content['file']['tmp_name']);
+							for($n = 3; $n <= 6; $n++)
+							{
+								if (strpos($line1,'boulder'.$n)) $num_problems = $n;
+							}
+							if ($num_problems && $num_problems != $content['route_num_problems'])
+							{
+								$content['route_num_problems'] = $num_problems;
+								$need_save = true;
+							}
+						}
+						// set the name from the csv file
+						if (substr($content['file']['name'],0,strlen($cat['name'])+3) == $cat['name'].' - ' &&
+							($name_from_file = str_replace('.csv','',substr($content['file']['name'],strlen($cat['name'])+3))) != $content['route_name'])
+						{
+							$content['route_name'] = $name_from_file;
+							$need_save = true;
+						}
+						// save the route, if we set something above
+						if ($need_save && $this->route->save($content) != 0)
+						{
+							$msg = lang('Error: saving the heat!!!');
+							$button = $js = '';	// dont exit the window
+							break;
+						}
 						$param['msg'] = ($msg .= lang('%1 participants imported',$imported));
+						$param['show_result'] = 1;
 						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
 					}
 					else
@@ -265,7 +294,7 @@ class uiresult extends boresult
 						$param['msg'] = ($msg .= $imported);
 					}
 					break;
-					
+
 				case 'ranking':
 					$param['msg'] = $msg = $this->import_ranking($content);
 					break;
@@ -311,7 +340,7 @@ class uiresult extends boresult
 				elseif($content['route_quota'] == 1)
 				{
 					$content['route_quota'] = '';
-					$content['route_name'] = lang('Small final');					
+					$content['route_name'] = lang('Small final');
 				}
 				else
 				{
@@ -331,13 +360,24 @@ class uiresult extends boresult
 			'route_status' => $this->stati,
 			'route_type' => $this->quali_types,
 			'discipline' => $this->disciplines,
+			'upload_options' => array(
+				1 => array(
+					'label' => 'delete result',
+					'title' => 'Delete an eventually existing result withour further confirmation',
+				),
+				2 => array(
+					'label' => 'add athletes',
+					'title' => 'add not existing athletes to the database, use with caution!',
+				),
+				3 => 'all above',
+			),
 		);
 		if ($content['route_order'] == -1)
 		{
 			unset($sel_options['route_status'][0]);
 		}
 		// cant delete general result or not yet saved routes
-		$readonlys['button[startlist]'] = $readonlys['button[delete]'] = 
+		$readonlys['button[startlist]'] = $readonlys['button[delete]'] =
 			$content['route_order'] == -1 || $content['new_route'];
 		// disable max. complimentary selection if no quali.
 		if ($content['route_order'] > (int)($content['route_type']==TWO_QUALI_HALF))
@@ -375,7 +415,7 @@ class uiresult extends boresult
 					if ($content['dsp_id'.$num] && $display->read($content['dsp_id'.$num]))
 					{
 						$preserv['dsp_clone_of'.$num] = $display->dsp_clone_of;
-						
+
 						if (is_null($format))
 						{
 							include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
@@ -417,14 +457,14 @@ class uiresult extends boresult
 		$query = $query_in;
 		unset($query['rows']);		// no need to save, can not unset($query_in['rows']), as this is $rows !!!
 		$GLOBALS['egw']->session->appsession('result','ranking',$query);
-		
+
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['GrpId'] = $query['cat'];
 		$query['col_filter']['route_order'] = $query['route'];
 		// this is to transport the route_type to route_result::search's filter param
 		$query['col_filter']['route_type'] = $query['route_type'];
 		$query['col_filter']['discipline'] = $query['discipline'];
-		
+
 		switch (($order = $query['order']))
 		{
 			case 'result_rank':
@@ -470,7 +510,7 @@ class uiresult extends boresult
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
-			
+
 			// results for setting on regular routes (no general result)
 			if($query['route'] >= 0) $rows['set'][$row['PerId']] = $row;
 
@@ -484,15 +524,15 @@ class uiresult extends boresult
 				$rows[$k]['ranking_place'] = $ranking[$row['PerId']]['platz'];
 				$rows[$k]['ranking_points'] = $ranking[$row['PerId']]['pkt'];
 			}
-			$rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on'; 
-			if ($query['discipline'] == 'speed' && $query['route'] >= 2 && 
-				(strstr($query['template'],'startlist') && $order == 'start_order' || 
+			$rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on';
+			if ($query['discipline'] == 'speed' && $query['route'] >= 2 &&
+				(strstr($query['template'],'startlist') && $order == 'start_order' ||
 				!strstr($query['template'],'startlist') && !$row['result_rank'] && $order == 'result_rank'))
 			{
 				if (!$unranked)
 				{
 					$unranked[$k & 2] = $rows[$k]['class'];
-					$unranked[2*!($k & 2)] = $rows[$k]['class'] == 'row_off' ? 'row_on' : 'row_off';	
+					$unranked[2*!($k & 2)] = $rows[$k]['class'] == 'row_off' ? 'row_on' : 'row_off';
 				}
 				$rows[$k]['class'] = $unranked[$k & 2];
 			}
@@ -522,18 +562,18 @@ class uiresult extends boresult
 		}
 		// report the set-values at time of display back to index() for calling boresult::save_result
 		$query_in['return'] = $rows['set'];
-		
+
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
 			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4;
-		
+
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
 		if ($query['discipline'] == 'lead')
 		{
-			$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' : 
-				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' : 
+			$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' :
+				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' :
 				($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
 		}
 		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'];
@@ -541,7 +581,7 @@ class uiresult extends boresult
 		$rows['no_delete'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
 		$rows['time_measurement'] = $query['time_measurement'];
-		
+
 		return $total;
 	}
 
@@ -554,7 +594,7 @@ class uiresult extends boresult
 	function index($content=null,$msg='',$pstambl='')
 	{
 		$tmpl =& new etemplate('ranking.result.index');
-		
+
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
 			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
@@ -583,7 +623,7 @@ class uiresult extends boresult
 			if (is_numeric($_GET['route'])) $content['nm']['route'] = $_GET['route'];
 			if ($_GET['msg']) $msg = $_GET['msg'];
 			if (isset($_GET['show_result'])) $content['nm']['show_result'] = (int)$_GET['show_result'];
-			
+
 			$content['nm']['pstambl'] = $pstambl;
 		}
 		elseif ($content['nm']['show_result'] < 0)
@@ -684,18 +724,18 @@ class uiresult extends boresult
 						{
 							foreach($data as $field => $error)
 							{
-								$tmpl->set_validation_error("nm[rows][set][$PerId][$field]",$error);					
+								$tmpl->set_validation_error("nm[rows][set][$PerId][$field]",$error);
 								$errors[$error] = $error;
 							}
 						}
 						$msg = lang('Error').': '.implode(', ',$errors);
 					}
 					break;
-					
+
 				case 'download':
 					$this->download($keys);
 					break;
-					
+
 				case 'delete':
 					if (!is_numeric($PerId) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 						!$this->delete_participant($keys+array('PerId'=>$PerId)))
@@ -710,7 +750,7 @@ class uiresult extends boresult
 			}
 		}
 		unset($content['nm']['rows']);
-		
+
 		// create new view
 		$sel_options = array(
 			'calendar' => $this->ranking_nations,
@@ -751,13 +791,13 @@ class uiresult extends boresult
 		$content['nm']['num_problems'] = $route['route_num_problems'];
 		$content['nm']['time_measurement'] = $route['route_time_host'] && $route['route_status'] != STATUS_RESULT_OFFICIAL;
 		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
-		
+
 		// make competition and category data availible for print
 		$content['comp'] = $comp;
 		$content['cat']  = $cat;
 
 		$content['msg'] = $msg;
-		
+
 		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
 		{
 			if ($content['nm']['discipline'] == 'speed')	// for speed include pairing graph
@@ -769,7 +809,7 @@ class uiresult extends boresult
 			unset($sel_options['route'][-1]);
 			$sel_options['route'] = array(-1 => $label)+$sel_options['route'];
 			$sel_options['show_result'][2] = lang('General result');
-			
+
 		}
 		elseif ($content['nm']['route'] == -1)	// general result with only one heat --> show quali if exist
 		{
@@ -779,7 +819,7 @@ class uiresult extends boresult
 		//_debug_array($sel_options);
 
 		// no startlist, no rights at all or result offical -->disable all update possebilities
-		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) || 
+		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || $route['route_status'] == STATUS_RESULT_OFFICIAL))
 		{
 			$readonlys['nm'] = true;
@@ -795,7 +835,7 @@ class uiresult extends boresult
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
 		{
 			$readonlys['button[edit]'] = $readonlys['button[new]'] = true;
-			
+
 			if (!is_numeric($keys['route_order']) || !$sel_options['route']) $content['no_route_selection'] = true;	// no route yet
 		}
 		elseif (!is_numeric($keys['route_order']) || !$sel_options['route'])	// no route yet
@@ -854,7 +894,7 @@ class uiresult extends boresult
 		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],$content['nm']['discipline']);
 		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_
 		$content['nm']['route_quota'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_quota'] : 0;
-		
+
 		// should we show the result offical footer?
 		$content['result_official'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL;
 
@@ -864,17 +904,17 @@ class uiresult extends boresult
 			$GLOBALS['egw']->js =& new javascript();
 		}
 		$GLOBALS['egw']->js->validate_file('.','ranking','ranking',false);
-		
+
 		// create a nice header
-		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') : 
-			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED || 
+		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') :
+			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED ||
 			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
-		
+
 		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
-	
+
 	/**
 	 * Update a result of a single participant
 	 *
@@ -887,7 +927,7 @@ class uiresult extends boresult
 	{
 		//$start = microtime(true);
 		$response = new xajaxResponse();
-		
+
 		require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate_request.inc.php');
 		if (!($request =& etemplate_request::read($request_id)))
 		{
@@ -907,7 +947,7 @@ class uiresult extends boresult
 				//$args .= ",$name='$value'";
 			}
 			//$response->addAlert("ajax_update('$request_id',$PerId$args)");
-		
+
 			//_debug_array($request->preserv); exit;
 			$content = $content['exec'];
 			$tpl = new etemplate();	// process_show is NOT static
@@ -968,7 +1008,7 @@ class uiresult extends boresult
 		//error_log("processing of ajax_update took ".sprintf('%4.2lf s',microtime(true)-$start));
 		return $response->getXML();
 	}
-	
+
 	/**
 	 * Get the template name depending on show_result and discipline
 	 *
@@ -998,7 +1038,7 @@ class uiresult extends boresult
 		}
 		return 'ranking.result.index.rows_startlist';
 	}
-	
+
 	/**
 	 * Start the time measurement for $PerId
 	 *
@@ -1010,7 +1050,7 @@ class uiresult extends boresult
 	{
 		//$start = microtime(true);
 		$response = new xajaxResponse();
-		
+
 		require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate_request.inc.php');
 		if (!($request =& etemplate_request::read($request_id)))
 		{
@@ -1031,7 +1071,7 @@ class uiresult extends boresult
 		}
 		require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_time_measurement.inc.php');
 		$timy =& new ranking_time_measurement($route['route_time_host'],$route['route_time_port']);
-		
+
 		if (!$timy->is_connected())
 		{
 			$response->addAlert(lang("Can't connect to time controll program at '%1': %2",$route['route_time_host'].':'.$route['route_time_port'],$timy->error));
@@ -1058,7 +1098,7 @@ class uiresult extends boresult
 			// find out the other participant
 			if ($route['route_order'] < 2 && $old_result['result_time'])	// quali and already measured
 			{
-				$side1 = 'r'; 
+				$side1 = 'r';
 				$side2 = 'l';
 				$other_sorder = $old_result['start_order'] + 1;
 			}
@@ -1089,7 +1129,7 @@ class uiresult extends boresult
 					// other participant not found --> error
 					$response->addAlert(lang("Can't find co-participant!"));
 					$timy->close();
-					return $this->_stop_time_measurement($response);					
+					return $this->_stop_time_measurement($response);
 				}
 			}
 			elseif ($old_other['PerId'] < 0)	// wildcard as other participant
@@ -1109,21 +1149,21 @@ class uiresult extends boresult
 		}
 		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI)	// two routes with only one climber, set other to 0
 		{
-			$timy->send("start:l:0");	
+			$timy->send("start:l:0");
 		}
 		if ($old_other)
 		{
 			$time = is_numeric($old_result['time_sum']) ? $old_result['time_sum'] : '';
 			$other_snr = $old_other['start_number'] ? $old_other['start_number'] : $old_other['start_order'];
-			$timy->send("start:$side2:$other_snr:".$old_other['time_sum'].':'.$other_athlete['nachname'].', '.$other_athlete['vorname'].' ('.$other_athlete['nation'].')');	
+			$timy->send("start:$side2:$other_snr:".$old_other['time_sum'].':'.$other_athlete['nachname'].', '.$other_athlete['vorname'].' ('.$other_athlete['nation'].')');
 		}
 		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI)	// two routes with only one climber, set other to 0
 		{
 			$s = $side1 == 'l' ? 'r' : 'l';
-			$timy->send("start:$s:0");	
+			$timy->send("start:$s:0");
 		}
 		$timy->send('notify:'.$side);
-		
+
 		if(($dsp_id=$route['dsp_id']) && ($frm_id=$route['frm_id']))
 		{
 			// add display update(s)
@@ -1161,7 +1201,7 @@ class uiresult extends boresult
 						if ($other_athlete) $display->activate($frm_id2,$other_PerId,$dsp_id2,$keys['GrpId'],$keys['route_order']);
 					}
 					break;
-					
+
 				case 'stop':
 					$result = $event_side == 'l' ? 'result_time' : 'result_time_r';
 					if ($event_side == $side1)	// side1
@@ -1201,7 +1241,7 @@ class uiresult extends boresult
 						$stop = true;
 					}
 					break;
-					
+
 				case 'false':
 					$response->addAlert(lang('False start %1: %2',$event_side != 'r' ? lang('left') : lang('right'),
 						$event_side != 'b' ? $time : $time2).($event_side == 'b' ? ', '.lang('right').': '.$time : ''));
@@ -1220,7 +1260,7 @@ class uiresult extends boresult
 		//error_log("processing of ajax_time_measurement took ".sprintf('%4.2lf s',microtime(true)-$start));
 		return $this->_stop_time_measurement($response,lang('Time measured'));
 	}
-	
+
 	function _update_ranks(array $keys,xajaxResponse &$response,etemplate_request &$request)
 	{
 error_log("content[order]=".$request->content['nm']['order'].", changes[order]=".$request->changes['nm']['order']);
@@ -1238,10 +1278,10 @@ error_log("content[order]=".$request->content['nm']['order'].", changes[order]="
 			$response->addScript('document.eTemplate.submit();');
 		}
 	}
-	
+
 	/**
 	 * Stop the running time measurement ON CLIENT SIDE
-	 * 
+	 *
 	 * @access private
 	 * @param xajaxResponse $response response object with preset responses
 	 * @return string

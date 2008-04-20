@@ -747,14 +747,16 @@ class boresult extends boranking
 	 * @param array $keys WetId, GrpId, route_order
 	 * @param string $file uploaded file
 	 * @param string/int error message or number of lines imported
+	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
+	 * @return int/string integer number of imported results or string with error message
 	 */
-	function upload($keys,$file)
+	function upload($keys,$file,$add_athletes=false)
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) // permission denied
 		{
 			return lang('Permission denied !!!');
 		}
-		$csv = $this->parse_csv($keys,$file);
+		$csv = $this->parse_csv($keys,$file,false,$add_athletes);
 
 		if (!is_array($csv)) return $csv;
 
@@ -816,20 +818,28 @@ class boresult extends boranking
 				break;
 
 			case 'boulder':	// #t# #b#
-				list($top,$bonus) = explode(' ',$str);
-				list($top,$top_tries) = explode('t',$top);
-				list($bonus,$bonus_tries) = explode('b',$bonus);
-				$result['result_top'] = $top ? 100 * $top - $top_tries : null;
-				$result['result_zone'] = 100 * $bonus - $bonus_tries;
-				for($i = 1; $i <= 6 && array_key_exists('boulder'.$i,$arr); ++$i)
+				if (($bonus_pos = strpos($str,'b')) !== false)	// we split the string on the position of 'b' minus one char, as num of bonus is always 1 digit
 				{
-					if (!($boulder = $arr['boulder'.$i])) continue;
-					if ($boulder{0} == 't')
+					list($top,$top_tries) = explode('t',substr($str,0,$bonus_pos-1));
+					list($bonus,$bonus_tries) = explode('b',trim(substr($str,$bonus_pos-1)));
+					$result['result_top'] = $top ? 100 * $top - $top_tries : null;
+					$result['result_zone'] = 100 * $bonus - $bonus_tries;
+					for($i = 1; $i <= 6 && array_key_exists('boulder'.$i,$arr); ++$i)
 					{
-						$result['top'.$i] = (int) substr($boulder,1);
-						list(,$boulder) = explode(' ',$boulder);
+						$result['top'.$i] = '';
+						$result['zone'.$i] = strpos($str,'0b') !== false ? '0' : '';	// we need to differ between 0b and not climbed!
+						if (!($boulder = $arr['boulder'.$i])) continue;
+						if ($boulder[0] == 't')
+						{
+							$result['top'.$i] = (int) substr($boulder,1);
+							$boulder = strstr($boulder,'b');
+						}
+						$result['zone'.$i] = (int) substr($boulder,1);
 					}
-					$result['zone'.$i] = (int) substr($boulder,1);
+				}
+				else
+				{
+					$result = array();
 				}
 				break;
 		}

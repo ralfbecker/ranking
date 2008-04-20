@@ -6,8 +6,11 @@
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
 %1. heat	ranking	de	%1. Runde
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
+1. display	ranking	de	1. Display
 1. place	ranking	de	1. Platz
+2. display	ranking	de	2. Display
 2. qualification	ranking	de	2. Qualifikation
+2. time	ranking	de	2. Zeit
 3. place	ranking	de	3. Platz
 aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
@@ -16,7 +19,10 @@ add a new athlete	ranking	de	einen neuen Athleten anlegen
 add a new competition	ranking	de	einen neuen Wettkampf anlegen
 add a new cup	ranking	de	Neue Serie anlegen
 add a new heat	ranking	de	Neue Runde anlegen
+add athletes	ranking	de	Athleten hinzufügen
 add heat	ranking	de	Runde anlegen
+add not existing athletes to the database, use with caution!	ranking	de	Nicht existierende Athleten zur Datenbank hinzufügen, mit Vorsicht benutzen!
+all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 applied	ranking	de	beantragt
@@ -79,6 +85,8 @@ default ranking view	ranking	de	Standardansicht Ranglisten
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
 delete all rights for this nation	ranking	de	Alle Rechte für diese Nation löschen
+delete an eventually existing result withour further confirmation	ranking	de	Löscht das eventuel existierende Ergebnis ohne weitere Rückfrage
+delete result	ranking	de	Ergebnis löschen
 delete this athlete	ranking	de	Diesen Athleten löschen
 delete this competition	ranking	de	Diesen Wettkampf löschen
 delete this cup	ranking	de	Diesen Cup löschen
@@ -176,6 +184,7 @@ host	admin	de	Rechner
 host nation	ranking	de	durchführende Nation
 host quota	ranking	de	Quote durchf. Nation
 host/ip	ranking	de	Rechner/IP
+hostname or ip the timy control program is running, eg. localhost	ranking	de	Hostname oder IP des laufenden Timy Kontrollprogramms, zB. localhost
 how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	de	wie wird der Schlüssel für den Cup dieser Kategorie gebildet, zB. '??_WC' für den Weltcup (?? wird durch das Jahr ersetzt)
 how many athletes from the complimentary list of each nation should be used	ranking	de	Wie viele Athleten der Komplimentärliste sollen von jeder Nation zugelassen werden
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
@@ -300,6 +309,7 @@ select calendar	ranking	de	Kalender auswählen
 select competition	ranking	de	Wettkampf auswählen
 select heat	ranking	de	Runde auswählen
 select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
+select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 serid	ranking	de	SerId
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
@@ -311,6 +321,7 @@ small final	ranking	de	Kleines Finale
 someone already applied for a %1 license!	ranking	de	Jemand hat bereits die %1 Lizenz beantragt!
 speed	ranking	de	Geschwindigkeit
 squad	ranking	de	Kader
+start	ranking	de	Start
 start heat	ranking	de	Beginn Durchgang
 start order	ranking	de	Startreihenfolge
 start- number	ranking	de	Start- nummer
@@ -336,6 +347,7 @@ this module displays information from the resultservice of the ranking app.	rank
 this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
 time	ranking	de	Zeit
+time measurement	ranking	de	Zeitmessung
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
 top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein

@@ -1119,9 +1119,10 @@ class boranking extends soranking
 	 * @param array $keys WetId, GrpId, route_order
 	 * @param string $file uploaded file
 	 * @param boolean $result_only true = only results allowed, false = startlists too
+	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
 	 * @return string/array error message or result lines
 	 */
-	function parse_csv($keys,$file,$result_only=false)
+	function parse_csv($keys,$file,$result_only=false,$add_athletes=false)
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
@@ -1182,26 +1183,31 @@ class boranking extends soranking
 			{
 				if (!($athlete = $this->athlete->read($line['athlete'])))
 				{
-/* code to create not existing athletes, eg. as offline backup solution
-					static $gender;
-					if (is_null($gender))
+					// code to create not existing athletes, eg. as offline backup solution
+					if ($add_athletes)
 					{
-						$this->cats->read($keys['GrpId']);
-						$gender = $this->cats->data['sex'];
+						static $gender;
+						if (is_null($gender))
+						{
+							$this->cats->read($keys['GrpId']);
+							$gender = $this->cats->data['sex'];
+						}
+						$this->athlete->init(array(
+							'PerId' => $line['athlete'],
+							'vorname' => $line['firstname'],
+							'nachname' => $line['lastname'],
+							'nation' => $line['nation'],
+							'sex' => $gender,
+							'geb_date' => $line['birthyear'] ? $line['birthyear'].'-01-01' : null,
+						));
+						$this->athlete->generate_rkey();
+						$this->athlete->save();
+						$athlete = $this->athlete->data;
 					}
-					$this->athlete->init(array(
-						'PerId' => $line['athlete'],
-						'vorname' => $line['firstname'],
-						'nachname' => $line['lastname'],
-						'nation' => $line['nation'],
-						'sex' => $gender,
-						'geb_date' => $line['birthyear'] ? $line['birthyear'].'-01-01' : null,
-					));
-					$this->athlete->generate_rkey();
-					$this->athlete->save();
-					$athlete = $this->athlete->data;
-*/
-					return lang('Error: dataline %1 contains not existing athlete id #%2 !!!',$n,$line['athlete']);
+					else
+					{
+						return lang('Error: dataline %1 contains not existing athlete id #%2 !!!',$n,$line['athlete']);
+					}
 				}
 				if ($athlete['sex'] != $cat['sex'])
 				{
