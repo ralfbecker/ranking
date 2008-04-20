@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.route" template="" lang="" group="0" version="1.4.002">
+	<template id="ranking.result.route" template="" lang="" group="0" version="1.4.003">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -100,6 +100,9 @@
 					<hbox options="0,0" span="all">
 						<file id="file"/>
 						<button id="button[upload]" label="Upload" class="leftPad5"/>
+						<menulist class="leftPad5">
+							<menupopup id="upload_options" options="Options"/>
+						</menulist>
 					</hbox>
 				</row>
 				<row class="row" disabled="@no_display">
