@@ -188,7 +188,8 @@ class boresult extends boranking
 		// old reverse ranking: $starters =& parent::generate_startlist($comp,$cat,$route_type == TWO_QUALI_HALF ? 2 : 1,$max_compl,1,$old_startlist);
 		$starters =& parent::generate_startlist($comp,$cat,
 			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
-			in_array($route_type,array(TWO_QUALI_HALF,TWO_QUALI_ALL_SEED_STAGGER,TWOxTWO_QUALI)) ? 3 : 0,		// 3 = distribution by ranking, 0 = random
+			$discipline == 'speed' ? 1 :																		// 1 = reverse of ranking for speed
+			(in_array($route_type,array(TWO_QUALI_HALF,TWO_QUALI_ALL_SEED_STAGGER,TWOxTWO_QUALI)) ? 3 : 0),		// 3 = distribution by ranking, 0 = random
 			$route_type == TWO_QUALI_ALL_SEED_STAGGER,															// true = stagger, false = no stagger
 			$old_startlist);
 
