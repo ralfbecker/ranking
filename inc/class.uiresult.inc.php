@@ -246,7 +246,7 @@ class uiresult extends boresult
 						$param['msg'] = $msg = lang('Heat saved').', ';
 						unset($content['new_route']);
 					}
-					if (!$content['delete_result'] && $this->has_results($content))
+					if (!($content['upload_options'] & 1) && $this->has_results($content))
 					{
 						$param['msg'] = $msg = lang('Error: route already has a result!!!');
 						$param['show_result'] = 1;
@@ -255,7 +255,7 @@ class uiresult extends boresult
 					{
 						$param['msg'] = ($msg .= lang('Error: no file to upload selected'));
 					}
-					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'])))
+					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'],$content['upload_options'] & 2)))
 					{
 						// set number of problems from csv file
 						if ($content['route_num_problems'])
