@@ -1186,18 +1186,12 @@ class boranking extends soranking
 					// code to create not existing athletes, eg. as offline backup solution
 					if ($add_athletes)
 					{
-						static $gender;
-						if (is_null($gender))
-						{
-							$this->cats->read($keys['GrpId']);
-							$gender = $this->cats->data['sex'];
-						}
 						$this->athlete->init(array(
 							'PerId' => $line['athlete'],
 							'vorname' => $line['firstname'],
 							'nachname' => $line['lastname'],
 							'nation' => $line['nation'],
-							'sex' => $gender,
+							'sex' => $cat['sex'],
 							'geb_date' => $line['birthyear'] ? $line['birthyear'].'-01-01' : null,
 						));
 						$this->athlete->generate_rkey();
