@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
@@ -46,9 +46,9 @@ class competition extends so_sql
 	{
 		//$this->debug = 1;
 		$this->so_sql('ranking','Wettkaempfe',$db);	// call constructor of extended class
-		
+
 		if ($source_charset) $this->source_charset = $source_charset;
-		
+
 		$this->charset = $GLOBALS['egw']->translation->charset();
 
 		foreach(array(
@@ -110,9 +110,9 @@ class competition extends so_sql
 		}
 		$data['pkt_bis'] = $data['pkt_bis']!='' ? intval(100 * $data['pkt_bis']) : 100;
 		$data['feld_bis'] = $data['feld_bis']!='' ? intval(100 * $data['feld_bis']) : 100;
-		
+
 		if ($data['judges']) $data['judges'] = explode(',',$data['judges']);
-		
+
 		if ($data['datum'])
 		{
 			// calculate an end-date as Y-m-d and a printable span like 1. - 3. Januar 2007
@@ -143,8 +143,8 @@ class competition extends so_sql
 			$data['gruppen'] = implode(',',$data['gruppen']);
 		}
 		if ($data['duration']) $data['gruppen'] .= '@' . $data['duration'];
-		if ($data['pkt_bis'])  $data['pkt_bis']  = $data['pkt_bis']  == 100 ? '' : 100.0*$data['pkt_bis'];
-		if ($data['feld_bis']) $data['feld_bis'] = $data['feld_bis'] == 100 ? '' : 100.0*$data['feld_bis'];
+		if ($data['pkt_bis'])  $data['pkt_bis']  = $data['pkt_bis']  == 100 ? '' : round($data['pkt_bis']/100,2);
+		if ($data['feld_bis']) $data['feld_bis'] = $data['feld_bis'] == 100 ? '' : round($data['feld_bis']/100,2);
 		if ($data['rkey'])     $data['rkey'] = strtoupper($data['rkey']);
 		if ($data['nation'] && !is_array($data['nation']))   $data['nation'] = $data['nation'] == 'NULL' ? null : strtoupper($data['nation']);
 		if (isset($data['pkte']) && !$data['pkte']) $data['pkte'] = null;
@@ -165,7 +165,7 @@ class competition extends so_sql
 	 *
 	 * @param mixed $keys array with keys, or WetId or rkey
 	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or 
+	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
 	 * @return array/boolean array with competition or false on error (eg. not found)
 	 */
 	function read($keys,$extra_cols='',$join='')
@@ -193,7 +193,7 @@ class competition extends so_sql
 		//$this->debug = 1;
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
-	
+
 	/**
 	 * get the $num-last competition before $date in a given category, calendar and cup
 	 *
@@ -224,14 +224,14 @@ class competition extends so_sql
 			$query[] = $this->db->expression($this->result_table,array('GrpId' => $cats));
 		}
 		$ret = $this->search(array(),false,$this->table_name.'.datum DESC','','',false,
-			'AND',array($num-1,1),$query,",$this->result_table WHERE $this->table_name.WetId=$this->result_table.WetId 
+			'AND',array($num-1,1),$query,",$this->result_table WHERE $this->table_name.WetId=$this->result_table.WetId
 			AND $this->table_name.datum <= ".$this->db->quote($date));
-		
+
 		if ($this->debug) echo "<p>competition::last_comp('$date',".print_r($cats,true).",'$nation',$cup)=".$ret[0]['rkey']."</p>\n";
-			
+
 		return $ret ? $ret[0] : false;
 	}
-	
+
 	/**
 	 * get the next competition after $date in the _same_ year in a given category, calendar and cup
 	 *
@@ -257,18 +257,18 @@ class competition extends so_sql
 			'datum > '.$this->db->quote($date),
 			'datum <= '.$this->db->quote((int)$date.'-12-31'),
 			$cup ? 'serie='.(int)$cup : 'faktor > 0.0',
-			$this->check_in_cats($cats),			
+			$this->check_in_cats($cats),
 		));
 		if ($this->debug) echo "<p>competition::next_comp_this_year('$date',".print_r($cats,true).",'$nation',$cup) = '$ret[rkey]'</p>\n";
-		
+
 		return $ret ? $ret[0] : false;
 	}
-	
+
 	/**
 	 * SQL to check if competition has one of the given cats
 	 *
 	 * old competitions might have regular expressions of the cats attending them
-	 * 
+	 *
 	 * @static
 	 * @param array/string $cats cat-rkeys
 	 * @return string
@@ -289,7 +289,7 @@ class competition extends so_sql
 	 *
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
 	 * @param int $rkeys=0 0: WetId=>name, 1: rkey=>name, 2: rkey=>rkey: name
-	 * @param string $sort='datum DESC' 
+	 * @param string $sort='datum DESC'
 	 * @return array with comp-names as specified in $rkeys
 	 */
 	function names($keys=array(),$rkeys=0,$sort='datum DESC')
@@ -304,7 +304,7 @@ class competition extends so_sql
 		}
 		return $names;
 	}
-	
+
 	/**
 	 * get the nations of the competitions
 	 *
@@ -313,7 +313,7 @@ class competition extends so_sql
 	function nations()
 	{
 		$this->db->select($this->table_name,'DISTINCT nation','nation IS NOT NULL',__LINE__,__FILE__);
-		
+
 		$nations = array();
 		while($this->db->next_record())
 		{
@@ -322,13 +322,13 @@ class competition extends so_sql
 		}
 		return $nations;
 	}
-	
+
 	/**
 	 * checks if a competition already has results recorded
 	 *
 	 * @param int/array $keys WetId or array with keys of competition to check
 	 * @param int $GrpId=null optional GrpId to only check for a certain category
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function has_results($keys,$GrpId=null)
 	{
@@ -337,24 +337,24 @@ class competition extends so_sql
 			$data_backup = $this->data;
 			$keys = $this->read($keys);
 			$this->data = $data_backup;
-			
+
 			if (!$keys)
 			{
 				return false;
 			}
 		}
 		$WetId = !is_array($keys) ? $keys : $keys['WetId'];
-		
+
 		static $has_results = array();	// little bit of caching
-		
+
 		if (isset($has_results[$WetId][(string)$GrpId])) return $has_results[$WetId][(string)$GrpId];
-		
+
 		$check = array('WetId' => $WetId);
 		if ($GrpId) $check['GrpId'] = $GrpId;
-		
+
 		return $has_results[$WetId][(string)$GrpId] = ExecMethod('ranking.result.has_results',$check);
 	}
-	
+
 	/**
 	 * path of a pdf attachment of a certain type for the competition in data
 	 *
@@ -362,7 +362,7 @@ class competition extends so_sql
 	 * @param array $data competition
 	 * @param string $rkey rkey to use, default ''=use the one from our internal data
 	 * @return string the path
-	 */	 
+	 */
 	function attachment_path($type,$data=null,$rkey='')
 	{
 		if (!$data) $data =& $this->data;
@@ -377,8 +377,8 @@ class competition extends so_sql
 			$year = substr($this->data['datum'],0,4);
 		}
 		return $this->vfs_pdf_dir.$data['nation'].'/'.$year.'/'.$this->attachment_prefixes[$type].$rkey.'.pdf';
-	}		
-		
+	}
+
 	/**
 	 * Checks and returns links to the attached files
 	 *
@@ -389,7 +389,9 @@ class competition extends so_sql
 	function attachments($data=null,$return_link=false)
 	{
 		if (!$data) $data =& $this->data;
-			
+
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return array();
+
 		if (!isset($GLOBALS['egw']->vfs))
 		{
 			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
@@ -403,7 +405,7 @@ class competition extends so_sql
 					'relatives' => RELATIVE_ROOT,
 				)))
 			{
-				$parts = explode('/',$vfs_path); 
+				$parts = explode('/',$vfs_path);
 				$file = array_pop($parts);
 				$path = implode('/',$parts);
 				$linkdata = array(
@@ -424,7 +426,7 @@ class competition extends so_sql
 		}
 		return $attachments;
 	}
-	
+
 	/**
 	 * attaches one or more files as info, startlist or result
 	 *
@@ -436,26 +438,28 @@ class competition extends so_sql
 	function attach_files($files,&$error_msg,$keys=null)
 	{
 		if ($keys && !$this->read($keys)) return false;
-		
+
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false;
+
 		if (!isset($GLOBALS['egw']->vfs))
 		{
 			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
 		}
 		foreach($files as $type => $path)
 		{
-			if (!file_exists($path) || !is_readable($path)) 
+			if (!file_exists($path) || !is_readable($path))
 			{
 				$error_msg = lang("'%1' does not exist or is not readable by the webserver !!!",$path);
 				return false;
 			}
 			$vfs_path = $this->attachment_path($type);
-			
+
 			// check and evtl. create the year directory
 			$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
 			if (!$GLOBALS['egw']->vfs->file_exists($vfs_dir = array(
 					'string' => dirname($vfs_path),
 					'relatives' => RELATIVE_ROOT,
-				)) && !$GLOBALS['egw']->vfs->mkdir($vfs_dir)) 
+				)) && !$GLOBALS['egw']->vfs->mkdir($vfs_dir))
 			{
 				$error_msg = lang("Can not create directory '%1' !!!",dirname($vfs_path));
 				$GLOBALS['egw']->vfs->override_acl = 0;
@@ -486,7 +490,9 @@ class competition extends so_sql
 	function remove_attachment($type,$keys=null)
 	{
 		if ($keys && !$this->read($keys)) return false;
-		
+
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false;
+
 		if (!isset($GLOBALS['egw']->vfs))
 		{
 			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
@@ -501,7 +507,7 @@ class competition extends so_sql
 
 		return $Ok;
 	}
-	
+
 	/**
 	 * renames the attachments to a new rkey
 	 *
@@ -513,7 +519,10 @@ class competition extends so_sql
 	{
 		//echo "<p>competitions::rename_attachments('$old_rkey',".print_r($keys,true).") data[rkey]='".$this->data['rkey']."'</p>\n";
 		if (!$old_rkey || $keys && !$this->read($keys)) return false;
-		
+
+
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false;
+
 		if (!isset($GLOBALS['egw']->vfs))
 		{
 			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
