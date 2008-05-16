@@ -694,12 +694,20 @@ class boresult extends boranking
 				'start_number' => 'startnumber',
 				'result' => 'result',
 			);
-			if ($route['route_num_problems'])	// results of each boulder
+			switch($keys['discipline'])
 			{
-				for ($i = 1; $i <= $route['route_num_problems']; ++$i)
-				{
-					$name2csv['boulder'.$i] = 'boulder'.$i;
-				}
+				case 'boulder':
+					for ($i = 1; $i <= $route['route_num_problems']; ++$i)
+					{
+						$name2csv['boulder'.$i] = 'boulder'.$i;
+					}
+					break;
+				case 'speed':
+					unset($name2csv['result']);
+					$name2csv['time_sum'] = 'result';
+					$name2csv['result'] = 'time-left';
+					$name2csv['result_r'] = 'time-right';
+					break;
 			}
 			echo implode(';',$name2csv)."\n";
 			$charset = $GLOBALS['egw']->translation->charset();
@@ -723,7 +731,8 @@ class boresult extends boranking
 							$val = $route['route_name'];
 							break;
 						case 'result':
-							$val = str_replace(array('&nbsp;',' '),'',$athlete['result']);
+							$val = $athlete['discipline'] == 'boulder' ? $athlete[$name] :
+								str_replace(array('&nbsp;',' '),'',$athlete[$name]);
 							break;
 						default:
 							$val = $athlete[$name];
@@ -792,7 +801,7 @@ class boresult extends boranking
 
 		$str = trim(str_replace(',','.',$arr['result']));		// remove space and allow to use comma instead of dot as decimal del.
 
-		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climed so far
+		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climbed so far
 
 		switch($discipline)
 		{
@@ -815,7 +824,17 @@ class boresult extends boranking
 				break;
 
 			case 'speed':
-				$result['result_time'] = is_numeric($str) ? (double) $str : ELIMINATED_TIME;
+				foreach(array('' => 'time-left','_r' => 'time-right') as $postfix => $name)
+				if (is_numeric($arr[$name]))
+				{
+					$result['result_time'.$postfix] = (double) $arr[$name];
+					$result['eliminated'.$postfix] = '';
+				}
+				else
+				{
+					$result['result_time'.$postfix] = '';
+					$result['eliminated'.$postfix] = (int) in_array($arr[$name],array('eliminiert','eliminated'));
+				}
 				break;
 
 			case 'boulder':	// #t# #b#
