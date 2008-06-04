@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
@@ -41,8 +41,8 @@ class route_result extends so_sql
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 	);
 	var $charset,$source_charset;
-	
-	var $athlete_join = 'LEFT JOIN Personen ON RouteResults.PerId=Personen.PerId';
+
+	var $athlete_join = 'LEFT JOIN Personen USING(PerId) JOIN Athlete2Fed USING(PerId) JOIN Federations USING(fed_id)';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
@@ -56,9 +56,9 @@ class route_result extends so_sql
 	{
 		//$this->debug = 1;
 		$this->so_sql('ranking','RouteResults',$db);	// call constructor of extended class
-		
+
 		if ($source_charset) $this->source_charset = $source_charset;
-		
+
 		$this->charset = is_object($GLOBALS['egw']->translation) ? $GLOBALS['egw']->translation->charset() : 'iso-8859-1';
 /*
 		foreach(array(
@@ -74,7 +74,7 @@ class route_result extends so_sql
 		}
 */
 	}
-	
+
 	/**
 	 * searches db for rows matching searchcriteria
 	 *
@@ -83,7 +83,7 @@ class route_result extends so_sql
 	 * For a union-query you call search for each query with $start=='UNION' and one more with only $order_by and $start set to run the union-query.
 	 *
 	 * @param array/string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
-	 * @param boolean/string/array $only_keys=true True returns only keys, False returns all cols. or 
+	 * @param boolean/string/array $only_keys=true True returns only keys, False returns all cols. or
 	 *	comma seperated list or array of columns to return
 	 * @param string $order_by='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
 	 * @param string/array $extra_cols='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
@@ -241,8 +241,8 @@ class route_result extends so_sql
 				{
 					// sort the rows now by the user's criteria
 					usort($rows,create_function('$a,$b',$func='return '.($sort == 'DESC' ? '-' : '').
-						($this->table_def['fd'][$order] == 'varchar' || in_array($order,array('nachname','vorname','nation','ort')) ? 
-						"strcasecmp(\$a['$order'],\$b['$order'])" : 
+						($this->table_def['fd'][$order] == 'varchar' || in_array($order,array('nachname','vorname','nation','ort')) ?
+						"strcasecmp(\$a['$order'],\$b['$order'])" :
 						"(\$a['$order']-\$b['$order'])").';'));
 						//"(\$a['$order'] ? \$a['$order']-\$b['$order'] : -99999999)").';'));
 					//echo "<p>order='$order', sort='$sort', func=$func</p>\n";
@@ -252,13 +252,13 @@ class route_result extends so_sql
 					$rows = array_reverse($rows);
 				}
 				$rows['route_names'] = $route_names;
-				
+
 				return $rows;
 			}
 		}
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
-	
+
 	/**
 	 * Subquery to get the rank in the previous heat
 	 *
@@ -270,7 +270,7 @@ class route_result extends so_sql
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
 		{
-			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
+			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
 			$r = 'r1';
 			// result_rank == NULL is counted wrong if we do: $r.result_rank=c$r.result_rank
 			$rank_equal = "(CASE WHEN $r.result_rank IS NULL THEN c$r.result_rank IS NULL ELSE $r.result_rank=c$r.result_rank END)";
@@ -297,7 +297,7 @@ class route_result extends so_sql
 		}
 /*		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
 		{
-			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
+			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
 			$r = 'r1';
 			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND c$r.route_order IN (0,1) AND $r.result_rank=c$r.result_rank";
 			$r = 'r2';
@@ -311,7 +311,7 @@ class route_result extends so_sql
 			return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order IN (2,3) AND r1.PerId=r2.PerId".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order IN (0,1)".
-				" AND $this->table_name.PerId=r1.PerId";			
+				" AND $this->table_name.PerId=r1.PerId";
 		}*/
 		elseif($route_type == TWOxTWO_QUALI && in_array($route_order,array(2,3)))
 		{
@@ -325,7 +325,7 @@ class route_result extends so_sql
 	/**
 	 * Return join and extra_cols for a general result
 	 *
-	 * @internal 
+	 * @internal
 	 * @param array $keys values for WetId and GrpId
 	 * @param array &$extra_cols
 	 * @param string &$order_by
@@ -342,7 +342,7 @@ class route_result extends so_sql
 			$GLOBALS['egw']->route =& new route($this->source_charset,$this->db);
 		}
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
-		
+
 		$order_by = array("$this->table_name.result_rank");	// Quali
 
 		foreach($route_names as $route_order => $label)
@@ -384,10 +384,10 @@ class route_result extends so_sql
 
 		return $join;
 	}
-	
+
 	/**
 	 * changes the data from the db-format to our work-format
-	 * 
+	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 * @return array
 	 */
@@ -395,7 +395,7 @@ class route_result extends so_sql
 	{
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
-		
+
 		static $plus2string = array(
 			-1 => '-',
 			0  => '&nbsp;',
@@ -482,7 +482,7 @@ class route_result extends so_sql
 				if ($data['rank_prev_heat'] && $data['route_type'] == TWOxTWO_QUALI && in_array($data['route_order'],array(2,3)))
 				{
 					$data['rank_prev_heat'] = unserialize($data['rank_prev_heat']);
-					$data['rank_prev_heat'] = sprintf('%4.2lf',$data['rank_prev_heat']['qoints']);					
+					$data['rank_prev_heat'] = sprintf('%4.2lf',$data['rank_prev_heat']['qoints']);
 				}
 				break;
 
@@ -522,7 +522,7 @@ class route_result extends so_sql
 					++$suffix;
 				}
 				break;
-			
+
 			case 'speed':
 				if ($data['result_time'])	// speed result
 				{
@@ -549,7 +549,7 @@ class route_result extends so_sql
 							{
 								$data['eliminated'] = 0;
 								$data['result_time'] = null;
-								$data['time_sum'] = $data['result'] = lang('Wildcard');	
+								$data['time_sum'] = $data['result'] = lang('Wildcard');
 							}
 							else
 							{
@@ -558,12 +558,12 @@ class route_result extends so_sql
 						}
 						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
 						{
-							$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) : 
+							$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) :
 								($data['eliminated_l'] ? lang('eliminated') : lang('Wildcard'));
 							$data['result_time'] = $data['result_time_l'];
 							$data['eliminated'] = $data['eliminated_l'] || $data['eliminated_r'];
-							$data['result_r'] = (string)$data['eliminated_r'] === '' ? 
-								($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') : 
+							$data['result_r'] = (string)$data['eliminated_r'] === '' ?
+								($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') :
 								($data['eliminated_r'] ? lang('eliminated') : lang('Wildcard'));
 						}
 					}
@@ -581,7 +581,7 @@ class route_result extends so_sql
 								}
 								elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
 								{
-									$data['result'.$suffix] = lang('Wildcard');						
+									$data['result'.$suffix] = lang('Wildcard');
 								}
 								else
 								{
@@ -602,12 +602,12 @@ class route_result extends so_sql
 		}
 		$this->_shorten_name($data['nachname']);
 		$this->_shorten_name($data['vorname']);
-			
+
 		if ($data['geb_date']) $data['birthyear'] = (int)$data['geb_date'];
 
 		return $data;
 	}
-	
+
 	/**
 	 * Appriviate the name to make it better printable
 	 *
@@ -620,7 +620,7 @@ class route_result extends so_sql
 
 		// add a space after each dash or comma, if there's none already
 		$name = preg_replace('/([-,]+ *)/','\\1 ',$name);
-		
+
 		// check all space separated parts for their length
 		$parts = explode(' ',$name);
 		foreach($parts as &$part)
@@ -630,12 +630,12 @@ class route_result extends so_sql
 				$part = substr($part,0,$max-1).'.';
 			}
 		}
-		$name = implode(' ',$parts);		
+		$name = implode(' ',$parts);
 	}
 
 	/**
 	 * changes the data from our work-format to the db-format
-	 * 
+	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 * @return array
 	 */
@@ -669,12 +669,12 @@ class route_result extends so_sql
 			);
 			if ((string)$data['eliminated'] !== '' || (string)$data['eliminated_r'] !== '')
 			{
-				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ? 
+				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ?
 					($data['eliminated'] ? ELIMINATED_TIME : WILDCARD_TIME) : ELIMINATED_TIME));
 			}
 			else
 			{
-				$data['result_time'] = $data['result_time']+$data['result_time_r'] ? 
+				$data['result_time'] = $data['result_time']+$data['result_time_r'] ?
 					round(1000 * ($data['result_time']+$data['result_time_r'])) : null;
 			}
 		}
@@ -725,10 +725,10 @@ class route_result extends so_sql
 
 		return $data;
 	}
-	
+
 	/**
 	 * merges in new values from the given new data-array
-	 * 
+	 *
 	 * Reimplemented to also merge top1-6 and zone1-6
 	 *
 	 * @param $new array in form col => new_value with values to set
@@ -736,7 +736,7 @@ class route_result extends so_sql
 	function data_merge($new)
 	{
 		parent::data_merge($new);
-		
+
 		for($i = 1; $i <= 6; ++$i)
 		{
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
@@ -761,7 +761,7 @@ class route_result extends so_sql
 	{
 		//echo "<p>update_ranking(".print_r($keys,true),",$route_type,'$discipline')</p>\n";
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
-		
+
 		$keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
 
 		$extra_cols = array();
@@ -773,7 +773,7 @@ class route_result extends so_sql
 				$order_by = 'result_height IS NULL,new_rank ASC';
 				break;
 			case 'speed':
-				$order_by = 'result_time IS NULL,new_rank ASC';	
+				$order_by = 'result_time IS NULL,new_rank ASC';
 				if ($keys['route_order'] < 2)
 				{
 					$mode = $this->rank_speed_quali;
@@ -816,11 +816,11 @@ class route_result extends so_sql
 			}
 			foreach($result as &$data)
 			{
-				// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2 
+				// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
 				$data['new_qoints'] = ($places[$data['new_rank']] + 2*$data['new_rank'] - 1)/2;
 				if ($data['other_detail'])
 				{
-					$data['new_quali_points'] = $data['new_qoints'] ? sprintf('%4.2lf',round(sqrt($data['other_detail']['qoints'] * $data['new_qoints']),2)) : 
+					$data['new_quali_points'] = $data['new_qoints'] ? sprintf('%4.2lf',round(sqrt($data['other_detail']['qoints'] * $data['new_qoints']),2)) :
 						$data['other_detail']['qoints']+10000;
 				}
 			}
@@ -894,7 +894,7 @@ class route_result extends so_sql
 		$to_delete = $this->search($keys,true,'','start_order');
 
 		if (!$this->delete($keys)) return false;
-		
+
 		foreach($to_delete as $data)
 		{
 			$this->db->query("UPDATE $this->table_name SET start_order=start_order-1 WHERE ".
@@ -902,12 +902,12 @@ class route_result extends so_sql
 					'WetId' => $data['WetId'],
 					'GrpId' => $data['GrpId'],
 					'route_order' => $data['route_order'],
-					'start_order > '.(int)$data['start_order'],			
+					'start_order > '.(int)$data['start_order'],
 				)),__LINE__,__FILE__);
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Determine the highest existing route_order for $comp and $cat
 	 *
@@ -921,7 +921,7 @@ class route_result extends so_sql
 			'WetId' => $comp,
 			'GrpId' => $cat,
 		),__LINE__,__FILE__);
-		
+
 		return $this->db->next_record() ? $this->db->f(0) : null;
 	}
 }

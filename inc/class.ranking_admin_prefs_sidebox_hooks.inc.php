@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 class ranking_admin_prefs_sidebox_hooks
@@ -26,10 +26,12 @@ class ranking_admin_prefs_sidebox_hooks
 		{
 			// add ranking version to the eGW version
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
-			
+
 			$file = array(
 				'Athletes' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uiathletes.index' )),
+				'Federations' => $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.ranking_federation_ui.index' )),
 				'Competitions' => $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => 'ranking.uicompetitions.index' )),
 				'Cups' => $GLOBALS['egw']->link('/index.php',array(
@@ -65,7 +67,7 @@ class ranking_admin_prefs_sidebox_hooks
 									'menuaction' => 'ranking.ranking_display_ui.index',
 									'dsp_id' => $dsp_id,
 								)).
-								'" onclick="window.open(this.href,\'display'.$dsp_id.'\',\'dependent=yes,width=700,height=580,scrollbars=yes,status=yes\'); 
+								'" onclick="window.open(this.href,\'display'.$dsp_id.'\',\'dependent=yes,width=700,height=580,scrollbars=yes,status=yes\');
 								return false;">'.$dsp_name.'</a>',
 							'no_lang' => true,
 							'link' => false
@@ -77,12 +79,12 @@ class ranking_admin_prefs_sidebox_hooks
 							'text' => '<a class="textSidebox" href="'.$GLOBALS['egw']->link('/index.php',array(
 									'menuaction' => 'ranking.ranking_display_ui.display',
 								)).
-								'" onclick="window.open(this.href,\'_blank\',\'dependent=yes,width=640,height=480,scrollbars=yes,status=yes\'); 
+								'" onclick="window.open(this.href,\'_blank\',\'dependent=yes,width=640,height=480,scrollbars=yes,status=yes\');
 								return false;">'.lang('Add').'</a>',
 							'no_lang' => true,
 							'link' => false
 						);
-						
+
 					}
 					display_sidebox($appname,lang('Displays'),$file);
 				}
@@ -99,7 +101,7 @@ class ranking_admin_prefs_sidebox_hooks
 				display_section($appname,$file);
 			}
 			else
-			{	
+			{
 				$file[] = array(
 					'text'   => 'Manual',
 					'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
@@ -128,7 +130,7 @@ class ranking_admin_prefs_sidebox_hooks
 			}
 		}
 	}
-	
+
 	function hook_settings()
 	{
 		$ranking_views = array(
@@ -143,7 +145,7 @@ class ranking_admin_prefs_sidebox_hooks
 		);
 		create_select_box('Default ranking view','default_view',$ranking_views,
 			'Which view do you want to see, when you start the ranking app?');
-			
+
 		return true;
 	}
 }
