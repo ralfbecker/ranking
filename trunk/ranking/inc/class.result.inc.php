@@ -7,8 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
@@ -36,9 +36,9 @@ class result extends so_sql
 	{
 		//$this->debug = 1;
 		$this->so_sql('ranking',$this->result_table,$db);	// call constructor of extended class
-		
+
 		if ($source_charset) $this->source_charset = $source_charset;
-		
+
 		$this->charset = $GLOBALS['egw']->translation->charset();
 
 		foreach(array(
@@ -64,7 +64,7 @@ class result extends so_sql
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
 	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string/boolean $join=true true for the default join or sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or 
+	 * @param string/boolean $join=true true for the default join or sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
 	 * @param string $order='' order clause or '' for the default order depending on the keys given
 	 * @return array/boolean data if row could be retrived else False
 	 */
@@ -77,9 +77,9 @@ class result extends so_sql
 		if (isset($filter['nation']))	// nation is from the joined athlete table, cant be quoted automatic
 		{
 			unset($filter['nation']);
-			
+
 			if ($join) $filter[] = $this->db->expression($this->athlete_table,array('nation' => $keys['nation']));
-			
+
 			unset($keys['nation']);
 		}
 		foreach(array('WetId','GrpId','PerId') as $key)
@@ -99,8 +99,9 @@ class result extends so_sql
 			$cols = false;
 			if ($join === true)
 			{
-				$join = ",$this->athlete_table WHERE $this->result_table.PerId=$this->athlete_table.PerId";
-				if (!$extra_cols) 
+				$join = 'JOIN '.athlete::ATHLETE_TABLE.' USING(PerId)'.athlete::FEDERATIONS_JOIN;
+
+				if (!$extra_cols)
 				{
 					$extra_cols = "nachname,vorname,nation,geb_date,pkt & 63 AS reg_nr";
 				}
@@ -135,12 +136,12 @@ class result extends so_sql
 		// result of single person
 		return parent::read($keys,$extra_cols,$join !== true ? $join : '');
 	}
-	
+
 	function &comps_with_startlist($keys=array(),$registration_too=true)
 	{
 		//echo "<p>result::comps_with_startlist(".print_r($keys,true).")</p>\n";
 		$keys['platz'] = 0;
-		
+
 		if ($registration_too)
 		{
 			$keys[] = $this->comp_table.'.datum >= '.$this->db->quote(date('Y-m-d'));
@@ -200,7 +201,7 @@ class result extends so_sql
 		}
 		return $data;
 	}
-	
+
 	/**
 	 * Checks if there are any results (platz > 0) for the given keys
 	 *
@@ -214,7 +215,7 @@ class result extends so_sql
 		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
 
 		$this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__);
-		
+
 		return $this->db->next_record() ? $this->db->f(0) : false;
 	}
 
@@ -231,7 +232,7 @@ class result extends so_sql
 		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
 
 		$this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__);
-		
+
 		return $this->db->next_record() ? $this->db->f(0) : false;
 	}
 
@@ -249,7 +250,7 @@ class result extends so_sql
 	 * @param string $op defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
 	 * @param int/boolean $start if != false, return only maxmatch rows begining with start
 	 * @param array $filter if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
-	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or 
+	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
 	 *	"LEFT JOIN table2 ON (x=y)", Note: there's no quoting done on $join!
 	 * @return array of matching rows (the row is an array of the cols) or False
 	 */
@@ -262,7 +263,7 @@ class result extends so_sql
 	}*/
 
 	/**
-	 * get competitiors prequalified for a given competition, because of a certain place in spec. competitions 
+	 * get competitiors prequalified for a given competition, because of a certain place in spec. competitions
 	 *
 	 * @param int/array $comp WetId or complete competition array
 	 * @param int/array $cat GrpId or complete category array
@@ -297,7 +298,7 @@ class result extends so_sql
 		//echo "result::prequalified($comp[rkey],$cat)="; _debug_array($prequals);
 		return array_values($prequals);
 	}
-	
+
 	/**
 	 * return result-list for a cup-ranking of $cup as of $stand
 	 *
@@ -310,16 +311,16 @@ class result extends so_sql
 	 */
 	function &cup_results($SerId,$PktId,$cats,$stand,$allowed_nations)
 	{
-		$this->db->query("SELECT p.*,r.platz,s.pkt,r.WetId,r.GrpId
-			FROM $this->result_table r,$this->comp_table w,$this->athlete_table p,$this->pkte_table s
-			WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.platz > 0
-			AND r.GrpId ".(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').' 
-			AND w.serie='.(int) $SerId.' AND r.platz=s.platz AND s.PktId='.(int) $PktId.'
-			AND s.pkt > 0 AND w.datum <= '.$this->db->quote($stand).
-			($allowed_nations ? ' AND p.nation IN (\'' . implode("','",$allowed_nations) . "')" : '').'
-			ORDER BY r.PerId,s.pkt DESC',__LINE__,__FILE__);
-		
-		$results = array();	
+		$this->db->query('SELECT p.*,'.athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,s.pkt,r.WetId,r.GrpId'.
+			" FROM $this->result_table r,$this->comp_table w,$this->pkte_table s,$this->athlete_table p".athlete::FEDERATIONS_JOIN.
+			' WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.platz > 0'.
+			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
+			' AND w.serie='.(int) $SerId.' AND r.platz=s.platz AND s.PktId='.(int) $PktId.
+			' AND s.pkt > 0 AND w.datum <= '.$this->db->quote($stand).
+			($allowed_nations ? ' AND p.nation IN (\'' . implode("','",$allowed_nations) . "')" : '').
+			' ORDER BY r.PerId,s.pkt DESC',__LINE__,__FILE__);
+
+		$results = array();
 		while(($row = $this->db->row(true)))
 		{
 			$results[] = $this->athlete->db2data($row);
@@ -341,15 +342,15 @@ class result extends so_sql
 	{
 		//list($usec,$sec) = explode(' ',microtime()); $s_time = (float)$usec + (float)$sec;
 
-		$this->db->query($sql="SELECT p.*,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId
-			FROM $this->result_table r,$this->comp_table w,$this->athlete_table p
-			WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0
-			AND r.GrpId ".(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').'
-			AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
+		$this->db->query($sql='SELECT p.*,'.athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
+			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table p".athlete::FEDERATIONS_JOIN.
+			' WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0'.
+			' AND r.GrpId '.(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').
+			' AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
 			($from_year && $to_year ? ' AND NOT ISNULL(p.geb_date) AND '.
-			(int) $from_year.' <= YEAR(p.geb_date) AND YEAR(p.geb_date) <= '.(int) $to_year : '').'
-			ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__);
-		
+			(int) $from_year.' <= YEAR(p.geb_date) AND YEAR(p.geb_date) <= '.(int) $to_year : '').
+			' ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__);
+
 		$results = array();
 		while(($row = $this->db->row(true)))
 		{
@@ -359,7 +360,7 @@ class result extends so_sql
 		//echo "<p>result::ranking_results(".print_r($cats,true).",'$stand','$start',$from_year,$to_year) count(\$results)=".count($results).", time=".sprintf('%0.2lf',$e_time-$s_time)."<br>$sql</p>\n";
 		return $results;
 	}
-	
+
 	/**
 	 * Save a calculated fieldfactor
 	 *

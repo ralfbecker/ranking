@@ -7,18 +7,18 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '1.4.003';
+$setup_info['ranking']['version']   = '1.5.004';
 $setup_info['ranking']['app_order'] = 1;
-$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','Displays','DisplayFormats');
+$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','Displays','DisplayFormats','Federations','Athlete2Fed');
 $setup_info['mydms']['only_db']     = array('mysql','postgres');
 $setup_info['ranking']['enable']    = 1;
 
-$setup_info['ranking']['author'] = 
+$setup_info['ranking']['author'] =
 $setup_info['ranking']['maintainer'] = array(
 	'name'  => 'Ralf Becker',
 	'email' => 'RalfBecker@digitalROCK.de',
@@ -28,7 +28,7 @@ $setup_info['ranking']['license']  = 'GPL';
 $setup_info['ranking']['description'] =
 	"<p>Calendar-, result- and ranking-service on this site is provided by digital ROCK.</p>
 	<ul>
-    	<li>UIAA Climbing officials can manage the competition calendar and other website content from everywhere all over the world.</li>
+    	<li>IFSC Climbing officials can manage the competition calendar and other website content from everywhere all over the world.</li>
     	<li>National federations can online register athlets for competitions and update their personal profiles.</li>
     	<li>Judges can draw starting-lists from the registered athlets, enter results &amp; print result-lists.</li>
     	<li>Rankings and cup-results are generated on the fly by the system and linked to the athlet's profiles.</li>
@@ -53,12 +53,16 @@ $setup_info['ranking']['hooks'][] = 'config_validate';
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
 	 'appname' => 'phpgwapi',
-	 'versions' => Array('1.3','1.4','1.5')
+	 'versions' => Array('1.3','1.4','1.5','1.6','1.7')
 );
 $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
-	'versions' => Array('1.3','1.4','1.5')
+	'versions' => Array('1.3','1.4','1.5','1.6','1.7')
 );
+
+
+
+
 
 
 

@@ -1,4 +1,5 @@
 %1 deleted	ranking	de	%1 gelöscht
+%1 federations merged.	ranking	de	%1 Verbände zusammengeführt.
 %1 is an admin and has therefor all rights!	ranking	de	%1 ist ein Administrator und hat daher alle Rechte!
 %1 participants imported	ranking	de	%1 Teilnehmer importiert
 %1 saved	ranking	de	%1 gespeichert
@@ -29,6 +30,7 @@ applied	ranking	de	beantragt
 applied for a %1 license	ranking	de	%1 Lizenz beantragt
 applies for the license and downloads the necessary form to mail to the office	ranking	de	Beantragt eine Lizenz und lädt das notwendige Forumlar herunter damit es an das Büro geschickt werden kann
 apply for	ranking	de	Beantragen
+apply modifications below to all selected federations	ranking	de	Wende Änderungen darunter auf alle ausgewählten Verbände an
 apply the changes made	ranking	de	vorgenommene Änderungen anwenden
 apply the changes of this athlete only	ranking	de	Nur Änderungen an diesem Athleten anwenden
 as of	ranking	de	Stand
@@ -49,10 +51,18 @@ boulder	ranking	de	Bouldern
 can not be higher as top!	ranking	de	Kann nicht höher als Top sein!
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
+can't connect to time controll program at '%1': %2	ranking	de	Kann nicht mit Zeit Kontrollprogramm auf '%1': %2 verbinden
+can't find co-participant!	ranking	de	Kann zweiten Teilnehmer (Co) nicht finden!
 can't open connection to display %1 (%2:%3)!!!	ranking	de	Kann keine Verbindung zu Anzeige %1 (%2:%3) aufbauen!!!
+can't open connection to displays at %1 !!!	ranking	de	Kann keine Verbindung zu Anzeige unter %1 aufbauen!!!
+can't open connection to timy at %1 !!!	ranking	de	Kann keine Verbindung zu Timy unter %1 aufbauen!!!
+can't open control port (%1) %2 !!!	ranking	de	Kann Kontroll Port (%1) %2 nicht öffnen !!!
 cannel without saving	ranking	de	Abbrechen ohne zu Speichern
 cathegories	ranking	de	Kategorien
 cellphone	ranking	de	Mobiltelefon
+changes applied to %1 federations.	ranking	de	Änderungen auf %1 Verbände angewandt.
+check all	ranking	de	Alle auswählen
+children	ranking	de	Kinder
 city	ranking	de	Stadt
 click to view	ranking	de	anklicken zum Anzeigen
 climbing professional	ranking	de	Profi
@@ -90,6 +100,7 @@ delete result	ranking	de	Ergebnis löschen
 delete this athlete	ranking	de	Diesen Athleten löschen
 delete this competition	ranking	de	Diesen Wettkampf löschen
 delete this cup	ranking	de	Diesen Cup löschen
+delete this federation	ranking	de	Diesen Verband löschen
 delete this heat including all results	ranking	de	Löscht diese Runde einschließlich der Ergebnisse
 deletes this cup	ranking	de	Löscht diesen Cup
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
@@ -119,8 +130,10 @@ encoding	ranking	de	Zeichensatz
 end	ranking	de	Ende
 entry not found !!!	ranking	de	Eintrag nicht gefunden !!!
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
+error deleting federation!	ranking	de	Fehler beim Löschen des Verbandes!
 error deleting format!	ranking	de	Fehler beim Löschen des Formats!
 error saving display!	ranking	de	Fehler beim Speichern der Anzeige!
+error saving federation!	ranking	de	Fehler beim Speichern des Verbandes!
 error saving format!	ranking	de	Fehler beim Speichern des Formats!
 error writing to display!!!	ranking	de	Fehler beim Schreiben zur Anzeige!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
@@ -144,9 +157,12 @@ error: saving the heat!!!	ranking	de	Fehler: beim Speichern der Runde !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
 exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
 factor	ranking	de	Faktor
+false start %1: %2	ranking	de	Fehlstart %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Familienname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 fax	ranking	de	Fax
 federation	ranking	de	Verband
+federation deleted.	ranking	de	Verband gelöscht.
+federation saved.	ranking	de	Verband gespeichert.
 female	ranking	de	weiblich
 fieldfactorpoints	ranking	de	Feldfaktorpunkte
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	de	Datei %1 nicht gefunden (entweder Typ=%2 oder DR_PATH=%3 falsch)!
@@ -215,6 +231,8 @@ line	ranking	de	Zeile
 male	ranking	de	männlich
 max	ranking	de	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
+measurement aborted!	ranking	de	Messung abgebrochen!
+merge selected federations with the one opened for editing	ranking	de	Vereinige ausgewählte Verbände mit dem zu Bearbeiten geöffneten
 minus	ranking	de	minus
 name(s)	ranking	de	Namen
 nation	ranking	de	Nation
@@ -224,13 +242,17 @@ nation if national competition or none for an internatinal one	ranking	de	Nation
 nation the athlete is competing for	ranking	de	Nation für die der Athlete startet
 nation to use (empty = international)	ranking	de	Nation (leer = international)
 national team ranking	ranking	de	Nationen-Team-Rangliste
+nationname	ranking	de	Name des Landes
+nations and federations	ranking	de	Nationen und Verbände
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	de	Kein Wettkampf (&comp=XYZ) und kein Cup (&cup=XYZ) über die URL ausgewählt!
+no federation selected to edit / merge to!	ranking	de	Kein Verband zum bearbeiten / vereinigen ausgewählt!
 no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Runde angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
 no startlist or result yet!	ranking	de	Bisher keine Startliste oder Ergebnis!
 not used at the moment	ranking	de	im Moment nicht benutzt
+nothing to apply!	ranking	de	Nichts anzuwenden!
 nothing to update	ranking	de	Nichts zu aktualisieren
 notice	ranking	de	Notiz
 number of competitions counting for the cup (empty for all)	ranking	de	Anzahl Wettkämpfe die für den Cup zählen (leer für alle)
@@ -245,6 +267,7 @@ other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
 pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Athletenprofile
 pairing speed final	ranking	de	Paarungen Speed Finale
+parent	ranking	de	Eltern
 participant deleted	ranking	de	Teilnehmer gelöscht
 perid	ranking	de	PerId
 permission denied !!!	ranking	de	Zugriff verweigert !!!
@@ -305,16 +328,19 @@ rows	ranking	de	Zeilen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
 select a cup for a cup-ranking	ranking	de	Einen Cup auswählen für eine Cup-Ranliste
 select a nation first	ranking	de	Zuerst Nation auswählen
+select an action	ranking	de	Einen Befehl auswählen
 select calendar	ranking	de	Kalender auswählen
 select competition	ranking	de	Wettkampf auswählen
 select heat	ranking	de	Runde auswählen
 select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
+select multiple federations for a further action	ranking	de	Mehrere Verbände für einen Befehl auswählen
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 serid	ranking	de	SerId
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
 show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
+since	ranking	de	seit
 since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
 size (cm)	ranking	de	Größe (cm)
 small final	ranking	de	Kleines Finale
@@ -347,6 +373,7 @@ this module displays information from the resultservice of the ranking app.	rank
 this text will be shown in the profil on the website.	ranking	de	Dieser Text wird im Profil auf der Webseite angezeigt
 til place	ranking	de	bis Platz
 time	ranking	de	Zeit
+time measured	ranking	de	Zeit gemessen
 time measurement	ranking	de	Zeitmessung
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
@@ -379,6 +406,7 @@ view the attached pdf	ranking	de	Angehangenes PDF anzeigen
 view this athlete	ranking	de	Diesen Athleten anzeigen
 view this competition	ranking	de	Diesen Wettkampf anzeigen
 view this cup	ranking	de	Diesen Cup anzeigen
+website	ranking	de	Webseite
 weight (kg)	ranking	de	Gewicht (kg)
 weight in kilogram	ranking	de	Gewicht in Kilogram
 weight, size, hobbies, ...	ranking	de	Gewicht, Größe, Hobies, ...
@@ -395,3 +423,4 @@ you can only create a new heat, if the previous one '%1' has a result!	ranking	d
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden! Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (Sie können einge für den öffentlichen Zugrif gesperrt werden). Fortfahren
+you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!

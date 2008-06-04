@@ -1,4 +1,5 @@
 %1 deleted	ranking	en	%1 deleted
+%1 federations merged.	ranking	en	%1 federations merged.
 %1 is an admin and has therefor all rights!	ranking	en	%1 is an admin and has therefor all rights!
 %1 participants imported	ranking	en	%1 participants imported
 %1 saved	ranking	en	%1 saved
@@ -29,6 +30,7 @@ applied	ranking	en	applied
 applied for a %1 license	ranking	en	Applied for a %1 license
 applies for the license and downloads the necessary form to mail to the office	ranking	en	Applies for the license and downloads the necessary form to mail to the office
 apply for	ranking	en	Apply for
+apply modifications below to all selected federations	ranking	en	Apply modifications below to all selected federations
 apply the changes made	ranking	en	apply the changes made
 apply the changes of this athlete only	ranking	en	Apply the changes of this athlete only
 as of	ranking	en	As of
@@ -49,10 +51,18 @@ boulder	ranking	en	boulder
 can not be higher as top!	ranking	en	Can NOT be higher as top!
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
+can't connect to time controll program at '%1': %2	ranking	en	Can't connect to time controll program at '%1': %2
+can't find co-participant!	ranking	en	Can't find co-participant!
 can't open connection to display %1 (%2:%3)!!!	ranking	en	Can't open connection to display %1 (%2:%3)!!!
+can't open connection to displays at %1 !!!	ranking	en	Can't open connection to displays at %1 !!!
+can't open connection to timy at %1 !!!	ranking	en	Can't open connection to Timy at %1 !!!
+can't open control port (%1) %2 !!!	ranking	en	Can't open control port (%1) %2 !!!
 cannel without saving	ranking	en	Cannel without saving
 cathegories	ranking	en	Cathegories
 cellphone	ranking	en	Cellphone
+changes applied to %1 federations.	ranking	en	Changes applied to %1 federations.
+check all	ranking	en	Check all
+children	ranking	en	Children
 city	ranking	en	City
 click to view	ranking	en	click to view
 climbing professional	ranking	en	Climbing professional
@@ -90,6 +100,7 @@ delete result	ranking	en	delete result
 delete this athlete	ranking	en	Delete this athlete
 delete this competition	ranking	en	Delete this competition
 delete this cup	ranking	en	Delete this cup
+delete this federation	ranking	en	Delete this federation
 delete this heat including all results	ranking	en	Delete this heat including all results
 deletes this cup	ranking	en	deletes this cup
 deny public access to	ranking	en	deny public access to
@@ -119,8 +130,10 @@ encoding	ranking	en	Encoding
 end	ranking	en	End
 entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
+error deleting federation!	ranking	en	Error deleting federation!
 error deleting format!	ranking	en	Error deleting format!
 error saving display!	ranking	en	Error saving display!
+error saving federation!	ranking	en	Error saving federation!
 error saving format!	ranking	en	Error saving format!
 error writing to display!!!	ranking	en	Error writing to display!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
@@ -144,9 +157,12 @@ error: saving the heat!!!	ranking	en	Error: saving the heat!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
 exists without saving the changes	ranking	en	exists without saving the changes
 factor	ranking	en	Factor
+false start %1: %2	ranking	en	False start %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	en	Family name of the athlete in latin chars! Accents and umlauts are ok
 fax	ranking	en	Fax
 federation	ranking	en	Federation
+federation deleted.	ranking	en	Federation deleted.
+federation saved.	ranking	en	Federation saved.
 female	ranking	en	female
 fieldfactorpoints	ranking	en	Fieldfactorpoints
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)!
@@ -215,6 +231,8 @@ line	ranking	en	Line
 male	ranking	en	male
 max	ranking	en	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
+measurement aborted!	ranking	en	Measurement aborted!
+merge selected federations with the one opened for editing	ranking	en	Merge selected federations with the one opened for editing
 minus	ranking	en	minus
 name(s)	ranking	en	name(s)
 nation	ranking	en	Nation
@@ -224,13 +242,17 @@ nation if national competition or none for an internatinal one	ranking	en	nation
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
 nation to use (empty = international)	ranking	en	Nation to use (empty = international)
 national team ranking	ranking	en	National team ranking
+nationname	ranking	en	Nationname
+nations and federations	ranking	en	Nations and Federations
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	en	No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	en	No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!
+no federation selected to edit / merge to!	ranking	en	No federation selected to edit / merge to!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous heat!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	en	No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!
 no startlist or result yet!	ranking	en	No startlist or result yet!
 not used at the moment	ranking	en	not used at the moment
+nothing to apply!	ranking	en	Nothing to apply!
 nothing to update	ranking	en	Nothing to update
 notice	ranking	en	Notice
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
@@ -245,6 +267,7 @@ other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
 pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete profiles
 pairing speed final	ranking	en	Pairing speed final
+parent	ranking	en	Parent
 participant deleted	ranking	en	Participant deleted
 perid	ranking	en	PerId
 permission denied !!!	ranking	en	Permission denied !!!
@@ -305,16 +328,19 @@ rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
+select an action	ranking	en	Select an action
 select calendar	ranking	en	Select calendar
 select competition	ranking	en	Select competition
 select heat	ranking	en	Select heat
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
+select multiple federations for a further action	ranking	en	Select multiple federations for a further action
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
 serid	ranking	en	SerId
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
 show athlets from all categories	ranking	en	show athlets from all categories
+since	ranking	en	since
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
 small final	ranking	en	Small final
@@ -347,6 +373,7 @@ this module displays information from the resultservice of the ranking app.	rank
 this text will be shown in the profil on the website.	ranking	en	This text will be shown in the profil on the website.
 til place	ranking	en	til place
 time	ranking	en	Time
+time measured	ranking	en	Time measured
 time measurement	ranking	en	Time measurement
 to year	ranking	en	to year
 top	ranking	en	Top
@@ -379,6 +406,7 @@ view the attached pdf	ranking	en	View the attached PDF
 view this athlete	ranking	en	View this athlete
 view this competition	ranking	en	View this competition
 view this cup	ranking	en	View this cup
+website	ranking	en	Website
 weight (kg)	ranking	en	Weight (kg)
 weight in kilogram	ranking	en	weight in kilogram
 weight, size, hobbies, ...	ranking	en	Weight, size, hobbies, ...
@@ -395,3 +423,4 @@ you can only create a new heat, if the previous one '%1' has a result!	ranking	e
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last heat, not one in between!
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	en	You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue
+you need to select some federations first!	ranking	en	You need to select some federations first!

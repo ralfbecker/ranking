@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.ranking" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.ranking" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
 				<column width="10%"/>
@@ -59,16 +59,16 @@
 								<description value="Firstname"/>
 								<description value="Birthyear"/>
 								<description value="Nation"/>
-								<description value="City"/>
+								<description value="Federation"/>
 								<description value="Points"/>
 							</row>
 							<row class="row">
 								<description class="place" id="ranking[$row][platz]" no_lang="1" align="center"/>
-								<description id="ranking[$row][nachname]" no_lang="1"/>
+								<description id="ranking[$row][nachname]" no_lang="1" class="lastname"/>
 								<description id="ranking[$row][vorname]" no_lang="1"/>
 								<date options="Y-m-d" id="ranking[$row][geb_year]" readonly="true" align="center"/>
 								<description no_lang="1" id="ranking[$row][nation]" align="center"/>
-								<description no_lang="1" id="ranking[$row][ort]"/>
+								<description no_lang="1" id="ranking[$row][verband]"/>
 								<description no_lang="1" id="ranking[$row][pkt]" align="right"/>
 							</row>
 						</rows>

@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.federation.index.rows" template="" lang="" group="0" version="1.5.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-filterheader options="Nation..." align="center" id="nation" no_lang="1"/>
+					<nextmatch-sortheader label="Nationname" id="fed_nationname"/>
+					<nextmatch-filterheader options="Continent" id="fed_continent"/>
+					<nextmatch-sortheader label="Name" id="verband"/>
+					<nextmatch-sortheader label="Athletes" align="center" id="num_athletes"/>
+					<nextmatch-sortheader label="Parent" id="fed_parent"/>
+					<nextmatch-sortheader label="Children" align="center" id="num_children"/>
+					<nextmatch-sortheader label="Key" align="center" id="fed_id"/>
+					<hbox align="center">
+						<description value="Action" align="center"/>
+						<button image="check" label="Check all" id="check_all" statustext="Check all" onclick="toggle_all(this.form,form::name('checked[]')); return false;" needed="1" align="right"/>
+					</hbox>
+				</row>
+				<row class="row">
+					<description id="${row}[nation]" align="center" no_lang="1"/>
+					<description id="${row}[fed_nationname]"/>
+					<menulist>
+						<menupopup id="${row}[fed_continent]" readonly="true"/>
+					</menulist>
+					<description no_lang="1" id="${row}[verband]" options=",$row_cont[fed_url],,,_blank"/>
+					<description id="${row}[num_athletes]" align="center"/>
+					<description id="${row}[parent_name]"/>
+					<description id="${row}[num_children]" align="center"/>
+					<description no_lang="1" align="center" id="${row}[fed_id]"/>
+					<hbox align="center">
+						<button label="Edit" id="edit[$row_cont[fed_id]]" image="edit" statustext="Edit this competition"/>
+						<button id="delete[$row_cont[fed_id]]" image="delete" label="Delete" onclick="return confirm('Delete this federation');" statustext="Delete this federation" align="center"/>
+						<checkbox id="checked[]" options="$row_cont[fed_id]" statustext="Select multiple federations for a further action" align="right"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
+		</styles>
+	</template>
+	<template id="ranking.federation.index" template="" lang="" group="0" version="1.5.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description class="redItalic" id="msg" align="center" no_lang="1"/>
+				</row>
+				<row>
+					<nextmatch options="ranking.federation.index.rows" id="nm"/>
+				</row>
+				<row disabled="!@is_admin">
+					<hbox align="right">
+						<menulist>
+							<menupopup id="action" options="Select an action" onchange="1"/>
+						</menulist>
+						<button image="arrow_ltr" label="Check all" id="check_all" statustext="Check all" onclick="toggle_all(this.form,form::name('nm[rows][checked][]')); return false;" needed="1" class="checkAllArrow"/>
+					</hbox>
+				</row>
+				<row>
+					<groupbox>
+						<caption label="Edit"/>
+						<grid id="fed">
+							<columns>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description value="Nation" options=",,,nation"/>
+									<hbox options="0,0">
+										<textbox size="3" maxlength="3" id="nation" onchange="1" class="inputRequired"/>
+										<textbox id="fed_nationname" size="50" maxlength="80" class="leftPad5"/>
+										<menulist class="leftPad5">
+											<menupopup id="fed_continent" options="Select one"/>
+										</menulist>
+									</hbox>
+								</row>
+								<row>
+									<description value="Name"/>
+									<textbox size="80" maxlength="80" id="verband" class="inputRequired"/>
+								</row>
+								<row>
+									<description options=",,,fed_url" value="Website"/>
+									<textbox size="80" maxlength="128" id="fed_url"/>
+								</row>
+								<row>
+									<description value="Parent" options=",,,fed_parent"/>
+									<menulist>
+										<menupopup options="None" id="fed_parent"/>
+									</menulist>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row>
+					<hbox>
+						<button label="Save" id="button[save]"/>
+						<button id="button[apply]" label="Apply"/>
+						<button id="button[cancel]" label="Cancel"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

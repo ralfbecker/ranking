@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
@@ -28,10 +28,23 @@ define('ACL_DENY_PROFILE',128);
 class athlete extends so_sql
 {
 	var $charset,$source_charset;
-	var $result_table = 'Results';
-	
+	const ATHLETE_TABLE = 'Personen';
+	const RESULT_TABLE = 'Results';
+	const ATHLETE2FED_TABLE = 'Athlete2Fed';
+	const FEDERATIONS_TABLE = 'Federations';
+	const FEDERATIONS_JOIN = ' JOIN Athlete2Fed USING(PerId) JOIN Federations USING(fed_id)';
+
+	/**
+	 * Federation cols, not longer stored in the athlete table
+	 *
+	 * @var array
+	 */
+	var $non_db_cols = array('verband','nation','fed_id','a2f_start','a2f_end');
+
+	var $result_table = self::RESULT_TABLE;
+
 	var $cats;
-	
+
 	var $picture_url = '/jpgs';
 	var $picture_path = '../../../jpgs';
 	var $pkt2license = array(
@@ -69,12 +82,12 @@ class athlete extends so_sql
 	 */
 	function athlete($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','Personen',$db);	// call constructor of derived class
+		$this->so_sql('ranking',self::ATHLETE_TABLE,$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
-		
+
 		$this->charset = $GLOBALS['egw']->translation->charset();
-		
+
 		foreach(array(
 				'cats'  => 'category',
 			) as $var => $class)
@@ -141,7 +154,7 @@ class athlete extends so_sql
 					}
 				}
 			}
-		}		
+		}
 		return $data;
 	}
 
@@ -158,7 +171,7 @@ class athlete extends so_sql
 			$data =& $this->data;
 		}
 		if ($data['rkey']) $data['rkey'] = strtoupper($data['rkey']);
-		if ($data['nation'] && !is_array($data['nation'])) 
+		if ($data['nation'] && !is_array($data['nation']))
 		{
 			$data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
 		}
@@ -182,11 +195,11 @@ class athlete extends so_sql
 		}
 		return $data;
 	}
-	
+
 	function init($arr=array())
 	{
 		parent::init($arr);
-		
+
 		// switching everything off, but the city
 		$this->data['acl'] = array(
 			ACL_DENY_BIRTHDAY,
@@ -219,27 +232,51 @@ class athlete extends so_sql
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
 	{
 		//echo "<p>athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
-		
-		foreach(array('nation','sex') as $name)
-		{
-			if ($filter[$name] == 'NULL')
-			{
-				$filter[$name] = null;
-			}
-			elseif (!isset($filter[$name]) && !(isset($criteria[$name]) && $op == 'AND'))
-			{
-				// by default only show real athlets (nation and sex set)
-				$filter[] = $name . ' IS NOT NULL';
-			}
-		}
+
 		if ($join === true || is_numeric($join))
 		{
-			if ($extra_cols) $extra_cols = explode(',',$extra_cols);
-			if (is_numeric($join))	// add join to filter for a category
+			$cat = $join;
+			$join = '';
+		}
+		if ($extra_cols) $extra_cols = explode(',',$extra_cols);
+
+		// join in nation & federation
+		$join .= self::FEDERATIONS_JOIN;
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.nation AS nation';
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.verband AS verband';
+
+		// by default only show real athlets (nation and sex set)
+		if (!isset($filter['sex']) && !(isset($criteria['sex']) && $op == 'AND'))
+		{
+			$filter[] = 'sex IS NOT NULL';
+		}
+		// handle nation and verband, which are in the Federations table
+		foreach(array('nation','verband') as $name)
+		{
+			if ($filter[$name])
 			{
-				$cat = (int) $join;
-				$join = "JOIN $this->result_table ON GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
-				
+				if ($filter[$name] == 'NULL') $filter[$name] = null;
+				$filter[] = self::FEDERATIONS_TABLE.'.'.$name.(is_null($filter[$name]) ? ' IS NULL' : '='.$this->db->quote($filter[$name]));
+			}
+			unset($filter[$name]);
+			if ($criteria[$name])
+			{
+				if ($criteria[$name] == 'NULL') $criteria[$name] = null;
+				$criteria[] = self::FEDERATIONS_TABLE.'.'.$name.(is_null($criteria[$name]) ? ' IS NULL' : '='.$this->db->quote($criteria[$name]));
+			}
+			unset($criteria[$name]);
+			if (strpos($order_by,$name) !== false)
+			{
+				$order_by = str_replace($name,self::FEDERATIONS_TABLE.'.'.$name,$order_by);
+			}
+		}
+		if ($cat === true || is_numeric($cat))
+		{
+			if (is_numeric($cat))	// add join to filter for a category
+			{
+				$cat = (int) $cat;
+				$join .= "JOIN $this->result_table ON GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+
 				// if cat uses an age-group only show athlets in that age-group
 				if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
 				{
@@ -247,12 +284,10 @@ class athlete extends so_sql
 				}
 				$extra_cols[] = "MAX($this->result_table.datum) AS last_comp";
 				$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
-				
 			}
-			else	// LEFT JOIN to get latest competition 
+			else	// LEFT JOIN to get latest competition
 			{
 				$extra_cols[] = "(SELECT MAX(datum) FROM $this->result_table WHERE $this->result_table.PerId=$this->table_name.PerId AND platz > 0) AS last_comp";
-				$join = '';
 			}
 
 			$join .= " LEFT JOIN $this->result_table l ON l.PerId=$this->table_name.PerId AND l.WetId=-$this->license_year AND l.GrpId=0";
@@ -270,7 +305,7 @@ class athlete extends so_sql
 				{
 					$filter['license'] = array_search($filter['license'],$this->pkt2license);
 				}
-				$filter[] = !$filter['license'] ? 'l.pkt IS NULL' : 
+				$filter[] = !$filter['license'] ? 'l.pkt IS NULL' :
 					$this->db->expression($this->result_table,'l.',array('pkt'=>$filter['license']));
 				unset($filter['license']);
 			}
@@ -291,12 +326,12 @@ class athlete extends so_sql
 		}
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
-	
+
 	/**
 	 * Gets a distinct list of all values of a given column for a given nation (or all)
 	 *
 	 * @param string $column column-name, eg. 'nation', 'nachname', ...
-	 * @param array/string $keys array with column-value pairs or string with nation to search, defaults to '' = all
+	 * @param array|string $keys array with column-value pairs or string with nation to search, defaults to '' = all
 	 * @return array with name as key and value
 	 */
 	function distinct_list($column,$keys='')
@@ -305,17 +340,26 @@ class athlete extends so_sql
 
 		static $cache;
 		$cache_key = $column.'-'.serialize($keys);
-		
+
 		if (isset($cache[$cache_key]))
 		{
 			return $cache[$cache_key];
-		}		
-		if (!($column = array_search($column,$this->db_cols))) return false;
+		}
+		if (!in_array($column,array('nation','verband')) && !($column = array_search($column,$this->db_cols))) return false;
 
 		if ($keys && !is_array($keys)) $keys = array('nation' => $keys);
-		
+
 		$values = array();
-		foreach((array)$this->search($keys,'DISTINCT '.$column,$column,'','',true,'AND',false,null,'') as $data)
+
+		if (in_array($column,array('nation','verband')) && (!$keys || !array_diff(array('nation','verband'),array_keys((array)$keys))))
+		{
+			$result = $this->db->select(self::FEDERATIONS_TABLE,'DISTINCT '.$column,$keys,__LINE__,__FILE__,false,'ORDER BY '.$column,'ranking');
+		}
+		else
+		{
+			$result = (array)$this->search($keys,'DISTINCT '.$column,$column,'','',true,'AND',false,null,'');
+		}
+		foreach($result as $data)
 		{
 			$val = $data[$column];
 			$values[$val] = $val;
@@ -323,18 +367,18 @@ class athlete extends so_sql
 		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),") took ".round(1000*(microtime(true)-$start))."ms</p>\n";
 		return $cache[$cache_key] =& $values;
 	}
-	
+
 	/**
 	 * Generates a rkey for an athlete by using one letter of the first name, 2 from the last name the year and the sex
 	 */
 	function generate_rkey($data='')
 	{
 		if (!is_array($data)) $data =& $this->data;
-		
+
 		if ($data['rkey']) return $data['rkey'];
 
 		$data['rkey'] = substr($data['vorname'],0,1).substr($data['nachname'],0,2).date('y').substr($data['sex'],0,1);
-		
+
 		// we convert some chars to 7bit ascii, the rest is removed by mb_convert_encoding(...,'7bit',...)
 		static $to_ascii = array(
 			'Ä' => 'A', 'ä' => 'a', 'á' => 'a', 'à' => 'a', 'À' => 'A', 'Á' => 'A',
@@ -342,7 +386,7 @@ class athlete extends so_sql
 			'Ü' => 'U', 'ü' => 'u',
 			'ß' => 's',
 			'é' => 'e', 'É' => 'E', 'è' => 'e', 'È' => 'E', 'ê' => 'e', 'Ê' => 'E',
-			'ć' => 'c', 'Ć' => 'C', 'ĉ' => 'c', 'Ĉ' => 'C', 
+			'ć' => 'c', 'Ć' => 'C', 'ĉ' => 'c', 'Ĉ' => 'C',
 		);
 		$data['rkey'] = mb_convert_encoding(strtoupper(str_replace(array_keys($to_ascii),array_values($to_ascii),$data['rkey'])),
 			'7bit',$GLOBALS['egw']->translation->charset());
@@ -352,7 +396,7 @@ class athlete extends so_sql
 		while ($this->not_unique() != 0)
 		{
 			$data['rkey'] = $rkey.$n++;
-		}		
+		}
 		return $data['rkey'];
 	}
 
@@ -360,7 +404,7 @@ class athlete extends so_sql
 	 * checks if an athlete already has results recorded
 	 *
 	 * @param int/array $keys PerId or array with keys of the athlete to check, default null = use keys in data
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function has_results($keys=null)
 	{
@@ -375,12 +419,12 @@ class athlete extends so_sql
 		}
 		$PerId = is_numeric($keys) ? $keys : $this->data['PerId'];
 		if ($data_backup) $this->data = $data_backup;
-		
+
 		$this->db->select('Results','count(*)',array('PerId' => $PerId,'platz > 0'),__LINE__,__FILE__);
-		
+
 		return $this->db->next_record() && $this->db->f(0);
 	}
-	
+
 	/**
 	 * get the path of the picture
 	 *
@@ -390,13 +434,13 @@ class athlete extends so_sql
 	function picture_path($rkey=null)
 	{
 		if (is_null($rkey)) $rkey = $this->data['rkey'];
-		
+
 		return $rkey ? $this->picture_path.'/'.$rkey.'.jpg' : false;
 	}
 
 	/**
 	 * attach a picture to the athlete
-	 * 
+	 *
 	 * @param string $fname filename of the picture to attach
 	 * @param string $rkey=null rkey of the athlete or null to use this->data[rkey]
 	 * @return boolean true on success, flase otherwise
@@ -406,12 +450,12 @@ class athlete extends so_sql
 		$path = $this->picture_path($rkey);
 
 		if (!$path || !file_exists($fname) || !is_readable($fname) || !is_writeable($this->picture_path)) return false;
-		
+
 		if (file_exists($path)) @unlink($path);
-		
+
 		return copy($fname,$path);
 	}
-	
+
 	/**
 	 * get the url of the picture
 	 *
@@ -424,10 +468,10 @@ class athlete extends so_sql
 
 		$url = $this->picture_url.'/'.$this->data['rkey'].'.jpg';
 		$path = $this->picture_path($rkey);
-		
+
 		return file_exists($path) && is_readable($path) ? $url : false;
 	}
-	
+
 	/**
 	 * delete the picture
 	 *
@@ -437,7 +481,7 @@ class athlete extends so_sql
 	{
 		return @delete($this->picture_path());
 	}
-	
+
 	/**
 	 * deletes athlete(s), see so_sql
 	 *
@@ -475,19 +519,31 @@ class athlete extends so_sql
 	 */
 	function read($keys,$extra_cols='',$join='')
 	{
-		if (is_numeric($join))
+		if (is_numeric($year = $join))
 		{
-			$join = "LEFT JOIN $this->result_table ON $this->table_name.PerId=$this->result_table.PerId AND $this->result_table.WetId=-$join AND $this->result_table.GrpId=0";
-			if (!is_array($extra_cols))
-			{
-				$extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
-			}
+			$join = '';
+		}
+		if (!is_array($extra_cols))
+		{
+			$extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
+		}
+		// join in the federation information
+		$join = self::FEDERATIONS_JOIN;
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.nation AS nation';
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.verband AS verband';
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_id AS fed_id';
+		$extra_cols[] = self::ATHLETE2FED_TABLE.'.a2f_start AS a2f_start';
+		$extra_cols[] = self::ATHLETE2FED_TABLE.'.a2f_end AS a2f_end';
+
+		if (is_numeric($year))
+		{
+			$join .= " LEFT JOIN $this->result_table ON $this->table_name.PerId=$this->result_table.PerId AND $this->result_table.WetId=-$year AND $this->result_table.GrpId=0";
 			$extra_cols[] = $this->result_table.'.pkt AS license';
 			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
 		}
 		return parent::read($keys,$extra_cols,$join);
 	}
-	
+
 	/**
 	 * Set the license for a given year
 	 *
@@ -501,7 +557,7 @@ class athlete extends so_sql
 		if (is_null($PerId)) $PerId = $this->data['PerId'];
 
 		if (!(int)$PerId || $year <= 0) return false;
-		
+
 		if (!in_array($status,$this->pkt2license) || $status == 'n')
 		{
 			$this->db->delete($this->result_table,array(
@@ -524,7 +580,93 @@ class athlete extends so_sql
 		}
 		if ($PerId == $this->data['PerId']) $this->data['license'] = $status;
 		//echo "athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
-		
+
 		return $this->db->affected_rows();
+	}
+
+	/**
+	 * Return a list of federation names indexed by fed_id, evtl. of a given nation only
+	 *
+	 * @param string $nation=null
+	 * @return array
+	 */
+	function federations($nation=null)
+	{
+		$feds = array();
+		$where = $nation ? array('nation' => $nation) : array();
+		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$where,__LINE__,__FILE__,false,
+			'ORDER BY nation ASC,verband ASC','ranking') as $fed)
+		{
+			$feds[$fed['fed_id']] = (!$nation ? $fed['nation'].': ' : '').$fed['verband'];
+		}
+		return $feds;
+	}
+
+	/**
+	 * Set the federation of an athlete, automatic record the old federation
+	 *
+	 * @param int $fed_id id of the federation
+	 * @param int &$a2f_start start year of (new) federation, only used if the federation changes, always returned
+	 * @param int $PerId=null default current athlete
+	 * @return true if federation is set (or was already), false on error
+	 */
+	function set_federation($fed_id,&$a2f_start,$PerId=null)
+	{
+		if (is_null($PerId)) $PerId = $this->data['PerId'];
+		if (!$PerId || !$fed_id) return false;
+
+		// read current (year=9999) federation
+		if (!($fed = $this->db->select(self::ATHLETE2FED_TABLE,'*',array(
+			'PerId' => $PerId,
+			'a2f_end' => 9999,
+		),__LINE__,__FILE__)->fetch()))
+		{
+			$a2f_start = 0;		// not found --> ignore start given by user and use default of 0
+		}
+		elseif($fed['fed_id'] == $fed_id)	// no change necessary --> ignore it
+		{
+			//echo "<p>fed not changed, setting old start of $fed[a2f_start]</p>\n";
+			$a2f_start = $fed['a2f_start'];
+			return true;
+		}
+		elseif($a2f_start && $a2f_start > $fed['a2f_start']) 	// federation changed and (valid) start given --> record old one
+		{
+			if (!($a2f_start > 2000)) $a2f_start = (int)date('Y');
+
+			$this->db->update(self::ATHLETE2FED_TABLE,array('a2f_end' => $a2f_start-1),$fed,__LINE__,__FILE__);
+		}
+		else	// no (valid) start given, use current one
+		{
+			//echo "<p>no (valid) start ($a2f_start) given, using $fed[a2f_start] now</p>\n";
+			$a2f_start = $fed['a2f_start'];
+		}
+		// store the new federation including start
+		return !!$this->db->insert(self::ATHLETE2FED_TABLE,array(
+			'fed_id' => $fed_id,
+		),array(
+			'PerId' => $PerId,
+			'a2f_end' => 9999,
+			'a2f_start' => $a2f_start,
+		),__LINE__,__FILE__,'ranking');
+	}
+
+	/**
+	 * saves the content of data to the db
+	 *
+	 * Reimplemented to save nation&federation ...
+	 *
+	 * @param array $keys if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function save($keys=null,$extra_where=null)
+	{
+		if (is_array($keys) && count($keys)) $this->data_merge($keys);
+
+		if (!($err = parent::save()) && $this->data['fed_id'])
+		{
+			$this->set_federation($this->data['fed_id'],$this->data['a2f_start']);
+		}
+		return $err;
 	}
 }

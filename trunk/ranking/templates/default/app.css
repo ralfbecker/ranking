@@ -37,3 +37,5 @@
 }
 .half_down { position: relative; top: 2.3em; }
 .winner { font-weight: bold; }
+.selectboxFullWidth select { width: 100%; }
+.checkAllArrow input { right-pad: 10px; }

@@ -8,20 +8,20 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 class soranking
 {
 	/**
 	 * configuration
-	 * 
+	 *
 	 * @var array
 	 */
-	var $config=array();	
+	var $config=array();
 	/**
 	 * db-object with connection to ranking database, might be different from eGW database
-	 * 
+	 *
 	 * @var egw_db
 	 */
 	var $db;
@@ -57,17 +57,17 @@ class soranking
 	 * @var route
 	 */
 	var $route;
-	
+
 	/**
 	 * Constructor
 	 */
-	function soranking()
+	function soranking($extra_classes=array())
 	{
 		$c =& CreateObject('phpgwapi.config','ranking');
 		$c->read_repository();
 		$this->config = $c->config_data;
 		unset($c);
-		
+
 		if ($this->config['ranking_db_host'] || $this->config['ranking_db_name'])
 		{
 			foreach(array('host','port','name','user','pass') as $var)
@@ -77,11 +77,11 @@ class soranking
 			$this->db =& new egw_db();
 			$this->db->connect($this->config['ranking_db_name'],$this->config['ranking_db_host'],
 				$this->config['ranking_db_port'],$this->config['ranking_db_user'],$this->config['ranking_db_pass']);
-			
+
 			if (!$this->config['ranking_db_charset']) $this->db->Link_ID->SetCharSet($GLOBALS['egw_info']['server']['system_charset']);
 
 		}
-		else 
+		else
 		{
 			$this->db =& $GLOBALS['egw']->db;
 		}
@@ -95,7 +95,7 @@ class soranking
 				'result'  => 'result',
 				'route'   => 'route',
 				'route_result'  => 'route_result',
-			) as $var => $class)
+			)+$extra_classes as $var => $class)
 		{
 			$egw_name = $class;
 			if (!isset($GLOBALS['egw']->$egw_name))
@@ -105,7 +105,7 @@ class soranking
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
 	}
-	
+
 	/**
 	 * Get an instance of the ranking_so object
 	 *
