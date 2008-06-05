@@ -706,7 +706,7 @@ function ranking_upgrade1_4_003()
 		),
 		'pk' => array('fed_id'),
 		'fk' => array(),
-		'ix' => array('fed_nation','fed_parent'),
+		'ix' => array('nation','fed_parent'),
 		'uc' => array()
 	));
 
@@ -830,37 +830,18 @@ function ranking_upgrade1_5_002()
 
 function ranking_upgrade1_5_003()
 {
-	/* done by RefreshTable() anyway
 	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_url',array(
 		'type' => 'varchar',
 		'precision' => '128'
-	));*/
-	/* done by RefreshTable() anyway
+	));
 	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_nationname',array(
 		'type' => 'varchar',
 		'precision' => '80'
-	));*/
-	/* done by RefreshTable() anyway
+	));
 	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_continent',array(
 		'type' => 'int',
 		'precision' => '1',
 		'default' => '0'
-	));*/
-	$GLOBALS['egw_setup']->oProc->RefreshTable('Federations',array(
-		'fd' => array(
-			'fed_id' => array('type' => 'auto','nullable' => False),
-			'verband' => array('type' => 'varchar','precision' => '80','nullable' => False),
-			'nation' => array('type' => 'varchar','precision' => '3','nullable' => False),
-			'fed_parent' => array('type' => 'int','precision' => '4'),
-			'fed_aliases' => array('type' => 'text'),
-			'fed_url' => array('type' => 'varchar','precision' => '128'),
-			'fed_nationname' => array('type' => 'varchar','precision' => '80'),
-			'fed_continent' => array('type' => 'int','precision' => '1','default' => '0')
-		),
-		'pk' => array('fed_id'),
-		'fk' => array(),
-		'ix' => array(),
-		'uc' => array()
 	));
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.004';

@@ -310,7 +310,7 @@ $phpgw_baseline = array(
 		),
 		'pk' => array('fed_id'),
 		'fk' => array(),
-		'ix' => array(),
+		'ix' => array('nation','fed_nation'),
 		'uc' => array()
 	),
 	'Athlete2Fed' => array(
