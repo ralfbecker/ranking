@@ -7,21 +7,21 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 if (!defined('DR_PATH'))
 {
-	define('DR_PATH',realpath(strstr($_SERVER['DOCUMENT_ROOT'],'uiaaclimbing.com') ? $_SERVER['DOCUMENT_ROOT'].'/../digitalrock.de' : $_SERVER['DOCUMENT_ROOT']));
+	define('DR_PATH',file_exists($_SERVER['DOCUMENT_ROOT'].'/../digitalrock.de') ? realpath($_SERVER['DOCUMENT_ROOT'].'/../digitalrock.de') : $_SERVER['DOCUMENT_ROOT']);
 }
-class module_ranking_digitalrock extends Module 
+class module_ranking_digitalrock extends Module
 {
 	function module_ranking_digitalrock()
 	{
 		$this->arguments = array(
 			'type' => array(
-				'type' => 'select', 
+				'type' => 'select',
 				'label' => lang('Type of display'),
 				'options' => array(
 					'calendar' => lang('Competition calendar'),
@@ -34,33 +34,33 @@ class module_ranking_digitalrock extends Module
 			'nation' => array(
 				'type' => 'textfield',
 				'label' => lang('Nation to use (empty = international)'),
-			),	
+			),
 			'cat' => array(
 				'type' => 'textfield',
 				'label' => lang('Key of the category'),
-			),	
+			),
 			'cup' => array(
 				'type' => 'textfield',
 				'label' => lang('Key of the cup'),
-			),	
+			),
 			'comp' => array(
 				'type' => 'textfield',
 				'label' => lang('Key of the competition'),
-			),	
+			),
 			'person' => array(
 				'type' => 'textfield',
 				'label' => lang('Key of the Person'),
-			),	
+			),
 			'year' => array(
 				'type' => 'textfield',
 				'label' => lang('Year of the calendar (empty for current)'),
-			),	
+			),
 		);
 		$this->title = lang('digital ROCK');
 		$this->description = lang('This module displays calendar, results and rankings');
 	}
-	
-	function get_content(&$arguments,$properties) 
+
+	function get_content(&$arguments,$properties)
 	{
 		foreach($arguments as $name => $value)
 		{
@@ -74,7 +74,7 @@ class module_ranking_digitalrock extends Module
 			case 'calendar':
 				$file = (empty($arguments['nation']) ? 'icc' : strtolower($arguments['nation'])).'_calendar';
 				break;
-				
+
 			case 'result':
 				if (!$GLOBALS['dr_config']['params']['comp'])
 				{
@@ -85,7 +85,7 @@ class module_ranking_digitalrock extends Module
 					$file = 'all_result';
 				}
 				break;
-				
+
 			case 'ranglist':
 				if (!$GLOBALS['dr_config']['params']['cat'])
 				{
@@ -93,14 +93,14 @@ class module_ranking_digitalrock extends Module
 					$file = 'icc_calendar';
 				}
 				break;
-				
+
 			case 'pstambl':
 				if (!$GLOBALS['dr_config']['params']['person'] || !$GLOBALS['dr_config']['params']['cat'])
 				{
 					return '<p>'.lang('No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!')."</p>\n";	// otherwise we get a fatal error
 				}
 				break;
-				
+
 			case 'nat_team_ranking':
 				if (!$GLOBALS['dr_config']['params']['comp'] && !$GLOBALS['dr_config']['params']['cup'])
 				{
@@ -116,9 +116,9 @@ class module_ranking_digitalrock extends Module
 		include($file);
 		$content = ob_get_contents();
 		ob_end_clean();
-		
+
 		//$content = preg_replace('/<html>.*<body>(.*)<\\/body>.*<\\/html>/i','\\1',$content);
-		
+
 		return $content;
 	}
 }
