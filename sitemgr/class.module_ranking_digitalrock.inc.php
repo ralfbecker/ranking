@@ -17,6 +17,8 @@ if (!defined('DR_PATH'))
 }
 class module_ranking_digitalrock extends Module
 {
+	const PAGE_URL_TEMPLATE = 'index.php?page_name=%s&amp;';
+
 	function module_ranking_digitalrock()
 	{
 		$this->arguments = array(
@@ -54,6 +56,45 @@ class module_ranking_digitalrock extends Module
 			'year' => array(
 				'type' => 'textfield',
 				'label' => lang('Year of the calendar (empty for current)'),
+			),
+			'prefix' => array(
+				'type' => 'textfield',
+				'label' => lang('Prefix for the following page names (default none)'),
+			),
+			'result' => array(
+				'type' => 'textfield',
+				'label' => lang('Pagename for results (default: result)'),
+				'default' => 'result',
+			),
+			'pstambl' => array(
+				'type' => 'textfield',
+				'label' => lang('Pagename for athlete profile (default: pstambl)'),
+				'default' => 'pstambl',
+			),
+			'pstambl' => array(
+				'type' => 'textfield',
+				'label' => lang('Target for athlete profile (default: profil)'),
+				'default' => 'profil',
+			),
+			'pstambl_target' => array(
+				'type' => 'textfield',
+				'label' => lang('Pagename for ranglists (default: ranglist)'),
+				'default' => 'ranglist',
+			),
+			'startlist' => array(
+				'type' => 'textfield',
+				'label' => lang('Target for start lists (default: startlist)'),
+				'default' => 'startlist',
+			),
+			'nat_team_ranking' => array(
+				'type' => 'textfield',
+				'label' => lang('Target for national team rankings (default: nat_team_ranking)'),
+				'default' => 'nat_team_ranking',
+			),
+			'resultservice' => array(
+				'type' => 'textfield',
+				'label' => lang('Target for national team rankings (default: resultservice)'),
+				'default' => 'nat_team_ranking',
 			),
 		);
 		$this->title = lang('digital ROCK');
@@ -111,6 +152,18 @@ class module_ranking_digitalrock extends Module
 		if (!file_exists($file = DR_PATH.'/'.$file.'.php'))
 		{
 			return '<p>'.lang('File %1 not found (either type=%2 or DR_PATH=%3 wrong)!',$file,$arguments['type'],DR_PATH)."</p>\n";
+		}
+		foreach($this->arguments as $name => $data)
+		{
+			if (!isset($data['default'])) continue;
+
+			$value = $arguments['prefix'] . ($arguments[$name] ? $arguments[$name] : $data['default']);
+
+			if ($name != 'pstambl_target')
+			{
+				$value = sprintf(self::PAGE_URL_TEMPLATE,$value);
+			}
+			$GLOBALS['dr_config'][$name] = $value;
 		}
 		ob_start();
 		include($file);
