@@ -113,7 +113,21 @@ class module_ranking_digitalrock extends Module
 		switch($file)
 		{
 			case 'calendar':
-				$file = (empty($arguments['nation']) ? 'icc' : strtolower($arguments['nation'])).'_calendar';
+				switch(strtolower($arguments['nation']))
+				{
+					case 'ger':
+						$file = 'dav_calendar';
+						break;
+					case 'sui':
+						$file = 'sac_calendar';
+						break;
+					case '':
+						$file = 'icc_calendar';
+						break;
+					default:
+						$file = strtolower($arguments['nation']).'_calendar';
+						break;
+				}
 				break;
 
 			case 'result':
