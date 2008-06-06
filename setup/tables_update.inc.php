@@ -847,3 +847,32 @@ function ranking_upgrade1_5_003()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.004';
 }
 
+
+function ranking_upgrade1_5_004()
+{
+	/* done by RefreshTable() anyway
+	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_shortcut',array(
+		'type' => 'varchar',
+		'precision' => '20'
+	));*/
+	$GLOBALS['egw_setup']->oProc->RefreshTable('Federations',array(
+		'fd' => array(
+			'fed_id' => array('type' => 'auto','nullable' => False),
+			'verband' => array('type' => 'varchar','precision' => '80','nullable' => False),
+			'nation' => array('type' => 'varchar','precision' => '3','nullable' => False),
+			'fed_parent' => array('type' => 'int','precision' => '4'),
+			'fed_aliases' => array('type' => 'text'),
+			'fed_url' => array('type' => 'varchar','precision' => '128'),
+			'fed_nationname' => array('type' => 'varchar','precision' => '80'),
+			'fed_continent' => array('type' => 'int','precision' => '1','default' => '0'),
+			'fed_shortcut' => array('type' => 'varchar','precision' => '20')
+		),
+		'pk' => array('fed_id'),
+		'fk' => array(),
+		'ix' => array('nation'),
+		'uc' => array()
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.005';
+}
+

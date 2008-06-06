@@ -1,4 +1,5 @@
 %1 deleted	ranking	en	%1 deleted
+%1 federations added to parent federation.	ranking	en	%1 federations added to parent federation.
 %1 federations merged.	ranking	en	%1 federations merged.
 %1 is an admin and has therefor all rights!	ranking	en	%1 is an admin and has therefor all rights!
 %1 participants imported	ranking	en	%1 participants imported
@@ -23,6 +24,7 @@ add a new heat	ranking	en	Add a new heat
 add athletes	ranking	en	add athletes
 add heat	ranking	en	Add heat
 add not existing athletes to the database, use with caution!	ranking	en	add not existing athletes to the database, use with caution!
+add to parent federation opened for editing	ranking	en	Add to parent federation opened for editing
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
@@ -163,6 +165,7 @@ fax	ranking	en	Fax
 federation	ranking	en	Federation
 federation deleted.	ranking	en	Federation deleted.
 federation saved.	ranking	en	Federation saved.
+federations	ranking	en	Federations
 female	ranking	en	female
 fieldfactorpoints	ranking	en	Fieldfactorpoints
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)!
@@ -246,7 +249,7 @@ nationname	ranking	en	Nationname
 nations and federations	ranking	en	Nations and Federations
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	en	No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	en	No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!
-no federation selected to edit / merge to!	ranking	en	No federation selected to edit / merge to!
+no federation selected to edit!	ranking	en	No federation selected to edit!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous heat!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	en	No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!
@@ -267,7 +270,7 @@ other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
 pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete profiles
 pairing speed final	ranking	en	Pairing speed final
-parent	ranking	en	Parent
+parent federation	ranking	en	Parent federation
 participant deleted	ranking	en	Participant deleted
 perid	ranking	en	PerId
 permission denied !!!	ranking	en	Permission denied !!!

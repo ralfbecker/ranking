@@ -13,6 +13,7 @@
 				<column/>
 				<column/>
 				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -20,8 +21,9 @@
 					<nextmatch-sortheader label="Nationname" id="fed_nationname"/>
 					<nextmatch-filterheader options="Continent" id="fed_continent"/>
 					<nextmatch-sortheader label="Name" id="verband"/>
+					<nextmatch-sortheader label="Shortcut" id="fed_shortcut"/>
 					<nextmatch-sortheader label="Athletes" align="center" id="num_athletes"/>
-					<nextmatch-sortheader label="Parent" id="fed_parent"/>
+					<nextmatch-sortheader label="Parent federation" id="fed_parent"/>
 					<nextmatch-sortheader label="Children" align="center" id="num_children"/>
 					<nextmatch-sortheader label="Key" align="center" id="fed_id"/>
 					<hbox align="center">
@@ -36,6 +38,7 @@
 						<menupopup id="${row}[fed_continent]" readonly="true"/>
 					</menulist>
 					<description no_lang="1" id="${row}[verband]" options=",$row_cont[fed_url],,,_blank"/>
+					<description id="${row}[fed_shortcut]"/>
 					<description id="${row}[num_athletes]" align="center"/>
 					<description id="${row}[parent_name]"/>
 					<description id="${row}[num_children]" align="center"/>
@@ -85,7 +88,7 @@
 									<description value="Nation" options=",,,nation"/>
 									<hbox options="0,0">
 										<textbox size="3" maxlength="3" id="nation" onchange="1" class="inputRequired"/>
-										<textbox id="fed_nationname" size="50" maxlength="80" class="leftPad5"/>
+										<textbox id="fed_nationname" size="60" maxlength="80" class="leftPad5"/>
 										<menulist class="leftPad5">
 											<menupopup id="fed_continent" options="Select one"/>
 										</menulist>
@@ -93,14 +96,17 @@
 								</row>
 								<row>
 									<description value="Name"/>
-									<textbox size="80" maxlength="80" id="verband" class="inputRequired"/>
+									<hbox options="0,0">
+										<textbox size="80" maxlength="80" id="verband" class="inputRequired"/>
+										<textbox id="fed_shortcut" size="10" maxlength="20" class="leftPad5" statustext="Shortcut"/>
+									</hbox>
 								</row>
 								<row>
 									<description options=",,,fed_url" value="Website"/>
-									<textbox size="80" maxlength="128" id="fed_url"/>
+									<textbox size="95" maxlength="128" id="fed_url"/>
 								</row>
 								<row>
-									<description value="Parent" options=",,,fed_parent"/>
+									<description value="Parent federation" options=",,,fed_parent"/>
 									<menulist>
 										<menupopup options="None" id="fed_parent"/>
 									</menulist>

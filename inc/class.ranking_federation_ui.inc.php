@@ -170,22 +170,22 @@ class ranking_federation_ui extends boranking
 				}
 				else
 				{
+					$fed = $content['fed'];
 					switch($content['action'])
 					{
 						case 'merge':
-							if (!$content['fed']['fed_id'])
+							if (!$fed['fed_id'])
 							{
-								$msg = lang('No federation selected to edit / merge to!');
+								$msg = lang('No federation selected to edit!');
 							}
 							else
 							{
 								$msg = lang('%1 federations merged.',
-									$this->federation->merge($content['fed']['fed_id'],$checked));
+									$this->federation->merge($fed['fed_id'],$checked));
 							}
 							break;
 						case 'apply':
-							$fed = $content['fed'];
-							if(!$fed['nation'] && !$fed['verband'] && !$fed['fed_parent'])
+							if(!$fed['nation'] && !$fed['fed_parent'] && !$fed['fed_shortcut'] && !$fed['fed_parent'])
 							{
 								$msg = lang('Nothing to apply!');
 							}
@@ -193,6 +193,17 @@ class ranking_federation_ui extends boranking
 							{
 								$msg = lang('Changes applied to %1 federations.',
 									$this->federation->apply($fed,$checked));
+							}
+							break;
+						case 'parent':
+							if (!$fed['fed_id'])
+							{
+								$msg = lang('No federation selected to edit!');
+							}
+							else
+							{
+								$msg = lang('%1 federations added to parent federation.',
+									$this->federation->apply(array('fed_parent' => $fed['fed_id']),$checked));
 							}
 							break;
 					}
@@ -213,6 +224,7 @@ class ranking_federation_ui extends boranking
 			'action' => array(
 				'apply' => lang('Apply modifications below to all selected federations'),
 				'merge' => lang('Merge selected federations with the one opened for editing'),
+				'parent' => lang('Add to parent federation opened for editing'),
 			),
 			'fed_continent' => ranking_federation::$continents,
 			'fed_parent' => !$content['fed']['nation'] ? array() :
