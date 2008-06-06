@@ -122,7 +122,7 @@ class ranking_federation extends so_sql
 		$extra_cols[] = self::FEDERATION_ATHLETES.' AS num_athletes';
 		$extra_cols[] = self::FEDERATION_CHILDREN.' AS num_children';
 
-		//$order_by .= ($order_by ? ',' : '').'nation ASC';
+		$order_by .= ($order_by ? ',' : '').'nation ASC,verband ASC';
 
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
@@ -132,6 +132,7 @@ class ranking_federation extends so_sql
 	 *
 	 * @param array $data data to merge (only non-empty fields)
 	 * @param array $fed_ids federations to merge
+	 * @param int|string number of federations modified or "none"
 	 */
 	function apply(array $data,array $fed_ids)
 	{
@@ -144,7 +145,7 @@ class ranking_federation extends so_sql
 		if (!$fed_ids || !$data)
 		{
 			//echo "<p>nothing to do: fed_ids=".array2string($fed_ids).", data=".array2string($data)."</p>\n";
-			return false;
+			return lang('None');
 		}
 		$this->db->update(self::FEDERATIONS_TABLE,$data,array('fed_id' => $fed_ids),__LINE__,__FILE__,self::APPLICATION);
 
@@ -156,7 +157,7 @@ class ranking_federation extends so_sql
 	 *
 	 * @param int $fed_id federation to merge into
 	 * @param array $fed_ids federations to merge (can contain $fed_id)
-	 * @return int|boolean number of merged federations or false on error
+	 * @param int|string number of federations modified or "none"
 	 */
 	function merge($fed_id,array $fed_ids)
 	{
@@ -167,7 +168,7 @@ class ranking_federation extends so_sql
 		if (!$fed_id || !$fed_ids)
 		{
 			//echo "<p>nothing to do: fed_id=$fed_id, fed_ids=".array2string($fed_ids)."</p>\n";
-			return false;
+			return lang('None');
 		}
 		$this->db->update(self::ATHLETE2FED_TABLE,array('fed_id'=>$fed_id),array('fed_id'=>$fed_ids),__LINE__,__FILE__,self::APPLICATION);
 

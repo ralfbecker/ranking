@@ -1,4 +1,5 @@
 %1 deleted	ranking	de	%1 gelöscht
+%1 federations added to parent federation.	ranking	de	%1 Verbände zu übergeordnetem hinzugefügt.
 %1 federations merged.	ranking	de	%1 Verbände zusammengeführt.
 %1 is an admin and has therefor all rights!	ranking	de	%1 ist ein Administrator und hat daher alle Rechte!
 %1 participants imported	ranking	de	%1 Teilnehmer importiert
@@ -23,6 +24,7 @@ add a new heat	ranking	de	Neue Runde anlegen
 add athletes	ranking	de	Athleten hinzufügen
 add heat	ranking	de	Runde anlegen
 add not existing athletes to the database, use with caution!	ranking	de	Nicht existierende Athleten zur Datenbank hinzufügen, mit Vorsicht benutzen!
+add to parent federation opened for editing	ranking	de	Hinzufügen zu zum Bearbeiten geöffneten übergeordneten Verband
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
@@ -163,6 +165,7 @@ fax	ranking	de	Fax
 federation	ranking	de	Verband
 federation deleted.	ranking	de	Verband gelöscht.
 federation saved.	ranking	de	Verband gespeichert.
+federations	ranking	de	Verbände
 female	ranking	de	weiblich
 fieldfactorpoints	ranking	de	Feldfaktorpunkte
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	de	Datei %1 nicht gefunden (entweder Typ=%2 oder DR_PATH=%3 falsch)!
@@ -246,7 +249,7 @@ nationname	ranking	de	Name des Landes
 nations and federations	ranking	de	Nationen und Verbände
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	de	Kein Wettkampf (&comp=XYZ) und kein Cup (&cup=XYZ) über die URL ausgewählt!
-no federation selected to edit / merge to!	ranking	de	Kein Verband zum bearbeiten / vereinigen ausgewählt!
+no federation selected to edit!	ranking	de	Kein Verband zum bearbeiten ausgewählt!
 no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Runde angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
@@ -267,7 +270,7 @@ other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
 pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Athletenprofile
 pairing speed final	ranking	de	Paarungen Speed Finale
-parent	ranking	de	Eltern
+parent federation	ranking	de	übergeordneter Verband
 participant deleted	ranking	de	Teilnehmer gelöscht
 perid	ranking	de	PerId
 permission denied !!!	ranking	de	Zugriff verweigert !!!
