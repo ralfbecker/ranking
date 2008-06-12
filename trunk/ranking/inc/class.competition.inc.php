@@ -390,7 +390,7 @@ class competition extends so_sql
 	{
 		if (!$data) $data =& $this->data;
 
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return array();
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return array();
 
 		if (!isset($GLOBALS['egw']->vfs))
 		{
@@ -439,7 +439,7 @@ if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return array
 	{
 		if ($keys && !$this->read($keys)) return false;
 
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false;
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
 
 		if (!isset($GLOBALS['egw']->vfs))
 		{
@@ -491,7 +491,7 @@ if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false
 	{
 		if ($keys && !$this->read($keys)) return false;
 
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false;
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
 
 		if (!isset($GLOBALS['egw']->vfs))
 		{
@@ -521,7 +521,7 @@ if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false
 		if (!$old_rkey || $keys && !$this->read($keys)) return false;
 
 
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5); return false;
+if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
 
 		if (!isset($GLOBALS['egw']->vfs))
 		{
