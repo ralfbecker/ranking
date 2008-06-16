@@ -588,12 +588,14 @@ class athlete extends so_sql
 	 * Return a list of federation names indexed by fed_id, evtl. of a given nation only
 	 *
 	 * @param string $nation=null
+	 * @param boolean $only_national=false if true return only national federations (fed_parent=NULL)
 	 * @return array
 	 */
-	function federations($nation=null)
+	function federations($nation=null,$only_national=false)
 	{
 		$feds = array();
 		$where = $nation ? array('nation' => $nation) : array();
+		if ($only_national) $where[] = 'fed_parent IS NULL';
 		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$where,__LINE__,__FILE__,false,
 			'ORDER BY nation ASC,verband ASC','ranking') as $fed)
 		{
@@ -663,6 +665,12 @@ class athlete extends so_sql
 	{
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
 
+		// get fed_id from national federation, if fed_id is not given but nation
+		if (!$this->data['fed_id'] && $this->data['nation'] &&
+			($feds = $this->federations($this->data['nation'],true)))
+		{
+			list($this->data['fed_id']) = each($feds);
+		}
 		if (!($err = parent::save()) && $this->data['fed_id'])
 		{
 			$this->set_federation($this->data['fed_id'],$this->data['a2f_start']);
