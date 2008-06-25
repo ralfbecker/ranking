@@ -325,5 +325,23 @@ $phpgw_baseline = array(
 		'fk' => array(),
 		'ix' => array('fed_id'),
 		'uc' => array()
+	),
+	'Licenses' => array(
+		'fd' => array(
+			'PerId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'nation' => array('type' => 'varchar','precision' => '3','nullable' => False),
+			'lic_year' => array('type' => 'int','precision' => '2','nullable' => False),
+			'lic_status' => array('type' => 'varchar','precision' => '1','default' => 'c'),
+			'lic_applied' => array('type' => 'date'),
+			'lic_applied_by' => array('type' => 'int','precision' => '4'),
+			'lic_confirmed' => array('type' => 'date'),
+			'lic_confirmed_by' => array('type' => 'int','precision' => '4'),
+			'lic_suspended' => array('type' => 'date'),
+			'lic_suspended_by' => array('type' => 'int','precision' => '4')
+		),
+		'pk' => array('PerId','nation','lic_year'),
+		'fk' => array(),
+		'ix' => array(),
+		'uc' => array()
 	)
 );

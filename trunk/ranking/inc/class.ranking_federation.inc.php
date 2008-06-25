@@ -174,4 +174,22 @@ class ranking_federation extends so_sql
 
 		return $this->delete(array('fed_id' => $fed_ids));
 	}
+
+	/**
+	 * Return id or all fields of a federation specified by name and optional nation
+	 *
+	 * @param string $name
+	 * @param string $nation=null
+	 * @param boolean $id_only=false return only the integer id
+	 * @return int|array|boolean integer id, array with all data or false if no federation is found
+	 */
+	function get_federation($name,$nation=null,$id_only=false)
+	{
+		$where = array('verband' => $name);
+		if ($nation) $where['nation'] = $nation;
+
+		$federation = $this->read($where);
+
+		return $id_only && $federation ? $federation['fed_id'] : $federation;
+	}
 }

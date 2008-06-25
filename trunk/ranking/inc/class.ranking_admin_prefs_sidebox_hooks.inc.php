@@ -1,22 +1,22 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - Admin-, Preferences- and SideboxMenu-Hooks
+ * eGroupWare digital ROCK Rankings - Hooks: diverse static methods to be called as hooks
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
+/**
+ * eGroupWare digital ROCK Rankings - Hooks: diverse static methods to be called as hooks
+ */
 class ranking_admin_prefs_sidebox_hooks
 {
-	var $public_functions = array(
-		'all_hooks' => true,
-	);
-	function all_hooks($args)
+	static function all_hooks($args)
 	{
 		$appname = 'ranking';
 		$location = is_array($args) ? $args['location'] : $args;
@@ -51,11 +51,6 @@ class ranking_admin_prefs_sidebox_hooks
 
 			if (is_object($GLOBALS['uiresult']))	// we show the displays menu only if we are in the result-service
 			{
-				if (!is_object($GLOBALS['uiresult']->display))
-				{
-					include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
-					$GLOBALS['uiresult']->display =& new ranking_display($GLOBALS['uiresult']->db);
-				}
 				if (($displays = $GLOBALS['uiresult']->display->displays()) || $GLOBALS['egw_info']['user']['apps']['admin'])
 				{
 					if (!is_array($displays)) $displays = array();
@@ -119,6 +114,8 @@ class ranking_admin_prefs_sidebox_hooks
 					'appname'    => 'ranking',
 				 )),
 				'Nation ACL' => $GLOBALS['egw']->link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
+				'Import' => $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.ranking_import.index' )),
 			);
 			if ($location == 'admin')
 			{
@@ -131,7 +128,7 @@ class ranking_admin_prefs_sidebox_hooks
 		}
 	}
 
-	function hook_settings()
+	static function hook_settings()
 	{
 		$ranking_views = array(
 			'ranking.uicompetitions.index'   => lang('Competitions'),
@@ -147,5 +144,28 @@ class ranking_admin_prefs_sidebox_hooks
 			'Which view do you want to see, when you start the ranking app?');
 
 		return true;
+	}
+
+	/**
+	 * Hook called by link-class to include athletes in the appregistry of the linkage
+	 *
+	 * @param array/string $location location and other parameters (not used)
+	 * @return array with method-names
+	 */
+	static function search_link($location)
+	{
+		return array(
+			'query' => 'ranking.athlete.link_query',
+			'title' => 'ranking.athlete.link_title',
+//			'titles' => 'ranking.athlete.link_titles',
+			'view' => array(
+				'menuaction' => 'ranking.uiathletes.edit'
+			),
+			'view_id' => 'PerId',
+			'add' => array(
+				'menuaction' => 'ranking.uiathletes.edit'
+			),
+			'add_popup'  => '850x450',
+		);
 	}
 }

@@ -148,7 +148,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.3.001">
+	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -167,6 +167,9 @@
 					<description options=",,,vorname" value="First name"/>
 					<textbox size="20" maxlength="20" id="vorname" needed="1" statustext="First name of the athlete in Latin chars! Accents and umlauts are ok"/>
 					<hbox align="right">
+						<menulist>
+							<menupopup id="license_nation" onchange="1"/>
+						</menulist>
 						<description value="License" id="license_year" no_lang="1"/>
 						<menulist>
 							<menupopup id="license"/>
@@ -175,13 +178,13 @@
 					</hbox>
 				</row>
 				<row class="row">
-					<description options=",,,nation" value="Nation"/>
-					<menulist>
-						<menupopup options="Select one" id="nation" statustext="nation the athlete is competing for" no_lang="1" needed="1"/>
-					</menulist>
 					<description options=",,,sex" value="Gender"/>
-					<menulist span="all">
+					<menulist>
 						<menupopup options="Select one" id="sex" statustext="gender of the athlete" needed="1"/>
+					</menulist>
+					<description options=",,,nation" value="Nation"/>
+					<menulist span="all">
+						<menupopup options="Select one" id="nation" statustext="nation the athlete is competing for" no_lang="1" needed="1" onchange="1"/>
 					</menulist>
 				</row>
 				<row class="row">
@@ -192,7 +195,9 @@
 				</row>
 				<row class="row">
 					<description options=",,,verband" value="Federation"/>
-					<textbox size="60" maxlength="60" span="all" id="verband"/>
+					<menulist span="3" class="selectboxFullWidth">
+						<menupopup id="fed_id"/>
+					</menulist>
 				</row>
 				<row>
 					<tabbox span="all">

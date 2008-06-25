@@ -23,6 +23,7 @@ add a new cup	ranking	de	Neue Serie anlegen
 add a new heat	ranking	de	Neue Runde anlegen
 add athletes	ranking	de	Athleten hinzufügen
 add heat	ranking	de	Runde anlegen
+add new athlete with the given data	ranking	de	Neuen Athleten mit den gegebenen Daten anlegen
 add not existing athletes to the database, use with caution!	ranking	de	Nicht existierende Athleten zur Datenbank hinzufügen, mit Vorsicht benutzen!
 add to parent federation opened for editing	ranking	de	Hinzufügen zu zum Bearbeiten geöffneten übergeordneten Verband
 all above	ranking	de	Alle darüber
@@ -105,8 +106,10 @@ delete this cup	ranking	de	Diesen Cup löschen
 delete this federation	ranking	de	Diesen Verband löschen
 delete this heat including all results	ranking	de	Löscht diese Runde einschließlich der Ergebnisse
 deletes this cup	ranking	de	Löscht diesen Cup
+delimiter	ranking	de	Begrenzungszeichen
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
 deny public display of the checked information	ranking	de	öffentlichen Anzeige der ausgewählte Informationen verweigern
+detect athletes	ranking	de	Athleten erkennen
 digital rock	ranking	de	digital ROCK
 display	ranking	de	Anzeige
 display #%1 not found!!!	ranking	de	Anzeige #%1 nicht gefunden!!!
@@ -193,6 +196,7 @@ generate all startlists together	ranking	de	Erzeugt alle Startlisten  auf ein ma
 generate startlist	ranking	de	Startliste erzeugen
 go	ranking	de	Go
 grpid	ranking	de	GrpId
+header	ranking	de	Spaltenköpfe
 heat	ranking	de	Runde
 heat deleted	ranking	de	Runde gelöscht
 heat saved	ranking	de	Runde gespeichert
@@ -209,6 +213,9 @@ how many athletes from the complimentary list of each nation should be used	rank
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athleten des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
+ignore	ranking	de	Ignorieren
+import as	ranking	de	Importieren als
+import charset	ranking	de	Zeichensatz
 import file	ranking	de	Datei importieren
 import into ranking	ranking	de	Ranglistenimport
 import the result into the ranking	ranking	de	Importiert die Ergebnisse in die Rangliste

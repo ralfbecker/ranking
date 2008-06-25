@@ -141,16 +141,16 @@ class boranking extends soranking
 	/**
 	 * Constructor
 	 *
-	 * @param $extra_classes=array()
+	 * @param array $extra_classes=array()
 	 * @return boranking
 	 */
-	function boranking($extra_classes=array())
+	function __construct(array $extra_classes=array())
 	{
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['Time'] = 'Zeit';
 
-		$this->soranking($extra_classes);	// calling the parent constructor
+		parent::__construct($extra_classes);	// calling the parent constructor
 
 		$this->pkt_names = $this->pkte->names();
 		$this->cat_names = $this->cats->names();
@@ -226,7 +226,19 @@ class boranking extends soranking
 		$this->license_year = (int) date('Y');
 
 		// makeing the boranking object availible for other objects
-		$GLOBALS['boranking'] =& $this;
+		$GLOBALS['boranking'] = $this;
+	}
+
+	/**
+	 * php4 constructor
+	 *
+	 * @deprecated use __construct()
+	 * @param array $extra_classes=array()
+	 * @return boranking
+	 */
+	function boranking(array $extra_classes=array())
+	{
+		self::__construct($extra_classes);
 	}
 
 	/**
@@ -1015,7 +1027,7 @@ class boranking extends soranking
 	function set_ui_state($calendar=null,$comp=null,$cat=null)
 	{
 		//echo "<p>boranking::set_ui_state(calendar='$calendar',comp=$comp,cat=$cat) menuaction=$_GET[menuaction]</p>\n";
-		foreach(array('registration','result') as $type)
+		foreach(array('registration','result','import') as $type)
 		{
 			$data = $GLOBALS['egw']->session->appsession($type,'ranking');
 			foreach(array('calendar','comp','cat') as $name)

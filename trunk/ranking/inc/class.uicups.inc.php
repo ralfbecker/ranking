@@ -8,12 +8,13 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 
-class uicups extends boranking 
+class uicups extends boranking
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -23,13 +24,6 @@ class uicups extends boranking
 		'edit'  => true,
 		'view'  => true,
 	);
-
-	function uicups()
-	{
-		$this->boranking();
-
-		$this->tmpl =& CreateObject('etemplate.etemplate');
-	}
 
 	/**
 	 * View a cup
@@ -47,6 +41,8 @@ class uicups extends boranking
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
+		$tmpl = new etemplate('ranking.cup.edit');
+
 		if (($_GET['rkey'] || $_GET['SerId']) && !$this->cup->read($_GET))
 		{
 			$msg .= lang('Entry not found !!!');
@@ -100,7 +96,7 @@ class uicups extends boranking
 			}
 			if ($content['cancel'])
 			{
-				$this->tmpl->location(array('menuaction'=>'ranking.uicups.index'));
+				$tmpl->location(array('menuaction'=>'ranking.uicups.index'));
 			}
 			if ($content['delete'] && $this->acl_check($content['nation'],EGW_ACL_EDIT))
 			{
@@ -150,8 +146,7 @@ class uicups extends boranking
 			}
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('cup'));
-		$this->tmpl->read('ranking.cup.edit');
-		$this->tmpl->exec('ranking.uicups.edit',$content,
+		$tmpl->exec('ranking.uicups.edit',$content,
 			$sel_options,$readonlys,array(
 				'cup_data' => $this->cup->data,
 				'view' => $view,
@@ -182,7 +177,7 @@ class uicups extends boranking
 			if ($val == 'NULL') $query['col_filter'][$col] = null;
 		}
 		$total = $this->cup->get_rows($query,$rows,$readonlys);
-		
+
 		$readonlys = array();
 		foreach($rows as $row)
 		{
@@ -196,7 +191,7 @@ class uicups extends boranking
 			echo "<p>uicups::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
 			_debug_array($readonlys);
 		}
-		return $total;		
+		return $total;
 	}
 
 	/**
@@ -207,8 +202,10 @@ class uicups extends boranking
 	 */
 	function index($content=null,$msg='')
 	{
+		$tmpl = new etemplate('ranking.cup.list');
+
 		$content = $content['nm']['rows'];
-		
+
 		if ($content['view'] || $content['edit'] || $content['delete'])
 		{
 			foreach(array('view','edit','delete') as $action)
@@ -223,19 +220,19 @@ class uicups extends boranking
 			switch($action)
 			{
 				case 'view':
-					$this->tmpl->location(array(
+					$tmpl->location(array(
 						'menuaction' => 'ranking.uicups.view',
 						'SerId'      => $id,
 					));
 					break;
-					
+
 				case 'edit':
-					$this->tmpl->location(array(
+					$tmpl->location(array(
 						'menuaction' => 'ranking.uicups.edit',
 						'SerId'      => $id,
 					));
 					break;
-					
+
 				case 'delete':
 					if (!$this->is_admin && $this->cup->read(array('SerId' => $id)) &&
 						!in_array($this->cup->data['nation'],$this->edit_rights))
@@ -244,16 +241,16 @@ class uicups extends boranking
 					}
 					else
 					{
-						$msg = $this->cup->delete(array('SerId' => $id)) ? 
+						$msg = $this->cup->delete(array('SerId' => $id)) ?
 							lang('%1 deleted',lang('Cup')) : lang('Error: deleting %1 !!!',lang('Cup'));
 					}
 					break;
-			}						
+			}
 		}
 		$content = array();
 
 		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','cup_state');
-		
+
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
@@ -273,9 +270,8 @@ class uicups extends boranking
 		}
 		$content['msg'] = $msg;
 
-		$this->tmpl->read('ranking.cup.list');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('cups');
-		$this->tmpl->exec('ranking.uicups.index',$content,array(
+		$tmpl->exec('ranking.uicups.index',$content,array(
 			'nation' => $this->ranking_nations,
 		));
 	}

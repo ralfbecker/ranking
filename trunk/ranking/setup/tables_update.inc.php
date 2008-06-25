@@ -876,3 +876,56 @@ function ranking_upgrade1_5_004()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.005';
 }
 
+
+function ranking_upgrade1_5_005()
+{
+	$GLOBALS['egw_setup']->oProc->CreateTable('Licenses',array(
+		'fd' => array(
+			'PerId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'nation' => array('type' => 'varchar','precision' => '3','nullable' => False),
+			'lic_year' => array('type' => 'int','precision' => '2','nullable' => False),
+			'lic_status' => array('type' => 'char','precision' => '1','default' => 'c'),
+			'lic_applied' => array('type' => 'date'),
+			'lic_applied_by' => array('type' => 'int','precision' => '4'),
+			'lic_confirmed' => array('type' => 'date'),
+			'lic_confirmed_by' => array('type' => 'int','precision' => '4'),
+			'lic_suspended' => array('type' => 'date'),
+			'lic_suspended_by' => array('type' => 'int','precision' => '4')
+		),
+		'pk' => array('PerId','nation','lic_year'),
+		'fk' => array(),
+		'ix' => array(),
+		'uc' => array()
+	));
+
+	$GLOBALS['egw_setup']->db->query('INSERT INTO Licenses (PerId,nation,lic_year,lic_status,lic_applied,lic_confirmed,lic_suspended) '.
+		"SELECT PerId,'',-WetId,CASE pkt WHEN 1 THEN 'a' WHEN 2 THEN 'c' ELSE 's' END,
+			CASE pkt WHEN 1 THEN datum ELSE NULL END,
+			CASE pkt WHEN 2 THEN datum ELSE NULL END,
+			CASE pkt WHEN 3 THEN datum ELSE NULL END FROM Results WHERE GrpId=0",__LINE__,__FILE__);
+	$GLOBALS['egw_setup']->db->delete('Results',array('GrpId' => 0),__LINE__,__FILE__);
+/*
+CREATE TABLE `Licenses` (
+`PerId`                  INTEGER NOT NULL,
+`nation`                 VARCHAR(3) NOT NULL,
+`lic_year`               SMALLINT NOT NULL,
+`lic_status`             VARCHAR(1) DEFAULT 'c',
+`lic_applied`            DATE,
+`lic_applied_by`         INTEGER,
+`lic_confirmed`          DATE,
+`lic_confirmed_by`       INTEGER,
+`lic_suspended`          DATE,
+`lic_suspended_by`       INTEGER,
+PRIMARY KEY (`PerId`, `nation`, `lic_year`)
+)CHARACTER SET utf8
+INSERT INTO Licenses (PerId,nation,lic_year,lic_status,lic_applied,lic_confirmed,lic_suspended)
+	SELECT PerId,'',-WetId,CASE pkt WHEN 1 THEN 'a' WHEN 2 THEN 'c' ELSE 's' END,
+		CASE pkt WHEN 1 THEN datum ELSE NULL END,
+		CASE pkt WHEN 2 THEN datum ELSE NULL END,
+		CASE pkt WHEN 3 THEN datum ELSE NULL END
+	FROM Results WHERE GrpId=0
+DELETE FROM Results WHERE GrpId=0
+*/
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.006';
+}
+
