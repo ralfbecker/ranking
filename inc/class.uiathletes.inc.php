@@ -34,7 +34,6 @@ class uiathletes extends boranking
 	 * @var etemplate
 	 */
 	var $tmpl;
-	var $license_form_name;
 
 	function uiathletes()
 	{
@@ -52,7 +51,6 @@ class uiathletes extends boranking
 			ACL_DENY_CITY		=> lang('city'),
 			ACL_DENY_PROFILE	=> lang('complete profile'),
 		);
-		$this->license_form_name = $_SERVER['DOCUMENT_ROOT'].'/'.$this->license_year.'/license_'.$this->license_year.'.rtf';
 	}
 
 	/**
@@ -66,7 +64,7 @@ class uiathletes extends boranking
 		$tabs = 'contact|profile|freetext|other|pictures|results';
 		if ($_GET['rkey'] || $_GET['PerId'])
 		{
-			if ($this->athlete->read($_GET,'',$this->license_year))
+			if ($this->athlete->read($_GET,'',$this->license_year,$_GET['license_nation']))
 			{
 				// read the athletes results
 				$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
@@ -82,10 +80,13 @@ class uiathletes extends boranking
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
 		{
+			$content['license_nation'] = strip_tags($_GET['license_nation']);
+			$content['license_year'] = $this->license_year;
+
 			if (!$_GET['PerId'] && !$_GET['rkey'] || !$this->athlete->data['PerId'])
 			{
-				$this->athlete->init();
-				$this->athlete->data['nation'] = $this->only_nation_athlete;
+				$this->athlete->init($_GET['preset']);
+				if ($this->only_nation_athlete) $this->athlete->data['nation'] = $this->only_nation_athlete;
 				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
 			}
 			// we have no edit-rights for that nation
@@ -202,20 +203,25 @@ class uiathletes extends boranking
 								}
 								if (!$required_missing)
 								{
-									$this->athlete->set_license($this->license_year,'a');
-									$msg .= ', '.lang('Applied for a %1 license',$this->license_year);
+									$this->athlete->set_license($content['license_year'],'a',null,$content['license_nation']);
+									$msg .= ', '.lang('Applied for a %1 license',$content['license_year'].
+										($content['license_nation']?' '.$content['license_nation']:''));
 								}
 							}
 							else
 							{
-								$msg .= ', '.lang('Someone already applied for a %1 license!',$this->license_year);
+								$msg .= ', '.lang('Someone already applied for a %1 license!',$content['license_year'].
+									($content['license_nation']?' '.$content['license_nation']:''));
 							}
 							// download form
-							if (file_exists($this->license_form_name) && !$required_missing && $content['athlete_data']['license'] != 's')
+							if (file_exists($this->license_form_name($content['license_nation'],$content['license_year'])) &&
+								!$required_missing && $content['athlete_data']['license'] != 's')
 							{
 								$link = $GLOBALS['egw']->link('/index.php',array(
 									'menuaction' => 'ranking.uiathletes.licenseform',
 									'PerId' => $this->athlete->data['PerId'],
+									'license_year' => $content['license_year'],
+									'license_nation' => $content['license_nation'],
 								));
 								$js .= "window.location='$link';";
 							}
@@ -223,7 +229,7 @@ class uiathletes extends boranking
 						elseif ($content['athlete_data']['license'] != $content['license'] &&
 							$this->acl_check('NULL',EGW_ACL_ADD))	// you need int. athlete rights
 						{
-							$this->athlete->set_license($this->license_year,$content['license']);
+							$this->athlete->set_license($content['license_year'],$content['license'],null,$content['license_nation']);
 						}
 					}
 				}
@@ -234,7 +240,7 @@ class uiathletes extends boranking
 				$link = $GLOBALS['egw']->link('/index.php',array(
 					'menuaction' => $content['referer'],//'ranking.uiathletes.index',
 					'msg' => $msg,
-				));
+				)+($content['row'] ? array('row['.$content['row'].']' => $this->athlete->data['PerId']) : array()));
 				if (!$required_missing) $js = "window.opener.location='$link'; $js";
 			}
 			if ($content['delete'])
@@ -266,7 +272,8 @@ class uiathletes extends boranking
 			'is_admin' => $this->is_admin,
 			$tabs => $content[$tabs],
 			'foto' => $this->athlete->picture_url().'?'.time(),
-			'license_year' => $this->license_year,
+			'license_year' => $content['license_year'],
+			'license_nation' => $content['license_nation'],
 			'referer' => $content['referer'],
 		);
 		$sel_options = array(
@@ -275,6 +282,7 @@ class uiathletes extends boranking
 			'acl'    => $this->acl_deny_labels,
 			'license'=> $this->license_labels,
 			'fed_id' => $content['nation'] ? $this->athlete->federations($content['nation']) : array(lang('Select a nation first')),
+			'license_nation' => ($license_nations = $this->license_nations()),
 		);
 		$readonlys = array(
 			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]],
@@ -283,6 +291,10 @@ class uiathletes extends boranking
 			'apply_license' => in_array($content['license'],array('s','c')) || !$this->acl_check($content['nation'],EGW_ACL_ADD),
 			'license'=> !$this->acl_check('NULL',EGW_ACL_ADD),
 		);
+		if (count($license_nations) == 1)	// no selectbox, if no selection
+		{
+			$readonlys['license_nation'] = true;
+		}
 		// dont allow non-admins to change sex and nation, once it's been set
 		if ($this->athlete->data['PerId'] && !$this->is_admin)
 		{
@@ -317,7 +329,28 @@ class uiathletes extends boranking
 				'athlete_data' => $this->athlete->data,
 				'view' => $view,
 				'referer' => $content['referer'],
+				'row' => (int)$_GET['row'] ? (int)$_GET['row'] : $content['row'],
+				'license_year' => $content['license_year'],
+				'license_nation' => $content['license_nation']
 			),2);
+	}
+
+	/**
+	 * nations for which we manage licenses
+	 *
+	 * Need to fix license nations to not contain international for digital ROCK site, but IFSC
+	 *
+	 * @return array with key => label pairs
+	 */
+	function license_nations()
+	{
+		// fix license nations to not contain international for digital ROCK site, but IFSC
+		$license_nations = $this->ranking_nations;
+		if (isset($license_nations['GER']) && !is_null($nation))
+		{
+			unset($license_nations['NULL']);
+		}
+		return $license_nations;
 	}
 
 	/**
@@ -386,6 +419,20 @@ class uiathletes extends boranking
 			$readonlys["apply_license[$row[PerId]]"] = $row['license'] != 'n' ||
 				!($this->is_admin || in_array($row['nation'],$this->athlete_rights));
 		}
+		$sel_options['license_nation'] = $this->license_nations();
+		if($query['filter'] && ($cat = $this->cats->read($query['filter'])))
+		{
+			$rows['license_nation'] = $cat['nation'];
+		}
+		elseif ($query['col_filter']['nation'])
+		{
+			$rows['license_nation'] = $query['col_filter']['nation'];
+		}
+		else
+		{
+			unset($rows['license_nation']);
+		}
+
 		$rows['sel_options'] =& $sel_options;
 		$rows['no_license'] = $query['filter2'] != '';
 		$rows['license_year'] = $this->license_year;
@@ -467,13 +514,31 @@ class uiathletes extends boranking
 	}
 
 	/**
+	 * Get the name of the license form, depending on nation and year
+	 *
+	 * @param string $nation=null
+	 * @param int $year=null defaults to $this->license_year
+	 * @return string path on server
+	 */
+	function license_form_name($nation=null,$year=null)
+	{
+		if (is_null($year)) $year = $this->license_year;
+
+		return $_SERVER['DOCUMENT_ROOT'].'/'.$year.'/license_'.$year.$nation.'.rtf';
+	}
+
+	/**
 	 * Download the personaliced application form
 	 *
+	 * @param string $nation=null
+	 * @param int $year=null defaults to $this->license_year
 	 */
-	function licenseform()
+	function licenseform($nation=null,$year=null)
 	{
+		if (is_null($year)) $year = $this->license_year;
+
 		if (!$this->athlete->read($_GET) ||
-			!($form = file_get_contents($this->license_form_name)))
+			!($form = file_get_contents($this->license_form_name($nation,$year))))
 		{
 			$GLOBALS['egw']->common->egw_exit();
 		}
@@ -486,7 +551,7 @@ class uiathletes extends boranking
 		}
 		include_once(EGW_API_INC.'/class.browser.inc.php');
 		$browser = new browser();
-		$file = 'License '.$this->license_year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
+		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
 		$browser->content_header($file,'text/rtf');
 		echo $form;
 		$GLOBALS['egw']->common->egw_exit();

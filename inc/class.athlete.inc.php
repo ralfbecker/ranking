@@ -33,6 +33,7 @@ class athlete extends so_sql
 	const ATHLETE2FED_TABLE = 'Athlete2Fed';
 	const FEDERATIONS_TABLE = 'Federations';
 	const FEDERATIONS_JOIN = ' JOIN Athlete2Fed USING(PerId) JOIN Federations USING(fed_id)';
+	const LICENSE_TABLE = 'Licenses';
 
 	/**
 	 * Federation cols, not longer stored in the athlete table
@@ -47,12 +48,6 @@ class athlete extends so_sql
 
 	var $picture_url = '/jpgs';
 	var $picture_path = '../../../jpgs';
-	var $pkt2license = array(
-		''  => 'n',
-		'1' => 'a',
-		'2' => 'c',
-		'3' => 's',
-	);
 	var $acl2clear = array(
 		ACL_DENY_BIRTHDAY  => array('geb_date'),
 		ACL_DENY_EMAIL     => array('email'),
@@ -82,6 +77,11 @@ class athlete extends so_sql
 	 */
 	function athlete($source_charset='',$db=null)
 	{
+		if (is_null($db))
+		{
+			require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
+			$db = soranking::get_rang_db();
+		}
 		$this->so_sql('ranking',self::ATHLETE_TABLE,$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
@@ -102,6 +102,8 @@ class athlete extends so_sql
 		$this->picture_path = $_SERVER['DOCUMENT_ROOT'].'/jpgs';
 
 		$this->license_year = (int) date('Y');
+
+		$GLOBALS['athlete'] = $this;
 	}
 
 	/**
@@ -126,10 +128,6 @@ class athlete extends so_sql
 		}
 		if ($data['geb_date']) $data['geb_year'] = (int) $data['geb_date'];
 
-		if (array_key_exists('license',$data))
-		{
-			$data['license'] = $this->pkt2license[(string)$data['license']];
-		}
 		if ($data['acl'])
 		{
 			$acl = $data['acl'];
@@ -233,6 +231,8 @@ class athlete extends so_sql
 	{
 		//echo "<p>athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
+		if ($only_keys === true) $only_keys = self::ATHLETE_TABLE.'.PerID';
+
 		if ($join === true || is_numeric($join))
 		{
 			$cat = $join;
@@ -257,6 +257,7 @@ class athlete extends so_sql
 			{
 				if ($filter[$name] == 'NULL') $filter[$name] = null;
 				$filter[] = self::FEDERATIONS_TABLE.'.'.$name.(is_null($filter[$name]) ? ' IS NULL' : '='.$this->db->quote($filter[$name]));
+				if ($name == 'nation') $license_nation = $filter[$name];
 			}
 			unset($filter[$name]);
 			if ($criteria[$name])
@@ -284,29 +285,32 @@ class athlete extends so_sql
 				}
 				$extra_cols[] = "MAX($this->result_table.datum) AS last_comp";
 				$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
+
+				$license_nation = $cat['nation'];
 			}
 			else	// LEFT JOIN to get latest competition
 			{
 				$extra_cols[] = "(SELECT MAX(datum) FROM $this->result_table WHERE $this->result_table.PerId=$this->table_name.PerId AND platz > 0) AS last_comp";
 			}
-
-			$join .= " LEFT JOIN $this->result_table l ON l.PerId=$this->table_name.PerId AND l.WetId=-$this->license_year AND l.GrpId=0";
-			$extra_cols[] = 'l.pkt AS license';
+			// get the license (license nation is set by: nation filter, category (numeric join arg), filter[license_nation] (highes precedence))
+			if (array_key_exists('license_nation',$filter))	// pseudo filter, only specifies the nation, does NOT filter by it!
+			{
+				$license_nation = $filter['license_nation'];
+				unset($filter['license_nation']);
+			}
+			$license_year = $this->license_year;
+			if (isset($filter['license_year']))		// pseudo filter: explicit specified license year, does NOT filter by it!
+			{
+				$license_year = (int)$filter['license_year'];
+				unset($filter['license_year']);
+			}
+			$join .= ' LEFT JOIN '.self::LICENSE_TABLE." l ON l.PerId=$this->table_name.PerId AND lic_year=$license_year AND l.nation=".
+				$this->db->quote($license_nation);
+			$extra_cols[] = 'lic_status AS license';
 			if ($filter['license'])
 			{
-				if (is_array($filter['license']))
-				{
-					foreach($filter['license'] as $key => $val)
-					{
-						$filter['license'][$key] = array_search($val,$this->pkt2license);
-					}
-				}
-				else
-				{
-					$filter['license'] = array_search($filter['license'],$this->pkt2license);
-				}
-				$filter[] = !$filter['license'] ? 'l.pkt IS NULL' :
-					$this->db->expression($this->result_table,'l.',array('pkt'=>$filter['license']));
+				$filter[] = !$filter['license'] ? 'lic_status IS NULL' :
+					$this->db->expression(self::LICENSE_TABLE,array('lic_status'=>$filter['license']));
 				unset($filter['license']);
 			}
 		}
@@ -517,8 +521,9 @@ class athlete extends so_sql
 	 * @param string $join numeric year, adds a license-column or sql to do a join, see so_sql::read()
 	 * @return array/boolean data if row could be retrived else False
 	 */
-	function read($keys,$extra_cols='',$join='')
+	function read($keys,$extra_cols='',$join='',$nation=null)
 	{
+		//echo "<p>".__METHOD__."(".array2string($keys).",$extra_cols,$join,$nation)</p>\n";
 		if (is_numeric($year = $join))
 		{
 			$join = '';
@@ -528,7 +533,7 @@ class athlete extends so_sql
 			$extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 		}
 		// join in the federation information
-		$join = self::FEDERATIONS_JOIN;
+		$join .= self::FEDERATIONS_JOIN;
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.nation AS nation';
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.verband AS verband';
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_id AS fed_id';
@@ -537,10 +542,12 @@ class athlete extends so_sql
 
 		if (is_numeric($year))
 		{
-			$join .= " LEFT JOIN $this->result_table ON $this->table_name.PerId=$this->result_table.PerId AND $this->result_table.WetId=-$year AND $this->result_table.GrpId=0";
-			$extra_cols[] = $this->result_table.'.pkt AS license';
-			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
+			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' ON '.self::LICENSE_TABLE.".PerId=$this->table_name.PerId AND lic_year=".
+				(int)$year.' AND '.self::LICENSE_TABLE.'.nation='.$this->db->quote((string)$nation);
+			$extra_cols[] = 'lic_status AS license';
 		}
+		$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
+
 		return parent::read($keys,$extra_cols,$join);
 	}
 
@@ -548,37 +555,53 @@ class athlete extends so_sql
 	 * Set the license for a given year
 	 *
 	 * @param int $year
-	 * @param string $status 'n' = none, 'a' = applied, 'c' = confirmed
+	 * @param string $status 'n' = none, 'a' = applied, 'c' = confirmed, 's' = suspended
 	 * @param int $PerId=null else use $this->data[PerId]
+	 * @param string $nation=null nation for a national license, or null for an international one
 	 * @return boolean/int false on wrong parameter or number of affected rows
 	 */
-	function set_license($year,$status='c',$PerId=null)
+	function set_license($year,$status='c',$PerId=null,$nation=null)
 	{
+		//echo "<p>set_license($year,'$status',$PerId,'$nation')</p>\n";
 		if (is_null($PerId)) $PerId = $this->data['PerId'];
 
 		if (!(int)$PerId || $year <= 0) return false;
 
-		if (!in_array($status,$this->pkt2license) || $status == 'n')
+		$where = array(
+			'PerId' => $PerId,
+			'nation' => (string)$nation,
+			'lic_year' => $year,
+		);
+		if (!in_array($status,array('a','c','s'))/* || $status == 'n'*/)
 		{
-			$this->db->delete($this->result_table,array(
-				'PerId' => $PerId,
-				'WetId' => -$year,
-				'GrpId' => 0,
-			),__LINE__,__FILE__);
+			$this->db->delete(self::LICENSE_TABLE,$where,__LINE__,__FILE__,'ranking');
 		}
 		else
 		{
-			$this->db->insert($this->result_table,array(
-				'pkt' => array_search($status,$this->pkt2license),
-				'platz' => 0,
-			),array(
-				'PerId' => $PerId,
-				'WetId' => -$year,
-				'GrpId' => 0,
-				'datum' => date('Y-m-d'),
-			),__LINE__,__FILE__);
+			switch($status)
+			{
+				case 'a': $what = 'applied'; break;
+				case 'c': $what = 'confirmed'; break;
+				case 's': $what = 'suspended'; break;
+			}
+			$data = array(
+				'lic_status' => $status,
+				'lic_'.$what => date('Y-m-d'),
+				'lic_'.$what.'_by' => $GLOBALS['egw_info']['user']['account_id'],
+			);
+			if($this->db->select(self::LICENSE_TABLE,'PerId',$where,__LINE__,__FILE__,false,'','ranking')->fetch())
+			{
+				$this->db->update(self::LICENSE_TABLE,$data,$where,__LINE__,__FILE__,'ranking');
+			}
+			else
+			{
+				$this->db->insert(self::LICENSE_TABLE,$data,$where,__LINE__,__FILE__,'ranking');
+			}
 		}
-		if ($PerId == $this->data['PerId']) $this->data['license'] = $status;
+		if ($PerId == $this->data['PerId'])
+		{
+			$this->data['license'] = $status;
+		}
 		//echo "athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
 
 		return $this->db->affected_rows();
@@ -596,6 +619,7 @@ class athlete extends so_sql
 		$feds = array();
 		$where = $nation ? array('nation' => $nation) : array();
 		if ($only_national) $where[] = 'fed_parent IS NULL';
+
 		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$where,__LINE__,__FILE__,false,
 			'ORDER BY nation ASC,verband ASC','ranking') as $fed)
 		{
@@ -676,5 +700,100 @@ class athlete extends so_sql
 			$this->set_federation($this->data['fed_id'],$this->data['a2f_start']);
 		}
 		return $err;
+	}
+
+	/**
+	 * get title for an athlete
+	 *
+	 * Is called as hook to participate in the linking. The format is determined by the link_title preference.
+	 *
+	 * @param int/string/array $athlete int/string id or array with athlete
+	 * @return string/boolean string with the title, null if contact does not exitst, false if no perms to view it
+	 */
+	function link_title($athlete)
+	{
+		if (!is_array($athlete) && $athlete)
+		{
+			$athlete = $this->read($athlete);
+		}
+		if (!is_array($athlete))
+		{
+			return $athlete;
+		}
+		return $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')';
+	}
+
+	/**
+	 * get title for multiple contacts identified by $ids
+	 *
+	 * Is called as hook to participate in the linking. The format is determined by the link_title preference.
+	 *
+	 * @param array $ids array with contact-id's
+	 * @return array with titles, see link_title
+	 */
+/*	function link_titles(array $ids)
+	{
+		$titles = array();
+		if (($athletes =& $this->search(array('contact_id' => $ids),false)))
+		{
+			foreach($athletes as $athlete)
+			{
+				$titles[$athlete['id']] = $this->link_title($athlete);
+			}
+		}
+		// we assume all not returned contacts are not readable for the user (as we report all deleted contacts to egw_link)
+		foreach($ids as $id)
+		{
+			if (!isset($titles[$id]))
+			{
+				$titles[$id] = false;
+			}
+		}
+		return $titles;
+	}*/
+
+	/**
+	 * query db for athletes matching $pattern
+	 *
+	 * Is called as hook to participate in the linking
+	 *
+	 * @param string $pattern pattern to search
+	 * @return array with id - title pairs of the matching entries
+	 */
+	function link_query($pattern)
+	{
+		$result = $criteria = array();
+		if ($pattern)
+		{
+			// allow to prefix pattern with gender and nation, eg: "GER: Becker", "M: Becker" or "M: GER: Becker"
+			if (strpos($pattern,':') !== false)
+			{
+				$parts = split(': ?',$pattern);
+				$pattern = array_pop($parts);
+				foreach($parts as $part)
+				{
+					if (strlen($part) == 3)	// nation
+					{
+						$filter['nation'] = strtoupper($part);
+					}
+					else
+					{
+						$filter['sex'] = strtolower($filter['sex']) == 'm' ? 'male' : 'female';
+					}
+				}
+			}
+			foreach(array('vorname','nachname','ort','verband') as $col)
+			{
+				$criteria[$col] = $pattern;
+			}
+		}
+		if (($athletes = $this->search($criteria,false,'nachname,vorname,nation','','%',false,'OR',false,$filter)))
+		{
+			foreach($athletes as $athlete)
+			{
+				$result[$athlete['PerId']] = $this->link_title($athlete);
+			}
+		}
+		return $result;
 	}
 }

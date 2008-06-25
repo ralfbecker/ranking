@@ -11,14 +11,23 @@
  * @version $Id$
  */
 
+/**
+ * eGroupWare digital ROCK Rankings - storage object
+ *
+ * This is not a storage object itself: It created the DB connection to the (separate) rang database
+ * and passes it to it's sub-objects which are private and get instanciated on demand by a __get() method.
+ *
+ * These sub-objects implement DB access to the various tables of the rang database.
+ */
 class soranking
 {
+	var $debug;
 	/**
 	 * configuration
 	 *
 	 * @var array
 	 */
-	var $config=array();
+	var $config;
 	/**
 	 * db-object with connection to ranking database, might be different from eGW database
 	 *
@@ -28,95 +37,137 @@ class soranking
 	/**
 	 * @var pktsystem
 	 */
-	var $pkte;
+	private $pkte;
 	/**
 	 * @var rls_system
 	 */
-	var $rls;
+	private $rls;
 	/**
 	 * @var category
 	 */
-	var $cats;
+	private $cats;
 	/**
 	 * @var cup
 	 */
-	var $cup;
+	private $cup;
 	/**
 	 * @var competition
 	 */
-	var $comp;
+	private $comp;
 	/**
 	 * @var athlete
 	 */
-	var $athlete;
+	private $athlete;
 	/**
 	 * @var result
 	 */
-	var $result;
+	private $result;
 	/**
 	 * @var route
 	 */
-	var $route;
+	private $route;
+	/**
+	 * @var ranking_federation
+	 */
+	private $federation;
+	/**
+	 * @var ranking_display
+	 */
+	private $display;
+
+	/**
+	 * sub-objects, which get automatic instanciated by __get()
+	 *
+	 * @var unknown_type
+	 */
+	static $sub_classes = array(
+		'pkte'    => 'pktsystem',
+		'rls'     => 'rls_system',
+		'cats'    => 'category',
+		'cup'     => 'cup',
+		'comp'    => 'competition',
+		'athlete' => 'athlete',
+		'result'  => 'result',
+		'route'   => 'route',
+		'route_result'  => 'route_result',
+		'federation' => 'ranking_federation',
+		'display' => 'ranking_display',
+	);
+
 
 	/**
 	 * Constructor
+	 *
+	 * @param array $extra_classes
+	 * @return soranking
 	 */
-	function soranking($extra_classes=array())
+	function __construct(array $extra_classes=array())
 	{
-		$c =& CreateObject('phpgwapi.config','ranking');
-		$c->read_repository();
-		$this->config = $c->config_data;
-		unset($c);
+		$this->db = self::get_rang_db($this->config);
+	}
 
-		if ($this->config['ranking_db_host'] || $this->config['ranking_db_name'])
+	/**
+	 * Get a db object connected to the ranking database
+	 *
+	 * @param array &$config=null
+	 * @return egw_db
+	 */
+	public static function get_rang_db(&$config=null)
+	{
+		if (is_null($config))
+		{
+			$c =& CreateObject('phpgwapi.config','ranking');
+			$c->read_repository();
+			$config = $c->config_data;
+			unset($c);
+		}
+		if ($config['ranking_db_host'] || $config['ranking_db_name'])
 		{
 			foreach(array('host','port','name','user','pass') as $var)
 			{
-				if (!$this->config['ranking_db_'.$var]) $this->config['ranking_db_'.$var] = $GLOBALS['egw_info']['server']['db_'.$var];
+				if (!$config['ranking_db_'.$var]) $config['ranking_db_'.$var] = $GLOBALS['egw_info']['server']['db_'.$var];
 			}
-			$this->db =& new egw_db();
-			$this->db->connect($this->config['ranking_db_name'],$this->config['ranking_db_host'],
-				$this->config['ranking_db_port'],$this->config['ranking_db_user'],$this->config['ranking_db_pass']);
+			$db =& new egw_db();
+			$db->connect($config['ranking_db_name'],$config['ranking_db_host'],
+				$config['ranking_db_port'],$config['ranking_db_user'],$config['ranking_db_pass']);
 
-			if (!$this->config['ranking_db_charset']) $this->db->Link_ID->SetCharSet($GLOBALS['egw_info']['server']['system_charset']);
+			if (!$config['ranking_db_charset']) $db->Link_ID->SetCharSet($GLOBALS['egw_info']['server']['system_charset']);
 
 		}
 		else
 		{
-			$this->db =& $GLOBALS['egw']->db;
+			$db = $GLOBALS['egw']->db;
 		}
-		foreach(array(
-				'pkte'    => 'pktsystem',
-				'rls'     => 'rls_system',
-				'cats'    => 'category',
-				'cup'     => 'cup',
-				'comp'    => 'competition',
-				'athlete' => 'athlete',
-				'result'  => 'result',
-				'route'   => 'route',
-				'route_result'  => 'route_result',
-			)+$extra_classes as $var => $class)
-		{
-			$egw_name = $class;
-			if (!isset($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
-			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
-		}
+		return $db;
 	}
 
 	/**
-	 * Get an instance of the ranking_so object
+	 * Getter for sub-classes, instanciates them on demand
 	 *
-	 * @return ranking_so
+	 * @param string $name
+	 * @return mixed
 	 */
-	public static function getInstance()
+	function __get($name)
 	{
-		if (!is_object($GLOBALS['soranking']))
+		//error_log(__METHOD__."('$name')");
+		if ($this->$name === null)
 		{
-			$GLOBALS['soranking'] = new ranking_so();
+			if (!isset(self::$sub_classes[$name]))
+			{
+				if (!class_exists('egw_exception_wrong_parameter',true))
+				{
+					return false;	// eGW 1.4, can be removed if 1.4 support is no longer needed
+				}
+				throw new egw_exception_wrong_parameter("NO sub-class '$name'!");
+			}
+			$class = self::$sub_classes[$name];
+
+			if (!isset($GLOBALS['egw']->$name))
+			{
+				$GLOBALS['egw']->$name = CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
+			}
+			$this->$name = $GLOBALS['egw']->$name;
 		}
-		return $GLOBALS['soranking'];
+		return $this->$name;
 	}
 }

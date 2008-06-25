@@ -23,6 +23,7 @@ add a new cup	ranking	en	add a new cup
 add a new heat	ranking	en	Add a new heat
 add athletes	ranking	en	add athletes
 add heat	ranking	en	Add heat
+add new athlete with the given data	ranking	en	Add new athlete with the given data
 add not existing athletes to the database, use with caution!	ranking	en	add not existing athletes to the database, use with caution!
 add to parent federation opened for editing	ranking	en	Add to parent federation opened for editing
 all above	ranking	en	all above
@@ -105,8 +106,10 @@ delete this cup	ranking	en	Delete this cup
 delete this federation	ranking	en	Delete this federation
 delete this heat including all results	ranking	en	Delete this heat including all results
 deletes this cup	ranking	en	deletes this cup
+delimiter	ranking	en	Delimiter
 deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
+detect athletes	ranking	en	Detect athletes
 digital rock	ranking	en	digital ROCK
 display	ranking	en	Display
 display #%1 not found!!!	ranking	en	Display #%1 not found!!!
@@ -193,6 +196,7 @@ generate all startlists together	ranking	en	Generate all startlists together
 generate startlist	ranking	en	Generate startlist
 go	ranking	en	Go
 grpid	ranking	en	GrpId
+header	ranking	en	Header
 heat	ranking	en	Heat
 heat deleted	ranking	en	Heat deleted
 heat saved	ranking	en	Heat saved
@@ -209,6 +213,9 @@ how many athletes from the complimentary list of each nation should be used	rank
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
+ignore	ranking	en	Ignore
+import as	ranking	en	Import as
+import charset	ranking	en	Import Charset
 import file	ranking	en	Import file
 import into ranking	ranking	en	Import into ranking
 import the result into the ranking	ranking	en	Import the result into the ranking

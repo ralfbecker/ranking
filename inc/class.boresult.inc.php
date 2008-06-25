@@ -58,18 +58,6 @@ class boresult extends boranking
 	 */
 	var $plus,$plus_labels;
 	/**
-	 * Instance of the route object
-	 *
-	 * @var route
-	 */
-	var $route;
-	/**
-	 * Instance of the route-result object
-	 *
-	 * @var route_result
-	 */
-	var $route_result;
-	/**
 	 * Logfile for the bridge to the rock programms running via async service
 	 * Set to null to switch it of.
 	 *
@@ -77,9 +65,9 @@ class boresult extends boranking
 	 */
 	var $rock_bridge_log = '/tmp/rock_bridge.log';
 
-	function boresult()
+	function __construct()
 	{
-		$this->boranking();
+		parent::__construct();
 /* doch in soranking, da es sonst nicht tut ;-)
 		foreach(array(
 				'route' => 'route',
@@ -116,6 +104,17 @@ class boresult extends boranking
 			'-1' => '-',
 			TOP_PLUS => lang('Top'),
 		);
+	}
+
+	/**
+	 * php4 constructor
+	 *
+	 * @deprecated use __construct()
+	 * @return boresult
+	 */
+	function boresult()
+	{
+		self::__construct();
 	}
 
 	/**

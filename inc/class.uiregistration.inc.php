@@ -8,13 +8,13 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 
-class uiregistration extends boranking 
+class uiregistration extends boranking
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -55,7 +55,7 @@ class uiregistration extends boranking
 			}
 		}
 		$total = $this->athlete->get_rows($query,$rows,$readonlys,$query['show_all'] ? true : $query['cat']);
-		
+
 		// admins and judges are allowed to EXECPTIONAL register athletes without license
 		$allow_no_license_register = $this->is_admin || $this->is_judge($query['comp']);
 
@@ -82,13 +82,14 @@ class uiregistration extends boranking
 		$rows['sel_options'] =& $sel_options;
 		$rows['comp'] = $query['comp'];
 		$rows['cat']  = $query['cat'];
-		$rows['license_year'] = $this->license_year;
+		$rows['license_year'] = $query['col_filter']['license_year'];
+		$rows['license_nation'] = $query['col_filter']['license_nation'];
 
 		if ($this->debug)
 		{
 			echo "<p>uiregistration::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
 		}
-		return $total;		
+		return $total;
 	}
 
 	/**
@@ -119,7 +120,7 @@ class uiregistration extends boranking
 		$comp   = $content['comp'];
 		$cat    = $content['cat'];
 		$show_all = $content['show_all'];
-		
+
 		if (!($comp = $this->comp->read($comp)) || 			// unknown competition
 			!$this->acl_check($nation,EGW_ACL_REGISTER,$comp) || 	// no rights for that nation
 			!($cat  = $this->cats->read($cat ? $cat : $comp['gruppen'][0])) ||	// unknown category
@@ -139,6 +140,8 @@ class uiregistration extends boranking
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'col_filter'     => array(
 					'nation' => $nation,
+					'license_nation' => $comp['nation'],
+					'license_year'   => (int)$comp['datum'],
 				),
 				'comp'           => $comp['WetId'],
 				'csv_fields'     => false,
@@ -165,7 +168,7 @@ class uiregistration extends boranking
 		$tmpl =& new etemplate('ranking.register.add');
 		$tmpl->exec('ranking.uiregistration.add',$content,$select_options,$readonly,$preserv,2);
 	}
-		
+
 	/**
 	 * Show the registrations of a competition and allow to register for it
 	 *
@@ -320,7 +323,7 @@ class uiregistration extends boranking
 						$max_compl = $content['max_compl'][$cat['GrpId']];
 						if ($max_compl === '') $max_compl = 999;	// all
 						$num_routes = $content['num_routes'][$cat['GrpId']];
-						
+
 						if ($num_routes && $this->generate_startlist($comp,$cat,$num_routes,$max_compl,1))
 						{
 							$cats[] = $cat['name'];
@@ -348,7 +351,7 @@ class uiregistration extends boranking
 					'cat'  => (int) $cat,
 					'download' => 1,
 				));
-			}	
+			}
 			$starters =& $this->result->read(array(
 				'WetId'  => $comp['WetId'],
 				'GrpId'  => -1,
@@ -356,7 +359,7 @@ class uiregistration extends boranking
 				'nation' => $nation,
 			):array()),'',true,'nation,GrpId,reg_nr');
 			//_debug_array($starters);
-			
+
 			$nat = '';
 			$nat_starters = array();
 			$prequal_lines = 0;
@@ -415,7 +418,7 @@ class uiregistration extends boranking
 					foreach($nat_starters as $i => $row)
 					{
 						$rows[] = array(
-							'nation' => !$nation || $nat && $nat != $nation || !$nat && $i != $quota ? $nat : 
+							'nation' => !$nation || $nat && $nat != $nation || !$nat && $i != $quota ? $nat :
 								($i == $quota ? lang('Complimentary') : lang('Quota')),
 						) + $row;
 						$nat = '';
@@ -498,11 +501,17 @@ class uiregistration extends boranking
 		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
 	}
 
+	/**
+	 * Show a result list (from the ranking NOT the result service!)
+	 */
 	function result()
 	{
 		return $this->lists(null,'','result');
 	}
 
+	/**
+	 * Show a start list (from the ranking NOT the result service!)
+	 */
 	function startlist()
 	{
 		return $this->lists(null,'','startlist');
@@ -520,7 +529,7 @@ class uiregistration extends boranking
 		//echo "uiregistration::lists(,'$msg','$show') content="; _debug_array($content);
 
 		$tmpl =& new etemplate('ranking.register.lists');
-		
+
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
 			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
@@ -588,13 +597,13 @@ class uiregistration extends boranking
 				$show = 'startlist';
 				$order = 'GrpId,pkt,nachname,vorname';
 			}
-			else	// sort by nation 
+			else	// sort by nation
 			{
 				$keys['platz'] = 0;
 				$order = 'GrpId,nation,pkt,nachname,vorname';
 			}
 			$starters =& $this->result->read($keys,'',true,$order);
-			
+
 			if ($content['download'] && $starters && count($starters))
 			{
 				$browser =& CreateObject('phpgwapi.browser');
@@ -604,7 +613,7 @@ class uiregistration extends boranking
 					'GrpId'    => 'cat',
 					'PerId'    => 'athlete',
 					'platz'    => 'place',
-					'category',			
+					'category',
 					$show == 'startlist' ? 'startnumber' : 'points',
 					'nachname' => 'lastname',
 					'vorname'  => 'firstname',
@@ -621,7 +630,7 @@ class uiregistration extends boranking
 					if ($c['GrpId'] != $athlete['GrpId'])
 					{
 						$c = $this->cats->read($athlete['GrpId']);
-						
+
 						$stand = $comp['datum'];
 		 				$this->ranking($c,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
 					}
@@ -721,7 +730,7 @@ class uiregistration extends boranking
 		// save calendar, competition & cat between calls in the session
 		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
 		$this->set_ui_state($perserv['calendar'],$preserv['comp'],$preserv['cat']);
-		
+
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
@@ -752,7 +761,7 @@ class uiregistration extends boranking
 		}
 		return $tmpl->exec('ranking.uiregistration.lists',$content,$select_options,$readonlys,$preserv);
 	}
-	
+
 	/**
 	 * Upload a result as csv file
 	 *
@@ -769,9 +778,9 @@ class uiregistration extends boranking
 			return lang('Permission denied !!!');
 		}
 		$csv = $this->parse_csv($keys,$file,true);
-		
+
 		if (!is_array($csv)) return $csv;
-		
+
 		return $this->import_ranking($keys,$csv);
 	}
 }

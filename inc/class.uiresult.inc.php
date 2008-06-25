@@ -24,13 +24,6 @@ class uiresult extends boresult
 		'route' => true,
 	);
 
-	function uiresult()
-	{
-		$start = microtime(true);
-		$this->boresult();
-		error_log("boresult constructor took ".sprintf('%4.2lf s',microtime(true)-$start));
-	}
-
 	/**
 	 * Edit or add a route / heat
 	 *
@@ -659,7 +652,7 @@ class uiresult extends boresult
 			$comp = $cat = false;
 			$content['nm']['route'] = '';	// dont show route-selection
 		}
-		if ($comp && (!($cat = $content['nm']['cat']) || (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']))))
+		if ($comp && (!($cat = $content['nm']['cat']) || !($cat = $this->cats->read($cat)) || !is_array($comp['gruppen']) || !in_array($cat['rkey'],$comp['gruppen'])))
 		{
 			$cat = false;
 			$content['nm']['route'] = '';	// dont show route-selection

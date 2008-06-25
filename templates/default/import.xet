@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.isolation" template="" lang="" group="0" version="1.3.001">
+		<groupbox rows="1" cols="1" class="extra_startlist">
+			<caption label="Isolation zone and starting time"/>
+			<grid padding="5">
+				<columns>
+					<column/>
+					<column/>
+					<column/>
+				</columns>
+				<rows>
+					<row>
+						<description value="Isolation zone"/>
+						<description value="opens" id="route_iso_open" no_lang="1"/>
+						<description value="closes" id="route_iso_close" no_lang="1"/>
+					</row>
+					<row>
+						<description value="Starting time"/>
+						<description span="all" id="route_start" no_lang="1"/>
+					</row>
+					<row>
+						<description value="Observation time"/>
+						<description id="route_observation_time" no_lang="1"/>
+						<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+					</row>
+				</rows>
+			</grid>
+		</groupbox>
+		<styles>
+			.extra_startlist { margin-top: 20px; }
+		</styles>
+	</template>
+	<template id="ranking.result.official" template="" lang="" group="0" version="1.3.001">
+		<groupbox rows="1" cols="1" class="extra_result">
+			<caption label="Result official"/>
+			<grid>
+				<columns>
+					<column/>
+				</columns>
+				<rows>
+					<row>
+						<description id="route_result" no_lang="1"/>
+					</row>
+					<row>
+						<description no_lang="1" id="route_judge"/>
+					</row>
+				</rows>
+			</grid>
+		</groupbox>
+		<styles>
+			.extra_result { margin-top: 20px; }
+		</styles>
+	</template>
+	<template id="ranking.import" template="" lang="" group="0" version="1.5.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@msg">
+					<description class="redItalic" id="msg"/>
+				</row>
+				<row class="noPrint">
+					<hbox options="0,0">
+						<menulist class="rightPad5">
+							<menupopup id="keys[calendar]" onchange="1" no_lang="1" statustext="Select calendar"/>
+						</menulist>
+						<menulist>
+							<menupopup id="keys[comp]" onchange="1" options="Select competition" no_lang="1"/>
+						</menulist>
+					</hbox>
+				</row>
+				<row class="noPrint" disabled="!@keys[comp]">
+					<menulist class="bold">
+						<menupopup id="keys[cat]" no_lang="1" options="Select category" onchange="1"/>
+					</menulist>
+				</row>
+				<row>
+					<menulist>
+						<menupopup id="keys[route]" label="Import"/>
+					</menulist>
+				</row>
+				<row disabled="!@import">
+					<grid id="import">
+						<columns>
+							<column width="170"/>
+							<column/>
+						</columns>
+						<rows>
+							<row class="th">
+								<description value="Header"/>
+								<description id="header[$c]" value="$c:"/>
+							</row>
+							<row class="th">
+								<description value="Import as"/>
+								<menulist>
+									<menupopup options="Ignore" id="as[$c]"/>
+								</menulist>
+							</row>
+							<row class="row {$cont[detection][$row][row]}">
+								<hbox options="0,0">
+									<link-entry options="ranking" id="athlete[$row]"/>
+									<buttononly id="add[$row]" options="new" label="Add" align="right" disabled="true" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit$row_cont[presets]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" statustext="Add new athlete with the given data"/>
+									<buttononly id="edit[$row]" options="edit" label="Edit" align="right" onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=')+document.getElementById(form::name('athlete[$row][id]')).value, '_blank', '850', '450', 'yes'); return false;" statustext="Edit athlete"/>
+								</hbox>
+								<checkbox id="replace[$row][$c]" statustext="@detection[$row][help-$c]" label="@{$row}[$c]" class="{$cont[detection][$row][$c]}" readonly="true"/>
+							</row>
+						</rows>
+					</grid>
+				</row>
+				<row disabled="@import">
+					<hbox options="0,0">
+						<file id="file"/>
+						<button id="button[upload]" class="leftPad5" label="Upload" onclick="if(document.getElementById(form::name('file')).value) return true; alert('You need to select a file first!'); return false;"/>
+						<menulist class="leftPad5">
+							<menupopup id="delimiter" label="Delimiter"/>
+						</menulist>
+						<menulist class="leftPad5">
+							<menupopup label="Import Charset" id="charset"/>
+						</menulist>
+					</hbox>
+				</row>
+				<row class="noPrint" disabled="!@import">
+					<hbox>
+						<menulist>
+							<menupopup id="license" options="Set license to"/>
+						</menulist>
+						<button label="Import" id="button[import]"/>
+						<button label="Update" id="button[apply]" statustext="Apply the changes made"/>
+						<button label="Detect athletes" id="button[detect]"/>
+						<button id="button[cancel]" label="Cancel"/>
+					</hbox>
+				</row>
+				<row class="onlyPrint" disabled="!@nm[show_result]=0">
+					<template span="all" id="ranking.result.isolation"/>
+				</row>
+				<row class="onlyPrint" disabled="!@result_official">
+					<template span="all" id="ranking.result.official"/>
+				</row>
+				<row class="onlyPrint">
+					<template id="ranking.import"/>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.ajax-loader { display: none; }
+.noAthlete { background-color: #ffffd0; }
+.conflictData { background-color: #ffffd0; font-weight: bold; }
+.newData { font-weight: bold; font-style: italic; }
+		</styles>
+	</template>
+</overlay>

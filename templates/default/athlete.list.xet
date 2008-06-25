@@ -25,7 +25,12 @@
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader label="Federation" id="verband"/>
 					<nextmatch-sortheader label="Last competition" id="last_comp"/>
-					<description value="License" id="license_year" no_lang="1" class="leftPad5"/>
+					<vbox no_lang="1" options="0,0">
+						<menulist>
+							<menupopup id="license_nation" readonly="true"/>
+						</menulist>
+						<description value="License" id="license_year" no_lang="1"/>
+					</vbox>
 					<description value="Action" align="center"/>
 				</row>
 				<row class="row">
@@ -43,10 +48,10 @@
 						<menulist>
 							<menupopup id="${row}[license]" readonly="true"/>
 						</menulist>
-						<button class="small" label="Apply for" id="apply_license[$row_cont[PerId]]" statustext="Applies for the license and downloads the necessary form to mail to the office" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+						<button class="small" label="Apply for" id="apply_license[$row_cont[PerId]]" statustext="Applies for the license and downloads the necessary form to mail to the office" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
 					</hbox>
 					<hbox options="0,0">
-						<button label="Edit" id="edit[$row_cont[PerId]]" image="edit" statustext="Edit this athlete" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+						<button label="Edit" id="edit[$row_cont[PerId]]" image="edit" statustext="Edit this athlete" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
 						<button id="delete[$row_cont[PerId]]" image="delete" label="Delete" onclick="return confirm('Delete this athlete');" statustext="Delete this athlete"/>
 					</hbox>
 				</row>
@@ -56,7 +61,7 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
-	<template id="ranking.athlete.list" template="" lang="" group="0" version="1.3.001">
+	<template id="ranking.athlete.list" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
 				<column/>

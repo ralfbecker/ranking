@@ -12,9 +12,9 @@
  */
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '1.5.005';
+$setup_info['ranking']['version']   = '1.5.006';
 $setup_info['ranking']['app_order'] = 1;
-$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','Displays','DisplayFormats','Federations','Athlete2Fed');
+$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses');
 $setup_info['mydms']['only_db']     = array('mysql','postgres');
 $setup_info['ranking']['enable']    = 1;
 
@@ -47,6 +47,7 @@ $setup_info['ranking']['hooks']['settings']     = 'ranking.ranking_admin_prefs_s
 $setup_info['ranking']['hooks']['admin']        = 'ranking.ranking_admin_prefs_sidebox_hooks.all_hooks';
 $setup_info['ranking']['hooks']['sidebox_menu'] = 'ranking.ranking_admin_prefs_sidebox_hooks.all_hooks';
 $setup_info['ranking']['hooks']['edit_user']    = 'ranking.admin.edit_user';
+$setup_info['ranking']['hooks']['search_link'] = 'ranking.ranking_admin_prefs_sidebox_hooks.search_link';
 $setup_info['ranking']['hooks'][] = 'config';
 $setup_info['ranking']['hooks'][] = 'config_validate';
 

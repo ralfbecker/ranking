@@ -78,7 +78,7 @@ class result extends so_sql
 		{
 			unset($filter['nation']);
 
-			if ($join) $filter[] = $this->db->expression($this->athlete_table,array('nation' => $keys['nation']));
+			if ($join) $filter[] = $this->db->expression(athlete::FEDERATIONS_TABLE,array('nation' => $keys['nation']));
 
 			unset($keys['nation']);
 		}

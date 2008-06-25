@@ -7,13 +7,14 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 
-class uicompetitions extends boranking 
+class uicompetitions extends boranking
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -25,12 +26,10 @@ class uicompetitions extends boranking
 	);
 	var $attachment_type = array();
 
-	function uicompetitions()
+	function __construct()
 	{
-		$this->boranking();
+		parent::__construct();
 
-		$this->tmpl =& CreateObject('etemplate.etemplate');
-		
 		$this->attachment_type = array(
 			'info'      => lang('Information PDF'),
 			'startlist' => lang('Startlist PDF'),
@@ -54,6 +53,8 @@ class uicompetitions extends boranking
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
+		$tmpl = new etemplate('ranking.comp.edit');
+
 		if (($_GET['rkey'] || $_GET['WetId']) && !$this->comp->read($_GET))
 		{
 			$msg .= lang('Entry not found !!!');
@@ -77,12 +78,12 @@ class uicompetitions extends boranking
 			$this->comp->data = $content['comp_data'];
 			$old_rkey = $content['comp_data']['rkey'];
 			unset($content['comp_data']);
-			
+
 			$view = $content['view'] && !($content['edit'] && $this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT));
 
 			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
 
-			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] && 
+			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] &&
 				$this->cup->read(array('SerId' => $content['serie'])))
 			{
 				foreach((array)$this->cup->data['presets']+array('gruppen' => $this->cup->data['gruppen']) as $key => $val)
@@ -104,7 +105,7 @@ class uicompetitions extends boranking
 						$pattern = $this->cup->data['rkey'];
 						if (strlen($pattern) > 5) $pattern = str_replace('_','',$pattern);
 					}
-					$n = 0;					
+					$n = 0;
 					do
 					{
 						$this->comp->data['rkey'] = $pattern . '_' . strtoupper(
@@ -125,9 +126,9 @@ class uicompetitions extends boranking
 				else
 				{
 					$msg .= lang('%1 saved',lang('Competition'));
-					
-					//echo "<p>renaming attachments from '?$old_rkey' to '?".$this->comp->data['rkey']."'</p>\n";					
-					if ($old_rkey && $this->comp->data['rkey'] != $old_rkey && 
+
+					//echo "<p>renaming attachments from '?$old_rkey' to '?".$this->comp->data['rkey']."'</p>\n";
+					if ($old_rkey && $this->comp->data['rkey'] != $old_rkey &&
 						!$this->comp->rename_attachments($old_rkey))
 					{
 						$msg .= ', '.lang("Error: renaming the attachments !!!");
@@ -138,7 +139,7 @@ class uicompetitions extends boranking
 						if (is_array($file) && $file['tmp_name'] && $file['name'])
 						{
 							//echo $type; _debug_array($file);
-							$error_msg = $file['type'] != 'application/pdf' && 
+							$error_msg = $file['type'] != 'application/pdf' &&
 								strtolower(substr($file['name'],-4)) != '.pdf' ?
 								lang('File is not a PDF'): false;
 
@@ -150,14 +151,14 @@ class uicompetitions extends boranking
 							{
 								$msg .= ', '.lang("Error: attaching '%1' as %2 (%3) !!!",$file['name'],$this->attachment_type[$type],$error_msg);
 							}
-						}	
+						}
 					}
 					if ($content['save']) $content['cancel'] = true;	// leave dialog now
 				}
 			}
 			if ($content['cancel'])
 			{
-				$this->tmpl->location(array('menuaction'=>'ranking.uicompetitions.index'));
+				$tmpl->location(array('menuaction'=>'ranking.uicompetitions.index'));
 			}
 			if ($content['delete'] && $this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
 			{
@@ -227,8 +228,8 @@ class uicompetitions extends boranking
 			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] = true;
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
-		$this->tmpl->read('ranking.comp.edit');
-		$this->tmpl->exec('ranking.uicompetitions.edit',$content,
+		$tmpl->read('ranking.comp.edit');
+		$tmpl->exec('ranking.uicompetitions.edit',$content,
 			$sel_options,$readonlys,array(
 				'comp_data' => $this->comp->data,
 				'view' => $view,
@@ -263,9 +264,9 @@ class uicompetitions extends boranking
 		$cups = $this->cup->names(!$nation ? array() : array('nation' => $query['col_filter']['nation']),true);
 		// unset the cup, if it's not (longer) in the selected nations cups
 		if (!isset($cups[$query['col_filter']['serie']])) $query['col_filter']['serie'] = '';
-		
+
 		$total = $this->comp->get_rows($query,$rows,$readonlys);
-		
+
 		$readonlys = array();
 		foreach($rows as $n => $row)
 		{
@@ -282,13 +283,13 @@ class uicompetitions extends boranking
 		}
 		// set the cups based on the selected nation
 		$rows['sel_options']['serie'] = $cups;
-		
+
 		if ($this->debug)
 		{
 			echo "<p>uicompetitions::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
 			_debug_array($readonlys);
 		}
-		return $total;		
+		return $total;
 	}
 
 	/**
@@ -299,8 +300,10 @@ class uicompetitions extends boranking
 	 */
 	function index($content=null,$msg='')
 	{
+		$tmpl = new etemplate('ranking.comp.list');
+
 		$content = $content['nm']['rows'];
-		
+
 		if ($content['view'] || $content['edit'] || $content['delete'])
 		{
 			foreach(array('view','edit','delete') as $action)
@@ -315,19 +318,19 @@ class uicompetitions extends boranking
 			switch($action)
 			{
 				case 'view':
-					$this->tmpl->location(array(
+					$tmpl->location(array(
 						'menuaction' => 'ranking.uicompetitions.view',
 						'WetId'      => $id,
 					));
 					break;
-					
+
 				case 'edit':
-					$this->tmpl->location(array(
+					$tmpl->location(array(
 						'menuaction' => 'ranking.uicompetitions.edit',
 						'WetId'      => $id,
 					));
 					break;
-					
+
 				case 'delete':
 					if (!$this->is_admin && $this->comp->read(array('WetId' => $id)) &&
 						!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
@@ -342,14 +345,14 @@ class uicompetitions extends boranking
 					{
 						$msg = $this->comp->delete(array('WetId' => $id)) ? lang('%1 deleted',lang('Competition')) :
 							lang('Error: deleting %1 !!!',lang('Competition'));
-					}						
+					}
 					break;
-			}						
+			}
 		}
 		$content = array();
 
 		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','comp_state');
-		
+
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
@@ -369,9 +372,8 @@ class uicompetitions extends boranking
 		}
 		$content['msg'] = $msg;
 
-		$this->tmpl->read('ranking.comp.list');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
-		$this->tmpl->exec('ranking.uicompetitions.index',$content,array(
+		$tmpl->exec('ranking.uicompetitions.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),
 		));

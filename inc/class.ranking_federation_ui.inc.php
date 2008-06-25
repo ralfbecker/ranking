@@ -24,17 +24,6 @@ class ranking_federation_ui extends boranking
 	var $public_functions = array(
 		'index' => true,
 	);
-	/**
-	 * Federation object
-	 *
-	 * @var ranking_federation
-	 */
-	protected $federation;
-
-	function __construct()
-	{
-		$this->boranking(array('federation' => 'ranking_federation'));
-	}
 
 	/**
 	 * query federations for nextmatch
@@ -72,12 +61,6 @@ class ranking_federation_ui extends boranking
 					$fed['parent_name'] = $parents[$fed['fed_parent']];
 				}
 			}
-		}
-
-		if ($this->debug)
-		{
-			echo "<p>uiathles::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
-			_debug_array($readonlys);
 		}
 		return $total;
 	}
