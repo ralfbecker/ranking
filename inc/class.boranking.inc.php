@@ -1268,9 +1268,13 @@ class boranking extends soranking
 				else
 				{
 					// try fixing broken EYC results from ifsc-climbing.org containing place and points without space inbetween
-					if (preg_match('/^([0-9]+[+-]?)'.(int)$arr['place'].'\.[0-9]+\.[0-9]{2}$/',$str,$matches))
+					if (preg_match('/^([0-9.]+[+-]?)'.(int)$arr['place'].'\.([0-9]+\.[0-9]{2})?$/',$str,$matches))
 					{
 						$str = $matches[1];
+					}
+					else
+					{
+						list($str) = explode(' ',$str);		// cut of space separated extra values of EYC
 					}
 					$result['result_height'] = (double) $str;
 					switch(substr($str,-1))
