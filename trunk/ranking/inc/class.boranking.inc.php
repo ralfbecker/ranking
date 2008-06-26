@@ -1130,7 +1130,7 @@ class boranking extends soranking
 	 * Parse a csv file
 	 *
 	 * @param array $keys WetId, GrpId, route_order
-	 * @param string $file uploaded file
+	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $result_only true = only results allowed, false = startlists too
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
 	 * @return string/array error message or result lines
@@ -1146,7 +1146,7 @@ class boranking extends soranking
 		}
 		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
 
-		if (!($fp = fopen($file,'rb')) || !($labels = fgetcsv($fp,null,';')) || count($labels) <= 1)
+		if (!($fp = is_resource($file) ? $file : fopen($file,'rb')) || !($labels = fgetcsv($fp,null,';')) || count($labels) <= 1)
 		{
 			return lang('Error: no line with column names, eg. delemiter is not ;');
 		}

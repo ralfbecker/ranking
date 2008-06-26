@@ -34,6 +34,23 @@ class uiresult extends boresult
 	{
 		$tmpl = new etemplate('ranking.result.route');
 
+		if (!is_array($content))
+		{
+			$content = $keys = array(
+				'WetId' => $_GET['comp'],
+				'GrpId' => $_GET['cat'],
+				'route_order' => $_GET['route'],
+			);
+		}
+		// read $comp, $cat, $discipline and check the permissions
+		if (!$this->init_route($content,$comp,$cat,$discipline))
+		{
+			$js = "alert('".addslashes($e->getMessage())."'); window.close();";
+			$GLOBALS['egw']->common->egw_header();
+			echo "<html><head><script>".$js."</script></head></html>\n";
+			$GLOBALS['egw']->common->egw_exit();
+		}
+/*
 		if (!($comp = $this->comp->read($_GET['comp'] ? $_GET['comp'] : $content['WetId'])) ||
 			!($cat = $this->cats->read($_GET['cat'] ? $_GET['cat'] : $content['GrpId'])) ||
 			!in_array($cat['rkey'],$comp['gruppen']))
@@ -104,11 +121,12 @@ class uiresult extends boresult
 				$content = $this->route->init($keys);
 				$content['new_route'] = true;
 			}
-			// speed uses a different type for quali on two routes
-			if ($content['route_type'] == TWO_QUALI_SPEED)
-			{
-				$content['route_type'] = TWO_QUALI_ALL;
-			}
+		}
+*/
+		// speed uses a different type for quali on two routes
+		if ($content['route_type'] == TWO_QUALI_SPEED)
+		{
+			$content['route_type'] = TWO_QUALI_ALL;
 		}
 		// check if user has NO edit rights
 		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)))
