@@ -1255,7 +1255,7 @@ class boranking extends soranking
 
 		$str = trim(str_replace(',','.',$arr['result']));		// remove space and allow to use comma instead of dot as decimal del.
 
-		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climed so far
+		if ($str === '' || is_null($str)) return $result;	// no result, eg. not climbed so far
 
 		switch($discipline)
 		{
@@ -1267,6 +1267,11 @@ class boranking extends soranking
 				}
 				else
 				{
+					// try fixing broken EYC results from ifsc-climbing.org containing place and points without space inbetween
+					if (preg_match('/^([0-9]+[+-]?)'.(int)$arr['place'].'\.[0-9]+\.[0-9]{2}$/',$str,$matches))
+					{
+						$str = $matches[1];
+					}
 					$result['result_height'] = (double) $str;
 					switch(substr($str,-1))
 					{
@@ -1278,24 +1283,42 @@ class boranking extends soranking
 				break;
 
 			case 'speed':
-				$result['result_time'] = is_numeric($str) ? (double) $str : ELIMINATED_TIME;
+				foreach(isset($arr['time-left']) ? array('' => 'time-left','_r' => 'time-right') : array('' => 'result') as $postfix => $name)
+				if (is_numeric($arr[$name]))
+				{
+					$result['result_time'.$postfix] = (double) $arr[$name];
+					$result['eliminated'.$postfix] = '';
+				}
+				else
+				{
+					$result['result_time'.$postfix] = '';
+					$result['eliminated'.$postfix] = (int) in_array($arr[$name],array('eliminiert','eliminated'));
+				}
 				break;
 
 			case 'boulder':	// #t# #b#
-				list($top,$bonus) = explode(' ',$str);
-				list($top,$top_tries) = explode('t',$top);
-				list($bonus,$bonus_tries) = explode('b',$bonus);
-				$result['result_top'] = $top ? 100 * $top - $top_tries : null;
-				$result['result_zone'] = 100 * $bonus - $bonus_tries;
-				for($i = 1; $i <= 6 && array_key_exists('boulder'.$i,$arr); ++$i)
+				if (($bonus_pos = strpos($str,'b')) !== false)	// we split the string on the position of 'b' minus one char, as num of bonus is always 1 digit
 				{
-					if (!($boulder = $arr['boulder'.$i])) continue;
-					if ($boulder{0} == 't')
+					list($top,$top_tries) = explode('t',substr($str,0,$bonus_pos-1));
+					list($bonus,$bonus_tries) = explode('b',trim(substr($str,$bonus_pos-1)));
+					$result['result_top'] = $top ? 100 * $top - $top_tries : null;
+					$result['result_zone'] = 100 * $bonus - $bonus_tries;
+					for($i = 1; $i <= 6 && array_key_exists('boulder'.$i,$arr); ++$i)
 					{
-						$result['top'.$i] = (int) substr($boulder,1);
-						list(,$boulder) = explode(' ',$boulder);
+						$result['top'.$i] = '';
+						$result['zone'.$i] = strpos($str,'0b') !== false ? '0' : '';	// we need to differ between 0b and not climbed!
+						if (!($boulder = $arr['boulder'.$i])) continue;
+						if ($boulder[0] == 't')
+						{
+							$result['top'.$i] = (int) substr($boulder,1);
+							$boulder = strstr($boulder,'b');
+						}
+						$result['zone'.$i] = (int) substr($boulder,1);
 					}
-					$result['zone'.$i] = (int) substr($boulder,1);
+				}
+				else
+				{
+					$result = array();
 				}
 				break;
 		}
