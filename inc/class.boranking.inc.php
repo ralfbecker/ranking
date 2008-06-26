@@ -1328,4 +1328,78 @@ class boranking extends soranking
 		}
 		return $result;
 	}
+
+	/**
+	 * Merge all data of one entry into an other one
+	 *
+	 * @param int|array $from entry to merge
+	 * @param int|array $to entry to merge into
+	 * @return number of merged results
+	 */
+	function merge_athlete($from,$to)
+	{
+		echo "<p>".__METHOD__."($from,$to)</p>\n";
+		if (!is_array($from) && !($from = $this->athlete->read($id=$from)))
+		{
+			throw new Exception(lang('Athlete %1 not found!',$id));
+		}
+		if (!is_array($to) && !($to = $this->athlete->read($id=$to)))
+		{
+			throw new Exception(lang('Athlete %1 not found!',$id));
+		}
+		if ($from['PerId'] == $to['PerId'])
+		{
+			return 0;	// nothing to merge
+		}
+		if ($from['nation'] != $to['nation'] || $from['sex'] != $to['sex'] ||
+			$from['geb_date'] && $to['geb_date'] && (int)$from['geb_date'] != (int)$to['geb_date'] ||
+			!$this->is_admin && !self::similar_names($from['vorname'].' '.$from['nachname'],$to['vorname'].' '.$to['nachname']))
+		{
+			throw new Exception(lang('Nation, birthyear and gender have to be identical to merge, the names have to be similar!'));
+		}
+		if (!$this->is_admin && !in_array($from['nation'],$this->athlete_rights))
+		{
+			throw new Exception(lang('Permission denied !!!'));
+		}
+		// merge athlete data
+		foreach($from as $name => $value)
+		{
+			if ($value && !$to[$name] ||	// to value is empty
+				$name == 'geb_date' && (int)$value.'-01-01' == $to[$name] ||	// is just a birthyear, but no date
+				$name == 'verband' && substr($value,0,strlen($to[$name])) == $to[$name])	// federation from to is parent fed of the one from from
+			{
+				$to[$name] = $value;	// --> overwrite to value with the one from from
+			}
+		}
+		$this->athlete->init($to);
+		if ($this->athlete->save() != 0)
+		{
+			throw new Exception(lang('Error: while saving !!!'));
+		}
+		// merge licenses
+		$this->athlete->merge_licenses($from['PerId'],$to['PerId']);
+		// merge result service data
+		$this->route_result->merge($from['PerId'],$to['PerId']);
+		// merge result data
+		$merged = $this->result->merge($from['PerId'],$to['PerId']);
+
+		$this->athlete->delete(array('PerId' => $from['PerId']));
+
+		return $merged;
+	}
+
+	/**
+	 * Check if two names are similar
+	 *
+	 * @param string $first
+	 * @param string $second
+	 * @param double $min minimum similarity to return true
+	 * @return boolean true if names are similar
+	 */
+	static function similar_names($first,$second,$min=0.8)
+	{
+		$length = (strlen($first)+strlen($second)) / 2;
+
+		return similar_text($first,$second)/$length >= $min;
+	}
 }

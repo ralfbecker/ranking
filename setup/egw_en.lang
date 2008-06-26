@@ -1,7 +1,9 @@
+%1 athletes imported.	ranking	en	%1 athletes imported.
 %1 deleted	ranking	en	%1 deleted
 %1 federations added to parent federation.	ranking	en	%1 federations added to parent federation.
 %1 federations merged.	ranking	en	%1 federations merged.
 %1 is an admin and has therefor all rights!	ranking	en	%1 is an admin and has therefor all rights!
+%1 lines read from file.	ranking	en	%1 lines read from file.
 %1 participants imported	ranking	en	%1 participants imported
 %1 saved	ranking	en	%1 saved
 %1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
@@ -26,6 +28,7 @@ add heat	ranking	en	Add heat
 add new athlete with the given data	ranking	en	Add new athlete with the given data
 add not existing athletes to the database, use with caution!	ranking	en	add not existing athletes to the database, use with caution!
 add to parent federation opened for editing	ranking	en	Add to parent federation opened for editing
+admin rights required!	ranking	en	Admin rights required!
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
@@ -38,6 +41,8 @@ apply the changes made	ranking	en	apply the changes made
 apply the changes of this athlete only	ranking	en	Apply the changes of this athlete only
 as of	ranking	en	As of
 athlete	ranking	en	Athlete
+athlete %1 not found!	ranking	en	Athlete %1 not found!
+athlete including %1 results merged.	ranking	en	Athlete including %1 results merged.
 athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athletes	ranking	en	Athletes
 before	ranking	en	before
@@ -89,10 +94,12 @@ confirmed	ranking	en	confirmed
 contact	ranking	en	Contact
 copy current formats to the new competition, which does not have any formats yet?	ranking	en	Copy current formats to the new competition, which does not have any formats yet?
 counting for rankings	ranking	en	counting for rankings
+create new federation: %1 (%2)	ranking	en	Create new federation: %1 (%2)
 cup	ranking	en	Cup
 cuppattern	ranking	en	Cuppattern
 cups	ranking	en	cups
 database	admin	en	Database
+dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	en	Dataline %1 has a different number of columns (%2) then labels (%3)!
 deadline	ranking	en	Deadline
 default ranking view	ranking	en	Default ranking view
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
@@ -153,6 +160,7 @@ error: heat already has a result!!!	ranking	en	Error: heat already has a result!
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
 error: no file to upload selected	ranking	en	Error: no file to upload selected
 error: no line with column names, eg. delemiter is not ;	ranking	en	Error: no line with column names, eg. delemiter is not ;
+error: no line with column names, eg. wrong delemiter	ranking	en	Error: no line with column names, eg. wrong delemiter
 error: registration	ranking	en	Error: registration
 error: removing the %1 !!!	ranking	en	Error: removing the %1 !!!
 error: renaming the attachments !!!	ranking	en	Error: renaming the attachments !!!
@@ -214,6 +222,7 @@ how many athlets (percentage) of the field are used to calculate the fieldfaktor
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
 ignore	ranking	en	Ignore
+import	ranking	en	Import
 import as	ranking	en	Import as
 import charset	ranking	en	Import Charset
 import file	ranking	en	Import file
@@ -242,7 +251,9 @@ male	ranking	en	male
 max	ranking	en	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
 measurement aborted!	ranking	en	Measurement aborted!
+merge	ranking	en	Merge
 merge selected federations with the one opened for editing	ranking	en	Merge selected federations with the one opened for editing
+merges this entry into the selected one.	ranking	en	Merges this entry into the selected one.
 minus	ranking	en	minus
 name(s)	ranking	en	name(s)
 nation	ranking	en	Nation
@@ -251,6 +262,7 @@ nation if national competition or internatinal	ranking	en	nation if national com
 nation if national competition or none for an internatinal one	ranking	en	nation if national competition or none for an internatinal one
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
 nation to use (empty = international)	ranking	en	Nation to use (empty = international)
+nation, birthyear and gender have to be identical to merge, the names have to be similar!	ranking	en	Nation, birthyear and gender have to be identical to merge, the names have to be similar!
 national team ranking	ranking	en	National team ranking
 nationname	ranking	en	Nationname
 nations and federations	ranking	en	Nations and Federations
@@ -275,6 +287,9 @@ opens	ranking	en	opens
 or	ranking	en	or
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
+pagename for athlete profile (default: pstambl)	ranking	en	Pagename for athlete profile (default: pstambl)
+pagename for ranglists (default: ranglist)	ranking	en	Pagename for ranglists (default: ranglist)
+pagename for results (default: result)	ranking	en	Pagename for results (default: result)
 pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete profiles
 pairing speed final	ranking	en	Pairing speed final
 parent federation	ranking	en	Parent federation
@@ -295,6 +310,7 @@ pointalocation	ranking	en	Pointalocation
 points	ranking	en	Points
 port	admin	en	Port
 postalcode	ranking	en	Postalcode
+prefix for the following page names (default none)	ranking	en	Prefix for the following page names (default none)
 prequalified	ranking	en	Prequalified
 prequalified competitiors	ranking	en	Prequalified competitiors
 presets	ranking	en	Presets
@@ -323,6 +339,7 @@ registration	ranking	en	Registration
 registration deadline	ranking	en	Registration deadline
 remove the attached pdf	ranking	en	Remove the attached PDF
 removed the %1	ranking	en	Removed the %1
+replace: %1	ranking	en	replace: %1
 required information missing, application rejected!	ranking	en	Required information missing, application rejected!
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
 result form is timed out, please reload the form by clicking on the application icon.	ranking	en	Result form is timed out, please reload the form by clicking on the application icon.
@@ -347,6 +364,7 @@ select multiple federations for a further action	ranking	en	Select multiple fede
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
 serid	ranking	en	SerId
+set license to	ranking	en	Set license to
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
 show athlets from all categories	ranking	en	show athlets from all categories
@@ -374,6 +392,9 @@ street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
 sum	ranking	en	Sum
 suspended	ranking	en	suspended
+target for athlete profile (default: profil)	ranking	en	Target for athlete profile (default: profil)
+target for national team rankings (default: nat_team_ranking)	ranking	en	Target for national team rankings (default: nat_team_ranking)
+target for start lists (default: startlist)	ranking	en	Target for start lists (default: startlist)
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
 this athlete has no license! are you sure you want to make an exception	ranking	en	This athlete has NO license! Are you sure you want to make an EXCEPTION
@@ -433,4 +454,6 @@ you can only create a new heat, if the previous one '%1' has a result!	ranking	e
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last heat, not one in between!
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	en	You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue
+you need to select a file first!	ranking	en	You need to select a file first!
+you need to select an other athlete first!	ranking	en	You need to select an other athlete first!
 you need to select some federations first!	ranking	en	You need to select some federations first!

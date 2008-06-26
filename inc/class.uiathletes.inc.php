@@ -266,6 +266,30 @@ class uiathletes extends boranking
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
 				$GLOBALS['egw']->common->egw_exit();
 			}
+			if ($content['merge'] && $this->athlete->data['PerId'])
+			{
+				if (!(int)$content['merge_to'])
+				{
+					$msg = lang('You need to select an other athlete first!');
+				}
+				else
+				{
+					try {
+						$msg = lang('Athlete including %1 results merged.',
+							$this->merge_athlete($this->athlete->data['PerId'],$content['merge_to']));
+						$this->athlete->read($content['merge_to']);	// show the athlete we merged too
+						$link = $GLOBALS['egw']->link('/index.php',array(
+							'menuaction' => $content['referer'],//'ranking.uiathletes.index',
+							'msg' => $msg,
+						));
+						$js = "window.opener.location='$link';";
+						unset($content['merge_to']);
+					}
+					catch(Exception $e) {
+						$msg = $e->getMessage();
+					}
+				}
+			}
 		}
 		$content = $this->athlete->data + array(
 			'msg' => $msg,
@@ -275,6 +299,7 @@ class uiathletes extends boranking
 			'license_year' => $content['license_year'],
 			'license_nation' => $content['license_nation'],
 			'referer' => $content['referer'],
+			'merge_to' => $content['merge_to'],
 		);
 		$sel_options = array(
 			'nation' => $nations,
@@ -284,13 +309,20 @@ class uiathletes extends boranking
 			'fed_id' => $content['nation'] ? $this->athlete->federations($content['nation']) : array(lang('Select a nation first')),
 			'license_nation' => ($license_nations = $this->license_nations()),
 		);
+		$edit_rights = $this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights);
 		$readonlys = array(
-			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]],
+			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]] || !$edit_rights,
 			'nation' => !!$this->only_nation_athlete,
-			'edit'   => !($view && ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights))),
+			'edit'   => $view || !$edit_rights,
 			'apply_license' => in_array($content['license'],array('s','c')) || !$this->acl_check($content['nation'],EGW_ACL_ADD),
 			'license'=> !$this->acl_check('NULL',EGW_ACL_ADD),
+			'merge' => !$edit_rights || !$this->athlete->data['PerId'],
+			'merge_to' => !$edit_rights || !$this->athlete->data['PerId'],
 		);
+		if (!$readonlys['merge_to'] && !$content['merge_to'])
+		{
+			$content['merge_to']['query'] = $content['sex'][0].':'.$content['nation'].':!'.$content['PerId'].': '.$content['nachname'];
+		}
 		if (count($license_nations) == 1)	// no selectbox, if no selection
 		{
 			$readonlys['license_nation'] = true;

@@ -772,14 +772,19 @@ class athlete extends so_sql
 				$pattern = array_pop($parts);
 				foreach($parts as $part)
 				{
-					if (strlen($part) == 3)	// nation
+					if ($part[0] == '!')	// NOT id/license number
+					{
+						$filter[] = self::ATHLETE_TABLE.'.PerId != '.(int)substr($part,1);
+					}
+					elseif (strlen($part) == 3)	// nation
 					{
 						$filter['nation'] = strtoupper($part);
 					}
 					else
 					{
-						$filter['sex'] = strtolower($filter['sex']) == 'm' ? 'male' : 'female';
+						$filter['sex'] = strtolower($part) == 'm' ? 'male' : 'female';
 					}
+					//error_log(__METHOD__."() pattern=$pattern, part=$part, filter=".array2string($filter));
 				}
 			}
 			foreach(array('vorname','nachname','ort','verband') as $col)
@@ -795,5 +800,23 @@ class athlete extends so_sql
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * Merge the licenses from athlete $from to athlete $to
+	 *
+	 * @param int $from
+	 * @param int $to
+	 * @return int number of merged licenses
+	 */
+	function merge_licenses($from,$to)
+	{
+		if (!(int)$from || !(int)$to)
+		{
+			return false;
+		}
+		$this->db->update(self::LICENSE_TABLE,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
+
+		return $this->db->affected_rows();
 	}
 }
