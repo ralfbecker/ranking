@@ -754,7 +754,7 @@ class boresult extends boranking
 	 * Upload a route as csv file
 	 *
 	 * @param array $keys WetId, GrpId, route_order
-	 * @param string $file uploaded file
+	 * @param string|FILE $file uploaded file name or handle
 	 * @param string/int error message or number of lines imported
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
 	 * @return int/string integer number of imported results or string with error message
@@ -823,7 +823,7 @@ class boresult extends boranking
 				break;
 
 			case 'speed':
-				foreach(array('' => 'time-left','_r' => 'time-right') as $postfix => $name)
+				foreach(isset($arr['time-left']) ? array('' => 'time-left','_r' => 'time-right') : array('' => 'result') as $postfix => $name)
 				if (is_numeric($arr[$name]))
 				{
 					$result['result_time'.$postfix] = (double) $arr[$name];
@@ -887,7 +887,6 @@ class boresult extends boranking
 		{
 			if ($row['result_rank']) $result[$row['PerId']] = $row['result_rank'];
 		}
-		//_debug_array($result);
 		return parent::import_ranking($keys,$result);
 	}
 
@@ -1073,7 +1072,7 @@ class boresult extends boranking
 	 * @param int $num_participants=null
 	 * @return int
 	 */
-	function default_quota($discipline,$route_order,$quali_type=null,$num_participants=null)
+	static function default_quota($discipline,$route_order,$quali_type=null,$num_participants=null)
 	{
 		$quota = null;
 
@@ -1108,6 +1107,92 @@ class boresult extends boranking
 		}
 		//echo "<p>boresult::default_quota($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
 		return $quota;
+	}
+
+	/**
+	 * Initialise a route for a given competition, category and route_order and check the (read) permissions
+	 *
+	 * For existing routes we only check the (read) permissions and read comp and cat.
+	 *
+	 * @param array &$content on call at least keys WetId, GrpId, route_order, on return initialised route
+	 * @param array &$comp on call competition array or null, on return competition array
+	 * @param array &$cat  on call category array or null, on return category array
+	 * @param string &$discipline on return discipline of route: 'lead', 'speed' or 'boulder'
+	 * @return boolean true on success, false if permission denied
+	 */
+	function init_route(array &$content,&$comp,&$cat,&$discipline)
+	{
+		if (!is_array($comp) && !($comp = $this->comp->read($content['WetId'])) ||
+			!is_array($cat) && !($cat = $this->cats->read($content['GrpId'])) ||
+			!in_array($cat['rkey'],$comp['gruppen']))
+		{
+			return false;	// permission denied
+		}
+		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+
+		if (count($content) > 3)
+		{
+			return true;	// no new route
+		}
+		$keys = array(
+			'WetId' => $comp['WetId'],
+			'GrpId' => $cat['GrpId'],
+			'route_order' => $route_order=$content['route_order'],
+		);
+		if ((int)$comp['WetId'] && (int)$cat['GrpId'] && (!is_numeric($route_order) ||
+			!($content = $this->route->read($content,true))))
+		{
+			// try reading the previous heat, to set some stuff from it
+			if (($keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId'])) >= 0 &&
+				($previous = $this->route->read($keys,true)))
+			{
+				++$keys['route_order'];
+				if ($keys['route_order'] == 1 && in_array($previous['route_type'],array(ONE_QUALI,TWO_QUALI_SPEED)))
+				{
+					$keys['route_order'] = 2;
+				}
+				foreach(array('route_type','dsp_id','frm_id','dsp_id2','frm_id2','route_time_host','route_time_port') as $name)
+				{
+					$keys[$name] = $previous[$name];
+				}
+			}
+			else
+			{
+				$keys['route_order'] = '0';
+				$keys['route_type'] = ONE_QUALI;
+			}
+			$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') :
+				($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
+
+			if ($discipline != 'speed')
+			{
+				$keys['route_quota'] = self::default_quota($discipline,$keys['route_order']);
+			}
+			elseif ($previous && $previous['route_quota'] > 2)
+			{
+				$keys['route_quota'] = $previous['route_quota'] / 2;
+			}
+			if ($previous && $previous['route_judge'])
+			{
+				$keys['route_judge'] = $previous['route_judge'];
+			}
+			else	// set judges from the competition
+			{
+				if ($comp['judges'])
+				{
+					$keys['route_judge'] = array();
+					foreach($comp['judges'] as $uid)
+					{
+						$keys['route_judge'][] = $GLOBALS['egw']->common->grab_owner_name($uid);
+					}
+					$keys['route_judge'] = implode(', ',$keys['route_judge']);
+				}
+			}
+			$content = $this->route->init($keys);
+			$content['new_route'] = true;
+			$content['route_status'] = STATUS_STARTLIST;
+		}
+		return true;
 	}
 
 	/**
