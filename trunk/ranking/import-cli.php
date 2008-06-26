@@ -218,7 +218,6 @@ curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 curl_setopt($ch,CURLOPT_HEADER,true);
 
 // getting the page of the competition and category --> get's us to the general result
-curl_setopt(CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
 if ($debug > 2) echo "\nGETting $url\n";
 $get = curl_exec($ch);
 //echo substr($get,0,500)."\n\n";
@@ -236,7 +235,7 @@ foreach($cats as $n => $cat)
 	if ($n)	// changing the cat via a post --> get's us to the general result
 	{
 		// setting route=0 qualification with a post
-		curl_setopt(CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
+		curl_setopt($ch,CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
 		curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
 			'etemplate_exec_id' => $exec_id,
 			'exec' => array(
@@ -270,7 +269,7 @@ foreach($cats as $n => $cat)
 	for($route=0; $route <= 3; ++$route)
 	{
 		// download each heat
-		curl_setopt(CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
+		curl_setopt($ch,CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
 		curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
 			'etemplate_exec_id' => $exec_id,
 			'submit_button' => 'exec[button][download]',
