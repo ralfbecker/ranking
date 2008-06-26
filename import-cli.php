@@ -251,7 +251,7 @@ foreach($cats as $n => $cat)
 		//if ($n) echo $download."\n\n";
 	}
 	// setting route=0 qualification with a post
-	curl_setopt(CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
+	curl_setopt($ch,CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
 	curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
 		'etemplate_exec_id' => $exec_id,
 		'exec' => array(
