@@ -1,7 +1,9 @@
+%1 athletes imported.	ranking	de	%1 Athleten importiert.
 %1 deleted	ranking	de	%1 gelöscht
 %1 federations added to parent federation.	ranking	de	%1 Verbände zu übergeordnetem hinzugefügt.
 %1 federations merged.	ranking	de	%1 Verbände zusammengeführt.
 %1 is an admin and has therefor all rights!	ranking	de	%1 ist ein Administrator und hat daher alle Rechte!
+%1 lines read from file.	ranking	de	%1 Zeilen von der Datei gelesen.
 %1 participants imported	ranking	de	%1 Teilnehmer importiert
 %1 saved	ranking	de	%1 gespeichert
 %1, %2 deleted for category %3	ranking	de	%1, %2 gelöscht für Kategorie %3
@@ -26,6 +28,7 @@ add heat	ranking	de	Runde anlegen
 add new athlete with the given data	ranking	de	Neuen Athleten mit den gegebenen Daten anlegen
 add not existing athletes to the database, use with caution!	ranking	de	Nicht existierende Athleten zur Datenbank hinzufügen, mit Vorsicht benutzen!
 add to parent federation opened for editing	ranking	de	Hinzufügen zu zum Bearbeiten geöffneten übergeordneten Verband
+admin rights required!	ranking	de	Administrator Rechte erforderlich!
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
@@ -38,6 +41,8 @@ apply the changes made	ranking	de	vorgenommene Änderungen anwenden
 apply the changes of this athlete only	ranking	de	Nur Änderungen an diesem Athleten anwenden
 as of	ranking	de	Stand
 athlete	ranking	de	Athlet
+athlete %1 not found!	ranking	de	Athlet %1 nicht gefunden!
+athlete including %1 results merged.	ranking	de	Athlet einschließlich %1 Ergebnisse vereinigt.
 athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athletes	ranking	de	Athleten
 before	ranking	de	vor
@@ -89,10 +94,12 @@ confirmed	ranking	de	bestätigt
 contact	ranking	de	Kontakt
 copy current formats to the new competition, which does not have any formats yet?	ranking	de	Sollen die aktuellen Formate zum neuen Wettkampf, der noch keine Formate hat, kopiert werden?
 counting for rankings	ranking	de	zählend für die Rangliste
+create new federation: %1 (%2)	ranking	de	Lege neuen Verband an: %1 (%2)
 cup	ranking	de	Cup
 cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
 database	admin	de	Datenbank
+dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	de	Datenzeile %1 hat eine andere Anzahl Spalten (%2) als die Kopfzeile (%3)!
 deadline	ranking	de	Anmeldeschluss
 default ranking view	ranking	de	Standardansicht Ranglisten
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
@@ -153,6 +160,7 @@ error: heat already has a result!!!	ranking	de	Fehler: die Runde hat bereits ein
 error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlüssel '%1' existiert bereits, er muß eindeutig sein !!!
 error: no file to upload selected	ranking	de	Fehler: keine Datei zum Hochladen ausgewählt
 error: no line with column names, eg. delemiter is not ;	ranking	de	Fehler: keine Zeile mit den Spaltennamen, zB. Trennzeichen ist nicht ;
+error: no line with column names, eg. wrong delemiter	ranking	de	Fehler: keine Zeile mit Spaltennamen, zB. falsches Trennzeichen
 error: registration	ranking	de	Fehler: Registrierung
 error: removing the %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: renaming the attachments !!!	ranking	de	Fehler: beim Umbenennen der Anhänge !!!
@@ -214,6 +222,7 @@ how many athlets (percentage) of the field are used to calculate the fieldfaktor
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athleten des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
 ignore	ranking	de	Ignorieren
+import	ranking	de	Importieren
 import as	ranking	de	Importieren als
 import charset	ranking	de	Zeichensatz
 import file	ranking	de	Datei importieren
@@ -242,7 +251,9 @@ male	ranking	de	männlich
 max	ranking	de	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
 measurement aborted!	ranking	de	Messung abgebrochen!
+merge	ranking	de	Vereinigen
 merge selected federations with the one opened for editing	ranking	de	Vereinige ausgewählte Verbände mit dem zu Bearbeiten geöffneten
+merges this entry into the selected one.	ranking	de	Vereinige diesen Eintrag mit dem ausgewählten (in diesem).
 minus	ranking	de	minus
 name(s)	ranking	de	Namen
 nation	ranking	de	Nation
@@ -251,6 +262,7 @@ nation if national competition or internatinal	ranking	de	Nation für nationalen
 nation if national competition or none for an internatinal one	ranking	de	Nation falls es sich um einen natinalen Wettkampf handelt oder keine für einen internationalen
 nation the athlete is competing for	ranking	de	Nation für die der Athlete startet
 nation to use (empty = international)	ranking	de	Nation (leer = international)
+nation, birthyear and gender have to be identical to merge, the names have to be similar!	ranking	de	Nation, Geburtsjahr und Geschlecht müssen identisch sein zum Vereinigen, die Namen müssen ähnlich sein!
 national team ranking	ranking	de	Nationen-Team-Rangliste
 nationname	ranking	de	Name des Landes
 nations and federations	ranking	de	Nationen und Verbände
@@ -275,6 +287,9 @@ opens	ranking	de	öffnet
 or	ranking	de	oder
 other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
+pagename for athlete profile (default: pstambl)	ranking	de	Seitenname für die Athletenprofile (Vorgabe: pstambl)
+pagename for ranglists (default: ranglist)	ranking	de	Seitenname für Ranglisten (Vorgabe: ranglist)
+pagename for results (default: result)	ranking	de	Seitenname für Ergebnisse (Vorgabe: result)
 pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Athletenprofile
 pairing speed final	ranking	de	Paarungen Speed Finale
 parent federation	ranking	de	übergeordneter Verband
@@ -295,6 +310,7 @@ pointalocation	ranking	de	Punkteverteilung
 points	ranking	de	Punkte
 port	admin	de	Port
 postalcode	ranking	de	Postleitzahl
+prefix for the following page names (default none)	ranking	de	Prefix für die folgenden Seitennamen (Vorgabe keines)
 prequalified	ranking	de	Vorqualifiziert
 prequalified competitiors	ranking	de	Vorqualifizierte Teilnehmer
 presets	ranking	de	Voreinstellungen
@@ -323,6 +339,7 @@ registration	ranking	de	Registrierung
 registration deadline	ranking	de	Anmeldeschuss für die Registrierung
 remove the attached pdf	ranking	de	Das angehangene PDF löschen
 removed the %1	ranking	de	Das %1 wurde gelöscht
+replace: %1	ranking	de	Ersetze: %1
 required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
 result form is timed out, please reload the form by clicking on the application icon.	ranking	de	Das Ergebnis Formular ist nicht mehr gültig (zu lange nicht aktualisiert), bitte aktualisieren Sie es durch Anklicken des Anwendungsicons.
@@ -347,6 +364,7 @@ select multiple federations for a further action	ranking	de	Mehrere Verbände f�
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 serid	ranking	de	SerId
+set license to	ranking	de	Setze Lizenz als
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
 show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
@@ -374,6 +392,9 @@ street	ranking	de	Straße
 street, postcode	ranking	de	Straße, Postleitzahl
 sum	ranking	de	Summe
 suspended	ranking	de	gesperrt
+target for athlete profile (default: profil)	ranking	de	Ziel (target) für Athletenprofile (Vorgabe: profile)
+target for national team rankings (default: nat_team_ranking)	ranking	de	Ziel (target) für nationale Team Rankings (Vorgabe: nat_team_ranking)
+target for start lists (default: startlist)	ranking	de	Ziel (target) für Startlisten (Vorgabe: startlist)
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
 this athlete has no license! are you sure you want to make an exception	ranking	de	Dieser Athlete hat KEINE Lizenz! Sind Sie sicher, dass Sie eine AUSNAHME machen wollen
@@ -433,4 +454,6 @@ you can only create a new heat, if the previous one '%1' has a result!	ranking	d
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden! Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (Sie können einge für den öffentlichen Zugrif gesperrt werden). Fortfahren
+you need to select a file first!	ranking	de	Sie müssen zuerst eine Datei auswählen!
+you need to select an other athlete first!	ranking	de	Sie müssen zuerst einen anderen Athleten auswählen!
 you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!

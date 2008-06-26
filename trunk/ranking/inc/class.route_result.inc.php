@@ -924,4 +924,22 @@ class route_result extends so_sql
 
 		return $this->db->next_record() ? $this->db->f(0) : null;
 	}
+
+	/**
+	 * Merge the resultservice results from athlete $from to athlete $to
+	 *
+	 * @param int $from
+	 * @param int $to
+	 * @return int number of merged results
+	 */
+	function merge($from,$to)
+	{
+		if (!(int)$from || !(int)$to)
+		{
+			return false;
+		}
+		$this->db->update($this->table_name,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
+
+		return $this->db->affected_rows();
+	}
 }

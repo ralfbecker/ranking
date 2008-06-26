@@ -148,7 +148,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.5.002">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -220,12 +220,16 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox span="4">
+					<hbox span="2">
 						<button label="Save" id="save" statustext="Saves the changes made"/>
 						<button label="Apply" id="apply" statustext="Applies the changes made"/>
 						<button label="Cancel" id="cancel" statustext="exists without saving the changes" onclick="window.close();"/>
 					</hbox>
-					<button label="Delete" align="right" id="delete" statustext="Delete this athlete" onclick="return confirm('Delete this athlete');"/>
+					<hbox span="all" align="right">
+						<link-entry id="merge_to" options="ranking"/>
+						<button id="merge" label="Merge" statustext="Merges this entry into the selected one." onclick="return confirm('ATTENTION: merging can NOT be undone! Really want to merge?');"/>
+						<button label="Delete" id="delete" statustext="Delete this athlete" onclick="return confirm('Delete this athlete');"/>
+					</hbox>
 				</row>
 			</rows>
 		</grid>
