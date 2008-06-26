@@ -365,7 +365,7 @@ class ranking_import extends boresult
 		$lastname_col  = array_search('nachname',$col2name);
 		$nation_col    = array_search('nation',$col2name);
 		$id_col        = array_search('PerId',$col2name);
-		error_log(__METHOD__."(,".array2string($col2name).",$nation,$sex) firstname_col=$firstname_col, lastname_col=$lastname_col, nation_col=$nation_col, id_col=$id_col");
+		//error_log(__METHOD__."(,".array2string($col2name).",$nation,$sex) firstname_col=$firstname_col, lastname_col=$lastname_col, nation_col=$nation_col, id_col=$id_col");
 
 		$detection =& $import['detection'];
 		$detection = array();
