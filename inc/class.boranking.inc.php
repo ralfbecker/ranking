@@ -1338,7 +1338,7 @@ class boranking extends soranking
 	 */
 	function merge_athlete($from,$to)
 	{
-		echo "<p>".__METHOD__."($from,$to)</p>\n";
+		//echo "<p>".__METHOD__."($from,$to)</p>\n";
 		if (!is_array($from) && !($from = $this->athlete->read($id=$from)))
 		{
 			throw new Exception(lang('Athlete %1 not found!',$id));
