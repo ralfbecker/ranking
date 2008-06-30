@@ -86,6 +86,10 @@ class uiathletes extends boranking
 			if (!$_GET['PerId'] && !$_GET['rkey'] || !$this->athlete->data['PerId'])
 			{
 				$this->athlete->init($_GET['preset']);
+				if (isset($_GET['preset']) && isset($_GET['preset']['verband']) && !isset($_GET['preset']['fed_id']))
+				{
+					$this->athlete->data['fed_id'] = $this->federation->get_federation($_GET['preset']['verband'],$_GET['preset']['nation'],true);
+				}
 				if ($this->only_nation_athlete) $this->athlete->data['nation'] = $this->only_nation_athlete;
 				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
 			}
