@@ -508,6 +508,10 @@ class athlete extends so_sql
 			$this->db->delete(self::LICENSE_TABLE,array(
 				'PerId' => is_null($keys) ? $this->data['PerId'] : $keys['PerId'],
 			),__LINE__,__FILE__);
+			// delete association with federations
+			$this->db->delete(self::ATHLETE2FED_TABLE,array(
+				'PerId' => is_null($keys) ? $this->data['PerId'] : $keys['PerId'],
+			),__LINE__,__FILE__);
 		}
 		return $Ok;
 	}
