@@ -575,7 +575,8 @@ class uiathletes extends boranking
 	 */
 	function licenseform($nation=null,$year=null)
 	{
-		if (is_null($year)) $year = $this->license_year;
+		if (is_null($year)) $year = $_GET['license_year'] ? $_GET['license_year'] : $this->license_year;
+		if (is_null($nation) && $_GET['license_nation']) $nation = $_GET['license_nation'];
 
 		if (!$this->athlete->read($_GET) ||
 			!($form = file_get_contents($this->license_form_name($nation,$year))))
