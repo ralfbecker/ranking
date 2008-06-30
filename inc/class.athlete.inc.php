@@ -505,9 +505,8 @@ class athlete extends so_sql
 		if ($Ok && (is_null($keys) || $keys['PerId']))
 		{
 			// delete licenses
-			$this->db->delete($this->result_table,array(
+			$this->db->delete(self::LICENSE_TABLE,array(
 				'PerId' => is_null($keys) ? $this->data['PerId'] : $keys['PerId'],
-				'GrpId' => 0,
 			),__LINE__,__FILE__);
 		}
 		return $Ok;
