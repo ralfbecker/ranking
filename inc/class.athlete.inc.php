@@ -153,6 +153,10 @@ class athlete extends so_sql
 				}
 			}
 		}
+		if (array_key_exists('license',$data) && !$data['license'])
+		{
+			$data['license'] = 'n';
+		}
 		return $data;
 	}
 
