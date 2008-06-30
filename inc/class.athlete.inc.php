@@ -562,6 +562,31 @@ class athlete extends so_sql
 	 * Set the license for a given year
 	 *
 	 * @param int $year
+	 * @param string $nation nation for a national license, or null for an international one
+	 * @param int $PerId=null else use $this->data[PerId]
+	 * @return string|boolean false on wrong parameter or string with license status ('n' for no license)
+	 */
+	function get_license($year,$nation,$PerId=null)
+	{
+		if (!(int)$year) return false;
+
+		if ($nation == 'NULL') $nation = null;
+
+		if (!($status = $this->db->select(self::LICENSE_TABLE,'lic_status',array(
+			'PerId' => is_null($PerId) ? $this->data['PerId'] : $PerId,
+			'nation' => (string)$nation,
+			'lic_year' => $year,
+		),__LINE__,__FILE__,false,'','ranking')->fetchSingle()))
+		{
+			$status = 'n';
+		}
+		return $status;
+	}
+
+	/**
+	 * Set the license for a given year
+	 *
+	 * @param int $year
 	 * @param string $status 'n' = none, 'a' = applied, 'c' = confirmed, 's' = suspended
 	 * @param int $PerId=null else use $this->data[PerId]
 	 * @param string $nation=null nation for a national license, or null for an international one
@@ -610,6 +635,24 @@ class athlete extends so_sql
 			$this->data['license'] = $status;
 		}
 		//echo "athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
+
+		return $this->db->affected_rows();
+	}
+
+	/**
+	 * Merge the licenses from athlete $from to athlete $to
+	 *
+	 * @param int $from
+	 * @param int $to
+	 * @return int number of merged licenses
+	 */
+	function merge_licenses($from,$to)
+	{
+		if (!(int)$from || !(int)$to)
+		{
+			return false;
+		}
+		$this->db->update(self::LICENSE_TABLE,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
 
 		return $this->db->affected_rows();
 	}
@@ -822,23 +865,5 @@ class athlete extends so_sql
 			}
 		}
 		return $result;
-	}
-
-	/**
-	 * Merge the licenses from athlete $from to athlete $to
-	 *
-	 * @param int $from
-	 * @param int $to
-	 * @return int number of merged licenses
-	 */
-	function merge_licenses($from,$to)
-	{
-		if (!(int)$from || !(int)$to)
-		{
-			return false;
-		}
-		$this->db->update(self::LICENSE_TABLE,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
-
-		return $this->db->affected_rows();
 	}
 }

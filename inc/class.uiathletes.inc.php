@@ -123,6 +123,11 @@ class uiathletes extends boranking
 
 			//echo "<br>uiathletes::edit: content ="; _debug_array($content);
 			$this->athlete->init($content['athlete_data']);
+			// reload license, if nation or year changed
+			if ($content['old_license_nation'] != $content['license_nation'])
+			{
+				$content['athlete_data']['license'] = $content['license'] = $this->athlete->get_license($content['license_year'],$content['license_nation']);
+			}
 			$this->athlete->data['license'] = $content['athlete_data']['license'];
 			$old_geb_date = $this->athlete->data['geb_date'];
 
@@ -371,7 +376,8 @@ class uiathletes extends boranking
 				'referer' => $content['referer'],
 				'row' => (int)$_GET['row'] ? (int)$_GET['row'] : $content['row'],
 				'license_year' => $content['license_year'],
-				'license_nation' => $content['license_nation']
+				'license_nation' => $content['license_nation'],
+				'old_license_nation' => $content['license_nation'],
 			),2);
 	}
 
