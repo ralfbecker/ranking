@@ -318,13 +318,14 @@ class uiathletes extends boranking
 		);
 		$edit_rights = $this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights);
 		$readonlys = array(
-			'delete' => !$this->athlete->data[$this->athlete->db_key_cols[$this->athlete->autoinc_id]] || !$edit_rights,
+			'delete' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->data['comp'],
 			'nation' => !!$this->only_nation_athlete,
 			'edit'   => $view || !$edit_rights,
 			'apply_license' => in_array($content['license'],array('s','c')) || !$this->acl_check($content['nation'],EGW_ACL_ADD),
 			'license'=> !$this->acl_check('NULL',EGW_ACL_ADD),
-			'merge' => !$edit_rights || !$this->athlete->data['PerId'],
-			'merge_to' => !$edit_rights || !$this->athlete->data['PerId'],
+			// for now disable merge, if user is no admin: !$this->is_admin || (can be removed later)
+			'merge' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
+			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 		);
 		if (!$readonlys['merge_to'] && !$content['merge_to'])
 		{
