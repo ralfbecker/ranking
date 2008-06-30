@@ -796,7 +796,22 @@ class athlete extends so_sql
 		{
 			foreach($athletes as $athlete)
 			{
-				$result[$athlete['PerId']] = $this->link_title($athlete);
+				if ($athlete['geb_year'])
+				{
+					$geb = $athlete['geb_year'];
+					if ($athlete['geb_date'])
+					{
+						$geb = explode('-',$athlete['geb_date']);
+						$geb = $GLOBALS['egw']->common->dateformatorder($geb[0],$geb[1],$geb[2],true);
+					}
+				}
+				$result[$athlete['PerId']] = array(
+					'label' => $this->link_title($athlete),
+					'title' => ($athlete['geb_year'] ? $geb.': ' : '').
+						($athlete['ort'] ? $athlete['ort'] : '').
+						($athlete['ort'] && $athlete['verband'] ? ', ' : '').
+						($athlete['verband'] ? $athlete['verband'] : ''),
+				);
 			}
 		}
 		return $result;
