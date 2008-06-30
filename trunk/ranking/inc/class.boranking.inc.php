@@ -1369,6 +1369,7 @@ class boranking extends soranking
 				$name == 'verband' && substr($value,0,strlen($to[$name])) == $to[$name])	// federation from to is parent fed of the one from from
 			{
 				$to[$name] = $value;	// --> overwrite to value with the one from from
+				if ($name == 'verband') $to['fed_id'] = $from['fed_id'];
 			}
 		}
 		$this->athlete->init($to);
