@@ -189,7 +189,9 @@ class uiregistration extends boranking
 					'nation'   => $_GET['nation'],
 					'cat'      => $_GET['cat'],
 				);
-				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'],'',$this->license_year)))
+				if($content['comp']) $comp = $this->comp->read($content['comp']);
+
+				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'],'',$this->license_year,$comp['nation'])))
 				{
 					$content['nation'] = $athlete['nation'];
 				}
@@ -200,8 +202,10 @@ class uiregistration extends boranking
 				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
 			}
 		}
-		if($content['comp']) $comp = $this->comp->read($content['comp']);
-
+		elseif($content['comp'])
+		{
+			$comp = $this->comp->read($content['comp']);
+		}
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
 			$readonlys['calendar'] = $readonlys['comp'] = true;
@@ -280,11 +284,11 @@ class uiregistration extends boranking
 				{
 					list($athlete) = $content['register'] ? each($content['register']) : each($content['delete']);
 					list($cat,$athlete) = explode('/',$athlete);
-					$athlete = $this->athlete->read($athlete,'',$this->license_year);
+					$athlete = $this->athlete->read($athlete,'',$this->license_year,$comp['nation']);
 				}
 				if (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']) ||
 					$cat['sex'] && $athlete['sex'] != $cat['sex'] ||
-					$athlete['license'] == 'n' && !$this->is_admin && !$this->is_judge($comp))
+					$content['register'] && $athlete['license'] == 'n' && !$this->is_admin && !$this->is_judge($comp))
 				{
 					//_debug_array($cat);
 					//_debug_array($comp);
