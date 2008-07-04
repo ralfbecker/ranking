@@ -102,6 +102,7 @@ class ranking_federation_ui extends boranking
 			{
 				list($fed_id) = each($content['nm']['rows']['edit']);
 				$content['fed'] = $this->federation->read($fed_id);
+				$content['fed']['grants'] = $this->federation->get_grants();
 			}
 			elseif ($this->is_admin && $content['nm']['rows']['delete'])
 			{
@@ -131,7 +132,8 @@ class ranking_federation_ui extends boranking
 						}
 						elseif ($this->is_admin && $this->federation->save($content['fed']) == 0)
 						{
-							$content['fed'] = $this->federation->data;
+							$this->federation->set_grants($content['fed']['grants']);
+							$content['fed'] = $this->federation->data + array('grants' => $content['fed']['grants']);
 							$msg = lang('Federation saved.');
 						}
 						else

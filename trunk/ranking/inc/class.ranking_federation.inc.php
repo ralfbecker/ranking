@@ -48,7 +48,7 @@ class ranking_federation extends so_sql
 	 */
 	function __construct($source_charset='',$db=null)
 	{
-		$this->so_sql(self::APPLICATION,self::FEDERATIONS_TABLE,$db);	// call constructor of derived class
+		$this->so_sql(self::APPLICATION,self::FEDERATIONS_TABLE,$db);   // call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
@@ -84,7 +84,7 @@ class ranking_federation extends so_sql
 		$feds = array();
 		$where = $nation ? array('nation' => $nation) : array();
 		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$where,__LINE__,__FILE__,false,
-			'ORDER BY nation ASC,verband ASC','ranking') as $fed)
+			'ORDER BY nation ASC,verband ASC',self::APPLICATION) as $fed)
 		{
 			$feds[$fed['fed_id']] = (!$nation ? $fed['nation'].': ' : '').$fed['verband'];
 		}
@@ -176,6 +176,51 @@ class ranking_federation extends so_sql
 	}
 
 	/**
+	 * Delete reimplemented to delete the grants in the ACL table too
+	 *
+	 * @param array $keys if given array with col => value pairs to characterise the rows to delete
+	 * @return int affected rows, should be 1 if ok, 0 if an error
+	 */
+	function delete($keys=null)
+	{
+		if (!$keys) return 0;
+
+		// get the fed_id's from the keys
+		if (!is_array($keys))
+		{
+			$fed_ids = array($keys);
+		}
+		elseif(count($keys) == 1 && isset($keys['fed_id']))
+		{
+			$fed_ids = $keys['fed_id'];
+		}
+		elseif(($rows = $this->search($keys)))
+		{
+			foreach($rows as $row)
+			{
+				$fed_ids[] = $row['fed_id'];
+			}
+		}
+		else
+		{
+			return 0;	// nothing to do
+		}
+		// delete the grants
+		foreach($fed_ids as $fed_id)
+		{
+			$this->delete_grants($fed_id);
+		}
+		// todo: make all children top-level feds
+		$this->db->update(self::FEDERATIONS_TABLE,array('fed_parent' => null),array('fed_id' => $fed_ids),__LINE__,__FILE__,self::APPLICATION);
+
+		// delete all Athlete2Fed associations
+		$this->db->delete(self::ATHLETE2FED_TABLE,array('fed_id' => $fed_ids),__LINE__,__FILE__,self::APPLICATION);
+
+		// now let the parent delete the fed(s) itself
+		return parent::delete($keys);
+	}
+
+	/**
 	 * Return id or all fields of a federation specified by name and optional nation
 	 *
 	 * @param string $name
@@ -191,5 +236,174 @@ class ranking_federation extends so_sql
 		$federation = $this->read($where);
 
 		return $id_only && $federation ? $federation['fed_id'] : $federation;
+	}
+
+	/**
+	 * Prefix to get an ACL location from a fed_id
+	 */
+	const ACL_LOCATION_PREFIX = '#';
+	/**
+	 * Available ACL grants of a federation
+	 *
+	 * Grants are valid for athlets of a federation including it's child federations!
+	 *
+	 * @var array
+	 */
+	static $grant_types = array(
+		'athletes' => EGW_ACL_ATHLETE,	// edit athletes
+		'register' => EGW_ACL_REGISTER,	// register athletes for national competitions
+	);
+
+	/**
+	 * Read ACL grants of a federation
+	 *
+	 * @param int $fed_id=null default use fed_id of this object
+	 * @return array
+	 */
+	function get_grants($fed_id=null)
+	{
+		if (is_null($fed_id)) $fed_id = $this->data['fed_id'];
+
+		foreach(self::$grant_types as $name => $right)
+		{
+			$grants[$name] = $GLOBALS['egw']->acl->get_ids_for_location(self::ACL_LOCATION_PREFIX.$fed_id,$right,self::APPLICATION);
+		}
+		return $grants;
+	}
+
+	/**
+	 * Delete ACL grants of a federation
+	 *
+	 * @param int $fed_id=null default use fed_id of this object
+	 */
+	function delete_grants($fed_id=null)
+	{
+		if (is_null($fed_id)) $fed_id = $this->data['fed_id'];
+
+		$GLOBALS['egw']->acl->delete_repository(self::APPLICATION,self::ACL_LOCATION_PREFIX.$fed_id,false);
+	}
+
+	/**
+	 * Set ACL grants of a federation
+	 *
+	 * @param array $grants
+	 * @param int $fed_id=null default use fed_id of this object
+	 */
+	function set_grants(array $grants,$fed_id=null)
+	{
+		if (is_null($fed_id)) $fed_id = $this->data['fed_id'];
+
+		$this->delete_grants($fed_id);
+
+		$accounts = array();
+		foreach(self::$grant_types as $name => $right)
+		{
+			if (is_array($grants[$name])) $accounts = $accounts ? array_unique(array_merge($accounts,$grants[$name])) : $grants[$name];
+		}
+		foreach($accounts as $account)
+		{
+			$rights = 0;
+			foreach(self::$grant_types as $name => $right)
+			{
+				if (in_array($account,$grants[$name])) $rights |= $right;
+			}
+			if ($rights)	// only write rights if there are some
+			{
+				//echo "$nation: $account = $rights<br>";
+				$GLOBALS['egw']->acl->add_repository(self::APPLICATION,self::ACL_LOCATION_PREFIX.$fed_id,$account,$rights);
+			}
+		}
+	}
+
+	/**
+	 * Read federation ACL grants for the current user
+	 *
+	 * @return array with fed_id => rights pairs
+	 */
+	function get_user_grants()
+	{
+		static $grants;
+
+		if (!is_null($grants)) return $grants;
+
+		$grants = array();
+		foreach($GLOBALS['egw']->acl->read() as $data)	// uses the users account and it's memberships
+		{
+			if ($data['appname'] != 'ranking' || $data['location'][0] != ranking_federation::ACL_LOCATION_PREFIX)
+			{
+				continue;
+			}
+			$grants[(int)substr($data['location'],1)] = $data['rights'];
+		}
+		// now include the direkt children (eg. sektionen from the landesverbände)
+		if ($grants && ($children = $this->search(array('fed_parent' => array_keys($grants)),'fed_id,fed_parent')))
+		{
+			foreach($children as $child)
+			{
+				$grants[$child['fed_id']] = $grants[$child['fed_parent']];
+			}
+		}
+		return $grants;
+	}
+
+	/**
+	 * Get the federations for a competition of a given nation, optinal limited to the one the user has registration rights for
+	 *
+	 * For international competitions we just return the nations, for national competitions we return
+	 * fed_id => verband pairs of fed's which are the direct childs of the national federation
+	 * PLUS the nations after them, to allow judges to register international participants
+	 *
+	 * @param string $nation 3-char nation code, null or NULL for international
+	 * @param array $register_rights=null register_rights (array with 3-char nation codes) of current user
+	 * 	to limit returned array to nations/federations the user as registration rights for, or null for all
+	 * @return array with value => label pairs for a selectbox
+	 */
+	function get_competition_federations($nation,array $register_rights=null)
+	{
+		static $comp_feds;
+		//echo "<p>get_competition_federations($nation,".array2string($register_rights).")</p>\n";
+		if ($nation == 'NULL') $nation = null;
+		if (is_null($comp_feds) && !($comp_feds = $GLOBALS['egw']->session->appsession('comp_feds','ranking'))) $comp_feds = array();
+
+		if (!isset($comp_feds[(string)$nation]))
+		{
+			$feds = array();
+			if ($nation)
+			{
+				$nations_feds = 'SELECT fed_id FROM '.self::FEDERATIONS_TABLE.' WHERE nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
+				foreach($this->search(array('nation' => $nation,"fed_parent IN ($nations_feds)"),'fed_id,verband','verband') as $fed)
+				{
+					$feds[$fed['fed_id']] = $nation.': '.$fed['verband'];
+				}
+				$feds[$nation] = $nation;	// show nation itself, directly under the national feds, above the international ones
+			}
+			foreach($this->search(array('fed_parent IS NULL'),'DISTINCT nation,verband,fed_nationname,fed_continent','nation') as $fed)
+			{
+				if ($fed['fed_continent'])	// remove all test feds
+				{
+					$feds[$fed['nation']] = $fed['nation'].': '.$fed['verband'].' ('.lang($fed['fed_nationname']).')';
+				}
+			}
+			// store result in cache and cache in session, to not query it again from DB
+			$comp_feds[(string)$nation] = $feds;
+			$GLOBALS['egw']->session->appsession('comp_feds','ranking',$comp_feds);
+		}
+		else
+		{
+			$feds = $comp_feds[(string)$nation];
+		}
+		if (!is_null($register_rights))
+		{
+			foreach($this->get_user_grants() as $fed_id => $rights)
+			{
+				if ($rights & EGW_ACL_REGISTER)
+				{
+					$register_rights[$fed_id] = $fed_id;
+				}
+			}
+			$feds = array_intersect_key($feds,$register_rights);
+		}
+		//_debug_array($feds);
+		return $feds;
 	}
 }

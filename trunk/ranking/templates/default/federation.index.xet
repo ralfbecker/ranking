@@ -111,6 +111,14 @@
 										<menupopup options="None" id="fed_parent"/>
 									</menulist>
 								</row>
+								<row>
+									<description options="3,,0,0" value="Edit athlete"/>
+									<hbox options="0,0">
+										<listbox type="select-account" rows="5" id="acl[edit]"/>
+										<description value="National registration"/>
+										<listbox type="select-account" rows="5" class="leftPad5" id="acl[register]"/>
+									</hbox>
+								</row>
 							</rows>
 						</grid>
 					</groupbox>

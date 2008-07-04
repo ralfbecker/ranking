@@ -139,7 +139,7 @@ class athlete extends so_sql
 			// echo "<p>athlete::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
 
 			// blank out the acl'ed fields, if user has no athletes rights
-			if (is_object($GLOBALS['boranking']) && !$GLOBALS['boranking']->acl_check($data['nation'],EGW_ACL_ADD))
+			if (is_object($GLOBALS['boranking']) && !$GLOBALS['boranking']->acl_check_athlete($data))
 			{
 				foreach($this->acl2clear as $deny => $to_clear)
 				{
@@ -248,6 +248,8 @@ class athlete extends so_sql
 		$join .= self::FEDERATIONS_JOIN;
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.nation AS nation';
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.verband AS verband';
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_id AS fed_id';
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_parent AS fed_parent';
 
 		// by default only show real athlets (nation and sex set)
 		if (!isset($filter['sex']) && !(isset($criteria['sex']) && $op == 'AND'))
@@ -544,6 +546,7 @@ class athlete extends so_sql
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.nation AS nation';
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.verband AS verband';
 		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_id AS fed_id';
+		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_parent AS fed_parent';
 		$extra_cols[] = self::ATHLETE2FED_TABLE.'.a2f_start AS a2f_start';
 		$extra_cols[] = self::ATHLETE2FED_TABLE.'.a2f_end AS a2f_end';
 
