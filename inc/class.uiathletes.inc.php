@@ -94,8 +94,7 @@ class uiathletes extends boranking
 				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
 			}
 			// we have no edit-rights for that nation
-			if (!$this->is_admin && (!count($this->athlete_rights) || $this->athlete->data['nation'] &&
-				!in_array($this->athlete->data['nation'],$this->athlete_rights) && !in_array('NULL',$this->athlete_rights)))
+			if (!$this->acl_check_athlete($this->athlete->data))
 			{
 				$view = true;
 			}
@@ -136,7 +135,7 @@ class uiathletes extends boranking
 
 			if (($content['save'] || $content['apply']) || $content['apply_license'])
 			{
-				if ($this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights))
+				if ($this->acl_check_athlete($this->athlete->data))
 				{
 					if (!$this->athlete->data['rkey'])
 					{
@@ -191,6 +190,12 @@ class uiathletes extends boranking
 							if ($content['athlete_data']['license'] == 's')
 							{
 								$msg .= ', '.lang('Athlete is suspended !!!');
+								$required_missing = true;	// to not download the form
+							}
+							elseif(!$this->acl_check_athlete($this->athlete->data,EGW_ACL_ATHLETE,null,$content['license_nation']))
+							{
+								$msg .= ', '.lang('You are not permitted to apply for a license!');
+								$required_missing = true;	// to not download the form
 							}
 							elseif ($content['athlete_data']['license'] != 'a')
 							{
@@ -223,8 +228,7 @@ class uiathletes extends boranking
 									($content['license_nation']?' '.$content['license_nation']:''));
 							}
 							// download form
-							if (file_exists($this->license_form_name($content['license_nation'],$content['license_year'])) &&
-								!$required_missing && $content['athlete_data']['license'] != 's')
+							if (file_exists($this->license_form_name($content['license_nation'],$content['license_year'])) && !$required_missing)
 							{
 								$link = $GLOBALS['egw']->link('/index.php',array(
 									'menuaction' => 'ranking.uiathletes.licenseform',
@@ -235,8 +239,9 @@ class uiathletes extends boranking
 								$js .= "window.location='$link';";
 							}
 						}
+						// change of license status, requires athlete rights for the license-nation
 						elseif ($content['athlete_data']['license'] != $content['license'] &&
-							$this->acl_check('NULL',EGW_ACL_ADD))	// you need int. athlete rights
+							$this->acl_check($content['license_nation'],EGW_ACL_ATHLETE))	// you need int. athlete rights
 						{
 							$this->athlete->set_license($content['license_year'],$content['license'],null,$content['license_nation']);
 						}
@@ -254,20 +259,10 @@ class uiathletes extends boranking
 			}
 			if ($content['delete'])
 			{
-				if (in_array($content['nation'],$this->athlete_rights))
-				{
-					$link = $GLOBALS['egw']->link('/index.php',array(
-						'menuaction' => 'ranking.uiathletes.index',
-						'delete' => $this->athlete->data['PerId'],
-					));
-				}
-				else
-				{
-					$link = $GLOBALS['egw']->link('/index.php',array(
-						'menuaction' => 'ranking.uiathletes.index',
-						'msg' => lang('Permission denied !!!'),
-					));
-				}
+				$link = $GLOBALS['egw']->link('/index.php',array(
+					'menuaction' => 'ranking.uiathletes.index',
+					'delete' => $this->athlete->data['PerId'],
+				));
 				$js = "window.opener.location='$link';";
 			}
 			if ($content['save'] || $content['delete'] || $content['cancel'])
@@ -321,13 +316,16 @@ class uiathletes extends boranking
 			'fed_id' => $content['nation'] ? $this->athlete->federations($content['nation']) : array(lang('Select a nation first')),
 			'license_nation' => ($license_nations = $this->license_nations()),
 		);
-		$edit_rights = $this->is_admin || in_array($this->athlete->data['nation'],$this->athlete_rights);
+		$edit_rights = $this->acl_check_athlete($this->athlete->data);
 		$readonlys = array(
 			'delete' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->data['comp'],
 			'nation' => !!$this->only_nation_athlete,
 			'edit'   => $view || !$edit_rights,
-			'apply_license' => in_array($content['license'],array('s','c')) || !$this->acl_check($content['nation'],EGW_ACL_ADD),
-			'license'=> !$this->acl_check('NULL',EGW_ACL_ADD),
+			// show apply license only if status is 'n' or 'a' AND user has right to apply for license
+			'apply_license' => in_array($content['license'],array('s','c')) ||
+				!$this->acl_check_athlete($this->athlete->data,EGW_ACL_ATHLETE,null,$content['license_nation']),
+			// to simply set the license field, you need athlete rights for the nation of the license
+			'license'=> !$this->acl_check($content['license_nation'],EGW_ACL_ATHLETE),
 			// for now disable merge, if user is no admin: !$this->is_admin || (can be removed later)
 			'merge' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
@@ -392,7 +390,7 @@ class uiathletes extends boranking
 	{
 		// fix license nations to not contain international for digital ROCK site, but IFSC
 		$license_nations = $this->ranking_nations;
-		if (isset($license_nations['GER']) && !is_null($nation))
+		if (isset($license_nations['GER']))
 		{
 			unset($license_nations['NULL']);
 		}
@@ -454,31 +452,26 @@ class uiathletes extends boranking
 
 		//_debug_array($rows);
 
+		if($query['filter'] && ($cat = $this->cats->read($query['filter'])))
+		{
+			$license_nation = $cat['nation'];
+		}
+		elseif ($query['col_filter']['nation'])
+		{
+			$license_nation = $query['col_filter']['nation'];
+		}
 		$readonlys = array();
-
 		foreach($rows as $row)
 		{
-			if ($row['last_comp'] || !in_array($row['nation'],$this->athlete_rights))
+			if ($row['last_comp'] || !$this->acl_check_athlete($row))
 			{
 				$readonlys["delete[$row[PerId]]"] = true;
 			}
 			$readonlys["apply_license[$row[PerId]]"] = $row['license'] != 'n' ||
-				!($this->is_admin || in_array($row['nation'],$this->athlete_rights));
+				!$this->acl_check_athlete($row,EGW_ACL_ATHLETE,null,$license_nation?$license_nation:'NULL');
 		}
 		$sel_options['license_nation'] = $this->license_nations();
-		if($query['filter'] && ($cat = $this->cats->read($query['filter'])))
-		{
-			$rows['license_nation'] = $cat['nation'];
-		}
-		elseif ($query['col_filter']['nation'])
-		{
-			$rows['license_nation'] = $query['col_filter']['nation'];
-		}
-		else
-		{
-			unset($rows['license_nation']);
-		}
-
+		$rows['license_nation'] = $license_nation;
 		$rows['sel_options'] =& $sel_options;
 		$rows['no_license'] = $query['filter2'] != '';
 		$rows['license_year'] = $this->license_year;
@@ -509,8 +502,7 @@ class uiathletes extends boranking
 			{
 				$id = $_GET['delete'];
 			}
-			if (!$this->is_admin && $this->athlete->read(array('PerId' => $id)) &&
-				!in_array($this->athlete->data['nation'],$this->athlete_rights))
+			if (!$this->is_admin && $this->athlete->read(array('PerId' => $id)) && !$this->acl_check_athlete($this->athlete->data))
 			{
 				$msg = lang('Permission denied !!!');
 			}
@@ -541,9 +533,9 @@ class uiathletes extends boranking
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
 			);
-			if (count($this->athlete_rights) == 1)
+			if ($this->only_nation_athlete)
 			{
-				$content['nm']['col_filter']['nation'] = $this->athlete_rights[0];
+				$content['nm']['col_filter']['nation'] = $this->only_nation_athlete;
 			}
 		}
 		$readonlys['nm[rows][edit][0]'] = !count($this->athlete_rights);

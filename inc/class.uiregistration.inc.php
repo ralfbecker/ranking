@@ -17,7 +17,9 @@ require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 class uiregistration extends boranking
 {
 	/**
-	 * @var array $public_functions functions callable via menuaction
+	 * functions callable via menuaction
+	 *
+	 * @var array
 	 */
 	var $public_functions = array(
 		'lists'     => true,
@@ -26,11 +28,6 @@ class uiregistration extends boranking
 		'index'     => true,
 		'add'       => true,
 	);
-
-	function uiregistration()
-	{
-		$this->boranking();
-	}
 
 	/**
 	 * query athlets for nextmatch in the athlets list
@@ -122,7 +119,7 @@ class uiregistration extends boranking
 		$show_all = $content['show_all'];
 
 		if (!($comp = $this->comp->read($comp)) || 			// unknown competition
-			!$this->acl_check($nation,EGW_ACL_REGISTER,$comp) || 	// no rights for that nation
+			!$this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER,$comp) || // no rights for that nation/federation
 			!($cat  = $this->cats->read($cat ? $cat : $comp['gruppen'][0])) ||	// unknown category
 			(!in_array($cat['rkey'],$comp['gruppen'])))		// cat not in this competition
 		{
@@ -139,7 +136,6 @@ class uiregistration extends boranking
 				'order'          =>	'last_comp',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'col_filter'     => array(
-					'nation' => $nation,
 					'license_nation' => $comp['nation'],
 					'license_year'   => (int)$comp['datum'],
 				),
@@ -147,6 +143,18 @@ class uiregistration extends boranking
 				'csv_fields'     => false,
 			),
 		);
+		if ($nation && !is_numeric($nation))
+		{
+			$content['nm']['col_filter']['nation'] = $nation;
+			if (!$show_all && $_GET['nation'] && $cat['nation'] && $_GET['nation'] != $cat['nation'])
+			{
+				$show_all = true;	// automatic show all cat's if cat has a nation and the given one does not match
+			}
+		}
+		elseif (is_numeric($nation))
+		{
+			$content['nm']['col_filter'][] = '(fed_parent='.(int)$nation.' OR fed_id='.(int)$nation.')';
+		}
 		$content += array(
 			'comp_name' => $comp ? $comp['name'] : '',
 			'cat'       => $cat['GrpId'],
@@ -193,7 +201,8 @@ class uiregistration extends boranking
 
 				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'],'',$this->license_year,$comp['nation'])))
 				{
-					$content['nation'] = $athlete['nation'];
+					$nation = $content['nation'] = $comp['nation'] && $comp['nation'] == $athlete['nation'] && $athlete['fed_parent'] ?
+						$athlete['fed_parent'] : $athlete['nation'];
 				}
 				$GLOBALS['egw']->session->appsession('registration','ranking',$content);
 			}
@@ -202,7 +211,7 @@ class uiregistration extends boranking
 				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
 			}
 		}
-		elseif($content['comp'])
+		if($content['comp'] && !isset($comp))
 		{
 			$comp = $this->comp->read($content['comp']);
 		}
@@ -227,10 +236,20 @@ class uiregistration extends boranking
 		{
 			list($calendar) = each($this->ranking_nations);
 		}
-		$nation = $athlete ? $athlete['nation'] : $content['nation'];
-		if (is_null($nation) && $this->only_nation_register && !$this->is_judge($comp))
+		if (!isset($nation))
 		{
-			$nation = $this->only_nation_register;
+			$nation = $content['nation'];
+		}
+		if (is_null($nation) && !$this->is_judge($comp))
+		{
+			if ($this->only_nation_register)
+			{
+				$nation = $this->only_nation_register;
+			}
+			else
+			{
+				list($nation) = @each($this->federation->get_user_grants());
+			}
 		}
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
@@ -239,14 +258,12 @@ class uiregistration extends boranking
 				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
+			'nation' => $this->federation->get_competition_federations($comp['nation'],
+				!$this->is_admin && !$this->is_judge($comp) ? $this->register_rights : null),	// limit non-judge to feds user has registration rights
 		);
 		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
 		{
 			$select_options['comp'][$comp['WetId']] = $comp['name'];
-		}
-		foreach($this->is_judge($comp) ? $this->athlete->distinct_list('nation') : $this->register_rights as $nat)
-		{
-			$select_options['nation'][$nat] = $nat;
 		}
 		// check if a valid competition is selected
 		if ($comp)
@@ -356,17 +373,27 @@ class uiregistration extends boranking
 					'download' => 1,
 				));
 			}
-			$starters =& $this->result->read(array(
+			$where = array(
 				'WetId'  => $comp['WetId'],
 				'GrpId'  => -1,
-			)+($nation ? array(
-				'nation' => $nation,
-			):array()),'',true,'nation,GrpId,reg_nr');
-			//_debug_array($starters);
+			);
+			if ($nation)	// filter by given nation/federation
+			{
+				if (!$comp['nation'] || $nation == $comp['nation'])	// int. competition
+				{
+					$where['nation'] = $nation;
+				}
+				else		// national competition
+				{
+					$where[] = is_numeric($nation) ? 'fed_parent='.(int)$nation : 'nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
+				}
+			}
+			$starters =& $this->result->read($where,'',true,$comp['nation'] ? 'nation,fed_parent,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
 
 			$nat = '';
 			$nat_starters = array();
 			$prequal_lines = 0;
+			// if nation/federation selected, show prequalified first
 			if ($nation)
 			{
 				foreach($prequalified as $cat_id => $athletes)
@@ -405,6 +432,7 @@ class uiregistration extends boranking
 					}
 				}
 			}
+			// show the regular registered (not prequalified) starters
 			$rows = array(false,false);	// we need 2 to be the index of the first row
 			$starters[] = array('nation'=>'');	// to get the last line out
 			foreach((array)$starters as $starter)
@@ -417,10 +445,16 @@ class uiregistration extends boranking
 					$readonlys['download'] = $readonlys[$download] = $tmpl->sitemgr && !$starter['platz'] && $starter['pkt'] < 64;
 				}
 				// new nation and data for the previous nation ==> write that data
-				if ($nat != $starter['nation'])
+				$starter_nat_fed = !$comp['nation'] || $starter['nation'] != $comp['nation'] || !$starter['fed_parent'] ?
+					$starter['nation'] : $starter['fed_parent'];
+				if ($nat != $starter_nat_fed)
 				{
 					foreach($nat_starters as $i => $row)
 					{
+						if (is_numeric($nat) && ($fed = $this->federation->read($nat)))
+						{
+							$nat = $fed['fed_shortcut'] ? $fed['fed_shortcut'] : $fed['verband'];
+						}
 						$rows[] = array(
 							'nation' => !$nation || $nat && $nat != $nation || !$nat && $i != $quota ? $nat :
 								($i == $quota ? lang('Complimentary') : lang('Quota')),
@@ -428,7 +462,8 @@ class uiregistration extends boranking
 						$nat = '';
 					}
 					$nat_starters = array();
-					$nat = $starter['nation'];
+					$nat = $starter_nat_fed;
+					// ToDo: quota for national competition depending on category and fed_parent
 					$quota = $comp['host_quota'] && $comp['host_nation'] == $nation ? $comp['host_quota'] : $comp['quota'];
 				}
 				if ($nation && isset($prequalified[$starter['GrpId']][$starter['PerId']]))
@@ -436,7 +471,7 @@ class uiregistration extends boranking
 					continue;	// prequalified athlets are in an own block
 				}
 				// set a new column for an unknown/new rkey/cat
-				if ($starter['nation'] && !isset($cat2col[$starter['GrpId']]))
+				if ($starter_nat_fed /*???*/ && !isset($cat2col[$starter['GrpId']]))
 				{
 					$cat2col[$starter['GrpId']] = $tmpl->num2chrs(count($cat2col));
 				}
@@ -507,6 +542,8 @@ class uiregistration extends boranking
 
 	/**
 	 * Show a result list (from the ranking NOT the result service!)
+	 *
+	 * @return string
 	 */
 	function result()
 	{
@@ -515,6 +552,8 @@ class uiregistration extends boranking
 
 	/**
 	 * Show a start list (from the ranking NOT the result service!)
+	 *
+	 * @return string
 	 */
 	function startlist()
 	{
@@ -527,6 +566,8 @@ class uiregistration extends boranking
 	 * @param array $content
 	 * @param string $msg
 	 * @param string $show='' 'startlist','result' or '' for whatever is availible
+	 *
+	 * @return string
 	 */
 	function lists($content=null,$msg='',$show='')
 	{

@@ -13,6 +13,10 @@
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
 
+/**
+ * Editing athletes data is mapped to EGW_ACL_ADD
+ */
+define('EGW_ACL_ATHLETE',EGW_ACL_ADD);
 define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
 define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
 
@@ -84,6 +88,12 @@ class boranking extends soranking
 	 * @var array
 	 */
 	var $athlete_rights = array();
+	/**
+	 * nations the user is allowed to edit athlets
+	 *
+	 * @var array
+	 */
+	var $athlete_rights_no_judge = array();
 	/**
 	 * nations the user is allowed to register athlets for competitions
 	 */
@@ -164,12 +174,14 @@ class boranking extends soranking
 		// read the nation ACL
 		foreach($GLOBALS['egw']->acl->read() as $data)	// uses the users account and it's memberships
 		{
-			if ($data['appname'] != 'ranking' || $data['location'] == 'run') continue;
-
+			if ($data['appname'] != 'ranking' || $data['location'] == 'run' || $data['location'][0] == ranking_federation::ACL_LOCATION_PREFIX)
+			{
+				continue;
+			}
 			foreach(array(
 				'read_rights'     => EGW_ACL_READ,
 				'edit_rights'     => EGW_ACL_EDIT,
-				'athlete_rights'  => EGW_ACL_ADD,
+				'athlete_rights'  => EGW_ACL_ATHLETE,
 				'register_rights' => EGW_ACL_REGISTER,
 			) as $var => $right)
 			{
@@ -184,6 +196,7 @@ class boranking extends soranking
 		$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
 		$this->user = $GLOBALS['egw_info']['user']['account_id'];
 
+		$this->athlete_rights_no_judge = $this->athlete_rights;
 		$this->athlete_rights = array_merge($this->athlete_rights,$this->judge_athlete_rights());
 		if (in_array('NULL',$this->athlete_rights) || $this->is_admin)
 		{
@@ -244,13 +257,12 @@ class boranking extends soranking
 	/**
 	 * Checks if the user is admin or has ACL-settings for a required right and a nation
 	 *
-	 * Editing athletes data is mapped to EGW_ACL_ADD.
-	 * Having EGW_ACL_ADD or EGW_ACL_REGISTER for NULL=international, is equivalent to having that right for ANY nation.
+	 * Having EGW_ACL_ATHLETE or EGW_ACL_REGISTER for NULL=international, is equivalent to having that right for ANY nation.
 	 * EGW_ACL_RESULT requires _both_ EGW_ACL_EDIT or EGW_ACL_REGISTER (for the nation of the calendar/competition)
 	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international
 	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER|RESULT}
-	 * @param array/int $comp=null competition array or id, default null
+	 * @param array|int $comp=null competition array or id, default null
 	 * @return boolean true if access is granted, false otherwise
 	 */
 	function acl_check($nation,$required,$comp=null)
@@ -270,11 +282,80 @@ class boranking extends soranking
 			else
 			{
 				$acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($nation ? $nation : 'NULL',$required,'ranking') ||
-					($required == EGW_ACL_ADD || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
+					($required == EGW_ACL_ATHLETE || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
 			}
 		}
 		// check competition specific judges rights for REGISTER and RESULT too
 		return $acl_cache[$nation][$required] || $comp && in_array($required,array(EGW_ACL_REGISTER,EGW_ACL_RESULT)) && $this->is_judge($comp);
+	}
+
+	/**
+	 * Check athlete ACL, which uses the nation ACL above, or the federation (and it's parents)
+	 *
+	 * @param array|int $athlete athlete id or data, or array with values for keys 'nation' and 'fed_id'
+	 * @param int $required=EGW_ACL_ATHLETE EGW_ACL_{ATHLETE|REGISTER|RESULT}
+	 * @param array|int $comp=null competition array or id, default null
+	 * @param string $license=null nation for which a license should be applied for, default null=no license (NULL for international)
+	 * @return boolean true if access is granted, false otherwise
+	 */
+	function acl_check_athlete($athlete,$required=EGW_ACL_ATHLETE,$comp=null,$license=null)
+	{
+		static $fed_grants;
+
+		if ($this->is_admin)
+		{
+			$check = true;	// admin has always access
+			$which = 'user is admin';
+		}
+		elseif ($comp && !is_array($comp) && !($comp = $this->comp->read($comp)))
+		{
+			$check = false;	// competition not found
+			$which = 'competition NOT found!';
+		}
+		elseif (!is_array($athlete) && !($athlete = $this->athlete->read($athlete)))
+		{
+			$check = false;	// athlete not found
+			$which = 'athlete NOT found!';
+		}
+		// first check the nation ACL
+		elseif ($this->acl_check($athlete['nation'],$required,$comp))
+		{
+			$check = true;
+			$which = 'national ACL grants access';
+		}
+		// if competition given, we only check the federation if it's a national competition of that athlete!
+		elseif ($comp && !is_numeric($athlete['nation']) && $comp['nation'] != $athlete['nation'])
+		{
+			$check = false;
+			$which = 'WRONG nation of competition (to check federation)';
+		}
+		elseif($license == 'NULL')
+		{
+			$check = false;
+			$which = 'national sub-federation rights allow NOT to apply for an international license!';
+		}
+		// now check if user has rights for the athletes federation (or a parent fed of it)
+		else
+		{
+			if (is_null($fed_grants))
+			{
+				$fed_grants = $this->federation->get_user_grants();
+			}
+			$fed_rights = $fed_grants[$athlete['fed_id']];
+
+			$check = isset($fed_rights) && ($fed_rights & $required);
+			$which = "fed_id=$athlete[fed_id] has rights=$fed_rights";
+		}
+		// do we have to check for a license, jury rights do NOT allow to apply for licenses
+		if ($check && !$this->is_admin && $license)
+		{
+			if (!($check =  $license != NULL && $fed_rights || in_array($license,$this->athlete_rights_no_judge)))
+			{
+				$which = 'jury rights do NOT allow to apply for a license!';
+			}
+		}
+		error_log(__METHOD__."(".array2string($athlete).",$required,".array2string($comp).",$license) ".($check?'TRUE':'FALSE')." ($which)");
+		return $check;
 	}
 
 	/**
@@ -357,7 +438,7 @@ class boranking extends soranking
 		}
 		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
 			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
-			((!$nation || $this->acl_check($nation,EGW_ACL_REGISTER)) && 	// ( user has the necessary registration rights for $nation AND
+			((!$nation || $this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER)) ||	// ( user has the necessary registration rights for $nation AND
 			(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
 			 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
@@ -595,10 +676,10 @@ class boranking extends soranking
 	 * for performance reasons the result is cached in the session
 	 *
 	 * @param mixed $comp complete competition array or WetId/rkey
-	 * @param mixed $do_cat complete category array or GrpId/rkey, or 0 for all cat's of $comp
+	 * @param int $do_cat complete category array or GrpId/rkey, or 0 for all cat's of $comp
 	 * @return array/boolean array of PerId's or false if $comp or $cat not found
 	 */
-	function prequalified($comp,$do_cat=0)
+	function prequalified($comp,$do_cat=0,$prequal_ranking=null)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
@@ -632,6 +713,7 @@ class boranking extends soranking
 					$prequalified[$cat_id] = $this->result->prequalified($comp,$cat_id);
 				}
 				// get athlets prequalified by ranking
+				// ToDo: prequalified might be different per cat
 				if ($comp['prequal_ranking'])
 				{
 					$stand = $comp['datum'];
@@ -658,7 +740,7 @@ class boranking extends soranking
 	 * get all prequalifed athlets of one nation for a given competition in all categories
 	 *
 	 * @param mixed $comp complete competition array or WetId/rkey
-	 * @param string $nation 3-digit nat-code
+	 * @param string|int $nation 3-digit nat-code or integer fed_parent of athletes
 	 * @return array with GrpId => array(PerId => athlete-array)
 	 */
 	function national_prequalified($comp,$nation)
@@ -675,10 +757,18 @@ class boranking extends soranking
 
 		if (count($all_cats))
 		{
-			foreach((array)$this->athlete->search(array(),false,'','','',false,'AND',false,array(
-				'nation' => $nation,
+			$filter = array(
 				'PerId'  => $all_cats,
-			),false) as $athlete)
+			);
+			if (is_numeric($nation) && (is_array($comp) || ($comp = $this->comp->read($comp))) && $comp['nation'])
+			{
+				$filter[] = 'fed_parent='.(int)$nation;
+			}
+			else
+			{
+				$filter['nation'] = $nation;
+			}
+			foreach((array)$this->athlete->search(array(),false,'nachname,vorname','','',false,'AND',false,$filter,false) as $athlete)
 			{
 				foreach($prequalified as $cat => $prequals)
 				{

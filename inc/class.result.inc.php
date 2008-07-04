@@ -103,7 +103,7 @@ class result extends so_sql
 
 				if (!$extra_cols)
 				{
-					$extra_cols = "nachname,vorname,nation,geb_date,pkt & 63 AS reg_nr";
+					$extra_cols = "nachname,vorname,nation,fed_id,fed_parent,geb_date,pkt & 63 AS reg_nr";
 				}
 				else
 				{

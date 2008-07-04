@@ -1,25 +1,26 @@
 <?php
-/**************************************************************************\
-* eGroupWare - digital ROCK Rankings - Administration                      *
-* http://www.egroupware.org, http://www.digitalROCK.de                     *
-* Written and (c) by Ralf Becker <RalfBecker@outdoor-training.de>          *
-* --------------------------------------------                             *
-*  This program is free software; you can redistribute it and/or modify it *
-*  under the terms of the GNU General Public License as published by the   *
-*  Free Software Foundation; either version 2 of the License, or (at your  *
-*  option) any later version.                                              *
-\**************************************************************************/
+/**
+ * eGroupWare digital ROCK Rankings - administration
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
 
-/* $Id$ */
-
+/**
+ * Editing athletes data is mapped to EGW_ACL_ADD
+ *
+ * This is orginally defined in boranking, which is NOT included here.
+ */
+define('EGW_ACL_ATHLETE',EGW_ACL_ADD);
 define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
 
 /**
  * digital ROCK Rankings - Administration
- *
- * @package ranking
- * @author RalfBecker-AT-outdoor-training.de
- * @license GPL
  */
 class admin
 {
@@ -87,14 +88,14 @@ class admin
 					if ($nation == '***new***' && !($nation = strtoupper($data['nation']))) continue;	// no new entry
 
 					$this->acl->delete_repository('ranking',$nation,$account_id ? $account_id : false);
-					
+
 					if ($n == $delete) continue;	// it got deleted
-					
+
 					if ($account_id)
 					{
 						$rights = ($data['read'] ? EGW_ACL_READ : 0) | ($data['edit'] ? EGW_ACL_EDIT|EGW_ACL_READ : 0) |
-							($data['athlets'] ? EGW_ACL_ADD : 0) | ($data['register'] ? EGW_ACL_REGISTER : 0);
-						
+							($data['athlets'] ? EGW_ACL_ATHLETE : 0) | ($data['register'] ? EGW_ACL_REGISTER : 0);
+
 						//echo "$nation: $account_id = $rights<br>";
 						if ($rights) $this->acl->add_repository('ranking',$nation,$account_id,$rights);
 					}
@@ -104,11 +105,11 @@ class admin
 						//echo "<p>$n: $nation: accounts=".print_r($accounts,true).", read=".print_r($data['read'],true).", edit=".print_r($data['edit'],true).", athlets=".print_r($data['athlets'],true)."</p>\n";
 						foreach($accounts as $account)
 						{
-							$rights = (is_array($data['read']) && in_array($account,$data['read']) ? EGW_ACL_READ : 0) | 
+							$rights = (is_array($data['read']) && in_array($account,$data['read']) ? EGW_ACL_READ : 0) |
 								(is_array($data['edit']) && in_array($account,$data['edit']) ? EGW_ACL_EDIT|EGW_ACL_READ : 0) |
-								(is_array($data['athlets']) && in_array($account,$data['athlets']) ? EGW_ACL_ADD : 0) |
+								(is_array($data['athlets']) && in_array($account,$data['athlets']) ? EGW_ACL_ATHLETE : 0) |
 								(is_array($data['register']) && in_array($account,$data['register']) ? EGW_ACL_REGISTER : 0);
-							
+
 							if ($rights)	// only write rights if there are some
 							{
 								//echo "$nation: $account = $rights<br>";
@@ -155,6 +156,12 @@ class admin
 			$content['admin_menu'] = $preserve['admin_menu'];
 		}
 		if (!($nations = $this->acl->get_locations_for_app('ranking'))) $nations = array();
+		// remove federation ACL (location starting with a hash followed by the fed_id)
+		require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_federation.inc.php');
+		foreach($nations as $key => $nation)
+		{
+			if ($nation[0] == ranking_federation::ACL_LOCATION_PREFIX) unset($nations[$key]);
+		}
 		sort($nations);
 		if(($null_key = array_search('NULL',$nations)) !== false) unset($nations[$null_key]);	// to have it always first
 		$nations = array_merge(array('NULL'),$nations);
@@ -169,7 +176,7 @@ class admin
 			foreach(array(
 				'read'     => EGW_ACL_READ,
 				'edit'     => EGW_ACL_EDIT,
-				'athlets'  => EGW_ACL_ADD,
+				'athlets'  => EGW_ACL_ATHLETE,
 				'register' => EGW_ACL_REGISTER,
 			) as $name => $right)
 			{
@@ -202,13 +209,13 @@ class admin
 			$content['msg'] = lang('%1 is an admin and has therefor all rights!',$GLOBALS['egw']->common->grab_owner_name($account_id));
 		}
 		$readonlys['delete['.$n.']'] = true;
-		
+
 		$tmpl =& CreateObject('etemplate.etemplate',$account_id ? 'ranking.admin.user_acl' : 'ranking.admin.acl');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nation ACL').
 			($account_id ? ': '.$GLOBALS['egw']->common->grab_owner_name($account_id) : '');
 		$tmpl->exec('ranking.admin.acl',$content,false,$readonlys,$preserve);
 	}
-	
+
 	/**
 	 * add nation ACL tab to Admin >> Edit user
 	 */
