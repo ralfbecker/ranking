@@ -354,7 +354,7 @@ class boranking extends soranking
 				$which = 'jury rights do NOT allow to apply for a license!';
 			}
 		}
-		error_log(__METHOD__."(".array2string($athlete).",$required,".array2string($comp).",$license) ".($check?'TRUE':'FALSE')." ($which)");
+		//error_log(__METHOD__."(".array2string($athlete).",$required,".array2string($comp).",$license) ".($check?'TRUE':'FALSE')." ($which)");
 		return $check;
 	}
 
@@ -443,7 +443,6 @@ class boranking extends soranking
 			 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
 		//echo "<p>boranking::registration_check(".print_r($comp,true).",'$nation') = $ret</p>\n";
-
 		return $ret;
 	}
 
@@ -1212,7 +1211,7 @@ class boranking extends soranking
 			));
 		}
 		// not sure if the new code still uses that, but it does not hurt ;-)
-		$this->result->save_feldfactor($keys['WetId'],$keys['GrpId'],$feldfactor);
+		$this->result->save_feldfactor($keys['WetId'],$keys['GrpId'],$feldfactor * $comp['faktor']);
 
 		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2lf',$feldfactor));
 	}
