@@ -166,7 +166,7 @@ class competition extends so_sql
 		{
 			$data['judges'] = implode(',',$data['judges']);
 		}
-		foreach(array('prequal_extra' => 'cat','quota_extra' => 'fed') as $name => $key)
+		foreach(array('prequal_extra','quota_extra') as $name)
 		{
 			if (isset($data[$name]) && is_array($data[$name]))
 			{
@@ -174,7 +174,10 @@ class competition extends so_sql
 				foreach($data[$name] as $pair)
 				{
 
-					if ($pair[$key] && $pair['num']) $extra[] = $pair['cat'].':'.$pair['num'].($pair['fed']?':'.$pair['fed']:'');
+					if (($pair['fed'] || $pair['cat']) && $pair['num'])
+					{
+						$extra[] = $pair['cat'].':'.$pair['num'].($pair['fed']?':'.$pair['fed']:'');
+					}
 				}
 				$data[$name] = $extra ? implode(',',$extra) : null;
 			}
