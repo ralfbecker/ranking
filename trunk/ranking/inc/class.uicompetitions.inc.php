@@ -195,13 +195,18 @@ class uicompetitions extends boranking
 				'link' => $linkdata,
 			);
 		}
+		$content['quota_extra'][] = array('fed' => '');		// one extra line to add a new fed or cat value
+		$content['prequal_extra'][] = array('cat' => '');
+
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
 			'serie'     => array(0 => lang('none')) + $this->cup->names(array(
-				'nation'=>$this->comp->data['nation'])),
+				'nation'=> $this->comp->data['nation'])),
 			'nation'    => $this->ranking_nations,
+			'fed'       => $this->federation->get_competition_federations($this->comp->data['nation']),
 			'gruppen'   => $this->cats->names(array('nation' => $this->comp->data['nation'])),
+			'cat'       => $this->cats->names(array('nation' => $this->comp->data['nation']),-1),
 			'prequal_comps' => $this->comp->names(array(
 				!$this->comp->data['datum'] ? 'datum > \''.(date('Y')-2).'\'' :
 					'datum < '.$this->db->quote($this->comp->data['datum']).' AND datum > \''.((int)$this->comp->data['datum']-2).'-01-01\'',

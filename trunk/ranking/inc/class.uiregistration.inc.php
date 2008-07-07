@@ -330,6 +330,11 @@ class uiregistration extends boranking
 					$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete,isset($prequalified[$cat['GrpId']][$athlete['PerId']])) ?
 						lang('%1, %2 registered for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
 						lang('Error: registration');
+					// remember athlete to check later for over quota
+					if ($comp['no_complimentary'] && !isset($prequalified[$cat['GrpId']][$athlete['PerId']]))
+					{
+						$check_athlete_over_quota = $athlete['PerId'];
+					}
 				}
 			}
 			// generate a startlist
@@ -449,6 +454,7 @@ class uiregistration extends boranking
 					$starter['nation'] : $starter['fed_parent'];
 				if ($nat != $starter_nat_fed)
 				{
+					ksort($nat_starters);	// due to $quota < $max_quota, the rows might not be sorted by number/key
 					foreach($nat_starters as $i => $row)
 					{
 						if (is_numeric($nat) && ($fed = $this->federation->read($nat)))
@@ -456,16 +462,17 @@ class uiregistration extends boranking
 							$nat = $fed['fed_shortcut'] ? $fed['fed_shortcut'] : $fed['verband'];
 						}
 						$rows[] = array(
-							'nation' => !$nation || $nat && $nat != $nation || !$nat && $i != $quota ? $nat :
-								($i == $quota ? lang('Complimentary') : lang('Quota')),
+							'nation' => !$nation || $nat && $nat != $nation || !$nat && $i != $max_quota ? $nat :
+								($i == $max_quota ? lang('Complimentary') : lang('Quota')),
 						) + $row;
 						$nat = '';
 					}
 					$nat_starters = array();
 					$nat = $starter_nat_fed;
-					// ToDo: quota for national competition depending on category and fed_parent
-					$quota = $comp['host_quota'] && $comp['host_nation'] == $nation ? $comp['host_quota'] : $comp['quota'];
+					$max_quota = $this->comp->max_quota($starter_nat_fed,$comp);
 				}
+				$quota = $this->comp->quota($starter_nat_fed,$starter['GrpId'],$comp);
+
 				if ($nation && isset($prequalified[$starter['GrpId']][$starter['PerId']]))
 				{
 					continue;	// prequalified athlets are in an own block
@@ -477,7 +484,14 @@ class uiregistration extends boranking
 				}
 				$col = $cat2col[$starter['GrpId']];
 				// find first free line to add that starter
-				for ($i = 0; isset($nat_starters[$i][$col]); ++$i) ;
+				for ($i = 0; isset($nat_starters[$i][$col]) || $i >= $quota && $i < $max_quota; ++$i) ;
+				// check if newly registered athlete is over quota AND we have no complimentary list
+				if ($check_athlete_over_quota && $starter['PerId'] == $check_athlete_over_quota && $i >= $quota)
+				{
+					$this->register($comp['WetId'],$starter['GrpId'],$starter['PerId'],2);	// delete starter again
+					$msg = lang('No complimentary list (over quota)')." quota=$quota!";
+					continue;
+				}
 				$delete_button = 'delete['.$starter['GrpId'].'/'.$starter['PerId'].']';
 				$nat_starters[$i][$col] = $starter+array(
 					'cn' => strtoupper($starter['nachname']).', '.$starter['vorname'],

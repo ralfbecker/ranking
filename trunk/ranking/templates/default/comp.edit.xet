@@ -97,7 +97,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
 				<column width="15%"/>
@@ -107,14 +107,34 @@
 			<rows>
 				<row class="row">
 					<description options=",,,deadline" value="Registration deadline"/>
-					<date options="Y-m-d" id="deadline" statustext="Until which date (incl.) are registrations allowed" span="all"/>
+					<date options="Y-m-d" id="deadline" statustext="Until which date (incl.) are registrations allowed"/>
+					<checkbox label="No complimentary list (over quota)" id="no_complimentary"/>
 				</row>
 				<row class="row">
 					<description options=",,,quota" value="Quota"/>
 					<menulist>
 						<menupopup type="select-number" options="Select one,1,10,1" id="quota"/>
 					</menulist>
-					<description/>
+					<grid spacing="0" padding="1" id="quota_extra">
+						<columns>
+							<column/>
+							<column/>
+							<column/>
+						</columns>
+						<rows>
+							<row>
+								<menulist>
+									<menupopup options="Federation" id="${row}[fed]"/>
+								</menulist>
+								<menulist>
+									<menupopup options="Category" id="${row}[cat]"/>
+								</menulist>
+								<menulist>
+									<menupopup type="select-number" options="None,1,10" id="${row}[num]"/>
+								</menulist>
+							</row>
+						</rows>
+					</grid>
 				</row>
 				<row class="row">
 					<description options=",,,host_quota" value="Host quota"/>
@@ -130,9 +150,25 @@
 				</row>
 				<row class="row">
 					<description options=",,,prequal_ranking" value="from the ranking"/>
-					<menulist span="all">
+					<menulist>
 						<menupopup type="select-number" options="None,1,15,1" id="prequal_ranking"/>
 					</menulist>
+					<grid spacing="0" padding="1" id="prequal_extra">
+						<columns>
+							<column/>
+							<column/>
+						</columns>
+						<rows>
+							<row>
+								<menulist>
+									<menupopup options="Category" id="${row}[cat]"/>
+								</menulist>
+								<menulist>
+									<menupopup type="select-number" options="None,1,30" id="${row}[num]"/>
+								</menulist>
+							</row>
+						</rows>
+					</grid>
 				</row>
 				<row class="row" valign="top">
 					<description options=",,,prequal_comps" value="from other competitions"/>
@@ -210,7 +246,7 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox data="" rows="1" cols="4" span="3">
+					<hbox rows="1" cols="4" span="3">
 						<button id="edit" label="Edit" statustext="Edit this competition"/>
 						<button label="Save" id="save" statustext="saves the changes made"/>
 						<button label="Apply" id="apply" statustext="saves the changes made"/>

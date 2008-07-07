@@ -263,11 +263,13 @@ nation if national competition or none for an internatinal one	ranking	de	Nation
 nation the athlete is competing for	ranking	de	Nation für die der Athlete startet
 nation to use (empty = international)	ranking	de	Nation (leer = international)
 nation, birthyear and gender have to be identical to merge, the names have to be similar!	ranking	de	Nation, Geburtsjahr und Geschlecht müssen identisch sein zum Vereinigen, die Namen müssen ähnlich sein!
+national registration	ranking	de	Nationale Registrierung
 national team ranking	ranking	de	Nationen-Team-Rangliste
 nationname	ranking	de	Name des Landes
 nations and federations	ranking	de	Nationen und Verbände
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	de	Kein Wettkampf (&comp=XYZ) und kein Cup (&cup=XYZ) über die URL ausgewählt!
+no complimentary list (over quota)	ranking	de	Keine Komplimentärliste (über die Quote hinaus)
 no federation selected to edit!	ranking	de	Kein Verband zum bearbeiten ausgewählt!
 no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Runde angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
