@@ -929,3 +929,25 @@ DELETE FROM Results WHERE GrpId=0
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.006';
 }
 
+
+function ranking_upgrade1_5_006()
+{
+/*
+ALTER TABLE Wettkaempfe ADD Column prequal_extra VARCHAR(255)
+ALTER TABLE Wettkaempfe ADD Column quota_extra VARCHAR(255)
+ALTER TABLE Wettkaempfe ADD Column no_complimentary TINYINT
+*/
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','prequal_extra',array(
+		'type' => 'varchar',
+		'precision' => '255'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','quota_extra',array(
+		'type' => 'varchar',
+		'precision' => '255'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','no_complimentary',array(
+		'type' => 'bool'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.007';
+}

@@ -39,7 +39,10 @@ $phpgw_baseline = array(
 			'prequal_comp' => array('type' => 'int','precision' => '2'),
 			'prequal_comps' => array('type' => 'varchar','precision' => '64'),
 			'judges' => array('type' => 'varchar','precision' => '64'),
-			'discipline' => array('type' => 'varchar','precision' => '8')
+			'discipline' => array('type' => 'varchar','precision' => '8'),
+			'prequal_extra' => array('type' => 'varchar','precision' => '255'),
+			'quota_extra' => array('type' => 'varchar','precision' => '255'),
+			'no_complimentary' => array('type' => 'bool')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),

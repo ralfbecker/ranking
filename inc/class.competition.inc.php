@@ -124,6 +124,19 @@ class competition extends so_sql
 				($data['duration'] > 1 ? ' - '.(int)date('d',$end).'. ' : '').lang(date('F',$end)).' '.$y;
 			//echo "<p>y=$y, m=$m, d=$d, duration=$data[duration], start=$start, end=$end=$data[date_end], span=$data[date_span]</p>\n";
 		}
+		foreach(array('prequal_extra','quota_extra') as $name)
+		{
+			if (isset($data[$name]) && $data[$name])
+			{
+				$extra = array();
+				foreach(explode(',',$data[$name]) as $pair)
+				{
+					list($cat,$num,$fed) = explode(':',$pair);
+					$extra[] = array('cat' => $cat,'num' => $num,'fed' => $fed);
+				}
+				$data[$name] = $extra;
+			}
+		}
 		return $data;
 	}
 
@@ -153,11 +166,110 @@ class competition extends so_sql
 		{
 			$data['judges'] = implode(',',$data['judges']);
 		}
+		foreach(array('prequal_extra' => 'cat','quota_extra' => 'fed') as $name => $key)
+		{
+			if (isset($data[$name]) && is_array($data[$name]))
+			{
+				$extra = array();
+				foreach($data[$name] as $pair)
+				{
+
+					if ($pair[$key] && $pair['num']) $extra[] = $pair['cat'].':'.$pair['num'].($pair['fed']?':'.$pair['fed']:'');
+				}
+				$data[$name] = $extra ? implode(',',$extra) : null;
+			}
+		}
 		if (count($data) && $this->source_charset)
 		{
 			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
+	}
+
+	/**
+	 * Get the number of athlets prequalified from the ranking, depending on the cat
+	 *
+	 * @param int $cat integer GrpId
+	 * @param array $comp=null competition data, default use $this->data
+	 * @return integer
+	 */
+	function prequal_ranking($cat=null,array $comp=null)
+	{
+		if (is_null($comp))
+		{
+			$comp =& $this->data;
+		}
+		if ($cat && is_array($comp['prequal_extra']))
+		{
+			foreach($comp['prequal_extra'] as $pair)
+			{
+				if ($pair['cat'] == $cat) return $pair['num'];
+			}
+		}
+		return $comp['prequal_ranking'];
+	}
+
+	/**
+	 * Get the quota, depending on federation/nation and cat
+	 *
+	 * @param int|string $fed integer fed_id or string 3-char nation
+	 * @param int $cat integer GrpId
+	 * @param array $comp=null competition data, default use $this->data
+	 * @return integer
+	 */
+	function quota($fed=null,$cat=null,array $comp=null)
+	{
+		if (is_null($comp))
+		{
+			$comp =& $this->data;
+		}
+		if (($fed || $cat) && is_array($comp['quota_extra']))
+		{
+			foreach($comp['quota_extra'] as $data)
+			{
+				if ($fed == $data['fed'] && $cat == $data['cat'])
+				{
+					$quota = $data['num'];
+					break;	// exact match, no further check
+				}
+				if (!isset($quota) && ($fed && $fed == $data['fed'] && !$data['cat'] || $cat && $cat == $data['cat'] && !$data['fed']))
+				{
+					$quota = $data['num'];
+				}
+			}
+		}
+		if (!isset($quota))
+		{
+			$quota = $fed && $fed == $comp['host_nation'] ? $comp['host_quota'] : $comp['quota'];
+		}
+		//echo "<p>".__METHOD__."($fed,$cat,".array2string($comp).") = $quota</p>\n";
+		return $quota;
+	}
+
+	/**
+	 * Get the maximum quota for a federation
+	 *
+	 * @param int|string $fed integer fed_id or string 3-char nation
+	 * @param array $comp=null competition data, default use $this->data
+	 * @return int
+	 */
+	function max_quota($fed=null,array $comp=null)
+	{
+		if (is_null($comp))
+		{
+			$comp =& $this->data;
+		}
+		$quota = $fed && $fed == $comp['host_nation'] ? $comp['host_quota'] : $comp['quota'];
+
+		foreach((array)$comp['quota_extra'] as $data)
+		{
+			if ($quota < $data['num'] && $fed == $data['fed'])
+			{
+				$quota = $data['num'];
+			}
+		}
+		//echo "<p>".__METHOD__."($fed,".array2string($comp).") = $quota</p>\n";
+		return $quota;
 	}
 
 	/**

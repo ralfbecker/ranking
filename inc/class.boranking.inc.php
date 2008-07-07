@@ -678,7 +678,7 @@ class boranking extends soranking
 	 * @param int $do_cat complete category array or GrpId/rkey, or 0 for all cat's of $comp
 	 * @return array/boolean array of PerId's or false if $comp or $cat not found
 	 */
-	function prequalified($comp,$do_cat=0,$prequal_ranking=null)
+	function prequalified($comp,$do_cat=0)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
@@ -712,15 +712,14 @@ class boranking extends soranking
 					$prequalified[$cat_id] = $this->result->prequalified($comp,$cat_id);
 				}
 				// get athlets prequalified by ranking
-				// ToDo: prequalified might be different per cat
-				if ($comp['prequal_ranking'])
+				if (($prequal_ranking = $this->comp->prequal_ranking($cat_id,$comp)))
 				{
 					$stand = $comp['datum'];
 					$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);
 
 					foreach((array)$ranking as $athlet)
 					{
-						if ($athlet['platz'] > $comp['prequal_ranking']) break;
+						if ($athlet['platz'] > $prequal_ranking) break;
 
 						if (!in_array($athlet['PerId'],$prequalified[$cat_id]))
 						{
@@ -797,7 +796,7 @@ class boranking extends soranking
 	 */
 	function register($comp,$cat,$athlete,$mode=0)
 	{
-		//echo "<p>boranking::register($comp,$cat,$athlete$athlete[PerId],$mode)</p>\n";
+		if ($this->debug) echo "<p>boranking::register($comp,$cat,".(is_array($athlete)?$athlete['PerId']:$athlete).",$mode)</p>\n";
 		if (!$comp || !$cat || !$athlete) return false;
 
 		if ((int)$mode == 2)	// de-register

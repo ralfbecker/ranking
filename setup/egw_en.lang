@@ -263,11 +263,13 @@ nation if national competition or none for an internatinal one	ranking	en	nation
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
 nation to use (empty = international)	ranking	en	Nation to use (empty = international)
 nation, birthyear and gender have to be identical to merge, the names have to be similar!	ranking	en	Nation, birthyear and gender have to be identical to merge, the names have to be similar!
+national registration	ranking	en	National registration
 national team ranking	ranking	en	National team ranking
 nationname	ranking	en	Nationname
 nations and federations	ranking	en	Nations and Federations
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	en	No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	en	No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!
+no complimentary list (over quota)	ranking	en	No complimentary list (over quota)
 no federation selected to edit!	ranking	en	No federation selected to edit!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous heat!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
