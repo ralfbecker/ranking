@@ -715,8 +715,17 @@ class boranking extends soranking
 				if (($prequal_ranking = $this->comp->prequal_ranking($cat_id,$comp)))
 				{
 					$stand = $comp['datum'];
-					$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);
-
+					if (in_array($cat_id,array(48,49,50,11,12,13)))		// german youth does NOT use ranking, but cup result since 2008!
+					{
+						if (!($ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$comp['serie'])))
+						{
+							$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,'JC_'.(date('y')-1));	// previous year
+						}
+					}
+					else
+					{
+						$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);
+					}
 					foreach((array)$ranking as $athlet)
 					{
 						if ($athlet['platz'] > $prequal_ranking) break;
