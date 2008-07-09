@@ -103,7 +103,7 @@ class result extends so_sql
 
 				if (!$extra_cols)
 				{
-					$extra_cols = "nachname,vorname,nation,fed_id,fed_parent,geb_date,pkt & 63 AS reg_nr";
+					$extra_cols = "nachname,vorname,nation,".athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
 				}
 				else
 				{
@@ -311,13 +311,14 @@ class result extends so_sql
 	 */
 	function &cup_results($SerId,$PktId,$cats,$stand,$allowed_nations)
 	{
-		$this->db->query('SELECT p.*,'.athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,s.pkt,r.WetId,r.GrpId'.
-			" FROM $this->result_table r,$this->comp_table w,$this->pkte_table s,$this->athlete_table p".athlete::FEDERATIONS_JOIN.
-			' WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.platz > 0'.
+		$this->db->query("SELECT $this->athlete_table.*,".
+			athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,s.pkt,r.WetId,r.GrpId'.
+			" FROM $this->result_table r,$this->comp_table w,$this->pkte_table s,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
+			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.platz > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND w.serie='.(int) $SerId.' AND r.platz=s.platz AND s.PktId='.(int) $PktId.
 			' AND s.pkt > 0 AND w.datum <= '.$this->db->quote($stand).
-			($allowed_nations ? ' AND p.nation IN (\'' . implode("','",$allowed_nations) . "')" : '').
+			($allowed_nations ? ' AND '.athlete::FEDERATIONS_TABLE.'.nation IN (\'' . implode("','",$allowed_nations) . "')" : '').
 			' ORDER BY r.PerId,s.pkt DESC',__LINE__,__FILE__);
 
 		$results = array();
@@ -342,13 +343,14 @@ class result extends so_sql
 	{
 		//list($usec,$sec) = explode(' ',microtime()); $s_time = (float)$usec + (float)$sec;
 
-		$this->db->query($sql='SELECT p.*,'.athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
-			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table p".athlete::FEDERATIONS_JOIN.
-			' WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0'.
+		$this->db->query($sql="SELECT $this->athlete_table.*,".
+			athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
+			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
+			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
 			' AND r.GrpId '.(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
-			($from_year && $to_year ? ' AND NOT ISNULL(p.geb_date) AND '.
-			(int) $from_year.' <= YEAR(p.geb_date) AND YEAR(p.geb_date) <= '.(int) $to_year : '').
+			($from_year && $to_year ? ' AND NOT ISNULL(geb_date) AND '.
+			(int) $from_year.' <= YEAR(geb_date) AND YEAR(geb_date) <= '.(int) $to_year : '').
 			' ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__);
 
 		$results = array();
