@@ -16,10 +16,6 @@ if (isset($_SERVER['HTTP_HOST']))	// security precaution: forbit calling admin-c
 {
 	die('<h1>import-cli.php must NOT be called as web-page --> exiting !!!</h1>');
 }
-if ($_SERVER['argc'] <= 2)
-{
-	usage();
-}
 $arguments = $_SERVER['argv'];
 array_shift($arguments);	// remove cmd
 // this is kind of a hack, as the autocreate_session_callback can not change the type of the loaded account-class
@@ -41,6 +37,11 @@ $GLOBALS['egw_info'] = array(
 );
 
 include(dirname(__FILE__).'/../header.inc.php');
+
+if ($_SERVER['argc'] <= 2)
+{
+	usage();
+}
 
 /**
  * Exit the script with a numeric exit code and an error-message, does NOT return
@@ -103,6 +104,7 @@ function usage($ret=0)
 	echo "--cat id or rkey of a category to import, default import all categories of a competition\n";
 	echo "--download download files into current directory, instead of importing them\n";
 	echo "--quali-type sets the qualification type:\n";
+	if (!is_object($GLOBALS['boresult'])) $GLOBALS['boresult'] = CreateObject('ranking.boresult');
 	foreach($GLOBALS['boresult']->quali_types as $num => $label)
 	{
 		echo "\t$num\t$label\n";
