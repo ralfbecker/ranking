@@ -314,7 +314,7 @@ class athlete extends so_sql
 			if (is_numeric($cat))	// add join to filter for a category
 			{
 				$cat = (int) $cat;
-				$join .= "JOIN $this->result_table ON GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+				$join .= " JOIN $this->result_table ON GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
 
 				// if cat uses an age-group only show athlets in that age-group
 				if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))

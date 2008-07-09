@@ -153,7 +153,7 @@ class uiregistration extends boranking
 		}
 		elseif (is_numeric($nation))
 		{
-			$content['nm']['col_filter'][] = '(fed_parent='.(int)$nation.' OR fed_id='.(int)$nation.')';
+			$content['nm']['col_filter'][] = '(fed_parent='.(int)$nation.' OR '.athlete::FEDERATIONS_TABLE.'.fed_id='.(int)$nation.')';
 		}
 		$content += array(
 			'comp_name' => $comp ? $comp['name'] : '',
