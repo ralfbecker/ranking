@@ -29,6 +29,7 @@ add new athlete with the given data	ranking	de	Neuen Athleten mit den gegebenen 
 add not existing athletes to the database, use with caution!	ranking	de	Nicht existierende Athleten zur Datenbank hinzufügen, mit Vorsicht benutzen!
 add to parent federation opened for editing	ranking	de	Hinzufügen zu zum Bearbeiten geöffneten übergeordneten Verband
 admin rights required!	ranking	de	Administrator Rechte erforderlich!
+administrated by: parent federation	ranking	de	Verwaltet von: übergeordnetem Verband
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen

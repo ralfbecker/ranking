@@ -32,8 +32,21 @@ class athlete extends so_sql
 	const RESULT_TABLE = 'Results';
 	const ATHLETE2FED_TABLE = 'Athlete2Fed';
 	const FEDERATIONS_TABLE = 'Federations';
-	const FEDERATIONS_JOIN = ' JOIN Athlete2Fed USING(PerId) JOIN Federations USING(fed_id)';
+	//const FEDERATIONS_JOIN = ' JOIN Athlete2Fed USING(PerId) JOIN Federations USING(fed_id)';
+	const FEDERATIONS_JOIN = ' JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 JOIN Federations USING(fed_id) LEFT JOIN Athlete2Fed acl ON Personen.PerId=acl.PerId AND acl.a2f_end=-1';
 	const LICENSE_TABLE = 'Licenses';
+	/**
+	 * extra colums of the federation table (initialisied in init_static)
+	 *
+	 * @var array
+	 */
+	static $fed_cols;
+	/**
+	 * extra colums of the Athlete2Fed table used for read (initialisied in init_static)
+	 *
+	 * @var array
+	 */
+	static $a2f_cols;
 
 	/**
 	 * Federation cols, not longer stored in the athlete table
@@ -57,7 +70,7 @@ class athlete extends so_sql
 		ACL_DENY_STREET    => array('strasse','plz'),
 		ACL_DENY_CITY      => array('ort'),
 		ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','sex','nation','verband','license','acl','last_comp',
-			'platz','pkt','WetId','GrpId'),		// otherwise the get no points in the ranking!
+			'platz','pkt','WetId','GrpId'),		// otherwise they get no points in the ranking!
 	);
 	/**
 	 * year we check the license for
@@ -71,6 +84,27 @@ class athlete extends so_sql
 	 * @var boranking
 	 */
 	var $boranking;
+
+	/**
+	 * Initialise the static vars of this class, called by including the class
+	 */
+	static function init_static()
+	{
+		self::$fed_cols = array(
+			self::FEDERATIONS_TABLE.'.nation AS nation',
+			self::FEDERATIONS_TABLE.'.verband AS verband',
+			self::FEDERATIONS_TABLE.'.fed_id AS fed_id',
+//			self::FEDERATIONS_TABLE.'.fed_parent AS fed_parent',
+			'CASE WHEN acl.fed_id IS NULL THEN '.self::FEDERATIONS_TABLE.'.fed_parent ELSE acl.fed_id END AS fed_parent',
+		);
+		self::$a2f_cols = array(
+//			self::ATHLETE2FED_TABLE.'.a2f_start AS a2f_start',
+//			self::ATHLETE2FED_TABLE.'.a2f_end AS a2f_end',
+			'a2f.a2f_start AS a2f_start',
+			'a2f.a2f_end AS a2f_end',
+			'acl.fed_id AS acl_fed_id',
+		);
+	}
 
 	/**
 	 * constructor of the athlete class
@@ -246,10 +280,8 @@ class athlete extends so_sql
 
 		// join in nation & federation
 		$join .= self::FEDERATIONS_JOIN;
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.nation AS nation';
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.verband AS verband';
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_id AS fed_id';
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_parent AS fed_parent';
+		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
+		$extra_cols += self::$fed_cols;
 
 		// by default only show real athlets (nation and sex set)
 		if (!isset($filter['sex']) && !(isset($criteria['sex']) && $op == 'AND'))
@@ -537,18 +569,10 @@ class athlete extends so_sql
 		{
 			$join = '';
 		}
-		if (!is_array($extra_cols))
-		{
-			$extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
-		}
 		// join in the federation information
 		$join .= self::FEDERATIONS_JOIN;
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.nation AS nation';
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.verband AS verband';
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_id AS fed_id';
-		$extra_cols[] = self::FEDERATIONS_TABLE.'.fed_parent AS fed_parent';
-		$extra_cols[] = self::ATHLETE2FED_TABLE.'.a2f_start AS a2f_start';
-		$extra_cols[] = self::ATHLETE2FED_TABLE.'.a2f_end AS a2f_end';
+		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
+		$extra_cols = array_merge($extra_cols,self::$fed_cols,self::$a2f_cols);
 
 		if (is_numeric($year))
 		{
@@ -687,13 +711,37 @@ class athlete extends so_sql
 	 * @param int $fed_id id of the federation
 	 * @param int &$a2f_start start year of (new) federation, only used if the federation changes, always returned
 	 * @param int $PerId=null default current athlete
+	 * @param int $fed_parent=null explicit fed_id of parent (0 deletes)
 	 * @return true if federation is set (or was already), false on error
 	 */
-	function set_federation($fed_id,&$a2f_start,$PerId=null)
+	function set_federation($fed_id,&$a2f_start,$PerId=null,$fed_parent=null)
 	{
 		if (is_null($PerId)) $PerId = $this->data['PerId'];
+		//echo "<p>".__METHOD__."($fed_id,$a2f_start,$PerId,$fed_parent)</p>\n";
 		if (!$PerId || !$fed_id) return false;
 
+		if (!is_null($fed_parent))
+		{
+			// set or delete explicit fed_parent
+			if ((int)$fed_parent > 0)
+			{
+				$this->db->insert(self::ATHLETE2FED_TABLE,array(
+					'fed_id' => $fed_parent,
+				),array(
+					'PerId' => $PerId,
+					'a2f_end' => -1,
+					'a2f_start' => 0,
+				),__LINE__,__FILE__,'ranking');
+			}
+			else
+			{
+				$this->db->delete(self::ATHLETE2FED_TABLE,array(
+					'PerId' => $PerId,
+					'a2f_end' => -1,
+					'a2f_start' => 0,
+				),__LINE__,__FILE__,'ranking');
+			}
+		}
 		// read current (year=9999) federation
 		if (!($fed = $this->db->select(self::ATHLETE2FED_TABLE,'*',array(
 			'PerId' => $PerId,
@@ -750,7 +798,7 @@ class athlete extends so_sql
 		}
 		if (!($err = parent::save()) && $this->data['fed_id'])
 		{
-			$this->set_federation($this->data['fed_id'],$this->data['a2f_start']);
+			$this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']);
 		}
 		return $err;
 	}
@@ -870,3 +918,4 @@ class athlete extends so_sql
 		return $result;
 	}
 }
+athlete::init_static();

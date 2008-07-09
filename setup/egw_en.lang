@@ -29,6 +29,7 @@ add new athlete with the given data	ranking	en	Add new athlete with the given da
 add not existing athletes to the database, use with caution!	ranking	en	add not existing athletes to the database, use with caution!
 add to parent federation opened for editing	ranking	en	Add to parent federation opened for editing
 admin rights required!	ranking	en	Admin rights required!
+administrated by: parent federation	ranking	en	Administrated by: parent federation
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types

@@ -131,6 +131,7 @@ class uiathletes extends boranking
 			$old_geb_date = $this->athlete->data['geb_date'];
 
 			$this->athlete->data_merge($content);
+			$this->athlete->data['acl_fed_id'] = (int)$content['acl_fed_id']['fed_id'];
 			//echo "<br>uiathletes::edit: athlete->data ="; _debug_array($this->athlete->data);
 
 			if (($content['save'] || $content['apply']) || $content['apply_license'])
@@ -308,6 +309,7 @@ class uiathletes extends boranking
 			'referer' => $content['referer'],
 			'merge_to' => $content['merge_to'],
 		);
+		$content['acl_fed_id'] = array('fed_id' => $this->athlete->data['acl_fed_id']);
 		$sel_options = array(
 			'nation' => $nations,
 			'sex'    => $this->genders,
@@ -350,7 +352,7 @@ class uiathletes extends boranking
 			{
 				$readonlys[$name] = true;
 			}
-			$readonlys['foto'] = $readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
+			$readonlys['acl_fed_id[fed_id]'] = $readonlys['foto'] = $readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
 		}
 		elseif (!$this->athlete->data['PerId'] || $this->athlete->data['last_comp'])
 		{
