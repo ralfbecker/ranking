@@ -195,7 +195,7 @@
 				</row>
 				<row class="row">
 					<description options=",,,verband" value="Federation"/>
-					<menulist span="3" class="selectboxFullWidth">
+					<menulist span="2" class="selectboxFullWidth">
 						<menupopup id="fed_id"/>
 					</menulist>
 				</row>
