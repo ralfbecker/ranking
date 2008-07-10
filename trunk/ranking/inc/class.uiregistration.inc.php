@@ -304,12 +304,16 @@ class uiregistration extends boranking
 					$athlete = $this->athlete->read($athlete,'',$this->license_year,$comp['nation']);
 				}
 				if (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']) ||
-					$cat['sex'] && $athlete['sex'] != $cat['sex'] ||
-					$content['register'] && $athlete['license'] == 'n' && !$this->is_admin && !$this->is_judge($comp))
+					$cat['sex'] && $athlete['sex'] != $cat['sex'])
 				{
+					//_debug_array($athlete);
 					//_debug_array($cat);
 					//_debug_array($comp);
 					$msg = lang('Permission denied !!!');
+				}
+				elseif($content['register'] && $athlete['license'] == 'n' && !$this->is_admin && !$this->is_judge($comp))
+				{
+					$msg = lang('Athlete has no license! Use regular registration to apply for a license first.');
 				}
 				elseif (!$this->registration_check($comp,$nation,$cat['GrpId']))
 				{
@@ -498,7 +502,7 @@ class uiregistration extends boranking
 					'class' => $nation && $i >= $quota ? 'complimentary' : 'registered',
 					'delete_button' => $delete_button,
 				);
-				$readonlys[$delete_button] = !($this->is_admin || $this->is_judge($comp) || in_array($starter['nation'],$this->register_rights));	// re-enable the button
+				$readonlys[$delete_button] = !$this->acl_check_athlete($starter,EGW_ACL_REGISTER,$comp);
 			}
 			$cats = array();
 			foreach((array)$cat2col as $cat => $col)
@@ -550,7 +554,8 @@ class uiregistration extends boranking
 		$this->set_ui_state($perserv['calendar'],$preserv['comp'],$preserv['cat']);
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
-			($nation && $nation != 'NULL' ? ': '.$nation : '');
+			(!$nation || !$nation == 'NULL' ? '' : (': '.
+			(is_numeric($nation) && ($fed || ($fed = $this->federation->read($nation))) ? $fed['verband'] : $nation)));
 		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
 	}
 
