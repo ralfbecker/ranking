@@ -201,8 +201,8 @@ class route_result extends so_sql
 				$old = null;
 				foreach($rows as $n => &$row)
 				{
-					$row['org_rank'] = $row['result_rank'.$row['route_order']];
 					if ($row['route_order'] == 0) $row['result_rank0'] = $row['result_rank'];
+					$row['org_rank'] = $row['result_rank'.$row['route_order']];
 
 					// check for ties
 					$row['result_rank'] = $old['result_rank'];
