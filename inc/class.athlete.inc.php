@@ -288,27 +288,39 @@ class athlete extends so_sql
 		{
 			$filter[] = 'sex IS NOT NULL';
 		}
-		// handle nation and verband, which are in the Federations table
-		foreach(array('nation','verband') as $name)
+		if (($n = strpos($order_by,'PerId')) !== false && (!$n || $order_by[$n-1] != '.'))
+		{
+			$order_by = str_replace('PerId',self::ATHLETE_TABLE.'.PerId',$order_by);
+		}
+		if ($order_by[0] == '_') $order_by = substr($order_by,1);	// cut of _ from eTemplate hack to allow sort and filter for same nm colum
+
+		// handle nation, verband and fed_id, which are in the Federations or Athelte2Fed table
+		foreach(array(
+			'nation'  => self::FEDERATIONS_TABLE,
+			'verband' => self::FEDERATIONS_TABLE,
+			'fed_id'  => 'a2f',//self::ATHLETE2FED_TABLE,
+		) as $name => $table)
 		{
 			if ($filter[$name])
 			{
 				if ($filter[$name] == 'NULL') $filter[$name] = null;
-				$filter[] = self::FEDERATIONS_TABLE.'.'.$name.(is_null($filter[$name]) ? ' IS NULL' : '='.$this->db->quote($filter[$name]));
+				$filter[] = $table.'.'.$name.(is_null($filter[$name]) ? ' IS NULL' : '='.$this->db->quote($filter[$name]));
 				if ($name == 'nation') $license_nation = $filter[$name];
 			}
 			unset($filter[$name]);
 			if ($criteria[$name])
 			{
 				if ($criteria[$name] == 'NULL') $criteria[$name] = null;
-				$criteria[] = self::FEDERATIONS_TABLE.'.'.$name.(is_null($criteria[$name]) ? ' IS NULL' : '='.$this->db->quote($criteria[$name]));
+				$criteria[] = $table.'.'.$name.(is_null($criteria[$name]) ? ' IS NULL' : '='.$this->db->quote($criteria[$name]));
 			}
 			unset($criteria[$name]);
 			if (strpos($order_by,$name) !== false)
 			{
-				$order_by = str_replace($name,self::FEDERATIONS_TABLE.'.'.$name,$order_by);
+				$order_by = str_replace($name,$table.'.'.$name,$order_by);
 			}
 		}
+		$order_by .= ($order_by?',':'').'nachname,vorname';
+
 		if ($cat === true || is_numeric($cat))
 		{
 			if (is_numeric($cat))	// add join to filter for a category
@@ -322,7 +334,7 @@ class athlete extends so_sql
 					$join .= " AND $from_year <= YEAR(geb_date) AND YEAR(geb_date) <= $to_year";
 				}
 				$extra_cols[] = "MAX($this->result_table.datum) AS last_comp";
-				$order_by = "GROUP BY $this->table_name.PerId ".($order_by ? 'ORDER BY '.$order_by : 'ORDER BY nachname,vorname');
+				$order_by = "GROUP BY $this->table_name.PerId ORDER BY $order_by";
 
 				$license_nation = $cat['nation'];
 			}
@@ -691,13 +703,13 @@ class athlete extends so_sql
 	 * @param boolean $only_national=false if true return only national federations (fed_parent=NULL)
 	 * @return array
 	 */
-	function federations($nation=null,$only_national=false)
+	function federations($nation=null,$only_national=false,$filter = array())
 	{
 		$feds = array();
-		$where = $nation ? array('nation' => $nation) : array();
-		if ($only_national) $where[] = 'fed_parent IS NULL';
+		if ($nation) $filter['nation'] = $nation;
+		if ($only_national) $filter[] = 'fed_parent IS NULL';
 
-		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$where,__LINE__,__FILE__,false,
+		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$filter,__LINE__,__FILE__,false,
 			'ORDER BY nation ASC,verband ASC','ranking') as $fed)
 		{
 			$feds[$fed['fed_id']] = (!$nation ? $fed['nation'].': ' : '').$fed['verband'];
