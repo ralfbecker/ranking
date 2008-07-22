@@ -354,7 +354,7 @@ class boranking extends soranking
 				$which = 'jury rights do NOT allow to apply for a license!';
 			}
 		}
-		error_log(__METHOD__."(".array2string($athlete).",$required,".array2string($comp).",$license) ".($check?'TRUE':'FALSE')." ($which)");
+		//error_log(__METHOD__."(".array2string($athlete).",$required,".array2string($comp).",$license) ".($check?'TRUE':'FALSE')." ($which)");
 		return $check;
 	}
 
