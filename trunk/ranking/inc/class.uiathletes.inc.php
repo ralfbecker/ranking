@@ -92,6 +92,26 @@ class uiathletes extends boranking
 				}
 				if ($this->only_nation_athlete) $this->athlete->data['nation'] = $this->only_nation_athlete;
 				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
+				if (!$this->athlete_rights && ($grants = $this->federation->get_user_grants()))
+				{
+					$feds_with_grants = array();
+					foreach($grants as $fed_id => $rights)
+					{
+						if ($rights && EGW_ACL_ATHLETE)
+						{
+							$feds_with_grants[] = $fed_id;
+						}
+					}
+					if ($feds_with_grants)
+					{
+						// if we have a/some feds the user is responsible for get the first (and only) nation
+						$nations = $this->federation->query_list('nation','nation',array('fed_id' => $feds_with_grants));
+						if (count($nations) != 1) throw new egw_exception_assertion_failed('Fed grants only implemented for a single nation!');
+						list($this->only_nation_athlete) = each($nations);
+						$this->athlete->data['nation'] = $this->only_nation_athlete;
+						list($this->athlete->data['fed_id']) = $feds_with_grants;
+					}
+				}
 			}
 			// we have no edit-rights for that nation
 			if (!$this->acl_check_athlete($this->athlete->data))
@@ -315,7 +335,8 @@ class uiathletes extends boranking
 			'sex'    => $this->genders,
 			'acl'    => $this->acl_deny_labels,
 			'license'=> $this->license_labels,
-			'fed_id' => $content['nation'] ? $this->athlete->federations($content['nation']) : array(lang('Select a nation first')),
+			'fed_id' => !$content['nation'] ? array(lang('Select a nation first')) :
+				$this->athlete->federations($content['nation'],false,$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
 			'license_nation' => ($license_nations = $this->license_nations()),
 		);
 		$edit_rights = $this->acl_check_athlete($this->athlete->data);
@@ -358,6 +379,7 @@ class uiathletes extends boranking
 		{
 			$readonlys['delete'] = true;
 		}
+		if ($content['nation'] != 'SUI') $readonlys['acl_fed_id[fed_id]'] = true;	// dont allow to set acl_fed_id for GER
 		if ($js)
 		{
 			if (!is_object($GLOBALS['egw']->js))
@@ -449,6 +471,7 @@ class uiathletes extends boranking
 			}
 		}
 		$sel_options['filter'] = array('' => lang('All')) + $this->cats->names($cat_filter,-1);
+		$sel_options['fed_id'] = $this->athlete->federations($query['col_filter']['nation']);
 
 		$total = $this->athlete->get_rows($query,$rows,$readonlys,(int)$query['filter'] ? (int)$query['filter'] : true);
 
@@ -540,9 +563,18 @@ class uiathletes extends boranking
 				$content['nm']['col_filter']['nation'] = $this->only_nation_athlete;
 			}
 		}
-		$readonlys['nm[rows][edit][0]'] = !count($this->athlete_rights);
-
-		$this->tmpl->read('ranking.athlete.list');
+		if (($readonlys['nm[rows][edit][0]'] = !count($this->athlete_rights)) && ($grants = $this->federation->get_user_grants()))
+		{
+			foreach($grants as $fed_id => $rights)
+			{
+				if ($rights & EGW_ACL_ATHLETE)
+				{
+					$readonlys['nm[rows][edit][0]'] = false;
+					break;
+				}
+			}
+		}
+		$this->tmpl->read('ranking.athlete.index');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
 		$this->set_ui_state();
 		$this->tmpl->exec('ranking.uiathletes.index',$content,array(
