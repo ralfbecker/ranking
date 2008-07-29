@@ -491,6 +491,8 @@ class competition extends so_sql
 		{
 			$year = substr($this->data['datum'],0,4);
 		}
+		if ($data['nation'] === 'NULL') $data['nation'] = '';
+
 		return $this->vfs_pdf_dir.$data['nation'].'/'.$year.'/'.$this->attachment_prefixes[$type].$rkey.'.pdf';
 	}
 
