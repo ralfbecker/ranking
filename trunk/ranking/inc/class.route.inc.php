@@ -7,8 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
@@ -24,29 +24,16 @@ class route extends so_sql
 	/**
 	 * constructor of the route class
 	 */
-	function route($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null)
 	{
 		//$this->debug = 1;
-		$this->so_sql('ranking','Routes',$db);	// call constructor of extended class
-		
+		parent::__construct('ranking','Routes',$db);	// call constructor of extended class
+
 		if ($source_charset) $this->source_charset = $source_charset;
-		
+
 		$this->charset = is_object($GLOBALS['egw']->translation) ? $GLOBALS['egw']->translation->charset() : 'iso-8859-1';
-/*
-		foreach(array(
-				'athlete'  => 'athlete',
-			) as $var => $class)
-		{
-			$egw_name = $class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
-			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
-		}
-*/
 	}
-	
+
 	/**
 	 * Determine the highest existing route_order for $comp and $cat
 	 *
@@ -60,10 +47,10 @@ class route extends so_sql
 			'WetId' => $comp,
 			'GrpId' => $cat,
 		),__LINE__,__FILE__);
-		
+
 		return $this->db->next_record() ? $this->db->f(0) : null;
 	}
-	
+
 	/**
 	 * deletes row representing keys in internal data or the supplied $keys if != null
 	 *
@@ -84,10 +71,10 @@ class route extends so_sql
 		}
 		return $ret;
 	}
-	
+
 	/**
 	 * reads row matched by key and puts all cols in the data array
-	 * 
+	 *
 	 * Reimplemented to change the type of $keys['route_order'] to string, as it can be (int)0 and so_sql ignores (int)0.
 	 * Reimplemented to return a default general result, if it does not exist.
 	 *
@@ -102,7 +89,7 @@ class route extends so_sql
 			$keys['route_order'] = (string) $keys['route_order'];
 		}
 		$ret = parent::read($keys);
-		
+
 		if (!$ret && $keys['route_order'] == -1)		// general result not found --> return a default one
 		{
 			$keys['route_order'] = 0;
