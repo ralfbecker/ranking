@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.4.002">
+	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -22,7 +22,7 @@
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
-					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
+					<nextmatch-sortheader label="@fed_label" id="$cont[fed_col]" align="center"/>
 					<description value="License" id="PerId" align="center"/>
 					<nextmatch-sortheader label="Start- number" id="start_order" align="center"/>
 					<nextmatch-sortheader label="Time" id="result_top_time" align="center"/>
@@ -35,7 +35,7 @@
 					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1" options="$row_cont[link]"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
-					<description align="center" id="{$row}[nation]" no_lang="1"/>
+					<description align="center" id="{$row}[$cont[fed_col]]" no_lang="1"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
 					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order]" no_lang="1"/>
 					<hbox align="center" options="0,0">

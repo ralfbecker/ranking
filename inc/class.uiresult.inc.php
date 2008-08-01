@@ -512,8 +512,9 @@ class uiresult extends boresult
 			$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
 			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
 		}
+		$comp = $this->comp->read($query['comp']);
 		if ($query['ranking'] && strstr($query['template'],'startlist') &&
-			($comp = $this->comp->read($query['comp'])) && ($cat = $this->cats->read($query['cat'])))
+			($cat = $this->cats->read($query['cat'])))
 		{
 			$stand = $comp['datum'];
  			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
@@ -593,6 +594,22 @@ class uiresult extends boresult
 		$rows['no_ranking'] = !$ranking;
 		$rows['time_measurement'] = $query['time_measurement'];
 
+		switch((string)$comp['nation'])
+		{
+			case '':	// international
+				$rows['fed_col'] = 'nation';
+				$rows['fed_label'] = 'Nation';
+				break;
+			case 'GER':
+				$rows['fed_col'] = 'verband';
+				$rows['fed_label'] = 'Sektion';
+				break;
+			case 'SUI':
+			default:
+				$rows['fed_col'] = 'ort';
+				$rows['fed_label'] = 'City';
+				break;
+		}
 		return $total;
 	}
 
