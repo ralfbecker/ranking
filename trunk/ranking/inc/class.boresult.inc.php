@@ -790,14 +790,16 @@ class boresult extends boranking
 	 * Import the general result of a competition into the ranking
 	 *
 	 * @param array $keys WetId, GrpId, discipline, route_type, route_order=-1
+	 * @param string $filter_nation=null only import athletes of the given nation
 	 * @return string message
 	 */
-	function import_ranking($keys)
+	function import_ranking($keys,$filter_nation=null)
 	{
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']))
 		{
 			return false;
 		}
+		$skiped = 0;
 		foreach($this->route_result->search('',false,'result_rank','','',false,'AMD',false,array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
@@ -806,9 +808,18 @@ class boresult extends boranking
 			'route_type' => $keys['route_type'],
 		)) as $row)
 		{
-			if ($row['result_rank']) $result[$row['PerId']] = $row['result_rank'];
+			if ($row['result_rank'])
+			{
+				if ($filter_nation && $row['nation'] != $filter_nation)
+				{
+					$skiped++;
+					continue;
+				}
+				$row['result_rank'] -= $skiped;
+				$result[$row['PerId']] = $row['result_rank'];
+			}
 		}
-		return parent::import_ranking($keys,$result);
+		return parent::import_ranking($keys,$result).($skiped ? "\n".lang('(%1 athletes not from %2 skipped)',$skiped,$filter_nation) : '');
 	}
 
 	/**
