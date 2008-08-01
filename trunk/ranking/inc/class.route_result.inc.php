@@ -324,9 +324,9 @@ class route_result extends so_sql
 	 */
 	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array())
 	{
-		if (!is_object($GLOBALS['egw']->route))
+		if (!isset($GLOBALS['egw']->route) || !is_object($GLOBALS['egw']->route))
 		{
-			$GLOBALS['egw']->route =& new route($this->source_charset,$this->db);
+			$GLOBALS['egw']->route = new route($this->source_charset,$this->db);
 		}
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
 		//echo "keys="; _debug_array($keys);
