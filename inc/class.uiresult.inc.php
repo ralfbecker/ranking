@@ -526,7 +526,8 @@ class uiresult extends boresult
 			// results for setting on regular routes (no general result)
 			if($query['route'] >= 0) $rows['set'][$row['PerId']] = $row;
 
-			if (!$quota_line && $query['route_quota'] && $row['result_rank'] > $query['route_quota'])
+			if (!$quota_line && $query['route_quota'] && $query_in['order'] == 'result_rank' && $query_in['sort'] == 'ASC' &&
+				$row['result_rank'] > $query['route_quota'])	// only show quota line if sorted by rank ASC
 			{
 				$rows[$k]['quota_class'] = 'quota_line';
 				$quota_line = true;
@@ -571,6 +572,7 @@ class uiresult extends boresult
 				list($page_name,$target) = explode(',',$query['pstambl']);
 				$rows[$k]['link'] = ',index.php?page_name='.$page_name.'&person='.$row['PerId'].'&cat='.$query['cat']['GrpId'].',,,'.$target;
 			}
+			if ($query['readonly']) $readonlys['set['.$row['PerId'].']'] = true;	// disable all result input
 		}
 		// report the set-values at time of display back to index() for calling boresult::save_result
 		$query_in['return'] = $rows['set'];
@@ -850,7 +852,6 @@ class uiresult extends boresult
 		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || $route['route_status'] == STATUS_RESULT_OFFICIAL))
 		{
-			$readonlys['nm'] = true;
 			$sel_options['result_plus'] = $this->plus;
 			$content['nm']['readonly'] = true;
 		}
