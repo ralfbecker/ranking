@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -52,27 +52,14 @@ class route_result extends so_sql
 	/**
 	 * constructor of the competition class
 	 */
-	function route_result($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null)
 	{
 		//$this->debug = 1;
-		$this->so_sql('ranking','RouteResults',$db);	// call constructor of extended class
+		parent::__construct('ranking','RouteResults',$db);	// call constructor of extended class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = is_object($GLOBALS['egw']->translation) ? $GLOBALS['egw']->translation->charset() : 'iso-8859-1';
-/*
-		foreach(array(
-				'athlete'  => 'athlete',
-			) as $var => $class)
-		{
-			$egw_name = $class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name =& CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
-			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
-		}
-*/
 	}
 
 	/**
@@ -342,7 +329,8 @@ class route_result extends so_sql
 			$GLOBALS['egw']->route =& new route($this->source_charset,$this->db);
 		}
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
-
+		//echo "keys="; _debug_array($keys);
+		//echo "route_names="; _debug_array($route_names);
 		$order_by = array("$this->table_name.result_rank");	// Quali
 
 		foreach($route_names as $route_order => $label)
