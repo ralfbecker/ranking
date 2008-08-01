@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.4.001">
+	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -49,55 +49,55 @@
 					<description id="{$row}[result]" no_lang="1" align="center"/>
 					<vbox options="0,0">
 						<menulist class="noPrint noWrap">
-							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top1]" label="Top" align="right"/>
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top1]" label="Top" align="right" onchange="check_top(this)"/>
 						</menulist>
 						<menulist class="noPrint noWrap">
-							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone1]" label="Bonus" align="right"/>
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone1]" label="Bonus" align="right" onchange="check_bonus(this)"/>
 						</menulist>
 						<description id="{$row}[boulder1]" class="onlyPrint" no_lang="1"/>
 					</vbox>
 					<box options="0,0">
 						<menulist class="noPrint">
-							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top2]"/>
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top2]" onchange="check_top(this)"/>
 						</menulist>
 						<menulist class="noPrint">
-							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone2]"/>
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone2]" onchange="check_bonus(this)"/>
 						</menulist>
 						<description id="{$row}[boulder2]" class="onlyPrint" no_lang="1"/>
 					</box>
 					<box options="0,0">
 						<menulist class="noPrint">
-							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top3]"/>
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top3]" onchange="check_top(this)"/>
 						</menulist>
 						<menulist class="noPrint">
-							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone3]"/>
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone3]" onchange="check_bonus(this)"/>
 						</menulist>
 						<description id="{$row}[boulder3]" class="onlyPrint" no_lang="1"/>
 					</box>
 					<box options="0,0">
 						<menulist class="noPrint">
-							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top4]"/>
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top4]" onchange="check_top(this)"/>
 						</menulist>
 						<menulist class="noPrint">
-							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone4]"/>
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone4]" onchange="check_bonus(this)"/>
 						</menulist>
 						<description id="{$row}[boulder4]" class="onlyPrint" no_lang="1"/>
 					</box>
 					<box options="0,0">
 						<menulist class="noPrint">
-							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top5]"/>
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top5]" onchange="check_top(this)"/>
 						</menulist>
 						<menulist class="noPrint">
-							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone5]"/>
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone5]" onchange="check_bonus(this)"/>
 						</menulist>
 						<description id="{$row}[boulder5]" class="onlyPrint" no_lang="1"/>
 					</box>
 					<box options="0,0">
 						<menulist class="noPrint">
-							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top6]"/>
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top6]" onchange="check_top(this)"/>
 						</menulist>
 						<menulist class="noPrint">
-							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone6]"/>
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone6]" onchange="check_bonus(this)"/>
 						</menulist>
 						<description id="{$row}[boulder6]" class="onlyPrint" no_lang="1"/>
 					</box>
