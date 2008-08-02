@@ -573,6 +573,9 @@ class uiresult extends boresult
 				$rows[$k]['link'] = ',index.php?page_name='.$page_name.'&person='.$row['PerId'].'&cat='.$query['cat']['GrpId'].',,,'.$target;
 			}
 			if ($query['readonly']) $readonlys['set['.$row['PerId'].']'] = true;	// disable all result input
+
+			// shorten DAV or SAC Sektion
+			$rows[$k]['verband'] = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen Club) /','',$row['verband']);
 		}
 		// report the set-values at time of display back to index() for calling boresult::save_result
 		$query_in['return'] = $rows['set'];
