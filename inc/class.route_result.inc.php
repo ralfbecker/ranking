@@ -171,7 +171,7 @@ class route_result extends so_sql
 						unset($filter[$col]);
 					}
 				}
-				if ($route_type == TWO_QUALI_ALL)
+				if ($route_type == TWO_QUALI_ALL && $discipline != 'speed')		// speed stores both results in the first quali
 				{
 					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL OR r1.result_rank IS NOT NULL)';
 				}
