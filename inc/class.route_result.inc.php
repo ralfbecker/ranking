@@ -655,7 +655,7 @@ class route_result extends so_sql
 				'result_time_r' => $data['result_time_r'] ? number_format($data['result_time_r'],3) : '',
 				'eliminated_r'  => $data['eliminated_r'],
 			);
-			if ((string)$data['eliminated'] !== '' || (string)$data['eliminated_r'] !== '')
+			if ((string)$data['eliminated'] !== '' || $data['eliminated_r'])
 			{
 				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ?
 					($data['eliminated'] ? ELIMINATED_TIME : WILDCARD_TIME) : ELIMINATED_TIME));
