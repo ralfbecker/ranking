@@ -268,7 +268,7 @@ foreach($cats as $n => $cat)
 	$exec_id = get_exec_id($download=curl_exec($ch));	// switch to route=0 and get new exec-id
 	if ($debug > 4) echo $download."\n\n";
 
-	for($route=0; $route <= 3; ++$route)
+	for($route=0; $route <= 6; ++$route)
 	{
 		// download each heat
 		curl_setopt($ch,CURLOPT_URL,$url=$baseurl.'comp='.$arg.'&cat='.$cat['GrpId']);
