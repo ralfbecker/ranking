@@ -1154,7 +1154,7 @@ class boranking extends soranking
 		$rls = $cat['vor'] && $comp['datum'] < $cat['vor'] ? $cat['vor_rls'] : $cat['rls'];
 		$has_feldfakt = $rls && $comp['feld_pkte'] && $comp['faktor'] && $cat['rkey'] != "OMEN";
 
-		if (!$has_feldfakt) return 'no fieldfactor';//1.0;
+		if (!$has_feldfakt) return 1.0;
 
 		// we have to use the ranking of the day before the competition starts
 		$stand = explode('-',$comp['datum']);
