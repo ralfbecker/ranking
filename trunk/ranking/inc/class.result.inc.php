@@ -103,7 +103,7 @@ class result extends so_sql
 
 				if (!$extra_cols)
 				{
-					$extra_cols = "nachname,vorname,nation,".athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
+					$extra_cols = "nachname,vorname,nation,".athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
 				}
 				else
 				{

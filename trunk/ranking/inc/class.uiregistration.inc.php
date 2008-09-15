@@ -153,7 +153,7 @@ class uiregistration extends boranking
 		}
 		elseif (is_numeric($nation))
 		{
-			$content['nm']['col_filter'][] = '(fed_parent='.(int)$nation.' OR '.athlete::FEDERATIONS_TABLE.'.fed_id='.(int)$nation.')';
+			$content['nm']['col_filter']['fed_id'] = (int)$nation;
 		}
 		$content += array(
 			'comp_name' => $comp ? $comp['name'] : '',
@@ -392,18 +392,22 @@ class uiregistration extends boranking
 				{
 					$where['nation'] = $nation;
 				}
-				else		// national competition
+				elseif(is_numeric($nation))
 				{
-					$where[] = is_numeric($nation) ? 'fed_parent='.(int)$nation : 'nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
+					$where[] = '(fed_parent='.(int)$nation.' OR acl.fed_id='.(int)$nation.')';
+				}
+				else
+				{
+					$where[] = 'nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
 				}
 			}
-			$starters =& $this->result->read($where,'',true,$comp['nation'] ? 'nation,fed_parent,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
+			$starters =& $this->result->read($where,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
 
 			$nat = '';
 			$nat_starters = array();
 			$prequal_lines = 0;
 			// if nation/federation selected, show prequalified first
-			if ($nation)
+			if ($nation && $prequalified)
 			{
 				foreach($prequalified as $cat_id => $athletes)
 				{
@@ -455,7 +459,7 @@ class uiregistration extends boranking
 				}
 				// new nation and data for the previous nation ==> write that data
 				$starter_nat_fed = !$comp['nation'] || $starter['nation'] != $comp['nation'] || !$starter['fed_parent'] ?
-					$starter['nation'] : $starter['fed_parent'];
+					$starter['nation'] : ($starter['acl_fed_id'] ? $starter['acl_fed_id'] : $starter['fed_parent']);
 				if ($nat != $starter_nat_fed)
 				{
 					ksort($nat_starters);	// due to $quota < $max_quota, the rows might not be sorted by number/key

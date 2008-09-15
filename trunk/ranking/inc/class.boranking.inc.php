@@ -684,6 +684,10 @@ class boranking extends soranking
 		{
 			return false;
 		}
+		if (!$do_cat && !$comp['gruppen'])
+		{
+			return array();	// no category --> noone prequalified
+		}
 		foreach($do_cat ? array($do_cat) : $comp['gruppen'] as $cat)
 		{
 			//echo "boranking::prequalified($comp[rkey],$do_cat) cat='$cat($cat[rkey])'<br>\n";
