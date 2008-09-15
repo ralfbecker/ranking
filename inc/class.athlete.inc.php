@@ -32,7 +32,6 @@ class athlete extends so_sql
 	const RESULT_TABLE = 'Results';
 	const ATHLETE2FED_TABLE = 'Athlete2Fed';
 	const FEDERATIONS_TABLE = 'Federations';
-	//const FEDERATIONS_JOIN = ' JOIN Athlete2Fed USING(PerId) JOIN Federations USING(fed_id)';
 	const FEDERATIONS_JOIN = ' JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 JOIN Federations USING(fed_id) LEFT JOIN Athlete2Fed acl ON Personen.PerId=acl.PerId AND acl.a2f_end=-1';
 	const LICENSE_TABLE = 'Licenses';
 	/**
@@ -298,13 +297,18 @@ class athlete extends so_sql
 		foreach(array(
 			'nation'  => self::FEDERATIONS_TABLE,
 			'verband' => self::FEDERATIONS_TABLE,
-			'fed_id'  => 'a2f',//self::ATHLETE2FED_TABLE,
+			'fed_id'  => 'a2f',	//a2f is alias for self::ATHLETE2FED_TABLE,
 		) as $name => $table)
 		{
 			if ($filter[$name])
 			{
 				if ($filter[$name] == 'NULL') $filter[$name] = null;
-				$filter[] = $table.'.'.$name.(is_null($filter[$name]) ? ' IS NULL' : '='.$this->db->quote($filter[$name]));
+				$f = $table.'.'.$name.(is_null($filter[$name]) ? ' IS NULL' : '='.$this->db->quote($filter[$name]));
+				if ($name == 'fed_id' && !is_null($filter[$name]))	// also filter for acl federation (SAC Regionalzentrum) and fed_parent
+				{
+					$f = '('.$f.' OR '.str_replace('a2f.fed_id','acl.fed_id',$f).' OR fed_parent='.(int)$filter[$name].')';
+				}
+				$filter[] = $f;
 				if ($name == 'nation') $license_nation = $filter[$name];
 			}
 			unset($filter[$name]);
