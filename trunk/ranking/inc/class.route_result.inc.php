@@ -536,7 +536,7 @@ class route_result extends so_sql
 							{
 								$data['eliminated'] = 1;
 								$data['result_time'] = null;
-								$data['time_sum'] = $data['result'] = lang('eliminated');
+								$data['time_sum'] = $data['result'] = lang('fall');
 							}
 							elseif ($data['result_time'] == WILDCARD_TIME)
 							{
@@ -552,12 +552,12 @@ class route_result extends so_sql
 						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
 						{
 							$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) :
-								($data['eliminated_l'] ? lang('eliminated') : lang('Wildcard'));
+								($data['eliminated_l'] ? lang('fall') : lang('Wildcard'));
 							$data['result_time'] = $data['result_time_l'];
 							$data['eliminated'] = $data['eliminated_l'] || $data['eliminated_r'];
 							$data['result_r'] = (string)$data['eliminated_r'] === '' ?
 								($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') :
-								($data['eliminated_r'] ? lang('eliminated') : lang('Wildcard'));
+								($data['eliminated_r'] ? lang('fall') : lang('Wildcard'));
 						}
 					}
 					else
@@ -570,7 +570,7 @@ class route_result extends so_sql
 								$data['result_time'.$suffix] *= 0.001;
 								if ($data['result_time'.$suffix] == ELIMINATED_TIME)
 								{
-									$data['result'.$suffix] = lang('eliminated');
+									$data['result'.$suffix] = lang('fall');
 								}
 								elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
 								{
