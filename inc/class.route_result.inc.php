@@ -85,6 +85,7 @@ class route_result extends so_sql
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
+		//echo "<p>".__METHOD__."(crit=".print_r($criteria,true).",only_keys=".print_r($only_keys,true).",order_by=$order_by,extra_cols=".print_r($extra_cols,true).",$wildcard,$empty,$op,$start,filter=".print_r($filter,true).",join=$join)</p>\n";
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 
 		if (is_array($filter) && array_key_exists('route_type',$filter))	// pseudo-filter to transport the route_type
@@ -255,7 +256,7 @@ class route_result extends so_sql
 	 */
 	function _sql_rank_prev_heat($route_order,$route_type)
 	{
-		if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
+		if ($route_order == 2 && boresult::is_two_quali_all($route_type))
 		{
 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
 			$r = 'r1';
@@ -324,12 +325,12 @@ class route_result extends so_sql
 	 */
 	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array())
 	{
+		//echo "<p>".__METHOD__."(".print_r($keys,true).",".print_r($extra_cols,true).",,,type=$route_type,$discipline,".print_r($result_cols,true).")</p>\n";
 		if (!isset($GLOBALS['egw']->route) || !is_object($GLOBALS['egw']->route))
 		{
 			$GLOBALS['egw']->route = new route($this->source_charset,$this->db);
 		}
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
-		//echo "keys="; _debug_array($keys);
 		//echo "route_names="; _debug_array($route_names);
 		$order_by = array("$this->table_name.result_rank");	// Quali
 
@@ -340,7 +341,10 @@ class route_result extends so_sql
 			{
 				if (in_array($route_order,array(2,3))) continue;	// base of the query, no need to join
 			}
-			elseif ($route_order < 2-(int)($route_type==TWO_QUALI_ALL)) continue;	// no need to join the qualification
+			elseif ($route_order < 2-(int)boresult::is_two_quali_all($route_type))
+			{
+				continue;	// no need to join the qualification
+			}
 
 			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.PerId=r$route_order.PerId";
 			foreach($result_cols as $col)
@@ -349,7 +353,7 @@ class route_result extends so_sql
 			}
 			if ($route_type == TWOxTWO_QUALI && $route_order < 2) continue;	// dont order by the 1. quali
 
-			if ($route_type == TWO_QUALI_ALL && $route_order == 1)
+			if (boresult::is_two_quali_all($route_type) && $route_order == 1)
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order,$route_type).')';
@@ -370,6 +374,7 @@ class route_result extends so_sql
 
 		$extra_cols[] = $this->table_name.'.*';		// trick so_sql to return the cols from the quali as regular cols
 
+		//echo "join=$join, order_by=$order_by, extra_cols="; _debug_array($extra_cols);
 		return $join;
 	}
 
