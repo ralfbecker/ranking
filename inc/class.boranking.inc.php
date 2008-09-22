@@ -341,10 +341,10 @@ class boranking extends soranking
 			{
 				$fed_grants = $this->federation->get_user_grants();
 			}
-			$fed_rights = $fed_grants[$athlete['fed_id']];
+			$fed_rights = (int)$fed_grants[$athlete['fed_id']] | (int)$fed_grants[$athlete['acl_fed_id']];
 
-			$check = isset($fed_rights) && ($fed_rights & $required);
-			$which = "fed_id=$athlete[fed_id] has rights=$fed_rights";
+			$check = $fed_rights & $required;
+			$which = "fed_id=$athlete[fed_id], acl_fed_id=$athlete[acl_fed_id] --> rights=$fed_rights";
 		}
 		// do we have to check for a license, jury rights do NOT allow to apply for licenses
 		if ($check && !$this->is_admin && $license)
