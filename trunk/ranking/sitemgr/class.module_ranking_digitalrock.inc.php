@@ -93,8 +93,8 @@ class module_ranking_digitalrock extends Module
 			),
 			'resultservice' => array(
 				'type' => 'textfield',
-				'label' => lang('Target for national team rankings (default: resultservice)'),
-				'default' => 'nat_team_ranking',
+				'label' => lang('Target for result service (default: resultservice)'),
+				'default' => 'resultservice',
 			),
 		);
 		$this->title = lang('digital ROCK');
