@@ -52,7 +52,7 @@ class athlete extends so_sql
 	 *
 	 * @var array
 	 */
-	var $non_db_cols = array('verband','nation','fed_id','a2f_start','a2f_end');
+	var $non_db_cols = array('verband','nation','fed_id','acl_fed_id','a2f_start','a2f_end');
 
 	var $result_table = self::RESULT_TABLE;
 
@@ -280,7 +280,7 @@ class athlete extends so_sql
 		// join in nation & federation
 		$join .= self::FEDERATIONS_JOIN;
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
-		$extra_cols += self::$fed_cols;
+		$extra_cols = array_merge($extra_cols,self::$fed_cols,self::$a2f_cols);
 
 		// by default only show real athlets (nation and sex set)
 		if (!isset($filter['sex']) && !(isset($criteria['sex']) && $op == 'AND'))
