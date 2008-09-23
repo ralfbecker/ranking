@@ -347,6 +347,28 @@ class ranking_federation extends so_sql
 	}
 
 	/**
+	 * Get the nations the user has (at least one) federation grant for
+	 *
+	 */
+	function get_user_nations()
+	{
+		static $nations;
+
+		if (!is_null($nations)) return $nations;
+
+		$nations = array();
+		if (!($grants = $this->get_user_grants()))
+		{
+			return $nations;
+		}
+		foreach($this->db->select(self::FEDERATIONS_TABLE,'DISTINCT nation',array('fed_id' => array_keys($grants)),__LINE__,__FILE__) as $row)
+		{
+			$nations[] = $row['nation'];
+		}
+		return $nations;
+	}
+
+	/**
 	 * Get the federations for a competition of a given nation, optinal limited to the one the user has registration rights for
 	 *
 	 * For international competitions we just return the nations, for national competitions we return

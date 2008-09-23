@@ -110,7 +110,18 @@ class uiathletes extends boranking
 						if (count($nations) != 1) throw new egw_exception_assertion_failed('Fed grants only implemented for a single nation!');
 						list($this->only_nation_athlete) = each($nations);
 						$this->athlete->data['nation'] = $this->only_nation_athlete;
-						list($this->athlete->data['fed_id']) = $feds_with_grants;
+						// SUI Regionalzentren
+						if ($this->only_nation_athlete == 'SUI' && count($feds_with_grants) == 1)
+						{
+							list($this->athlete->data['acl_fed_id']) = $feds_with_grants;
+							list($this->athlete->data['fed_id']) = @each($this->athlete->federations($this->only_nation_athlete,true));	// set the national federation
+							unset($feds_with_grants);
+						}
+						// everyone else (eg. GER Landesverbände)
+						else
+						{
+							list($this->athlete->data['fed_id']) = $feds_with_grants;
+						}
 					}
 				}
 			}
@@ -376,11 +387,17 @@ class uiathletes extends boranking
 			}
 			$readonlys['acl_fed_id[fed_id]'] = $readonlys['foto'] = $readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
 		}
-		elseif (!$this->athlete->data['PerId'] || $this->athlete->data['last_comp'])
+		else
 		{
-			$readonlys['delete'] = true;
+			if (!$this->athlete->data['PerId'] || $this->athlete->data['last_comp'])
+			{
+				$readonlys['delete'] = true;
+			}
+			if ($content['nation'] != 'SUI' || !in_array('SUI',$this->athlete_rights))
+			{
+				$readonlys['acl_fed_id[fed_id]'] = !$this->is_admin;	// dont allow non-admins to set acl_fed_id for nations other then SUI
+			}
 		}
-		if ($content['nation'] != 'SUI') $readonlys['acl_fed_id[fed_id]'] = true;	// dont allow to set acl_fed_id for GER
 		if ($js)
 		{
 			if (!is_object($GLOBALS['egw']->js))
@@ -401,6 +418,7 @@ class uiathletes extends boranking
 				'license_year' => $content['license_year'],
 				'license_nation' => $content['license_nation'],
 				'old_license_nation' => $content['license_nation'],
+				'acl_fed_id' => $content['acl_fed_id'],
 			),2);
 	}
 
@@ -562,6 +580,11 @@ class uiathletes extends boranking
 			if ($this->only_nation_athlete)
 			{
 				$content['nm']['col_filter']['nation'] = $this->only_nation_athlete;
+			}
+			// also set nation filter, if grants are from a single nation
+			elseif (count($fed_nations = $this->federation->get_user_nations()) == 1)
+			{
+				$content['nm']['col_filter']['nation'] = array_pop($fed_nations);
 			}
 		}
 		if (($readonlys['nm[rows][edit][0]'] = !count($this->athlete_rights)) && ($grants = $this->federation->get_user_grants()))
