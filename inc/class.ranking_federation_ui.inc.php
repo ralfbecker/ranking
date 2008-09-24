@@ -93,6 +93,15 @@ class ranking_federation_ui extends boranking
 					'csv_fields'  => false,
 					'default_cols' => '!fed_id',
 				);
+				if ($this->only_nation_athlete)
+				{
+					$content['nm']['col_filter']['nation'] = $this->only_nation_athlete;
+				}
+				// also set nation filter, if grants are from a single nation
+				elseif (count($fed_nations = $this->federation->get_user_nations()) == 1)
+				{
+					$content['nm']['col_filter']['nation'] = array_pop($fed_nations);
+				}
 			}
 		}
 		else
