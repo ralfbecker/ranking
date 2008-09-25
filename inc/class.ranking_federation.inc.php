@@ -423,7 +423,7 @@ class ranking_federation extends so_sql
 					$register_rights[$fed_id] = $fed_id;
 				}
 			}
-			$feds = array_intersect_key($feds,$register_rights);
+			$feds = array_intersect_key($feds,array_flip($register_rights));
 		}
 		//_debug_array($feds);
 		return $feds;
