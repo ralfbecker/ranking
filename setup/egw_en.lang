@@ -10,6 +10,7 @@
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 %1. heat	ranking	en	%1. Heat
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
+(%1 athletes not from %2 skipped)	ranking	en	(%1 athletes not from %2 skipped)
 1. display	ranking	en	1. Display
 1. place	ranking	en	1. place
 2. display	ranking	en	2. Display
@@ -40,6 +41,7 @@ apply for	ranking	en	Apply for
 apply modifications below to all selected federations	ranking	en	Apply modifications below to all selected federations
 apply the changes made	ranking	en	apply the changes made
 apply the changes of this athlete only	ranking	en	Apply the changes of this athlete only
+are you sure you want to make an exception?	ranking	en	Are you sure you want to make an EXCEPTION?
 as of	ranking	en	As of
 athlete	ranking	en	Athlete
 athlete %1 not found!	ranking	en	Athlete %1 not found!
@@ -125,6 +127,7 @@ display #%1 not found!!!	ranking	en	Display #%1 not found!!!
 display ranking	ranking	en	display ranking
 display saved	ranking	en	Display saved
 displays	ranking	en	Displays
+do you want to use a day-license?	ranking	en	Do you want to use a day-license?
 down	ranking	en	Down
 download	ranking	en	Download
 download all	ranking	en	Download all
@@ -172,6 +175,7 @@ error: saving the heat!!!	ranking	en	Error: saving the heat!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
 exists without saving the changes	ranking	en	exists without saving the changes
 factor	ranking	en	Factor
+fall	ranking	en	fall
 false start %1: %2	ranking	en	False start %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	en	Family name of the athlete in latin chars! Accents and umlauts are ok
 fax	ranking	en	Fax
@@ -398,10 +402,11 @@ sum	ranking	en	Sum
 suspended	ranking	en	suspended
 target for athlete profile (default: profil)	ranking	en	Target for athlete profile (default: profil)
 target for national team rankings (default: nat_team_ranking)	ranking	en	Target for national team rankings (default: nat_team_ranking)
+target for result service (default: resultservice)	ranking	en	Target for result service (default: resultservice)
 target for start lists (default: startlist)	ranking	en	Target for start lists (default: startlist)
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
-this athlete has no license! are you sure you want to make an exception	ranking	en	This athlete has NO license! Are you sure you want to make an EXCEPTION
+this athlete has no license!	ranking	en	This athlete has NO license!
 this module displays calendar, results and rankings	ranking	en	This module displays calendar, results and rankings
 this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
 this module displays information from the resultservice of the ranking app.	ranking	en	This module displays information from the resultservice of the ranking app.
@@ -432,6 +437,7 @@ url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. h
 use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"
 use access control to deny display on the website	ranking	en	use access control to deny display on the website
 use better result to break ties in the ranking	ranking	en	Use better result to break ties in the ranking
+use regular registration to apply for a license first.	ranking	en	Use regular registration to apply for a license first.
 use the acl to hide the birthdate, you can't remove it !!!	ranking	en	Use the ACL to hide the birthdate, you can't remove it !!!
 used to preset a link in rankings and competition-calendar	ranking	en	used to preset a link in rankings and competition-calendar
 vfs directory for the pdf files (excluding the year)	admin	en	VFS directory for the pdf files (excluding the year)
@@ -453,7 +459,9 @@ which pointalocation should be used to calculate the fieldfactor, usualy cuwr or
 which rankingsystem was used before, if any	ranking	en	which rankingsystem was used before, if any
 which view do you want to see, when you start the ranking app?	ranking	en	Which view do you want to see, when you start the ranking app?
 wildcard	ranking	en	Wildcard
+wrong admin-account or -password !!!	ranking	en	Wrong admin-account or -password !!!
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
+you are not permitted to apply for a license!	ranking	en	You are not permitted to apply for a license!
 you can only create a new heat, if the previous one '%1' has a result!	ranking	en	You can only create a new heat, if the previous one '%1' has a result!
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last heat, not one in between!
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
