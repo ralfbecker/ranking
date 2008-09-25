@@ -10,6 +10,7 @@
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
 %1. heat	ranking	de	%1. Runde
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
+(%1 athletes not from %2 skipped)	ranking	de	(%1 Athleten nicht aus %2 überlesen)
 1. display	ranking	de	1. Display
 1. place	ranking	de	1. Platz
 2. display	ranking	de	2. Display
@@ -40,6 +41,7 @@ apply for	ranking	de	Beantragen
 apply modifications below to all selected federations	ranking	de	Wende Änderungen darunter auf alle ausgewählten Verbände an
 apply the changes made	ranking	de	vorgenommene Änderungen anwenden
 apply the changes of this athlete only	ranking	de	Nur Änderungen an diesem Athleten anwenden
+are you sure you want to make an exception?	ranking	de	Sind Sie sicher, dass Sie eine AUSNAHME machen wollen?
 as of	ranking	de	Stand
 athlete	ranking	de	Athlet
 athlete %1 not found!	ranking	de	Athlet %1 nicht gefunden!
@@ -125,6 +127,7 @@ display #%1 not found!!!	ranking	de	Anzeige #%1 nicht gefunden!!!
 display ranking	ranking	de	Rangliste anzeigen
 display saved	ranking	de	Anzeige gespeichert
 displays	ranking	de	Anzeigen
+do you want to use a day-license?	ranking	de	Wollen Sie eine Tageslizenz verwenden?
 down	ranking	de	Nach unten
 download	ranking	de	Herunterladen
 download all	ranking	de	Alle herunterladen
@@ -172,6 +175,7 @@ error: saving the heat!!!	ranking	de	Fehler: beim Speichern der Runde !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
 exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
 factor	ranking	de	Faktor
+fall	ranking	de	Sturz
 false start %1: %2	ranking	de	Fehlstart %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Familienname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 fax	ranking	de	Fax
@@ -398,10 +402,11 @@ sum	ranking	de	Summe
 suspended	ranking	de	gesperrt
 target for athlete profile (default: profil)	ranking	de	Ziel (target) für Athletenprofile (Vorgabe: profile)
 target for national team rankings (default: nat_team_ranking)	ranking	de	Ziel (target) für nationale Team Rankings (Vorgabe: nat_team_ranking)
+target for result service (default: resultservice)	ranking	de	Ziel (target) für Ergebnisservice (Vorgabe: resultservice)
 target for start lists (default: startlist)	ranking	de	Ziel (target) für Startlisten (Vorgabe: startlist)
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
-this athlete has no license! are you sure you want to make an exception	ranking	de	Dieser Athlete hat KEINE Lizenz! Sind Sie sicher, dass Sie eine AUSNAHME machen wollen
+this athlete has no license!	ranking	de	Dieser Athlete hat KEINE Lizenz!
 this module displays calendar, results and rankings	ranking	de	Dieses Module zeigt Kalender, Ergebnisse und Ranglisten an
 this module displays information from the ranking app.	ranking	de	Dieses Modul zeigt Informationen der Ranglisten Anwendung.
 this module displays information from the resultservice of the ranking app.	ranking	de	Dieses Modul zeigt Informationen des Ergebnisservice der Ranglisten Anwendung.
@@ -432,6 +437,7 @@ url to own homepage, eg. http://domain.com	ranking	de	URL zu eigener Homepage, z
 use "yes" or "no, prefession"	ranking	de	benützen Sie "yes" oder "no, Beruf"
 use access control to deny display on the website	ranking	de	benützen Sie die Zugangskontrolle um die Anzeige auf der Webseite zu verhindern
 use better result to break ties in the ranking	ranking	de	Benutze ein besseres Ergebnis um Gleichstände in der Rangliste aufzubrechen
+use regular registration to apply for a license first.	ranking	de	Benutzen Sie zuerst die reguläre Registration um eine Lizenz zu beantragen.
 use the acl to hide the birthdate, you can't remove it !!!	ranking	de	Benutzen sie die Zugangscontrolle um das Geburtsdatum nicht anzuzeigen, Sie dürfen es nicht löschen !!!
 used to preset a link in rankings and competition-calendar	ranking	de	wird benutzt um einen Verweis in der Rangliste oder dem Wettkampfkalender anzuzeigen
 vfs directory for the pdf files (excluding the year)	admin	de	VFS Verzeichnis für PDF Dateien (ohne die Jahreszahl)
@@ -453,7 +459,9 @@ which pointalocation should be used to calculate the fieldfactor, usualy cuwr or
 which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem wurde zuvor benützt, wenn überhaupt
 which view do you want to see, when you start the ranking app?	ranking	de	Welche Ansicht soll angezeigt werden, wenn sie die Ranglistenanwendung starten?
 wildcard	ranking	de	Wildcard
+wrong admin-account or -password !!!	ranking	de	Falsches Admin-Konto oder -Passwort !!!
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
+you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizenz beantragen!
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
