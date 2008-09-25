@@ -323,6 +323,12 @@ class boranking extends soranking
 			$check = true;
 			$which = 'national ACL grants access';
 		}
+		// national edit rights allow to register foreing athlets for national competition
+		elseif($comp['nation'] && $required == EGW_ACL_REGISTER && in_array($comp['nation'],$this->edit_rights))
+		{
+			$check = true;
+			$which = 'national edit rights allow to register foreign athlets for national competitions';
+		}
 		// if competition given, we only check the federation if it's a national competition of that athlete!
 		elseif ($comp && !is_numeric($athlete['nation']) && $comp['nation'] != $athlete['nation'])
 		{
@@ -383,7 +389,7 @@ class boranking extends soranking
 	/**
 	 * checks if user is a judge of a given competition, this counts only 2 weeks before and after the competition!!!
 	 *
-	 * @param array/int $comp competitiion array or id
+	 * @param array|int $comp competitiion array or id
 	 * @return boolean
 	 */
 	function is_judge($comp)
@@ -394,8 +400,33 @@ class boranking extends soranking
 		}
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = abs(mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
-
+		//echo "<p>".__METHOD__."($comp[rkey]: $comp[name] ($comp[datum])) distance=$distance</p>\n";
 		return $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) && $distance <= $this->judge_right_days;
+	}
+
+	/**
+	 * Check if user is allowed to register an athlete without a license
+	 *
+	 * This function does NOT check if the athelte has a license or not!
+	 *
+	 * @param array|int $comp competitiion array or id
+	 * @return string|boolean string for confirmation message or boolean true or false to allow or deny it
+	 */
+	function allow_no_license_registration($comp)
+	{
+		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
+		{
+			return false;
+		}
+		if ($comp['nation'] == 'SUI')
+		{
+			return lang('This athlete has NO license!').' '.lang('Do you want to use a day-license?');
+		}
+		elseif ($this->is_admin || $this->is_judge($comp))
+		{
+			return lang('This athlete has NO license!').' '.lang('Are you sure you want to make an EXCEPTION?');
+		}
+		return false;
 	}
 
 	/**

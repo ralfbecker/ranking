@@ -54,7 +54,7 @@ class uiregistration extends boranking
 		$total = $this->athlete->get_rows($query,$rows,$readonlys,$query['show_all'] ? true : $query['cat']);
 
 		// admins and judges are allowed to EXECPTIONAL register athletes without license
-		$allow_no_license_register = $this->is_admin || $this->is_judge($query['comp']);
+		$allow_no_license_register = $this->allow_no_license_registration($query['comp']);
 
 		$readonlys = array();
 		foreach($rows as &$row)
@@ -63,7 +63,7 @@ class uiregistration extends boranking
 			{
 				if ($allow_no_license_register)	// admins or judges have to confirm the registration
 				{
-					$row['confirm'] = "if(confirm('This athlete has NO license! Are you sure you want to make an EXCEPTION')) ";
+					if ($allow_no_license_register !== true) $row['confirm'] = "if(confirm('".addslashes($allow_no_license_register)."')) ";
 				}
 				else	// others are denied to register
 				{
@@ -251,6 +251,9 @@ class uiregistration extends boranking
 				list($nation) = @each($this->federation->get_user_grants());
 			}
 		}
+		$allow_register_everyone = $this->is_admin || $this->is_judge($comp) ||		// limit non-judge to feds user has registration rights
+			// national edit rights allow to register foreing athlets for national competition
+			in_array($comp['nation'],$this->register_rights) && in_array($comp['nation'],$this->edit_rights);
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
@@ -258,8 +261,7 @@ class uiregistration extends boranking
 				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
-			'nation' => $this->federation->get_competition_federations($comp['nation'],
-				!$this->is_admin && !$this->is_judge($comp) ? $this->register_rights : null),	// limit non-judge to feds user has registration rights
+			'nation' => $this->federation->get_competition_federations($comp['nation'],$allow_register_everyone ? null : $this->register_rights),
 		);
 		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
 		{
@@ -311,9 +313,9 @@ class uiregistration extends boranking
 					//_debug_array($comp);
 					$msg = lang('Permission denied !!!');
 				}
-				elseif($content['register'] && $athlete['license'] == 'n' && !$this->is_admin && !$this->is_judge($comp))
+				elseif($content['register'] && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
 				{
-					$msg = lang('Athlete has no license! Use regular registration to apply for a license first.');
+					$msg = lang('This athlete has NO license!').' '.lang('Use regular registration to apply for a license first.');
 				}
 				elseif (!$this->registration_check($comp,$nation,$cat['GrpId']))
 				{
@@ -395,6 +397,10 @@ class uiregistration extends boranking
 				elseif(is_numeric($nation))
 				{
 					$where[] = '(fed_parent='.(int)$nation.' OR acl.fed_id='.(int)$nation.')';
+				}
+				elseif ($comp['nation'] != $nation)		// foreign participants in a national competition
+				{
+					$where['nation'] = $nation;
 				}
 				else
 				{
