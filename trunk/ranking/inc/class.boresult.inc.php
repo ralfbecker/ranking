@@ -805,7 +805,8 @@ class boresult extends boranking
 			'GrpId' => $keys['GrpId'],
 			'route_order' => $keys['route_order'],
 			'discipline' => $keys['discipline'],
-			'route_type' => $keys['route_type'],
+			// TWO_QUALI_SPEED is handled like ONE_QUALI (sum is stored in the result, the 2 times in the extra array)
+			'route_type' => $keys['route_type'] == TWO_QUALI_SPEED ? ONE_QUALI : $keys['route_type'],
 		)) as $row)
 		{
 			if ($row['result_rank'])

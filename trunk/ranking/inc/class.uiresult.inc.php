@@ -45,7 +45,7 @@ class uiresult extends boresult
 		// read $comp, $cat, $discipline and check the permissions
 		if (!$this->init_route($content,$comp,$cat,$discipline))
 		{
-			$js = "alert('".addslashes($e->getMessage())."'); window.close();";
+			$js = "alert('".addslashes(lang('Permission denied !!!'))."'); window.close();";
 			$GLOBALS['egw']->common->egw_header();
 			echo "<html><head><script>".$js."</script></head></html>\n";
 			$GLOBALS['egw']->common->egw_exit();

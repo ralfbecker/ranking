@@ -109,6 +109,7 @@ function usage($ret=0)
 	{
 		echo "\t$num\t$label\n";
 	}
+	echo "\t".TWO_QUALI_SPEED."\ttwo qualifications speed\n";
 	echo "--set-status sets the status of an imported heat, default 'result official':\n";
 	foreach($GLOBALS['boresult']->stati as $num => $label)
 	{
@@ -184,7 +185,7 @@ while(($arg = array_shift($arguments)) && substr($arg,0,2) == '--')
 			break;
 		case '--quali-type':
 			$route_type = (int)array_shift($arguments);
-			if (!isset($boresult->quali_types[$route_type]))
+			if (!isset($boresult->quali_types[$route_type]) && $route_type !== TWO_QUALI_SPEED)
 			{
 				echo "Error: not existing status!\n";
 				usage(10);
