@@ -587,9 +587,9 @@ class uiresult extends boresult
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
-		if ($query['discipline'] == 'lead')
+		if (!in_array($query['discipline'],array('speed','boulder')))
 		{
-			$rows['route_type'] = $query['route_type'] == TWO_QUALI_ALL ? 'TWO_QUALI_ALL' :
+			$rows['route_type'] = boresult::is_two_quali_all($query['route_type']) ? 'TWO_QUALI_ALL' :
 				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' :
 				($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
 		}
@@ -612,6 +612,7 @@ class uiresult extends boresult
 			case 'SUI':
 			default:
 				$rows['fed_col'] = 'ort';
+				$rows['fed_col2'] = 'plz';
 				$rows['fed_label'] = 'City';
 				break;
 		}
