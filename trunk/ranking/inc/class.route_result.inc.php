@@ -113,7 +113,7 @@ class route_result extends so_sql
 		if (!$only_keys && !$join || $route_order < 0)
 		{
 			$join = $this->athlete_join;
-			$extra_cols = array_merge($extra_cols,array('vorname','nachname','nation','geb_date','verband','ort'));
+			$extra_cols = array_merge($extra_cols,array('vorname','nachname','nation','geb_date','verband','ort','plz'));
 
 			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
 			if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
