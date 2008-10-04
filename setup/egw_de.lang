@@ -122,6 +122,7 @@ deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
 deny public display of the checked information	ranking	de	öffentlichen Anzeige der ausgewählte Informationen verweigern
 detect athletes	ranking	de	Athleten erkennen
 digital rock	ranking	de	digital ROCK
+discipline	ranking	de	Disziplin
 display	ranking	de	Anzeige
 display #%1 not found!!!	ranking	de	Anzeige #%1 nicht gefunden!!!
 display ranking	ranking	de	Rangliste anzeigen
@@ -372,6 +373,7 @@ select multiple federations for a further action	ranking	de	Mehrere Verbände f�
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 serid	ranking	de	SerId
+set by category	ranking	de	nach der Kategorie
 set license to	ranking	de	Setze Lizenz als
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung

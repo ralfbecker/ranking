@@ -122,6 +122,7 @@ deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
 detect athletes	ranking	en	Detect athletes
 digital rock	ranking	en	digital ROCK
+discipline	ranking	en	Discipline
 display	ranking	en	Display
 display #%1 not found!!!	ranking	en	Display #%1 not found!!!
 display ranking	ranking	en	display ranking
@@ -372,6 +373,7 @@ select multiple federations for a further action	ranking	en	Select multiple fede
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
 serid	ranking	en	SerId
+set by category	ranking	en	set by category
 set license to	ranking	en	Set license to
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
