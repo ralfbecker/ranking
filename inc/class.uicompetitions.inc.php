@@ -213,6 +213,7 @@ class uicompetitions extends boranking
 				'nation' => $this->comp->data['nation'],
 			)),
 			'host_nation' => $this->athlete->distinct_list('nation'),
+			'discipline' => $this->disciplines,
 		);
 		$readonlys = array(
 			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
