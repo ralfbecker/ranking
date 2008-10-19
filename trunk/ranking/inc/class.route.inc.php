@@ -63,11 +63,14 @@ class route extends so_sql
 
 		if (($ret = parent::delete($keys)))
 		{
+			/* dont know why this dont work: delete is in the query log, but it get's not executed, rows_effected=0
 			if (!is_object($GLOBALS['egw']->route_result))
 			{
 				$GLOBALS['egw']->route_result = new route_result($this->source_charset,$this->db);
 			}
 			$GLOBALS['egw']->route_result->delete($keys);
+			*/
+			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
 		}
 		return $ret;
 	}
