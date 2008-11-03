@@ -575,7 +575,7 @@ class uiresult extends boresult
 			if ($query['readonly']) $readonlys['set['.$row['PerId'].']'] = true;	// disable all result input
 
 			// shorten DAV or SAC Sektion
-			$rows[$k]['verband'] = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen Club) /','',$row['verband']);
+			$rows[$k]['verband'] = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -].Club) /','',$row['verband']);
 		}
 		// report the set-values at time of display back to index() for calling boresult::save_result
 		$query_in['return'] = $rows['set'];
@@ -790,7 +790,7 @@ class uiresult extends boresult
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum < '.$this->db->quote(date('Y-m-d',time()+7*24*3600)),	// starting 5 days from now
+				'datum < '.$this->db->quote(date('Y-m-d',time()+10*24*3600)),	// starting 10 days from now
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
