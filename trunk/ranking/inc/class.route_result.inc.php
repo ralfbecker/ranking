@@ -42,12 +42,12 @@ class route_result extends so_sql
 	);
 	var $charset,$source_charset;
 
-	var $athlete_join = 'LEFT JOIN Personen USING(PerId) JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 JOIN Federations USING(fed_id)';
+	var $athlete_join = 'LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations USING(fed_id)';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
-	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time > r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
+	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time >= r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
 
 	/**
 	 * constructor of the competition class
@@ -243,6 +243,10 @@ class route_result extends so_sql
 
 				return $rows;
 			}
+		}
+		if ($discipline == 'speed')
+		{
+			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// otherwise wildcards loose their id
 		}
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
@@ -586,9 +590,8 @@ class route_result extends so_sql
 						if (!$data['route_order']) $data['result_rank0'] = $data['result_rank'];
 					}
 				}
-				if (!$data['PerId'])	// Wildcard
+				if ($data['PerId'] < 0)	// Wildcard
 				{
-					$data['PerId'] = -$data['start_order'];
 					$data['nachname'] = '-- '.lang('Wildcard').' --';
 				}
 				break;
@@ -774,7 +777,8 @@ class route_result extends so_sql
 				else
 				{
 					$mode = $this->rank_speed_final;
-					$order_by .= ',result_time ASC';
+					//$order_by .= ',result_time ASC';
+					$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
 					$extra_cols[] = 'result_time';
 				}
 				break;
@@ -841,8 +845,11 @@ class route_result extends so_sql
 			{
 				if ($data['eliminated']) $data['time_sum'] = ELIMINATED_TIME;
 				$new_speed_rank = $data['new_rank'];
-				$data['new_rank'] = !$old_time || $old_time < $data['time_sum'] ||
-					 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
+				if ($data['new_rank'] > 1)	// all winners must have rank=1(!)
+				{
+					$data['new_rank'] = !$old_time || $old_time < $data['time_sum'] ||
+						 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
+				}
 				//echo "<p>$i. $data[PerId]: time=$data[time_sum], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
 				$old_time = $data['time_sum'];
 				$old_speed_rank = $new_speed_rank;

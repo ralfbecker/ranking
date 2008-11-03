@@ -48,7 +48,7 @@ class boresult extends boranking
 	);
 	var $eliminated_labels = array(
 		''=> '',
-		1 => 'eliminated',
+		1 => 'fall',
 		0 => 'wildcard',
 	);
 	/**
@@ -68,20 +68,7 @@ class boresult extends boranking
 	function __construct()
 	{
 		parent::__construct();
-/* doch in soranking, da es sonst nicht tut ;-)
-		foreach(array(
-				'route' => 'route',
-				'route_result'  => 'route_result',
-			) as $var => $class)
-		{
-			$egw_name = $class;
-			if (!is_object($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name =& new $class('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
-			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
-		}
-*/
+
 		$this->order_nums = array(
 			0 => lang('Qualification'),
 			1 => lang('2. Qualification'),
@@ -278,6 +265,7 @@ class boresult extends boranking
 			2 => 3, 3 => 4,
 		),
 	);
+
 	/**
 	 * Generate a startlist from the result of a previous heat
 	 *
@@ -291,6 +279,10 @@ class boresult extends boranking
 	function _startlist_from_previous_heat($keys,$start_order='reverse',$ko_system=false,$discipline='lead')
 	{
 		//echo "<p>".__METHOD__."(".print_r($keys,true).",$start_order,$ko_system,$discipline)</p>\n";
+		if ($ko_system && $keys['route_order'] > 2)
+		{
+			return $this->_startlist_from_ko_heat($keys,$prev_route);
+		}
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
@@ -304,12 +296,8 @@ class boresult extends boranking
 			$start_order != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
 			$ko_system && !$prev_route['route_quota'])
 		{
-			if (!$ko_system || !--$prev_keys['route_order'] || !($prev_route = $this->route->read($prev_keys,true)) ||
-				!$this->has_results($prev_keys))
-			{
-				//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
-				return false;	// prev. route not found or no result
-			}
+			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
+			return false;	// prev. route not found or no result
 		}
 		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
 		{
@@ -322,14 +310,7 @@ class boresult extends boranking
 		if ($prev_route['route_quota'] &&
 			(!self::is_two_quali_all($prev_route['route_type']) || $keys['route_order'] > 2))
 		{
-			if (!$ko_system || $prev_route['route_quota'] != 2 || $prev_route['route_order']+2 == $keys['route_order'])
-			{
-				$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
-			}
-			else	// small final
-			{
-				$prev_keys[] = 'result_rank > '.(int)$prev_route['route_quota'];
-			}
+			$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
 		}
 		$cols = 'PerId,start_number,result_rank';
 		if ($prev_route['route_quota'] == 1 || 				// superfinal
@@ -384,6 +365,7 @@ class boresult extends boranking
 			$order_by .= ',RAND()';					// --> randomized
 		}
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
+		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
 		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $prev_route['route_quota'])
@@ -439,15 +421,98 @@ class boresult extends boranking
 		{
 			while($start_order <= $prev_route['route_quota'])
 			{
-				$this->route_result->init($keys);
-				$this->route_result->save(array(
-					'PerId' => -$start_order,	// has to be set and unique (per route) for each wildcard
-					'start_order' => $this->ko_start_order[$prev_route['route_quota']][$start_order++],
-					'result_time' => ELIMINATED_TIME,
-				));
+				$this->_create_wildcard_co($keys,$this->ko_start_order[$prev_route['route_quota']][$start_order++]);
 			}
 		}
 		return $start_order-1;
+	}
+
+	/**
+	 * Generate a startlist from the result of a previous heat
+	 *
+	 * @param array $keys values for WetId, GrpId and route_order
+	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
+	 * @param boolean $ko_system=false use ko-system
+	 * @param string $discipline
+	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
+	 */
+	function _startlist_from_ko_heat($keys)
+	{
+		//echo "<p>".__METHOD__."(".print_r($keys,true).")</p>\n";
+		$prev_keys = array(
+			'WetId' => $keys['WetId'],
+			'GrpId' => $keys['GrpId'],
+			'route_order' => $keys['route_order']-1,
+		);
+		if (!($prev_route = $this->route->read($prev_keys)))
+		{
+			return false;
+		}
+		if ($prev_route['route_quota'] == 2)	// small final
+		{
+			$prev_keys[] = 'result_rank > 2';
+		}
+		else	// 1/2|4|8 Final
+		{
+			$prev_keys[] = 'result_rank = 1';
+
+			if (!$prev_route['route_quota'] && --$prev_keys['route_order'] &&	// final
+				!($prev_route = $this->route->read($prev_keys)))
+			{
+				return false;
+			}
+		}
+		$starters =& $this->route_result->search('',$cols='PerId,start_number,start_order',
+			$order_by='start_order','','',false,'AND',false,$prev_keys);
+		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
+
+		// reindex by _new_ start_order
+		foreach($starters as &$starter)
+		{
+			$start_order = (int)(($starter['start_order']+1)/2);
+			$starters_by_startorder[$start_order] =& $starter;
+		}
+		for($start_order=1; $start_order <= $prev_route['route_quota']; ++$start_order)
+		{
+			$data = $starters_by_startorder[$start_order];
+			if (!isset($data) || $data['PerId'] <= 0)	// no starter --> wildcard for co
+			{
+				$this->_create_wildcard_co($keys,$start_order,array('result_rank' => 2));
+			}
+			else	// regular starter
+			{
+				// check if our co is a regular starter, as we otherwise have a wildcard
+				$co = $starters_by_startorder[$start_order & 1 ? $start_order+1 : $start_order-1];
+				if (!isset($co) || $co['PerId'] <= 0)
+				{
+					$data['result_time'] = WILDCARD_TIME;
+					$data['result_rank'] = 1;
+				}
+				$data['start_order'] = $start_order;
+
+				$this->route_result->init($keys);
+				$this->route_result->save($data);
+
+			}
+		}
+		return $start_order-1;
+	}
+
+	/**
+	 * Create a wildcard co-starter
+	 *
+	 * @param array $keys
+	 * @param int $start_order
+	 * @param array $extra=array()
+	 */
+	function _create_wildcard_co(array $keys,$start_order,array $extra=array())
+	{
+		$this->route_result->init($keys);
+		$this->route_result->save($data=array(
+			'PerId' => -$start_order,	// has to be set and unique (per route) for each wildcard
+			'start_order' => $start_order,
+			'result_time' => ELIMINATED_TIME,
+		)+$extra);
 	}
 
 	/**
