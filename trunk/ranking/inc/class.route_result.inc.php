@@ -777,8 +777,9 @@ class route_result extends so_sql
 				else
 				{
 					$mode = $this->rank_speed_final;
-					//$order_by .= ',result_time ASC';
-					$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
+					// ORDER BY CASE column-alias does NOT work with MySQL 5.0.22-Debian_0ubuntu6.06.6, it works with 5.0.51a-log SUSE
+					//$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
+					$order_by = "result_time IS NULL,CASE ($this->rank_speed_final) WHEN 1 THEN 0 ELSE result_time END ASC";
 					$extra_cols[] = 'result_time';
 				}
 				break;
