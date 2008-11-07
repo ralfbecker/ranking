@@ -100,6 +100,7 @@ copy current formats to the new competition, which does not have any formats yet
 counting for rankings	ranking	de	zählend für die Rangliste
 create new federation: %1 (%2)	ranking	de	Lege neuen Verband an: %1 (%2)
 cup	ranking	de	Cup
+cup (unranked last)	ranking	de	Cup (nicht gelistet zuletzt)
 cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
 database	admin	de	Datenbank
@@ -125,6 +126,8 @@ digital rock	ranking	de	digital ROCK
 discipline	ranking	de	Disziplin
 display	ranking	de	Anzeige
 display #%1 not found!!!	ranking	de	Anzeige #%1 nicht gefunden!!!
+display cup	ranking	de	Cup anzeigen
+display no ranking	ranking	de	Rangliste nicht anzeigen
 display ranking	ranking	de	Rangliste anzeigen
 display saved	ranking	de	Anzeige gespeichert
 displays	ranking	de	Anzeigen
@@ -333,9 +336,13 @@ provisional result	ranking	de	provisorisches Ergebnis
 qualification	ranking	de	Qualifikation
 qualification, 1/2-final, ...	ranking	de	Qualifikation, 1/2-Finale, ...
 quota	ranking	de	Quote
+random (distribution cup)	ranking	de	gelost (Verteilung Cup)
+random (distribution ranking)	ranking	de	gelost (Verteilung Rangliste)
+random (keep existing startorder!)	ranking	de	gelost (bereits geloste behalten!)
 ranglist	ranking	de	Rangliste
 rank	ranking	de	Rang
 ranking	common	de	Ranglisten
+ranking (unranked last)	ranking	de	Rangliste (nicht gelistet zuletzt)
 ranking database	admin	de	Ranglisten Datenbank
 rankings - categories	ranking	de	Ranglisten - Kategorien
 rankings - cathegories	ranking	de	Ranglisten - Kategorien
@@ -358,6 +365,8 @@ resultlist	ranking	de	Ergebnisliste
 results	ranking	de	Ergebnisse
 results of %1 participants imported into the ranking, feldfactor: %2	ranking	de	Ergebnis von %1 Teilnehmern in die Rangliste importiert, Feldfaktor: %2
 resultservice	ranking	de	Ergebnisservice
+reverse cup (unranked first)	ranking	de	Umgekehrter Cup (nicht gelistet zuerst)
+reverse ranking (unranked first)	ranking	de	Umgekehrte Rangliste (nicht gelistet zuerst)
 route	ranking	de	Route
 routes	ranking	de	Routen
 rows	ranking	de	Zeilen
@@ -370,6 +379,7 @@ select competition	ranking	de	Wettkampf auswählen
 select heat	ranking	de	Runde auswählen
 select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
 select multiple federations for a further action	ranking	de	Mehrere Verbände für einen Befehl auswählen
+select order for qualification startlist or use default	ranking	de	Sortierung für Startliste der Qualifikation wählen oder Vorgabe verwenden
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 serid	ranking	de	SerId
@@ -422,6 +432,7 @@ top	ranking	de	Top
 top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
 two * two qualification	ranking	de	zwei * zwei Qualifikationen für alle
+two qualification	ranking	de	zwei Qualifikationen
 two qualification for all, flash one after the other	ranking	de	zwei Qualifikationen für alle, Flash nacheinander
 two qualification for all, flash simultaniously	ranking	de	zwei Qualifikationen für alle, Flash gleichzeitig
 two qualification for all, on sight	ranking	de	zwei Qualifikationen für alle, on sight
@@ -439,6 +450,7 @@ url to own homepage, eg. http://domain.com	ranking	de	URL zu eigener Homepage, z
 use "yes" or "no, prefession"	ranking	de	benützen Sie "yes" oder "no, Beruf"
 use access control to deny display on the website	ranking	de	benützen Sie die Zugangskontrolle um die Anzeige auf der Webseite zu verhindern
 use better result to break ties in the ranking	ranking	de	Benutze ein besseres Ergebnis um Gleichstände in der Rangliste aufzubrechen
+use default order	ranking	de	Vorgabe für Sortierung verwenden
 use regular registration to apply for a license first.	ranking	de	Benutzen Sie zuerst die reguläre Registration um eine Lizenz zu beantragen.
 use the acl to hide the birthdate, you can't remove it !!!	ranking	de	Benutzen sie die Zugangscontrolle um das Geburtsdatum nicht anzuzeigen, Sie dürfen es nicht löschen !!!
 used to preset a link in rankings and competition-calendar	ranking	de	wird benutzt um einen Verweis in der Rangliste oder dem Wettkampfkalender anzuzeigen

@@ -46,6 +46,10 @@ class boresult extends boranking
 		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, on sight',				// lead on 2 routes for all on sight
 		TWOxTWO_QUALI  => 'two * two Qualification',		// multiply the rank of 2 quali rounds on two routes each
 	);
+	var $quali_types_speed = array(
+		ONE_QUALI       => 'one Qualification',
+		TWO_QUALI_SPEED => 'two Qualification',
+	);
 	var $eliminated_labels = array(
 		''=> '',
 		1 => 'fall',
@@ -115,9 +119,15 @@ class boresult extends boranking
 	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL*
 	 * @param int $discipline='lead' 'lead', 'speed', 'boulder'
 	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
+	 * @param int $order=null 0=random, 1=reverse ranking, 2=reverse cup, 3=random(distribution ranking), 4=random(distrib. cup), 5=ranking, 6=cup
+	 * @param int $order=null null = default order from self::quali_startlist_default(), int with bitfield of
+	 * 	&1  use ranking for order, unranked are random behind last ranked
+	 *  &2  use cup for order, unranked are random behind last ranked
+	 *  &4  reverse ranking or cup (--> unranked first)
+	 *  &8  use ranking/cup for distribution only, order is random
 	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999)
+	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null)
 	{
 		$keys = array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
@@ -171,11 +181,9 @@ class boresult extends boranking
 			if ($starter['PerId']) $old_startlist[$starter['PerId']] = $starter;
 		}
 		// generate a startlist, without storing it in the result store
-		// old reverse ranking: $starters =& parent::generate_startlist($comp,$cat,$route_type == TWO_QUALI_HALF ? 2 : 1,$max_compl,1,$old_startlist);
 		$starters =& parent::generate_startlist($comp,$cat,
 			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
-			$discipline == 'speed' ? 1 :																		// 1 = reverse of ranking for speed
-			(in_array($route_type,array(TWO_QUALI_HALF,TWO_QUALI_ALL_SEED_STAGGER,TWOxTWO_QUALI)) ? 3 : 0),		// 3 = distribution by ranking, 0 = random
+			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
 			$route_type == TWO_QUALI_ALL_SEED_STAGGER,															// true = stagger, false = no stagger
 			$old_startlist);
 
@@ -200,6 +208,38 @@ class boresult extends boranking
 			$this->_store_startlist(isset($starters[2]) ? $starters[2] : $starters[1],1,isset($starters[2]));
 		}
 		return $num;
+	}
+
+	/**
+	 * Get the default ordering of the qualification startlist
+	 *
+	 * order bitfields:
+	 * 	&1  use ranking for order, unranked are random behind last ranked
+	 *  &2  use cup for order, unranked are random behind last ranked
+	 *  &4  reverse ranking or cup (--> unranked first)
+	 *  &8  use ranking/cup for distribution only, order is random
+	 *
+	 * @param string $discipline 'lead', 'speed', 'boulder'
+	 * @param int $route_type {ONE|TWO|TWOxTWO}_QUALI(_{HALF|ALL|ALL_SEED_STAGGER})?
+	 * @param string $nation=null nation of competition
+	 * @return int 0=random, 1=reverse ranking, 2=reverse cup, 3=random(distribution ranking), 4=random(distrib. cup), 5=ranking, 6=cup
+	 */
+	static function quali_startlist_default($discipline,$route_type,$nation=null)
+	{
+		switch($nation)
+		{
+			case 'SUI':
+				$order = 2|4;	// reverse cup
+				break;
+				
+			default:
+				$order = $discipline == 'speed' ? 1|4 :		// 5 = reverse of ranking for speed
+					// 9 = distribution by ranking, 0 = random
+					(in_array($route_type,array(TWO_QUALI_HALF,TWO_QUALI_ALL_SEED_STAGGER,TWOxTWO_QUALI)) ? 1|8 : 0);
+				break;
+		}
+		//echo "<p>".__METHOD__."($discipline,$route_type,$nation) order=$order</p>\n";
+		return $order;
 	}
 
 	/**
@@ -1116,7 +1156,7 @@ class boresult extends boranking
 	 * @param array &$comp on call competition array or null, on return competition array
 	 * @param array &$cat  on call category array or null, on return category array
 	 * @param string &$discipline on return discipline of route: 'lead', 'speed' or 'boulder'
-	 * @return boolean true on success, false if permission denied
+	 * @return boolean|string true on success, false if permission denied or string with message (eg. 'No quota set in previous heat!')
 	 */
 	function init_route(array &$content,&$comp,&$cat,&$discipline)
 	{
@@ -1162,13 +1202,26 @@ class boresult extends boranking
 			$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') :
 				($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
 
+			if ($previous && !$previous['route_quota']/* && ($discipline != 'speed' || $content['route_order'] <= 2)*/)
+			{
+				$msg = lang('No quota set in the previous heat!!!');
+			}
 			if ($discipline != 'speed')
 			{
 				$keys['route_quota'] = self::default_quota($discipline,$keys['route_order']);
 			}
-			elseif ($previous && $previous['route_quota'] > 2)
+			elseif ($previous && $previous['route_quota'])
 			{
 				$keys['route_quota'] = $previous['route_quota'] / 2;
+				if ($keys['route_quota'] > 1)
+				{
+					$keys['route_name'] = '1/'.$keys['route_quota'].' - '.lang('Final');
+				}
+				elseif($keys['route_quota'] == 1)
+				{
+					$keys['route_quota'] = '';
+					$keys['route_name'] = lang('Small final');
+				}
 			}
 			if ($previous && $previous['route_judge'])
 			{
@@ -1190,7 +1243,7 @@ class boresult extends boranking
 			$content['new_route'] = true;
 			$content['route_status'] = STATUS_STARTLIST;
 		}
-		return true;
+		return $msg ? $msg : true;
 	}
 
 	/**

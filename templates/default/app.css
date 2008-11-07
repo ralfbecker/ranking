@@ -6,7 +6,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
@@ -38,4 +38,5 @@
 .half_down { position: relative; top: 2.3em; }
 .winner { font-weight: bold; }
 .selectboxFullWidth select { width: 100%; }
+.inputFullWidth input { width:100%; }
 .checkAllArrow input { right-pad: 10px; }

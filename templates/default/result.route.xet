@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.route" template="" lang="" group="0" version="1.4.003">
+	<template id="ranking.result.route" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
-				<column/>
+				<column width="120"/>
 				<column/>
 				<column/>
 			</columns>
@@ -45,7 +45,8 @@
 				</row>
 				<row class="th">
 					<description value="Name"/>
-					<textbox id="route_name" size="64" maxlength="80" span="all" needed="1" statustext="Qualification, 1/2-Final, ..."/>
+					<textbox id="route_name" size="64" maxlength="80" span="all" class="inputFullWidth" needed="1" statustext="Qualification, 1/2-Final, ..."/>
+					<description/>
 				</row>
 				<row class="row">
 					<description value="Status"/>
@@ -53,11 +54,19 @@
 						<menulist>
 							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
 						</menulist>
-						<button id="button[startlist]" class="leftPad5" label="Generate Startlist"/>
+						<button id="button[ranking]" label="Import into ranking" statustext="Import the result into the ranking" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row class="row" disabled="@no_startlist">
+					<description value="Startlist"/>
+					<hbox span="all" options="0,0">
+						<button id="button[startlist]" label="Generate Startlist"/>
 						<menulist class="leftPad5">
 							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10"/>
 						</menulist>
-						<button id="button[ranking]" label="Import into ranking" statustext="Import the result into the ranking" class="leftPad5"/>
+						<menulist class="leftPad5">
+							<menupopup id="slist_order" statustext="Select order for qualification startlist or use default" options="Use default order"/>
+						</menulist>
 					</hbox>
 				</row>
 				<row class="row" disabled="@route_order=-1">
@@ -69,7 +78,8 @@
 				</row>
 				<row class="row" disabled="@route_order=-1">
 					<description options=",,,route_start" value="Start heat"/>
-					<textbox size="64" maxlength="64" id="route_start" blur="time" span="all"/>
+					<textbox size="64" maxlength="64" id="route_start" blur="time" span="all" class="inputFullWidth"/>
+					<description/>
 				</row>
 				<row class="row" disabled="@route_order=-1">
 					<description value="Observation time" options=",,,route_observation_time"/>
@@ -85,15 +95,17 @@
 				</row>
 				<row class="row">
 					<description value="Result official"/>
-					<textbox size="64" maxlength="80" id="route_result" blur="time" span="all"/>
+					<textbox size="64" maxlength="80" id="route_result" blur="time" span="all" class="inputFullWidth"/>
+					<description/>
 				</row>
 				<row class="row">
 					<description options=",,,route_judge" value="Judge"/>
-					<textbox size="64" maxlength="80" id="route_judge" blur="name(s)" span="all"/>
+					<textbox size="64" maxlength="80" id="route_judge" blur="name(s)" span="all" class="inputFullWidth"/>
+					<description/>
 				</row>
 				<row class="row" valign="top">
 					<description options=",,,route_comments" value="Comments"/>
-					<textbox multiline="true" rows="5" cols="52" id="route_comments" span="all"/>
+					<textbox multiline="true" rows="4" cols="52" id="route_comments" span="all"/>
 				</row>
 				<row class="row" disabled="@no_upload">
 					<description value="Import file"/>
