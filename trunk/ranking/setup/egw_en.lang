@@ -100,6 +100,7 @@ copy current formats to the new competition, which does not have any formats yet
 counting for rankings	ranking	en	counting for rankings
 create new federation: %1 (%2)	ranking	en	Create new federation: %1 (%2)
 cup	ranking	en	Cup
+cup (unranked last)	ranking	en	cup (unranked last)
 cuppattern	ranking	en	Cuppattern
 cups	ranking	en	cups
 database	admin	en	Database
@@ -125,6 +126,8 @@ digital rock	ranking	en	digital ROCK
 discipline	ranking	en	Discipline
 display	ranking	en	Display
 display #%1 not found!!!	ranking	en	Display #%1 not found!!!
+display cup	ranking	en	display cup
+display no ranking	ranking	en	display no ranking
 display ranking	ranking	en	display ranking
 display saved	ranking	en	Display saved
 displays	ranking	en	Displays
@@ -333,9 +336,13 @@ provisional result	ranking	en	provisional result
 qualification	ranking	en	Qualification
 qualification, 1/2-final, ...	ranking	en	Qualification, 1/2-Final, ...
 quota	ranking	en	Quota
+random (distribution cup)	ranking	en	random (distribution cup)
+random (distribution ranking)	ranking	en	random (distribution ranking)
+random (keep existing startorder!)	ranking	en	random (keep existing startorder!)
 ranglist	ranking	en	Ranglist
 rank	ranking	en	Rank
 ranking	common	en	Ranking
+ranking (unranked last)	ranking	en	ranking (unranked last)
 ranking database	admin	en	Ranking database
 rankings - categories	ranking	en	Rankings - Categories
 rankings - cathegories	ranking	en	Rankings - Cathegories
@@ -358,6 +365,8 @@ resultlist	ranking	en	Resultlist
 results	ranking	en	Results
 results of %1 participants imported into the ranking, feldfactor: %2	ranking	en	results of %1 participants imported into the ranking, feldfactor: %2
 resultservice	ranking	en	Resultservice
+reverse cup (unranked first)	ranking	en	reverse cup (unranked first)
+reverse ranking (unranked first)	ranking	en	reverse ranking (unranked first)
 route	ranking	en	Route
 routes	ranking	en	Routes
 rows	ranking	en	Rows
@@ -370,6 +379,7 @@ select competition	ranking	en	Select competition
 select heat	ranking	en	Select heat
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
 select multiple federations for a further action	ranking	en	Select multiple federations for a further action
+select order for qualification startlist or use default	ranking	en	Select order for qualification startlist or use default
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
 serid	ranking	en	SerId
@@ -422,6 +432,7 @@ top	ranking	en	Top
 top: number of tries or no	ranking	en	Top: number of tries or no
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
 two * two qualification	ranking	en	two * two Qualification
+two qualification	ranking	en	two Qualification
 two qualification for all, flash one after the other	ranking	en	two Qualification for all, flash one after the other
 two qualification for all, flash simultaniously	ranking	en	two Qualification for all, flash simultaniously
 two qualification for all, on sight	ranking	en	two Qualification for all, on sight
@@ -439,6 +450,7 @@ url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. h
 use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"
 use access control to deny display on the website	ranking	en	use access control to deny display on the website
 use better result to break ties in the ranking	ranking	en	Use better result to break ties in the ranking
+use default order	ranking	en	Use default order
 use regular registration to apply for a license first.	ranking	en	Use regular registration to apply for a license first.
 use the acl to hide the birthdate, you can't remove it !!!	ranking	en	Use the ACL to hide the birthdate, you can't remove it !!!
 used to preset a link in rankings and competition-calendar	ranking	en	used to preset a link in rankings and competition-calendar

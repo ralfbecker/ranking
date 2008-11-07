@@ -12,7 +12,7 @@
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
 
 class uiresult extends boresult
 {
@@ -39,94 +39,24 @@ class uiresult extends boresult
 			$content = $keys = array(
 				'WetId' => $_GET['comp'],
 				'GrpId' => $_GET['cat'],
-				'route_order' => $_GET['route'],
+				'route_order' => $_GET['route'] == '-2' ? -1 : $_GET['route'],	// -2 pairing speed --> show general result
 			);
 		}
 		// read $comp, $cat, $discipline and check the permissions
-		if (!$this->init_route($content,$comp,$cat,$discipline))
+		if (!($ok = $this->init_route($content,$comp,$cat,$discipline)))
 		{
 			$js = "alert('".addslashes(lang('Permission denied !!!'))."'); window.close();";
 			$GLOBALS['egw']->common->egw_header();
 			echo "<html><head><script>".$js."</script></head></html>\n";
 			$GLOBALS['egw']->common->egw_exit();
 		}
-/*
-		if (!($comp = $this->comp->read($_GET['comp'] ? $_GET['comp'] : $content['WetId'])) ||
-			!($cat = $this->cats->read($_GET['cat'] ? $_GET['cat'] : $content['GrpId'])) ||
-			!in_array($cat['rkey'],$comp['gruppen']))
+		elseif(is_string($ok))
 		{
-			$msg = lang('Permission denied !!!');
-			$js = "alert('".addslashes($msg)."'); window.close();";
-			$GLOBALS['egw']->common->egw_header();
-			echo "<html><head><script>".$js."</script></head></html>\n";
-			$GLOBALS['egw']->common->egw_exit();
+			$msg .= $ok;
 		}
-		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
-
-		if (!is_array($content))
+		if (!isset($content['slist_order']))
 		{
-			$content = $keys = array(
-				'WetId' => $_GET['comp'],
-				'GrpId' => $_GET['cat'],
-				'route_order' => $_GET['route'],
-			);
-			if ((int)$_GET['comp'] && (int)$_GET['cat'] && (!is_numeric($_GET['route']) ||
-				!($content = $this->route->read($content,true))))
-			{
-				// try reading the previous heat, to set some stuff from it
-				if (($keys['route_order'] = $this->route->get_max_order($_GET['comp'],$_GET['cat'])) >= 0 &&
-					($previous = $this->route->read($keys,true)))
-				{
-					++$keys['route_order'];
-					if ($keys['route_order'] == 1 && in_array($previous['route_type'],array(ONE_QUALI,TWO_QUALI_SPEED)))
-					{
-						$keys['route_order'] = 2;
-					}
-					foreach(array('route_type','dsp_id','frm_id','dsp_id2','frm_id2','route_time_host','route_time_port') as $name)
-					{
-						$keys[$name] = $previous[$name];
-					}
-				}
-				else
-				{
-					$keys['route_order'] = '0';
-				}
-				$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') :
-					($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
-
-				if ($discipline != 'speed')
-				{
-					$keys['route_quota'] = $this->default_quota($discipline,$keys['route_order']);
-				}
-				elseif ($previous && $previous['route_quota'] > 2)
-				{
-					$keys['route_quota'] = $previous['route_quota'] / 2;
-				}
-				if ($previous && $previous['route_judge'])
-				{
-					$keys['route_judge'] = $previous['route_judge'];
-				}
-				else	// set judges from the competition
-				{
-					$keys['route_judge'] = array();
-					if ($comp['judges'])
-					{
-						foreach($comp['judges'] as $uid)
-						{
-							$keys['route_judge'][] = $GLOBALS['egw']->common->grab_owner_name($uid);
-						}
-						$keys['route_judge'] = implode(', ',$keys['route_judge']);
-					}
-				}
-				$content = $this->route->init($keys);
-				$content['new_route'] = true;
-			}
-		}
-*/
-		// speed uses a different type for quali on two routes
-		if ($content['route_type'] == TWO_QUALI_SPEED)
-		{
-			$content['route_type'] = TWO_QUALI_ALL;
+			$content['slist_order'] = self::quali_startlist_default($discipline,$content['route_type'],$comp['nation']);
 		}
 		// check if user has NO edit rights
 		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)))
@@ -174,10 +104,7 @@ class uiresult extends boresult
 						)) ? $format->frm_id : 0;
 					}
 					//_debug_array($content);
-					// speed uses a different type for quali on two routes
-					if ($discipline == 'speed' && $content['route_type'] == TWO_QUALI_ALL) $content['route_type'] = TWO_QUALI_SPEED;
 					$err = $this->route->save($content);
-					if ($discipline == 'speed' && $content['route_type'] == TWO_QUALI_SPEED) $content['route_type'] = TWO_QUALI_ALL;
 					if ($err)
 					{
 						$msg = lang('Error: saving the heat!!!');
@@ -203,7 +130,7 @@ class uiresult extends boresult
 					}
 					elseif (is_numeric($content['route_order']) &&
 						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'],
-							$content['max_compl']!=='' ? $content['max_compl'] : 999)))
+							$content['max_compl']!=='' ? $content['max_compl'] : 999,$content['slist_order'])))
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
 
@@ -335,31 +262,6 @@ class uiresult extends boresult
 		{
 			$tmpl->disable_cells('route_num_problems');
 		}
-		if ($previous)	// previous heat of a NEW route
-		{
-			if (!$previous['route_quota'] && ($content['discipline'] != 'speed' || $content['route_order'] <= 2))
-			{
-				$content['msg'] = lang('No quota set in the previous heat!!!');
-			}
-			elseif ($content['discipline'] == 'speed')
-			{
-				$content['route_quota'] = $previous['route_quota'] / 2;
-				if ($content['route_quota'] > 1)
-				{
-					$content['route_name'] = '1/'.$content['route_quota'].' - '.lang('Final');
-				}
-				elseif($content['route_quota'] == 1)
-				{
-					$content['route_quota'] = '';
-					$content['route_name'] = lang('Small final');
-				}
-				else
-				{
-					$content['route_quota'] = '';
-					$content['route_name'] = lang('Final');
-				}
-			}
-		}
 		foreach(array('new_route','route_type','route_order','dsp_id','frm_id','dsp_id2','frm_id2') as $name)
 		{
 			$preserv[$name] = $content[$name];
@@ -369,7 +271,7 @@ class uiresult extends boresult
 			'GrpId' => array($cat['GrpId']  => $cat['name']),
 			'route_order' => $this->order_nums,
 			'route_status' => $this->stati,
-			'route_type' => $this->quali_types,
+			'route_type' => $discipline == 'speed' ? $this->quali_types_speed : $this->quali_types,
 			'discipline' => $this->disciplines,
 			'upload_options' => array(
 				1 => array(
@@ -382,6 +284,7 @@ class uiresult extends boresult
 				),
 				3 => 'all above',
 			),
+			'slist_order' => self::slist_order_options($comp['serie']),
 		);
 		if ($content['route_order'] == -1)
 		{
@@ -391,9 +294,11 @@ class uiresult extends boresult
 		$readonlys['button[startlist]'] = $readonlys['button[delete]'] =
 			$content['route_order'] == -1 || $content['new_route'];
 		// disable max. complimentary selection if no quali.
-		if ($content['route_order'] > (int)($content['route_type']==TWO_QUALI_HALF))
+		if ($content['route_order'] > (int)($content['route_type']==TWO_QUALI_HALF) || $content['route_order'] < 0)
 		{
 			$tmpl->disable_cells('max_compl');
+			$tmpl->disable_cells('slist_order');
+			if ($readonlys['button[startlist]']) $content['no_startlist'] = true;	// disable empty startlist row
 		}
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
@@ -452,6 +357,32 @@ class uiresult extends boresult
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.
 			($content['new_route'] ? lang('Add heat') : lang('Edit heat'));
 		$tmpl->exec('ranking.uiresult.route',$content,$sel_options,$readonlys,$preserv,2);
+	}
+
+	/**
+	 * Return options for startlist order
+	 *
+	 * @param boolean $cup
+	 * @return array
+	 */
+	private static function slist_order_options($cup)
+	{
+		$options = array(
+			0  => 'random (keep existing startorder!)',
+			9  => 'random (distribution ranking)',
+			10 => 'random (distribution cup)',
+			1  => 'ranking (unranked last)',
+			5  => 'reverse ranking (unranked first)',
+			2  => 'cup (unranked last)',
+			6  => 'reverse cup (unranked first)',
+		);
+		if (!$cup)
+		{
+			unset($options[2]);
+			unset($options[4]);
+			unset($options[6]);
+		}
+		return $options;
 	}
 
 	/**
@@ -517,7 +448,7 @@ class uiresult extends boresult
 			($cat = $this->cats->read($query['cat'])))
 		{
 			$stand = $comp['datum'];
- 			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
+ 			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$query['ranking']==2?$comp['serie']:'');
 		}
 		foreach($rows as $k => $row)
 		{
@@ -806,6 +737,9 @@ class uiresult extends boresult
 			),
 			'eliminated' => $this->eliminated_labels,
 			'eliminated_r' => $this->eliminated_labels,
+			'ranking' => array(
+				1 => 'display ranking',
+			) + ($comp['serie'] ? array(2 => 'display cup') : array()),
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
 
