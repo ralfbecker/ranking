@@ -750,11 +750,14 @@ class boranking extends soranking
 				if (($prequal_ranking = $this->comp->prequal_ranking($cat_id,$comp)))
 				{
 					$stand = $comp['datum'];
-					if (in_array($cat_id,array(48,49,50,11,12,13)))		// german youth does NOT use ranking, but cup result since 2008!
+					// german youth does NOT use ranking, but cup result since 2008!
+					if (in_array($cat_id,array(48,49,50,11,12,13)))
 					{
-						if (!($ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$comp['serie'])))
+						if (!($ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,
+							$comp['serie'] ? $comp['serie'] : sprintf('%02d_JC',date('y')))))
 						{
-							$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,'JC_'.(date('y')-1));	// previous year
+							$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,
+								sprintf('%02d_JC',date('y')-1));	// previous year
 						}
 					}
 					else
@@ -787,6 +790,7 @@ class boranking extends soranking
 	 */
 	function national_prequalified($comp,$nation)
 	{
+		//echo "<p>".__METHOD__."(".array2string($comp).",$nation)</p>\n";
 		if (!($prequalified = $this->prequalified($comp))) return false;
 
 		$all_cats = $nat_prequals = array();
@@ -821,6 +825,7 @@ class boranking extends soranking
 				}
 			}
 		}
+		//echo "nat_prequals="; _debug_array($nat_prequals);
 		return $nat_prequals;
 	}
 
@@ -914,7 +919,7 @@ class boranking extends soranking
 		$use_cup = (boolean)($order & 2);
 		$reverse_ranking = (boolean)($order & 4);
 		$distribution_only = (boolean)($order & 8);
-		
+
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
