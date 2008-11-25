@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
@@ -34,9 +34,9 @@ class cup extends so_sql
 		$this->so_sql('ranking','Serien',$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
-		
+
 		$this->charset = $GLOBALS['egw']->translation->charset();
-		
+
 		foreach(array(
 				'cats'  => 'category',
 			) as $var => $class)
@@ -100,7 +100,7 @@ class cup extends so_sql
 			$data =& $this->data;
 		}
 		if ($data['rkey']) $data['rkey'] = strtoupper($data['rkey']);
-		if ($data['nation'] && !is_array($data['nation'])) 
+		if ($data['nation'] && !is_array($data['nation']))
 		{
 			$data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
 		}
@@ -116,7 +116,7 @@ class cup extends so_sql
 			}
 			unset($data['nat_team_quota']);
 			unset($data['max_per_cat']);
-			
+
 			$data['gruppen'] = implode(',',$data['gruppen']);
 		}
 		if (is_array($data['presets'])) $data['presets'] = serialize($data['presets']);
@@ -156,7 +156,7 @@ class cup extends so_sql
 	function names($keys=array(),$rkey_only=false)
 	{
 		if (!is_array($keys)) $keys = $keys ? array('nation' => ($keys == 'NULL' ? null : $keys)) : array();
-		
+
 		$names = array();
 		foreach((array)$this->search(array(),False,'year DESC','','',true,'AND',false,$keys) as $data)
 		{
@@ -164,7 +164,7 @@ class cup extends so_sql
 		}
 		return $names;
 	}
-	
+
 	/**
 	 * get max. number of comps. counting for $cat in $cup
 	 *
@@ -181,7 +181,7 @@ class cup extends so_sql
 			$cup =& $this->data;
 		}
 		$max = $cup['max_per_cat'][$cat_rkey] ? (int) $cup['max_per_cat'][$cat_rkey] : $cup['max_serie'];
-		
+
 		if ($max < 0)	// $max comps less then the total
 		{
 			if (!isset($GLOBALS['egw']->comp))
@@ -194,12 +194,29 @@ class cup extends so_sql
 			$wettks = $GLOBALS['egw']->comp->search(array(),true,'','','',false,'AND',false,array(
 				'nation' => $cup['nation'],
 				'serie'  => $cup['SerId'],
-				$GLOBALS['egw']->comp->check_in_cats($cats),			
+				$GLOBALS['egw']->comp->check_in_cats($cats),
 			));
 			$anz_wettk = count($wettks);
 			//echo "<p>$sql: anz_wettk=$anz_wettk</p>\n";
 			return ($cup['max_serie'] + $anz_wettk)." (=$anz_wettk$cup[max_serie])";
 		}
 		return $max;
+	}
+
+	/**
+	 * Read a competition, reimplemented to allow to pass WetId or rkey instead of the array
+	 *
+	 * @param mixed $keys array with keys, or WetId or rkey
+	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
+	 * @return array/boolean array with competition or false on error (eg. not found)
+	 */
+	function read($keys,$extra_cols='',$join='')
+	{
+		if ($keys && !is_array($keys))
+		{
+			$keys = is_numeric($keys) ? array('GrpId' => (int) $keys) : array('rkey' => $keys);
+		}
+		return parent::read($keys,$extra_cols,$join);
 	}
 }
