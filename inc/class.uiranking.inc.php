@@ -8,13 +8,13 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
 
-class uiranking extends boranking 
+class uiranking extends boranking
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -50,7 +50,7 @@ class uiranking extends boranking
 		//_debug_array($content);
 
 		$nation = $this->only_nation ? $this->only_nation : $content['nation'];
-		if (!$nation) 
+		if (!$nation)
 		{
 			list($nation) = each($this->ranking_nations);	// use the first nation
 		}
@@ -65,7 +65,7 @@ class uiranking extends boranking
 				'rkey' => $cup['gruppen'],
 			) : array(
 				'nation' => $nation,
-				'rls > 0',    
+				'rls > 0',
 			),1),
 			'stand_rkey' => $this->comp->names(array(
 				'nation' => $nation,
@@ -76,7 +76,7 @@ class uiranking extends boranking
 		);
 		$cat = $content['cat'] ? $this->cats->read($content['cat']) : '';
 		// if no cat selected or cat invalid for the choosen nation and cup ==> use first cat from list
-		if (!$cat || $nation != ($cat['nation'] ? $cat['nation'] : 'NULL') || 
+		if (!$cat || $nation != ($cat['nation'] ? $cat['nation'] : 'NULL') ||
 			$cup && !in_array($cat['rkey'],$cup['gruppen']))
 		{
 			list($cat) = each($select_options['cat']);	// use the first cat
@@ -116,7 +116,7 @@ class uiranking extends boranking
 				// setup array-indices starting with 1
 				$content['ranking'] = array_values($content['ranking']);
 				array_unshift($content['ranking'],false);
-			}			
+			}
 		}
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').($cup ? ': '.$cup['name'] : '').
