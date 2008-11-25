@@ -502,9 +502,16 @@ class uiregistration extends boranking
 				// check if newly registered athlete is over quota AND we have no complimentary list
 				if ($check_athlete_over_quota && $starter['PerId'] == $check_athlete_over_quota && $i >= $quota)
 				{
-					$this->register($comp['WetId'],$starter['GrpId'],$starter['PerId'],2);	// delete starter again
-					$msg = lang('No complimentary list (over quota)')." quota=$quota!";
-					continue;
+					if ($this->is_admin || $this->is_judge($comp))
+					{
+						$msg .= '. '.lang('No complimentary list (over quota)').'!';
+					}
+					else
+					{
+						$this->register($comp['WetId'],$starter['GrpId'],$starter['PerId'],2);	// delete starter again
+						$msg = lang('No complimentary list (over quota)').' quota='.(int)$quota.'!';
+						continue;
+					}
 				}
 				$delete_button = 'delete['.$starter['GrpId'].'/'.$starter['PerId'].']';
 				$nat_starters[$i][$col] = $starter+array(
