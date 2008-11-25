@@ -12,7 +12,7 @@
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_federation.inc.php');
 
 class ranking_federation_ui extends boranking
