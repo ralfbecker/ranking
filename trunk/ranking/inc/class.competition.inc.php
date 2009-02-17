@@ -507,38 +507,13 @@ class competition extends so_sql
 	{
 		if (!$data) $data =& $this->data;
 
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return array();
-
-		if (!isset($GLOBALS['egw']->vfs))
-		{
-			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
-		}
 		$attachments = false;
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
 			$vfs_path = $this->attachment_path($type,$data);
-			if ($GLOBALS['egw']->vfs->file_exists(array(
-					'string' => $vfs_path,
-					'relatives' => RELATIVE_ROOT,
-				)))
+			if (egw_vfs::stat($vfs_path))
 			{
-				$parts = explode('/',$vfs_path);
-				$file = array_pop($parts);
-				$path = implode('/',$parts);
-				$linkdata = array(
-					'menuaction' => 'filemanager.uifilemanager.view',
-					'path'       => base64_encode($path),
-					'file'       => base64_encode($file),
-				);
-				if ($return_link)
-				{
-					$linkdata = $GLOBALS['egw']->link('/index.php',$linkdata);
-					if ($linkdata{0} == '/')
-					{
-						$linkdata = ($_SERVER['HTTPS'] ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].$linkdata;
-					}
-				}
-				$attachments[$type] = $linkdata;
+				$attachments[$type] = egw_vfs::download_url($vfs_path);
 			}
 		}
 		return $attachments;
@@ -556,44 +531,38 @@ if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return array(
 	{
 		if ($keys && !$this->read($keys)) return false;
 
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
-
-		if (!isset($GLOBALS['egw']->vfs))
-		{
-			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
-		}
+		egw_vfs::$is_root = true;		// acl is based on edit rights for the competition and NOT the vfs rights
 		foreach($files as $type => $path)
 		{
 			if (!file_exists($path) || !is_readable($path))
 			{
 				$error_msg = lang("'%1' does not exist or is not readable by the webserver !!!",$path);
+				egw_vfs::$is_root = false;
 				return false;
 			}
 			$vfs_path = $this->attachment_path($type);
 
 			// check and evtl. create the year directory
-			$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
-			if (!$GLOBALS['egw']->vfs->file_exists($vfs_dir = array(
-					'string' => dirname($vfs_path),
-					'relatives' => RELATIVE_ROOT,
-				)) && !$GLOBALS['egw']->vfs->mkdir($vfs_dir))
+			if (!egw_vfs::is_dir($dir = dirname($vfs_path)) &&
+				!egw_vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
 			{
-				$error_msg = lang("Can not create directory '%1' !!!",dirname($vfs_path));
-				$GLOBALS['egw']->vfs->override_acl = 0;
+				$error_msg = lang("Can not create directory '%1' !!!",$dir);
+				egw_vfs::$is_root = false;
 				return false;
 			}
-			if (!$GLOBALS['egw']->vfs->mv(array(
-					'from' => $path,
-					'to'   => $vfs_path,
-					'relatives' => array(RELATIVE_NONE|VFS_REAL,RELATIVE_ROOT),
-				)))
+			$ok = false;
+			if ((!($from_fp = fopen($path,'r')) || !($to_fp = egw_vfs::fopen($vfs_path,'w')) ||
+				!($ok = stream_copy_to_stream($from_fp,$to_fp) !== false)))
 			{
 				$error_msg = lang("Can not move '%1' to %2 !!!",$path,$vfs_path);
-				$GLOBALS['egw']->vfs->override_acl = 0;
-				return false;
 			}
-			$GLOBALS['egw']->vfs->override_acl = 0;
+	 		if ($from_fp) fclose($from_fp);
+	 		if ($to_fp)   fclose($to_fp);
+
+	 		if (!$ok) return false;
 		}
+		egw_vfs::$is_root = false;
+
 		return true;
 	}
 
@@ -608,19 +577,9 @@ if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
 	{
 		if ($keys && !$this->read($keys)) return false;
 
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
-
-		if (!isset($GLOBALS['egw']->vfs))
-		{
-			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
-		}
-		$vfs_path_arr = array(
-			'string' => $this->attachment_path($type),
-			'relatives' => RELATIVE_ROOT,
-		);
-		$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
-		$Ok = $GLOBALS['egw']->vfs->file_exists($vfs_path_arr) && $GLOBALS['egw']->vfs->rm($vfs_path_arr);
-		$GLOBALS['egw']->vfs->override_acl = 0;
+		egw_vfs::$is_root = true;		// acl is based on edit rights for the competition and NOT the vfs rights
+		$Ok = egw_vfs::remove($this->attachment_path($type));
+		egw_vfs::$is_root = false;
 
 		return $Ok;
 	}
@@ -637,34 +596,21 @@ if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
 		//echo "<p>competitions::rename_attachments('$old_rkey',".print_r($keys,true).") data[rkey]='".$this->data['rkey']."'</p>\n";
 		if (!$old_rkey || $keys && !$this->read($keys)) return false;
 
-
-if ($GLOBALS['egw_info']['server']['versions']['phpgwapi'] >= 1.5) return false;
-
-		if (!isset($GLOBALS['egw']->vfs))
-		{
-			$GLOBALS['egw']->vfs = CreateObject('phpgwapi.vfs');
-		}
 		$ok = true;
-		$GLOBALS['egw']->vfs->override_acl = 1;		// acl is based on edit rights for the competition and NOT the vfs rights
+		egw_vfs::$is_root = true;		// acl is based on edit rights for the competition and NOT the vfs rights
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
 			$old_path = $this->attachment_path($type,null,$old_rkey);
 			$new_path = $this->attachment_path($type);
 			//echo "$old_path --> $new_path<br>\n";
 
-			if ($old_path != $new_path && $GLOBALS['egw']->vfs->file_exists(array(
-					'string' => $old_path,
-					'relatives' => RELATIVE_ROOT,
-				)) && !$GLOBALS['egw']->vfs->mv(array(
-					'from' => $old_path,
-					'to'   => $new_path,
-					'relatives' => array(RELATIVE_ROOT,RELATIVE_ROOT),
-				)))
+			if ($old_path != $new_path && egw_vfs::stat($old_path) &&
+				!egw_vfs::rename($old_path,$new_path))
 			{
 				$ok = false;
 			}
 		}
-		$GLOBALS['egw']->vfs->override_acl = 0;
+		egw_vfs::$is_root = false;
 
 		return $ok;
 	}
