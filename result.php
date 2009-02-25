@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -41,11 +41,6 @@ function check_anon_access(&$anon_account)
 <!--
 @import url(/egroupware/etemplate/templates/default/app.css);
 @import url(/egroupware/ranking/templates/default/app.css);
-#category { display: none; }
-@media print {
-	#result { padding-top: 3cm; }
-	#category { display: inline; position: absolute; font-weight: bold; font-size: 10pt; top: 2.2cm; left: 0.25cm; }
-}
 -->
 </style>
 <?php
@@ -59,12 +54,6 @@ $GLOBALS['Common_BO'] = new stdClass;
 $content = ExecMethod('ranking.uiresult.index');
 // rewrite id of result, to be able to use it in css
 $content = preg_replace('/id="ranking.result.index.rows[^"]+"/','id="result"',$content);
-// extract current category and route for print
-if (preg_match('/<select[^>]+id="exec\[nm\]\[cat\]".*<option[^>]+selected="selected"[^>]*>([^<]+)<\/option>.*<\/select>/Us',$content,$matches))
-{
-	preg_match('/<select[^>]+id="exec\[nm\]\[route\]".*<option[^>]+selected="selected"[^>]*>([^<]+)<\/option>.*<\/select>/Us',$content,$matches2);
-	echo '<div id="category">'.$matches2[1].' '.$matches[1]."</div>\n";
-}
 // remove (not working) download button
 $content = preg_replace('/<a.*id="exec\[button\]\[download\]".*<\/a>/','',$content);
 
