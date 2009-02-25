@@ -40,3 +40,4 @@
 .selectboxFullWidth select { width: 100%; }
 .inputFullWidth input { width:100%; }
 .checkAllArrow input { right-pad: 10px; }
+.previewImage img { max-width: 200px; max-height: 100px; border: 1px solid black; }

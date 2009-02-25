@@ -34,6 +34,8 @@ class uicompetitions extends boranking
 			'info'      => lang('Information PDF'),
 			'startlist' => lang('Startlist PDF'),
 			'result'    => lang('Result PDF'),
+			'logo'      => lang('Competition logo'),
+			'sponsors'  => lang('Sponsor logos'),
 		);
 	}
 
@@ -139,17 +141,25 @@ class uicompetitions extends boranking
 						if (is_array($file) && $file['tmp_name'] && $file['name'])
 						{
 							//echo $type; _debug_array($file);
-							$error_msg = $file['type'] != 'application/pdf' &&
-								strtolower(substr($file['name'],-4)) != '.pdf' ?
-								lang('File is not a PDF'): false;
-
-							if (!$error_msg && $this->comp->attach_files(array($type => $file['tmp_name']),$error_msg))
+							if ($type != 'logo' && $type != 'sponsors')
 							{
-								$msg .= ', '.lang("File '%1' successful attached as %2",$file['name'],$this->attachment_type[$type]);
+								$extension = '.pdf';
+								$error_msg = $file['type'] != 'application/pdf' &&
+									strtolower(substr($file['name'],-4)) != $extension ?
+									lang('File is not a PDF') : false;
 							}
 							else
 							{
-								$msg .= ', '.lang("Error: attaching '%1' as %2 (%3) !!!",$file['name'],$this->attachment_type[$type],$error_msg);
+								$error_msg = ($extension=competition::is_image($file['name'],$file['type'])) ? false :
+									lang('File is not an image (%1)',str_replace(array('\\','$'),'',implode(', ',competition::$image_types)));
+							}
+							if (!$error_msg && $this->comp->attach_files(array($type => $file['tmp_name']),$error_msg,null,$extension))
+							{
+								$msg .= ",\n".lang("File '%1' successful attached as %2",$file['name'],$this->attachment_type[$type]);
+							}
+							else
+							{
+								$msg .= ",\n".lang("Error: attaching '%1' as %2 (%3) !!!",$file['name'],$this->attachment_type[$type],$error_msg);
 							}
 						}
 					}
@@ -187,10 +197,11 @@ class uicompetitions extends boranking
 			'msg' => $msg,
 			$tabs => $content[$tabs],
 		);
-		foreach((array) $this->comp->attachments() as $type => $linkdata)
+		foreach((array) $this->comp->attachments(null,false,false) as $type => $linkdata)
 		{
-			$content['pdf'][$type] = array(
-				'icon' => $type,
+			$content['files'][$type] = array(
+				'icon' => $type != 'logo' && $type != 'sponsors' ? $type :
+					egw::link($linkdata),
 				'file' => $this->comp->attachment_path($type),
 				'link' => $linkdata,
 			);
@@ -222,7 +233,7 @@ class uicompetitions extends boranking
 		);
 		foreach($this->attachment_type as $type => $label)
 		{
-			$readonlys['remove['.$type.']'] = $view || !isset($content['pdf'][$type]);
+			$readonlys['remove['.$type.']'] = $view || !isset($content['files'][$type]);
 		}
 		if ($view)
 		{

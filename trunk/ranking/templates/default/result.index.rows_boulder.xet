@@ -1,7 +1,68 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%" class="extra_footer">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@comp_sponsors">
+					<image src="comp_sponsors" class="comp_sponsors"/>
+				</row>
+				<row disabled="!@show_result=0">
+					<groupbox rows="1" cols="1" class="extra_startlist">
+						<caption label="Isolation zone and starting time"/>
+						<grid padding="5">
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description value="Isolation zone"/>
+									<description value="opens" id="route_iso_open" no_lang="1"/>
+									<description value="closes" id="route_iso_close" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Starting time"/>
+									<description span="all" id="route_start" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Observation time"/>
+									<description id="route_observation_time" no_lang="1"/>
+									<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row disabled="!@result_official">
+					<groupbox rows="1" cols="1" class="extra_result">
+						<caption label="Result official"/>
+						<grid>
+							<columns>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description id="route_result" no_lang="1"/>
+								</row>
+								<row>
+									<description no_lang="1" id="route_judge"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.extra_footer { margin-top: 10px; }
+		</styles>
+	</template>
+	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.7.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -21,7 +82,24 @@
 				<column disabled="@no_prev_heat"/>
 			</columns>
 			<rows>
-				<row class="th">
+				<row part="header">
+					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row class="th" part="header">
 					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
@@ -38,12 +116,29 @@
 					<description value="6" class="place"/>
 					<nextmatch-sortheader label="previous heat" id="rank_prev_heat" align="center"/>
 				</row>
+				<row part="footer">
+					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
 				<row class="row $row_cont[quota_class]">
 					<description id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
 					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1" options="$row_cont[link]"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
-					<description id="{$row}[$cont[fed_col]]" no_lang="1"/>
+					<description id="{$row}[$cont[fed_col]]" no_lang="1" value="@${row}[$cont[fed_col2]]"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
 					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order]" no_lang="1"/>
 					<description id="{$row}[result]" no_lang="1" align="center"/>

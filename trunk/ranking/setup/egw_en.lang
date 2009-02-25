@@ -88,6 +88,7 @@ competition	ranking	en	Competition
 competition already has a result for this category!	ranking	en	Competition already has a result for this category!
 competition calendar	ranking	en	Competition calendar
 competition has not yet a startlist	ranking	en	Competition has not yet a startlist
+competition logo	ranking	en	Competition logo
 competition name	ranking	en	Competition name
 competition results	ranking	en	Competition results
 competitions	ranking	en	competitions
@@ -192,6 +193,7 @@ fieldfactorpoints	ranking	en	Fieldfactorpoints
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)!
 file '%1' successful attached as %2	ranking	en	File '%1' successful attached as %2
 file is not a pdf	ranking	en	File is not a PDF
+file is not an image (%1)	ranking	en	File is not an image (%1)
 final	ranking	en	Final
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	en	First name of the athlete in Latin chars! Accents and umlauts are ok
 for internal use, not shown on the website.	ranking	en	For internal use, not shown on the website.
@@ -354,6 +356,7 @@ register this athlete for the selected category	ranking	en	Register this athlete
 registration	ranking	en	Registration
 registration deadline	ranking	en	Registration deadline
 remove the attached pdf	ranking	en	Remove the attached PDF
+remove the grafic	ranking	en	Remove the grafic
 removed the %1	ranking	en	Removed the %1
 replace: %1	ranking	en	replace: %1
 required information missing, application rejected!	ranking	en	Required information missing, application rejected!
@@ -394,6 +397,7 @@ size (cm)	ranking	en	Size (cm)
 small final	ranking	en	Small final
 someone already applied for a %1 license!	ranking	en	Someone already applied for a %1 license!
 speed	ranking	en	speed
+sponsor logos	ranking	en	Sponsor logos
 squad	ranking	en	Squad
 start	ranking	en	Start
 start heat	ranking	en	Start heat

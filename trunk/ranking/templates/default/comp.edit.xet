@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.comp.edit.general" template="" lang="" group="0" version="1.5.001">
-		<grid width="100%">
+		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -32,7 +32,7 @@
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -70,8 +70,8 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="1%"/>
@@ -81,30 +81,42 @@
 			<rows>
 				<row class="row">
 					<description value="Information PDF" options=",,,upload_info"/>
-					<image options="@pdf[info][link],_blank" label="@pdf[info][file]" statustext="click to view" src="pdf[info][icon]" no_lang="1"/>
+					<image options="@files[info][link],_blank" label="@files[info][file]" statustext="click to view" src="files[info][icon]" no_lang="1"/>
 					<button image="delete" label="Remove the attached PDF" id="remove[info]" onclick="return confirm('Remove the attached PDF');"/>
 					<file id="upload_info" statustext="each new upload will overwrite the previous one"/>
 				</row>
 				<row class="row">
 					<description value="Startlist PDF" options=",,,upload_startlist"/>
-					<image options="@pdf[startlist][link],_blank" label="@pdf[startlist][file]" statustext="click to view" src="pdf[startlist][icon]"/>
+					<image options="@files[startlist][link],_blank" label="@files[startlist][file]" statustext="click to view" src="files[startlist][icon]"/>
 					<button image="delete" label="Remove the attached PDF" id="remove[startlist]" onclick="return confirm('Remove the attached PDF');"/>
 					<file id="upload_startlist" statustext="each new upload will overwrite the previous one"/>
 				</row>
 				<row class="row">
 					<description value="Result PDF" options=",,,upload_result"/>
-					<image options="@pdf[result][link],_blank" label="@pdf[result][file]" statustext="click to view" src="pdf[result][icon]"/>
+					<image options="@files[result][link],_blank" label="@files[result][file]" statustext="click to view" src="files[result][icon]"/>
 					<button image="delete" label="Remove the attached PDF" id="remove[result]" onclick="return confirm('Remove the attached PDF');"/>
 					<file id="upload_result" statustext="each new upload will overwrite the previous one"/>
 				</row>
-				<row class="row" height="100">
-					<description span="all"/>
+				<row class="th">
+					<description span="all" value="Resultservice"/>
+				</row>
+				<row class="row">
+					<description value="Competition logo"/>
+					<image src="files[logo][icon]" class="previewImage" label="@files[logo][file]"/>
+					<button image="delete" label="Remove the grafic" id="remove[logo]" onclick="return confirm('Remove the grafic');"/>
+					<file id="upload_logo" statustext="each new upload will overwrite the previous one"/>
+				</row>
+				<row class="row">
+					<description value="Sponsor logos"/>
+					<image src="files[sponsors][icon]" class="previewImage" label="@files[sponsors][file]"/>
+					<button image="delete" label="Remove the grafic" id="remove[sponsors]" onclick="return confirm('Remove the grafic');"/>
+					<file id="upload_sponsors" statustext="each new upload will overwrite the previous one"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.5.001">
-		<grid width="100%">
+		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="15%"/>
@@ -187,7 +199,7 @@
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.judges" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%" height="180">
+		<grid width="100%" height="200">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -195,7 +207,7 @@
 			<rows>
 				<row class="row" valign="top">
 					<description options=",,,judges" value="Judges"/>
-					<listbox type="select-account" rows="10" id="judges" statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition"/>
+					<listbox type="select-account" rows="14" id="judges" statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition"/>
 				</row>
 			</rows>
 		</grid>
@@ -234,7 +246,7 @@
 					<textbox size="8" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " span="all"/>
 				</row>
 				<row>
-					<tabbox span="all">
+					<tabbox span="all" id="general|ranking|files|startlist|judges">
 						<tabs>
 							<tab label="General" statustext=""/>
 							<tab label="Ranking" statustext=""/>

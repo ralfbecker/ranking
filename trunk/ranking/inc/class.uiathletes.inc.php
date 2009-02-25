@@ -643,7 +643,7 @@ class uiathletes extends boranking
 		foreach($this->athlete->data as $name => $value)
 		{
 			// the rtf seems to use iso-8859-1
-			$value = $GLOBALS['egw']->translation->convert($value,'egw_charset','iso-8859-1');
+			$value = $GLOBALS['egw']->translation->convert($value,$egw_charset,'iso-8859-1');
 			$form = str_replace('$$'.$name.'$$',$value,$form);
 		}
 		include_once(EGW_API_INC.'/class.browser.inc.php');
