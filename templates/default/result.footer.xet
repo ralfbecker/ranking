@@ -2,13 +2,13 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
-		<grid width="100%">
+		<grid width="100%" class="extra_footer">
 			<columns>
 				<column/>
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -58,5 +58,8 @@
 				</row>
 			</rows>
 		</grid>
+		<styles>
+			.extra_footer { margin-top: 10px; }
+		</styles>
 	</template>
 </overlay>
