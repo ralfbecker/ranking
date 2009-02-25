@@ -35,6 +35,8 @@ class competition extends so_sql
 		'info'      => '',
 		'startlist' => 'S',
 		'result'    => 'R',
+		'logo'      => 'l',
+		'sponsors'  => 's',
 	);
 	var $vfs_pdf_dir = '';
 	var $result_table = 'Results';
@@ -471,14 +473,49 @@ class competition extends so_sql
 	}
 
 	/**
+	 * Image mime-types and file-name (extension) regular expression
+	 *
+	 * @var array
+	 */
+	static $image_types = array(
+		'image/gif'  => '\.gif$',
+		'image/jpeg' => '\.jpe?g$',
+		'image/png'  => '\.png$',
+	);
+
+	/**
+	 * Check if (uploaded) file contains an image (for web display)
+	 *
+	 * @param string $filename
+	 * @param string $mime=null mime-type
+	 * @return boolean|string false or default extension (incl. leading '.')
+	 */
+	static function is_image($filename,$mime=null)
+	{
+		$extension = false;
+		foreach(self::$image_types as $mime_type => $file_regexp)
+		{
+			if (strtolower($mime) == $mime_type || preg_match('/'.$file_regexp.'$/i',$filename))
+			{
+				$extension = str_replace(array('\\','?','$'),'',$file_regexp);
+				break;
+			}
+		}
+		//echo "<p>".__METHOD__."('$filename','$mime') = '$extension'</p>\n";
+		return $extension;
+	}
+
+
+	/**
 	 * path of a pdf attachment of a certain type for the competition in data
 	 *
 	 * @param string $type 'info', 'startlist', 'result'
 	 * @param array $data competition
 	 * @param string $rkey rkey to use, default ''=use the one from our internal data
+	 * @param string $extension=null extension of the file
 	 * @return string the path
 	 */
-	function attachment_path($type,$data=null,$rkey='')
+	function attachment_path($type,$data=null,$rkey='',$extension=null)
 	{
 		if (!$data) $data =& $this->data;
 		if (!$rkey) $rkey = $data['rkey'];
@@ -493,23 +530,46 @@ class competition extends so_sql
 		}
 		if ($data['nation'] === 'NULL') $data['nation'] = '';
 
-		return $this->vfs_pdf_dir.$data['nation'].'/'.$year.'/'.$this->attachment_prefixes[$type].$rkey.'.pdf';
+		$vfs_path = $this->vfs_pdf_dir.$data['nation'].'/'.$year.'/'.$this->attachment_prefixes[$type].$rkey;
+
+		if ($type != 'logo' && $type != 'sponsors')
+		{
+			$extension = '.pdf';
+		}
+		elseif (!$extension)
+		{
+			foreach(self::$image_types as $mime => $ext_regexp)
+			{
+				$ext = str_replace(array('\\','?','$'),'',$ext_regexp);
+
+				if (egw_vfs::stat($vfs_path.$ext))
+				{
+					$extension = $ext;
+					break;
+				}
+			}
+		}
+		//echo "<p>".__METHOD__."('$type',,'$rkey','$extension') = '$vfs_path$extension'</p>\n";
+		return $vfs_path.$extension;
 	}
 
 	/**
 	 * Checks and returns links to the attached files
 	 *
 	 * @param array $data a given competition, default use the already read one
-	 * @param boolean $return_link return links or arrays with vars for the link-function, default false=array
+	 * @param boolean $return_link=false return links or arrays with vars for the link-function, default false=array
+	 * @param boolean $only_pdf=true return only pdfs (default) or the logos too
 	 * @return boolean/array links for the keys: info, startlist, result or false on error
 	 */
-	function attachments($data=null,$return_link=false)
+	function attachments($data=null,$return_link=false,$only_pdf=true)
 	{
 		if (!$data) $data =& $this->data;
 
 		$attachments = false;
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
+			if ($only_pdf && ($type == 'logo' || $type == 'sponsors')) continue;
+
 			$vfs_path = $this->attachment_path($type,$data);
 			if (egw_vfs::stat($vfs_path))
 			{
@@ -525,9 +585,10 @@ class competition extends so_sql
 	 * @param array $files full path to files for the keys info, startlist and result
 	 * @param string &$error_msg error-messaage if returning false
 	 * @param array $keys to read/use a given competitions, default use the already read one
+	 * @param string $extension='.pdf' extension of file to attach
 	 * @return boolean true on success, false otherwise
 	 */
-	function attach_files($files,&$error_msg,$keys=null)
+	function attach_files($files,&$error_msg,$keys=null,$extension='.pdf')
 	{
 		if ($keys && !$this->read($keys)) return false;
 
@@ -540,7 +601,7 @@ class competition extends so_sql
 				egw_vfs::$is_root = false;
 				return false;
 			}
-			$vfs_path = $this->attachment_path($type);
+			$vfs_path = $this->attachment_path($type,null,null,$extension);
 
 			// check and evtl. create the year directory
 			if (!egw_vfs::is_dir($dir = dirname($vfs_path)) &&
@@ -601,7 +662,7 @@ class competition extends so_sql
 		foreach($this->attachment_prefixes as $type => $prefix)
 		{
 			$old_path = $this->attachment_path($type,null,$old_rkey);
-			$new_path = $this->attachment_path($type);
+			$new_path = $this->attachment_path($type,null,null,self::is_image($old_path));
 			//echo "$old_path --> $new_path<br>\n";
 
 			if ($old_path != $new_path && egw_vfs::stat($old_path) &&

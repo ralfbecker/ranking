@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@comp_sponsors">
+					<image src="comp_sponsors" class="comp_sponsors"/>
+				</row>
+				<row disabled="!@show_result=0">
+					<groupbox rows="1" cols="1" class="extra_startlist">
+						<caption label="Isolation zone and starting time"/>
+						<grid padding="5">
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description value="Isolation zone"/>
+									<description value="opens" id="route_iso_open" no_lang="1"/>
+									<description value="closes" id="route_iso_close" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Starting time"/>
+									<description span="all" id="route_start" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Observation time"/>
+									<description id="route_observation_time" no_lang="1"/>
+									<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row disabled="!@result_official">
+					<groupbox rows="1" cols="1" class="extra_result">
+						<caption label="Result official"/>
+						<grid>
+							<columns>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description id="route_result" no_lang="1"/>
+								</row>
+								<row>
+									<description no_lang="1" id="route_judge"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

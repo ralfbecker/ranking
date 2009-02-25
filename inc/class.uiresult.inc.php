@@ -530,6 +530,11 @@ class uiresult extends boresult
 		$rows['no_ranking'] = !$ranking;
 		$rows['time_measurement'] = $query['time_measurement'];
 
+		// make div. print values available
+		foreach(array('calendar','route_name','comp_name','comp_date','comp_logo','comp_sponsors','show_result','result_official') as $name)
+		{
+			$rows[$name] =& $query[$name];
+		}
 		switch((string)$comp['nation'])
 		{
 			case '':	// international
@@ -763,7 +768,24 @@ class uiresult extends boresult
 		// make competition and category data availible for print
 		$content['comp'] = $comp;
 		$content['cat']  = $cat;
+		$content['nm']['comp_name'] = $comp['name'];
+		$content['nm']['comp_date'] = $comp['date_span'];
 
+		unset($content['nm']['comp_logo']);
+		unset($content['nm']['comp_sponsors']);
+		$docroot_base_path = '/'.(int)$comp['datum'].'/'.($calendar != 'NULL' ? $calendar.'/' : '');
+		foreach((array)$this->comp->attachments($comp,true,false) as $type => $linkdata)
+		{
+			if ($type == 'logo' || $type == 'sponsors')
+			{
+				$content['nm']['comp_'.$type] = egw::link($linkdata);
+				// check if images are directly reachable from the docroot --> use them direct
+				if (file_exists($_SERVER['DOCUMENT_ROOT'].$docroot_base_path.basename($linkdata)))
+				{
+					$content['nm']['comp_'.$type] = $docroot_base_path.basename($linkdata);
+				}
+			}
+		}
 		$content['msg'] = $msg;
 
 		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
@@ -863,7 +885,7 @@ class uiresult extends boresult
 		$content['nm']['route_quota'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_quota'] : 0;
 
 		// should we show the result offical footer?
-		$content['result_official'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL;
+		$content['nm']['result_official'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL;
 
 		if (!is_object($GLOBALS['egw']->js))
 		{
@@ -873,7 +895,8 @@ class uiresult extends boresult
 		$GLOBALS['egw']->js->validate_file('.','ranking','ranking',false);
 
 		// create a nice header
-		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') :
+		$content['nm']['route_name'] = $GLOBALS['egw_info']['flags']['app_header'] =
+			/*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') :
 			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED ||
 			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').

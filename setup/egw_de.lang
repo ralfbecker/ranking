@@ -88,6 +88,7 @@ competition	ranking	de	Wettkampf
 competition already has a result for this category!	ranking	de	Der Wettkampf hat bereits ein Ergebnis für diese Kategorie!
 competition calendar	ranking	de	Wettkampfkalender
 competition has not yet a startlist	ranking	de	Wettkampf hat noch keine Startliste
+competition logo	ranking	de	Logo des Wettkampfes
 competition name	ranking	de	Wettkampfname
 competition results	ranking	de	Wettkampfergebnisse
 competitions	ranking	de	Wettkämpfe
@@ -192,6 +193,7 @@ fieldfactorpoints	ranking	de	Feldfaktorpunkte
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	de	Datei %1 nicht gefunden (entweder Typ=%2 oder DR_PATH=%3 falsch)!
 file '%1' successful attached as %2	ranking	de	Datei '%1' erfolgreich als %2 angehangen
 file is not a pdf	ranking	de	Die Datei ist kein PDF
+file is not an image (%1)	ranking	de	Datei ist kein Bild (%1)
 final	ranking	de	Finale
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Vorname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 for internal use, not shown on the website.	ranking	de	Zur internen Benutzung, wird nicht auf der Webseite angezeigt.
@@ -354,6 +356,7 @@ register this athlete for the selected category	ranking	de	Diesen Athleten für 
 registration	ranking	de	Registrierung
 registration deadline	ranking	de	Anmeldeschuss für die Registrierung
 remove the attached pdf	ranking	de	Das angehangene PDF löschen
+remove the grafic	ranking	de	Bild entfernen
 removed the %1	ranking	de	Das %1 wurde gelöscht
 replace: %1	ranking	de	Ersetze: %1
 required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
@@ -394,6 +397,7 @@ size (cm)	ranking	de	Größe (cm)
 small final	ranking	de	Kleines Finale
 someone already applied for a %1 license!	ranking	de	Jemand hat bereits die %1 Lizenz beantragt!
 speed	ranking	de	Geschwindigkeit
+sponsor logos	ranking	de	Sponsorenlogo(s)
 squad	ranking	de	Kader
 start	ranking	de	Start
 start heat	ranking	de	Beginn Durchgang

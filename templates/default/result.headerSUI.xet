@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.headerNULL" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.headerSUI" template="" lang="" group="0" version="1.7.001">
 		<grid width="100%">
 			<columns>
 				<column disabled="!@comp_logo"/>
@@ -16,7 +16,7 @@
 						<description id="comp_date" no_lang="1"/>
 						<description id="route_name" no_lang="1"/>
 					</vbox>
-					<image align="right" class="fed_logo" src="ifsc.gif"/>
+					<image align="right" class="fed_logo" src="sac110.gif"/>
 				</row>
 			</rows>
 		</grid>
