@@ -71,12 +71,12 @@ class module_ranking_digitalrock extends Module
 				'label' => lang('Pagename for athlete profile (default: pstambl)'),
 				'default' => 'pstambl',
 			),
-			'pstambl' => array(
+			'pstambl_target' => array(
 				'type' => 'textfield',
 				'label' => lang('Target for athlete profile (default: profil)'),
 				'default' => 'profil',
 			),
-			'pstambl_target' => array(
+			'ranglist' => array(
 				'type' => 'textfield',
 				'label' => lang('Pagename for ranglists (default: ranglist)'),
 				'default' => 'ranglist',
