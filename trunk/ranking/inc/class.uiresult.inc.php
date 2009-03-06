@@ -447,7 +447,13 @@ class uiresult extends boresult
 			($cat = $this->cats->read($query['cat'])))
 		{
 			$stand = $comp['datum'];
- 			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$query['ranking']==2?$comp['serie']:'');
+			if (!$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$query['ranking']==2?$comp['serie']:'') && $query['ranking'] == 2 &&
+				// if there no cup ranking yet (first competition) --> use the one from last year
+				($last_cup = $this->cup->read($last_cup_rkey=str_replace('??',substr((int)$comp['datum']-1,-2),$cat['serien_pat']))))
+			{
+				$stand = ((int)$comp['datum']-1).'-12-31';
+				$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$last_cup);
+			}
 		}
 		foreach($rows as $k => $row)
 		{
