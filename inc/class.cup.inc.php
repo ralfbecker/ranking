@@ -215,7 +215,7 @@ class cup extends so_sql
 	{
 		if ($keys && !is_array($keys))
 		{
-			$keys = is_numeric($keys) ? array('GrpId' => (int) $keys) : array('rkey' => $keys);
+			$keys = is_numeric($keys) ? array('SerId' => (int) $keys) : array('rkey' => $keys);
 		}
 		return parent::read($keys,$extra_cols,$join);
 	}
