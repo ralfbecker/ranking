@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description value="opens" id="route_iso_open" no_lang="1"/>
-									<description value="closes" id="route_iso_close" no_lang="1"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_start" no_lang="1"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description id="route_observation_time" no_lang="1"/>
-									<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,10 +47,10 @@
 							</columns>
 							<rows>
 								<row>
-									<description id="route_result" no_lang="1"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_judge"/>
+									<description no_lang="1" id="route_data[route_judge]"/>
 								</row>
 							</rows>
 						</grid>
@@ -134,58 +134,6 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.result.isolation" template="" lang="" group="0" version="1.7.001">
-		<groupbox rows="1" cols="1" class="extra_startlist">
-			<caption label="Isolation zone and starting time"/>
-			<grid padding="5">
-				<columns>
-					<column/>
-					<column/>
-					<column/>
-				</columns>
-				<rows>
-					<row>
-						<description value="Isolation zone"/>
-						<description value="opens" id="route_iso_open" no_lang="1"/>
-						<description value="closes" id="route_iso_close" no_lang="1"/>
-					</row>
-					<row>
-						<description value="Starting time"/>
-						<description span="all" id="route_start" no_lang="1"/>
-					</row>
-					<row>
-						<description value="Observation time"/>
-						<description id="route_observation_time" no_lang="1"/>
-						<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
-					</row>
-				</rows>
-			</grid>
-		</groupbox>
-		<styles>
-			.extra_startlist { margin-top: 10px; }
-		</styles>
-	</template>
-	<template id="ranking.result.official" template="" lang="" group="0" version="1.7.001">
-		<groupbox rows="1" cols="1" class="extra_result">
-			<caption label="Result official"/>
-			<grid>
-				<columns>
-					<column/>
-				</columns>
-				<rows>
-					<row>
-						<description id="route_result" no_lang="1"/>
-					</row>
-					<row>
-						<description no_lang="1" id="route_judge"/>
-					</row>
-				</rows>
-			</grid>
-		</groupbox>
-		<styles>
-			.extra_result { margin-top: 10px; }
-		</styles>
-	</template>
 	<template id="ranking.result.index" template="" lang="" group="0" version="1.7.001">
 		<grid width="100%">
 			<columns>
@@ -234,12 +182,6 @@
 				</row>
 				<row class="noPrint" disabled="!@nm[route]">
 					<button label="Update" id="button[apply]" statustext="Apply the changes made"/>
-				</row>
-				<row class="onlyPrint" disabled="!@nm[show_result]=0">
-					<template span="all" id="ranking.result.isolation"/>
-				</row>
-				<row class="onlyPrint" disabled="!@result_official">
-					<template span="all" id="ranking.result.official"/>
 				</row>
 			</rows>
 		</grid>

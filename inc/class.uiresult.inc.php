@@ -7,12 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
 
 class uiresult extends boresult
 {
@@ -531,7 +530,7 @@ class uiresult extends boresult
 		$rows['time_measurement'] = $query['time_measurement'];
 
 		// make div. print values available
-		foreach(array('calendar','route_name','comp_name','comp_date','comp_logo','comp_sponsors','show_result','result_official') as $name)
+		foreach(array('calendar','route_name','comp_name','comp_date','comp_logo','comp_sponsors','show_result','result_official','route_data') as $name)
 		{
 			$rows[$name] =& $query[$name];
 		}
@@ -755,6 +754,7 @@ class uiresult extends boresult
 			$sel_options['zone'.$i] = array(lang('No'));
 		}
 		if (is_array($route)) $content += $route;
+		$content['nm']['route_data'] = $route;
 		$content['nm']['calendar'] = $calendar;
 		$content['nm']['comp']     = $content['nm']['old_comp']= $comp ? $comp['WetId'] : null;
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
