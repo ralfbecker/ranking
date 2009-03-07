@@ -7,12 +7,13 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.route.inc.php');
+require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.boresult.inc.php');
 
 define('TOP_PLUS',9999);
 define('TOP_HEIGHT',99999999);
