@@ -49,6 +49,7 @@ athlete has no license! use regular registration to apply for a license first.	r
 athlete including %1 results merged.	ranking	de	Athlet einschließlich %1 Ergebnisse vereinigt.
 athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athletes	ranking	de	Athleten
+attention: merging can not be undone! really want to merge?	ranking	de	ACHTUNG: Vereinigen kann NICHT rückgänig gemacht werden! Wollen Sie die beiden Athleten wirklich vereinigen?
 before	ranking	de	vor
 before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)
 better result splits ties	ranking	de	Besseres Ergebnis bricht Gleichstände auf
@@ -265,7 +266,7 @@ maximum number of competition counting for the ranking (empty for all)	ranking	d
 measurement aborted!	ranking	de	Messung abgebrochen!
 merge	ranking	de	Vereinigen
 merge selected federations with the one opened for editing	ranking	de	Vereinige ausgewählte Verbände mit dem zu Bearbeiten geöffneten
-merges this entry into the selected one.	ranking	de	Vereinige diesen Eintrag mit dem ausgewählten (in diesem).
+merges this entry into the selected one.	ranking	de	Vereinige diesen Eintrag mit und IN dem ausgewählten
 minus	ranking	de	minus
 name(s)	ranking	de	Namen
 nation	ranking	de	Nation

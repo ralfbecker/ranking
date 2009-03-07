@@ -305,16 +305,16 @@ class uiathletes extends boranking
 			}
 			if ($content['merge'] && $this->athlete->data['PerId'])
 			{
-				if (!(int)$content['merge_to'])
+				$to = is_array($content['merge_to']) ? $content['merge_to']['current'] : $content['merge_to'];
+				if (!(int)$to)
 				{
 					$msg = lang('You need to select an other athlete first!');
 				}
 				else
 				{
 					try {
-						$msg = lang('Athlete including %1 results merged.',
-							$this->merge_athlete($this->athlete->data['PerId'],$content['merge_to']));
-						$this->athlete->read($content['merge_to']);	// show the athlete we merged too
+						$msg = lang('Athlete including %1 results merged.',$this->merge_athlete($this->athlete->data['PerId'],$to));
+						$this->athlete->read($to);	// show the athlete we merged too
 						// read the athletes results
 						$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
 						if ($this->athlete->data['comp']) array_unshift($this->athlete->data['comp'],false);	// reindex with 1
