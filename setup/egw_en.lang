@@ -19,6 +19,7 @@
 3. place	ranking	en	3. place
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
+accounting	ranking	en	Accounting
 actions	ranking	en	Actions
 add a new athlete	ranking	en	add a new athlete
 add a new competition	ranking	en	add a new competition
@@ -189,6 +190,7 @@ federation	ranking	en	Federation
 federation deleted.	ranking	en	Federation deleted.
 federation saved.	ranking	en	Federation saved.
 federations	ranking	en	Federations
+fees	ranking	en	Fees
 female	ranking	en	female
 fieldfactorpoints	ranking	en	Fieldfactorpoints
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	en	File %1 not found (either type=%2 or DR_PATH=%3 wrong)!

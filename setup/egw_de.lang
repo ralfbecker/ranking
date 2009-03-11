@@ -19,6 +19,7 @@
 3. place	ranking	de	3. Platz
 aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
+accounting	ranking	de	Abrechnung
 actions	ranking	de	Befehle
 add a new athlete	ranking	de	einen neuen Athleten anlegen
 add a new competition	ranking	de	einen neuen Wettkampf anlegen
@@ -189,6 +190,7 @@ federation	ranking	de	Verband
 federation deleted.	ranking	de	Verband gelöscht.
 federation saved.	ranking	de	Verband gespeichert.
 federations	ranking	de	Verbände
+fees	ranking	de	Gebühren
 female	ranking	de	weiblich
 fieldfactorpoints	ranking	de	Feldfaktorpunkte
 file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	de	Datei %1 nicht gefunden (entweder Typ=%2 oder DR_PATH=%3 falsch)!
