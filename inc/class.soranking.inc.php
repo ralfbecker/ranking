@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -66,6 +66,10 @@ class soranking
 	 * @var route
 	 */
 	private $route;
+	/**
+	 * @var route_result
+	 */
+	private $route_result;
 	/**
 	 * @var ranking_federation
 	 */
