@@ -221,7 +221,7 @@ class ranking_accounting extends boresult
 		$config = config::read('ranking');
 		//_debug_array($config);
 
-		return isset($config['fees']) ? $config['fees'] : null;
+		return isset($config['fees']) && is_array($config['fees']) ? $config['fees'] : array();
 	}
 
 	/**
