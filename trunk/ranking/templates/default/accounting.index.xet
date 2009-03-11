@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.accounting.index.rows" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th" part="header">
+					<nextmatch-sortheader label="Startnumber" id="start_order"/>
+					<nextmatch-filterheader id="GrpId" options="Category"/>
+					<nextmatch-sortheader label="Lastname" id="nachname"/>
+					<nextmatch-sortheader label="Firstname" id="vorname"/>
+					<nextmatch-sortheader label="Street" id="strasse"/>
+					<nextmatch-sortheader label="Postalcode" id="plz"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-sortheader label="Birthdate" id="geb_date"/>
+					<nextmatch-sortheader label="Sektion" id="verband"/>
+					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id"/>
+					<nextmatch-sortheader label="License" id="license"/>
+					<nextmatch-header label="Total" align="right"/>
+					<nextmatch-header label="Federation" align="right"/>
+				</row>
+				<row class="th" disabled="!@total" part="footer">
+					<description value="Sum"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<textbox type="float" id="total" readonly="true" min="2" align="right"/>
+					<textbox type="float" min="2" id="fed" readonly="true" align="right"/>
+				</row>
+				<row class="row">
+					<description id="${row}[start_number]" value="$row_cont[start_order]" align="center"/>
+					<menulist>
+						<menupopup id="${row}[GrpId]" readonly="true"/>
+					</menulist>
+					<description id="${row}[nachname]"/>
+					<description id="${row}[vorname]"/>
+					<description id="${row}[strasse]"/>
+					<description id="${row}[plz]"/>
+					<description id="${row}[ort]"/>
+					<date options="Y-m-d" id="${row}[geb_date]" readonly="true" label="%s ($row_cont[age])"/>
+					<description id="${row}[verband]" readonly="true"/>
+					<menulist>
+						<menupopup id="${row}[acl_fed_id]" readonly="true"/>
+					</menulist>
+					<menulist>
+						<menupopup id="${row}[license]" readonly="true"/>
+					</menulist>
+					<textbox type="float" min="2" id="${row}[total]" readonly="true" align="right"/>
+					<textbox type="float" min="2" id="${row}[fed]" readonly="true" align="right"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.accounting.index" template="" lang="" group="0" version="1.7.001">
+		<grid>
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<menulist class="noPrint">
+						<menupopup label="Competition" id="nm[comp]" onchange="1" options="Select one"/>
+					</menulist>
+				</row>
+				<row disabled="!@nm[comp]">
+					<nextmatch options="ranking.accounting.index.rows" span="all" id="nm"/>
+				</row>
+				<row disabled="!@nm[comp]">
+					<groupbox class="fees" align="center">
+						<caption label="Fees"/>
+						<grid id="fees">
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row class="th">
+									<description value="Tageslizenz"/>
+									<description value="Mitglied"/>
+									<description value="Nichtmitglied"/>
+									<description value="Startgeld"/>
+									<description value="SAC Anteil"/>
+								</row>
+								<row class="row">
+									<description value="bis 19 Jahre"/>
+									<textbox type="float" id="member_til19" align="center"/>
+									<textbox type="float" id="non_til19" align="center"/>
+									<textbox type="float" id="entry_til19" align="center"/>
+									<textbox type="float" id="fed_til19" align="center"/>
+								</row>
+								<row class="row">
+									<description value="ab 20 Jahre"/>
+									<textbox type="float" id="member_20plus" align="center"/>
+									<textbox type="float" id="non_20plus" align="center"/>
+									<textbox type="float" id="entry_20plus" align="center"/>
+									<textbox type="float" id="fed_20plus" align="center"/>
+								</row>
+								<row class="noPrint" disabled="@no_save">
+									<description/>
+									<button label="Save" id="save"/>
+									<description/>
+									<description/>
+									<description/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row>
+					<description/>
+				</row>
+			</rows>
+		</grid>
+		<styles>.fees { display: inline; }</styles>
+	</template>
+</overlay>

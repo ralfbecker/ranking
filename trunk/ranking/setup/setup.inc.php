@@ -42,12 +42,12 @@ $setup_info['ranking']['note'] =
 	<a href="mailto:RalfBecker at digitalROCK.de"><span onClick="document.location=\'mailto:RalfBecker\'+\'@\'+\'digitalROCK.de\'; return false;">Ralf Becker</span></a></p></td></tr></table></p>';
 
 /* The hooks this app includes, needed for hooks registration */
-$setup_info['ranking']['hooks']['preferences']  = 'ranking.ranking_admin_prefs_sidebox_hooks.all_hooks';
-$setup_info['ranking']['hooks']['settings']     = 'ranking.ranking_admin_prefs_sidebox_hooks.hook_settings';
-$setup_info['ranking']['hooks']['admin']        = 'ranking.ranking_admin_prefs_sidebox_hooks.all_hooks';
-$setup_info['ranking']['hooks']['sidebox_menu'] = 'ranking.ranking_admin_prefs_sidebox_hooks.all_hooks';
+$setup_info['ranking']['hooks']['preferences']  = 'ranking_admin_prefs_sidebox_hooks::all_hooks';
+$setup_info['ranking']['hooks']['settings']     = 'ranking_admin_prefs_sidebox_hooks::hook_settings';
+$setup_info['ranking']['hooks']['admin']        = 'ranking_admin_prefs_sidebox_hooks::all_hooks';
+$setup_info['ranking']['hooks']['sidebox_menu'] = 'ranking_admin_prefs_sidebox_hooks::all_hooks';
 $setup_info['ranking']['hooks']['edit_user']    = 'ranking.admin.edit_user';
-$setup_info['ranking']['hooks']['search_link'] = 'ranking.ranking_admin_prefs_sidebox_hooks.search_link';
+//$setup_info['ranking']['hooks']['search_link'] = 'ranking.ranking_admin_prefs_sidebox_hooks.search_link';
 $setup_info['ranking']['hooks'][] = 'config';
 $setup_info['ranking']['hooks'][] = 'config_validate';
 

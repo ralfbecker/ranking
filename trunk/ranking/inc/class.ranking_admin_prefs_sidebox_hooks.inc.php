@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -28,25 +28,20 @@ class ranking_admin_prefs_sidebox_hooks
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
 
 			$file = array(
-				'Athletes' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiathletes.index' )),
-				'Federations' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.ranking_federation_ui.index' )),
-				'Competitions' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uicompetitions.index' )),
-				'Cups' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uicups.index' )),
-				/*'Categories' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.ranking.cat_edit' )),*/
-				'Registration' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiregistration.index' )),
-				'Resultservice' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiresult.index' )),
-				'Results' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiregistration.result' )),
-				'Ranking' => $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiranking.index' )),
+				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.uiathletes.index')),
+				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
+				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.uicompetitions.index')),
+				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.uicups.index')),
+				//'Categories'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking.cat_edit')),
+				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.index')),
+				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.uiresult.index')),
+				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.result')),
+				'Ranking'       => egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
 			);
+			if (is_object($GLOBALS['boranking']) && in_array('SUI',$GLOBALS['boranking']->ranking_nations))
+			{
+				$file['Accounting'] = egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index'));
+			}
 			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 
 			if (is_object($GLOBALS['uiresult']))	// we show the displays menu only if we are in the result-service
@@ -58,7 +53,7 @@ class ranking_admin_prefs_sidebox_hooks
 					foreach($displays as $dsp_id => $dsp_name)
 					{
 						$file[] = array(
-							'text' => '<a class="textSidebox" href="'.$GLOBALS['egw']->link('/index.php',array(
+							'text' => '<a class="textSidebox" href="'.egw::link('/index.php',array(
 									'menuaction' => 'ranking.ranking_display_ui.index',
 									'dsp_id' => $dsp_id,
 								)).
@@ -71,7 +66,7 @@ class ranking_admin_prefs_sidebox_hooks
 					if ($GLOBALS['egw_info']['user']['apps']['admin'])
 					{
 						$file[] = array(
-							'text' => '<a class="textSidebox" href="'.$GLOBALS['egw']->link('/index.php',array(
+							'text' => '<a class="textSidebox" href="'.egw::link('/index.php',array(
 									'menuaction' => 'ranking.ranking_display_ui.display',
 								)).
 								'" onclick="window.open(this.href,\'_blank\',\'dependent=yes,width=640,height=480,scrollbars=yes,status=yes\');
@@ -89,7 +84,7 @@ class ranking_admin_prefs_sidebox_hooks
 		if ($GLOBALS['egw_info']['user']['apps']['preferences'] && $location != 'admin')
 		{
 			$file = array(
-				'Preferences'     => $GLOBALS['egw']->link('/preferences/preferences.php','appname='.$appname),
+				'Preferences'     => egw::link('/preferences/preferences.php','appname='.$appname),
 			);
 			if ($location == 'preferences')
 			{
@@ -109,12 +104,12 @@ class ranking_admin_prefs_sidebox_hooks
 		if ($GLOBALS['egw_info']['user']['apps']['admin'] && $location != 'preferences')
 		{
 			$file = Array(
-				'Site configuration' => $GLOBALS['egw']->link('/index.php',array(
+				'Site configuration' => egw::link('/index.php',array(
 					'menuaction' => 'admin.uiconfig.index',
 					'appname'    => 'ranking',
 				 )),
-				'Nation ACL' => $GLOBALS['egw']->link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
-				'Import' => $GLOBALS['egw']->link('/index.php',array(
+				'Nation ACL' => egw::link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
+				'Import' => egw::link('/index.php',array(
 					'menuaction' => 'ranking.ranking_import.index' )),
 			);
 			if ($location == 'admin')

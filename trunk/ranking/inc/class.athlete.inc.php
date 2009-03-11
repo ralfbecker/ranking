@@ -7,11 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 define('ACL_DENY_BIRTHDAY',1);
 define('ACL_DENY_EMAIL',2);
@@ -318,14 +316,14 @@ class athlete extends so_sql
 				$criteria[] = $table.'.'.$name.(is_null($criteria[$name]) ? ' IS NULL' : '='.$this->db->quote($criteria[$name]));
 			}
 			unset($criteria[$name]);
-			if (strpos($order_by,$name) !== false)
+			if (strpos($order_by,$name) !== false && ($name != 'fed_id' || strpos($order_by,'acl_fed_id') === false))
 			{
 				$order_by = str_replace($name,$table.'.'.$name,$order_by);
 			}
 		}
 		$order_by .= ($order_by?',':'').'nachname,vorname';
 
-		if ($cat === true || is_numeric($cat))
+		if ($cat === true || is_numeric($cat) || $join)
 		{
 			if (is_numeric($cat))	// add join to filter for a category
 			{
@@ -358,7 +356,7 @@ class athlete extends so_sql
 				$license_year = (int)$filter['license_year'];
 				unset($filter['license_year']);
 			}
-			$join .= ' LEFT JOIN '.self::LICENSE_TABLE." l ON l.PerId=$this->table_name.PerId AND lic_year=$license_year AND l.nation=".
+			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' l ON l.PerId='.self::ATHLETE_TABLE.'.PerId AND lic_year='.(int)$license_year.' AND l.nation='.
 				$this->db->quote($license_nation);
 			$extra_cols[] = 'lic_status AS license';
 			if ($filter['license'])

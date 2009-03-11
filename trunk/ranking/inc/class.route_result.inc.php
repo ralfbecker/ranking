@@ -39,6 +39,11 @@ define('STATUS_RESULT_OFFICIAL',2);
  */
 class route_result extends so_sql
 {
+	/**
+	 * Name of the result table
+	 */
+	const RESULT_TABLE = 'RouteResults';
+
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 	);
 	var $charset,$source_charset;
@@ -56,7 +61,7 @@ class route_result extends so_sql
 	function __construct($source_charset='',$db=null)
 	{
 		//$this->debug = 1;
-		parent::__construct('ranking','RouteResults',$db);	// call constructor of extended class
+		parent::__construct('ranking',self::RESULT_TABLE,$db);	// call constructor of extended class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
