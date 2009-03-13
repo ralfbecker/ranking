@@ -307,7 +307,6 @@ class athlete extends so_sql
 					$f = '('.$f.' OR '.str_replace('a2f.fed_id','acl.fed_id',$f).' OR fed_parent='.(int)$filter[$name].')';
 				}
 				$filter[] = $f;
-				if ($name == 'nation') $license_nation = $filter[$name];
 			}
 			unset($filter[$name]);
 			if ($criteria[$name])
@@ -356,8 +355,9 @@ class athlete extends so_sql
 				$license_year = (int)$filter['license_year'];
 				unset($filter['license_year']);
 			}
+			//echo "<p>license_year=$license_year, license_nation=$license_nation</p>\n";
 			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' l ON l.PerId='.self::ATHLETE_TABLE.'.PerId AND lic_year='.(int)$license_year.' AND l.nation='.
-				$this->db->quote($license_nation);
+				$this->db->quote(!$license_nation || $license_nation == 'NULL' ? '' : $license_nation);
 			$extra_cols[] = 'lic_status AS license';
 			if ($filter['license'])
 			{
@@ -591,7 +591,7 @@ class athlete extends so_sql
 		if (is_numeric($year))
 		{
 			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' ON '.self::LICENSE_TABLE.".PerId=$this->table_name.PerId AND lic_year=".
-				(int)$year.' AND '.self::LICENSE_TABLE.'.nation='.$this->db->quote((string)$nation);
+				(int)$year.' AND '.self::LICENSE_TABLE.'.nation='.$this->db->quote(!$nation || $nation == 'NULL' ? '' : $nation);
 			$extra_cols[] = 'lic_status AS license';
 		}
 		$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
@@ -621,6 +621,7 @@ class athlete extends so_sql
 		{
 			$status = 'n';
 		}
+		//echo "<p>get_license($year,'$nation',$PerId) status='$status'</p>\n";
 		return $status;
 	}
 
@@ -642,7 +643,7 @@ class athlete extends so_sql
 
 		$where = array(
 			'PerId' => $PerId,
-			'nation' => (string)$nation,
+			'nation' => !$nation || $nation == 'NULL' ? '' : $nation,
 			'lic_year' => $year,
 		);
 		if (!in_array($status,array('a','c','s'))/* || $status == 'n'*/)
@@ -676,7 +677,6 @@ class athlete extends so_sql
 			$this->data['license'] = $status;
 		}
 		//echo "athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
-
 		return $this->db->affected_rows();
 	}
 
