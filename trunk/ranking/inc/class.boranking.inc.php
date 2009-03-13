@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -141,6 +141,14 @@ class boranking extends soranking
 		's' => 'suspended',		// no registration for competitions possible
 	);
 	/**
+	 * key => label pairs for which this instance maintaince licenses
+	 *
+	 * (the string 'NULL' is the key for international!)
+	 *
+	 * @var array
+	 */
+	var $license_nations = array();
+	/**
 	 * How many days before and after a competition a judge has rights on the competition and
 	 * to create new athletes for the competition
 	 *
@@ -237,7 +245,14 @@ class boranking extends soranking
 			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation', only_nation_athlete='$this->only_nation_athlete', athlete_rights=".print_r($this->athlete_rights,true)."</p>\n";
 		}
 		$this->license_year = (int) date('Y');
-
+		$this->license_nations = $this->ranking_nations;
+		// to test IFSC, uncomment the next line
+		//$this->license_nations = array('NULL' => $this->ranking_nations['NULL']);
+		// fix license nations to not contain international for digital ROCK site, but IFSC
+		if (isset($this->license_nations['GER']) || isset($this->license_nations['SUI']))
+		{
+			unset($this->license_nations['NULL']);
+		}
 		// makeing the boranking object availible for other objects
 		$GLOBALS['boranking'] = $this;
 	}
