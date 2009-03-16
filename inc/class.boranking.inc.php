@@ -370,9 +370,9 @@ class boranking extends soranking
 		// do we have to check for a license, jury rights do NOT allow to apply for licenses
 		if ($check && !$this->is_admin && $license)
 		{
-			if (!($check =  $license != NULL && $fed_rights || in_array($license,$this->athlete_rights_no_judge)))
+			if (!($check =  $license != 'NULL' && $fed_rights || in_array($athlete['nation'],$this->athlete_rights_no_judge)))
 			{
-				$which = 'jury rights do NOT allow to apply for a license!';
+				$which = 'jury rights do NOT allow to apply for a license!'." license='$license', athlete_rights_no_judge=".implode(', ',$this->athlete_rights_no_judge);
 			}
 		}
 		//error_log(__METHOD__."(".array2string($athlete).",$required,".array2string($comp).",$license) ".($check?'TRUE':'FALSE')." ($which)");
