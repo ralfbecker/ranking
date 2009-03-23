@@ -638,17 +638,18 @@ class uiathletes extends boranking
 			$GLOBALS['egw']->common->egw_exit();
 		}
 		$egw_charset = $GLOBALS['egw']->translation->charset();
+		$replace = array();
 		foreach($this->athlete->data as $name => $value)
 		{
+			if (is_array($value)) continue;
 			// the rtf seems to use iso-8859-1
-			$value = $GLOBALS['egw']->translation->convert($value,$egw_charset,'iso-8859-1');
-			$form = str_replace('$$'.$name.'$$',$value,$form);
+			$replace['$$'.$name.'$$'] = $value = $GLOBALS['egw']->translation->convert($value,$egw_charset,'iso-8859-1');
 		}
 		include_once(EGW_API_INC.'/class.browser.inc.php');
 		$browser = new browser();
 		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
 		$browser->content_header($file,'text/rtf');
-		echo $form;
+		echo str_replace(array_keys($replace),array_values($replace),$form);
 		$GLOBALS['egw']->common->egw_exit();
 	}
 }
