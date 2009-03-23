@@ -616,6 +616,7 @@ class uiathletes extends boranking
 	function license_form_name($nation=null,$year=null)
 	{
 		if (is_null($year)) $year = $this->license_year;
+		if ($nation == 'NULL') $nation = null;
 
 		return $_SERVER['DOCUMENT_ROOT'].'/'.$year.'/license_'.$year.$nation.'.rtf';
 	}
