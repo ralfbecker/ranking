@@ -134,6 +134,22 @@ class ranking_accounting extends boresult
 					'order'      => 'start_order',
 					'sort'       => 'ASC',
 					'show_result'=> 1,
+					'csv_fields' => array(
+						'start_order'  => array('label' => lang('Startorder'),  'type' => 'int'),
+						'start_number' => array('label' => lang('Startnumber'), 'type' => 'int'),
+						'GrpId'        => array('label' => lang('Category'),    'type' => 'select'),
+						'nachname'     => array('label' => lang('Lastname'),    'type' => 'text'),
+						'vorname'      => array('label' => lang('Lastname'),    'type' => 'text'),
+						'strasse'      => array('label' => lang('Street'),      'type' => 'text'),
+						'plz'          => array('label' => lang('Postcode'),    'type' => 'text'),
+						'ort'          => array('label' => lang('City'),        'type' => 'text'),
+						'geb_date'     => array('label' => lang('Birthdate'),   'type' => 'date'),
+						'verband'      => array('label' => lang('Sektion'),     'type' => 'text'),
+						'acl_fed_id'   => array('label' => lang('Regionalzentrum'),'type' => 'select'),
+						'license'      => array('label' => lang('License'),     'type' => 'select'),
+						'total'        => array('label' => lang('Total'),       'type' => 'float', 'size' => '2'),
+						'fed'          => array('label' => lang('Federation'),  'type' => 'float', 'size' => '2'),
+					)
 				);
 			}
 			if ($_GET['calendar']) $content['nm']['calendar'] = $_GET['calendar'];
