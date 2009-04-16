@@ -242,7 +242,7 @@ class uiregistration extends boranking
 		}
 		if (is_null($nation) && !$this->is_judge($comp))
 		{
-			if ($this->only_nation_register)
+			if ($this->only_nation_register && $this->only_nation_register != 'XYZ')
 			{
 				$nation = $this->only_nation_register;
 			}
@@ -571,7 +571,7 @@ class uiregistration extends boranking
 		$this->set_ui_state($perserv['calendar'],$preserv['comp'],$preserv['cat']);
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
-			(!$nation || !$nation == 'NULL' ? '' : (': '.
+			(!$nation || $nation == 'NULL' ? '' : (': '.
 			(is_numeric($nation) && ($fed || ($fed = $this->federation->read($nation))) ? $fed['verband'] : $nation)));
 		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
 	}
