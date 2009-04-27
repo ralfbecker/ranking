@@ -1460,7 +1460,7 @@ class boranking extends soranking
 				else
 				{
 					$result['result_time'.$postfix] = '';
-					$result['eliminated'.$postfix] = (int) in_array($arr[$name],array('eliminiert','eliminated'));
+					$result['eliminated'.$postfix] = (int) !in_array(strtolower($arr[$name]),array('wildcard'));
 				}
 				break;
 
