@@ -227,11 +227,11 @@ $get = curl_exec($ch);
 $exec_id = get_exec_id($get);
 
 curl_setopt($ch,CURLOPT_POST,true);		// from now on only posts
-foreach($cats as $n => $cat)
+foreach($cats as $n => $cat_name)
 {
-	if (!($cat = $boresult->cats->read($cat)))
+	if (!($cat = $boresult->cats->read($cat_name)))
 	{
-		throw new Exception("Error: Cat '$cat' not found!",7);
+		throw new Exception("Error: Cat '$cat_name' not found!",7);
 	}
 	echo $cat['rkey'].': '.$cat['name']."\n";
 
@@ -293,7 +293,7 @@ foreach($cats as $n => $cat)
 			if ($route == 1) continue;	// me might not have a 2. quali
 			break;	// no further heat
 		}
-		$fname = $matches[1];
+		$fname = str_replace('/','-',$matches[1]);
 
 		// convert from the given charset to eGW's
 		$download = $GLOBALS['egw']->translation->convert($download,$charset);
