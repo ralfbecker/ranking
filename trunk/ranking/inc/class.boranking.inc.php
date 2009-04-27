@@ -1452,15 +1452,17 @@ class boranking extends soranking
 
 			case 'speed':
 				foreach(isset($arr['time-left']) ? array('' => 'time-left','_r' => 'time-right') : array('' => 'result') as $postfix => $name)
-				if (is_numeric($arr[$name]))
 				{
-					$result['result_time'.$postfix] = (double) $arr[$name];
-					$result['eliminated'.$postfix] = '';
-				}
-				else
-				{
-					$result['result_time'.$postfix] = '';
-					$result['eliminated'.$postfix] = (int) !in_array(strtolower($arr[$name]),array('wildcard'));
+					if (is_numeric($arr[$name]))
+					{
+						$result['result_time'.$postfix] = (double) $arr[$name];
+						$result['eliminated'.$postfix] = '';
+					}
+					else
+					{
+						$result['result_time'.$postfix] = '';
+						$result['eliminated'.$postfix] = $arr[$name] ? (int) !in_array(strtolower($arr[$name]),array('wildcard')) : '';
+					}
 				}
 				break;
 
