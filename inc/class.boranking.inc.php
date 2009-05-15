@@ -575,7 +575,7 @@ class boranking extends soranking
 		{
 			$max_comp = $this->cup->get_max_comps($cat['rkey'],$cup);
 
-			if ((int) $stand >= 2000 && !in_array($cat['rkey'],$cup['gruppen']))
+			if ((int) $stand >= 2000 && !in_array($cat['rkey'],(array)$cup['gruppen']))
 			{
 				return false;			// no cup (ranking) defined for that group
 			}
