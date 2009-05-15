@@ -344,7 +344,7 @@ class athlete extends so_sql
 				$extra_cols[] = "(SELECT MAX(datum) FROM $this->result_table WHERE $this->result_table.PerId=$this->table_name.PerId AND platz > 0) AS last_comp";
 			}
 			// get the license (license nation is set by: nation filter, category (numeric join arg), filter[license_nation] (highes precedence))
-			if (array_key_exists('license_nation',$filter))	// pseudo filter, only specifies the nation, does NOT filter by it!
+			if (is_array($filter) && array_key_exists('license_nation',$filter))	// pseudo filter, only specifies the nation, does NOT filter by it!
 			{
 				$license_nation = $filter['license_nation'];
 				unset($filter['license_nation']);
