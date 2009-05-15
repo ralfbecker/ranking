@@ -7,8 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
@@ -78,9 +78,9 @@ class category extends so_sql
 	function category($source_charset='',$db=null)
 	{
 		$this->so_sql('ranking','Gruppen',$db);	// call constructor of derived class
-		
+
 		if ($source_charset) $this->source_charset = $source_charset;
-		
+
 		$this->charset = $GLOBALS['egw']->translation->charset();
 	}
 
@@ -143,14 +143,14 @@ class category extends so_sql
 
 		unset($criteria['rls']);	// is always set
 		unset($criteria['vor_rls']);
-		
+
 		if ($this->cache)
 		{
 			switch (count($criteria)+count($filter))
 			{
 				case 0:
 					return $this->cache;
-					
+
 				case 1:
 					$ret = false;
 					list($key,$val) = count($criteria) ? each($criteria) : each($filter);
@@ -168,14 +168,14 @@ class category extends so_sql
 		$filter[] = "rkey NOT LIKE 'X\\_%'";	// dont show old dR internal cats
 
 		$ret =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
-		
+
 		if (!$this->cache && count($criteria)+count($filter) == 0)
 		{
 			$this->cache =& $ret;
 		}
-		return $ret; 
+		return $ret;
 	}
-	
+
 	/**
 	 * read a category, reimplemented to use the cache
 	 */
@@ -186,7 +186,7 @@ class category extends so_sql
 			($new_rkey = array_search(is_array($keys) ? $keys['rkey'] : $keys,$this->cat2old)))
 		{
 			$keys['rkey'] = $new_rkey;
-		}	
+		}
 		if (!is_array($keys))
 		{
 			$keys = is_numeric($keys) ? array('GrpId' => (int) $keys) : array('rkey' => $keys);
@@ -210,7 +210,7 @@ class category extends so_sql
 	 * get the names of all or certain categories, eg. to use in a selectbox
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
 	 * @param int $rkeys -1: GrpId=>rkey:name 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
-	 * @param string $sort='rkey' 
+	 * @param string $sort='rkey'
 	 * @returns array with all Cups in the from specified in $rkeys
 	 */
 	function &names($keys=array(),$rkeys=2,$sort='')
@@ -225,7 +225,7 @@ class category extends so_sql
 			{
 				$keys['nation'] = null;
 			}
-			if (is_array($keys['nation']) && ($k = array_search('NULL',$keys['nation'])) !== false) 
+			if (is_array($keys['nation']) && ($k = array_search('NULL',$keys['nation'])) !== false)
 			{
 				$keys['nation'][$k] = null;
 			}
@@ -260,7 +260,7 @@ class category extends so_sql
 		//echo "<p>category::names(".print_r($keys,true).") = <pre>".print_r($names,true)."</pre>\n";
 		return $names;
 	}
-	
+
 	/**
 	 * converts a regular expression or comma-separated rkey-list, into an array of rkeys
 	 *
@@ -273,7 +273,7 @@ class category extends so_sql
 		if (empty($rexp)) return array();
 
 		$rexp = ereg_replace('=[^,]*','',$rexp);	// removes cat specific counts
-	
+
 		if (!$this->all_names)
 		{
 			$this->all_names = $this->names();
@@ -282,7 +282,7 @@ class category extends so_sql
 		foreach((array) $this->all_names as $rkey => $name)
 		{
 			if (stristr( ",".$rexp.",",",".$rkey."," ) || $rexp && eregi( '^'.$rexp.'$',$rkey ) ||
-				 		(isset($this->cat2old[$rkey]) && (stristr( ",".$rexp.",",",".$this->cat2old[$rkey]."," ) || 
+				 		(isset($this->cat2old[$rkey]) && (stristr( ",".$rexp.",",",".$this->cat2old[$rkey]."," ) ||
 				 		$rexp && eregi( '^'.$rexp.'$',$this->cat2old[$rkey] ))))
 					{
 						$cats[] = $rkey;
@@ -301,7 +301,7 @@ class category extends so_sql
 	 * @param int &$to_year on return finishing year
 	 * @return boolean true if cat uses an age_group, false otherwise
 	 */
-	function age_group($cat,$stand,&$from_year,&$to_year)
+	static function age_group(array $cat,$stand,&$from_year,&$to_year)
 	{
 		if (($from_year = $cat['from_year']) < 0) // neg. is age not year
 		{
@@ -311,11 +311,46 @@ class category extends so_sql
 		{
 			$to_year += $stand;
 		}
-		if ($from_year > $to_year) 
+		if ($from_year > $to_year)
 		{
 			$y = $from_year; $from_year = $to_year; $to_year = $y;
 		}
 		//echo "category::age_group(,'$stand',from=$from_year, to=$to_year)"; _debug_array($cat);
 		return $cat['from_year'] && $cat['to_year'];
+	}
+
+	/**
+	 * Check if a given birthdate is in the age-group of a category
+	 *
+	 * @param int|string $birthdate birthdate Y-m-d or birthyear
+	 * @param int|array $cat GrpId or category array
+	 * @param int|string $year=null year or date to check, default current year
+	 * @return boolean true if $birthdate is in the agegroup or category does NOT use age-groups
+	 */
+	function in_agegroup($birthdate,$cat,$year=null)
+	{
+		static $cats;	// some caching of cats, to not read them multiple times
+
+		if (!is_array($cat))
+		{
+			if (!isset($cats[$cat]))
+			{
+				$cats[$cat] = $this->read($cat);
+			}
+			$cat = $cats[$cat];
+		}
+		if (is_null($year)) $year = (int)date('Y');
+
+		if (!self::age_group($cat,$year,$from_year,$to_year))
+		{
+			$ret = true;
+			$reason = ' (cat does not use age-groups)';
+		}
+		else
+		{
+			$ret = $from_year <= (int)$birthdate && (int)$birthdate <= $to_year;
+		}
+		//echo "<p>".__METHOD__."($birthdate,".array2string($cat).",$year) from_year=$from_year, to_year=$to_year --> returning ".array2string($ret)."$reason</p>\n";
+		return $ret;
 	}
 }
