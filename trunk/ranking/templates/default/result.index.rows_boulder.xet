@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description value="opens" id="route_iso_open" no_lang="1"/>
-									<description value="closes" id="route_iso_close" no_lang="1"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_start" no_lang="1"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description id="route_observation_time" no_lang="1"/>
-									<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,10 +47,10 @@
 							</columns>
 							<rows>
 								<row>
-									<description id="route_result" no_lang="1"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_judge"/>
+									<description no_lang="1" id="route_data[route_judge]"/>
 								</row>
 							</rows>
 						</grid>
@@ -78,12 +78,16 @@
 				<column disabled="@num_problems=/[12]/"/>
 				<column disabled="@num_problems=/[123]/"/>
 				<column disabled="@num_problems=/[1234]/"/>
-				<column disabled="!@num_problems=6"/>
+				<column disabled="@num_problems=/[12345]/"/>
+				<column disabled="@num_problems=/[123456]/"/>
+				<column disabled="@num_problems=/[1234567]/"/>
 				<column disabled="@no_prev_heat"/>
 			</columns>
 			<rows>
 				<row part="header">
 					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
+					<description/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -114,10 +118,14 @@
 					<description value="4" no_lang="1" class="place"/>
 					<description value="5" class="place"/>
 					<description value="6" class="place"/>
+					<description value="7" class="place"/>
+					<description value="8" class="place"/>
 					<nextmatch-sortheader label="previous heat" id="rank_prev_heat" align="center"/>
 				</row>
 				<row part="footer">
 					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
+					<description/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -195,6 +203,24 @@
 							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone6]" onchange="check_bonus(this)"/>
 						</menulist>
 						<description id="{$row}[boulder6]" class="onlyPrint" no_lang="1"/>
+					</box>
+					<box options="0,0">
+						<menulist class="noPrint">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top7]" onchange="check_top(this)"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone7]" onchange="check_bonus(this)"/>
+						</menulist>
+						<description id="{$row}[boulder7]" class="onlyPrint" no_lang="1"/>
+					</box>
+					<box options="0,0">
+						<menulist class="noPrint">
+							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top8]" onchange="check_top(this)"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" options=" ,1,20" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone8]" onchange="check_bonus(this)"/>
+						</menulist>
+						<description id="{$row}[boulder8]" class="onlyPrint" no_lang="1"/>
 					</box>
 					<description class="place" id="{$row}[rank_prev_heat]" align="center" no_lang="1"/>
 				</row>

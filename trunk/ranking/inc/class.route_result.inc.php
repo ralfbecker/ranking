@@ -44,6 +44,13 @@ class route_result extends so_sql
 	 */
 	const RESULT_TABLE = 'RouteResults';
 
+	/**
+	 * Maximum number of boulders
+	 *
+	 * There have to be columns for each boulder in eTemplate "ranking.result.index.rows_boulder
+	 */
+	const MAX_BOULDERS = 8;
+
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 	);
 	var $charset,$source_charset;
@@ -494,7 +501,7 @@ class route_result extends so_sql
 				{
 					$data += unserialize($data['result_detail']);
 					unset($data['result_detail']);
-					for($i=1; $i <= 6; ++$i)
+					for($i=1; $i <= self::MAX_BOULDERS; ++$i)
 					{
 						$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
 							($data['zone'.$i] ? 'b'.$data['zone'.$i] : '');
@@ -700,7 +707,7 @@ class route_result extends so_sql
 		if (isset($data['top1']))
 		{
 			$data['result_top'] = $data['result_zone'] = $data['result_detail'] = null;
-			for($i = 1; $i <= 6; ++$i)
+			for($i = 1; $i <= self::MAX_BOULDERS; ++$i)
 			{
 				if ($data['top'.$i])
 				{
@@ -731,7 +738,7 @@ class route_result extends so_sql
 	/**
 	 * merges in new values from the given new data-array
 	 *
-	 * Reimplemented to also merge top1-6 and zone1-6
+	 * Reimplemented to also merge top1-MAX_BOULDERS and zone1-MAX_BOULDERS
 	 *
 	 * @param $new array in form col => new_value with values to set
 	 */
@@ -739,7 +746,7 @@ class route_result extends so_sql
 	{
 		parent::data_merge($new);
 
-		for($i = 1; $i <= 6; ++$i)
+		for($i = 1; $i <= self::MAX_BOULDERS; ++$i)
 		{
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
@@ -783,7 +790,7 @@ class route_result extends so_sql
 				else
 				{
 					$mode = $this->rank_speed_final;
-					// ORDER BY CASE column-alias does NOT work with MySQL 5.0.22-Debian_0ubuntu6.06.6, it works with 5.0.51a-log SUSE
+					// ORDER BY CASE column-alias does NOT work with MySQL 5.0.22-Debian_Ubuntu6.06.6, it works with 5.0.51a-log SUSE
 					//$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
 					$order_by = "result_time IS NULL,CASE ($this->rank_speed_final) WHEN 1 THEN 0 ELSE result_time END ASC";
 					$extra_cols[] = 'result_time';

@@ -30,7 +30,7 @@
 							<menupopup id="discipline" readonly="true"/>
 						</menulist>
 						<menulist class="leftPad5">
-							<menupopup type="select-number" options=",3,6,1" id="route_num_problems" statustext="Number of problems"/>
+							<menupopup type="select-number" options=",3,8,1" id="route_num_problems" statustext="Number of problems"/>
 						</menulist>
 					</hbox>
 				</row>
