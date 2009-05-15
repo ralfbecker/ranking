@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -333,9 +333,15 @@ class uiregistration extends boranking
 				}
 				else // register
 				{
-					$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete,isset($prequalified[$cat['GrpId']][$athlete['PerId']])) ?
-						lang('%1, %2 registered for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
-						lang('Error: registration');
+					try {
+						$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete,isset($prequalified[$cat['GrpId']][$athlete['PerId']])) ?
+							lang('%1, %2 registered for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
+							lang('Error: registration');
+					}
+					catch(egw_exception_wrong_userinput $e)
+					{
+						$msg = lang('Error').': '.$e->getMessage().'!';
+					}
 					// remember athlete to check later for over quota
 					if ($comp['no_complimentary'] && !isset($prequalified[$cat['GrpId']][$athlete['PerId']]))
 					{

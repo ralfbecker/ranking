@@ -824,6 +824,7 @@ class boranking extends soranking
 			if (is_numeric($nation) && (is_array($comp) || ($comp = $this->comp->read($comp))) && $comp['nation'])
 			{
 				$filter[] = 'fed_parent='.(int)$nation;
+				$filter['license_nation'] = $comp['nation'];	// otherwise we return international licenses
 			}
 			else
 			{
@@ -835,7 +836,15 @@ class boranking extends soranking
 				{
 					if (in_array($athlete['PerId'],$prequalified[$cat]))
 					{
-						$nat_prequals[$cat][$athlete['PerId']] = $athlete;
+						if ($this->in_agegroup($athlete['geb_date'],$cat,$comp))
+						{
+							$nat_prequals[$cat][$athlete['PerId']] = $athlete;
+						}
+						else
+						{
+							// not prequalified for that category, because athlete is now in a different age-group
+							// todo --> check rules if that prequalifies him in the next higher age-group
+						}
 					}
 				}
 			}
@@ -854,8 +863,9 @@ class boranking extends soranking
 	 *
 	 * @param int $comp WetId
 	 * @param int $cat GrpId
-	 * @param int/array $athlete PerId or complete athlete array
+	 * @param int|array $athlete PerId or complete athlete array
 	 * @param int $mode=0  0: register (quota or supplimentary), 1: register prequalified, 2: remove registration
+	 * @throws egw_exception_wrong_userinput with error message
 	 * @return boolean true of everythings ok, false on error
 	 */
 	function register($comp,$cat,$athlete,$mode=0)
@@ -874,6 +884,10 @@ class boranking extends soranking
 		}
 		if (!is_array($athlete)) $athlete = $this->athlete->read($athlete);
 
+		if (!$this->in_agegroup($athlete['geb_date'],$cat,$comp))
+		{
+			throw new egw_exception_wrong_userinput(lang('Athlete is NOT in the age-group of that category'));
+		}
 		// get next registration-number, to have registered athletes ordered
 		// registration number are from 1 to 63 in that 6 lowest bit (&63) of the points
 		$num = $this->result->read(array(
@@ -902,6 +916,37 @@ class boranking extends soranking
 			'pkt'  => $num,
 			'datum' => date('Y-m-d'),
 		));
+	}
+
+	/**
+	 * Check if a given birthdate is in the age-group of a category
+	 *
+	 * @param int|string $birthdate birthdate Y-m-d or birthyear
+	 * @param int|array $cat GrpId or category array
+	 * @param int|array $comp=null competition which date to use or default NULL to use the current year
+	 * @return boolean true if $birthdate is in the agegroup or category does NOT use age-groups
+	 */
+	function in_agegroup($birthdate,$cat,$comp=null)
+	{
+		static $comps;	// some caching
+
+		if (is_null($comp))
+		{
+			$year = null;
+		}
+		else
+		{
+			if (!is_array($comp))
+			{
+				if (!isset($comps[$comp]))
+				{
+					$comps[$comp] = $this->comp->read($comp);
+				}
+				$comp = $comps[$comp];
+			}
+			$year = (int)$comp['datum'];
+		}
+		return $this->cats->in_agegroup($birthdate,$cat,$year);
 	}
 
 	/**

@@ -48,6 +48,7 @@ athlete	ranking	en	Athlete
 athlete %1 not found!	ranking	en	Athlete %1 not found!
 athlete has no license! use regular registration to apply for a license first.	ranking	en	Athlete has no license! Use regular registration to apply for a license first.
 athlete including %1 results merged.	ranking	en	Athlete including %1 results merged.
+athlete is not in the age-group of that category	ranking	en	Athlete is NOT in the age-group of that category
 athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athletes	ranking	en	Athletes
 attention: merging can not be undone! really want to merge?	ranking	en	ATTENTION: merging can NOT be undone! Really want to merge?
@@ -415,6 +416,7 @@ startlist generated	ranking	en	Startlist generated
 startlist pdf	ranking	en	Startlist PDF
 startlists	ranking	en	Startlists
 startnumber	ranking	en	Startnumber
+startorder	ranking	en	Startorder
 street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
 sum	ranking	en	Sum
