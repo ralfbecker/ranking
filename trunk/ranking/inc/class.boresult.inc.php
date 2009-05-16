@@ -231,7 +231,7 @@ class boresult extends boranking
 			case 'SUI':
 				$order = 2|4;	// reverse cup
 				break;
-				
+
 			default:
 				$order = $discipline == 'speed' ? 1|4 :		// 5 = reverse of ranking for speed
 					// 9 = distribution by ranking, 0 = random
@@ -792,12 +792,21 @@ class boresult extends boranking
 				'nachname' => 'lastname',
 				'vorname'  => 'firstname',
 				'nation'   => 'nation',
+				'verband'  => 'federation',
 				'birthyear' => 'birthyear',
 				'ranking',
 				'ranking-points',
 				'start_number' => 'startnumber',
 				'result' => 'result',
 			);
+			if ($comp['nation'] == 'SUI')
+			{
+				$name2csv += array(
+					'ort'      => 'city',
+					'plz'      => 'postcode',
+					'geb_date' => 'birthdate',
+				);
+			}
 			switch($keys['discipline'])
 			{
 				case 'boulder':
