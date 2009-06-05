@@ -523,6 +523,8 @@ class boranking extends soranking
 	 *		rls->end_pflich_tol (!= 0 | I_EMPTY | nul) dann werden nur
 	 *		solche Athleten in die Rangliste aufgenommen, die zum Datum
 	 *		der Rangliste innerhalb der Jahrgangsgrenzen liegen
+	 * 10.06.2006: EYC nicht-europ. Teiln. zaehlen nicht fuer Punkte
+	 * 01.01.2009: Int. competition use "averaged" points for ex aquo
 	 */
 	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup='')
 	{
@@ -616,8 +618,8 @@ class boranking extends soranking
 
 		if ($cup)
 		{
-			$results =& $this->result->cup_results($cup['SerId'],$cup['pkte'],$cat['GrpIds'],$stand,
-				stristr($cup['rkey'],'EYC') ? $this->european_nations : false);
+			$results =& $this->result->cup_results($cup,$cat['GrpIds'],$stand,
+				stristr($cup['rkey'],'EYC') || stristr($cup['rkey'],'EYS') ? $this->european_nations : false);
 		}
 		else
 		{

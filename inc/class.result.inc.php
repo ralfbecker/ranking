@@ -302,27 +302,45 @@ class result extends so_sql
 	/**
 	 * return result-list for a cup-ranking of $cup as of $stand
 	 *
-	 * @param int $SerId id of the cup
-	 * @param int $PktId id of the point-system to use
+	 * @param array $cup
 	 * @param array $cats array of integer cat-id's (GrpId)
 	 * @param string $stand date as 'Y-m-d'
 	 * @param array $allowed_nations=null array with 3-digit nation-codes to limit the nations to return, default all
 	 * @return array ordered by PerId and number of points of arrays with full athlete-data, platz, pkt, WetId, GrpId
 	 */
-	function &cup_results($SerId,$PktId,$cats,$stand,$allowed_nations)
+	function &cup_results(array $cup,$cats,$stand,$allowed_nations)
 	{
-		$this->db->query("SELECT $this->athlete_table.*,".
-			athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,s.pkt,r.WetId,r.GrpId'.
+		$platz = 'r.platz';
+		$pkte = 's.pkt';
+		if ($allowed_nations)
+		{
+			// since 2006 (evtl. even before) only European nation are counting for places and points
+			if (($y = (int)$serie->rkey) >= 6 && $y < 90)
+			{
+				// Platz wenn nur die $allowed_nations zählen
+				$sql_platz = $platz = "CASE WHEN r.platz=999 THEN 999 ELSE (SELECT count(*)".
+					" FROM Results r2 JOIN Personen p2 ON r2.PerId=p2.PerId".str_replace('Personen','p2',athlete::FEDERATIONS_JOIN).// fed_join('p2').
+					" WHERE r2.WetId=r.WetId AND r2.GrpId=r.GrpId".
+					" AND nation IN ('".implode("','",$allowed_nations)."')".
+					" AND r2.platz < r.platz AND r2.platz > 0)+1 END";
+			}
+		}
+		// since 2009 int. cups use "averaged" points for ex aquo competitors
+		if (empty($cup['nation']) && ($y = (int)$cup['rkey']) >= 9 && $y < 90)
+		{
+			$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=r.GrpId AND ex.WetId=r.WetId AND ex.platz=r.platz)';
+			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE ROUND((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=".(int)$cup['pkte']." AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos,2) END)";
+		}
+		$results = array();
+		foreach($this->db->query("SELECT $this->athlete_table.*,".
+			athlete::FEDERATIONS_TABLE.".nation,verband,$platz AS platz,$pkte AS pkt,r.WetId,r.GrpId".
 			" FROM $this->result_table r,$this->comp_table w,$this->pkte_table s,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.platz > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
-			' AND w.serie='.(int) $SerId.' AND r.platz=s.platz AND s.PktId='.(int) $PktId.
+			' AND w.serie='.(int) $cup['SerId'].' AND r.platz=s.platz AND s.PktId='.(int) $cup['pkte'].
 			' AND s.pkt > 0 AND w.datum <= '.$this->db->quote($stand).
 			($allowed_nations ? ' AND '.athlete::FEDERATIONS_TABLE.'.nation IN (\'' . implode("','",$allowed_nations) . "')" : '').
-			' ORDER BY r.PerId,s.pkt DESC',__LINE__,__FILE__);
-
-		$results = array();
-		while(($row = $this->db->row(true)))
+			' ORDER BY r.PerId,s.pkt DESC',__LINE__,__FILE__) as $row)
 		{
 			$results[] = $this->athlete->db2data($row);
 		}
