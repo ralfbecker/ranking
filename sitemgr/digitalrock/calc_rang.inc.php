@@ -283,9 +283,9 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 
 	ksort($rang);			// Array $rang enthaelt jetzt Rangliste
 
-	$ret_ex_aquo =& $ex_aquo;
-	$ret_pers =& $pers;
-	$ret_nicht_gewertet =& $nicht_gewertet;
+	$ret_ex_aquo = $ex_aquo;
+	$ret_pers = $pers;
+	$ret_nicht_gewertet = $nicht_gewertet;
 
 	return $rang;
 }
