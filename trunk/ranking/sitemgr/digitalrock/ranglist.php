@@ -1,6 +1,11 @@
 <?php
-
 /* $Id$ */
+
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+{
+	include_once('cache.php');
+	do_cache();
+}
 
 require_once ('open_db.inc.php');
 include_once ('calc_rang.inc.php');
@@ -100,20 +105,31 @@ if ($rang && $show_calc)		// Liste enthaltene Wettk. erzeugen
 		foreach($GrpIds as $GrpId)
 		{
 			$row->GrpId = $GrpId;
-			$wettks[] = clone($row);	// $row is an object!
+			$wettks[$row->WetId] = clone($row);	// $row is an object!
 		}
 	}
-	global $sql_platz;
+	global $sql_platz,$sql_pkte;
 	$eyc_platz = '';
 	if ($sql_platz)	// neuer EYC bei dem nur europäer für die Punkte berücksichtigt werden
 	{
 		$eyc_platz = ','.$sql_platz.' AS eyc_platz';
 	}
-	$res = my_query($query = "SELECT * $eyc_platz FROM Results r WHERE GrpId IN ($gruppe->GrpIds)".
-						" AND '$anfang'<=datum AND datum<='$stand'");
+	if ($sql_pkte)	// 2009+ international ranking
+	{
+		$sql_pkte = ','.$sql_pkte.' AS pkt';
+		$pkt_join = 'JOIN PktSystemPkte s ON s.PktId='.(int)$serie->pkte.' AND s.platz=r.platz';
+	}
+	$res = my_query($query = "SELECT * $eyc_platz$sql_pkte FROM Results r $pkt_join WHERE GrpId IN ($gruppe->GrpIds)".
+		($wettks ? ' AND r.WetId IN ('.implode(',',array_keys($wettks)).')' : '').
+		" AND '$anfang'<=datum AND datum<='$stand' ORDER BY r.WetId,r.platz");
+
 	while ($row = mysql_fetch_object($res))
 	{
-		if (isset($pkte))
+		if (isset($sql_pkte))
+		{
+			$row->pkt *= 100;
+		}
+		elseif (isset($pkte))
 		{
 			$row->pkt = 100.0 * $pkte[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz];
 		}
@@ -197,7 +213,7 @@ foreach ($rang as $r)
 	per_link ($r,$gruppe);
 	printf("\t\t<td>%1.2f</td>\n",$r->pkt);
 
-	if ($show_calc)
+	if ($show_calc && is_array($wettks))
 	{
 		foreach($wettks as $w)
 		{
