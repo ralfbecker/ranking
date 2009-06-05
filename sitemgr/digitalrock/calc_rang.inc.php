@@ -348,7 +348,7 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 	{
 		$platz = 'r.platz';
 		$pkte = 's.pkt';
-		if (stristr($serie->rkey,'EYC'))
+		if (stristr($serie->rkey,'EYC') || stristr($serie->rkey,'EYS'))
 		{
 			$allowed_nations = $european_nations;
 
