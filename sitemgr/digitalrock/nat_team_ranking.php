@@ -1,7 +1,11 @@
 <?php
-
 /* $Id$ */
 
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+{
+	include_once('cache.php');
+	do_cache();
+}
 require ("open_db.inc.php");
 
 $wettk=prepare_var('comp','strtoupper',array('GET',0));
@@ -160,14 +164,24 @@ elseif($name == 'overall' && count($valid) > 2)
 	$min_cats = 2;	// overall ranking requires participation in 2 or more categories!
 }
 
-$res = my_query($q="SELECT nation,WetId,GrpId,nachname,vorname,Results.platz,PktSystemPkte.pkt,Results.PerId".
-		($min_cats > 1 || !$cup && $show_calc ? ",(SELECT COUNT(*) FROM Results v WHERE Results.WetId=v.WetId AND Results.PerId=v.PerId AND v.platz > 0 AND GrpId IN ($cats)) AS num_cats":'').
+$PktId=2;	// uiaa
+$pkte = 's.pkt';
+$platz = 'r.platz';
+// since 2009 int. cups use "averaged" points for ex aquo competitors
+if ((int)$wettk->datum >= 2009)
+{
+	$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=r.GrpId AND ex.WetId=r.WetId AND ex.platz=r.platz)';
+	$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE ROUND((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=$PktId AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos,2) END)";
+	$pkte .= ' AS pkt';
+}
+$res = my_query($q="SELECT nation,WetId,GrpId,nachname,vorname,r.platz,$pkte,r.PerId".
+		($min_cats > 1 || !$cup && $show_calc ? ",(SELECT COUNT(*) FROM Results v WHERE r.WetId=v.WetId AND r.PerId=v.PerId AND v.platz > 0 AND GrpId IN ($cats)) AS num_cats":'').
 		" FROM Personen".fed_join().
-		" JOIN Results ON Personen.PerId=Results.PerId".
-		" LEFT JOIN PktSystemPkte ON Results.platz=PktSystemPkte.platz AND PktId=2".
-		" WHERE WetId IN ($comps) AND Results.platz > 0".($cats ? " AND GrpId IN ($cats)" : '').
+		" JOIN Results r ON Personen.PerId=r.PerId".
+		" LEFT JOIN PktSystemPkte s ON r.platz=s.platz AND PktId=$PktId".
+		" WHERE WetId IN ($comps) AND r.platz > 0".($cats ? " AND GrpId IN ($cats)" : '').
 		($min_cats > 1 ? " HAVING num_cats >= $min_cats" : '').
-		" ORDER BY nation,WetId,GrpId,Results.platz");
+		" ORDER BY nation,WetId,GrpId,r.platz");
 //echo "$name, min_cats=$min_cats: $q";
 
 $nations = $nation_comp_pkte = array();
