@@ -1,6 +1,75 @@
 <?php
-
 /* $Id$ */
+
+if ($_SERVER['HTTP_HOST'] == 'localhost')
+{
+	$cache_time = false;	// no caching
+}
+elseif (!isset($cache_dir))
+{
+	$cache_dir  = '/tmp/digitalrock-cache';
+	$cache_time = 15*60;
+	$cache_log = true;
+}
+
+function calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret_ex_aquo,&$ret_nicht_gewertet,$serie='')
+{
+	global $sql_platz,$sql_pkte;
+
+	$cache_keys = array();
+	if ($serie)
+	{
+		if (is_numeric($serie))
+		{
+			read_serie($serie);
+		}
+		$cache_keys[] = is_object($serie) ? $serie->rkey : $serie;
+	}
+	if (is_numeric($gruppe))
+	{
+		read_gruppe($gruppe);
+	}
+	$cache_keys[] = is_object($gruppe) ? $gruppe->rkey : $gruppe;
+
+	$cache_keys[] = $stand;
+
+	$cache_file = $GLOBALS['cache_dir'].'/'.implode('-',$cache_keys).'.php';
+
+	if ($GLOBALS['cache_time'] && file_exists($cache_file) && filesize($cache_file))
+	{
+		if(time()-filemtime($cache_file) < $GLOBALS['cache_time'] && include($cache_file))
+		{
+			if ($GLOBALS['cache_log']) error_log(__METHOD__."('$gruppe->rkey','$stand',...,'".(is_object($serie)?$serie->rkey:$serie)."') using cache file $cache_file from ".date('Y-m-d H:i:s',filemtime($cache_file)));
+			return $ret;
+		}
+		if ($GLOBALS['cache_log']) error_log(__METHOD__."('$gruppe->rkey','$stand',...,'".(is_object($serie)?$serie->rkey:$serie)."') removed old cache file $cache_file from ".date('Y-m-d H:i:s',filemtime($cache_file)));
+		unlink($cache_file);
+	}
+	$ret = _calc_rangliste($gruppe,$stand,$anfang,$wettk,$ret_pers,$rls,$ret_ex_aquo,$ret_nicht_gewertet,$serie);
+
+	if ($GLOBALS['cache_time'] && ($f = fopen($cache_file,'x')))
+	{
+		$content = "<?php\n\n/**\n * ranglist cache for ".implode('-',$cache_keys)." created ".date('Y-m-d H:i:s')."\n */\n\n";
+
+		foreach(array('gruppe','stand','anfang','wettk','ret_pers','rls','ret_ex_aquo','ret_nicht_gewertet','ret','sql_platz','spl_pkte') as $name)
+		{
+			$content .= "\$$name = unserialize('".str_replace("'",'"',serialize($$name))."');\n\n";
+		}
+		fwrite($f,$content);
+		fclose($f);
+		if ($GLOBALS['cache_log']) error_log(__METHOD__."('$gruppe->rkey','$stand',...,'".(is_object($serie)?$serie->rkey:$serie)."') created cache file $cache_file at ".date('Y-m-d H:i:s',filemtime($cache_file)));
+
+		if($stand != array_pop($cache_keys))
+		{
+			$cache_keys[] = $stand;
+			$cache_file_stand = $GLOBALS['cache_dir'].'/'.implode('-',$cache_keys).'.php';
+			@unlink($cache_file_stand);
+			link($cache_file,$cache_file_stand);
+			if ($GLOBALS['cache_log']) error_log(__METHOD__."('$gruppe->rkey','$stand',...,'".(is_object($serie)?$serie->rkey:$serie)."') created cache file $cache_file at ".date('Y-m-d H:i:s',filemtime($cache_file)));
+		}
+	}
+	return $ret;
+}
 
 /**
  * Berechnet eine Rangliste vom Type $rls->window_type:
@@ -8,7 +77,7 @@
  *             wettk = $rls->window_anz Wettkaempfe ---- " -----
  * Es werden, wenn definiert, nur die $rls->best_wettk besten Ergebnisse beruecksichtigt.
  *
- * @param string/gruppe &$gruppe = rkey der Gruppe, on return: Gruppen-Obj.
+ * @param gruppe|string|int &$gruppe = rkey der Gruppe, on return: Gruppen-Obj.
  * @param string &$stand  = rkey eines Wettk., Datum YYYY-MM-DD oder "."=akt.Datum,
  * 	on return: Datum des letzten Wettk. der Rangliste
  * @param string &$anfang = on return: Anfangsdatum der Rangl.,dh. aeltester Wettk.
@@ -18,7 +87,7 @@
  * @param array $ex_aquo= on return: Array mit Anzahl ex aquo nach platz
  * @param array $nicht_gewertet = on return: Array mit String aller WetId die
  *	nicht gewertet wurden nach PerId
- * @param string $serie  = rkey der Serie oder "" bei Rangliste
+ * @param serie|string|int $serie  = rkey or SerId der Serie oder "" bei Rangliste
  * @return array Rangliste nach Ranglistenplatz sortiert
  *
  * Achtung:   Nicht beruecksichtigt sind die folgenden Parameter:
@@ -43,14 +112,14 @@
  * 24.03.2008: 2008 overall ranking (no older overall or combinded ranking supported)
  * 27.10.2008: overall ranking requires results (with points > 0!) in 2 or more cats
  */
-function calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret_ex_aquo,
+function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret_ex_aquo,
 	&$ret_nicht_gewertet,$serie='')
 {
 	global $t_no_ranking_for,$european_nations,$debug;
-	global $sql_platz;
+	global $sql_platz,$sql_pkte;
 
-	if ($serie) read_serie ($serie);
-	read_gruppe ($gruppe);
+	if ($serie) read_serie($serie);
+	read_gruppe($gruppe);
 
 	$combined = is_array($gruppe->mgroups) && count($gruppe->mgroups) > 1;	// combined ranking
 
@@ -155,8 +224,8 @@ function calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret
 	}
 	if (!is_array ($pers))
 	{
-		$ret_ex_aquo = $ex_aquo;
-		$ret_pers = $pers;
+		$ret_ex_aquo =& $ex_aquo;
+		$ret_pers =& $pers;
 
 		return ($pers);
 	}
@@ -191,7 +260,7 @@ function calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret
 					}
 					while(next($pkte) && (!isset($max_pkte) || substr(current($pkte),0,7) == $max_pkte));
 				}
-				arsort ($pkte);
+				arsort($pkte);
 				break;
 		}
 		reset($pkte);
@@ -208,22 +277,22 @@ function calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret
 		$last_pkte = $pers[$id]->pkt = current($pkte);
 		$rang[sprintf("%04d%s%s",$pers[$id]->platz,
 					$pers[$id]->nachname,
-					$pers[$id]->vorname)] = $pers[$id];
+					$pers[$id]->vorname)] =& $pers[$id];
 	}
-	while (next ($pkte));
+	while (next($pkte));
 
-	ksort ($rang);			// Array $rang enthaelt jetzt Rangliste
+	ksort($rang);			// Array $rang enthaelt jetzt Rangliste
 
-	$ret_ex_aquo = $ex_aquo;
-	$ret_pers = $pers;
-	$ret_nicht_gewertet = $nicht_gewertet;
+	$ret_ex_aquo =& $ex_aquo;
+	$ret_pers =& $pers;
+	$ret_nicht_gewertet =& $nicht_gewertet;
 
 	return $rang;
 }
 
 function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls)
 {
-	global $european_nations,$sql_platz;
+	global $european_nations,$sql_platz,$sql_pkte;
 
 	if ($serie)
 	{
@@ -278,6 +347,7 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 	if ($serie)
 	{
 		$platz = 'r.platz';
+		$pkte = 's.pkt';
 		if (stristr($serie->rkey,'EYC'))
 		{
 			$allowed_nations = $european_nations;
@@ -297,13 +367,19 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 		{
 			$allowed_nations = "AND Federations.nation IN ('" . implode("','",$allowed_nations) . "')";
 		}
-		return "SELECT p.*,Federations.*,$platz AS platz,s.pkt,r.WetId,r.GrpId".
+		// since 2009 int. cups use "averaged" points for ex aquo competitors
+		if (empty($serie->nation) && ($y = (int)$serie->rkey) >= 9 && $y < 90)
+		{
+			$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=r.GrpId AND ex.WetId=r.WetId AND ex.platz=r.platz)';
+			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE ROUND((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=$serie->pkte AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos,2) END)";
+		}
+		return "SELECT p.*,Federations.*,$platz AS platz,$pkte AS pkt,r.WetId,r.GrpId".
 			" FROM Results r,Wettkaempfe w,PktSystemPkte s,Personen p".fed_join('p').
 			" WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.Platz>0".
 			" AND r.GrpId IN ($gruppe->GrpIds) AND w.serie=$serie->SerId".
 			" AND $platz=s.platz AND s.PktId=$serie->pkte".
 			" AND s.pkt>0 AND w.datum<='$stand' $allowed_nations".
-			" ORDER BY r.PerId,s.pkt DESC";
+			" ORDER BY r.PerId,$pkte DESC";
 	}
 	$use_jahrgang = $rls->window_type!="wettk_athlet" && $rls->end_pflicht_tol
 		&& jahrgang( $gruppe,$stand,$from_year,$to_year);
