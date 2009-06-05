@@ -1322,14 +1322,36 @@ class boranking extends soranking
 		));
 		$this->pkte->get_pkte($comp['pkte'],$pkte);
 
+		// 2009+ int. competitions use only average points for ex aquos
+		if (empty($comp['nation']) && (int)$comp['datum'] >= 2009)
+		{
+			$ex_aquos = array();
+			foreach($result as $PerId => $place)
+			{
+				if (is_array($place)) $place = $place['result_rank'];
+				++$ex_aquos[$place];
+			}
+		}
 		foreach($result as $PerId => $place)
 		{
 			if (is_array($place)) $place = $place['result_rank'];
 
+			if (isset($ex_aquos))
+			{
+				for($n = $pkt = 0; $n < $ex_aquos[$place]; $n++)
+				{
+					$pkt += $pkte[$place+$n];
+				}
+				$pkt /= $ex_aquos[$place];
+			}
+			else
+			{
+				$pkt = $pkte[$place];
+			}
 			$this->result->save(array(
 				'PerId' => $PerId,
 				'platz' => $place,
-				'pkt'   => round(100.0 * $feldfactor * $comp['faktor'] * $pkte[$place]),
+				'pkt'   => round(100.0 * $feldfactor * $pkt),
 			));
 		}
 		// not sure if the new code still uses that, but it does not hurt ;-)
