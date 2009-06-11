@@ -12,6 +12,7 @@
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.athlete.inc.php');
 
 class ranking_accounting extends boresult
 {
