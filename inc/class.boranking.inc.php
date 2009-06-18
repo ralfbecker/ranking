@@ -165,9 +165,19 @@ class boranking extends soranking
 	function __construct(array $extra_classes=array())
 	{
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
-		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
-		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de') $GLOBALS['egw']->translation->lang_arr['Time'] = 'Zeit';
-
+		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de')
+		{
+			if ((float)$GLOBALS['egw_info']['apps']['phpgwapi']['version'] < 1.7)
+			{
+				$GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
+				$GLOBALS['egw']->translation->lang_arr['Time'] = 'Zeit';
+			}
+			else
+			{
+				translation::$lang_arr['top'] = 'Top';
+				translation::$lang_arr['Time'] = 'Zeit';
+			}
+		}
 		parent::__construct($extra_classes);	// calling the parent constructor
 
 		$this->pkt_names = $this->pkte->names();
