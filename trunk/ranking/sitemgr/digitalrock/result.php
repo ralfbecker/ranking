@@ -71,10 +71,10 @@ while(($row = mysql_fetch_object($res)))
 	$rows[] = clone($row);
 }
 // calculation the ex aquos on each place
-$ex_aquo = array();
+$ex_aquo_place = array();
 foreach($rows as $row)
 {
-	$ex_aquo[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz]++;
+	$ex_aquo_place[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz]++;
 }
 for ($last_platz = 0, $class = 'row_on', $n = 0; $row = $rows[$n++]; $last_platz=$row->platz, $class = $class == 'row_on' ? 'row_off' : 'row_on')
 {
@@ -97,11 +97,11 @@ for ($last_platz = 0, $class = 'row_on', $n = 0; $row = $rows[$n++]; $last_platz
 			// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
 			if (empty($wettk->nation) && (int)$wettk->datum >= 2009)
 			{
-				for ($i = $pkt = 0; $i < $ex_aquo[$row->eyc_platz]; $i++)
+				for ($i = $pkt = 0; $i < $ex_aquo_place[$row->eyc_platz]; $i++)
 				{
 					$pkt += $eyc_pkte[$row->eyc_platz+$i];
 				}
-				$pkt /= $ex_aquo[$row->eyc_platz];
+				$pkt /= $ex_aquo_place[$row->eyc_platz];
 				$pkt = (int)floor($pkt).'.00';	// rounding down!
 			}
 			else
