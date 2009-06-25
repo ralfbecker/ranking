@@ -325,11 +325,11 @@ class result extends so_sql
 					" AND r2.platz < r.platz AND r2.platz > 0)+1 END";
 			}
 		}
-		// since 2009 int. cups use "averaged" points for ex aquo competitors
+		// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
 		if (empty($cup['nation']) && ($y = (int)$cup['rkey']) >= 9 && $y < 90)
 		{
 			$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=r.GrpId AND ex.WetId=r.WetId AND ex.platz=r.platz)';
-			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE ROUND((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=".(int)$cup['pkte']." AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos,2) END)";
+			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE FLOOR((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=".(int)$cup['pkte']." AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos) END)";
 		}
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,".

@@ -1353,6 +1353,7 @@ class boranking extends soranking
 					$pkt += $pkte[$place+$n];
 				}
 				$pkt /= $ex_aquos[$place];
+				$pkt = (int)floor($pkt);	// round down!
 			}
 			else
 			{
