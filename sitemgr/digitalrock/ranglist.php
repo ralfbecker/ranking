@@ -105,8 +105,9 @@ if ($rang && $show_calc)		// Liste enthaltene Wettk. erzeugen
 		foreach($GrpIds as $GrpId)
 		{
 			$row->GrpId = $GrpId;
-			$wettks[$row->WetId] = clone($row);	// $row is an object!
+			$wettks[] = clone($row);	// $row is an object!
 		}
+		$WetIds[] = $row->WetId;
 	}
 	global $sql_platz,$sql_pkte;
 	$eyc_platz = '';
@@ -120,7 +121,7 @@ if ($rang && $show_calc)		// Liste enthaltene Wettk. erzeugen
 		$pkt_join = 'JOIN PktSystemPkte s ON s.PktId='.(int)$serie->pkte.' AND s.platz=r.platz';
 	}
 	$res = my_query($query = "SELECT * $eyc_platz$sql_pkte FROM Results r $pkt_join WHERE GrpId IN ($gruppe->GrpIds)".
-		($wettks ? ' AND r.WetId IN ('.implode(',',array_keys($wettks)).')' : '').
+		($wettks ? ' AND r.WetId IN ('.implode(',',$WetIds).')' : '').
 		" AND '$anfang'<=datum AND datum<='$stand' ORDER BY r.WetId,r.platz");
 
 	while ($row = mysql_fetch_object($res))
