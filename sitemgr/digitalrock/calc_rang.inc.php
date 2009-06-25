@@ -224,8 +224,8 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 	}
 	if (!is_array ($pers))
 	{
-		$ret_ex_aquo =& $ex_aquo;
-		$ret_pers =& $pers;
+		$ret_ex_aquo = $ex_aquo;
+		$ret_pers = $pers;
 
 		return ($pers);
 	}
@@ -367,11 +367,11 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 		{
 			$allowed_nations = "AND Federations.nation IN ('" . implode("','",$allowed_nations) . "')";
 		}
-		// since 2009 int. cups use "averaged" points for ex aquo competitors
+		// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
 		if (empty($serie->nation) && ($y = (int)$serie->rkey) >= 9 && $y < 90)
 		{
 			$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=r.GrpId AND ex.WetId=r.WetId AND ex.platz=r.platz)';
-			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE ROUND((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=$serie->pkte AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos,2) END)";
+			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE FLOOR((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=$serie->pkte AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos) END)";
 		}
 		return "SELECT p.*,Federations.*,$platz AS platz,$pkte AS pkt,r.WetId,r.GrpId".
 			" FROM Results r,Wettkaempfe w,PktSystemPkte s,Personen p".fed_join('p').
