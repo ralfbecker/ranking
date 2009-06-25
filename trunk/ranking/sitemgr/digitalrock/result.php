@@ -1,7 +1,11 @@
 <?php
-
 /* $Id$ */
 
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+{
+	include_once('cache.php');
+	do_cache();
+}
 require ("open_db.inc.php");
 
 $wettk=prepare_var('comp','strtoupper',array('GET',0));
@@ -62,7 +66,17 @@ if ($feldfakt)
 }
 echo "\t</tr>\n";
 
-for ($last_platz = 0, $class = 'row_on'; $row = mysql_fetch_object($res); $last_platz=$row->platz, $class = $class == 'row_on' ? 'row_off' : 'row_on')
+while(($row = mysql_fetch_object($res)))
+{
+	$rows[] = clone($row);
+}
+// calculation the ex aquos on each place
+$ex_aquo = array();
+foreach($rows as $row)
+{
+	$ex_aquo[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz]++;
+}
+for ($last_platz = 0, $class = 'row_on', $n = 0; $row = $rows[$n++]; $last_platz=$row->platz, $class = $class == 'row_on' ? 'row_off' : 'row_on')
 {
 	echo "\t".'<tr align="center" bgcolor="#f0f0f0" class="'.$class.'">'."\n\t\t<td>".
 		($row->platz==999 ? $t_disqualified : (!$last_platz || $last_platz!=$row->platz ? $row->platz.'.' : '&nbsp;'))."</td>\n";
@@ -80,7 +94,20 @@ for ($last_platz = 0, $class = 'row_on'; $row = mysql_fetch_object($res); $last_
 			{
 				get_pkte(6,$eyc_pkte);	// 6 = PktId von PktSytem benutzt für EYC
 			}
-			$pkt = $eyc_pkte[$row->eyc_platz].'.00';
+			// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
+			if (empty($wettk->nation) && (int)$wettk->datum >= 2009)
+			{
+				for ($i = $pkt = 0; $i < $ex_aquo[$row->eyc_platz]; $i++)
+				{
+					$pkt += $eyc_pkte[$row->eyc_platz+$i];
+				}
+				$pkt /= $ex_aquo[$row->eyc_platz];
+				$pkt = (int)floor($pkt).'.00';	// rounding down!
+			}
+			else
+			{
+				$pkt = $eyc_pkte[$row->eyc_platz].'.00';
+			}
 		}
 	}
 	else
@@ -98,6 +125,7 @@ for ($last_platz = 0, $class = 'row_on'; $row = mysql_fetch_object($res); $last_
 				$pkt += $pkte[$platz+$i];
 			}
 			$pkt /= $ex_aquo[$platz];
+			$pkt = (int)floor($pkt);	// rounding down!
 		}
 		else
 		{
