@@ -1,4 +1,11 @@
 <?php
+/* $Id$ */
+
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+{
+	include_once('cache.php');
+	do_cache();
+}
 require_once('open_db.inc.php');
 
 if (!$t_latest_result)	// happens if more then one ranking_digitalrock module is on one page in sitemgr
@@ -39,7 +46,7 @@ $res = my_query("SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
 
 $wettk = $w = mysql_fetch_object($res);
 
-if ($w_rkey == '') 
+if ($w_rkey == '')
 {
 	$w_rkey = $replace == $wettk->rkey ? $with : $wettk->rkey;
 }
@@ -49,7 +56,7 @@ foreach($_GET+array('header' => $header) as $name => $value)
 	if ($name != 'w_rkey') echo "\t".'<input type="hidden" name="'.htmlspecialchars($name).'" value="'.htmlspecialchars($value).'">'."\n";
 }
 echo "\t".'<select onchange="this.form.submit()" name="w_rkey">'."\n";
-do 
+do
 {
 	if ($w_rkey && $w->rkey == $w_rkey)
 	{
@@ -59,7 +66,7 @@ do
 	{
 		echo "\t\t".'<option value="'.$w->rkey.'">'.$w->name."</option>\n";
 	}
-} 
+}
 while ($w = mysql_fetch_object($res));
 
 echo "\t</select>\n";
