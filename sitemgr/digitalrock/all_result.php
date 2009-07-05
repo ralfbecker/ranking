@@ -1,7 +1,11 @@
 <?php
-
 /* $Id$ */
 
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+{
+	include_once('cache.php');
+	do_cache();
+}
 require_once 'open_db.inc.php';
 
 if (!isset($wettk))
@@ -120,19 +124,24 @@ if (!$wettk->nation && (int)$wettk->datum >= 2005 && $wettk->quota && preg_match
 	{
 		$valid_cats['overall'] = array(1,2,5,6,23,24);
 	}
+	if ((int)$wettk->datum >= 2009)	// no more combined ranking from 2009 on, only overall
+	{
+		unset($valid_cats['combined (lead &amp; boulder)']);
+	}
 	echo "\t<tr bgcolor=\"#c0c0c0\">\n\t\t<td colspan=\"4\"><b>$t_nat_team_ranking</b>:\n";
 
 	$links = array();
 	foreach($valid_cats as $name => $vcats)
 	{
-		if (count(array_intersect($cats,$vcats)) == count($vcats) ||
+		if ((count(array_intersect($cats,$vcats)) == count($vcats) ||
 			($name == 'overall' && count($cats) > 2))	// show overall if we have more then 2 cats
+			&& ($name != 'overall' || $wettk->WetId != 991))	// temporary disabling 2009 Word Championship
 		{
 			$links[] = '<a href="'.$GLOBALS['dr_config']['nat_team_ranking'].'comp='.$wettk->WetId.'&amp;cat='.implode(',',$vcats).'" target="_blank">'.$name.'</a>';
 		}
 	}
 	echo implode(",\n",$links)."</td>\t</tr>\n";
-	if ((int)$wettk->datum >= 2008)
+	if ((int)$wettk->datum >= 2008 && $wettk->WetId != 991)	// temporary disabling 2009 Word Championship
 	{
 		// combined ranking
 		$valid_cats = array(
