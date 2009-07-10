@@ -616,7 +616,7 @@ class uiresult extends boresult
 			$calendar = $this->only_nation;
 			$tmpl->disable_cells('nm[calendar]');
 		}
-		elseif ($comp && !$content['nm']['calendar'])
+		elseif ($comp && (!$content['nm']['calendar'] || isset($_GET['comp'])))
 		{
 			$calendar = $comp['nation'] ? $comp['nation'] : 'NULL';
 		}
