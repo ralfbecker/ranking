@@ -47,7 +47,7 @@ $setup_info['ranking']['hooks']['settings']     = 'ranking_admin_prefs_sidebox_h
 $setup_info['ranking']['hooks']['admin']        = 'ranking_admin_prefs_sidebox_hooks::all_hooks';
 $setup_info['ranking']['hooks']['sidebox_menu'] = 'ranking_admin_prefs_sidebox_hooks::all_hooks';
 $setup_info['ranking']['hooks']['edit_user']    = 'ranking.admin.edit_user';
-//$setup_info['ranking']['hooks']['search_link'] = 'ranking.ranking_admin_prefs_sidebox_hooks.search_link';
+$setup_info['ranking']['hooks']['search_link']  = 'ranking.ranking_admin_prefs_sidebox_hooks.search_link';
 $setup_info['ranking']['hooks'][] = 'config';
 $setup_info['ranking']['hooks'][] = 'config_validate';
 
