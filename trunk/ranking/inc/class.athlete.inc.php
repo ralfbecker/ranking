@@ -835,7 +835,7 @@ class athlete extends so_sql
 		{
 			return $athlete;
 		}
-		return $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')';
+		return $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].' '.$athlete['PerId'].')';
 	}
 
 	/**
