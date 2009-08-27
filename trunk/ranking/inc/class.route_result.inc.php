@@ -483,7 +483,7 @@ class route_result extends so_sql
 				{
 					$data += unserialize($data['result_detail']);
 					unset($data['result_detail']);
-					if ($data['qoints'] && !$data['general_result']) $data['result'] .= '&nbsp;&nbsp;'.sprintf('%4.2lf',$data['qoints']);
+					if ($data['qoints'] && $data['result_rank'] && !$data['general_result']) $data['result'] .= '&nbsp;&nbsp;'.sprintf('%4.2lf',$data['qoints']);
 				}
 				if ($data['other_detail'])
 				{
