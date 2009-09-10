@@ -128,19 +128,22 @@ if (!$wettk->nation && (int)$wettk->datum >= 2005 && $wettk->quota && preg_match
 	{
 		unset($valid_cats['combined (lead &amp; boulder)']);
 	}
-	echo "\t<tr bgcolor=\"#c0c0c0\">\n\t\t<td colspan=\"4\"><b>$t_nat_team_ranking</b>:\n";
 
 	$links = array();
 	foreach($valid_cats as $name => $vcats)
 	{
-		if ((count(array_intersect($cats,$vcats)) == count($vcats) ||
-			($name == 'overall' && count($cats) > 2))	// show overall if we have more then 2 cats
+		if ((count($icats=array_intersect($cats,$vcats)) == count($vcats) ||
+			($name == 'overall' && count($icats) > 2))	// show overall if we have more then 2 cats
 			&& ($name != 'overall' || $wettk->WetId != 991))	// temporary disabling 2009 Word Championship
 		{
 			$links[] = '<a href="'.$GLOBALS['dr_config']['nat_team_ranking'].'comp='.$wettk->WetId.'&amp;cat='.implode(',',$vcats).'" target="_blank">'.$name.'</a>';
 		}
 	}
-	echo implode(",\n",$links)."</td>\t</tr>\n";
+	if ($links)
+	{
+		echo "\t<tr bgcolor=\"#c0c0c0\">\n\t\t<td colspan=\"4\"><b>$t_nat_team_ranking</b>:\n";
+		echo implode(",\n",$links)."</td>\t</tr>\n";
+	}
 	if ((int)$wettk->datum >= 2008 && $wettk->WetId != 991)	// temporary disabling 2009 Word Championship
 	{
 		// combined ranking
