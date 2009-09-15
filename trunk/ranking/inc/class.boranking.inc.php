@@ -1276,9 +1276,9 @@ class boranking extends soranking
 		if (!is_array($cat) && !($cat = $this->cats->read($cat))) return false;
 
 		$rls = $cat['vor'] && $comp['datum'] < $cat['vor'] ? $cat['vor_rls'] : $cat['rls'];
-		$has_feldfakt = $rls && $comp['feld_pkte'] && $comp['faktor'] && $cat['rkey'] != "OMEN";
+		$has_feldfakt = $rls && $comp['feld_pkte'] && (double)$comp['faktor'] && $cat['rkey'] != "OMEN";
 
-		if (!$has_feldfakt) return 1.0;
+		if (!$has_feldfakt) return (double)$comp['faktor'];
 
 		// we have to use the ranking of the day before the competition starts
 		$stand = explode('-',$comp['datum']);
@@ -1299,7 +1299,7 @@ class boranking extends soranking
 			}
 		}
 		$feldfakt = round($feldfakt / $max_pkte,2);
-		//echo "<p>boresult::feldfactor('$comp[rkey]','$cat[rkey]')==$feldfakt</p>\n";
+		//echo "<p>boresult::feldfactor('$comp[rkey]','$cat[rkey]')==$feldfakt (has_feldfakt=$has_feldfakt)</p>\n";
 		return $feldfakt;
 	}
 
