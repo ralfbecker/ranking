@@ -74,7 +74,10 @@ while(($row = mysql_fetch_object($res)))
 $ex_aquo_place = array();
 foreach($rows as $row)
 {
-	$ex_aquo_place[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz]++;
+	if (!$eyc_platz || in_array($row->nation,$european_nations))	// ignore non-europ. nation for EYS
+	{
+		$ex_aquo_place[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz]++;
+	}
 }
 for ($last_platz = 0, $class = 'row_on', $n = 0; $row = $rows[$n++]; $last_platz=$row->platz, $class = $class == 'row_on' ? 'row_off' : 'row_on')
 {
