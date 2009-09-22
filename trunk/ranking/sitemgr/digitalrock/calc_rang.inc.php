@@ -1,5 +1,14 @@
 <?php
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - ranglist calculation
+ *
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
 
 if ($_SERVER['HTTP_HOST'] == 'localhost')
 {
@@ -316,7 +325,7 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 		switch ($rls->window_type)
 		{
 			case "monat":			// Rangliste nach anzahl Monaten
-				ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$stand,$date);
+				preg_match("/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",$stand,$date);
 				$anfang = date("Y-m-d",mktime(0,0,0,$date[2]-$rls->window_anz,$date[3]+1,$date[1]));
 				break;
 			case "wettk_athlet":
@@ -334,8 +343,7 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 				break;
 			case "wettk_nat":
 				$res = my_query("SELECT * FROM Wettkaempfe WHERE ".
-						($gruppe->nation ? "nation='$gruppe->nation'" :
-								"ISNULL(nation)").
+						($gruppe->nation ? "nation='$gruppe->nation'" : "ISNULL(nation)").
 						" AND faktor>0.0 AND datum<='$stand'".
 						" ORDER BY datum DESC LIMIT ".
 						($rls->window_anz-1).",1");
@@ -346,40 +354,12 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 	}
 	if ($serie)
 	{
-		$platz = 'r.platz';
-		$pkte = 's.pkt';
-		if (stristr($serie->rkey,'EYC') || stristr($serie->rkey,'EYS'))
-		{
-			$allowed_nations = $european_nations;
-
-			// seit 2006 (evtl. vorher) zaehlen nur die europ. nation fuer die Platzierung und damit die Punkte
-			if (($y = (int)$serie->rkey) >= 6 && $y < 90)
-			{
-				// Platz wenn nur die $allowed_nations zählen
-				$sql_platz = $platz = "CASE WHEN r.platz=999 THEN 999 ELSE (SELECT count(*)".
-					" FROM Results r2 JOIN Personen p2 ON r2.PerId=p2.PerId".fed_join('p2').
-					" WHERE r2.WetId=r.WetId AND r2.GrpId=r.GrpId".
-					" AND nation IN ('".implode("','",$allowed_nations)."')".
-					" AND r2.platz < r.platz AND r2.platz > 0)+1 END";
-			}
-		}
-		if ($allowed_nations)
-		{
-			$allowed_nations = "AND Federations.nation IN ('" . implode("','",$allowed_nations) . "')";
-		}
-		// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
-		if (empty($serie->nation) && ($y = (int)$serie->rkey) >= 9 && $y < 90)
-		{
-			$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=r.GrpId AND ex.WetId=r.WetId AND ex.platz=r.platz)';
-			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE FLOOR((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=$serie->pkte AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos) END)";
-		}
-		return "SELECT p.*,Federations.*,$platz AS platz,$pkte AS pkt,r.WetId,r.GrpId".
-			" FROM Results r,Wettkaempfe w,PktSystemPkte s,Personen p".fed_join('p').
+		return "SELECT p.*,Federations.*,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId".
+			" FROM Results r,Wettkaempfe w,Personen p".fed_join('p').
 			" WHERE r.WetId=w.WetId AND p.PerId=r.PerId AND r.Platz>0".
 			" AND r.GrpId IN ($gruppe->GrpIds) AND w.serie=$serie->SerId".
-			" AND $platz=s.platz AND s.PktId=$serie->pkte".
-			" AND s.pkt>0 AND w.datum<='$stand' $allowed_nations".
-			" ORDER BY r.PerId,$pkte DESC";
+			" AND r.cup_pkt > 0 AND w.datum<='$stand'".
+			" ORDER BY r.PerId,r.cup_pkt DESC";
 	}
 	$use_jahrgang = $rls->window_type!="wettk_athlet" && $rls->end_pflicht_tol
 		&& jahrgang( $gruppe,$stand,$from_year,$to_year);

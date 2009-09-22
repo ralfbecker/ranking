@@ -1,5 +1,14 @@
 <?php
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - result display
+ *
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
 
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
 {
@@ -22,7 +31,7 @@ $has_feldfakt = $rls && $wettk->feld_pkte && $wettk->faktor && $gruppe->rkey != 
 if (!$has_feldfakt) $feldfakt = 0;
 
 if ($feldfakt) {
-   ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$wettk->datum,$date);
+   preg_match("/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",$wettk->datum,$date);
    $stand = date("Y-m-d",mktime(0,0,0,$date[2],$date[3]-1,$date[1]));
 
    require ("calc_rang.inc.php");
@@ -31,27 +40,14 @@ if ($feldfakt) {
    $feldfakt = is_array ($pers);
    $max_pkte = get_pkte ($wettk->feld_pkte,$pkte);
 }
-$eyc_platz = '';
-// seit 2006 (evtl. vorher) zaehlen nur die europ. nation fuer die Platzierung und damit die Punkte
-if (stristr($wettk->rkey,'EYC') && ($y = (int) $wettk->rkey) >= 6 && $y < 90)
-{
-	global $european_nations;
-	// Platz wenn nur die $allowed_nations zählen
-	$sql_platz = "CASE WHEN r.platz=999 THEN 999 ELSE (SELECT count(*)".
-		" FROM Results r2".fed_join('r2',null,'f2').
-		" WHERE r2.WetId=r.WetId AND r2.GrpId=r.GrpId".
-		" AND f2.nation IN ('".implode("','",$european_nations)."')".
-		" AND r2.platz < r.platz AND r2.platz > 0)+1 END";
-	$eyc_platz = ','.$sql_platz.' AS eyc_platz';
-}
-$res = my_query("SELECT r.platz,r.pkt $eyc_platz,p.*,Federations.*" .
+$res = my_query("SELECT r.platz,r.pkt,r.cup_platz,r.cup_pkt,p.*,Federations.*" .
 		" FROM Personen p".
 		" JOIN Results r USING(PerId)".fed_join('r').
 		" WHERE r.WetId=$wettk->WetId AND r.GrpId=$gruppe->GrpId AND r.platz > 0" .
 		" ORDER BY r.platz,p.nachname,p.vorname");
 
-do_header ($wettk->name,"<B>$wettk->name</B><BR>".wettk_datum($wettk).
-                        "<p><B>$gruppe->name</B>");
+do_header ($wettk->name,"<b>$wettk->name</b><br />".wettk_datum($wettk).
+                        "<p><b>$gruppe->name</b>");
 echo '<table width="99%" align="center">'."\n\t".'<tr align="center" bgcolor="#c0c0c0" class="th">'."\n";
 
 echo "\t\t<td><b>".$t_rank.'</b></td>'."\n\t\t".'<td colspan="2" align="left"><b>'.$t_name."</b></td>\n".
@@ -79,44 +75,17 @@ foreach($rows as $row)
 		$ex_aquo_place[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz]++;
 	}
 }
+// show cup points for eyc
+$cup_pkte = stristr($wettk->rkey,'EYC') && ($y = (int) $wettk->rkey) >= 6 && $y < 90;
+
 for ($last_platz = 0, $class = 'row_on', $n = 0; $row = $rows[$n++]; $last_platz=$row->platz, $class = $class == 'row_on' ? 'row_off' : 'row_on')
 {
 	echo "\t".'<tr align="center" bgcolor="#f0f0f0" class="'.$class.'">'."\n\t\t<td>".
 		($row->platz==999 ? $t_disqualified : (!$last_platz || $last_platz!=$row->platz ? $row->platz.'.' : '&nbsp;'))."</td>\n";
 	per_link ($row,$gruppe);
 
-	if ($eyc_platz)
-	{
-		if (!in_array($row->nation,$european_nations))	// nicht-europ. nation
-		{
-			$pkt = '';
-		}
-		else
-		{
-			if (!isset($eyc_pkte))
-			{
-				get_pkte(6,$eyc_pkte);	// 6 = PktId von PktSytem benutzt für EYC
-			}
-			// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
-			if (empty($wettk->nation) && (int)$wettk->datum >= 2009)
-			{
-				for ($i = $pkt = 0; $i < $ex_aquo_place[$row->eyc_platz]; $i++)
-				{
-					$pkt += $eyc_pkte[$row->eyc_platz+$i];
-				}
-				$pkt /= $ex_aquo_place[$row->eyc_platz];
-				$pkt = (int)floor($pkt).'.00';	// rounding down!
-			}
-			else
-			{
-				$pkt = $eyc_pkte[$row->eyc_platz].'.00';
-			}
-		}
-	}
-	else
-	{
-		$pkt = sprintf('%4.2f',$row->pkt / 100.0);
-	}
+	if ($cup_pkte) $row->pkt = $row->cup_pkt;	// we could also depend on isset($row->cup_platz)
+	$pkt = isset($row->pkt) ? sprintf('%4.2f',$row->pkt / 100.0) : '';
 	echo "\t\t<td>$pkt</td>\n";
 
 	if ($feldfakt)

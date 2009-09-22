@@ -1314,7 +1314,8 @@ class boranking extends soranking
 	{
 		if (!$keys['WetId'] || !$keys['GrpId'] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || // permission denied
+			$comp['serie'] && !($cup = $this->cup->read($comp['serie'])))
 		{
 			return false;
 		}
@@ -1332,20 +1333,54 @@ class boranking extends soranking
 		));
 		$this->pkte->get_pkte($comp['pkte'],$pkte);
 
+		if ($cup)
+		{
+			// 2006+ EYS counts only european nations
+			if ((int)$comp['datum'] >= 2006 && preg_match('/_(EYC|EYS)$/',$cup['rkey']))
+			{
+				$allowed_nations = $this->european_nations;
+			}
+			$this->pkte->get_pkte($cup['pkte'],$cup_pkte);
+		}
 		// 2009+ int. competitions use only average points for ex aquos
 		if (empty($comp['nation']) && (int)$comp['datum'] >= 2009)
 		{
-			$ex_aquos = array();
+			$ex_aquos = $cup_ex_aquos = array();
+			$abs_place = $ex_place = $last_place = 1;
 			foreach($result as $PerId => $place)
 			{
-				if (is_array($place)) $place = $place['result_rank'];
+				$nation = '';
+				if (is_array($place))
+				{
+					$nation = $place['nation'];
+					$place = $place['result_rank'];
+				}
 				++$ex_aquos[$place];
+
+				// 2006+ EYS counts only european nations
+				if ($cup && $allowed_nations)
+				{
+					if (!in_array($nation,$allowed_nations)) continue;	// ignore wrong nation
+					$result[$PerId]['cup_place'] = $ex_place = $last_place == $place ? $ex_place : $abs_place;
+					++$cup_ex_aquos[$ex_place];
+					$last_place = $place;
+					$abs_place++;
+				}
+				elseif($cup)
+				{
+					++$cup_ex_aquos[$place];
+				}
 			}
 		}
 		foreach($result as $PerId => $place)
 		{
-			if (is_array($place)) $place = $place['result_rank'];
-
+			$nation = $cup_place = $cup_pkt = null;
+			if (is_array($place))
+			{
+				$nation = $place['nation'];
+				$cup_place = $place['cup_place'];
+				$place = $place['result_rank'];
+			}
 			if (isset($ex_aquos))
 			{
 				for($n = $pkt = 0; $n < $ex_aquos[$place]; $n++)
@@ -1359,10 +1394,31 @@ class boranking extends soranking
 			{
 				$pkt = $pkte[$place];
 			}
+			if ($cup && (!$allowed_nations || in_array($nation,$allowed_nations)))
+			{
+				$pl = isset($cup_place) ? $cup_place : $place;
+
+				if (isset($cup_ex_aquos))
+				{
+					for($n = $cup_pkt = 0; $n < $cup_ex_aquos[$pl]; $n++)
+					{
+						$cup_pkt += $cup_pkte[$pl+$n];
+					}
+					$cup_pkt /= $cup_ex_aquos[$pl];
+					$cup_pkt = (int)floor($cup_pkt);	// round down!
+				}
+				else
+				{
+					$cup_pkt = $cup_pkte[$pl];
+				}
+				$cup_pkt = round(100.0 * $cup['faktor'] * $cup_pkt);
+			}
 			$this->result->save(array(
 				'PerId' => $PerId,
 				'platz' => $place,
 				'pkt'   => round(100.0 * $feldfactor * $pkt),
+				'cup_platz' => $cup_place,
+				'cup_pkt'   => $cup_pkt,
 			));
 		}
 		// not sure if the new code still uses that, but it does not hurt ;-)

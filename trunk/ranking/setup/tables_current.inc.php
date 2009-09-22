@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -125,7 +125,11 @@ $phpgw_baseline = array(
 			'WetId' => array('type' => 'int','precision' => '4','nullable' => False),
 			'platz' => array('type' => 'int','precision' => '2','nullable' => False),
 			'pkt' => array('type' => 'int','precision' => '2','nullable' => False),
-			'datum' => array('type' => 'date','default' => '0000-00-00','nullable' => False)
+			'datum' => array('type' => 'date','nullable' => False,'default' => '0000-00-00'),
+			'cup_platz' => array('type' => 'int','precision' => '2'),
+			'cup_pkt' => array('type' => 'int','precision' => '2'),
+			'modified' => array('type' => 'timestamp','default' => 'current_timestamp'),
+			'modifier' => array('type' => 'int','precision' => '4')
 		),
 		'pk' => array('PerId','GrpId','WetId'),
 		'fk' => array(),

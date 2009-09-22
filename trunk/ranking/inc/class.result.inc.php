@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -310,37 +310,16 @@ class result extends so_sql
 	 */
 	function &cup_results(array $cup,$cats,$stand,$allowed_nations)
 	{
-		$platz = 'r.platz';
-		$pkte = 's.pkt';
-		if ($allowed_nations)
-		{
-			// since 2006 (evtl. even before) only European nation are counting for places and points
-			if (($y = (int)$serie->rkey) >= 6 && $y < 90)
-			{
-				// Platz wenn nur die $allowed_nations zählen
-				$sql_platz = $platz = "CASE WHEN r.platz=999 THEN 999 ELSE (SELECT count(*)".
-					" FROM Results r2 JOIN Personen p2 ON r2.PerId=p2.PerId".str_replace('Personen','p2',athlete::FEDERATIONS_JOIN).// fed_join('p2').
-					" WHERE r2.WetId=r.WetId AND r2.GrpId=r.GrpId".
-					" AND nation IN ('".implode("','",$allowed_nations)."')".
-					" AND r2.platz < r.platz AND r2.platz > 0)+1 END";
-			}
-		}
-		// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
-		if (empty($cup['nation']) && ($y = (int)$cup['rkey']) >= 9 && $y < 90)
-		{
-			$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=r.GrpId AND ex.WetId=r.WetId AND ex.platz=r.platz)';
-			$sql_pkte = $pkte = "(CASE WHEN r.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE FLOOR((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=".(int)$cup['pkte']." AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos) END)";
-		}
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,".
-			athlete::FEDERATIONS_TABLE.".nation,verband,$platz AS platz,$pkte AS pkt,r.WetId,r.GrpId".
-			" FROM $this->result_table r,$this->comp_table w,$this->pkte_table s,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
+			athlete::FEDERATIONS_TABLE.".nation,verband,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId".
+			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.platz > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
-			' AND w.serie='.(int) $cup['SerId'].' AND r.platz=s.platz AND s.PktId='.(int) $cup['pkte'].
-			' AND s.pkt > 0 AND w.datum <= '.$this->db->quote($stand).
-			($allowed_nations ? ' AND '.athlete::FEDERATIONS_TABLE.'.nation IN (\'' . implode("','",$allowed_nations) . "')" : '').
-			' ORDER BY r.PerId,s.pkt DESC',__LINE__,__FILE__) as $row)
+			' AND w.serie='.(int) $cup['SerId'].
+			" AND r.cup_pkt > 0".
+			' AND w.datum <= '.$this->db->quote($stand).
+			' ORDER BY r.PerId,r.cup_pkt DESC',__LINE__,__FILE__) as $row)
 		{
 			$results[] = $this->athlete->db2data($row);
 		}
@@ -359,9 +338,8 @@ class result extends so_sql
 	 */
 	function &ranking_results($cats,$stand,$start,$from_year=0,$to_year=0)
 	{
-		//list($usec,$sec) = explode(' ',microtime()); $s_time = (float)$usec + (float)$sec;
-
-		$this->db->query($sql="SELECT $this->athlete_table.*,".
+		$results = array();
+		foreach($this->db->query($sql="SELECT $this->athlete_table.*,".
 			athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
 			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
@@ -369,15 +347,10 @@ class result extends so_sql
 			' AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
 			($from_year && $to_year ? ' AND NOT ISNULL(geb_date) AND '.
 			(int) $from_year.' <= YEAR(geb_date) AND YEAR(geb_date) <= '.(int) $to_year : '').
-			' ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__);
-
-		$results = array();
-		while(($row = $this->db->row(true)))
+			' ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__) as $row)
 		{
 			$results[] = $this->athlete->db2data($row);
 		}
-		//list($usec,$sec) = explode(' ',microtime()); $e_time = (float)$usec + (float)$sec;
-		//echo "<p>result::ranking_results(".print_r($cats,true).",'$stand','$start',$from_year,$to_year) count(\$results)=".count($results).", time=".sprintf('%0.2lf',$e_time-$s_time)."<br>$sql</p>\n";
 		return $results;
 	}
 
@@ -414,5 +387,23 @@ class result extends so_sql
 		$this->db->update($this->table_name,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
 
 		return $this->db->affected_rows();
+	}
+
+	/**
+	 * saves the content of data to the db
+	 *
+	 * reimplemented to set a modifier (modified timestamp is set automatically by the database anyway)
+	 *
+	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function save($keys=null)
+	{
+		if (is_array($keys) && count($keys)) $this->data_merge($keys);
+
+		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
+		$this->data['modified'] = time();
+
+		return parent::save();
 	}
 }
