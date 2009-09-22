@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -951,3 +951,111 @@ ALTER TABLE Wettkaempfe ADD Column no_complimentary TINYINT
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.5.007';
 }
+
+/**
+ * Adding culumns with explicit points and place in a cut
+ *
+ * @return string '1.7.001'
+ */
+function ranking_upgrade1_5_007()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Results','cup_platz',array(
+		'type' => 'int',
+		'precision' => '2'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Results','cup_pkt',array(
+		'type' => 'int',
+		'precision' => '2'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Results','modified',array(
+		'type' => 'timestamp',
+		'default' => 'current_timestamp'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Results','modifier',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+
+	$european_nations = array(
+		'ALB','AND','ARM','AUT','AZE','BLR','BEL','BIH','BUL',
+		'CRO','CYP','CZE','DEN','EST','ESP','FIN','FRA','GBR',
+		'GEO','GER','GRE','HUN','IRL','ISL','ISR','ITA','LAT',
+		'LIE','LTU','LUX','MDA','MKD','MLT','MON','NED','NOR',
+		'POL','POR','ROU','RUS','SRB','SLO','SMR','SUI','SVK',
+		'SWE','TUR','UKR'
+	);
+	$db = $GLOBALS['egw_setup']->db;
+	$pkte = array();
+	foreach($db->select('Wettkaempfe','WetId,datum,serie,Serien.nation,Serien.faktor,Serien.pkte,Serien.rkey AS serie_rkey','',
+		__LINE__,__FILE__,false,'','ranking',0,' JOIN Serien ON serie=SerId') as $wettk)
+	{
+		if (!isset($pkte[$wettk['pkte']]))
+		{
+			foreach($db->select('PktSystemPkte','*',array('PktId' => $wettk['pkte']),__LINE__,__FILE__) as $row)
+			{
+				$pkte[$wettk['pkte']][$row['platz']] = $row['pkt'];
+			}
+		}
+		$allowed_nations = false;
+		if (empty($wettk['nation']) && (int)$wettk['datum'] >= 2006 && preg_match('/_(EYC|EYS)$/',$wettk['serie_rkey']))
+		{
+			$allowed_nations = $european_nations;
+		}
+		$results = $ex_aquo = array();
+		$last_GrpId = null;
+		foreach($db->select('Results','Results.PerId,GrpId,platz,nation',array('WetId' => $wettk['WetId']),
+			__LINE__,__FILE__,false,' ORDER BY GrpId,platz','ranking',0,
+			' JOIN Personen USING(PerId) '.
+			' JOIN Athlete2Fed ON Personen.PerId=Athlete2Fed.PerId AND a2f_end=9999 JOIN Federations USING(fed_id)') as $row)
+		{
+			if (!$row['platz'] || $row['platz'] == 999) continue;	// not placed or disqualified
+
+			if ($allowed_nations)
+			{
+				if (!in_array($row['nation'],$allowed_nations)) continue;	// ignore results of NOT allowed nations
+
+				if ($last_GrpId != $row['GrpId'])
+				{
+					$abs_platz = $ex_platz = $last_platz = 1;
+					$last_GrpId = $row['GrpId'];
+				}
+				$row['cup_platz'] = $ex_platz = $last_platz == $row['platz'] ? $ex_platz : $abs_platz;
+				$last_platz = $row['platz'];
+				$abs_platz++;
+			}
+			$results[$row['GrpId']][$row['PerId']] = $row;
+			$ex_aquo[$row['GrpId']][$allowed_nations ? $ex_platz : $row['platz']]++;
+		}
+		foreach($results as $GrpId => &$rows)
+		{
+			foreach($rows as $PerId => $row)
+			{
+				$platz = isset($row['cup_platz']) ? $row['cup_platz'] : $row['platz'];
+				$update = array('cup_platz' => $row['cup_platz']);
+				if (isset($pkte[$wettk['pkte']][$platz]))
+				{
+					// int. competitions from 2009 on use averaged points (rounded down)
+					if (empty($wettk['nation']) && (int)$wettk['datum'] >= 2009 && $ex_aquo[$row['GrpId']][$platz] > 1)
+					{
+						for($n = 0; $n < $ex_aquo[$row['GrpId']][$platz]; ++$n)
+						{
+							$update['cup_pkt'] += $pkte[$wettk['pkte']][$platz+$n];
+						}
+						$update['cup_pkt'] = 100 * $wettk['faktor'] * (int)floor($update['cup_pkt'] / $ex_aquo[$row['GrpId']][$platz]);
+					}
+					else
+					{
+						$update['cup_pkt'] = 100 * $wettk['faktor'] * $pkte[$wettk['pkte']][$platz];
+					}
+				}
+				$db->update('Results',$update,array(
+					'WetId' => $wettk['WetId'],
+					'GrpId' => $row['GrpId'],
+					'PerId' => $row['PerId'],
+				),__LINE__,__FILE__,'ranking');
+			}
+		}
+	}
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.001';
+}
+

@@ -1,5 +1,14 @@
 <?php
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - ranglist display
+ *
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
 
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
 {
@@ -9,7 +18,6 @@ if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'
 
 require_once ('open_db.inc.php');
 include_once ('calc_rang.inc.php');
-
 
 $stand = $from = prepare_var('comp','addslashes,strtoupper',array('GET',0),$_GET['from'] ? $_GET['from'] : '.');
 $gruppe=prepare_var('cat','strtoupper',array('GET',1));
@@ -109,31 +117,17 @@ if ($rang && $show_calc)		// Liste enthaltene Wettk. erzeugen
 		}
 		$WetIds[] = $row->WetId;
 	}
-	global $sql_platz,$sql_pkte;
-	$eyc_platz = '';
-	if ($sql_platz)	// neuer EYC bei dem nur europäer für die Punkte berücksichtigt werden
+	if ($serie)
 	{
-		$eyc_platz = ','.$sql_platz.' AS eyc_platz';
+		$cup_platz = ',r.cup_platz';
+		$cup_pkte = ',cup_pkt AS pkt';
 	}
-	if ($sql_pkte)	// 2009+ international ranking
-	{
-		$sql_pkte = ','.$sql_pkte.' AS pkt';
-		$pkt_join = 'JOIN PktSystemPkte s ON s.PktId='.(int)$serie->pkte.' AND s.platz=r.platz';
-	}
-	$res = my_query($query = "SELECT * $eyc_platz$sql_pkte FROM Results r $pkt_join WHERE GrpId IN ($gruppe->GrpIds)".
+	$res = my_query($query = "SELECT * $cup_platz $cup_pkte FROM Results r WHERE GrpId IN ($gruppe->GrpIds)".
 		($wettks ? ' AND r.WetId IN ('.implode(',',$WetIds).')' : '').
 		" AND '$anfang'<=datum AND datum<='$stand' ORDER BY r.WetId,r.platz");
 
 	while ($row = mysql_fetch_object($res))
 	{
-		if (isset($sql_pkte))
-		{
-			$row->pkt *= 100;
-		}
-		elseif (isset($pkte))
-		{
-			$row->pkt = 100.0 * $pkte[isset($row->eyc_platz) ? $row->eyc_platz : $row->platz];
-		}
 		$result[$row->WetId][$row->PerId][$row->GrpId] = $row;
 	}
 }
@@ -227,7 +221,7 @@ foreach ($rang as $r)
 				else
 				{
 					$platz = $result[$w->WetId][$r->PerId][$w->GrpId]->platz.'.';
-					$platz_eyc = $result[$w->WetId][$r->PerId][$w->GrpId]->eyc_platz;
+					$platz_eyc = $result[$w->WetId][$r->PerId][$w->GrpId]->cup_platz;
 					if (isset($platz_eyc) && $platz_eyc != $platz)
 					{
 						$platz .= " ($platz_eyc.)";

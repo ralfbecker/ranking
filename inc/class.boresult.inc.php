@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -931,7 +931,7 @@ class boresult extends boranking
 					continue;
 				}
 				$row['result_rank'] -= $skiped;
-				$result[$row['PerId']] = $row['result_rank'];
+				$result[$row['PerId']] = $row;
 			}
 		}
 		return parent::import_ranking($keys,$result).($skiped ? "\n".lang('(%1 athletes not from %2 skipped)',$skiped,$filter_nation) : '');
