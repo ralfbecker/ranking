@@ -123,7 +123,13 @@ class ranking_admin_prefs_sidebox_hooks
 		}
 	}
 
-	static function hook_settings()
+	/**
+	 * Settings hook
+	 *
+	 * @param array|string $hook_data
+	 * @return array
+	 */
+	static function hook_settings($hook_data)
 	{
 		$ranking_views = array(
 			'ranking.uicompetitions.index'   => lang('Competitions'),
@@ -135,10 +141,17 @@ class ranking_admin_prefs_sidebox_hooks
 			'ranking.uiregistration.result'  => lang('Results'),
 			'ranking.uiranking.index'        => lang('Ranking'),
 		);
-		create_select_box('Default ranking view','default_view',$ranking_views,
-			'Which view do you want to see, when you start the ranking app?');
-
-		return true;
+		return array(
+			'default_view' => array(
+				'type'   => 'select',
+				'label'  => 'Default ranking view',
+				'name'   => 'default_view',
+				'values' => $ranking_views,
+				'help'   => 'Which view do you want to see, when you start the ranking app?',
+				'xmlrpc' => True,
+				'admin'  => False,
+			),
+		);
 	}
 
 	/**
