@@ -66,11 +66,22 @@ class uicups extends boranking
 
 			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
 
+			if (!$view && is_array($content['max_per']))
+			{
+				$content['max_per_cat'] = array();
+				foreach($content['max_per'] as $row => $max)
+				{
+					if ((int)$max > 0 && !empty($content['per_cat'][$row]))
+					{
+						$content['max_per_cat'][$content['per_cat'][$row]] = (int)$max;
+					}
+				}
+			}
 			//echo "<br>uicups::edit: content ="; _debug_array($content);
 			$this->cup->data = $content['cup_data'];
 			unset($content['cup_data']);
-
 			$this->cup->data_merge($content);
+
 			//echo "<br>uicups::edit: cup->data ="; _debug_array($this->cup->data);
 
 			if (($content['save'] || $content['apply']) && $this->acl_check($content['nation'],EGW_ACL_EDIT))
@@ -126,6 +137,17 @@ class uicups extends boranking
 			'gruppen'   => $this->cats->names(array('nation' => $this->cup->data['nation'])),
 			'split_by_places' => $this->split_by_places,
 		);
+		$content['per_cat'] = $content['max_per'] = array();
+		foreach($this->cup->data['max_per_cat'] as $rkey => $max)
+		{
+			$content['per_cat'][] = $rkey;
+			$content['max_per'][] = $max;
+		}
+		$content['per_cat'][] = '';	// one extra row to add further cats
+		foreach($this->cup->data['gruppen'] as $rkey)
+		{
+			$sel_options['per_cat'][$rkey] = $sel_options['gruppen'][$rkey];
+		}
 		$readonlys = array(
 			'delete' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]],
 			'nation' => !!$this->only_nation_edit,

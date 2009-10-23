@@ -7,11 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * cup object
@@ -28,10 +26,14 @@ class cup extends so_sql
 
 	/**
 	 * constructor of the cup class
+	 *
+	 * @param string $source_charset
+	 * @param egw_db $db
+	 * @return cup
 	 */
-	function cup($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','Serien',$db);	// call constructor of derived class
+		parent::__construct('ranking','Serien',$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
@@ -48,6 +50,20 @@ class cup extends so_sql
 			}
 			$this->$var = $GLOBALS['egw']->$egw_name;
 		}
+		$this->non_db_cols = array('max_per_cat','nat_team_quota');
+	}
+
+	/**
+	 * PHP4 constructor
+	 *
+	 * @param string $source_charset
+	 * @param egw_db $db
+	 * @deprecated use __construct
+	 * @return cup
+	 */
+	function cup($source_charset='',$db=null)
+	{
+		self::__construct($source_charset,$db);
 	}
 
 	/**
@@ -104,13 +120,15 @@ class cup extends so_sql
 		{
 			$data['nation'] = $data['nation'] == 'NULL' ? '' : strtoupper($data['nation']);
 		}
-		if (is_array($data['gruppen']))
+		if ($data['gruppen'])
 		{
-			foreach($data['gruppen'] as $k => $cat_rkey)
+			if (!is_array($data['gruppen'])) $data['gruppen'] = explode(',',$data['gruppen']);
+
+			foreach($data['gruppen'] as &$cat_rkey)
 			{
 				if ($data['nat_team_quota'][$cat_rkey] || $data['max_per_cat'][$cat_rkey])
 				{
-					$data['gruppen'] .= '='.$data['nat_team_quota'][$cat_rkey].
+					$cat_rkey .= '='.$data['nat_team_quota'][$cat_rkey].
 						($data['max_per_cat'][$cat_rkey] ? '+'.$data['max_per_cat'][$cat_rkey] : '');
 				}
 			}
