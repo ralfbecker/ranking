@@ -286,7 +286,11 @@ foreach($cats as $n => $cat_name)
 		)));
 		if ($debug > 2) echo "\nPOSTing $url with $post\n";
 		$download = curl_exec($ch);
-		list($headers,$download) = explode("\r\n\r\n",$download,2);
+		$headers = '';
+		while (empty($headers) || $headers == 'HTTP/1.1 100 Continue')
+		{
+			list($headers,$download) = explode("\r\n\r\n",$download,2);
+		}
 		if ($debug > 3) echo $headers."\n";
 		if (!preg_match('/attachment; filename="([^"]+)"/m',$headers,$matches))
 		{
@@ -294,7 +298,6 @@ foreach($cats as $n => $cat_name)
 			break;	// no further heat
 		}
 		$fname = str_replace('/','-',$matches[1]);
-
 		// convert from the given charset to eGW's
 		$download = $GLOBALS['egw']->translation->convert($download,$charset);
 		if ($debug > 1) echo "$fname:\n".implode("\n",array_slice(explode("\n",$download),0,4))."\n\n";
