@@ -30,7 +30,7 @@ $cats = array(
 		'nation' => '',
 		'grps'	 => $icc_youth,
 		'wettk_reg' => '^[0-9]{2,2}(EYC|_Y|_JWM|_NAC){1,1}.*',
-		'serie_reg' => '^[0-9]{2,2}_EYC',
+		'serie_reg' => '^[0-9]{2,2}_EY[CS]',
 //		'rang_title'=> '',
 		'bgcolor'   => '#D8E8FF',
 	),
