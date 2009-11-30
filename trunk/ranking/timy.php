@@ -12,7 +12,22 @@
  */
 
 // timeout for the select, aka display refresh rate, in microseconds 0.5s = 500000
-define('DISPLAY_TIMEOUT',200000);
+define('DISPLAY_TIMEOUT',200000);	// baud 2400 --> 500000, 9600 --> 2000000
+/**
+ * Programmierung Display:
+ * - Taste drücken bis "br 09" kommt: br ist menupunkt (brightness), 09 ist wert
+ * - Aendern des Menupunktes bzw Wertes wenn er blinkt Taste drücken 
+ * - Auf Menupunkt SE gehen und dort h9 (9 = 9600 baud einstellen, 2 = 2400 baud)
+ * - Weiter menupunkt aendern bis Anzeige schwarz
+ * 
+ * Nach Neustart des timy.php Kontrollprogramms, MUSS auch der Timy gelöscht werden
+ * (da die Sequenznummern sich sonst überschneiden, da timy.php von vorne beginnt):
+ * --> Neustart von Dualtimer Programm:
+ * Liste Taste (oberhalb 7+8) blaettern bis programms, OK, F0 Change drücken, Dualtimer auswählen, OK
+ * CLR zum Löschen der Zeiten drücken, danach beliebige Taste drücken
+ * 
+ * Abbruch nach Sturz: Erneut auf [Start] drücken UND gestürztem Tn "Sturz" eintragen und aktualisieren
+ */
 // max. time the false start was trigered before the start, to interpret it as false start
 define('FALSE_START_DISTANCE',1.0);
 
@@ -97,7 +112,7 @@ foreach($display_interfaces as $display_interface)
 	{
 		$display = fopen($display_interface,'w');
 		// switching echo off!
-		system("stty 2400 -echo < $display_interface");
+		system("stty 9600 -echo < $display_interface");
 	}
 	if (!$display)
 	{
@@ -458,7 +473,7 @@ function handle_client($client,$str)
 
 function _get_free_sequence($snr)
 {
-	static $sequences;
+	static $sequences = array();
 	
 	$n = 0;
 	do 
