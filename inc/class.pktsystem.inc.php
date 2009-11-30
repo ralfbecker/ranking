@@ -52,7 +52,7 @@ class pktsystem extends so_sql
 		$this->so_sql('ranking','PktSysteme',$db);	// call constructor of derived class
 
 /*    not needed so far
-		$this->pkte =& new so_sql;
+		$this->pkte = new so_sql;
 		$this->pkte->db_name = $this->db_name_pkte;
 		$this->pkte->db_key_cols = $this->db_key_cols;
 		$this->pkte->db_data_cols = $this->db_data_cols_pkte;

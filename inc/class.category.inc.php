@@ -272,7 +272,7 @@ class category extends so_sql
 	{
 		if (empty($rexp)) return array();
 
-		$rexp = ereg_replace('=[^,]*','',$rexp);	// removes cat specific counts
+		$rexp = preg_replace('/=[^,]*/','',$rexp);	// removes cat specific counts
 
 		if (!$this->all_names)
 		{
@@ -281,9 +281,9 @@ class category extends so_sql
 		$cats = array();
 		foreach((array) $this->all_names as $rkey => $name)
 		{
-			if (stristr( ",".$rexp.",",",".$rkey."," ) || $rexp && eregi( '^'.$rexp.'$',$rkey ) ||
+			if (stristr( ",".$rexp.",",",".$rkey."," ) || $rexp && preg_match( '/^'.$rexp.'$/i',$rkey ) ||
 				 		(isset($this->cat2old[$rkey]) && (stristr( ",".$rexp.",",",".$this->cat2old[$rkey]."," ) ||
-				 		$rexp && eregi( '^'.$rexp.'$',$this->cat2old[$rkey] ))))
+				 		$rexp && preg_match( '/^'.$rexp.'$/i',$this->cat2old[$rkey] ))))
 					{
 						$cats[] = $rkey;
 					}

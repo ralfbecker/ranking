@@ -170,7 +170,7 @@ class route_result extends so_sql
 						$result_cols[] = 'result_zone';
 						break;
 				}
-				$order_by_parts = split('[ ,]',$order_by);
+				$order_by_parts = preg_split('/[ ,]/',$order_by);
 
 				$join .= $this->_general_result_join(array(
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],

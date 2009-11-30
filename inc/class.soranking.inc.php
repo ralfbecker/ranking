@@ -131,7 +131,7 @@ class soranking
 			{
 				if (!$config['ranking_db_'.$var]) $config['ranking_db_'.$var] = $GLOBALS['egw_info']['server']['db_'.$var];
 			}
-			$db =& new egw_db();
+			$db = new egw_db();
 			$db->connect($config['ranking_db_name'],$config['ranking_db_host'],
 				$config['ranking_db_port'],$config['ranking_db_user'],$config['ranking_db_pass']);
 

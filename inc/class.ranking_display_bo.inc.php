@@ -45,7 +45,7 @@ class ranking_display_bo
 	{
 		if (!is_object($GLOBALS['boresult']))
 		{
-			$GLOBALS['boresult'] =& new boresult();
+			$GLOBALS['boresult'] = new boresult();
 		}
 		$this->result =& $GLOBALS['boresult'];
 		

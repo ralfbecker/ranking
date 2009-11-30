@@ -617,7 +617,7 @@ class athlete extends so_sql
 			'PerId' => is_null($PerId) ? $this->data['PerId'] : $PerId,
 			'nation' => (string)$nation,
 			'lic_year' => $year,
-		),__LINE__,__FILE__,false,'','ranking')->fetchSingle()))
+		),__LINE__,__FILE__,false,'','ranking')->fetchColumn()))
 		{
 			$status = 'n';
 		}
@@ -883,7 +883,7 @@ class athlete extends so_sql
 			// allow to prefix pattern with gender and nation, eg: "GER: Becker", "M: Becker" or "M: GER: Becker"
 			if (strpos($pattern,':') !== false)
 			{
-				$parts = split(': ?',$pattern);
+				$parts = preg_split('/: ?/',$pattern);
 				$pattern = array_pop($parts);
 				foreach($parts as $part)
 				{

@@ -60,7 +60,7 @@ class ranking_import extends boresult
 			// for eGW 1.5+
 			//throw new egw_exception_no_permission_admin();
 		}
-		$tmpl =& new etemplate('ranking.import');
+		$tmpl = new etemplate('ranking.import');
 
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
@@ -440,7 +440,7 @@ class ranking_import extends boresult
 			{
 				if (strpos($lastname,',') !== false)
 				{
-					list($lastname,$firstname) = split(', ?',$lastname);
+					list($lastname,$firstname) = preg_split('/, ?/',$lastname);
 				}
 				else
 				{

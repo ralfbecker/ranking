@@ -173,7 +173,7 @@ class uiregistration extends boranking
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Register');
 		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
-		$tmpl =& new etemplate('ranking.register.add');
+		$tmpl = new etemplate('ranking.register.add');
 		$tmpl->exec('ranking.uiregistration.add',$content,$select_options,$readonly,$preserv,2);
 	}
 
@@ -185,7 +185,7 @@ class uiregistration extends boranking
 	 */
 	function index($content=null,$msg='')
 	{
-		$tmpl =& new etemplate('ranking.register.form');
+		$tmpl = new etemplate('ranking.register.form');
 
 		if (!is_array($content))
 		{
@@ -615,7 +615,7 @@ class uiregistration extends boranking
 	{
 		//echo "uiregistration::lists(,'$msg','$show') content="; _debug_array($content);
 
-		$tmpl =& new etemplate('ranking.register.lists');
+		$tmpl = new etemplate('ranking.register.lists');
 
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{

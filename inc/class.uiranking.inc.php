@@ -36,7 +36,7 @@ class uiranking extends boranking
 	 */
 	function index($content=null,$msg='')
 	{
-		$tmpl =& new etemplate('ranking.ranking');
+		$tmpl = new etemplate('ranking.ranking');
 
 		if (!is_array($content))
 		{

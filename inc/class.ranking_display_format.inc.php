@@ -39,7 +39,7 @@ class ranking_display_format extends so_sql2
 	{
 		if (!is_object($GLOBALS['boresult']))
 		{
-			$GLOBALS['boresult'] =& new boresult();
+			$GLOBALS['boresult'] = new boresult();
 		}
 		$this->result =& $GLOBALS['boresult'];
 
