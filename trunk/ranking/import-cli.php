@@ -160,7 +160,7 @@ while(($arg = array_shift($arguments)) && substr($arg,0,2) == '--')
 			$charset = array_shift($arguments);
 			break;
 		case '--cat';
-			$cats = split(', *',array_shift($arguments));
+			$cats = preg_split('/, */',array_shift($arguments));
 			break;
 		case '--baseurl';
 			$baseurl = array_shift($arguments);

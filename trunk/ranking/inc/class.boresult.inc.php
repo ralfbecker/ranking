@@ -1060,7 +1060,7 @@ class boresult extends boranking
 					$result = trim($rdata['boulder'][$i]);
 					if ($result{0} == 't')
 					{
-						list(,$data['top'.$i],,$data['zone'.$i]) = split('[tzb ]',$result);
+						list(,$data['top'.$i],,$data['zone'.$i]) = preg_split('/[tzb ]/',$result);
 					}
 					else
 					{

@@ -242,7 +242,7 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		$script .= 'document.eTemplate.submit();';
 
-		$response =& new xajaxResponse();
+		$response = new xajaxResponse();
 		$response->addScript($script);
 
 		return $response->getXML();
@@ -259,7 +259,7 @@ class ranking_display_ui extends ranking_display_bo
 	{
 		$GLOBALS['egw']->session->commit_session();		// stop this session from blocking other requests
 
-		$response =& new xajaxResponse();
+		$response = new xajaxResponse();
 
 		if (is_null($display) && ($display = $this->display) && !$display->read($dsp_id))
 		{
@@ -302,7 +302,7 @@ class ranking_display_ui extends ranking_display_bo
 
 		if (!$this->display->read($dsp_id))
 		{
-			$response =& new xajaxResponse();
+			$response = new xajaxResponse();
 			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes(lang('Display #%1 not found!!!',$dsp_id))."';");
 			return $response->getXML();
 		}
@@ -312,7 +312,7 @@ class ranking_display_ui extends ranking_display_bo
 			'frm_line' => $line,
 		)))
 		{
-			$response =& new xajaxResponse();
+			$response = new xajaxResponse();
 			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes(lang('Format #%1 not found!',$line))."';");
 			return $response->getXML();
 		}

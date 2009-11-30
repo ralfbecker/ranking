@@ -175,7 +175,7 @@ if (!$all)				// Ranglisten und Serienstand ausgeben
 	}
 	for ($i = 0,$year = 0 + $heute[0]; $i < 3 && $year>=$results_since; $year--)
 	{
-		$serie = ereg_replace ("\\?\\?",sprintf("%02d",$year % 100),$gruppe->serien_pat);
+		$serie = preg_replace ('/'."\\?\\?",sprintf("%02d".'/',$year % 100),$gruppe->serien_pat);
 		$stand = '.';
 		read_serie($serie,0);
 		if (is_object($serie) && calc_rangliste($gruppe,$stand,$anfang,$wettk,$rang,$rls,$ex_aquo,$ng,$serie) && $year == 0 + $stand)

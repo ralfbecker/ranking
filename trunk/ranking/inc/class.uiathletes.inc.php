@@ -40,7 +40,7 @@ class uiathletes extends boranking
 	{
 		$this->boranking();
 
-		$this->tmpl =& new etemplate;
+		$this->tmpl = new etemplate;
 
 		$this->acl_deny_labels = array(
 			ACL_DENY_BIRTHDAY	=> lang('birthday, shows only the year'),
@@ -409,7 +409,7 @@ class uiathletes extends boranking
 			if (!is_object($GLOBALS['egw']->js))
 			{
 				include_once(EGW_API_INC.'/class.javascript.inc.php');
-				$GLOBALS['egw']->js =& new javascript();
+				$GLOBALS['egw']->js = new javascript();
 			}
 			$GLOBALS['egw']->js->set_onload($js);
 		}

@@ -320,7 +320,7 @@ class uiresult extends boresult
 				$content['no_upload'] = $readonlys['button[upload]'] = true;	// no upload if result offical or general result
 			}
 			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
-			$display =& new ranking_display($this->db);
+			$display = new ranking_display($this->db);
 			// display selection, only if user has rights on the displays
 			if (($sel_options['dsp_id'] = $sel_options['dsp_id2'] = $display->displays()))
 			{
@@ -568,7 +568,7 @@ class uiresult extends boresult
 	 */
 	function index($content=null,$msg='',$pstambl='')
 	{
-		$tmpl =& new etemplate('ranking.result.index');
+		$tmpl = new etemplate('ranking.result.index');
 
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
@@ -896,7 +896,7 @@ class uiresult extends boresult
 		if (!is_object($GLOBALS['egw']->js))
 		{
 			require_once(EGW_API_INC.'/class.javascript.inc.php');
-			$GLOBALS['egw']->js =& new javascript();
+			$GLOBALS['egw']->js = new javascript();
 		}
 		$GLOBALS['egw']->js->validate_file('.','ranking','ranking',false);
 
@@ -1066,7 +1066,7 @@ class uiresult extends boresult
 			return $this->_stop_time_measurement($response);
 		}
 		require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_time_measurement.inc.php');
-		$timy =& new ranking_time_measurement($route['route_time_host'],$route['route_time_port']);
+		$timy = new ranking_time_measurement($route['route_time_host'],$route['route_time_port']);
 
 		if (!$timy->is_connected())
 		{

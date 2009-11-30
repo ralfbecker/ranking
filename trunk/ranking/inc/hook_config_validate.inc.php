@@ -55,7 +55,7 @@ function _set_async_job($start=true)
 
 	require_once(EGW_API_INC.'/class.asyncservice.inc.php');
 	
-	$async =& new asyncservice();
+	$async = new asyncservice();
 	
 	if ($start === !$async->read('ranking-import-rock'))
 	{

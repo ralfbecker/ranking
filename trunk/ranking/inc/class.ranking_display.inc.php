@@ -131,7 +131,7 @@ class ranking_display extends so_sql2
 		else
 		{
 			require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
-			$format =& new ranking_display_format($this->db);
+			$format = new ranking_display_format($this->db);
 		}
 		if (!$format->read($frm_id))
 		{

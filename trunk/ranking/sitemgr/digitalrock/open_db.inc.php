@@ -77,7 +77,7 @@ function do_header($head_title,$title,$align="center",$raise=0,$target='profil',
  <tr>
   <?php echo $t_header_logo; ?>
   <td align="<?php echo $align; ?>" class="onlyPrint"><font size="+2">
-   <?php echo ereg_replace(' - ','<br />',$title); ?>
+   <?php echo preg_replace('/ - /','<br />',$title); ?>
   </font></td>
 <?php if (!defined('DR_PATH')) {		// we dont run inside sitemgr
 ?>
@@ -206,7 +206,7 @@ function grp_in_grps($grp,$grps)
 	global $grp2old;
 
 	list($grps) = explode('@',$grps);
-	$grps = ereg_replace('=[^,]*','',$grps);
+	$grps = preg_replace('/=[^,]*/','',$grps);
 	return stristr( ",".$grps.",",",".$grp."," ) || $grps && eregi( '^'.$grps.'$',$grp ) ||
 		(isset($grp2old[$grp]) && (stristr( ",".$grps.",",",".$grp2old[$grp]."," ) || $grps && eregi( '^'.$grps.'$',$grp2old[$grp] )));
 }
@@ -295,7 +295,7 @@ function jahrgang( $gruppe,$stand,&$from_year,&$to_year)
 
 function datum($date,$long = True)
 {
-	if (!ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$date,$regs))
+	if (!preg_match('/'."([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})".'/',$date,$regs))
 	{
 		return '';
 	}
@@ -416,7 +416,7 @@ function nation_city_sektion( $per,$gruppe )
 	{
 		return htmlspecialchars($per->ort);
 	}					// Verband vor Sektion l�chen
-	if (!($sektion = eregi_replace($t_verband_del,"",$per->verband)) && $per->ort)
+	if (!($sektion = preg_replace('/'.$t_verband_del.'/i',"",$per->verband)) && $per->ort)
 	{
 		return '<i>'.htmlspecialchars($per->ort).'</i>';	// keine Sektion angegeben --> Ort
 	}
@@ -569,7 +569,7 @@ function get_param($name,$from,$default='')
 		}
 		if (is_numeric($f) && $_SERVER['QUERY_STRING'] && strchr($_SERVER['QUERY_STRING'],'=') === False)
 		{
-			$query = split('[ +]',urldecode($_SERVER['QUERY_STRING']));
+			$query = preg_split('/[ +]/',urldecode($_SERVER['QUERY_STRING']));
 
 			if (isset($query[intval($f)]))
 			{
