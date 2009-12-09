@@ -229,7 +229,8 @@ $phpgw_baseline = array(
 			'route_time_host' => array('type' => 'varchar','precision' => '64'),
 			'route_time_port' => array('type' => 'int','precision' => '4'),
 			'dsp_id2' => array('type' => 'int','precision' => '4'),
-			'frm_id2' => array('type' => 'int','precision' => '4')
+			'frm_id2' => array('type' => 'int','precision' => '4'),
+			'slist_order' => array('type' => 'int','precision' => '1','comment' => 'mode of startlist creation')
 		),
 		'pk' => array('WetId','GrpId','route_order'),
 		'fk' => array(),
