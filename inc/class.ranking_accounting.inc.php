@@ -56,11 +56,16 @@ class ranking_accounting extends boresult
 		switch (($order = $query['order']))
 		{
 			case 'start_order':
-				$query['order'] = 'GrpId,start_order';
+				$query['order'] = category::sui_cat_sort().',start_order';
 				break;
 		}
 		$comp = $this->comp->read($query['comp']);
 
+		// unset GrpId filter, if none (= 0) selected
+		if (!$query['col_filter']['GrpId'])
+		{
+			unset($query['col_filter']['GrpId']);
+		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 //		$total = $this->route_result->get_rows($query,$rows,$readonlys);
 		// we use athlete::get_rows, to also get the license data (joined with the results table)
@@ -96,6 +101,17 @@ class ranking_accounting extends boresult
 			{
 				$acl_feds[] = $row['acl_fed_id'];
 			}
+			$row['total'] = etemplate::number_format($row['total'],2);
+			$row['fed'] = etemplate::number_format($row['fed'],2);
+		}
+		// for csv export add an extra line with the summs
+		if ($query['csv_export'] && $rows['total'])
+		{
+			$rows[] = array(
+				'start_order' => lang('Sum'),
+				'total' => etemplate::number_format($rows['total'],2),
+				'fed'   => etemplate::number_format($rows['fed'],2),
+			);
 		}
 		$rows['license_year'] = (int)$comp['datum'];
 		$acl_feds = $this->federation->query_list('verband','fed_id',array('fed_id' => $acl_feds));
@@ -207,7 +223,7 @@ class ranking_accounting extends boresult
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
-			'GrpId'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
+			'GrpId'      => $this->cats->names(array('rkey' => $comp['gruppen']),0,'SUI'),
 			'license'    => $this->license_labels,
 		);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Accounting').' '.$comp['name'];
