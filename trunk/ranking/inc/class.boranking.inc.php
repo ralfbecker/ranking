@@ -987,7 +987,7 @@ class boranking extends soranking
 	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$order=0,$stagger=false,$old_startlist=null)
 	{
 		// order bitfields to booleans
-		$use_ranking = (boolean)($order & 3);
+		$use_ranking = (boolean)($order & 3);	// cup OR ranking
 		$use_cup = (boolean)($order & 2);
 		$reverse_ranking = (boolean)($order & 4);
 		$distribution_only = (boolean)($order & 8);
@@ -1105,10 +1105,11 @@ class boranking extends soranking
 			$this->move_to_startlist($starters,array_rand($starters),$startlist,$num_routes,$reset_data,__LINE__);
 			$reset_data = false;
 		}
-		// we have an old startlist --> try to keep the position
-		if ($old_startlist && !($use_ranking && !$distribution_only))
+		// we have an old startlist --> try to keep the position (unless we randomize everything / distribution only)
+		if ($old_startlist && !$distribution_only)
 		{
 			// reindex startlist's by PerId in $starters
+			$starters = array();
 			foreach($startlist as $num => $startlist_num)
 			{
 				foreach($startlist_num as $starter)
@@ -1118,8 +1119,9 @@ class boranking extends soranking
 			}
 			// move (reindexed) starters in their old order into the new routes
 			$startlist[2] = $startlist[1] = array();
-			foreach($old_startlist as $PerId => $starter)
+			foreach($old_startlist as $data)
 			{
+				$PerId = $data['PerId'];
 				if (isset($starters[1][$PerId]))
 				{
 					$this->move_to_startlist($starters[1],$PerId,$startlist,$num_routes,1,__LINE__);
@@ -1215,7 +1217,12 @@ class boranking extends soranking
 	/**
 	 * move an athlete to the startlist and diveds them on $num_routes routes
 	 *
-	 * @internal
+	 * @param array &$starters single source liste
+	 * @param string $k key into source list of athlete to move
+	 * @param array &$startlist destination lists, indexed by route=1|2, athletes added at the end
+	 * @param int $num_routes number of routes to use 1, 2, ...
+	 * @param int $reset_data=null set internal counter $route to $reset_data, if given and > 0
+	 * @param int $line=0 line number of caller for debug purpose
 	 */
 	function move_to_startlist(&$starters,$k,&$startlist,$num_routes,$reset_data=null,$line=0)
 	{
