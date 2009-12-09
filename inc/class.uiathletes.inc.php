@@ -438,7 +438,11 @@ class uiathletes extends boranking
 	function get_rows(&$query_in,&$rows,&$readonlys)
 	{
 		//echo "uiathletes::get_rows() query="; _debug_array($query_in);
-		$GLOBALS['egw']->session->appsession('ranking','athlete_state',$query=$query_in);
+		if (!$query_in['csv_export'])	// only store state if NOT called as csv export
+		{
+			$GLOBALS['egw']->session->appsession('ranking','athlete_state',$query_in);
+		}
+		$query = $query_in;
 
 		foreach((array) $query['col_filter'] as $col => $val)
 		{
@@ -498,8 +502,12 @@ class uiathletes extends boranking
 
 		//_debug_array($rows);
 
+		if ($query['col_filter']['nation'] == 'SUI')
+		{
+			$feds = $this->federation->federations($query['col_filter']['nation']);
+		}
 		$readonlys = array();
-		foreach($rows as $row)
+		foreach($rows as &$row)
 		{
 			if ($row['last_comp'] || !$this->acl_check_athlete($row))
 			{
@@ -507,6 +515,16 @@ class uiathletes extends boranking
 			}
 			$readonlys["apply_license[$row[PerId]]"] = $row['license'] != 'n' ||
 				!$this->acl_check_athlete($row,EGW_ACL_ATHLETE,null,$license_nation?$license_nation:'NULL');
+
+			if ($feds && $row['fed_parent'] && isset($feds[$row['fed_parent']]))
+			{
+				$row['regionalzentrum'] = $feds[$row['fed_parent']];
+			}
+			if ($query['csv_export'])
+			{
+				$row['license_status'] = lang($this->license_labels[$row['license']]);
+				$row['sex'] = lang($row['sex']);
+			}
 		}
 		$sel_options['license_nation'] = $this->license_nations;
 		$rows['sel_options'] =& $sel_options;
@@ -574,6 +592,26 @@ class uiathletes extends boranking
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
 			);
+			// only enable csv export, if user has at least for one nation athlete rights
+			if (count($this->athlete_rights))
+			{
+				$content['nm']['csv_fields'] = array(
+					'nachname' => lang('Name'),
+					'vorname'  => lang('First name'),
+					'geb_date' => lang('Birthday'),
+					'sex'      => lang('Gender'),
+					'plz'      => lang('Zip Code'),
+					'ort'      => lang('City'),
+					'strasse'  => lang('Street'),
+					'email'    => lang('Email'),
+					'tel'      => lang('Phone'),
+					'mobil'    => lang('Cellphone'),
+					'verband'  => lang('Sektion'),
+					'regionalzentrum' => lang('Regionalzentrum'),
+					'PerId'    => lang('License'),
+					'license_status' => lang('Status'),
+				);
+			}
 			if ($this->only_nation_athlete)
 			{
 				$content['nm']['col_filter']['nation'] = $this->only_nation_athlete;
