@@ -395,6 +395,7 @@ set license to	ranking	de	Setze Lizenz als
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
 show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
+show jurylist	ranking	de	Juryliste anzeigen
 since	ranking	de	seit
 since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
 size (cm)	ranking	de	Größe (cm)
@@ -407,6 +408,7 @@ start	ranking	de	Start
 start heat	ranking	de	Beginn Durchgang
 start order	ranking	de	Startreihenfolge
 start- number	ranking	de	Start- nummer
+start- order	ranking	de	Start- folge
 startdate	ranking	de	Startdatum
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	de	Startdatum (erste Runde, nicht die Registrierung) der Wettkampfes (darf nicht leer sein)
 starting time	ranking	de	Startzeit
@@ -416,7 +418,7 @@ startlist generated	ranking	de	Startliste erzeugt
 startlist pdf	ranking	de	Startlisten PDF
 startlists	ranking	de	Startlisten
 startnumber	ranking	de	Startnummer
-startorder	ranking	de	Startreihenfolge
+startorder	ranking	de	Startfolge
 street	ranking	de	Straße
 street, postcode	ranking	de	Straße, Postleitzahl
 sum	ranking	de	Summe

@@ -395,6 +395,7 @@ set license to	ranking	en	Set license to
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
 show athlets from all categories	ranking	en	show athlets from all categories
+show jurylist	ranking	en	show jurylist
 since	ranking	en	since
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
@@ -407,6 +408,7 @@ start	ranking	en	Start
 start heat	ranking	en	Start heat
 start order	ranking	en	Start order
 start- number	ranking	en	start- number
+start- order	ranking	en	start- order
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first heat, not registration) of the competition (must not be empty)
 starting time	ranking	en	Starting time
