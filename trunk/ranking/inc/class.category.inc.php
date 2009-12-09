@@ -207,6 +207,35 @@ class category extends so_sql
 	}
 
 	/**
+	 * Sort categories as swiss federation wants it
+	 *
+	 * all not explicitly named cats are sorted by their GrpId
+	 */
+	static function sui_cat_sort()
+	{
+		$fix_startorder = array(
+			38 => 1,	// SUI_F_M 	U14 Damen
+			37 => 2,	// SUI_M_M 	U14 Herren
+			47 => 3,	// SUI_F_B 	U16 Damen
+			35 => 4,	// SUI_M_B 	U16 Herren
+			46 => 5,	// SUI_F_A 	U18 Damen
+			34 => 6,	// SUI_M_A 	U18 Herren
+			44 => 10,	// SUI_F_3 	Open Damen
+			43 => 11,	// SUI_M_3 	Open Herren
+			30 => 12,	// SUI_F 	Elite Damen
+			33 => 13,	// SUI_M 	Elite Herren
+		);
+		$sql_sort = 'CASE GrpId';
+		foreach($fix_startorder as $grp_id => $sort)
+		{
+			$sql_sort .= ' WHEN '.$grp_id.' THEN '.$sort;
+		}
+		$sql_sort .= ' ELSE GrpId END';
+
+		return $sql_sort;
+	}
+
+	/**
 	 * get the names of all or certain categories, eg. to use in a selectbox
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
 	 * @param int $rkeys -1: GrpId=>rkey:name 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
@@ -215,7 +244,11 @@ class category extends so_sql
 	 */
 	function &names($keys=array(),$rkeys=2,$sort='')
 	{
-		if (!$sort || !preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort))
+		if ($sort == 'SUI')
+		{
+			$sort = self::sui_cat_sort();
+		}
+		elseif (!$sort || !preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort))
 		{
 			$sort = $rkeys == 0 || $rkeys == 1 ? 'name' : 'rkey';
 		}
