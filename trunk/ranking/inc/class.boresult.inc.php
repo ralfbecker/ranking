@@ -1217,7 +1217,14 @@ class boresult extends boranking
 			}
 			if ($discipline != 'speed')
 			{
-				$keys['route_quota'] = self::default_quota($discipline,$keys['route_order']);
+				if ($comp['nation'] == 'SUI')
+				{
+					$keys['route_quota'] = '';	// no default quota for SUI
+				}
+				else
+				{
+					$keys['route_quota'] = self::default_quota($discipline,$keys['route_order'],null,null);
+				}
 			}
 			elseif ($previous && $previous['route_quota'])
 			{
@@ -1251,6 +1258,9 @@ class boresult extends boranking
 			$content = $this->route->init($keys);
 			$content['new_route'] = true;
 			$content['route_status'] = STATUS_STARTLIST;
+
+			// default to 5 boulders
+			$content['route_num_problems'] = 5;
 		}
 		return $msg ? $msg : true;
 	}
