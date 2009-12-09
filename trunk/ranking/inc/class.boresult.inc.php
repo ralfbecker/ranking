@@ -192,7 +192,7 @@ class boresult extends boranking
 
 		$num = $this->_store_startlist($starters[1],$route_type == TWO_QUALI_HALF ? 0 : $route_order);
 
-		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL)))	// automatically generate 2. quali
+		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL)) && $discipline != 'speed')	// automatically generate 2. quali
 		{
 			$keys['route_order'] = 1;
 			if (!$this->route->read($keys))
