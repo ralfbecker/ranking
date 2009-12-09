@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description value="opens" id="route_iso_open" no_lang="1"/>
-									<description value="closes" id="route_iso_close" no_lang="1"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_start" no_lang="1"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description id="route_observation_time" no_lang="1"/>
-									<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,10 +47,10 @@
 							</columns>
 							<rows>
 								<row>
-									<description id="route_result" no_lang="1"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_judge"/>
+									<description no_lang="1" id="route_data[route_judge]"/>
 								</row>
 							</rows>
 						</grid>
@@ -62,12 +62,15 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.7.002">
 		<grid width="100%">
 			<columns>
+				<column width="5%"/>
 				<column/>
-				<column width="20%"/>
-				<column width="20%"/>
+				<column/>
+				<column width="5%"/>
+				<column/>
+				<column/>
 				<column/>
 				<column/>
 				<column/>
@@ -90,14 +93,20 @@
 					<description/>
 					<description/>
 					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="th" part="header">
 					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
-					<nextmatch-sortheader label="@fed_label" id="$cont[fed_col]"/>
-					<description value="License" id="PerId" align="center"/>
+					<nextmatch-sortheader label="Nation" id="nation"/>
+					<nextmatch-header label="Sektion" id="verband"/>
+					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-header label="License" id="PerId" align="center"/>
 					<nextmatch-sortheader label="Start- number" id="start_order" align="center"/>
 					<nextmatch-sortheader label="Time" id="result_top_time" align="center"/>
 					<description value="2. Time" align="center"/>
@@ -116,6 +125,9 @@
 					<description/>
 					<description/>
 					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="x $row_cont[class] $row_cont[quota_class]">
 					<description id="set[$row_cont[PerId]][result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
@@ -123,7 +135,10 @@
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description id="{$row}[$cont[fed_col]]" no_lang="1" value="@${row}[$cont[fed_col2]]"/>
-					<description id="{$row}[PerId]" no_lang="1" align="center"/>
+					<description id="${row}[verband]"/>
+					<description id="${row}[acl_fed]"/>
+					<description value="$row_cont[plz]" id="${row}[ort]"/>
+					<description id="${row}[PerId]" no_lang="1" align="center"/>
 					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order]" no_lang="1"/>
 					<hbox align="center" options="0,0">
 						<description class="$cont[ro_result]" no_lang="1" id="{$row}[result]" readonly="true"/>

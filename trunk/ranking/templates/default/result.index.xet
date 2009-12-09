@@ -62,12 +62,15 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_lead" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.index.rows_lead" template="" lang="" group="0" version="1.7.002">
 		<grid width="100%">
 			<columns>
+				<column width="5%"/>
 				<column/>
-				<column width="20%"/>
-				<column width="20%"/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
 				<column/>
 				<column/>
 				<column/>
@@ -88,14 +91,20 @@
 					<description/>
 					<description/>
 					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="th" part="header">
 					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
-					<nextmatch-sortheader label="@fed_label" id="$cont[fed_col]"/>
-					<description value="License" id="PerId" align="center"/>
+					<nextmatch-sortheader label="Nation" id="nation"/>
+					<nextmatch-header label="Sektion" id="verband"/>
+					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-header label="License" id="PerId" align="center"/>
 					<nextmatch-sortheader label="Start- number" id="start_order" align="center"/>
 					<nextmatch-sortheader label="Height" id="result_height" align="center"/>
 					<nextmatch-sortheader label="previous heat" id="rank_prev_heat" align="center"/>
@@ -112,13 +121,19 @@
 					<description/>
 					<description/>
 					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="row $row_cont[quota_class]">
 					<description id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
 					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1" options="$row_cont[link]"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
-					<description id="{$row}[$cont[fed_col]]" no_lang="1" value="@${row}[$cont[fed_col2]]"/>
+					<description id="{$row}[nation]" no_lang="1"/>
+					<description id="${row}[verband]"/>
+					<description id="${row}[acl_fed]"/>
+					<description value="$row_cont[plz]" id="${row}[ort]"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
 					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order]" no_lang="1"/>
 					<hbox align="center" options="0,0">

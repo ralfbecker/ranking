@@ -2,13 +2,13 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
-		<grid width="100%">
+		<grid width="100%" class="extra_footer">
 			<columns>
 				<column/>
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description value="opens" id="route_iso_open" no_lang="1"/>
-									<description value="closes" id="route_iso_close" no_lang="1"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_start" no_lang="1"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description id="route_observation_time" no_lang="1"/>
-									<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,10 +47,10 @@
 							</columns>
 							<rows>
 								<row>
-									<description id="route_result" no_lang="1"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_judge"/>
+									<description no_lang="1" id="route_data[route_judge]"/>
 								</row>
 							</rows>
 						</grid>
@@ -58,17 +58,27 @@
 				</row>
 			</rows>
 		</grid>
+		<styles>
+			.extra_footer { margin-top: 10px; }
+		</styles>
 	</template>
-	<template id="ranking.result.index.rows_startlist" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.index.rows_startlist" template="" lang="" group="0" version="1.7.002">
 		<grid width="100%">
 			<columns>
-				<column width="10%"/>
-				<column width="30%"/>
-				<column width="30%"/>
+				<column width="5%"/>
+				<column width="5%"/>
+				<column width="5%"/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
 				<column/>
 				<column/>
 				<column/>
 				<column disabled="@no_ranking"/>
+				<column width="15%"/>
+				<column width="30%"/>
 				<column disabled="@no_delete"/>
 			</columns>
 			<rows>
@@ -81,15 +91,29 @@
 					<description/>
 					<description/>
 					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader label="Startnumber" id="start_order" align="center"/>
+					<nextmatch-sortheader label="Start- order" id="start_order" align="center"/>
+					<nextmatch-sortheader label="Start- number" id="start_number" align="center" class="noPrint"/>
+					<nextmatch-header label="Start- number" id="printnumber" align="center" class="onlyPrint"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
-					<nextmatch-sortheader label="@fed_label" id="$cont[fed_col]"/>
-					<description value="License" id="PerId" align="center"/>
+					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
+					<nextmatch-header label="Sektion" id="verband"/>
+					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-header label="License" id="PerId" align="center"/>
 					<description value="Ranking" align="center"/>
+					<nextmatch-header label="Result" id="jury_result"/>
+					<nextmatch-header label="Remark" id="remark"/>
 					<description class="noPrint" value="Delete" align="center"/>
 				</row>
 				<row part="footer">
@@ -101,23 +125,32 @@
 					<description/>
 					<description/>
 					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="x $row_cont[class]">
-					<hbox align="center" options="0,0">
-						<description class="onlyPrint" id="{$row}[start_order]" no_lang="1" align="center"/>
-						<description class="onlyPrint" id="{$row}[start_number]" no_lang="1" align="center"/>
-						<description class="noPrint leftPad5" id="{$row}[start_order]" no_lang="1" align="center"/>
-						<textbox size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[PerId]][start_number]" no_lang="1" class="noPrint rightPad5" align="right"/>
-					</hbox>
+					<description id="{$row}[start_order]" no_lang="1" align="center"/>
+					<textbox size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[PerId]][start_number]" no_lang="1" class="noPrint" align="center"/>
+					<description class="onlyPrint" id="{$row}[start_number]" no_lang="1" align="center"/>
 					<description id="{$row}[nachname]" no_lang="1" class="lastname leftPad5" options="$row_cont[link]"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description no_lang="1" align="center" id="{$row}[birthyear]"/>
-					<description id="{$row}[$cont[fed_col]" no_lang="1" value="@${row}[$cont[fed_col2]]"/>
+					<description id="{$row}[nation]" no_lang="1" align="center"/>
+					<description id="${row}[verband]"/>
+					<description id="${row}[acl_fed]"/>
+					<description value="$row_cont[plz]" id="${row}[ort]"/>
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
 					<hbox no_lang="1" options="0,0">
 						<description no_lang="1" id="${row}[ranking_place]" class="place"/>
 						<description no_lang="1" id="${row}[ranking_points]" align="right"/>
 					</hbox>
+					<description/>
+					<description/>
 					<button image="delete" class="noPrint" label="Delete" align="center" id="delete[$row_cont[PerId]]" onclick="return confirm('Delete this participant (can NOT be undone)');"/>
 				</row>
 			</rows>

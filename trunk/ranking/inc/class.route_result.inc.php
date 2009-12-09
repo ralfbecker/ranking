@@ -55,7 +55,9 @@ class route_result extends so_sql
 	);
 	var $charset,$source_charset;
 
-	var $athlete_join = 'LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations USING(fed_id)';
+	//var $athlete_join = 'LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations USING(fed_id)';
+	const ATHLETE_JOIN = ' LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations ON a2f.fed_id=Federations.fed_id';
+	const ACL_FED_JOIN = ' LEFT JOIN Athlete2Fed a2acl_f ON Personen.PerId=a2acl_f.PerId AND a2acl_f.a2f_end=-1 LEFT JOIN Federations acl_fed ON a2acl_f.fed_id=acl_fed.fed_id';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
@@ -125,9 +127,14 @@ class route_result extends so_sql
 
 		if (!$only_keys && !$join || $route_order < 0)
 		{
-			$join = $this->athlete_join;
-			$extra_cols = array_merge($extra_cols,array('vorname','nachname','nation','geb_date','verband','ort','plz'));
+			$join = self::ATHLETE_JOIN;
+			$extra_cols = array_merge($extra_cols,array('vorname','nachname','Federations.nation AS nation','geb_date','Federations.verband AS verband','ort','plz',));
 
+			//if ($comp_nation == 'SUI')	// ToDo pass nation, so we dont need to do this join for other federations than SAC
+			{
+				$join .= self::ACL_FED_JOIN;
+				$extra_cols[] = 'acl_fed.verband AS acl_fed';
+			}
 			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
 			if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
 			{
@@ -257,10 +264,9 @@ class route_result extends so_sql
 				return $rows;
 			}
 		}
-		if ($discipline == 'speed')
-		{
-			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// otherwise wildcards loose their id
-		}
+		// otherwise wildcards or not matching LEFT JOINs remove PerId
+		$extra_cols[] = $this->table_name.'.PerId AS PerId';
+
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 

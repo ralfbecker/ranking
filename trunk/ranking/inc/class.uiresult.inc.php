@@ -443,7 +443,7 @@ class uiresult extends boresult
 			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
 		}
 		$comp = $this->comp->read($query['comp']);
-		if ($query['ranking'] && strstr($query['template'],'startlist') &&
+		if (($query['ranking'] & 3) && strstr($query['template'],'startlist') &&
 			($cat = $this->cats->read($query['cat'])))
 		{
 			$stand = $comp['datum'];
@@ -455,6 +455,7 @@ class uiresult extends boresult
 				$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$last_cup);
 			}
 		}
+		$need_start_number = false;
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
@@ -512,7 +513,13 @@ class uiresult extends boresult
 
 			// shorten DAV or SAC Sektion
 			$rows[$k]['verband'] = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /','',$row['verband']);
+
+			if (!$need_start_number && $row['start_number']) $need_start_number = true;
 		}
+		// disable print-only start-number
+		$rows['no_printnumber'] = !$need_start_number;
+		$rows['no_start_number'] = !$need_start_number && $query['route_status'] == STATUS_RESULT_OFFICIAL;
+
 		// report the set-values at time of display back to index() for calling boresult::save_result
 		$query_in['return'] = $rows['set'];
 
@@ -543,19 +550,24 @@ class uiresult extends boresult
 		switch((string)$comp['nation'])
 		{
 			case '':	// international
-				$rows['fed_col'] = 'nation';
-				$rows['fed_label'] = 'Nation';
+				$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 				break;
 			case 'GER':
-				$rows['fed_col'] = 'verband';
 				$rows['fed_label'] = 'Sektion';
+				$rows['no_ort'] = $rows['no_nation'] = $rows['no_acl_fed'] = true;
 				break;
 			case 'SUI':
 			default:
-				$rows['fed_col'] = 'ort';
-				$rows['fed_col2'] = 'plz';
-				$rows['fed_label'] = 'City';
+				$rows['fed_label'] = 'Sektion';
+				$rows['acl_fed_label'] = 'Regionalzentrum';
+				$rows['no_nation'] = $rows['no_PerId'] = true;
 				break;
+		}
+		// jury list --> switch extra columns on and all federation columns off
+		$rows['no_jury_result'] = $rows['no_remark'] = $query['ranking'] != 4;
+		if ($query['ranking'] == 4)
+		{
+			$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 		}
 		return $total;
 	}
@@ -749,7 +761,9 @@ class uiresult extends boresult
 			'eliminated_r' => $this->eliminated_labels,
 			'ranking' => array(
 				1 => 'display ranking',
-			) + ($comp['serie'] ? array(2 => 'display cup') : array()),
+			) + ($comp['serie'] ? array(2 => 'display cup') : array()) + array(
+				4 => 'show jurylist',
+			),
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
 
