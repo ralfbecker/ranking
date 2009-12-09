@@ -1059,3 +1059,21 @@ function ranking_upgrade1_5_007()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.001';
 }
 
+/**
+ * Add column to store starlist creation modus
+ *
+ * ALTER TABLE `Routes` ADD `slist_order` TINYINT( 4 ) NULL
+ *
+ * @return string
+ */
+function ranking_upgrade1_7_001()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','slist_order',array(
+		'type' => 'int',
+		'precision' => '1',
+		'comment' => 'mode of startlist creation'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.002';
+}
+
