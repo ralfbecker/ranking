@@ -470,7 +470,8 @@ class uiregistration extends boranking
 					$readonlys['download'] = $readonlys[$download] = $tmpl->sitemgr && !$starter['platz'] && $starter['pkt'] < 64;
 				}
 				// new nation and data for the previous nation ==> write that data
-				$starter_nat_fed = !$comp['nation'] || $starter['nation'] != $comp['nation'] || !$starter['fed_parent'] ?
+				$starter_nat_fed = !$comp['nation'] || $starter['nation'] != $comp['nation'] || 
+					!$starter['fed_parent'] && !$starter['acl_fed_id'] ?	// only use nation, if no RGZ set!
 					$starter['nation'] : ($starter['acl_fed_id'] ? $starter['acl_fed_id'] : $starter['fed_parent']);
 				if ($nat != $starter_nat_fed)
 				{
