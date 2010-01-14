@@ -145,7 +145,7 @@ class uiathletes extends boranking
 			{
 				$msg = lang('Athlete is suspended !!!');
 			}
-			else
+			elseif (!$view)
 			{
 				$msg = lang('Please use ONLY a first capital letter for names, do NOT capitalise the whole word!');
 			}
@@ -347,6 +347,16 @@ class uiathletes extends boranking
 			'referer' => $content['referer'],
 			'merge_to' => $content['merge_to'],
 		);
+		switch($content['license_nation'])
+		{
+			case 'SUI':
+				$content['license_msg'] = 'SUI License message :-)';
+				break;
+				
+			default:
+				$content['license_msg'] = lang('You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue');
+				
+		}
 		$content['acl_fed_id'] = array('fed_id' => $this->athlete->data['acl_fed_id']);
 		$sel_options = array(
 			'nation' => $nations,
@@ -402,6 +412,11 @@ class uiathletes extends boranking
 			if ($content['nation'] != 'SUI' || !in_array('SUI',$this->athlete_rights))
 			{
 				$readonlys['acl_fed_id[fed_id]'] = !$this->is_admin;	// dont allow non-admins to set acl_fed_id for nations other then SUI
+			}
+			// forbid SUI RGZs to change Sektion
+			if ($content['nation'] == 'SUI' && !in_array('SUI',$this->athlete_rights) && !$this->is_admin)
+			{
+				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
 			}
 		}
 		if ($js)
