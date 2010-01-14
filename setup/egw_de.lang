@@ -321,7 +321,6 @@ picture attached	ranking	de	Bild angehangen
 picture resized to %1 pixel	ranking	de	Bild auf %1 Pixel verkleinert
 place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
-please do not capitalise all words and names!	ranking	de	Bitte Worte und Namen NICHT KOMPLETT mit großen Buchstaben schreiben!
 please use only a first capital letter for names, do not capitalise the whole word!	ranking	de	Bitte NUR einen ersten Großbuchstaben verwenden, NICHT das ganze Wort großschreiben!
 plus	ranking	de	plus
 pointalocation	ranking	de	Punkteverteilung
@@ -490,7 +489,7 @@ you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizen
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
-you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden! Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (Sie können einge für den öffentlichen Zugrif gesperrt werden). Fortfahren
+you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden!  Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (einige können für den öffentlichen Zugriff gesperrt werden). Fortfahren
 you need to select a file first!	ranking	de	Sie müssen zuerst eine Datei auswählen!
 you need to select an other athlete first!	ranking	de	Sie müssen zuerst einen anderen Athleten auswählen!
 you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!

@@ -148,7 +148,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.5.002">
+	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.7.001">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -174,7 +174,7 @@
 						<menulist>
 							<menupopup id="license"/>
 						</menulist>
-						<button id="apply_license" label="Apply for" onclick="return confirm('You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue');" statustext="Applies for the license and downloads the necessary form to mail to the office"/>
+						<button id="apply_license" label="Apply for" onclick="return confirm('$cont[license_msg]');" statustext="Applies for the license and downloads the necessary form to mail to the office"/>
 					</hbox>
 				</row>
 				<row class="row">
@@ -200,7 +200,7 @@
 					</menulist>
 				</row>
 				<row>
-					<tabbox span="all">
+					<tabbox span="all" id="contact|profile|freetext|other|pictures|results">
 						<tabs>
 							<tab label="Contact" statustext="telephone, email, homepage, city, ..."/>
 							<tab label="Profile" statustext="Weight, size, hobbies, ..."/>
