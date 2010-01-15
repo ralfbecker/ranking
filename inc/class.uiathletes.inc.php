@@ -350,7 +350,7 @@ class uiathletes extends boranking
 		switch($content['license_nation'])
 		{
 			case 'SUI':
-				$content['license_msg'] = 'SUI License message :-)';
+				$content['license_msg'] = 'Wir haben die Lizenzanfrage für diese/n Athleten/in erhalten. Deinem Regionalzentrum wird Ende Saison eine Rechnung über den Gesamtbetrag der Lizenzkosten zugestellt.\nDie Lizenzen werden euch vor dem ersten Wettkampf und danach nach Bedarf zugeschickt.\n\nFortfahren?\n\nNous avons bien reçu la demande de licence pour cet/te athlète, ton centre régional recevra une facture du coût total des licences à la fin de la saison.\nLes licences vous seront envoyées avant la première compétition et ensuite selon demande.\n\nContinuer';
 				break;
 				
 			default:
