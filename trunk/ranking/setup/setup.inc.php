@@ -12,7 +12,7 @@
  */
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '1.7.002';
+$setup_info['ranking']['version']   = '1.7.003';
 $setup_info['ranking']['app_order'] = 1;
 $setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses');
 $setup_info['mydms']['only_db']     = array('mysql','postgres');
@@ -51,6 +51,9 @@ $setup_info['ranking']['hooks']['search_link']  = 'ranking.ranking_admin_prefs_s
 $setup_info['ranking']['hooks'][] = 'config';
 $setup_info['ranking']['hooks'][] = 'config_validate';
 
+// calendar integration
+$setup_info['ranking']['hooks']['calendar_search_union']  = 'ranking_calendar_integration::calendar_search_union';
+
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
 	 'appname' => 'phpgwapi',
@@ -60,6 +63,7 @@ $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
 	'versions' => Array('1.3','1.4','1.5','1.6','1.7')
 );
+
 
 
 

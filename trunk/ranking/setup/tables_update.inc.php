@@ -1077,3 +1077,33 @@ function ranking_upgrade1_7_001()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.002';
 }
 
+/**
+ * Add cat_id, modified and modifier colums to Wettkaempfe table
+ * 
+ * ALTER TABLE `Wettkaempfe` ADD `cat_id` INTEGER
+ * ALTER TABLE `Wettkaempfe` ADD `modified` TIMESTAMP NOT NULL
+ * ALTER TABLE `Wettkaempfe` ADD `modifier` INTEGER
+ * 
+ * @return string
+ */
+function ranking_upgrade1_7_002()
+{
+	$GLOBALS['egw_setup']->oProc->m_odb->query_log = '/tmp/query.log';
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','cat_id',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','modified',array(
+		'type' => 'timestamp',
+		'nullable' => False,
+		'default' => 'current_timestamp'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','modifier',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+	$GLOBALS['egw_setup']->oProc->m_odb->query_log = false;
+	
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.003';
+}
+

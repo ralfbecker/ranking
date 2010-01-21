@@ -42,7 +42,10 @@ $phpgw_baseline = array(
 			'discipline' => array('type' => 'varchar','precision' => '8'),
 			'prequal_extra' => array('type' => 'varchar','precision' => '255'),
 			'quota_extra' => array('type' => 'varchar','precision' => '255'),
-			'no_complimentary' => array('type' => 'bool')
+			'no_complimentary' => array('type' => 'bool'),
+			'cat_id' => array('type' => 'int','precision' => '4'),
+			'modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
+			'modifier' => array('type' => 'int','precision' => '4')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),
