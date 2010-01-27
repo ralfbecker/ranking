@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -84,6 +84,7 @@ class uicompetitions extends boranking
 			$view = $content['view'] && !($content['edit'] && $this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT));
 
 			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
+			if (!$content['cat_id']) $content['cat_id'] = ranking_so::cat_rkey2id($content['nation']);
 
 			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] &&
 				$this->cup->read(array('SerId' => $content['serie'])))
@@ -163,26 +164,30 @@ class uicompetitions extends boranking
 							}
 						}
 					}
-					if ($content['save']) $content['cancel'] = true;	// leave dialog now
+					if ($content['save'] || $content['apply'])
+					{
+						$link = egw::link($content['referer'],array(
+							'msg' => $msg,
+						));
+						$js = "window.opener.location='$link';";
+					}
 				}
 			}
-			if ($content['cancel'])
+			if ($content['delete'])
 			{
-				$tmpl->location(array('menuaction'=>'ranking.uicompetitions.index'));
-			}
-			if ($content['delete'] && $this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
-			{
-				$this->index(array(
-					'nm' => array(
-						'rows' => array(
-							'delete' => array(
-								$this->comp->data['WetId'] => 'delete'
-							)
-						)
-					)
+				$link = egw::link('/index.php',array(
+					'menuaction' => 'ranking.uicompetitions.index',
+					'delete' => $this->comp->data['WetId'],
 				));
-				return;
+				$js = "window.opener.location='$link';";
 			}
+			if ($content['save'] || $content['delete'])
+			{
+				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
+				common::egw_exit();
+			}
+			if (!empty($js)) $GLOBALS['egw']->js->set_onload($js);
+
 			if ($content['remove'] && $this->acl_check($content['nation'],EGW_ACL_EDIT))
 			{
 				list($type) = each($content['remove']);
@@ -192,10 +197,11 @@ class uicompetitions extends boranking
 					lang('Error: removing the %1 !!!',$this->attachment_type[$type]);
 			}
 		}
-		$tabs = 'general|ranking|files|startlist|judges';
 		$content = $this->comp->data + array(
-			'msg' => $msg,
-			$tabs => $content[$tabs],
+			'msg'  => $msg,
+			'tabs' => $content['tabs'],
+			'referer' => $content['referer'] ? $content['referer'] : 
+				common::get_referer('/index.php?menuaction=ranking.uicompetition.index'),
 		);
 		foreach((array) $this->comp->attachments(null,false,false) as $type => $linkdata)
 		{
@@ -208,7 +214,7 @@ class uicompetitions extends boranking
 		}
 		$content['quota_extra'][] = array('fed' => '');		// one extra line to add a new fed or cat value
 		$content['prequal_extra'][] = array('cat' => '');
-
+		
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
@@ -226,6 +232,10 @@ class uicompetitions extends boranking
 			'host_nation' => $this->athlete->distinct_list('nation'),
 			'discipline' => $this->disciplines,
 		);
+		// select a category parent fitting to the nation
+		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
+		$content['cat_parent_name'] = ($content['nation']? $content['nation'] : 'Int.').' '.lang('Competitions');
+
 		$readonlys = array(
 			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
 			'nation' => !!$this->only_nation_edit,
@@ -245,12 +255,13 @@ class uicompetitions extends boranking
 			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] = true;
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
-		$tmpl->read('ranking.comp.edit');
+
 		$tmpl->exec('ranking.uicompetitions.edit',$content,
 			$sel_options,$readonlys,array(
 				'comp_data' => $this->comp->data,
 				'view' => $view,
-			));
+				'referer' => $content['referer'],
+			),2);
 	}
 
 	/**
@@ -272,6 +283,19 @@ class uicompetitions extends boranking
 			}
 		}
 		$nation = $query['col_filter']['nation'];
+		
+		if ($query['cat_id'])
+		{
+			$query['col_filter']['cat_id'] = $GLOBALS['egw']->categories->return_all_children($query['cat_id']);
+		}
+		elseif ($query['cat_id'] === '0')
+		{
+			$query['col_filter']['cat_id'] = null;
+		}
+		else
+		{
+			unset($query['col_filter']['cat_id']);
+		}
 
 		foreach((array) $query['col_filter'] as $col => $val)
 		{
@@ -300,7 +324,7 @@ class uicompetitions extends boranking
 		}
 		// set the cups based on the selected nation
 		$rows['sel_options']['serie'] = $cups;
-
+		
 		if ($this->debug)
 		{
 			echo "<p>uicompetitions::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
@@ -321,49 +345,29 @@ class uicompetitions extends boranking
 
 		$content = $content['nm']['rows'];
 
-		if ($content['view'] || $content['edit'] || $content['delete'])
+		if ($content['delete'] || $_GET['delete'] > 0)
 		{
-			foreach(array('view','edit','delete') as $action)
+			if ($content['delete'])
 			{
-				if ($content[$action])
-				{
-					list($id) = each($content[$action]);
-					break;
-				}
+				list($id) = each($content['delete']);
 			}
-			if ($this->debug) echo "<p>ranking::competitions() action='$action', id='$id'</p>\n";
-			switch($action)
+			elseif($_GET['delete'] > 0)
 			{
-				case 'view':
-					$tmpl->location(array(
-						'menuaction' => 'ranking.uicompetitions.view',
-						'WetId'      => $id,
-					));
-					break;
-
-				case 'edit':
-					$tmpl->location(array(
-						'menuaction' => 'ranking.uicompetitions.edit',
-						'WetId'      => $id,
-					));
-					break;
-
-				case 'delete':
-					if (!$this->is_admin && $this->comp->read(array('WetId' => $id)) &&
-						!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
-					{
-						$msg = lang('Permission denied !!!');
-					}
-					elseif ($this->comp->has_results($id))
-					{
-						$msg = lang('You need to delete the results first !!!');
-					}
-					else
-					{
-						$msg = $this->comp->delete(array('WetId' => $id)) ? lang('%1 deleted',lang('Competition')) :
-							lang('Error: deleting %1 !!!',lang('Competition'));
-					}
-					break;
+				$id = (int)$_GET['delete'];
+			}
+			if (!$this->is_admin && $this->comp->read(array('WetId' => $id)) &&
+				!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
+			{
+				$msg = lang('Permission denied !!!');
+			}
+			elseif ($this->comp->has_results($id))
+			{
+				$msg = lang('You need to delete the results first !!!');
+			}
+			else
+			{
+				$msg = $this->comp->delete(array('WetId' => $id)) ? lang('%1 deleted',lang('Competition')) :
+					lang('Error: deleting %1 !!!',lang('Competition'));
 			}
 		}
 		$content = array();
@@ -376,7 +380,6 @@ class uicompetitions extends boranking
 				'get_rows'       =>	'ranking.uicompetitions.get_rows',
 				'no_filter'      => True,// I  disable the 1. filter
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
-				'no_cat'         => True,// I  disable the cat-selectbox
 				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
 				'order'          =>	'datum',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
@@ -385,14 +388,20 @@ class uicompetitions extends boranking
 			if (count($this->read_rights) == 1)
 			{
 				$content['nm']['col_filter']['nation'] = $this->read_rights[0];
+				$content['nm']['cat_parent'] = ranking_so::cat_rkey2id($this->read_rights[0]);
+			}
+			else
+			{
+				$content['nm']['cat_parent'] = ranking_so::cat_rkey2id('parent');
 			}
 		}
-		$content['msg'] = $msg;
+		$content['msg'] = $msg ? $msg : $_GET['msg'];
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 		$tmpl->exec('ranking.uicompetitions.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),
+			'cat_id' => array(lang('None')),
 		));
 	}
 }

@@ -7,11 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * competition object
@@ -40,18 +38,25 @@ class competition extends so_sql
 	);
 	var $vfs_pdf_dir = '';
 	var $result_table = 'Results';
+	
+	/**
+	 * Timestaps that need to be adjusted to user-time on reading or saving
+	 *
+	 * @var array
+	 */
+	var $timestamps = array('modified');
 
 	/**
 	 * constructor of the competition class
 	 */
-	function competition($source_charset='',$db=null,$vfs_pdf_dir='')
+	function __construct($source_charset='',$db=null,$vfs_pdf_dir='')
 	{
 		//$this->debug = 1;
-		$this->so_sql('ranking','Wettkaempfe',$db);	// call constructor of extended class
+		parent::__construct('ranking','Wettkaempfe',$db);	// call constructor of extended class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = translation::charset();
 
 		foreach(array(
 				'cats'  => 'category',
@@ -93,13 +98,13 @@ class competition extends so_sql
 	 */
 	function db2data($data=0)
 	{
-		if (!is_array($data))
+		if (($intern = !is_array($data)))
 		{
 			$data =& $this->data;
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
+			$data = translation::convert($data,$this->source_charset);
 		}
 		if ($data['name'])
 		{
@@ -139,7 +144,7 @@ class competition extends so_sql
 				$data[$name] = $extra;
 			}
 		}
-		return $data;
+		return parent::db2data($intern ? null : $data);	// important to use null, if $intern!
 	}
 
 	/**
@@ -149,7 +154,7 @@ class competition extends so_sql
 	 */
 	function data2db($data=0)
 	{
-		if (!is_array($data))
+		if (($intern = !is_array($data)))
 		{
 			$data =& $this->data;
 		}
@@ -186,9 +191,9 @@ class competition extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = translation::convert($data,$this->charset,$this->source_charset);
 		}
-		return $data;
+		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
 	}
 
 	/**
@@ -674,5 +679,24 @@ class competition extends so_sql
 		egw_vfs::$is_root = false;
 
 		return $ok;
+	}
+
+	/**
+	 * saves the content of data to the db
+	 * 
+	 * Reimplemented to automatic update modifier and modified time
+	 *
+	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function save($keys=null,$extra_where=null)
+	{
+		if (is_array($keys) && count($keys)) $this->data_merge($keys);
+		
+		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
+		$this->data['modified'] = $this->now;
+		
+		return parent::save(null,$extra_where);
 	}
 }

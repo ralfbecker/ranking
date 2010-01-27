@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -19,7 +19,7 @@
  *
  * These sub-objects implement DB access to the various tables of the rang database.
  */
-class soranking
+class ranking_so
 {
 	var $debug;
 	/**
@@ -82,7 +82,7 @@ class soranking
 	/**
 	 * sub-objects, which get automatic instanciated by __get()
 	 *
-	 * @var unknown_type
+	 * @var array
 	 */
 	static $sub_classes = array(
 		'pkte'    => 'pktsystem',
@@ -120,16 +120,16 @@ class soranking
 	{
 		if (is_null($config))
 		{
-			$c =& CreateObject('phpgwapi.config','ranking');
-			$c->read_repository();
-			$config = $c->config_data;
-			unset($c);
+			$config = config::read('ranking');
 		}
 		if ($config['ranking_db_host'] || $config['ranking_db_name'])
 		{
+			$defaults = !isset($GLOBALS['egw_setup']) ? $GLOBALS['egw_info']['server'] :
+				$GLOBALS['egw_domain'][$GLOBALS['egw_setup']->ConfigDomain];
+
 			foreach(array('host','port','name','user','pass') as $var)
 			{
-				if (!$config['ranking_db_'.$var]) $config['ranking_db_'.$var] = $GLOBALS['egw_info']['server']['db_'.$var];
+				if (!$config['ranking_db_'.$var]) $config['ranking_db_'.$var] = $defaults['db_'.$var];
 			}
 			$db = new egw_db();
 			$db->connect($config['ranking_db_name'],$config['ranking_db_host'],
@@ -143,6 +143,68 @@ class soranking
 			$db = $GLOBALS['egw']->db;
 		}
 		return $db;
+	}
+	
+	/**
+	 * Name of parent cat of all comptition cats
+	 */
+	const PARENT_CAT_NAME = 'Competitions';
+
+	/**
+	 * Get category by it's rkey (symbolic shortcut)
+	 * 
+	 * @param string $rkey
+	 * @param string $name='' name to create category if not found
+	 * @param int $parent=null parent for new categories, if not $global_parent
+	 * @return int id or null if not found AND empty($name)
+	 */
+	public static function cat_rkey2id($rkey,$name='',$parent=null)
+	{
+		static $cats,$global_parent,$rkey2id;
+		if (is_null($cats))
+		{
+			$cats = new categories(-1,'phpgw');
+			$global_parent = $cats->name2id(self::PARENT_CAT_NAME);
+			if (!$global_parent)
+			{
+				$global_parent = $cats->add(array(
+					'parent'  => 0,
+					'name'    => self::PARENT_CAT_NAME,
+					'description' => 'Do NOT change the name!',
+				));
+			}
+			$rkey2id =& egw_cache::getSession(__CLASS__,'rkey2id',create_function('','return array();'));
+		}
+		if ($rkey === 'parent')
+		{
+			return $global_parent;
+		}
+		if ($rkey === 'NULL') $rkey = 'int';
+
+		if (!isset($rkey2id[$rkey]))
+		{
+			foreach($cats->return_sorted_array($start=0,$limit=false,$query='',$sort='ASC',$order='cat_name',$globals=true, $global_parent) as $cat)
+			{
+				if (!is_array($cat['data'])) $cat['data'] = unserialize($cat['data']);
+				if (!$cat['data']) $cat['data'] = array();
+				
+				if (isset($cat['data']['rkey']) && $cat['data']['rkey'] == $rkey)
+				{
+					$rkey2id[$rkey] = $cat['id'];
+				}
+			}
+			// create not found cat, if name is given
+			if (!isset($rkey2id[$rkey]) && !empty($name))
+			{
+				$rkey2id[$rkey] = $cats->add(array(
+					'parent'  => $parent > 0 ? $parent : $global_parent,
+					'name'    => $name,
+					'data'    => serialize(array('rkey' => $rkey)),
+				));
+			}
+		}
+		//echo "<p>".__METHOD__."('$rkey','$name',$parent) = ".array2string($rkey2id[$rkey])."</p>\n";
+		return $rkey2id[$rkey];
 	}
 
 	/**
