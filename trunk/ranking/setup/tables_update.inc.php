@@ -1084,10 +1084,22 @@ function ranking_upgrade1_7_001()
  * ALTER TABLE `Wettkaempfe` ADD `modified` TIMESTAMP NOT NULL
  * ALTER TABLE `Wettkaempfe` ADD `modifier` INTEGER
  * 
+ * @param egw_db $db=null
  * @return string
  */
-function ranking_upgrade1_7_002()
+function ranking_upgrade1_7_002(egw_db $db=null)
 {
+	if (is_null($db))
+	{
+		$rang_db = ranking_so::get_rang_db();
+		// update separate rang db too
+		if ($rang_db !== $GLOBALS['egw']->db) ranking_upgrade1_7_002($rang_db);
+	}
+	else
+	{
+		unset($GLOBALS['egw_setup']->oProc->m_odb);
+		$GLOBALS['egw_setup']->oProc->m_odb = ranking_so::get_rang_db();
+	}
 	$GLOBALS['egw_setup']->oProc->m_odb->query_log = '/tmp/query.log';
 	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','cat_id',array(
 		'type' => 'int',
@@ -1102,8 +1114,63 @@ function ranking_upgrade1_7_002()
 		'type' => 'int',
 		'precision' => '4'
 	));
-	$GLOBALS['egw_setup']->oProc->m_odb->query_log = false;
 	
+	$nations = array(
+		'int' => array(
+			'int_adult'   => '^[0-9]{2,2}_(WC|WM|EM|EC|LC|TR|AM|AC|SM|LM|NAC){1,1}.*',
+			'int_youth'   => '^[0-9]{2,2}(EYC|EYS|_Y|_JWM|_NAC){1,1}.*',
+			'int_masters' => '^[0-9]{2,2}_[^WERASL]{1}.*',
+		),
+		'GER' => array(
+			'ger_boulder' => '^[0-9]{2,2}_B.*',
+			'ger_lead'    => '^[0-9]{2,2}_D.*',
+			'ger_speed'   => '^[0-9]{2,2}_S.*',
+			'ger_youth'   => '^[0-9]{2,2}[_J]{1,1}[^WL]+.*',
+			'ger_state'   => '^[0-9]{2,2}[_J]*LM[0-9_]{1,1}.*',
+		),
+		'SUI' => array(
+			'sui_adult' => '^[0-9]{2,2}_[^RY].*',
+			'sui_youth' => '^[0-9]{2,2}_[Y].*',
+			'sui_local' => '^[0-9]{2,2}_RG_.*',
+		),
+		'XYZ' => array(
+			'xyz' => '^.*',
+		),
+	);
+	foreach($nations as $nation => $cats)
+	{
+		$nat_parent = ranking_so::cat_rkey2id($nation,$nation.' competitions');
+		
+		foreach($GLOBALS['egw_setup']->oProc->m_odb->select('Wettkaempfe','WetId,rkey,gruppen',array(
+			'nation' => $nation != 'int' ? $nation : null,
+		),__LINE__,__FILE__,false,'','ranking') as $row)
+		{
+			unset($cat_id);
+			foreach($cats as $rkey => $pattern)
+			{
+				if (preg_match('/'.$pattern.'/i',$row['rkey']))
+				{
+					$cat_id = ranking_so::cat_rkey2id($rkey,str_replace('_',' ',$rkey),$nat_parent);
+					break;
+				}
+			}
+			if (!$cat_id)
+			{
+				$cat_id = $nat_parent;
+				$rkey = $nation.' competitions';
+			}
+			echo "<p>$nation: $row[rkey] ($row[WetId]) --> $rkey ($cat_id)</p>\n";
+			$GLOBALS['egw_setup']->oProc->m_odb->query('UPDATE Wettkaempfe SET cat_id='.(int)$cat_id.' WHERE WetId='.(int)$row['WetId'],__LINE__,__FILE__);
+		}
+	}
+	
+	$GLOBALS['egw_setup']->oProc->m_odb->query_log = false;
+
+	if (!is_null($db))
+	{
+		unset($GLOBALS['egw_setup']->oProc->m_odb);
+		$GLOBALS['egw_setup']->oProc->m_odb = $GLOBALS['egw']->db;
+	}
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.003';
 }
 

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -106,14 +106,13 @@ class athlete extends so_sql
 	/**
 	 * constructor of the athlete class
 	 */
-	function athlete($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null)
 	{
 		if (is_null($db))
 		{
-			require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
-			$db = soranking::get_rang_db();
+			$db = ranking_so::get_rang_db();
 		}
-		$this->so_sql('ranking',self::ATHLETE_TABLE,$db);	// call constructor of derived class
+		parent::__construct('ranking',self::ATHLETE_TABLE,$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 

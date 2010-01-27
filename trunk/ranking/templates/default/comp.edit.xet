@@ -141,13 +141,13 @@
 						</columns>
 						<rows>
 							<row>
-								<menulist>
+								<menulist class="selectboxFullWidth">
 									<menupopup options="Federation" id="${row}[fed]"/>
 								</menulist>
-								<menulist>
+								<menulist class="selectboxFullWidth">
 									<menupopup options="Category" id="${row}[cat]"/>
 								</menulist>
-								<menulist>
+								<menulist class="selectboxFullWidth">
 									<menupopup type="select-number" options="None,1,10" id="${row}[num]"/>
 								</menulist>
 							</row>
@@ -212,7 +212,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit" template="" lang="" group="0" version="1.0.0.004">
+	<template id="ranking.comp.edit" template="" lang="" group="0" version="1.7.001">
 		<grid width="100%\0">
 			<columns>
 				<column width="15%"/>
@@ -236,6 +236,13 @@
 					</menulist>
 				</row>
 				<row class="row">
+					<description value="Category"/>
+					<menulist span="3">
+						<menupopup type="select-cat" options="$cont[cat_parent_name],,,,$cont[cat_parent]" id="cat_id"/>
+					</menulist>
+					<description class="gray" value="WetId" no_lang="1" align="right" id="WetId"/>
+				</row>
+				<row class="row">
 					<description value="Name" options=",,,name"/>
 					<textbox size="100" maxlength="100" id="name" statustext="full competition name (must not be empty)" span="all" needed="1"/>
 				</row>
@@ -246,7 +253,7 @@
 					<textbox size="8" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " span="all"/>
 				</row>
 				<row>
-					<tabbox span="all" id="general|ranking|files|startlist|judges">
+					<tabbox span="all" id="tabs">
 						<tabs>
 							<tab label="General" statustext=""/>
 							<tab label="Ranking" statustext=""/>
@@ -268,7 +275,7 @@
 						<button id="edit" label="Edit" statustext="Edit this competition"/>
 						<button label="Save" id="save" statustext="saves the changes made"/>
 						<button label="Apply" id="apply" statustext="saves the changes made"/>
-						<button label="Cancel" id="cancel" statustext="aborts without saving changes"/>
+						<buttononly label="Cancel" id="cancel" statustext="aborts without saving changes" onclick="window.close();"/>
 					</hbox>
 					<description onclick="return confirm('Delete this competition');"/>
 					<button label="Delete" id="delete" statustext="Delete this competition" align="right" onclick="return confirm('Delete this competition');"/>

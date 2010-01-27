@@ -36,28 +36,27 @@ class ranking_calendar_integration
 	{
 		$config = config::read(self::APP_NAME);
 		$db_name = $config['ranking_db_name'];
-		
+
 		$app_cols = array(
 			'cal_id' => $GLOBALS['egw']->db->concat("'".self::APP_NAME."'",'WetId'),
 			'cal_title' => 'dru_bez',
 			'cal_description' => 'name',
 			'cal_start' => 'UNIX_TIMESTAMP(datum)',
 			'cal_end' => "UNIX_TIMESTAMP(ADDDATE(datum,CASE WHEN INSTR(gruppen,'@') > 0 AND SUBSTR(gruppen,INSTR(gruppen,'@')+1) > 0 THEN SUBSTR(gruppen,INSTR(gruppen,'@')+1)+1 ELSE 3 END))-1",
-			'cal_owner' => $GLOBALS['egw_info']['user']['account_id'],
+			//'cal_owner' => $GLOBALS['egw_info']['user']['account_id'],
 			'cal_non_blocking' => 1,
 			'cal_public' => 1,
-/*			'cal_uid' => 'info_uid',
-			'cal_etag' => 'info_datemodified',
-			'cal_location' => 'info_location',
-			'cal_category' => 'info_cat',
+			'cal_uid' => $GLOBALS['egw']->db->concat("'".self::APP_NAME.":comp-'",'WetId',"'-".$GLOBALS['egw_info']['server']['install_id']."'"),
+			'cal_etag' => 'modified',
+			//'cal_location' => 'info_location',
+			'cal_category' => 'cat_id',
 			'tz_id' => calendar_timezones::tz2id($GLOBALS['egw_info']['server']['server_timezone']),
-			'cal_modified' => 'info_datemodified',
-			'cal_modifier' => 'info_modifier',
+			'cal_modified' => 'modified',
+			'cal_modifier' => 'modifier',
 			'cal_recurrence' => 0,
-			'cal_priority' => "CASE info_priority WHEN 3 THEN 3 ELSE info_priority+1 END",
-			'participants' => "CASE info_responsible WHEN '0' THEN info_owner ELSE info_responsible END",
-			'icons' => $GLOBALS['egw']->db->concat("'".self::APP_NAME.":'",'info_type'),
-*/
+			//'cal_priority' => "CASE info_priority WHEN 3 THEN 3 ELSE info_priority+1 END",
+			//'participants' => "CASE info_responsible WHEN '0' THEN info_owner ELSE info_responsible END",
+			//'icons' => $GLOBALS['egw']->db->concat("'".self::APP_NAME.":'",'info_type'),
 		);
 		$where = array();
 
@@ -103,6 +102,7 @@ class ranking_calendar_integration
 			'edit_link' => array(
 				'edit' => array('menuaction' => 'ranking.uicompetitions.edit'),
 				'edit_id' => 'WetId',
+				'edit_popup' => '900x400',
 			),
 			'is_private' => false,	// all public
 			'icons' => false,	// no default application icon

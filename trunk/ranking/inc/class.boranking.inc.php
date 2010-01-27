@@ -11,8 +11,6 @@
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.soranking.inc.php');
-
 /**
  * Editing athletes data is mapped to EGW_ACL_ADD
  */
@@ -20,7 +18,10 @@ define('EGW_ACL_ATHLETE',EGW_ACL_ADD);
 define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
 define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
 
-class boranking extends soranking
+/**
+ * ranking business object/logic
+ */
+class boranking extends ranking_so
 {
 	var $split_by_places = array(
 		'no' => 'No never',
