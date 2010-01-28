@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%\0">
 			<columns>
 				<column/>
-				<column width="50%"/>
+				<column width="40%"/>
+				<column/>
+				<column/>
 				<column/>
 				<column/>
 				<column/>
@@ -18,7 +20,9 @@
 					<nextmatch-sortheader label="Name" id="name"/>
 					<nextmatch-filterheader options="Nation..." align="center" id="nation" no_lang="1"/>
 					<nextmatch-filterheader options="Cup..." id="serie" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="Category" id="cat_id"/>
 					<nextmatch-sortheader label="Key" align="center" id="rkey"/>
+					<nextmatch-sortheader label="Last modified" id="modified"/>
 					<description value="Status" align="center"/>
 					<description value="Action" align="center"/>
 				</row>
@@ -29,15 +33,24 @@
 					<menulist>
 						<menupopup align="center" id="${row}[serie]" no_lang="1" readonly="true"/>
 					</menulist>
+					<menulist>
+						<menupopup type="select-cat" id="${row}[cat_id]" readonly="true"/>
+					</menulist>
 					<description no_lang="1" align="center" id="${row}[rkey]"/>
+					<vbox options="0,0">
+						<date-time id="${row}[modified]" readonly="true"/>
+						<menulist>
+							<menupopup type="select-account" id="${row}[modifier]" readonly="true"/>
+						</menulist>
+					</vbox>
 					<hbox>
 						<image options="@${row}[pdf][info][link]" src="${row}[pdf][info][icon]" statustext="View the attached PDF" label="@${row}[pdf][info][label]" no_lang="1"/>
 						<image options="@${row}[pdf][startlist][link]" src="${row}[pdf][startlist][icon]" statustext="View the attached PDF" label="@${row}[pdf][startlist][label]" no_lang="1"/>
 						<image options="@${row}[pdf][result][link]" src="${row}[pdf][result][icon]" statustext="View the attached PDF" label="@${row}[pdf][result][label]" no_lang="1"/>
 					</hbox>
 					<hbox align="center">
-						<button id="view[$row_cont[WetId]]" image="view" label="View" statustext="View this competition"/>
-						<button label="Edit" align="center" id="edit[$row_cont[WetId]]" image="edit" statustext="Edit this competition"/>
+						<button label="View" id="view[$row_cont[WetId]]" image="view" statustext="View this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.view&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
+						<button label="Edit" id="edit[$row_cont[WetId]]" image="edit" statustext="Edit this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
 						<button id="delete[$row_cont[WetId]]" image="delete" label="Delete" onclick="return confirm('Delete this competition');" statustext="Delete this competition"/>
 					</hbox>
 				</row>
@@ -47,7 +60,7 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
-	<template id="ranking.comp.list" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.comp.list" template="" lang="" group="0" version="1.7.001">
 		<grid width="100%">
 			<columns>
 				<column/>
