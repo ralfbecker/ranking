@@ -34,6 +34,7 @@ class ranking_calendar_integration
 	 */
 	static public function calendar_search_union(array $data)
 	{
+		//_debug_array($data);
 		$config = config::read(self::APP_NAME);
 		$db_name = $config['ranking_db_name'];
 
@@ -63,18 +64,17 @@ class ranking_calendar_integration
 		// we use startdate also for end, as enddate in infolog is a due date
 		if ($data['start']) $where[] = (int)$data['start'] . ' <= UNIX_TIMESTAMP(datum)';
 		if ($data['end']) $where[] = 'UNIX_TIMESTAMP(datum) <= '.(int)$data['end'];
+		if ($data['cat_id'] > 0) $where['cat_id'] = $GLOBALS['egw']->categories->return_all_children($data['cat_id']);
 
 		// search infolog
 		if ($data['query'])
 		{
-/*			if(!is_array($data['query']))
+			if(!is_array($data['query']))
 			{
 				$pattern = ' '.$GLOBALS['egw']->db->capabilities[egw_db::CAPABILITY_CASE_INSENSITIV_LIKE].' '.$GLOBALS['egw']->db->quote('%'.$data['query'].'%');
-				$columns = array('info_from','info_addr','info_location','info_subject');
-				// at the moment MaxDB 7.5 cant cast nor search text columns, it's suppost to change in 7.6
-				if ($GLOBALS['egw']->db->capabilities['like_on_text']) $columns[] = 'info_des';
+				$columns = array('rkey','name','dru_bez','gruppen');
 	
-				$where[] = '('.(is_numeric($query['search']) ? 'info_id='.(int)$data['query'].' OR ' : '').
+				$where[] = '('.(is_numeric($query['search']) ? 'WetId='.(int)$data['query'].' OR ' : '').
 					implode($pattern.' OR ',$columns).$pattern.') ';
 			}
 			else
@@ -86,7 +86,7 @@ class ranking_calendar_integration
 						$where[] = $app_cols[$name].' = '.$GLOBALS['egw']->db->quote($value);
 					}
 				}
-			}*/
+			}
 		}
 		return array(
 			'selects' => array(
