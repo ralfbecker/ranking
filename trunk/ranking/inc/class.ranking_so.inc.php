@@ -163,7 +163,7 @@ class ranking_so
 		static $cats,$global_parent,$rkey2id;
 		if (is_null($cats))
 		{
-			$cats = new categories(-1,'phpgw');
+			$cats = new categories(categories::GLOBAL_ACCOUNT,categories::GLOBAL_APPNAME);
 			$global_parent = $cats->name2id(self::PARENT_CAT_NAME);
 			if (!$global_parent)
 			{
