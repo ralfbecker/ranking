@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="1.7.001">
-		<grid width="100%\0">
+		<grid width="100%">
 			<columns>
 				<column/>
 				<column width="40%"/>
@@ -73,7 +73,7 @@
 					<nextmatch options="ranking.comp.list.rows" id="nm"/>
 				</row>
 				<row>
-					<button label="Add" id="nm[rows][edit][0]" statustext="add a new competition"/>
+					<button label="Add" id="nm[rows][edit][0]" statustext="Add a new competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
 				</row>
 			</rows>
 		</grid>
