@@ -21,13 +21,13 @@ class ranking_calendar_integration
 
 	/**
 	 * Return query for calendar's search union query
-	 * 
+	 *
 	 * @param array $data
 	 * @param string $data['cols'] cols query is suppost to return to match calendar query
 	 * @param int $data['start'] start-date ts in servertime
 	 * @param int $data['end'] end-date ts in servertime
 	 * @param int|array $data['users'] users for which to return data
-	 * @param int $data['cat_id'] 
+	 * @param int $data['cat_id']
 	 * @param string $data[	'filter'] filter-name: all (not rejected), accepted, unknown, tentative, rejected
 	 * @param string $data[	'query']' pattern so search for, if unset or empty all matching entries are returned (no search)
 	 * @return array values for keys 'selectes', ...
@@ -43,7 +43,7 @@ class ranking_calendar_integration
 			'cal_title' => 'dru_bez',
 			'cal_description' => 'name',
 			'cal_start' => 'UNIX_TIMESTAMP(datum)',
-			'cal_end' => "UNIX_TIMESTAMP(ADDDATE(datum,CASE WHEN INSTR(gruppen,'@') > 0 AND SUBSTR(gruppen,INSTR(gruppen,'@')+1) > 0 THEN SUBSTR(gruppen,INSTR(gruppen,'@')+1)+1 ELSE 3 END))-1",
+			'cal_end' => "UNIX_TIMESTAMP(ADDDATE(datum,CASE WHEN INSTR(gruppen,'@') > 0 AND SUBSTR(gruppen,INSTR(gruppen,'@')+1) > 0 THEN SUBSTR(gruppen,INSTR(gruppen,'@')+1) ELSE 2 END))-1",
 			//'cal_owner' => $GLOBALS['egw_info']['user']['account_id'],
 			'cal_non_blocking' => 1,
 			'cal_public' => 1,
@@ -73,7 +73,7 @@ class ranking_calendar_integration
 			{
 				$pattern = ' '.$GLOBALS['egw']->db->capabilities[egw_db::CAPABILITY_CASE_INSENSITIV_LIKE].' '.$GLOBALS['egw']->db->quote('%'.$data['query'].'%');
 				$columns = array('rkey','name','dru_bez','gruppen');
-	
+
 				$where[] = '('.(is_numeric($query['search']) ? 'WetId='.(int)$data['query'].' OR ' : '').
 					implode($pattern.' OR ',$columns).$pattern.') ';
 			}
@@ -108,12 +108,12 @@ class ranking_calendar_integration
 			'icons' => false,	// no default application icon
 		);
 	}
-	
+
 	/**
 	 * Return union cols constructed from application cols and required cols
-	 * 
+	 *
 	 * Every col not supplied in $app_cols get returned as NULL.
-	 * 
+	 *
 	 * @param array $app_cols required name => own name pairs
 	 * @param string|array $required array or comma separated column names or table.*
 	 * @param string $required_app='calendar'
@@ -155,10 +155,10 @@ class ranking_calendar_integration
 		}
 		return implode(',',$return_cols);
 	}
-	
+
 	/**
 	 * Get columns of given table, taking into account historically different column order of egw_cal table
-	 * 
+	 *
 	 * @param string $app
 	 * @param string $table
 	 * @return array of column names
