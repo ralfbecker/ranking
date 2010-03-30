@@ -66,7 +66,7 @@ function result($wettk,$grp,$rgrps,$grp_name,$no_result=True)		// Link auf Wettk
 	//echo "<p>result('$wettk->rkey','$grp',,'$grp_name','$no_result')</p>\n";
 	global $t_show_result, $t_no_result;
 
-	$grp_name = str_replace('<BR>',' ',$grp_name);
+	$grp_name = str_replace('<br />',' ',$grp_name);
 	if (isset($rgrps[0][$grp]) && $rgrps[0][$grp])
 	{
 		return '<a class="mini_link" href="'.$GLOBALS['dr_config']['resultservice'].'comp='.$wettk->rkey.'&amp;cat='.$grp.'" title="'.$t_show_result.'">'.$grp_name.'</a>';
@@ -368,7 +368,7 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 	{
 		echo '<a name="ranking">'."\n";
 
-		echo '<TABLE width="100%"><tr>'."\n";
+		echo '<table width="100%"><tr>'."\n";
 		echo "\t".'<td align="left" valign="bottom"><span class="cal_head">'.$t_ranking."</span></td>\n";
 		echo "\t".'<td width="20%" align="right">'.$dav_header."</td>\n";
 		echo "</tr></table>\n";
@@ -386,7 +386,7 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 					//echo "<p>grp_in_grps('$grp','$serie->gruppen') = ".(grp_in_grps($grp,$serie->gruppen) ? 'True' : 'False')."</p>\n";
 					if (grp_in_grps($grp,$serie->gruppen))
 					{
-						$grps[$grp] = str_replace('<BR>',' ',$gname);
+						$grps[$grp] = str_replace('<br />',' ',$gname);
 					}
 				}
 			}
@@ -423,7 +423,7 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 				}
 				$i++;
 			}
-			//echo "<br>\n";
+			//echo "<br />\n";
 			echo $do_list ? "\t\t</ul>\n\t</li>\n" : "\n\t\t</td>\n\t</tr>\n";
 		}
 		if ($cat['serien'])
@@ -446,7 +446,7 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 				{
 					if (grp_in_grps($grp,$serie->gruppen))
 					{
-						$gname = str_replace('<BR>',' ',$gname);
+						$gname = str_replace('<br />',' ',$gname);
 						if ($do_list)
 						{
 							echo (!($i & 1) ? "\t\t\t<li>" : ', ').'<a href="'.$GLOBALS['dr_config']['ranglist'].'cat='.$grp.'&amp;cup='.$rkey.'">'.
