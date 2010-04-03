@@ -352,10 +352,10 @@ class uiathletes extends boranking
 			case 'SUI':
 				$content['license_msg'] = 'Wir haben die Lizenzanfrage für diese/n Athleten/in erhalten. Deinem Regionalzentrum wird Ende Saison eine Rechnung über den Gesamtbetrag der Lizenzkosten zugestellt.\nDie Lizenzen werden euch vor dem ersten Wettkampf und danach nach Bedarf zugeschickt.\n\nFortfahren?\n\nNous avons bien reçu la demande de licence pour cet/te athlète, ton centre régional recevra une facture du coût total des licences à la fin de la saison.\nLes licences vous seront envoyées avant la première compétition et ensuite selon demande.\n\nContinuer';
 				break;
-				
+
 			default:
 				$content['license_msg'] = lang('You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue');
-				
+
 		}
 		$content['acl_fed_id'] = array('fed_id' => $this->athlete->data['acl_fed_id']);
 		$sel_options = array(
@@ -625,6 +625,7 @@ class uiathletes extends boranking
 					'regionalzentrum' => lang('Regionalzentrum'),
 					'PerId'    => lang('License'),
 					'license_status' => lang('Status'),
+					'last_comp' => lang('Last competition'),
 				);
 			}
 			if ($this->only_nation_athlete)
