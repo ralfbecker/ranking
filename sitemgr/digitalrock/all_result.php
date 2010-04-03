@@ -58,7 +58,7 @@ $res = my_query($sql="SELECT r.GrpId,r.platz,r.pkt,p.rkey,p.vorname,p.nachname,p
 		" AND r.platz > 0".
 		" ORDER BY r.GrpId,r.platz,p.nachname,p.vorname");
 
-if (strstr('all_result.php',$_SERVER['PHP_SELF'])) { // we are NOT included
+if (strstr($_SERVER['PHP_SELF'],'all_result.php')) { // we are NOT included
 ?>
 <!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
