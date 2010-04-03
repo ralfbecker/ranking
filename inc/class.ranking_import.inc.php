@@ -8,11 +8,10 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2008 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $$
+ * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 
 class ranking_import extends boresult
 {
