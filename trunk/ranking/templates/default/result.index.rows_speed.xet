@@ -108,9 +108,9 @@
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-header label="License" id="PerId" align="center"/>
 					<nextmatch-sortheader label="Start- number" id="start_order" align="center"/>
-					<nextmatch-sortheader label="Time" id="result_top_time" align="center"/>
+					<nextmatch-sortheader label="Time" id="result_time" align="center"/>
 					<description value="2. Time" align="center"/>
-					<description value="Sum" align="center"/>
+					<nextmatch-sortheader label="Sum" align="center" id="result_time"/>
 					<description value="Actions" align="center" class="noPrint"/>
 				</row>
 				<row part="footer">
