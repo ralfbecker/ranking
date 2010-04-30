@@ -2,8 +2,8 @@
 
 /* $Id$ */
 
-$extra_header[2010] = '<font color=red>provisional</font>';
 $extra_header[2011] = '<font color=red>provisional</font>';
+$extra_header[2012] = '<font color=red>provisional</font>';
 
 // IFSC specific
 $results_since  = 1991;
@@ -52,30 +52,30 @@ $mgroups = array(
 //$mgroup_pktsys = 'EYC';
 
 $icc_adults = array(
-	'ICC_M'  => 'MEN<BR>lead',
-	'ICC_F'  => 'WOMEN<BR>lead',
-	'ICC_MB' => 'MEN<BR>boulder',
-	'ICC_FB' => 'WOMEN<BR>boulder',
-	'ICC_MS' => 'MEN<BR>speed',
-	'ICC_FS' => 'WOMEN<BR>speed'
+	'ICC_M'  => 'MEN lead',
+	'ICC_F'  => 'WOMEN lead',
+	'ICC_MB' => 'MEN boulder',
+	'ICC_FB' => 'WOMEN boulder',
+	'ICC_MS' => 'MEN speed',
+	'ICC_FS' => 'WOMEN speed'
 );
 $icc_combined = array(
 	'ICC_MX' => 'MEN overall',
 	'ICC_FX' => 'WOMEN overall',
 );
 $icc_youth = array(
-	'ICC_F_J' => 'female<BR>juniors',
-	'ICC_M_J' => 'male<BR>juniors',
-	'ICC_F_A' => 'female<BR>youth A',
-	'ICC_M_A' => 'male<BR>youth A',
-	'ICC_F_B' => 'female<BR>youth B',
-	'ICC_M_B' => 'male<BR>youth B',
-	'ICC_FSJ' => 'female<BR>juniors speed',
-	'ICC_MSJ' => 'male<BR>juniors speed',
-	'ICC_FSA' => 'female<BR>youth A speed',
-	'ICC_MSA' => 'male<BR>youth A speed',
-	'ICC_FSB' => 'female<BR>youth B speed',
-	'ICC_MSB' => 'male<BR>youth B speed',
+	'ICC_F_J' => 'female juniors',
+	'ICC_M_J' => 'male juniors',
+	'ICC_F_A' => 'female youth A',
+	'ICC_M_A' => 'male youth A',
+	'ICC_F_B' => 'female youth B',
+	'ICC_M_B' => 'male youth B',
+	'ICC_FSJ' => 'female juniors speed',
+	'ICC_MSJ' => 'male juniors speed',
+	'ICC_FSA' => 'female youth A speed',
+	'ICC_MSA' => 'male youth A speed',
+	'ICC_FSB' => 'female youth B speed',
+	'ICC_MSB' => 'male youth B speed',
 );
 
 ?>
