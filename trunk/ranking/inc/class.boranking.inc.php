@@ -992,6 +992,7 @@ class boranking extends ranking_so
 		$use_cup = (boolean)($order & 2);
 		$reverse_ranking = (boolean)($order & 4);
 		$distribution_only = (boolean)($order & 8);
+		//echo "<p>".__METHOD__."($comp,$cat,num_routes=$num_routes,max_compl=$max_compl,order=$order,stagger=$stagger,) use_ranking=$use_ranking,use_cup=$use_cup, reverse_ranking=$reverse_ranking, distribution_only=$distribution_only</p>\n";
 
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
@@ -1064,6 +1065,22 @@ class boranking extends ranking_so
 			$stand = $comp['datum'];
 		 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$use_cup ? $comp['serie'] : '');
 
+			// check if it might be the first comp of the year
+			if ($use_cup && (!$ranking || count($ranking) <= 1) && ($cup = $this->cup->read($comp['serie'])))
+			{
+				$stand = sprintf('%04d-12-31',date('Y')-1);
+				$cup_rkey = substr($stand,2,2).substr($cup['rkey'],2);
+				if (!($cup = $this->cup->read($cup_rkey)))
+				{
+					// not nice but better then no warning
+					echo "<p>".lang('Previous years cup "%1" not found!',$cup_rkey)."</p>\n";
+				}
+				else
+				{
+					//echo "<p>using cup ranking of $stand from cup $cup_rkey instead!</p>\n";
+		 			$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$cup);
+				}
+			}
 			// we generate the startlist starting from the end = first of the ranking
 			foreach((array) $ranking as $athlete)
 			{
