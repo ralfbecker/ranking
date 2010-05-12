@@ -334,6 +334,7 @@ presets	ranking	en	Presets
 presets for competitions	ranking	en	Presets for competitions
 previous heat	ranking	en	previous heat
 previous rankingsystem	ranking	en	previous Rankingsystem
+previous years cup "%1" not found!	ranking	en	Previous years cup "%1" not found!
 professional	ranking	en	Professional
 profile	ranking	en	Profile
 provisional	ranking	en	provisional
@@ -358,6 +359,7 @@ register athlets for this competition	ranking	en	Register athlets for this compe
 register this athlete for the selected category	ranking	en	Register this athlete for the selected category
 registration	ranking	en	Registration
 registration deadline	ranking	en	Registration deadline
+registration for this competition is over!	ranking	en	Registration for this competition is over!
 remove the attached pdf	ranking	en	Remove the attached PDF
 remove the grafic	ranking	en	Remove the grafic
 removed the %1	ranking	en	Removed the %1
@@ -485,6 +487,7 @@ which view do you want to see, when you start the ranking app?	ranking	en	Which 
 wildcard	ranking	en	Wildcard
 wrong admin-account or -password !!!	ranking	en	Wrong admin-account or -password !!!
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
+you are not allowed to register for %1!	ranking	en	You are not allowed to register for %1!
 you are not permitted to apply for a license!	ranking	en	You are not permitted to apply for a license!
 you can only create a new heat, if the previous one '%1' has a result!	ranking	en	You can only create a new heat, if the previous one '%1' has a result!
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last heat, not one in between!

@@ -334,6 +334,7 @@ presets	ranking	de	Voreinstellungen
 presets for competitions	ranking	de	Voreinstellungen für die Wettkämpfe
 previous heat	ranking	de	Vorrunde
 previous rankingsystem	ranking	de	vorhergegendes Ranglistensystem
+previous years cup "%1" not found!	ranking	de	Cup des Vorjahres "%1" nicht gefunden!
 professional	ranking	de	Profi
 profile	ranking	de	Profil
 provisional	ranking	de	provisorische
@@ -358,6 +359,7 @@ register athlets for this competition	ranking	de	Athleten für diesen Wettkampf 
 register this athlete for the selected category	ranking	de	Diesen Athleten für die ausgewählte Kategorie registrieren
 registration	ranking	de	Registrierung
 registration deadline	ranking	de	Anmeldeschuss für die Registrierung
+registration for this competition is over!	ranking	de	Die Registrierung für diesen Wettkampf ist vorüber!
 remove the attached pdf	ranking	de	Das angehangene PDF löschen
 remove the grafic	ranking	de	Bild entfernen
 removed the %1	ranking	de	Das %1 wurde gelöscht
@@ -493,3 +495,4 @@ you need to mail the downloaded and signed form to the office! please check if y
 you need to select a file first!	ranking	de	Sie müssen zuerst eine Datei auswählen!
 you need to select an other athlete first!	ranking	de	Sie müssen zuerst einen anderen Athleten auswählen!
 you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!
+you are not allowed to register for %1!	ranking	de	Sie sind nicht berechtigt für %1 zu registrieren!
