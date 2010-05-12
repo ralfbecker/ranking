@@ -289,7 +289,15 @@ class uiregistration extends boranking
 			//_debug_array($cat2col);
 			if (!$this->registration_check($comp,$nation))	// user allowed to register that nation
 			{
-				//echo "<h1>user not allowed to register nation '$nation'</h1>\n";
+				if ($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']))
+				{
+					$msg = lang('Registration for this competition is over!');
+				}
+				else
+				{
+					$msg = lang('You are not allowed to register for %1!',
+						is_numeric($nation) && ($fed = $this->federation->read($nation)) ? $fed['verband'] : $nation);
+				}
 				$nation = '';
 			}
 			// athlete to register
@@ -470,7 +478,7 @@ class uiregistration extends boranking
 					$readonlys['download'] = $readonlys[$download] = $tmpl->sitemgr && !$starter['platz'] && $starter['pkt'] < 64;
 				}
 				// new nation and data for the previous nation ==> write that data
-				$starter_nat_fed = !$comp['nation'] || $starter['nation'] != $comp['nation'] || 
+				$starter_nat_fed = !$comp['nation'] || $starter['nation'] != $comp['nation'] ||
 					!$starter['fed_parent'] && !$starter['acl_fed_id'] ?	// only use nation, if no RGZ set!
 					$starter['nation'] : ($starter['acl_fed_id'] ? $starter['acl_fed_id'] : $starter['fed_parent']);
 				if ($nat != $starter_nat_fed)
