@@ -172,18 +172,18 @@
 					<vbox options="0,0">
 						<hbox options="0,0" align="right" class="noPrint">
 							<menulist class="noPrint noWrap">
-								<menupopup type="select-number" options=" ,1,20" statustext="Top: total number or no" id="set[$row_cont[PerId]][tops]" label="Top" onchange="check_tops(this)"/>
+								<menupopup type="select-number" options=" ,1,8" statustext="Top: total number or no" id="set[$row_cont[PerId]][tops]" label="Top" onchange="check_tops(this)"/>
 							</menulist>
 							<menulist class="noPrint noWrap">
-								<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries" id="set[$row_cont[PerId]][top_tries]" label="Tries" onchange="check_top(this)"/>
+								<menupopup type="select-number" options="No,1,30" statustext="Top: number of tries" id="set[$row_cont[PerId]][top_tries]" label="Tries" onchange="check_top(this)"/>
 							</menulist>
 						</hbox>
 						<hbox options="0,0" align="right" class="noPrint">
 							<menulist class="noPrint noWrap">
-								<menupopup type="select-number" options=" ,1,20" statustext="Bonus: total number or no" id="set[$row_cont[PerId]][zones]" label="Bonus" onchange="check_zones(this)"/>
+								<menupopup type="select-number" options=" ,1,8" statustext="Bonus: total number or no" id="set[$row_cont[PerId]][zones]" label="Bonus" onchange="check_zones(this)"/>
 							</menulist>
 							<menulist class="noPrint noWrap">
-								<menupopup type="select-number" options="No,1,20" statustext="Bonus: number of tries" id="set[$row_cont[PerId]][zone_tries]" label="Tries"/>
+								<menupopup type="select-number" options="No,1,30" statustext="Bonus: number of tries" id="set[$row_cont[PerId]][zone_tries]" label="Tries"/>
 							</menulist>
 						</hbox>
 						<description id="{$row}[result]" class="onlyPrint noWrap" no_lang="1"/>
