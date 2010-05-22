@@ -47,6 +47,36 @@ function check_top(top)
 }
 
 /**
+ * onChange of tops: if bonus not set, set it to the same number of tops
+ *  if tops > zones alert user and set tops to zones or 
+ *  if less tries then tops alert user and set tries to tops
+ *
+ * @param top top select box
+ */
+function check_tops(top)
+{
+	var bonus = document.getElementById(top.name.replace(/tops/g,'zones'));
+
+	if (bonus && !bonus.value && top.value > 0) bonus.value = top.value;
+
+	if (bonus && top.value > 0 && top.value > bonus.value)
+	{
+		alert('Top > Bonus!');
+		bonus.value = top.value;
+	}
+	
+	var tries = document.getElementById(top.name.replace(/tops/g,'top_tries'));
+	
+	if (tries && !tries.value && top.value > 0) tries.value = top.value;
+
+	if (tries && top.value > 0 && top.value > tries.value)
+	{
+		alert('Top > Tries!');
+		tries.value = top.value;
+	}
+}
+
+/**
  * onChange of bonus: dont allow to set a bonus bigger then top or no bonus, but a top
  *
  * @param top top select box
@@ -63,6 +93,37 @@ function check_bonus(bonus)
 	if (top && top.value > 0 && !bonus.value)
 	{
 		top.value = bonus.value;
+	}
+}
+
+/**
+ * onChange of zones: dont allow to set a zones bigger then tops or no zones, but a top
+ * 	or if less tries then zones alert user and set tries to zones
+ *
+ * @param top top select box
+ */
+function check_zones(bonus)
+{
+	var top = document.getElementById(bonus.name.replace(/zones/g,'tops'));
+
+	if (top && top.value > 0 && bonus.value < top.value)
+	{
+		alert('Bonus < Top!');
+		top.value = bonus.value;
+	}
+	if (top && top.value > 0 && !bonus.value)
+	{
+		top.value = bonus.value;
+	}
+	
+	var tries = document.getElementById(bonus.name.replace(/zones/g,'zone_tries'));
+	
+	if (tries && !tries.value && bonus.value > 0) tries.value = bonus.value;
+
+	if (tries && bonus.value > 0 && bonus.value > tries.value)
+	{
+		alert('Bonus > Tries!');
+		tries.value = bonus.value;
 	}
 }
 

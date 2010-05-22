@@ -636,7 +636,22 @@ class boresult extends boranking
 				{
 					if ($data['top'.$i] && (int)$data['top'.$i] < (int)$data['zone'.$i])
 					{
-						$this->error[$PerId]['zone'.$i] = lang('Can NOT be higher as top!');
+						$this->error[$PerId]['zone'.$i] = lang('Can NOT be higher than top!');
+					}
+				}
+			}
+			if (isset($data['tops']))	// boulder result with just the sums
+			{
+				// todo: validation
+				if ($data['tops'] && (int)$data['tops'] > (int)$data['zones'])
+				{
+					$this->error[$PerId]['zones'] = lang('Can NOT be lower than tops!');
+				}
+				foreach(array('top','zone') as $name)
+				{
+					if ($data[$name.'s'] > $data[$name.'_tries'])
+					{
+						$this->error[$PerId][$name.'s'] = lang('Can NOT be higher than tries!');
 					}
 				}
 			}

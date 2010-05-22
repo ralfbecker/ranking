@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.7.003">
+	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.7.004">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -75,20 +75,22 @@
 				<column/>
 				<column/>
 				<column width="50"/>
-				<column/>
-				<column/>
-				<column/>
-				<column disabled="@num_problems=/[12]/"/>
-				<column disabled="@num_problems=/[123]/"/>
-				<column disabled="@num_problems=/[1234]/"/>
-				<column disabled="@num_problems=/[12345]/"/>
-				<column disabled="@num_problems=/[123456]/"/>
-				<column disabled="@num_problems=/[1234567]/"/>
+				<column disabled="!@num_problems"/>
+				<column disabled="@num_problems"/>
+				<column disabled="!@num_problems"/>
+				<column disabled="!@num_problems=/[2345678]/"/>
+				<column disabled="!@num_problems=/[345678]/"/>
+				<column disabled="!@num_problems=/[45678]/"/>
+				<column disabled="!@num_problems=/[5678]/"/>
+				<column disabled="!@num_problems=/[678]/"/>
+				<column disabled="!@num_problems=/[78]/"/>
+				<column disabled="!@num_problems=8"/>
 				<column disabled="@no_prev_heat"/>
 			</columns>
 			<rows>
 				<row part="header">
 					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -121,6 +123,7 @@
 					<nextmatch-header label="License" id="PerId" align="center"/>
 					<nextmatch-sortheader label="Start- number" id="start_order" align="center"/>
 					<nextmatch-sortheader label="Sum" id="result_top,result_zone" align="center"/>
+					<nextmatch-sortheader label="Sum" id="result_top,result_zone" align="center"/>
 					<description value="1" class="place" align="center"/>
 					<description value="2" class="place"/>
 					<description value="3" class="place"/>
@@ -133,6 +136,7 @@
 				</row>
 				<row part="footer">
 					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -165,6 +169,25 @@
 					<description id="{$row}[PerId]" no_lang="1" align="center"/>
 					<description align="center" id="{$row}[start_number]" value="$row_cont[start_order]" no_lang="1"/>
 					<description id="{$row}[result]" no_lang="1" align="center"/>
+					<vbox options="0,0">
+						<hbox options="0,0" align="right" class="noPrint">
+							<menulist class="noPrint noWrap">
+								<menupopup type="select-number" options=" ,1,20" statustext="Top: total number or no" id="set[$row_cont[PerId]][tops]" label="Top" onchange="check_tops(this)"/>
+							</menulist>
+							<menulist class="noPrint noWrap">
+								<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries" id="set[$row_cont[PerId]][top_tries]" label="Tries" onchange="check_top(this)"/>
+							</menulist>
+						</hbox>
+						<hbox options="0,0" align="right" class="noPrint">
+							<menulist class="noPrint noWrap">
+								<menupopup type="select-number" options=" ,1,20" statustext="Bonus: total number or no" id="set[$row_cont[PerId]][zones]" label="Bonus" onchange="check_zones(this)"/>
+							</menulist>
+							<menulist class="noPrint noWrap">
+								<menupopup type="select-number" options="No,1,20" statustext="Bonus: number of tries" id="set[$row_cont[PerId]][zone_tries]" label="Tries"/>
+							</menulist>
+						</hbox>
+						<description id="{$row}[result]" class="onlyPrint noWrap" no_lang="1"/>
+					</vbox>
 					<vbox options="0,0">
 						<menulist class="noPrint noWrap">
 							<menupopup type="select-number" options="No,1,20" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top1]" label="Top" align="right" onchange="check_top(this)"/>
