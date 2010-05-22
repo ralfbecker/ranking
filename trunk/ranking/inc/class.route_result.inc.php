@@ -527,6 +527,13 @@ class route_result extends so_sql
 						$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
 						$zones = round($data['result_zone'.$suffix] / 100);
 						$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
+						if (!$suffix)
+						{
+							$data['tops'] = $tops;
+							$data['top_tries'] = $top_tries;
+							$data['zones'] = $zones;
+							$data['zone_tries'] = $zone_tries;
+						}
 						$data['result'.$to_suffix] = $tops.'t'.$top_tries.' '.$zones.'b'.$zone_tries;
 						if ($suffix !== $to_suffix)
 						{
@@ -736,6 +743,18 @@ class route_result extends so_sql
 				}
 			}
 		}
+		// boulder result with just the sums
+		if (isset($data['tops']))
+		{
+			if (is_numeric($data['zones']))
+			{
+				$data['result_zone'] = 100 * $data['zones'] - $data['zone_tries'];
+				if ($data['tops'] > 0)
+				{
+					$data['result_top'] = 100 * $data['tops'] - $data['top_tries'];
+				}
+			}
+		}
 		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
 
 		return $data;
@@ -757,7 +776,7 @@ class route_result extends so_sql
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
 		}
-		foreach(array('eliminated','result_time_r','eliminated_r') as $name)
+		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries') as $name)
 		{
 			if (isset($new[$name])) $this->data[$name] = $new[$name];
 		}
