@@ -35,8 +35,8 @@ else
 		'pstambl_target' => false,
 		'ranglist' => 'ranglist.php?',
 		'nat_team_ranking' => 'nat_team_ranking.php?',
-		'startlist' => $url_icc_info.'?page_name=startlists&amp;',
-		'resultservice' => $url_icc_info.'?page_name=resultservice&amp;'
+		'startlist' => '/egroupware/ranking/starter.php?',
+		'resultservice' => '/egroupware/ranking/result.php?'
 	);
 }
 
