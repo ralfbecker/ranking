@@ -306,12 +306,14 @@ class competition extends so_sql
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
-		unset($criteria['pkte']);	// is allways set
-		if (!$criteria['feld_pkte']) unset($criteria['feld_pkte']);
-		unset($criteria['open']);
-		if (!$criteria['serie']) unset($criteria['serie']);
-		if ($criteria['rkey']) $criteria['rkey'] = strtoupper($criteria['rkey']);
-
+		if (is_array($criteria))
+		{
+			unset($criteria['pkte']);	// is allways set
+			if (!$criteria['feld_pkte']) unset($criteria['feld_pkte']);
+			unset($criteria['open']);
+			if (!$criteria['serie']) unset($criteria['serie']);
+			if ($criteria['rkey']) $criteria['rkey'] = strtoupper($criteria['rkey']);
+		}
 		//$this->debug = 1;
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
