@@ -57,7 +57,8 @@ $icc_adults = array(
 	'ICC_MB' => 'MEN boulder',
 	'ICC_FB' => 'WOMEN boulder',
 	'ICC_MS' => 'MEN speed',
-	'ICC_FS' => 'WOMEN speed'
+	'ICC_FS' => 'WOMEN speed',
+	'ICC_TR' => 'Team relay speed',
 );
 $icc_combined = array(
 	'ICC_MX' => 'MEN overall',
