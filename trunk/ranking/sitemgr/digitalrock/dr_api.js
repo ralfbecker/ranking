@@ -59,7 +59,7 @@ Startlist.prototype.handleResponse = function(_data)
 		var header = document.createElement('h1');
 		$(this.container).append(header);
 		header.className = 'listHeader';
-		$(header).append(_data.bezeichnung);
+		$(header).text(_data.bezeichnung);
 		
 		// create new table
 		this.table = new Table(_data.teilnehmer,{
@@ -79,7 +79,7 @@ Startlist.prototype.handleResponse = function(_data)
 		// update existing table
 		this.table.update(_data.teilnehmer);
 	}
-}
+};
 
 /**
  * Constructor for table with given data and columns
@@ -173,7 +173,7 @@ if (this.data[0].PerId == tbody.firstChild.id) this.data.reverse();
 	{
 		$('#'+pos.id+' ~ tr').remove();
 	}
-}
+};
 
 /**
  * Update given data-row with changed content
@@ -182,7 +182,7 @@ if (this.data[0].PerId == tbody.firstChild.id) this.data.reverse();
 Table.prototype.updateRow = function(_row,_data)
 {
 	
-}
+};
 
 /**
  * Create new data-row with all columns from this.columns
@@ -217,19 +217,21 @@ Table.prototype.createRow = function(_data,_tag)
 		}
 		if (typeof _data[col] == 'string')
 		{
-			$(tag).append(_data[col]);
+			$(tag).text(_data[col]);
 		}
 		else if (typeof _data[col] == 'object')
 		{
 			if (_data[col]['colspan'] > 1) tag.colSpan = _data[col]['colspan'];
-			$(tag).append(_data[col]['label']);
+			$(tag).text(_data[col]['label']);
 		}
 	}
 	return row;
-}
+};
 
 /**
  * Sort data according to sort criteria
+ * 
+ * @todo get using this.sortNummeric callback working
  */
 Table.prototype.sortData = function()
 {
@@ -250,7 +252,7 @@ Table.prototype.sortData = function()
 		console.log(this.data[i].startfolgenr+': '+this.data[i].name+', '+this.data[i].vorname);
 		if (i > 3) break;
 	}*/
-}
+};
 
 /**
  * Callback for sort by 'startfolgenr' attribute
@@ -272,8 +274,7 @@ function sortStartfolge(_a, _b)
  * @return int
  */
 Table.prototype.sortNummeric = function(_a,_b)
-//function sortNummeric(_a,_b)
 {
 	//console.log('_a[PerId]='+_a['PerId']+': _a['+this.sort+']='+_a[this.sort]+', _b[PerId]='+_b['PerId']+': _b['+this.sort+']='+_b[this.sort]+' returning '+((_b[this.sort] - _a[this.sort]) * (this.ascending ? 1 : -1)));
 	return (_a[this.sort] - _b[this.sort]) * (this.ascending ? 1 : -1);
-}
+};
