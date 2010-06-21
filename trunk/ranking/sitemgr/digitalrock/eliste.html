@@ -10,11 +10,11 @@
 	<body>
 		<div id="table"></div>
 		<script type="text/javascript">
-			var startlist;
+			var resultlist;
 			$(document).ready(function() {
-				startlist = new Startlist('table','/json.php'+location.search);
+				resultlist = new Resultlist('table','/json.php'+location.search);
 			});	
 		</script>
-		<input type="button" onclick="startlist.update();" value="Update" />
+		<input type="button" onclick="resultlist.update();" value="Update" />
 	</body>
 </html>

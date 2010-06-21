@@ -16,14 +16,67 @@
  * @param _json_url url for data to load
  * @param _profile_url url for athlete profiles
  */
-function Startlist(_container,_json_url,_profile_url)
+function Resultlist(_container,_json_url,_profile_url)
+{
+	Startlist.apply(this, [_container,_json_url,_profile_url,{
+		'platz': 'Rank',
+		'name' : {'label': 'Name', 'colspan': 2},
+		'vorname' : '',
+		'birthyear' : 'Birthyear',
+		'nation' : 'Nation',
+//		'startnummer': 'StartNr',
+		'result': 'Result'
+	}]);
+}
+
+/**
+ * Update Startlist from json_url
+ */
+Resultlist.prototype.update = function()
+{
+	Startlist.prototype.update.apply(this, []);
+};
+
+/**
+ * Callback for loading data via ajax
+ * 
+ * @param _data route data object
+ */            
+Resultlist.prototype.handleResponse = function(_data)
+{
+	Startlist.prototype.handleResponse.apply(this, [_data]);
+};
+
+/**
+ * Constructor for startlist from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ * @param _profile_url url for athlete profiles
+ * @param _columns hash with key => label pairs
+ * @param _sort name of column to sort by
+ */
+function Startlist(_container,_json_url,_profile_url,_columns,_sort)
 {
 	if (typeof _profile_url == 'undefined') _profile_url = '/pstambl.php?';
 	this.profile_url = _profile_url;
 	this.json_url = _json_url;
 	if (typeof _container == "string") _container = document.getElementById(_container);
 	this.container = _container;
-	
+	if (typeof _columns == 'undefined') _columns = {
+		'startfolgenr': {'label': 'StartNr', 'colspan': 2},
+		'startnummer': '',
+		'name' : {'label': 'Name', 'colspan': 2},
+		'vorname' : '',
+		'birthyear' : 'Birthyear',
+		'nation' : 'Nation'
+	};
+	this.columns = _columns;
+	if (typeof _sort == 'undefined') for(_sort in _columns) break;
+	this.sort = _sort;
+
 	this.update();
 }
 
@@ -59,18 +112,11 @@ Startlist.prototype.handleResponse = function(_data)
 		var header = document.createElement('h1');
 		$(this.container).append(header);
 		header.className = 'listHeader';
-		$(header).text(_data.bezeichnung);
+		$(header).text((this.sort == 'startfolgenr' ? 'Startlist' : 'Result')+': '+_data.bezeichnung);
 		
 		// create new table
-		this.table = new Table(_data.teilnehmer,{
-			'startfolgenr': {'label': 'Start', 'colspan': 2},
-			'startnummer': null,
-			'name' : {'label': 'Name', 'colspan': 2},
-			'vorname' : null,
-//			'birthyear' : 'Birthyear',
-			'nation' : 'Nation',
-//			'result': 'Result',
-		},this.profile_url+'cat='+_data.GrpId+'&person=','startfolgenr',true);
+		this.table = new Table(_data.teilnehmer,this.columns,
+			this.profile_url+'cat='+_data.GrpId+'&person=',this.sort);
 	
 		$(this.container).append(this.table.dom);
 	}
@@ -97,7 +143,9 @@ function Table(_data,_columns,_profile_url,_sort,_ascending)
 	this.profile_url = _profile_url;
 	this.data      = _data;
 	this.columns   = _columns;
+	if (typeof _sort == 'undefined') for(_sort in _columns) break;
 	this.sort      = _sort;
+	if (typeof _ascending == 'undefined') _ascending = true;
 	this.ascending = _ascending;
 	// hash with PerId => tr containing athlete
 	this.athletes = {};
@@ -119,7 +167,7 @@ function Table(_data,_columns,_profile_url,_sort,_ascending)
 		var row = this.createRow(this.data[i]);
 		$(tbody).append(row);
 	}
-	console.log(this.athletes);
+	//console.log(this.athletes);
 }
 
 /**
@@ -136,7 +184,8 @@ Table.prototype.update = function(_data)
 	var tbody = this.dom.firstChild.nextSibling;
 	var pos;
 
-if (this.data[0].PerId == tbody.firstChild.id) this.data.reverse();
+	// uncomment to test update: reverses the list on every call
+	//if (this.data[0].PerId == tbody.firstChild.id) this.data.reverse();
 	
 	athletes = this.athletes;
 	this.athletes = {};
@@ -198,9 +247,10 @@ Table.prototype.createRow = function(_data,_tag)
 		row.id = _data.PerId;
 		this.athletes[_data.PerId] = row;
 	}
+	var span = 1;
 	for(var col in this.columns)
 	{
-		if (_data[col] == null) continue;
+		if (--span > 0) continue;
 
 		var tag = document.createElement(_tag);
 		tag.className = col;
@@ -215,14 +265,15 @@ Table.prototype.createRow = function(_data,_tag)
 			$(tag).append(a);
 			tag = a;
 		}
-		if (typeof _data[col] == 'string')
+		if (typeof _data[col] == 'object')
+		{
+			if (_data[col]['colspan'] > 1) tag.colSpan = span = _data[col]['colspan'];
+			$(tag).text(_data[col]['label']);
+		}
+		else
 		{
 			$(tag).text(_data[col]);
-		}
-		else if (typeof _data[col] == 'object')
-		{
-			if (_data[col]['colspan'] > 1) tag.colSpan = _data[col]['colspan'];
-			$(tag).text(_data[col]['label']);
+			span = 1;
 		}
 	}
 	return row;
@@ -235,23 +286,21 @@ Table.prototype.createRow = function(_data,_tag)
  */
 Table.prototype.sortData = function()
 {
-//	console.log(this.data);
-
-//	this.data.sort(this.sortNummeric);
-//	this.data.sort(function(_a,_b) { this.sortNummeric.call(this,_a,_b);});
-	
-	var that = this;
-//	this.data.sort(function(_a,_b) { that.sortNummeric.call(that,_a,_b); })
-//	this.data.sort(function(_a,_b) { that.sortNummeric(_a,_b); })
-	this.data.sort(sortStartfolge);
-	
-//	console.log(this.data);
-	
-/*	for(i in this.data)
+	switch(this.sort)
 	{
-		console.log(this.data[i].startfolgenr+': '+this.data[i].name+', '+this.data[i].vorname);
-		if (i > 3) break;
-	}*/
+		case 'startfolgenr':
+			this.data.sort(sortStartfolge);
+			break;
+
+		case 'platz':
+			this.data.sort(sortPlatz);
+			break;
+
+		default:
+			throw("Table.sortData: Not yet implemented sort by '"+this.sort+"'!");
+			break;
+	}
+	if (!this.ascending) this.data.reverse();
 };
 
 /**
@@ -267,10 +316,28 @@ function sortStartfolge(_a, _b)
 }
 
 /**
+ * Callback for sort by 'platz' attribute and then 'name' and 'vorname'
+ * 
+ * @param _a first object to compare
+ * @param _b second object to compare
+ * @return int
+ */
+function sortPlatz(_a, _b)
+{
+	var ret = _a['platz'] - _b['platz'];
+	
+	if (!ret) ret = _a['name'] > _b['name'];
+	if (!ret) ret = _a['vorname'] > _b['vorname'];
+	
+	return ret;
+}
+
+/**
  * Callback for numerical sort
  * 
  * @param _a first object to compare
  * @param _b second object to compare
+ * @todo get this working
  * @return int
  */
 Table.prototype.sortNummeric = function(_a,_b)
