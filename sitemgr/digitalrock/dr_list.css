@@ -1,0 +1,54 @@
+/**
+ * digital ROCK CSS for jQuery based Javascript API
+ *
+ * @link http://www.digitalrock.de
+ * @author Ralf Becker <RalfBecker@digitalROCK.de>
+ * @copyright 2010 by RalfBecker@digitalROCK.de
+ * @version $Id$
+ */
+
+#table table {
+	width: 100%;
+}
+
+/**
+ * Background etc. for header rows
+ */
+#table thead {
+	background-color: #c0c0c0;
+}
+/**
+ * Background etc. for body rows
+ */
+#table tbody {
+	background-color: #f0f0f0;
+}
+/**
+ * Center all columns by default
+ */
+th, td {
+	text-align: center;
+}
+/**
+ * Left justify text columns like name
+ */
+.name, .vorname {
+	padding-left: 5px;
+	text-align: left;
+}
+/**
+ * Capitalize names
+ */
+.name {
+	text-transform: uppercase;
+}
+
+/**
+ * Format the header
+ */
+h1 {
+	padding: 0;
+	margin: 0;
+	font-size: 20pt;
+	font-weight: bold;
+}
