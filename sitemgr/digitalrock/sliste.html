@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"> 
+	<head> 
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 
+		<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+		<script type="text/javascript" src="http://localhost/dr_api.js"></script>
+		<style>
+#table table {
+	width: 100%;
+}
+
+#table thead {
+	background-color: #c0c0c0;
+}
+
+#table tbody {
+	background-color: #f0f0f0;
+}
+th, td {
+	text-align: left;
+}
+.nation, .startfolgenr, .startnummer {
+	text-align: center;
+}
+.name {
+	text-transform: uppercase;
+}
+h1 {
+	padding: 0;
+	margin: 0;
+	font-size: 20pt;
+	font-weight: bold;
+}
+
+		</style>
+	</head>
+	<body>
+		<div id="table"></div>
+		<script type="text/javascript">
+			var startlist;
+			$(document).ready(function() {
+				startlist = new Startlist('table','/json.php'+location.search);
+			});	
+		</script>
+		<input type="button" onclick="startlist.update();" value="Update" />
+	</body>
+</html>
