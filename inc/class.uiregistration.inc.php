@@ -163,7 +163,14 @@ class uiregistration extends boranking
 		);
 		// make (maybe changed) category infos avalible for nextmatch
 		$content['nm']['cat'] = $cat['GrpId'];
-		$content['nm']['col_filter']['sex'] = $cat['sex'];
+		if ($cat['sex'])
+		{
+			$content['nm']['col_filter']['sex'] = $cat['sex'];
+		}
+		else
+		{
+			unset($content['nm']['col_filter']['sex']);
+		}
 		$content['nm']['show_all'] = $show_all;
 
 		$select_options = array(
