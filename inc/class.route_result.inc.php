@@ -527,7 +527,8 @@ class route_result extends so_sql
 						$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
 						$zones = round($data['result_zone'.$suffix] / 100);
 						$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
-						if (!$suffix)
+						// boulder without problem specific results (route_num_problems=0)
+						if (!$suffix && !isset($data['zone1']))
 						{
 							$data['tops'] = $tops;
 							$data['top_tries'] = $top_tries;
@@ -743,7 +744,7 @@ class route_result extends so_sql
 				}
 			}
 		}
-		// boulder result with just the sums
+		// boulder result with just the sums (route_num_problems=0)
 		if (isset($data['tops']))
 		{
 			if (is_numeric($data['zones']))
@@ -754,6 +755,7 @@ class route_result extends so_sql
 					$data['result_top'] = 100 * $data['tops'] - $data['top_tries'];
 				}
 			}
+			unset($data['result_detail']);	// do NOT store existing problem specific results
 		}
 		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
 
