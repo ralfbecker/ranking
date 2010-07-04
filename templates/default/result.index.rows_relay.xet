@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
-									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" no_lang="1" id="route_data[route_start]"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description no_lang="1" id="route_data[route_observation_time]"/>
-									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,7 +47,7 @@
 							</columns>
 							<rows>
 								<row>
-									<description no_lang="1" id="route_data[route_result]"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
 									<description no_lang="1" id="route_data[route_judge]"/>
@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_relay" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.index.rows_relay" template="" lang="" group="0" version="1.7.002">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -102,14 +102,20 @@
 				<row class="x $row_cont[class]">
 					<description id="{$row}[start_order]" no_lang="1" align="center"/>
 					<menulist>
-						<menupopup options="Select one" id="set[$row_cont[team_id]][team_nation]" no_lang="1"/>
+						<menupopup options="Select one" id="set[$row_cont[team_id]][team_nation]" no_lang="1" onchange="if (this.value) xajax_doXMLHTTP('ranking.uiresult.ajax_set_athlets',{$cont[route_data][WetId]},{$cont[route_data][GrpId]},$row_cont[team_id],this.value);"/>
 					</menulist>
-					<textbox size="10" maxlength="64" id="set[$row_cont[team_id]][team_name]" no_lang="1"/>
-					<link-entry options="ranking" id="set[$row_cont[team_id]][PerId_1]" no_lang="1"/>
+					<textbox size="10" maxlength="64" id="set[$row_cont[team_id]][team_name]" no_lang="1" class="required"/>
+					<menulist>
+						<menupopup id="set[$row_cont[team_id]][PerId_1]" no_lang="1"/>
+					</menulist>
 					<textbox size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[team_id]][start_number_1]" no_lang="1" class="noPrint" align="center"/>
-					<link-entry options="ranking" id="set[$row_cont[team_id]][PerId_2]" no_lang="1"/>
+					<menulist>
+						<menupopup id="set[$row_cont[team_id]][PerId_2]" no_lang="1"/>
+					</menulist>
 					<textbox size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[team_id]][start_number_2]" no_lang="1" class="noPrint" align="center"/>
-					<link-entry options="ranking" id="set[$row_cont[team_id]][PerId_3]" no_lang="1"/>
+					<menulist>
+						<menupopup id="set[$row_cont[team_id]][PerId_3]" no_lang="1"/>
+					</menulist>
 					<textbox size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[team_id]][start_number_3]" no_lang="1" class="noPrint" align="center"/>
 					<description/>
 					<description/>

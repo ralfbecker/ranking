@@ -234,6 +234,37 @@ class boresult extends boranking
 		}
 		return $start_order;
 	}
+	
+	/**
+	 * Get registered athletes for given competition and category
+	 * 
+	 * @param array $keys array with values for WetId and GrpId
+	 * @param boolean $only_nations=false only return array with nations (as key and value)
+	 * @return array
+	 */
+	function get_registered($keys,$only_nations=false)
+	{
+		static $stored_keys,$starters;
+		if ($keys !== $stored_keys)
+		{
+			$starters = $this->result->read($keys,'',true,'nation,reg_nr');
+			$stored_keys = $keys;
+			//_debug_array($starters);
+		}
+		if ($only_nations)
+		{
+			$nations = array();
+			foreach($starters as $starter)
+			{
+				if (!isset($nations[$starter['nation']]))
+				{
+					$nations[$starter['nation']] = $starter['nation'];
+				}
+			}
+			return $nations;
+		}
+		return $starters;
+	}
 
 	/**
 	 * Get the default ordering of the qualification startlist
