@@ -546,6 +546,11 @@ class uiresult extends boresult
 			$rows[$k]['verband'] = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /','',$row['verband']);
 
 			if (!$need_start_number && $row['start_number']) $need_start_number = true;
+			
+			if ($query['discipline'] == 'speedrelay' && $query['route'] > 0)
+			{
+				$readonlys["set[$row[team_id]][team_nation]"] = $readonlys["set[$row[team_id]][team_name]"] = true;
+			}
 		}
 		// disable print-only start-number
 		$rows['no_printnumber'] = !$need_start_number;
@@ -801,8 +806,7 @@ class uiresult extends boresult
 			'ranking' => array(
 				1 => 'display ranking',
 			) + ($comp['serie'] ? array(2 => 'display cup') : array()) + array(
-				4 => 'sh_debug_array($keys);
-				ow jurylist',
+				4 => 'Show jurylist',
 			),
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
