@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -405,7 +405,19 @@ class uiresult extends boresult
 		// this is to transport the route_type to route_result::search's filter param
 		$query['col_filter']['route_type'] = $query['route_type'];
 		$query['col_filter']['discipline'] = $query['discipline'];
-
+		// check if route_result object is instancated for relay or not
+		if ($this->route_result->isRelay != ($query['discipline'] == 'speedrelay'))
+		{
+			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+				$query['discipline'] == 'speedrelay');
+		}
+		$alpha_sort = $this->route_result->isRelay ? ',team_nation '.$query['sort'].',team_name' :
+			',nachname '.$query['sort'].',vorname';
+		// in speed(relay) sort by time first and then alphabetic
+		if (substr($query['discipline'],0,5) == 'speed')
+		{
+			$alpha_sort = ',result_time '.$query['sort'].$alpha_sort;
+		}
 		switch (($order = $query['order']))
 		{
 			case 'result_rank':
@@ -417,11 +429,11 @@ class uiresult extends boresult
 				{
 					$query['order'] = 'CASE WHEN result_rank IS NULL THEN start_order ELSE 0 END '.$query['sort'];
 				}
-				$query['order'] .= ',result_rank '.$query['sort'].',nachname IS NULL,nachname '.$query['sort'].',vorname';
+				$query['order'] .= ',result_rank '.$query['sort'].$alpha_sort;
 				break;
 			case 'result_height':
 				$query['order'] = 'CASE WHEN result_height IS NULL THEN -start_order ELSE 0 END '.$query['sort'].
-					',result_height '.$query['sort'].',result_plus '.$query['sort'].',nachname '.$query['sort'].',vorname';
+					',result_height '.$query['sort'].',result_plus '.$query['sort'].$alpha_sort;
 				break;
 			case 'result_top,result_zone':
 				$query['order'] = 'result_top IS NULL,result_top '.$query['sort'].',result_zone IS NULL,result_zone';
@@ -437,7 +449,7 @@ class uiresult extends boresult
 		//echo $total; _debug_array($rows);
 
 		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
-		if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
+		if($query['route'] == -2 && substr($query['discipline'],0,5) == 'speed' && strstr($query['template'],'speed_graph'))
 		{
 			$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
 			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
@@ -455,14 +467,26 @@ class uiresult extends boresult
 				$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$last_cup);
 			}
 		}
+		// speedrelay quali startlist: add empty row to add new team
+		if ($query['discipline'] == 'speedrelay' && !$query['route'] && !$query['show_result'])
+		{
+			$rows[] = array(
+				'team_id' => 0,
+				'start_order' => count($rows)+1,
+			);
+			$readonlys['delete[0]'] = true;
+			++$total;
+		}
 		$need_start_number = false;
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
 
 			// results for setting on regular routes (no general result)
-			if($query['route'] >= 0) $rows['set'][$row['PerId']] = $row;
-
+			if($query['route'] >= 0)
+			{
+				$rows['set'][$row[$this->route_result->id_col]] = $row;
+			}
 			if (!$quota_line && $query['route_quota'] && $query_in['order'] == 'result_rank' && $query_in['sort'] == 'ASC' &&
 				$row['result_rank'] > $query['route_quota'])	// only show quota line if sorted by rank ASC
 			{
@@ -475,7 +499,7 @@ class uiresult extends boresult
 				$rows[$k]['ranking_points'] = $ranking[$row['PerId']]['pkt'];
 			}
 			$rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on';
-			if ($query['discipline'] == 'speed' && $query['route'] >= 2 &&
+			if (substr($query['discipline'],0,5) == 'speed' && $query['route'] >= 2 &&
 				(strstr($query['template'],'startlist') && $order == 'start_order' ||
 				!strstr($query['template'],'startlist') && !$row['result_rank'] && $order == 'result_rank'))
 			{
@@ -487,7 +511,7 @@ class uiresult extends boresult
 				$rows[$k]['class'] = $unranked[$k & 2];
 			}
 			// for the speed graphic, we have to make the athlets availible by the startnumber of each heat
-			if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
+			if($query['route'] == -2 && substr($query['discipline'],0,5) == 'speed' && strstr($query['template'],'speed_graph'))
 			{
 				for($suffix=2; $suffix <= 6; ++$suffix)
 				{
@@ -541,6 +565,7 @@ class uiresult extends boresult
 		$rows['no_delete'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
 		$rows['time_measurement'] = $query['time_measurement'];
+		$rows['discipline'] = $query['discipline'];
 
 		// make div. print values available
 		foreach(array('calendar','route_name','comp_name','comp_date','comp_logo','comp_sponsors','show_result','result_official','route_data') as $name)
@@ -656,6 +681,13 @@ class uiresult extends boresult
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['nm']['route'] < 0 ? -1 : $content['nm']['route'],
 		);
+		// get discipline and check if relay
+		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		if ($this->route_result->isRelay != ($content['nm']['discipline'] == 'speedrelay'))
+		{
+			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+				$content['nm']['discipline'] == 'speedrelay');
+		}
 		if ($comp && ($content['nm']['old_comp'] != $comp['WetId'] ||		// comp changed or
 			$cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
 			!($route = $this->route->read($keys)))))	// route not found and no general result
@@ -688,7 +720,7 @@ class uiresult extends boresult
 		unset($content['button']);
 		if (!$button && $content['nm']['rows']['delete'])
 		{
-			list($PerId) = @each($content['nm']['rows']['delete']);
+			list($id) = @each($content['nm']['rows']['delete']);
 			$button = 'delete';
 		}
 		if ($button && $comp && $cat && is_numeric($content['nm']['route']))
@@ -724,8 +756,8 @@ class uiresult extends boresult
 					break;
 
 				case 'delete':
-					if (!is_numeric($PerId) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
-						!$this->delete_participant($keys+array('PerId'=>$PerId)))
+					if (!is_numeric($id) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+						!$this->delete_participant($keys+array($this->route_result->id_col => $id)))
 					{
 						$msg = lang('Permission denied !!!');
 					}
@@ -762,7 +794,8 @@ class uiresult extends boresult
 			'ranking' => array(
 				1 => 'display ranking',
 			) + ($comp['serie'] ? array(2 => 'display cup') : array()) + array(
-				4 => 'show jurylist',
+				4 => 'sh_debug_array($keys);
+				ow jurylist',
 			),
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
@@ -780,7 +813,6 @@ class uiresult extends boresult
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
 		$content['nm']['route_type'] = $route['route_type'];
 		$content['nm']['route_status'] = $route['route_status'];
-		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
 		$content['nm']['num_problems'] = $route['route_num_problems'];
 		$content['nm']['time_measurement'] = $route['route_time_host'] && $route['route_status'] != STATUS_RESULT_OFFICIAL;
 		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
@@ -810,7 +842,7 @@ class uiresult extends boresult
 
 		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
 		{
-			if ($content['nm']['discipline'] == 'speed')	// for speed include pairing graph
+			if (substr($content['nm']['discipline'],0,5) == 'speed')	// for speed include pairing graph
 			{
 				$sel_options['show_result'][3] = lang('Pairing speed final');
 				$sel_options['route'] = array(-2 => lang('Pairing speed final'))+$sel_options['route'];
@@ -829,8 +861,11 @@ class uiresult extends boresult
 		//_debug_array($sel_options);
 
 		// no startlist, no rights at all or result offical -->disable all update possebilities
-		if (($readonlys['button[apply]'] = !$this->has_startlist($keys) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || $route['route_status'] == STATUS_RESULT_OFFICIAL))
+		if (($readonlys['button[apply]'] =
+			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || 
+			$route['route_status'] == STATUS_RESULT_OFFICIAL || 
+			$content['nm']['route_order'] < 0 || $content['nm']['show_result'] > 1))
 		{
 			$sel_options['result_plus'] = $this->plus;
 			$content['nm']['readonly'] = true;
@@ -882,6 +917,11 @@ class uiresult extends boresult
 		{
 			$sel_options['show_result'] = array(-1 => '');
 			$readonlys['nm[show_result]'] = true;
+		}
+		if ($content['nm']['discipline'] == 'speedrelay')
+		{
+			// todo show only nations registered for the competitiion
+			$sel_options['team_nation'] = $this->federation->query_list('nation','nation');
 		}
 		if ((string)$content['nm']['old_show'] !== (string)$content['nm']['show_result'])
 		{
@@ -1028,13 +1068,19 @@ class uiresult extends boresult
 	 */
 	function _template_name($show_result,$discipline='lead')
 	{
-		if ($show_result == 3 && $discipline == 'speed')
+		if ($show_result == 3 && substr($discipline,0,5) == 'speed')
 		{
 			return 'ranking.result.index.speed_graph';
 		}
 		if ($show_result == 2)
 		{
-			return 'ranking.result.index.rows_general';
+			switch($discipline)
+			{
+				case 'speedrelay': 
+					return 'ranking.result.index.rows_relay_general';
+				default:
+					return 'ranking.result.index.rows_general';
+			}
 		}
 		if ($show_result)
 		{
@@ -1044,9 +1090,17 @@ class uiresult extends boresult
 				case 'lead':    return 'ranking.result.index.rows_lead';
 				case 'speed':   return 'ranking.result.index.rows_speed';
 				case 'boulder': return 'ranking.result.index.rows_boulder';
+				case 'speedrelay': return 'ranking.result.index.rows_relay_speed';
 			}
 		}
-		return 'ranking.result.index.rows_startlist';
+		// startlist
+		switch($discipline)
+		{
+			case 'speedrelay': 
+				return 'ranking.result.index.rows_relay';
+			default:
+				return 'ranking.result.index.rows_startlist';
+		}
 	}
 
 	/**

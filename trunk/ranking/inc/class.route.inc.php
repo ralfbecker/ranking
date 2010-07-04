@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007/8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -71,6 +71,7 @@ class route extends so_sql
 			$GLOBALS['egw']->route_result->delete($keys);
 			*/
 			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
+			$this->db->delete('RelayResults',$keys,__LINE__,__FILE__);
 		}
 		return $ret;
 	}

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -43,7 +43,8 @@ class route_result extends so_sql
 	 * Name of the result table
 	 */
 	const RESULT_TABLE = 'RouteResults';
-
+	const RELAY_TABLE = 'RelayResults';
+	
 	/**
 	 * Maximum number of boulders
 	 *
@@ -54,6 +55,19 @@ class route_result extends so_sql
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 	);
 	var $charset,$source_charset;
+	
+	/**
+	 * Class instanciated for relay table
+	 * 
+	 * @var boolean
+	 */
+	var $isRelay = false;
+	/**
+	 * Id of an athlete or a team
+	 * 
+	 * @var string
+	 */
+	var $id_col = 'PerId';
 
 	//var $athlete_join = 'LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations USING(fed_id)';
 	const ATHLETE_JOIN = ' LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations ON a2f.fed_id=Federations.fed_id';
@@ -67,10 +81,12 @@ class route_result extends so_sql
 	/**
 	 * constructor of the competition class
 	 */
-	function __construct($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null,$pdf_dir=null,$relay=false)
 	{
+		$this->isRelay = $relay;
+		$this->id_col =  $relay ? 'team_id' : 'PerId';
 		//$this->debug = 1;
-		parent::__construct('ranking',self::RESULT_TABLE,$db);	// call constructor of extended class
+		parent::__construct('ranking',$relay ? self::RELAY_TABLE : self::RESULT_TABLE,$db);	// call constructor of extended class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
@@ -127,13 +143,16 @@ class route_result extends so_sql
 
 		if (!$only_keys && !$join || $route_order < 0)
 		{
-			$join = self::ATHLETE_JOIN;
-			$extra_cols = array_merge($extra_cols,array('vorname','nachname','Federations.nation AS nation','geb_date','Federations.verband AS verband','ort','plz',));
-
-			//if ($comp_nation == 'SUI')	// ToDo pass nation, so we dont need to do this join for other federations than SAC
+			if (!$this->isRelay) 
 			{
-				$join .= self::ACL_FED_JOIN;
-				$extra_cols[] = 'acl_fed.verband AS acl_fed';
+				$join = self::ATHLETE_JOIN;
+				$extra_cols = array_merge($extra_cols,array('vorname','nachname','Federations.nation AS nation','geb_date','Federations.verband AS verband','ort','plz',));
+	
+				//if ($comp_nation == 'SUI')	// ToDo pass nation, so we dont need to do this join for other federations than SAC
+				{
+					$join .= self::ACL_FED_JOIN;
+					$extra_cols[] = 'acl_fed.verband AS acl_fed';
+				}
 			}
 			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
 			if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
@@ -169,6 +188,7 @@ class route_result extends so_sql
 						$result_cols[] = 'result_plus';
 						break;
 					case 'speed':
+					case 'speedrelay':
 						$result_cols[] = 'result_time';
 						$result_cols[] = 'start_order';
 						break;
@@ -264,9 +284,11 @@ class route_result extends so_sql
 				return $rows;
 			}
 		}
-		// otherwise wildcards or not matching LEFT JOINs remove PerId
-		$extra_cols[] = $this->table_name.'.PerId AS PerId';
-
+		// otherwise wildcards or not matching LEFT JOINs remove PerId/team_id
+		if (strpos($cols,$this->id_col) !== false)
+		{
+			$extra_cols[] = $this->table_name.'.'.$this->id_col.' AS '.$this->id_col;
+		}
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 
@@ -302,9 +324,9 @@ class route_result extends so_sql
 			//pre 2008: $r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
 			//pre 2008: rounding to 2 digits: return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
 			return "SELECT SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2) FROM $this->table_name r1".
-				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.PerId=r2.PerId".
+				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.$this->id_col=r2.$this->id_col".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
-				" AND $this->table_name.PerId=r1.PerId";
+				" AND $this->table_name.$this->id_col=r1.$this->id_col";
 		}
 /*		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
 		{
@@ -320,17 +342,17 @@ class route_result extends so_sql
 			$r2 = "(1+(SELECT COUNT(*) FROM $this->table_name r$r WHERE $r.WetId=r$r.WetId AND $r.GrpId=r$r.GrpId AND r$r.route_order IN (2,3) AND $r.result_rank>r$r.result_rank))";
 			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r2 END)";
 			return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
-				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order IN (2,3) AND r1.PerId=r2.PerId".
+				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order IN (2,3) AND r1.$this->id_col=r2.$this->id_col".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order IN (0,1)".
-				" AND $this->table_name.PerId=r1.PerId";
+				" AND $this->table_name.$this->id_col=r1.$this->id_col";
 		}*/
 		elseif($route_type == TWOxTWO_QUALI && in_array($route_order,array(2,3)))
 		{
 			return "SELECT result_detail FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
-				'p.route_order='.(int)($route_order-2)." AND $this->table_name.PerId=p.PerId";
+				'p.route_order='.(int)($route_order-2)." AND $this->table_name.$this->id_col=p.$this->id_col";
 		}
 		return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
-			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1))." AND $this->table_name.PerId=p.PerId";
+			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1))." AND $this->table_name.$this->id_col=p.$this->id_col";
 	}
 
 	/**
@@ -342,7 +364,7 @@ class route_result extends so_sql
 	 * @param string &$order_by
 	 * @param array &$route_names route_order => route_name pairs
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
-	 * @param string $discipline 'lead', 'speed', 'boulder'
+	 * @param string $discipline 'lead', 'speed', 'boulder', 'speedrelay'
 	 * @param array $result_cols=array() result relevant col
 	 * @return string join
 	 */
@@ -369,7 +391,7 @@ class route_result extends so_sql
 				continue;	// no need to join the qualification
 			}
 
-			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.PerId=r$route_order.PerId";
+			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.$this->id_col=r$route_order.$this->id_col";
 			foreach($result_cols as $col)
 			{
 				$extra_cols[] = "r$route_order.$col AS $col$route_order";
@@ -393,8 +415,15 @@ class route_result extends so_sql
 				$order_by[] = "r$route_order.result_rank IS NULL";
 			}
 		}
-		$order_by = implode(',',array_reverse($order_by)).',nachname ASC,vorname ASC';
-
+		$order_by = implode(',',array_reverse($order_by));
+		if ($this->isRelay)
+		{
+			$order_by .= ',RelayResults.team_nation ASC,RelayResults.team_name ASC';
+		}
+		else
+		{
+			$order_by .= ',nachname ASC,vorname ASC';
+		}
 		$extra_cols[] = $this->table_name.'.*';		// trick so_sql to return the cols from the quali as regular cols
 
 		//echo "join=$join, order_by=$order_by, extra_cols="; _debug_array($extra_cols);
@@ -547,6 +576,17 @@ class route_result extends so_sql
 				}
 				break;
 
+				
+			case 'speedrelay':
+				for($i = 1; $i <= 3; ++$i)
+				{
+					$col = 'result_time_'.$i;
+					if ((string)$data[$col] != '')
+					{
+						$data[$col] = sprintf('%4.2lf',$data[$col]*0.001);
+					}
+				}
+				// fall through
 			case 'speed':
 				if ($data['result_time'])	// speed result
 				{
@@ -617,7 +657,7 @@ class route_result extends so_sql
 						if (!$data['route_order']) $data['result_rank0'] = $data['result_rank'];
 					}
 				}
-				if ($data['PerId'] < 0)	// Wildcard
+				if ($data[$this->id_col] < 0)	// Wildcard
 				{
 					$data['nachname'] = '-- '.lang('Wildcard').' --';
 				}
@@ -699,6 +739,19 @@ class route_result extends so_sql
 			{
 				$data['result_time'] = $data['result_time']+$data['result_time_r'] ?
 					round(1000 * ($data['result_time']+$data['result_time_r'])) : null;
+			}
+		}
+		// speed relay, todo: eliminated
+		elseif ($data['result_time_1'] || $data['result_time_2'] || $data['result_time_3'])
+		{
+			$data['result_time'] = null;
+			for($i = 1; $i <= 3; ++$i)
+			{
+				if ($data['result_time_'.$i])
+				{
+					$data['result_time_'.$i] = round(1000 * $data['result_time_'.$i]);
+					$data['result_time'] += $data['result_time_'.$i];
+				}
 			}
 		}
 		elseif ($data['result_time'] || isset($data['eliminated']))	// speed with result on only one route
@@ -790,7 +843,7 @@ class route_result extends so_sql
 	 * @param array $keys values for keys WetId, GrpId and route_order
 	 * @param boolean $do_countback=true should we do a countback on further heats
 	 * @param int $route_type=ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
-	 * @param string $discipline='lead' 'lead', 'speed', 'boulder'
+	 * @param string $discipline='lead' 'lead', 'speed', 'boulder', 'speedrelay'
 	 * @return int/boolean updated rows or false on error (no route specified in $keys)
 	 */
 	function update_ranking($keys,$route_type=ONE_QUALI,$discipline='lead')
@@ -807,19 +860,21 @@ class route_result extends so_sql
 			case 'lead':
 				$mode = $this->rank_lead;
 				$order_by = 'result_height IS NULL,new_rank ASC';
+				$extra_cols[] = 'result_details';
 				break;
+			case 'speedrelay':
 			case 'speed':
 				$order_by = 'result_time IS NULL,new_rank ASC';
 				if ($keys['route_order'] < 2)
 				{
-					$mode = $this->rank_speed_quali;
+					$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_quali);
 				}
 				else
 				{
-					$mode = $this->rank_speed_final;
+					$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_final);
 					// ORDER BY CASE column-alias does NOT work with MySQL 5.0.22-Debian_Ubuntu6.06.6, it works with 5.0.51a-log SUSE
 					//$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
-					$order_by = "result_time IS NULL,CASE ($this->rank_speed_final) WHEN 1 THEN 0 ELSE result_time END ASC";
+					$order_by = "result_time IS NULL,CASE ($mode) WHEN 1 THEN 0 ELSE result_time END ASC";
 					$extra_cols[] = 'result_time';
 				}
 				break;
@@ -837,12 +892,12 @@ class route_result extends so_sql
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS other_detail';
 			}
 		}
-		elseif ($discipline != 'speed' && $keys['route_order'] >= (2+(int)($route_type == TWO_QUALI_HALF)))
+		elseif (substr($discipline,0,5) != 'speed' && $keys['route_order'] >= (2+(int)($route_type == TWO_QUALI_HALF)))
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
 		}
-		$result = $this->search($keys,'PerId,result_rank,result_detail',$order_by,$extra_cols);
+		$result = $this->search($keys,$this->id_col.',result_rank',$order_by,$extra_cols);
 
 		if ($route_type == TWO_QUALI_ALL && $keys['route_order'] < 2 ||		// calculate the points
 			$route_type == TWOxTWO_QUALI && $keys['route_order'] < 4)
@@ -882,7 +937,7 @@ class route_result extends so_sql
 		foreach($result as $i => &$data)
 		{
 			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
-			if ($discipline == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
+			if (substr($discipline,0,5) == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
 			{
 				if ($data['eliminated']) $data['time_sum'] = ELIMINATED_TIME;
 				$new_speed_rank = $data['new_rank'];
@@ -891,16 +946,16 @@ class route_result extends so_sql
 					$data['new_rank'] = !$old_time || $old_time < $data['time_sum'] ||
 						 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
 				}
-				//echo "<p>$i. $data[PerId]: time=$data[time_sum], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
+				//echo "<p>$i. $data[$this->id_col]: time=$data[time_sum], last=$old_time, $data[result_rank] --> $data[new_rank]</p>\n";
 				$old_time = $data['time_sum'];
 				$old_speed_rank = $new_speed_rank;
 			}
-			//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
+			//echo "<p>$i. $data[$this->id_col]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			if ($data['new_rank'] && $data['new_rank'] != $i+1 && $old_prev_rank)	// do we have a tie and a prev. heat
 			{
 				// use the previous heat to break the tie
 				$data['new_rank'] = $old_prev_rank < $data['rank_prev_heat'] ? $i+1 : $old_rank;
-				//echo "<p>$i. $data[PerId]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
+				//echo "<p>$i. $data[$this->id_col]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			}
 			$to_update = array();
 			if ($places)	// calculate the quali-points of the single heat
@@ -913,9 +968,9 @@ class route_result extends so_sql
 			}
 			if ($data['new_rank'] != $data['result_rank']) $to_update['result_rank'] = $data['new_rank'];
 
-			if ($to_update && $this->db->update($this->table_name,$to_update,$keys+array('PerId'=>$data['PerId']),__LINE__,__FILE__))
+			if ($to_update && $this->db->update($this->table_name,$to_update,$keys+array($this->id_col=>$data[$this->id_col]),__LINE__,__FILE__))
 			{
-				//_debug_array($to_update+array('PerId'=>$data['PerId']));
+				//_debug_array($to_update+array($this->id_col=>$data[$this->id_col]));
 				++$modified;
 			}
 			$old_prev_rank = $data['rank_prev_heat'];
@@ -927,7 +982,7 @@ class route_result extends so_sql
 	/**
 	 * Delete a participant from a route and renumber the starting-order of the following participants
 	 *
-	 * @param array $keys required 'WetId', 'PerId', possible 'GrpId', 'route_number'
+	 * @param array $keys required 'WetId', $this->id_col, possible 'GrpId', 'route_number'
 	 * @return boolean true if participant was successful deleted, false otherwise
 	 */
 	function delete_participant($keys)
@@ -950,6 +1005,20 @@ class route_result extends so_sql
 	}
 
 	/**
+	 * Determine the highest existing value of given column for $keys (competition, category and route_order)
+	 *
+	 * @param array $keys
+	 * @param string $col='route_order'
+	 * @return mixed value of $col or null
+	 */
+	function get_max(array $keys,$col='route_order')
+	{
+		$this->db->select($this->table_name,'MAX('.$col.')',$keys,__LINE__,__FILE__);
+
+		return $this->db->next_record() ? $this->db->f(0) : null;
+	}
+
+	/**
 	 * Determine the highest existing route_order for $comp and $cat
 	 *
 	 * @param int $comp WetId
@@ -958,12 +1027,24 @@ class route_result extends so_sql
 	 */
 	function get_max_order($comp,$cat)
 	{
-		$this->db->select($this->table_name,'MAX(route_order)',array(
+		return $this->get_max(array(
 			'WetId' => $comp,
 			'GrpId' => $cat,
-		),__LINE__,__FILE__);
+		),'route_order');
+	}
 
-		return $this->db->next_record() ? $this->db->f(0) : null;
+	/**
+	 * Determine count of rows matching $keys (competition, category and route_order)
+	 *
+	 * @param array $keys
+	 * @param string $col='*'
+	 * @return int
+	 */
+	function get_count(array $keys,$col='*')
+	{
+		$this->db->select($this->table_name,'COUNT('.$col.')',$keys,__LINE__,__FILE__);
+
+		return $this->db->next_record() ? (int)$this->db->f(0) : null;
 	}
 
 	/**
@@ -980,7 +1061,31 @@ class route_result extends so_sql
 			return false;
 		}
 		$this->db->update($this->table_name,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
+		$affected = $this->db->affected_rows();
 
-		return $this->db->affected_rows();
+		for ($i = 1; $i <= 3; ++$i)
+		{
+			$this->db->update(self::RELAY_TABLE,array('PerId_'.$i=>$to),array('PerId_'.$i=>$from),__LINE__,__FILE__,'ranking');
+			$affected += $this->db->affected_rows();
+		}
+		return $affected;
+	}
+	
+	/**
+	 * which column should get propagated to next heat, depends on isRelay or not
+	 * 
+	 * @return string comma separated columns
+	 */
+	function startlist_cols()
+	{
+		if ($this->isRelay)
+		{
+			$cols = 'team_id,result_rank,team_nation,team_name,start_number_1,PerId_1,start_number_2,PerId_2,start_number_3,PerId_3';
+		}
+		else
+		{
+			$cols = 'PerId,result_rank,start_number';
+		}
+		return $cols;
 	}
 }

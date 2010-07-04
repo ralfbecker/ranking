@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.index.speed_graph.cellspeedrelay" template="" lang="" group="0" version="1.7.002">
+		<grid width="100%" class="speed_athlete">
+			<columns>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<description id="team_name" no_lang="1" value="%s ($cont[team_nation])"/>
+					<description no_lang="1" align="right" id="result"/>
+				</row>
+				<row>
+					<link-entry span="all" no_lang="1" id="PerId_1" options="ranking" readonly="true"/>
+				</row>
+				<row>
+					<link-entry span="all" no_lang="1" id="PerId_2" options="ranking" readonly="true"/>
+				</row>
+				<row disabled="!@PerId_3">
+					<link-entry span="all" no_lang="1" id="PerId_3" options="ranking" readonly="true"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

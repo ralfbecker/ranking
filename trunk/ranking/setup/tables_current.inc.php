@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -85,7 +85,7 @@ $phpgw_baseline = array(
 			'vor_rls' => array('type' => 'int','precision' => '2'),
 			'vor' => array('type' => 'int','precision' => '2'),
 			'extra' => array('type' => 'varchar','precision' => '40'),
-			'discipline' => array('type' => 'varchar','precision' => '8','default' => 'lead')
+			'discipline' => array('type' => 'varchar','precision' => '10','default' => 'lead')
 		),
 		'pk' => array('GrpId'),
 		'fk' => array(),
@@ -259,6 +259,34 @@ $phpgw_baseline = array(
 			'result_detail' => array('type' => 'varchar','precision' => '255')
 		),
 		'pk' => array('WetId','GrpId','route_order','PerId'),
+		'fk' => array(),
+		'ix' => array(),
+		'uc' => array()
+	),
+	'RelayResults' => array(
+		'fd' => array(
+			'WetId' => array('type' => 'int','precision' => '4'),
+			'GrpId' => array('type' => 'int','precision' => '4'),
+			'route_order' => array('type' => 'int','precision' => '2'),
+			'team_id' => array('type' => 'int','precision' => '2'),
+			'team_nation' => array('type' => 'varchar','precision' => '3'),
+			'team_name' => array('type' => 'varchar','precision' => '64'),
+			'start_order' => array('type' => 'int','precision' => '2'),
+			'result_time' => array('type' => 'int','precision' => '4'),
+			'result_rank' => array('type' => 'int','precision' => '2'),
+			'PerId_1' => array('type' => 'int','precision' => '4'),
+			'start_number_1' => array('type' => 'int','precision' => '2'),
+			'result_time_1' => array('type' => 'int','precision' => '4'),
+			'PerId_2' => array('type' => 'int','precision' => '4'),
+			'start_number_2' => array('type' => 'int','precision' => '2'),
+			'result_time_2' => array('type' => 'int','precision' => '4'),
+			'PerId_3' => array('type' => 'int','precision' => '4'),
+			'start_number_3' => array('type' => 'int','precision' => '2'),
+			'result_time_3' => array('type' => 'int','precision' => '4'),
+			'result_modified' => array('type' => 'int','precision' => '8'),
+			'result_modifier' => array('type' => 'int','precision' => '4')
+		),
+		'pk' => array('WetId','GrpId','route_order','team_id'),
 		'fk' => array(),
 		'ix' => array(),
 		'uc' => array()

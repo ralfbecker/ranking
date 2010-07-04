@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%" class="extra_footer">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@comp_sponsors">
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
+				</row>
+				<row disabled="!@show_result=0">
+					<groupbox rows="1" cols="1" class="extra_startlist">
+						<caption label="Isolation zone and starting time"/>
+						<grid padding="5">
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description value="Isolation zone"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Starting time"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Observation time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row disabled="!@result_official">
+					<groupbox rows="1" cols="1" class="extra_result">
+						<caption label="Result official"/>
+						<grid>
+							<columns>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description id="route_data[route_result]" no_lang="1"/>
+								</row>
+								<row>
+									<description no_lang="1" id="route_data[route_judge]"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.extra_footer { margin-top: 10px; }
+		</styles>
+	</template>
+	<template id="ranking.result.index.rows_relay" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%">
+			<columns>
+				<column width="5%"/>
+				<column/>
+				<column/>
+				<column/>
+				<column width="5%"/>
+				<column/>
+				<column width="5%"/>
+				<column/>
+				<column width="5%"/>
+				<column/>
+				<column/>
+				<column disabled="@no_delete"/>
+			</columns>
+			<rows>
+				<row part="header">
+					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row class="th" part="header">
+					<nextmatch-sortheader label="Start- order" id="start_order" align="center"/>
+					<nextmatch-sortheader label="Nation" id="team_nation"/>
+					<nextmatch-sortheader label="Teamname" id="team_name" class="leftPad5"/>
+					<nextmatch-header label="Athlete 1" id="PerId_1" class="leftPad5"/>
+					<nextmatch-sortheader label="Start- number" id="start_number_1" align="center" class="noPrint"/>
+					<nextmatch-header label="Athlete 2" id="PerId_2"/>
+					<nextmatch-sortheader label="Start- number" id="start_number_2" align="center" class="noPrint"/>
+					<nextmatch-header label="Athlete 3" id="PerId_3"/>
+					<nextmatch-sortheader label="Start- number" id="start_number_3" align="center" class="noPrint"/>
+					<nextmatch-header label="Result" id="jury_result"/>
+					<nextmatch-header label="Remark" id="remark"/>
+					<description class="noPrint" value="Actions" align="center"/>
+				</row>
+				<row part="footer">
+					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row class="x $row_cont[class]">
+					<description id="{$row}[start_order]" no_lang="1" align="center"/>
+					<menulist>
+						<menupopup options="Select one" id="set[$row_cont[team_id]][team_nation]" no_lang="1"/>
+					</menulist>
+					<textbox size="10" maxlength="64" id="set[$row_cont[team_id]][team_name]" no_lang="1"/>
+					<link-entry options="ranking" id="set[$row_cont[team_id]][PerId_1]" no_lang="1"/>
+					<textbox size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[team_id]][start_number_1]" no_lang="1" class="noPrint" align="center"/>
+					<link-entry options="ranking" id="set[$row_cont[team_id]][PerId_2]" no_lang="1"/>
+					<textbox size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[team_id]][start_number_2]" no_lang="1" class="noPrint" align="center"/>
+					<link-entry options="ranking" id="set[$row_cont[team_id]][PerId_3]" no_lang="1"/>
+					<textbox size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[team_id]][start_number_3]" no_lang="1" class="noPrint" align="center"/>
+					<description/>
+					<description/>
+					<button image="delete" label="Delete" align="center" id="delete[$row_cont[team_id]]" onclick="return confirm('Delete this participant (can NOT be undone)');" class="noPrint"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

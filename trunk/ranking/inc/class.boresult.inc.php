@@ -149,7 +149,7 @@ class boresult extends boranking
 			$this->route_result->delete($keys);
 			return $this->_startlist_from_previous_heat($keys,
 				($route_order >= 2 ? 'reverse' : 'previous'),	// after quali reversed result, otherwise as previous heat
-				$discipline == 'speed',$discipline);						// speed --> use ko-system for the final
+				$discipline);
 		}
 		// from now on only quali startlist from registration
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
@@ -312,13 +312,13 @@ class boresult extends boranking
 	 * @internal use generate_startlist
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
-	 * @param boolean $ko_system=false use ko-system
 	 * @param string $discipline
 	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function _startlist_from_previous_heat($keys,$start_order='reverse',$ko_system=false,$discipline='lead')
+	function _startlist_from_previous_heat($keys,$start_order='reverse',$discipline='lead')
 	{
-		//echo "<p>".__METHOD__."(".print_r($keys,true).",$start_order,$ko_system,$discipline)</p>\n";
+		$ko_system = substr($discipline,0,5) == 'speed';
+		echo "<p>".__METHOD__."(".array2string($keys).",$start_order,$discipline) ko_system=$ko_system</p>\n";
 		if ($ko_system && $keys['route_order'] > 2)
 		{
 			return $this->_startlist_from_ko_heat($keys,$prev_route);
@@ -336,7 +336,7 @@ class boresult extends boranking
 			$start_order != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
 			$ko_system && !$prev_route['route_quota'])
 		{
-			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
+			echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
 			return false;	// prev. route not found or no result
 		}
 		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
@@ -352,7 +352,9 @@ class boresult extends boranking
 		{
 			$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
 		}
-		$cols = 'PerId,start_number,result_rank';
+		// which column get propagated to next heat
+		$cols = $this->route_result->startlist_cols();
+
 		if ($prev_route['route_quota'] == 1 || 				// superfinal
 			$start_order == 'previous' && !$ko_system || 	// 2. Quali uses same startorder
 			$ko_system && $keys['route_order'] > 2)			// speed-final
@@ -404,8 +406,9 @@ class boresult extends boranking
 			}
 			$order_by .= ',RAND()';					// --> randomized
 		}
+		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n";
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
-		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
+		//_debug_array($starters);
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
 		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $prev_route['route_quota'])
@@ -502,7 +505,9 @@ class boresult extends boranking
 				return false;
 			}
 		}
-		$starters =& $this->route_result->search('',$cols='PerId,start_number,start_order',
+		// which column get propagated to next heat
+		$cols = $this->route_result->startlist_cols().',start_order';
+		$starters =& $this->route_result->search('',$cols,
 			$order_by='start_order','','',false,'AND',false,$prev_keys);
 		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
 
@@ -515,7 +520,7 @@ class boresult extends boranking
 		for($start_order=1; $start_order <= $prev_route['route_quota']; ++$start_order)
 		{
 			$data = $starters_by_startorder[$start_order];
-			if (!isset($data) || $data['PerId'] <= 0)	// no starter --> wildcard for co
+			if (!isset($data) || $data[$this->route_result->id_col] <= 0)	// no starter --> wildcard for co
 			{
 				$this->_create_wildcard_co($keys,$start_order,array('result_rank' => 2));
 			}
@@ -523,7 +528,7 @@ class boresult extends boranking
 			{
 				// check if our co is a regular starter, as we otherwise have a wildcard
 				$co = $starters_by_startorder[$start_order & 1 ? $start_order+1 : $start_order-1];
-				if (!isset($co) || $co['PerId'] <= 0)
+				if (!isset($co) || $co[$this->route_result->id_col] <= 0)
 				{
 					$data['result_time'] = WILDCARD_TIME;
 					$data['result_rank'] = 1;
@@ -532,7 +537,6 @@ class boresult extends boranking
 
 				$this->route_result->init($keys);
 				$this->route_result->save($data);
-
 			}
 		}
 		return $start_order-1;
@@ -549,9 +553,10 @@ class boresult extends boranking
 	{
 		$this->route_result->init($keys);
 		$this->route_result->save($data=array(
-			'PerId' => -$start_order,	// has to be set and unique (per route) for each wildcard
+			$this->route_result->id_col => -$start_order,	// has to be set and unique (per route) for each wildcard
 			'start_order' => $start_order,
 			'result_time' => ELIMINATED_TIME,
+			'team_name' => lang('Wildcard'),
 		)+$extra);
 	}
 
@@ -612,19 +617,34 @@ class boresult extends boranking
 		{
 			return $this->error = false;
 		}
+		// adding a new team for relay
+		$data = $results[0];
+		if ($discipline == 'speedrelay' && isset($data) && !empty($data['team_nation']) && !empty($data['team_name']))
+		{
+			$data['team_id'] = $this->route_result->get_max($keys,'team_id')+1;
+			$data['start_order'] = $this->route_result->get_max($keys,'start_order')+1;
+			$data['result_modified'] = time();
+			$data['result_modifier'] = $this->user;
+			_debug_array($data);
+			$this->route_result->init($keys);
+			$this->route_result->save($data);
+		}
+		unset($results[0]);
+
+		$id_col = $discipline == 'speedrelay' ? 'team_id' : 'PerId';
 		//echo "<p>boresult::save_result(".print_r($keys,true).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
 		if (is_null($old_values))
 		{
-			$keys['PerId'] = array_keys($results);
+			$keys[$id_col] = array_keys($results);
 			$old_values = $this->route_result->search($keys,'*');
 		}
 		$modified = 0;
-		foreach($results as $PerId => $data)
+		foreach($results as $id => $data)
 		{
-			$keys['PerId'] = $PerId;
+			$keys[$id_col] = $id;
 
-			foreach($old_values as $old) if ($old['PerId'] == $PerId) break;
-			if ($old['PerId'] != $PerId) unset($old);
+			foreach($old_values as $old) if ($old[$id_col] == $id) break;
+			if ($old[$id_col] != $id) unset($old);
 
 			// to also check the result_details
 			if ($data['result_details']) $data += $data['result_details'];
@@ -662,7 +682,7 @@ class boresult extends boranking
 				if ($key != 'result_details' && (!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) &&
 					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
-					if ($key == 'start_number' && strchr($val,'+') !== false)
+					if (($key == 'start_number' || $key == 'start_number_1') && strchr($val,'+') !== false)
 					{
 						$this->set_start_number($keys,$val);
 						++$modified;
@@ -682,7 +702,7 @@ class boresult extends boranking
 		// always trying the update, to be able to eg. incorporate changes in the prev. heat
 		//if ($modified)	// update the ranking only if there are modifications
 		{
-			unset($keys['PerId']);
+			unset($keys[$id_col]);
 
 			if ($keys['route_order'] == 2 && is_null($route_type))	// check the route_type, to know if we have a countback to the quali
 			{
@@ -698,30 +718,34 @@ class boresult extends boranking
 	/**
 	 * Set start-number of a given and the following participants
 	 *
-	 * @param array $keys 'WetId','GrpId', 'route_order', 'PerId'
+	 * @param array $keys 'WetId','GrpId', 'route_order', $this->route_result->id_col (PerId/team_id)
 	 * @param string $number [start]+increment
 	 */
 	function set_start_number($keys,$number)
 	{
-		$PerId = $keys['PerId'];
-		unset($keys['PerId']);
+		$id = $keys[$this->route_result->id_col];
+		unset($keys[$this->route_result->id_col]);
 		list($start,$increment) = explode('+',$number);
 		foreach($this->route_result->search($keys,false,'start_order') as $data)
 		{
-			if (!$PerId || $data['PerId'] == $PerId)
+			if (!$id || $data[$this->route_result->id_col] == $id)
 			{
-				if ($data['PerId'] == $PerId && $start)
+				for ($i = 0; $i <= 3; ++$i)
 				{
-					$data['start_number'] = $start;
+					$col = 'start_number'.($i ? '_'.$id : '');
+					if (!isset($data[$col])) continue;
+					if ($data[$this->route_result->id_col] == $id && $start)
+					{
+						$last = $data[$col] = $start;
+						unset($id);
+					}
+					else
+					{
+						$last = $data[$col] = is_numeric($increment) ? $last + $increment : $last;
+					}
+					$this->route_result->save($data);
 				}
-				else
-				{
-					$data['start_number'] = is_numeric($increment) ? $last + $increment : $last;
-				}
-				$this->route_result->save($data);
-				unset($PerId);
 			}
-			$last = $data['start_number'];
 		}
 	}
 
@@ -736,11 +760,11 @@ class boresult extends boranking
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return null;
 
-		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0,'PerId'=>0));
+		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0,'PerId'=>0,'team_id'=>0));
 
 		if (!$startlist_only) $keys[] = 'result_rank IS NOT NULL';
 
-		return (boolean) $this->route_result->search($keys);//,false);
+		return (boolean) $this->route_result->get_count($keys);
 	}
 
 	/**
@@ -758,12 +782,12 @@ class boresult extends boranking
 	/**
 	 * Delete a participant from a route and renumber the starting-order of the following participants
 	 *
-	 * @param array $keys required 'WetId', 'PerId', possible 'GrpId', 'route_number'
+	 * @param array $keys required 'WetId', 'PerId'/'team_id', possible 'GrpId', 'route_number'
 	 * @return boolean true if participant was successful deleted, false otherwise
 	 */
 	function delete_participant($keys)
 	{
-		if (!$keys['WetId'] || !$keys['PerId'] ||
+		if (!$keys['WetId'] || !$keys[$this->route_result->id_col] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 			$this->has_results($keys))
@@ -1191,7 +1215,12 @@ class boresult extends boranking
 			return false;	// permission denied
 		}
 		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
-
+		// switch route_result class to relay mode, if necessary
+		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
+		{
+			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+				$discipline == 'speedrelay');
+		}
 		if (count($content) > 3)
 		{
 			return true;	// no new route
@@ -1230,7 +1259,7 @@ class boresult extends boranking
 			{
 				$msg = lang('No quota set in the previous heat!!!');
 			}
-			if ($discipline != 'speed')
+			if (substr($discipline,0,5) != 'speed')
 			{
 				if ($comp['nation'] == 'SUI')
 				{
@@ -1265,7 +1294,7 @@ class boresult extends boranking
 					$keys['route_judge'] = array();
 					foreach($comp['judges'] as $uid)
 					{
-						$keys['route_judge'][] = $GLOBALS['egw']->common->grab_owner_name($uid);
+						$keys['route_judge'][] = common::grab_owner_name($uid);
 					}
 					$keys['route_judge'] = implode(', ',$keys['route_judge']);
 				}

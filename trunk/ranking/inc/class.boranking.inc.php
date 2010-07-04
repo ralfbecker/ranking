@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -37,6 +37,7 @@ class boranking extends ranking_so
 		'lead' => 'lead',
 		'boulder' => 'boulder',
 		'speed' => 'speed',
+		'speedrelay' => 'speedrelay',
 	);
 	var $pkt_names;
 	var $cat_names;
