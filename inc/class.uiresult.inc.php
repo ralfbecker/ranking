@@ -299,6 +299,13 @@ class uiresult extends boresult
 			$tmpl->disable_cells('slist_order');
 			if ($readonlys['button[startlist]']) $content['no_startlist'] = true;	// disable empty startlist row
 		}
+		// hack for speedrelay to use startlist button for redomizing
+		if ($discipline == 'speedrelay' && !$content['route_order'])
+		{
+			$tmpl->set_cell_attribute('button[startlist]','label','Randomize startlist');
+			$tmpl->disable_cells('max_compl');
+			$tmpl->disable_cells('slist_order');
+		}
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{

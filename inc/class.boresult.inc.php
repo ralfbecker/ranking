@@ -151,6 +151,11 @@ class boresult extends boranking
 				($route_order >= 2 ? 'reverse' : 'previous'),	// after quali reversed result, otherwise as previous heat
 				$discipline);
 		}
+		// hack for speedrelay, which currently does NOT use registration --> randomize teams
+		if ($discipline == 'speedrelay')
+		{
+			return $this->_randomize_speedrelay($keys);
+		}
 		// from now on only quali startlist from registration
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
@@ -208,6 +213,26 @@ class boresult extends boranking
 			$this->_store_startlist(isset($starters[2]) ? $starters[2] : $starters[1],1,isset($starters[2]));
 		}
 		return $num;
+	}
+	
+	/**
+	 * Randomize a startlist for speedrelay qualification
+	 *
+	 * @param array $keys values for WetId, GrpId and route_order
+	 * @return int|boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
+	 */
+	function _randomize_speedrelay(array $keys)
+	{
+		$start_order = null;
+		if (($starter = $this->route_result->search('',true,'RAND()')))
+		{
+			foreach($starter as $data)
+			{
+				$this->route_result->init($data);
+				$this->route_result->update(array('start_order' => ++$start_order));
+			}
+		}
+		return $start_order;
 	}
 
 	/**
