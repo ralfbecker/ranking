@@ -686,7 +686,7 @@ class boresult extends boranking
 		}
 		unset($results[0]);
 
-		//echo "<p>boresult::save_result(".print_r($keys,true).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
+		//echo "<p>".__METHOD__."(".array2string($keys).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
 		if (is_null($old_values) && $results)
 		{
 			$keys[$this->route_result->id_col] = array_keys($results);
