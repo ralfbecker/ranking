@@ -285,7 +285,7 @@ class route_result extends so_sql
 			}
 		}
 		// otherwise wildcards or not matching LEFT JOINs remove PerId/team_id
-		if (strpos($cols,$this->id_col) !== false)
+		if (!is_string($only_keys) || strpos($only_keys,$this->id_col) !== false)
 		{
 			$extra_cols[] = $this->table_name.'.'.$this->id_col.' AS '.$this->id_col;
 		}
