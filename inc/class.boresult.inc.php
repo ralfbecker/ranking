@@ -361,7 +361,7 @@ class boresult extends boranking
 			$start_order != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
 			$ko_system && !$prev_route['route_quota'])
 		{
-			echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
+			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
 			return false;	// prev. route not found or no result
 		}
 		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
@@ -650,26 +650,24 @@ class boresult extends boranking
 			$data['start_order'] = $this->route_result->get_max($keys,'start_order')+1;
 			$data['result_modified'] = time();
 			$data['result_modifier'] = $this->user;
-			_debug_array($data);
 			$this->route_result->init($keys);
 			$this->route_result->save($data);
 		}
 		unset($results[0]);
 
-		$id_col = $discipline == 'speedrelay' ? 'team_id' : 'PerId';
 		//echo "<p>boresult::save_result(".print_r($keys,true).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
-		if (is_null($old_values))
+		if (is_null($old_values) && $results)
 		{
-			$keys[$id_col] = array_keys($results);
+			$keys[$this->route_result->id_col] = array_keys($results);
 			$old_values = $this->route_result->search($keys,'*');
 		}
 		$modified = 0;
 		foreach($results as $id => $data)
 		{
-			$keys[$id_col] = $id;
+			$keys[$this->route_result->id_col] = $id;
 
-			foreach($old_values as $old) if ($old[$id_col] == $id) break;
-			if ($old[$id_col] != $id) unset($old);
+			foreach($old_values as $old) if ($old[$this->route_result->id_col] == $id) break;
+			if ($old[$this->route_result->id_col] != $id) unset($old);
 
 			// to also check the result_details
 			if ($data['result_details']) $data += $data['result_details'];
@@ -681,7 +679,7 @@ class boresult extends boranking
 				{
 					if ($data['top'.$i] && (int)$data['top'.$i] < (int)$data['zone'.$i])
 					{
-						$this->error[$PerId]['zone'.$i] = lang('Can NOT be higher than top!');
+						$this->error[$id]['zone'.$i] = lang('Can NOT be higher than top!');
 					}
 				}
 			}
@@ -690,13 +688,13 @@ class boresult extends boranking
 				// todo: validation
 				if ($data['tops'] && (int)$data['tops'] > (int)$data['zones'])
 				{
-					$this->error[$PerId]['zones'] = lang('Can NOT be lower than tops!');
+					$this->error[$id]['zones'] = lang('Can NOT be lower than tops!');
 				}
 				foreach(array('top','zone') as $name)
 				{
 					if ($data[$name.'s'] > $data[$name.'_tries'])
 					{
-						$this->error[$PerId][$name.'s'] = lang('Can NOT be higher than tries!');
+						$this->error[$id][$name.'s'] = lang('Can NOT be higher than tries!');
 					}
 				}
 			}
@@ -727,7 +725,7 @@ class boresult extends boranking
 		// always trying the update, to be able to eg. incorporate changes in the prev. heat
 		//if ($modified)	// update the ranking only if there are modifications
 		{
-			unset($keys[$id_col]);
+			unset($keys[$this->route_result->id_col]);
 
 			if ($keys['route_order'] == 2 && is_null($route_type))	// check the route_type, to know if we have a countback to the quali
 			{
