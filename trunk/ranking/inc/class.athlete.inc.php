@@ -308,12 +308,12 @@ class athlete extends so_sql
 				$filter[] = $f;
 			}
 			unset($filter[$name]);
-			if ($criteria[$name])
+			if (is_array($criteria) && $criteria[$name])
 			{
 				if ($criteria[$name] == 'NULL') $criteria[$name] = null;
 				$criteria[] = $table.'.'.$name.(is_null($criteria[$name]) ? ' IS NULL' : '='.$this->db->quote($criteria[$name]));
 			}
-			unset($criteria[$name]);
+			if (is_array($criteria)) unset($criteria[$name]);
 			if (strpos($order_by,$name) !== false && ($name != 'fed_id' || strpos($order_by,'acl_fed_id') === false))
 			{
 				$order_by = str_replace($name,$table.'.'.$name,$order_by);
@@ -365,7 +365,7 @@ class athlete extends so_sql
 				unset($filter['license']);
 			}
 		}
-		if ($join && strstr($join,'PerId') !== false)	// this column would be ambigues
+		if ($join && strstr($join,'PerId') !== false && is_array($criteria))	// this column would be ambigues
 		{
 			if ($criteria['PerId'])
 			{
