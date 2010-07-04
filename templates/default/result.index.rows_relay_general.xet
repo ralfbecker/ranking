@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%" class="extra_footer">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@comp_sponsors">
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
+				</row>
+				<row disabled="!@show_result=0">
+					<groupbox rows="1" cols="1" class="extra_startlist">
+						<caption label="Isolation zone and starting time"/>
+						<grid padding="5">
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description value="Isolation zone"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Starting time"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Observation time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row disabled="!@result_official">
+					<groupbox rows="1" cols="1" class="extra_result">
+						<caption label="Result official"/>
+						<grid>
+							<columns>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description id="route_data[route_result]" no_lang="1"/>
+								</row>
+								<row>
+									<description no_lang="1" id="route_data[route_judge]"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.extra_footer { margin-top: 10px; }
+		</styles>
+	</template>
+	<template id="ranking.result.index.rows_relay_general" template="" lang="" group="0" version="1.7.001">
+		<grid width="100%">
+			<columns>
+				<column width="5%"/>
+				<column/>
+				<column width="40%"/>
+				<column disabled="!@route_names[6]"/>
+				<column disabled="!@route_names[5]"/>
+				<column disabled="!@route_names[4]"/>
+				<column disabled="!@route_names[3]"/>
+				<column disabled="!@route_names[2]"/>
+				<column/>
+				<column disabled="!@route_names[1]"/>
+			</columns>
+			<rows>
+				<row part="header">
+					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row class="th" part="header">
+					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
+					<vbox options="0,0">
+						<nextmatch-sortheader label="Nation" id="team_nation" class="leftPad5"/>
+						<nextmatch-sortheader label="Name" id="team_name" class="leftPad5"/>
+					</vbox>
+					<nextmatch-header label="Athletes"/>
+					<nextmatch-sortheader label="@route_names[6]" id="result_rank4" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[5]" id="result_rank4" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[4]" id="result_rank4" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[3]" id="result_rank3" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[2]" id="result_rank2" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[0]" id="result_rank0" align="center" no_lang="1"/>
+					<nextmatch-sortheader label="@route_names[1]" id="result_rank1" align="center" no_lang="1"/>
+				</row>
+				<row part="footer">
+					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row class="row $row_cont[quota_class]">
+					<description id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
+					<vbox>
+						<description id="{$row}[team_nation]" class="nation leftPad5" no_lang="1"/>
+						<description id="{$row}[team_name]" no_lang="1" class="leftPad5"/>
+					</vbox>
+					<vbox options="0,0">
+						<link-entry options="ranking" id="${row}[PerId_1]" readonly="true"/>
+						<link-entry options="ranking" id="${row}[PerId_2]" readonly="true"/>
+						<link-entry options="ranking" id="${row}[PerId_3]" readonly="true"/>
+					</vbox>
+					<description id="{$row}[result6]" no_lang="1" align="center"/>
+					<description id="{$row}[result5]" no_lang="1" align="center"/>
+					<description id="{$row}[result4]" no_lang="1" align="center"/>
+					<description id="{$row}[result3]" no_lang="1" align="center"/>
+					<description id="{$row}[result2]" no_lang="1" align="center"/>
+					<description id="{$row}[result]" no_lang="1" align="center"/>
+					<description id="{$row}[result1]" no_lang="1" align="center"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -1172,5 +1172,62 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 		$GLOBALS['egw_setup']->oProc->m_odb = $GLOBALS['egw']->db;
 	}
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.003';
+}
+
+/**
+ * Create RouteTeamResults table
+ *
+ * @return string new version-number
+ */
+function ranking_upgrade1_7_003()
+{
+	$GLOBALS['egw_setup']->oProc->CreateTable('RelayResults',array(
+		'fd' => array(
+			'WetId' => array('type' => 'int','precision' => '4'),
+			'GrpId' => array('type' => 'int','precision' => '4'),
+			'route_order' => array('type' => 'int','precision' => '2'),
+			'team_id' => array('type' => 'int','precision' => '2'),
+			'team_nation' => array('type' => 'varchar','precision' => '3'),
+			'team_name' => array('type' => 'varchar','precision' => '64'),
+			'start_order' => array('type' => 'int','precision' => '2'),
+			'result_time' => array('type' => 'int','precision' => '4'),
+			'result_rank' => array('type' => 'int','precision' => '2'),
+			'PerId_1' => array('type' => 'int','precision' => '4'),
+			'start_number_1' => array('type' => 'int','precision' => '2'),
+			'result_time_1' => array('type' => 'int','precision' => '4'),
+			'PerId_2' => array('type' => 'int','precision' => '4'),
+			'start_number_2' => array('type' => 'int','precision' => '2'),
+			'result_time_2' => array('type' => 'int','precision' => '4'),
+			'PerId_3' => array('type' => 'int','precision' => '4'),
+			'start_number_3' => array('type' => 'int','precision' => '2'),
+			'result_time_3' => array('type' => 'int','precision' => '4'),
+			'result_modified' => array('type' => 'int','precision' => '8'),
+			'result_modifier' => array('type' => 'int','precision' => '4'),
+		),
+		'pk' => array('WetId','GrpId','route_order','team_id'),
+		'fk' => array(),
+		'ix' => array(),
+		'uc' => array()
+	));
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.004';
+}
+
+/**
+ * Add speedrelay discipline to categories table
+ * 
+ * @return string
+ */
+function ranking_upgrade1_7_004()
+{
+/*
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Gruppen','discipline',array(
+		'type' => 'varchar',
+		'precision' => '10',
+		'default' => 'lead'
+	));
+*/
+	$GLOBALS['egw_setup']->oProc->query("ALTER TABLE  `Gruppen` CHANGE  `discipline`  `discipline` ENUM(  'lead',  'boulder',  'speed',  'speedrelay' ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL",__LINE__,__FILE__);
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.005';
 }
 
