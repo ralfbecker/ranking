@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
+					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
-									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
+									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
+									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_data[route_start]" no_lang="1"/>
+									<description span="all" no_lang="1" id="route_data[route_start]"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description id="route_data[route_observation_time]" no_lang="1"/>
-									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
+									<description no_lang="1" id="route_data[route_observation_time]"/>
+									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,7 +47,7 @@
 							</columns>
 							<rows>
 								<row>
-									<description id="route_data[route_result]" no_lang="1"/>
+									<description no_lang="1" id="route_data[route_result]"/>
 								</row>
 								<row>
 									<description no_lang="1" id="route_data[route_judge]"/>
@@ -81,21 +81,8 @@
 				<column disabled="!@time_measurement"/>
 			</columns>
 			<rows>
-				<row part="header">
-					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
+				<row class="onlyPrint" part="header">
+					<template span="all" id="ranking.result.header$cont[calendar]"/>
 				</row>
 				<row class="th" part="header">
 					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
@@ -113,21 +100,8 @@
 					<nextmatch-sortheader label="Sum" align="center" id="result_time"/>
 					<description value="Actions" align="center" class="noPrint"/>
 				</row>
-				<row part="footer">
-					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
+				<row class="onlyPrint" part="footer">
+					<template span="all" id="ranking.result.footer"/>
 				</row>
 				<row class="x $row_cont[class] $row_cont[quota_class]">
 					<description id="set[$row_cont[PerId]][result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
