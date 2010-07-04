@@ -547,9 +547,27 @@ class uiresult extends boresult
 
 			if (!$need_start_number && $row['start_number']) $need_start_number = true;
 			
-			if ($query['discipline'] == 'speedrelay' && $query['route'] > 0)
+			if ($query['discipline'] == 'speedrelay')
 			{
-				$readonlys["set[$row[team_id]][team_nation]"] = $readonlys["set[$row[team_id]][team_name]"] = true;
+				if ($query['route'] > 0)
+				{
+					$readonlys["set[$row[team_id]][team_nation]"] = $readonlys["set[$row[team_id]][team_name]"] = true;
+				}
+				if ($row['team_id'] && $query['template'] == 'ranking.result.index.rows_relay')
+				{
+					$PerIds = $titles = array();
+					for($i = 1; $i <= 3; ++$i)
+					{
+						if ($row['PerId_'.$i] > 0) $PerIds[$row['PerId_'.$i]] = $row['PerId_'.$i];
+					}
+					if (count($PerIds) < 3) $titles[''] = lang('None');
+					if ($PerIds) $titles += egw_link::titles('ranking',$PerIds);	
+					$rows['sel_options']['set['.$row['team_id'].'][PerId_1]'] = 
+						$rows['sel_options']['set['.$row['team_id'].'][PerId_2]'] = 
+						$rows['sel_options']['set['.$row['team_id'].'][PerId_3]'] = $titles;
+
+					$readonlys['set['.$row['team_id'].'][team_nation]'] = true;
+				}
 			}
 		}
 		// disable print-only start-number
@@ -607,6 +625,57 @@ class uiresult extends boresult
 			$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 		}
 		return $total;
+	}
+	
+	/**
+	 * Set options of the three athlete selectboxes, after nation changed
+	 * 
+	 * @param int $comp
+	 * @param int $cat
+	 * @param int $team_id
+	 * @param string $nation
+	 */
+	function ajax_set_athlets($comp,$cat,$team_id,$nation)
+	{
+		$response = new xajaxResponse();
+		//$response->alert(__METHOD__."($comp,$cat,$team_id,'$nation')");
+		$starters = $this->get_registered(array(
+			'WetId' => $comp,
+			'GrpId' => $cat,
+			'nation'=> $nation,
+		));
+		$id = 'exec[nm][rows][set]['.(int)$team_id.'][team_name]';
+		$script = "document.getElementById('$id').value='$nation';";
+		// delete existing options
+		for($i = 1; $i <= 3; ++$i)
+		{
+			$id = 'exec[nm][rows][set]['.(int)$team_id.'][PerId_'.$i.']';
+			$script .= "document.getElementById('$id').options.length=0;";
+		}
+		// set option "None" for last selectbox
+		$label = lang('None');
+		$script .= "selectbox_add_option('$id','$label','',false);";
+		// add starter as options to all 3 selectboxes
+		foreach($starters as $starter)
+		{
+			$label = $this->athlete->link_title($starter);
+			$PerId = $starter['PerId'];
+			for($i = 1; $i <= 3; ++$i)
+			{
+				$id = 'exec[nm][rows][set]['.(int)$team_id.'][PerId_'.$i.']';
+				$script .= "selectbox_add_option('$id','$label','$PerId',false);";
+			}
+		}
+		// set 3 different starter
+		for($i = 1; $i <= 3; ++$i)
+		{
+			$starter = array_shift($starters);
+			$PerId = $starter['PerId'];
+			$id = 'exec[nm][rows][set]['.(int)$team_id.'][PerId_'.$i.']';
+			$script .= "document.getElementById('$id').value = '$PerId';";
+		}
+
+		$response->script($script);
 	}
 
 	/**
@@ -932,7 +1001,11 @@ class uiresult extends boresult
 		if ($content['nm']['discipline'] == 'speedrelay')
 		{
 			// todo show only nations registered for the competitiion
-			$sel_options['team_nation'] = $this->federation->query_list('nation','nation');
+			//$sel_options['team_nation'] = $this->federation->query_list('nation','nation');
+			$sel_options['team_nation'] = $this->get_registered(array(
+				'WetId' => $comp['WetId'],
+				'GrpId' => $cat['GrpId'],
+			),true);
 		}
 		if ((string)$content['nm']['old_show'] !== (string)$content['nm']['show_result'])
 		{
