@@ -78,11 +78,13 @@
 				<column width="5%"/>
 				<column/>
 				<column/>
+				<column/>
 				<column disabled="1"/>
 			</columns>
 			<rows>
 				<row part="header">
 					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -110,11 +112,13 @@
 					<nextmatch-header label="Athlete 3" id="PerId_3"/>
 					<nextmatch-sortheader label="Start- number" id="start_number_3" align="center"/>
 					<nextmatch-sortheader label="Time" id="result_time_3" align="center"/>
+					<nextmatch-header label="Eliminated"/>
 					<nextmatch-sortheader label="Sum" align="center" id="result_time"/>
 					<description class="noPrint" value="Actions" align="center"/>
 				</row>
 				<row part="footer">
 					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -151,6 +155,9 @@
 						<textbox type="float" id="set[$row_cont[team_id]][result_time_3]" size="5" precision="%4.2lf" class="$cont[rw_result]"/>
 						<description id="${row}[result_time_3]" class="$cont[ro_result]" readonly="true"/>
 					</hbox>
+					<menulist class="$cont[rw_result] leftPad5">
+						<menupopup id="set[$row_cont[team_id]][eliminated]" align="center"/>
+					</menulist>
 					<textbox type="float" align="center" id="${row}[result_time]" readonly="true" size="5" precision="%4.2lf"/>
 					<buttononly label="Start" statustext="select participant for time measurment" class="small noPrint" align="center" onclick="start_time_measurement(this,$row_cont[team_id]);"/>
 				</row>
