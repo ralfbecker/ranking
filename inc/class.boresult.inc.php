@@ -343,7 +343,7 @@ class boresult extends boranking
 	function _startlist_from_previous_heat($keys,$start_order='reverse',$discipline='lead')
 	{
 		$ko_system = substr($discipline,0,5) == 'speed';
-		echo "<p>".__METHOD__."(".array2string($keys).",$start_order,$discipline) ko_system=$ko_system</p>\n";
+		//echo "<p>".__METHOD__."(".array2string($keys).",$start_order,$discipline) ko_system=$ko_system</p>\n";
 		if ($ko_system && $keys['route_order'] > 2)
 		{
 			return $this->_startlist_from_ko_heat($keys,$prev_route);
@@ -768,8 +768,8 @@ class boresult extends boranking
 					{
 						$last = $data[$col] = is_numeric($increment) ? $last + $increment : $last;
 					}
-					$this->route_result->save($data);
 				}
+				$this->route_result->save($data);
 			}
 		}
 	}
