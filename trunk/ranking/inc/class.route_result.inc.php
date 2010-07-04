@@ -456,6 +456,10 @@ class route_result extends so_sql
 			{
 				$data['discipline'] = 'lead';
 			}
+			elseif (array_key_exists('result_time_1',$data))	// speed relay
+			{
+				$data['discipline'] = 'speedrelay';
+			}
 			elseif ($data['result_time'])	// speed result
 			{
 				$data['discipline'] = 'speed';
@@ -742,7 +746,7 @@ class route_result extends so_sql
 			}
 		}
 		// speed relay, todo: eliminated
-		elseif ($data['result_time_1'] || $data['result_time_2'] || $data['result_time_3'])
+		elseif (isset($data['result_time_1']))
 		{
 			$data['result_time'] = null;
 			for($i = 1; $i <= 3; ++$i)
@@ -752,6 +756,11 @@ class route_result extends so_sql
 					$data['result_time_'.$i] = round(1000 * $data['result_time_'.$i]);
 					$data['result_time'] += $data['result_time_'.$i];
 				}
+			}
+			if ((string)$data['eliminated'] !== '' && !($data['result_time'] && !$data['eliminated']))
+			{
+				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ?
+					($data['eliminated'] ? ELIMINATED_TIME : WILDCARD_TIME) : ELIMINATED_TIME));
 			}
 		}
 		elseif ($data['result_time'] || isset($data['eliminated']))	// speed with result on only one route
