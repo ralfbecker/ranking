@@ -732,8 +732,8 @@ class boresult extends boranking
 			{
 				for ($i = 0; $i <= 3; ++$i)
 				{
-					$col = 'start_number'.($i ? '_'.$id : '');
-					if (!isset($data[$col])) continue;
+					$col = 'start_number'.($i ? '_'.$i : '');
+					if (!array_key_exists($col,$data)) continue;
 					if ($data[$this->route_result->id_col] == $id && $start)
 					{
 						$last = $data[$col] = $start;
