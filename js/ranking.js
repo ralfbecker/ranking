@@ -37,9 +37,9 @@ function check_top(top)
 {
 	var bonus = document.getElementById(top.name.replace(/top/g,'zone'));
 
-	if (bonus && !bonus.value && top.value > 0) bonus.value = top.value;
+	if (bonus && !bonus.value && parseInt(top.value) > 0) bonus.value = top.value;
 
-	if (bonus && top.value > 0 && top.value < bonus.value)
+	if (bonus && parseInt(top.value) > 0 && parseInt(top.value) < parseInt(bonus.value))
 	{
 		alert('Top < Bonus!');
 		bonus.value = top.value;
@@ -57,9 +57,9 @@ function check_tops(top)
 {
 	var bonus = document.getElementById(top.name.replace(/tops/g,'zones'));
 
-	if (bonus && !bonus.value && top.value > 0) bonus.value = top.value;
+	if (bonus && !bonus.value && parseInt(top.value) > 0) bonus.value = top.value;
 
-	if (bonus && top.value > 0 && top.value > bonus.value)
+	if (bonus && parseInt(top.value) > 0 && parseInt(top.value) > parseInt(bonus.value))
 	{
 		alert('Top > Bonus!');
 		bonus.value = top.value;
@@ -67,9 +67,9 @@ function check_tops(top)
 	
 	var tries = document.getElementById(top.name.replace(/tops/g,'top_tries'));
 	
-	if (tries && !tries.value && top.value > 0) tries.value = top.value;
+	if (tries && !tries.value && parseInt(top.value) > 0) tries.value = top.value;
 
-	if (tries && top.value > 0 && top.value > tries.value)
+	if (tries && parseInt(top.value) > 0 && parseInt(top.value) > parseInt(tries.value))
 	{
 		alert('Top > Tries!');
 		tries.value = top.value;
@@ -85,12 +85,12 @@ function check_bonus(bonus)
 {
 	var top = document.getElementById(bonus.name.replace(/zone/g,'top'));
 
-	if (top && top.value > 0 && bonus.value > top.value)
+	if (top && parseInt(top.value) > 0 && parseInt(bonus.value) > parseInt(top.value))
 	{
 		alert('Bonus > Top!');
 		top.value = bonus.value;
 	}
-	if (top && top.value > 0 && !bonus.value)
+	if (top && parseInt(top.value) > 0 && !bonus.value)
 	{
 		top.value = bonus.value;
 	}
@@ -106,21 +106,21 @@ function check_zones(bonus)
 {
 	var top = document.getElementById(bonus.name.replace(/zones/g,'tops'));
 
-	if (top && top.value > 0 && bonus.value < top.value)
+	if (top && parseInt(top.value) > 0 && parseInt(bonus.value) < parseInt(top.value))
 	{
 		alert('Bonus < Top!');
 		top.value = bonus.value;
 	}
-	if (top && top.value > 0 && !bonus.value)
+	if (top && parseInt(top.value) > 0 && !bonus.value)
 	{
 		top.value = bonus.value;
 	}
 	
 	var tries = document.getElementById(bonus.name.replace(/zones/g,'zone_tries'));
 	
-	if (tries && !tries.value && bonus.value > 0) tries.value = bonus.value;
+	if (tries && !tries.value && parseInt(bonus.value) > 0) tries.value = bonus.value;
 
-	if (tries && bonus.value > 0 && bonus.value > tries.value)
+	if (tries && parseInt(bonus.value) > 0 && parseInt(bonus.value) > parseInt(tries.value))
 	{
 		alert('Bonus > Tries!');
 		tries.value = bonus.value;
