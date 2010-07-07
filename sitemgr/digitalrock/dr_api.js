@@ -14,14 +14,13 @@
  * 
  * @param _container
  * @param _json_url url for data to load
- * @param _profile_url url for athlete profiles
  */
-function Resultlist(_container,_json_url,_profile_url)
+function Resultlist(_container,_json_url)
 {
-	Startlist.apply(this, [_container,_json_url,_profile_url,{
-		'platz': 'Rank',
-		'name' : {'label': 'Name', 'colspan': 2},
-		'vorname' : '',
+	Startlist.apply(this, [_container,_json_url,{
+		'result_rank': 'Rank',
+		'lastname' : {'label': 'Name', 'colspan': 2},
+		'firstname' : '',
 		'birthyear' : 'Birthyear',
 		'nation' : 'Nation',
 //		'startnummer': 'StartNr',
@@ -54,22 +53,19 @@ Resultlist.prototype.handleResponse = function(_data)
  * 
  * @param _container
  * @param _json_url url for data to load
- * @param _profile_url url for athlete profiles
  * @param _columns hash with key => label pairs
  * @param _sort name of column to sort by
  */
-function Startlist(_container,_json_url,_profile_url,_columns,_sort)
+function Startlist(_container,_json_url,_columns,_sort)
 {
-	if (typeof _profile_url == 'undefined') _profile_url = '/pstambl.php?';
-	this.profile_url = _profile_url;
 	this.json_url = _json_url;
 	if (typeof _container == "string") _container = document.getElementById(_container);
 	this.container = _container;
 	if (typeof _columns == 'undefined') _columns = {
-		'startfolgenr': {'label': 'StartNr', 'colspan': 2},
-		'startnummer': '',
-		'name' : {'label': 'Name', 'colspan': 2},
-		'vorname' : '',
+		'start_order': {'label': 'StartNr', 'colspan': 2},
+		'start_number': '',
+		'lastname' : {'label': 'Name', 'colspan': 2},
+		'firstname' : '',
 		'birthyear' : 'Birthyear',
 		'nation' : 'Nation'
 	};
@@ -106,17 +102,16 @@ Startlist.prototype.handleResponse = function(_data)
 {
 	if (typeof this.table == 'undefined')
 	{
-		document.title = _data.bezeichnung;
+		document.title = _data.route_name;
 		
 		// header line
 		var header = document.createElement('h1');
 		$(this.container).append(header);
 		header.className = 'listHeader';
-		$(header).text((this.sort == 'startfolgenr' ? 'Startlist' : 'Result')+': '+_data.bezeichnung);
+		$(header).text((this.sort == 'start_order' ? 'Startlist' : 'Result')+': '+_data.route_name);
 		
 		// create new table
-		this.table = new Table(_data.teilnehmer,this.columns,
-			this.profile_url+'cat='+_data.GrpId+'&person=',this.sort);
+		this.table = new Table(_data.participants,this.columns,this.sort);
 	
 		$(this.container).append(this.table.dom);
 	}
@@ -134,13 +129,11 @@ Startlist.prototype.handleResponse = function(_data)
  * 
  * @param _data array with data for each participant
  * @param _columns hash with column name => header
- * @param _profile_url profile url (to which PerId of data-row gets appended)
  * @param _sort column name to sort by
  * @param _ascending
  */
-function Table(_data,_columns,_profile_url,_sort,_ascending)
+function Table(_data,_columns,_sort,_ascending)
 {
-	this.profile_url = _profile_url;
 	this.data      = _data;
 	this.columns   = _columns;
 	if (typeof _sort == 'undefined') for(_sort in _columns) break;
@@ -243,7 +236,6 @@ Table.prototype.createRow = function(_data,_tag)
 	var row = document.createElement('tr');
 	if (typeof _data.PerId != 'undefined' && _data.PerId > 0)
 	{
-		var profile_url = this.profile_url+_data.PerId;
 		row.id = _data.PerId;
 		this.athletes[_data.PerId] = row;
 	}
@@ -257,10 +249,10 @@ Table.prototype.createRow = function(_data,_tag)
 		$(row).append(tag);
 		
 		// add pstambl link to name & vorname
-		if (typeof profile_url != 'undefined' && (col == 'name' || col == 'vorname'))
+		if (typeof _data.url != 'undefined' && (col == 'lastname' || col == 'firstname'))
 		{
 			var a = document.createElement('a');
-			a.href = profile_url;
+			a.href = _data.url;
 			a.target = 'pstambl';
 			$(tag).append(a);
 			tag = a;
@@ -288,12 +280,12 @@ Table.prototype.sortData = function()
 {
 	switch(this.sort)
 	{
-		case 'startfolgenr':
-			this.data.sort(sortStartfolge);
+		case 'start_order':
+			this.data.sort(sortStartOrder);
 			break;
 
-		case 'platz':
-			this.data.sort(sortPlatz);
+		case 'result_rank':
+			this.data.sort(sortResultRank);
 			break;
 
 		default:
@@ -310,9 +302,9 @@ Table.prototype.sortData = function()
  * @param _b second object to compare
  * @return int
  */
-function sortStartfolge(_a, _b)
+function sortStartOrder(_a, _b)
 {
-	return _a['startfolgenr'] - _b['startfolgenr'];
+	return _a['start_order'] - _b['start_order'];
 }
 
 /**
@@ -322,12 +314,12 @@ function sortStartfolge(_a, _b)
  * @param _b second object to compare
  * @return int
  */
-function sortPlatz(_a, _b)
+function sortResultRank(_a, _b)
 {
-	var ret = _a['platz'] - _b['platz'];
+	var ret = _a['result_rank'] - _b['result_rank'];
 	
-	if (!ret) ret = _a['name'] > _b['name'];
-	if (!ret) ret = _a['vorname'] > _b['vorname'];
+	if (!ret) ret = _a['lastname'] > _b['lastname'];
+	if (!ret) ret = _a['firstname'] > _b['firstname'];
 	
 	return ret;
 }

@@ -12,7 +12,7 @@
 		<script type="text/javascript">
 			var startlist;
 			$(document).ready(function() {
-				startlist = new Startlist('table','/json.php'+location.search);
+				startlist = new Startlist('table','/egroupware/ranking/json.php'+location.search);
 			});	
 		</script>
 		<input type="button" onclick="startlist.update();" value="Update" />

@@ -1376,4 +1376,247 @@ class boresult extends boranking
 		}
 		return $GLOBALS['boresult'];
 	}
+	
+	/**
+	 * Get URL for athlete profile
+	 * 
+	 * @param array $athlete
+	 * @param int $cat=null
+	 * @return string
+	 */
+	static function profile_url($athlete,$cat=null)
+	{
+		return 'http://'.$_SERVER['HTTP_HOST'].'/pstambl.php?person='.$athlete['PerId'].
+			($cat ? '&cat='.$cat : '');
+	}
+
+	/**
+	 * Export route for xml or json access
+	 * 
+	 * @param int $comp
+	 * @param int|string $cat
+	 * @param int $heat=-1
+	 * @return array
+	 */
+	function export_route($comp,$cat,$heat=-1)
+	{
+		$start = microtime(true);
+	
+		if (!($cat = $this->cats->read($cat)))
+		{
+			throw new Exception(lang('Category NOT found !!!'));
+		}
+		//echo "<pre>".print_r($cat,true)."</pre>\n";
+		if (!($discipline = $cat['discipline']))
+		{
+			if (!($comp = $this->comp->read($comp)))
+			{
+				throw new Exception(lang('Competition NOT found !!!'));
+			}
+			$discipline = $comp['discipline'];
+		}
+	
+		if (!isset($heat) || !is_numeric($heat)) $heat = -1;	// General result
+	
+		if (!($route = $this->route->read(array(
+			'WetId' => $comp,
+			'GrpId' => $cat['GrpId'],
+			'route_order' => $heat,
+		))))
+		{
+			throw new Exception(lang('Route NOT found !!!'));
+		}
+		//printf("<p>reading route+result took %4.2lf s</p>\n",microtime(true)-$start);
+	
+		//echo "<pre>".print_r($route,true)."</pre>\n";
+	
+		// append category name to route name
+		$route['route_name'] .= ' '.$cat['name'];
+		
+		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
+		{
+			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+					$discipline == 'speedrelay');
+		}
+		if (!($result = $this->route_result->search(array(),false,'result_rank','','',false,'AND',false,array(
+			'WetId' => $comp,
+			'GrpId' => $cat['GrpId'],
+			'route_order' => $heat,
+			'discipline'  => $discipline,
+			'route_type'  => $route['route_type'],
+		)))) $result = array();
+		//echo "<pre>".print_r($result,true)."</pre>\n";
+		
+		// return route_names as part of route, not as participant
+		if (isset($result['route_names']))
+		{
+			$route['route_names'] = $result['route_names'];
+			unset($result['route_names']);
+		}
+	
+		// remove empty/null values from route
+		foreach($route as $name => $value)
+		{
+			if ((string)$value === '') unset($route[$name]);
+		}
+		// remove not needed route attributes
+		$route = array_diff_key($route,array_flip(array(
+			'route_type',
+			'frm_id','frm_id2',
+			'user_timezone_read',
+			'route_time_host','route_time_port',
+			'route_status',	// 'route_result' is set if result is official
+			'slist_order',
+		)));
+		if ($discipline != 'boulder') unset($route['route_num_problems']);
+		
+		if ($discipline == 'speedrelay')	// fetch athlete names
+		{
+			foreach($result as $key => $row)
+			{
+				$ids[] = $row['PerId_1'];
+				$ids[] = $row['PerId_2'];
+				if (!empty($row['PerId_3'])) $ids[] = $row['PerId_3'];
+			}
+			foreach($this->athlete->search(array('PerId' => $ids),false) as $athlete)
+			{
+				$athletes[$athlete['PerId']] = array(
+					'PerId'     => $athlete['PerId'],
+					'federation'=> $athlete['verband'],
+					'firstname' => $athlete['vorname'],
+					'lastname'  => $athlete['nachname'],
+					'nation'    => $athlete['nation'],
+					'url'       => self::profile_url($athlete,$cat['GrpId']),
+				);
+			}
+			//echo "<pre>".print_r($athletes,true)."</pre>\n";die('Stop');
+		}
+		
+		$tn = $unranked = array();
+		$last_modified = (int)$route['route_modified'];	// seems to get not set atm.
+		foreach($result as $key => $row)
+		{
+			// remove empty/null values from row
+			foreach($row as $name => $value)
+			{
+				if ((string)$value === '') unset($row[$name]);
+			}
+			if (isset($row['quali_points']) && $row['quali_points'])
+			{
+				$row['quali_points'] = number_format($row['quali_points'],2);
+			}
+			if ($row['result_modified'] > $last_modified) $last_modified = $row['result_modified'];
+			
+			if ($heat == -1)	// rename result to result0 for general result
+			{
+				$row['result0'] = $row['result'];
+				unset($row['result']);
+			}
+			// use english names
+			$row['firstname'] = $row['vorname'];
+			$row['lastname']  = $row['nachname'];
+			$row['federation']= $row['verband'];
+			if ($row['PerId']) $row['url'] = self::profile_url($row,$cat['GrpId']);
+			
+			// remove &nbsp; in lead results
+			if ($discipline == 'lead')
+			{
+				if (isset($row['quali_points']))
+				{
+					for($i = 0; $i <= 1; ++$i)
+					{
+						if(isset($row['result'.$i]))
+						{
+							$row['result'.$i] = str_replace('&nbsp;',' ',$row['result'.$i]);
+						}
+					}
+				}
+				if(isset($row['result']))
+				{
+					list($row['result']) = explode('&nbsp;',$row['result']);
+				}
+				for($i = 0; $i <= 5; ++$i)
+				{
+					if(isset($row['result'.$i]))
+					{
+						list($row['result'.$i]) = explode('&nbsp;',$row['result'.$i]);
+					}
+				}
+			}
+			// remove single boulder meaningless in general result
+			if ($discipline == 'boulder' && $heat == -1)
+			{
+				for($i = 1; $i <= 8; ++$i)
+				{
+					unset($row['boulder'.$i]);
+				}
+			}
+			if ($discipline == 'speedrelay')
+			{
+				$athletes[$row['PerId_1']]['start_number'] = $row['start_number_1'];
+				if ($heat > -1) $athletes[$row['PerId_1']]['result_time'] = $row['result_time_1'];
+				$athletes[$row['PerId_2']]['start_number'] = $row['start_number_2'];
+				if ($heat > -1) $athletes[$row['PerId_2']]['result_time'] = $row['result_time_2'];
+				$row['athletes'] = array(
+					$athletes[$row['PerId_1']],
+					$athletes[$row['PerId_2']],
+				);
+				if (!empty($row['PerId_3']))
+				{
+					$athletes[$row['PerId_3']]['start_number'] = $row['start_number_3'];
+					if ($heat > -1) $athletes[$row['PerId_3']]['result_time'] = $row['result_time_3'];
+					$row['athletes'][] = $athletes[$row['PerId_3']];
+				}
+				unset($row['time_sum']);	// identical to result
+			}
+			// remove not needed attributes
+			$row = array_diff_key($row,array_flip(array(
+				// remove keys, they are already in route
+				'GrpId','WetId','route_order','route_type','discipline',
+				'geb_date',	// we still have birthyear
+				// remove renamed values
+				'vorname','nachname','verband','plz','ort',
+				'general_result','org_rank','result_modifier',
+				'RouteResults.*','result_detail',
+				// speed single route use: time_sum, result, result_r
+				'result_time','result_time_l','result_time_r',
+				// speed general result use: result*, result_rank*
+				'result_time2','result_time3','result_time4','result_time5','result_time6',
+				'start_order2','start_order3','start_order4','start_order5','start_order6',
+				// lead general result
+				'result_height','result_height1','result_height2','result_height3','result_height4','result_height5',
+				'result_plus','result_plus1','result_plus2','result_plus3','result_plus4','result_plus5',
+				// boulder general result
+				'top','top1','top2','top3','top4','top5','top6','top7','top8',
+				'zone','zone1','zone2','zone3','zone4','zone5','zone6','zone7','zone8',
+				'result_top','result_top1','result_top2','result_top3','result_top4','result_top5','result_top6','result_top7','result_top8',
+				'result_zone','result_zone1','result_zone2','result_zone3','result_zone4','result_zone5','result_zone6','result_zone7','result_zone8',
+				// teamrelay
+				'PerId_1','PerId_2','PerId_3',
+				'start_number_1','start_number_2','start_number_3',
+				'result_time_1','result_time_2','result_time_3',
+			)));
+			
+			ksort($row);
+			if ($row['result_rank'])
+			{
+				$tn[$row[$this->route_result->id_col]] = $row;
+			}
+			else
+			{
+				$unranked[$row[$this->route_result->id_col]] = $row;
+			}
+			$last_rank = $row['result_rank'];
+		}
+		$tn = array_merge($tn,$unranked);
+	
+		$ret = $route+array(
+			'discipline'    => $discipline,
+			'participants'  => $tn,
+			'last_modified' => $last_modified,
+		);
+		$ret['etag'] = md5(serialize($ret));
+	
+		return $ret;
+	}
 }

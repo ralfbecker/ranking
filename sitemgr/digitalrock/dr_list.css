@@ -32,14 +32,14 @@ th, td {
 /**
  * Left justify text columns like name
  */
-.name, .vorname {
+.name, .vorname, .lastname, .firstname {
 	padding-left: 5px;
 	text-align: left;
 }
 /**
  * Capitalize names
  */
-.name {
+.name, .lastname {
 	text-transform: uppercase;
 }
 
