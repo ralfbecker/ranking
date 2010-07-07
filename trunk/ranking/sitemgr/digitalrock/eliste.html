@@ -12,7 +12,7 @@
 		<script type="text/javascript">
 			var resultlist;
 			$(document).ready(function() {
-				resultlist = new Resultlist('table','/json.php'+location.search);
+				resultlist = new Resultlist('table','/egroupware/ranking/json.php'+location.search);
 			});	
 		</script>
 		<input type="button" onclick="resultlist.update();" value="Update" />
