@@ -136,7 +136,7 @@ Startlist.prototype.handleResponse = function(_data)
 	else
 	{
 		// update existing table
-		this.table.update(_data.teilnehmer);
+		this.table.update(_data.participants);
 	}
 };
 
