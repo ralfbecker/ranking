@@ -108,10 +108,10 @@ Startlist.prototype.handleResponse = function(_data)
 		if (this.columns.result && _data.route_names)
 		{
 			delete this.columns.result;
-			//for(var route in _data.route_names)
+			// show final first and 2. quali behind 1. quali: eg. 3, 2, 0, 1
 			for(var route=10; route >= -1; --route)
 			{
-				if (route != 1 && typeof _data.route_names[route] != 'undefined')
+				if (route != 1 && typeof _data.route_names[Math.abs(route)] != 'undefined')
 					this.columns['result'+Math.abs(route)] = _data.route_names[Math.abs(route)];
 			}
 			// evtl. add points column
