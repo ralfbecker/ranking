@@ -102,13 +102,31 @@ Startlist.prototype.handleResponse = function(_data)
 {
 	if (typeof this.table == 'undefined')
 	{
-		document.title = _data.route_name;
+		var title_prefix = (this.sort == 'start_order' ? 'Startlist' : 'Result')+': ';
+
+		// for general result use one column per heat
+		if (this.columns.result && _data.route_names)
+		{
+			delete this.columns.result;
+			//for(var route in _data.route_names)
+			for(var route=10; route >= -1; --route)
+			{
+				if (route != 1 && typeof _data.route_names[route] != 'undefined')
+					this.columns['result'+Math.abs(route)] = _data.route_names[Math.abs(route)];
+			}
+			// evtl. add points column
+			if (_data.participants[0].quali_points)
+				this.columns['quali_points'] = 'Points';
+			
+			title_prefix = '';
+		}
+		document.title = title_prefix+_data.route_name;
 		
 		// header line
 		var header = document.createElement('h1');
 		$(this.container).append(header);
 		header.className = 'listHeader';
-		$(header).text((this.sort == 'start_order' ? 'Startlist' : 'Result')+': '+_data.route_name);
+		$(header).text(title_prefix+_data.route_name);
 		
 		// create new table
 		this.table = new Table(_data.participants,this.columns,this.sort);
