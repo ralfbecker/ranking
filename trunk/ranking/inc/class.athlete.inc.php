@@ -365,9 +365,9 @@ class athlete extends so_sql
 				unset($filter['license']);
 			}
 		}
-		if ($join && strstr($join,'PerId') !== false && is_array($criteria))	// this column would be ambigues
+		if ($join && strstr($join,'PerId') !== false)	// this column would be ambigues
 		{
-			if ($criteria['PerId'])
+			if (is_array($criteria) && $criteria['PerId'])
 			{
 				$criteria[] = $this->db->expression($this->table_name,$this->table_name.'.',array('PerId'=>$criteria['PerId']));
 				unset($criteria['PerId']);
