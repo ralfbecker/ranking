@@ -120,6 +120,10 @@ Startlist.prototype.handleResponse = function(_data)
 			
 			title_prefix = '';
 		}
+		if (this.columns.result && _data.participants[0].rank_prev_heat)
+		{
+			this.columns['rank_prev_heat'] = 'previous heat';
+		}
 		document.title = title_prefix+_data.route_name;
 		
 		// header line
