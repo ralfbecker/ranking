@@ -1,0 +1,132 @@
+So here's a small documentation. I will use XML as example because it's
+easier to view (eg. in Firefox) compared with the JSON, thought content
+is identical and you only have to replace xml.php with json.php in the
+URL's to get JSON. There's no difference in content or update frequency.
+
+Current only www.digitalrock.de is updated with the new software, so
+base URL for XML is
+
+	http://www.digigitalrock.de/egroupware/ranking/xml.php
+
+(On the competition we probably use www.ifsc-climbing.org)
+
+You can use a few GET parameters to influence what information you get:
+
+a) comp: This is the Id of the competition (1287 in case of Arco
+Rockmaster 2010). Older competitions id's can be found the the url's of
+eg. the competition calendar (www.ifsc-climbing.org/?page_name=calendar)
+or the latest result page (www.ifsc-climbing.org/?page_name=result)
+
+b) cat: This is id of the category and discipline:
+1 = MEN lead
+2 = WOMEN lead
+5 = WOMEN bouldering
+6 = MEN bouldering
+23 = MEN speed
+24 = WOMEN speed
+70 = MIXED team relay speed
+71 = WOMEN team relay speed
+72 = MEN team relay speed
+(You can lookup the used categories of a competition in the calendar or
+latest results page).
+
+c) route: The heat of a category result, or if ommited general result:
+-1 = general result
+0  = qualification
+1  = 2. qualification (if used, probably not in Arco)
+2  = further heats 'til the final depending on discipline
+N  = final (N-1 in speed is eg. small final)
+
+Examples:
+--------
+1) lead competition general result:
+HTML: www.digitalrock.de/eliste.html?comp=1204&cat=1
+XML:  www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1
+JSON: www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1
+
+2) lead competition 1. qualification:
+HTML: www.digitalrock.de/eliste.html?comp=1204&cat=1&route=0
+XML+JSON: just replace query in above url's
+
+3) lead competition 1. qualification:
+HTML: www.digitalrock.de/eliste.html?comp=1204&cat=1&route=1
+
+4) lead competition 1/2-final:
+HTML: www.digitalrock.de/eliste.html?comp=1204&cat=1&route=2
+
+5) lead competition final:
+HTML: www.digitalrock.de/eliste.html?comp=1204&cat=1&route=2
+
+6) boulder competition general result (1 qualification):
+HTML: www.digitalrock.de/eliste.html?comp=1247&cat=5
+
+7) boulder competition general result (2 qualification):
+HTML: www.digitalrock.de/eliste.html?comp=1258&cat=5
+
+8) boulder competition heats: append &route=0, 1, 2, 3
+HTML: www.digitalrock.de/eliste.html?comp=1258&cat=5&route=0
+
+9) speed competition general result:
+HTML: www.digitalrock.de/eliste.html?comp=1254&cat=23
+
+10) speed qualification:
+HTML: www.digitalrock.de/eliste.html?comp=1254&cat=23&route=0
+(In case of a 2. qualification route, xml contains additional result_l
+and result_r attributes, with the sum in result)
+
+11) speed final heats: append &route=2, 3, 4, ...
+
+12) speedrelay general result:
+HTML: www.digitalrock.de/egroupware/ranking/result.php?comp=991&cat=70
+Please note the changed HTML url, as eliste.html does not yet support
+it. There can by either 2 (mixed) or 3 team members!
+XML:  www.digitalrock.de/egroupware/ranking/xml.php?comp=991&cat=70
+Participants array/hierarchy contains now teams, with in turn contain an
+athletes hierarchy with the team-members and their single results.
+
+13) team relay heats: append &route=2, 3, 4, ...
+
+Explanation of xml/json attributes:
+----------------------------------
+WetId: equivalent of comp GET parameter, id of competition
+GrpId:  equivalent of cat GET parameter, id of category and discipline
+route_order: identical to route GET parameter
+route_name: name of heat including category
+route_names: name and route id of heats (general result / route=-1 only)
+route_result: time the result was made official by jury, if not given
+results should be displayed as "temporary"
+discipline: lead, speed, boulder or speedrelay
+participants: hierarchy of participants sorted by rank, for start-lists
+you need to sort them by
+start_order: order athletes are starting (1, 2, ...)
+start_number: number displayed by athlete (if used)
+result_rank: rank of athlete, if already ranked
+PerId: id of athlete
+url: url to profile page of athlete
+lastname, firstname, nation, federation: pretty much self explanatory
+result: result of competitor for given heat (not set for general result)
+rank_prev_heat: result&rank of previous heat if counting in countback
+resultN: N=0, 1, 2, ... result in heat N (general result only)
+result_rankN: N=0, 1, 2, ... rank in heat N (general result only)
+team_id, team_name, team_nation: id, name and nation for speedrelay
+athletes: hierarchy of athletes of the team including their single
+results (sum is in result attribute of team)
+
+Not yet implemented is an attribute to identify the current
+competitior(s): can be multiple depending on discipline.
+Probably a "current" attribute/hierarchy with PerId's or team_id's
+referencing the participants hierarchy. I will implemented this over the
+weekend.
+
+Please note that Arco Rockmaster might not always use the regular
+worldcup format, so there can be differences to the examples I gave!
+
+The HTML examples (eliste.html) I gave use a javascript API (using the
+described webservice via JSON). The API can be used to embed results
+into other webpages eg. the webcast page. They have an update method
+which can be called on non offical results to self-update on a certain
+frequency (NOT less then 10s!).
+
+If you have questions please ask.
+
+Ralf
