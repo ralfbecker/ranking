@@ -1551,6 +1551,13 @@ class boresult extends boranking
 					unset($row['boulder'.$i]);
 				}
 			}
+			// for speed quali, show time_sum as result
+			if ($discipline == 'speed' && $heat == 0 && isset($row['time_sum']))
+			{
+				$row['result_l'] = $row['result'];
+				$row['result'] = $row['time_sum'];
+				unset($row['time_sum']);	// identical to result
+			}
 			if ($discipline == 'speedrelay')
 			{
 				$athletes[$row['PerId_1']]['start_number'] = $row['start_number_1'];
@@ -1578,7 +1585,7 @@ class boresult extends boranking
 				'vorname','nachname','verband','plz','ort',
 				'general_result','org_rank','result_modifier',
 				'RouteResults.*','result_detail',
-				// speed single route use: time_sum, result, result_r
+				// speed single route use: result, result_l, result_r
 				'result_time','result_time_l','result_time_r',
 				// speed general result use: result*, result_rank*
 				'result_time2','result_time3','result_time4','result_time5','result_time6',
