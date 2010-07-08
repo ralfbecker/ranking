@@ -1380,14 +1380,29 @@ class boresult extends boranking
 	/**
 	 * Get URL for athlete profile
 	 * 
+	 * Currently /pstambl.php is used for every HTTP_HOST not www.ifsc-climbing.org,
+	 * for which /index.php?page_name=pstambl is used.
+	 * 
 	 * @param array $athlete
 	 * @param int $cat=null
 	 * @return string
 	 */
 	static function profile_url($athlete,$cat=null)
 	{
-		return 'http://'.$_SERVER['HTTP_HOST'].'/pstambl.php?person='.$athlete['PerId'].
-			($cat ? '&cat='.$cat : '');
+		static $base;
+		if (is_null($base))
+		{
+			$base = 'http://'.$_SERVER['HTTP_HOST'];
+			if ($_SERVER['HTTP_HOST'] == 'www.ifsc-climbing.org')
+			{
+				$base .= '/index.php?page_name=pstambl&person=';
+			}
+			else
+			{
+				$base .= '/pstambl.php?person=';
+			}
+		}
+		return $base.$athlete['PerId'].($cat ? '&cat='.$cat : '');
 	}
 
 	/**
