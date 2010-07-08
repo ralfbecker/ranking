@@ -175,6 +175,11 @@ function Table(_data,_columns,_sort,_ascending)
 	$(this.dom).append(tbody);
 	for(i in this.data)
 	{
+		if (this.sort == 'result_rank' && 
+			(typeof this.data[i].result_rank == 'undefined' || this.data[i].result_rank < 1))
+		{
+			break;	// no more ranked competitiors
+		}
 		var row = this.createRow(this.data[i]);
 		$(tbody).append(row);
 	}
@@ -206,6 +211,11 @@ Table.prototype.update = function(_data)
 		var data = this.data[i];
 		var row = athletes[data.PerId];
 		
+		if (this.sort == 'result_rank' && 
+			(typeof data.result_rank == 'undefined' || data.result_rank < 1))
+		{
+			break;	// no more ranked competitiors
+		}
 		// search athlete in tbody
 		if (typeof row != 'undefined')
 		{
@@ -334,7 +344,11 @@ function sortStartOrder(_a, _b)
  */
 function sortResultRank(_a, _b)
 {
-	var ret = _a['result_rank'] - _b['result_rank'];
+	var rank_a = _a['result_rank'];
+	if (typeof rank_a == 'undefined' || rank_a < 1) rank_a = 9999;
+	var rank_b = _b['result_rank'];
+	if (typeof rank_b == 'undefined' || rank_b < 1) rank_b = 9999;
+	var ret = rank_a - rank_b;
 	
 	if (!ret) ret = _a['lastname'] > _b['lastname'];
 	if (!ret) ret = _a['firstname'] > _b['firstname'];
