@@ -1511,11 +1511,6 @@ class boresult extends boranking
 		$last_modified = (int)$route['route_modified'];	// seems to get not set atm.
 		foreach($result as $key => $row)
 		{
-			// remove empty/null values from row
-			foreach($row as $name => $value)
-			{
-				if ((string)$value === '') unset($row[$name]);
-			}
 			if (isset($row['quali_points']) && $row['quali_points'])
 			{
 				$row['quali_points'] = number_format($row['quali_points'],2);
@@ -1566,8 +1561,8 @@ class boresult extends boranking
 					unset($row['boulder'.$i]);
 				}
 			}
-			// for speed quali, show time_sum as result
-			if ($discipline == 'speed' && $heat == 0 && isset($row['time_sum']))
+			// for speed show time_sum as result, plus result_l and result_r
+			if (isset($row['time_sum']))
 			{
 				$row['result_l'] = $row['result'];
 				$row['result'] = $row['time_sum'];
@@ -1591,6 +1586,9 @@ class boresult extends boranking
 				}
 				unset($row['time_sum']);	// identical to result
 			}
+			// always return result attribute
+			if ($heat != -1 && !isset($row['result'])) $row['result'] = '';
+			
 			// remove not needed attributes
 			$row = array_diff_key($row,array_flip(array(
 				// remove keys, they are already in route

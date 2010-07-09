@@ -99,19 +99,17 @@ foreach($route as $name => &$value)
 			if (!is_array($val))
 			{
 				if (!is_string($val)) $val = (string)$val;
-				if ($val !== '')
+				if ($name == 'route_names' || $name == 'route_name')
 				{
-					if ($name == 'route_names' || $name == 'route_name')
-					{
-						$xml->startElement('route_name');
-						$xml->writeAttribute('route',$id);
-						$xml->text($val);
-						$xml->endElement();
-					}
-					else
-					{
-						if (strlen($val) > 2) $xml->writeElement($name,$val);
-					}
+					$xml->startElement('route_name');
+					$xml->writeAttribute('route',$id);
+					$xml->text($val);
+					$xml->endElement();
+				}
+				else
+				{
+					//if (strlen($val) > 2)
+					$xml->writeElement($name,$val);
 				}
 			}
 			else	// only participants get here
@@ -132,7 +130,7 @@ function write_participant($xml,$participant)
 	{
 		if (!is_array($value))
 		{
-			if ((string)$value !== '') $xml->writeElement($name,(string)$value);
+			$xml->writeElement($name,(string)$value);
 		}
 		elseif($value)
 		{
