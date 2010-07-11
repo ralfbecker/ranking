@@ -89,7 +89,6 @@ class uiresult extends boresult
 				case 'apply':
 					if (isset($content['frm_line']))	// if a frm_line is given translate it back to a frm_id
 					{
-						include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
 						$format = new ranking_display_format($this->db);
 						$content['frm_id'] = $format->read(array(
 							'dsp_id' => $content['dsp_clone_of'] ? $content['dsp_clone_of'] : $content['dsp_id'],
@@ -575,7 +574,7 @@ class uiresult extends boresult
 		$rows['no_start_number'] = !$need_start_number && $query['route_status'] == STATUS_RESULT_OFFICIAL;
 
 		// report the set-values at time of display back to index() for calling boresult::save_result
-		$query_in['return'] = $rows['set'];
+		$GLOBALS['egw']->session->appsession('set_'.$query['comp'].'_'.$query['cat'].'_'.$query['route'],'ranking',$rows['set']);
 
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
@@ -692,7 +691,6 @@ class uiresult extends boresult
 		{
 			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
 		}
-		//_debug_array($content);exit;
 		if (!is_array($content))
 		{
 			$content = array('nm' => $GLOBALS['egw']->session->appsession('result','ranking'));
@@ -810,7 +808,8 @@ class uiresult extends boresult
 			switch($button)
 			{
 				case 'apply':
-					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$content['nm']['return']))
+					$old = $GLOBALS['egw']->session->appsession('set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route'],'ranking');
+					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old))
 					{
 						$msg = lang('Heat updated');
 					}
