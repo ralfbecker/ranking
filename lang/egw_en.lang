@@ -54,8 +54,10 @@ athletes	ranking	en	Athletes
 attention: merging can not be undone! really want to merge?	ranking	en	ATTENTION: merging can NOT be undone! Really want to merge?
 before	ranking	en	before
 before which year the old system was used (first year of new system)	ranking	en	before which year the old system was used (first year of new system)
+best of two (record format)	ranking	en	best of two (record format)
 better result splits ties	ranking	en	Better result splits ties
 birthdate	ranking	en	Birthdate
+birthday	ranking	en	Birthday
 birthday, shows only the year	ranking	en	birthday, shows only the year
 birthyear	ranking	en	Birthyear
 birthyears from	ranking	en	Birthyears from
@@ -63,7 +65,9 @@ body height in centimeter	ranking	en	body height in centimeter
 bonus	ranking	en	Bonus
 bonus: number of tries or no	ranking	en	Bonus: Number of tries or no
 boulder	ranking	en	boulder
-can not be higher as top!	ranking	en	Can NOT be higher as top!
+can not be higher than top!	ranking	en	Can NOT be higher than top!
+can not be higher than tries!	ranking	en	Can NOT be higher than tries!
+can not be lower than tops!	ranking	en	Can NOT be lower than tops!
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
 can't connect to time controll program at '%1': %2	ranking	en	Can't connect to time controll program at '%1': %2
@@ -73,6 +77,7 @@ can't open connection to displays at %1 !!!	ranking	en	Can't open connection to 
 can't open connection to timy at %1 !!!	ranking	en	Can't open connection to Timy at %1 !!!
 can't open control port (%1) %2 !!!	ranking	en	Can't open control port (%1) %2 !!!
 cannel without saving	ranking	en	Cannel without saving
+category not found !!!	ranking	en	Category NOT found !!!
 cathegories	ranking	en	Cathegories
 cellphone	ranking	en	Cellphone
 changes applied to %1 federations.	ranking	en	Changes applied to %1 federations.
@@ -93,6 +98,7 @@ competition calendar	ranking	en	Competition calendar
 competition has not yet a startlist	ranking	en	Competition has not yet a startlist
 competition logo	ranking	en	Competition logo
 competition name	ranking	en	Competition name
+competition not found !!!	ranking	en	Competition NOT found !!!
 competition results	ranking	en	Competition results
 competitions	ranking	en	competitions
 competitions counting	ranking	en	competitions counting
@@ -376,6 +382,7 @@ resultservice	ranking	en	Resultservice
 reverse cup (unranked first)	ranking	en	reverse cup (unranked first)
 reverse ranking (unranked first)	ranking	en	reverse ranking (unranked first)
 route	ranking	en	Route
+route not found !!!	ranking	en	Route NOT found !!!
 routes	ranking	en	Routes
 rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
@@ -496,3 +503,4 @@ you need to mail the downloaded and signed form to the office! please check if y
 you need to select a file first!	ranking	en	You need to select a file first!
 you need to select an other athlete first!	ranking	en	You need to select an other athlete first!
 you need to select some federations first!	ranking	en	You need to select some federations first!
+zip code	ranking	en	Zip Code

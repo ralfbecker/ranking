@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -49,6 +49,7 @@ class boresult extends boranking
 	var $quali_types_speed = array(
 		ONE_QUALI       => 'one Qualification',
 		TWO_QUALI_SPEED => 'two Qualification',
+		TWO_QUALI_BESTOF=> 'best of two (record format)',
 	);
 	var $eliminated_labels = array(
 		''=> '',
@@ -187,7 +188,7 @@ class boresult extends boranking
 		}
 		// generate a startlist, without storing it in the result store
 		$starters =& parent::generate_startlist($comp,$cat,
-			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
+			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
 			$route_type == TWO_QUALI_ALL_SEED_STAGGER,															// true = stagger, false = no stagger
 			$old_startlist);
@@ -655,15 +656,15 @@ class boresult extends boranking
 	 *
 	 * @param array $keys WetId, GrpId, route_order
 	 * @param array $results PerId => data pairs
-	 * @param int $route_type=null ONE_QUALI, TWO_QUALI_ALL, TWO_QUALI_HALF
-	 * @param string $discipline='lead' 'lead', 'speed', 'boulder'
+	 * @param int $route_type ONE_QUALI, TWO_QUALI_*, TWOxTWO_QUALI
+	 * @param string $discipline 'lead', 'speed', 'boulder' or 'speedrelay'
 	 * @param array $old_values values at the time of display, to check if somethings changed
 	 * 		default is null, which causes save_result to read the results now.
 	 * 		If multiple people are updating, you should provide the result of the time of display,
 	 * 		to not accidently overwrite results entered by someone else!
 	 * @return boolean/int number of changed results or false on error
 	 */
-	function save_result($keys,$results,$route_type=null,$discipline='lead',$old_values=null)
+	function save_result($keys,$results,$route_type,$discipline,$old_values=null)
 	{
 		$this->error = null;
 
@@ -673,6 +674,10 @@ class boresult extends boranking
 		{
 			return $this->error = false;
 		}
+		// setting discipline and route_type to allow using it in route_result->save()/->data2db
+		$this->route_result->discipline = $discipline;
+		$this->route_result->route_type = $route_type;
+
 		// adding a new team for relay
 		$data = $results[0];
 		if ($discipline == 'speedrelay' && isset($data) && !empty($data['team_nation']) && !empty($data['team_name']))
@@ -1292,7 +1297,7 @@ class boresult extends boranking
 				($previous = $this->route->read($keys,true)))
 			{
 				++$keys['route_order'];
-				if ($keys['route_order'] == 1 && in_array($previous['route_type'],array(ONE_QUALI,TWO_QUALI_SPEED)))
+				if ($keys['route_order'] == 1 && in_array($previous['route_type'],array(ONE_QUALI,TWO_QUALI_SPEED,TWO_QUALI_BESTOF)))
 				{
 					$keys['route_order'] = 2;
 				}
