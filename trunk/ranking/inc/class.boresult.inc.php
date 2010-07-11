@@ -711,10 +711,6 @@ class boresult extends boranking
 			{
 				$old['result_time'] = $old['result_time_l'];
 			}
-			// to also check the result_details
-			if ($data['result_details']) $data += $data['result_details'];
-			if ($old && $old['result_details']) $old += $old['result_details'];
-
 			if (isset($data['top1']))	// boulder result
 			{
 				for ($i=1; $i <= 6 && isset($data['top'.$i]); ++$i)
@@ -744,7 +740,7 @@ class boresult extends boranking
 			foreach($data as $key => $val)
 			{
 				// something changed?
-				if ($key != 'result_details' && (!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) &&
+				if ((!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) &&
 					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
 					if (($key == 'start_number' || $key == 'start_number_1') && strchr($val,'+') !== false)
