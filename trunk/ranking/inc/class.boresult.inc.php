@@ -1476,19 +1476,31 @@ class boresult extends boranking
 			unset($result['route_names']);
 		}
 	
+		for($i = 1; $i <= 8; ++$i)
+		{
+			if ($route['current_'.$i])
+			{
+				$route['current'][] = $route['current_'.$i];
+				unset($route['current_'.$i]);
+			}
+		}
 		// remove empty/null values from route
 		foreach($route as $name => $value)
 		{
 			if ((string)$value === '') unset($route[$name]);
 		}
+		$last_modified = (int)$route['route_modified'];
+
 		// remove not needed route attributes
 		$route = array_diff_key($route,array_flip(array(
 			'route_type',
-			'frm_id','frm_id2',
+			'dsp_id','frm_id','dsp_id2','frm_id2',
 			'user_timezone_read',
+			'route_modified','route_modifier',	// we have single last_modified
 			'route_time_host','route_time_port',
 			'route_status',	// 'route_result' is set if result is official
 			'slist_order',
+			'next_1','next_2','next_3','next_4','next_5','next_6','next_7','next_8',
 		)));
 		if ($discipline != 'boulder') unset($route['route_num_problems']);
 		
@@ -1515,7 +1527,6 @@ class boresult extends boranking
 		}
 		
 		$tn = $unranked = array();
-		$last_modified = (int)$route['route_modified'];	// seems to get not set atm.
 		foreach($result as $key => $row)
 		{
 			if (isset($row['quali_points']) && $row['quali_points'])
@@ -1599,7 +1610,7 @@ class boresult extends boranking
 			// remove not needed attributes
 			$row = array_diff_key($row,array_flip(array(
 				// remove keys, they are already in route
-				'GrpId','WetId','route_order','route_type','discipline',
+				'GrpId','WetId','route_order','route_type','discipline','acl_fed',
 				'geb_date',	// we still have birthyear
 				// remove renamed values
 				'vorname','nachname','verband','plz','ort',

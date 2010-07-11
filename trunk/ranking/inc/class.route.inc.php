@@ -11,7 +11,6 @@
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.route_result.inc.php');
 
 /**
@@ -114,5 +113,33 @@ class route extends so_sql
 			$ret['route_type'] = TWO_QUALI_ALL;
 		}
 		return $ret;
+	}
+	
+	/**
+	 * saves the content of data to the db
+	 *
+	 * Reimplemented to update modified, modifier and reset current_*, next_* if result offical.
+	 * 
+	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function save($keys=null,$extra_where=null)
+	{
+		if (is_array($keys) && count($keys)) $this->data_merge($keys);
+		
+		// unset current and next id's
+		if ($this->data['route_status'] == STATUS_RESULT_OFFICIAL)
+		{
+			for($i = 1; $i <= 8; ++$i)
+			{
+				$this->data['current_'.$i] = $this->data['next_'.$i] = null;
+			}
+			$this->data['boulder_started'] = null;
+		}
+		$this->data['route_modified'] = time();
+		$this->data['route_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
+
+		return parent::save(null,$extra_where);
 	}
 }

@@ -317,7 +317,8 @@ class uiresult extends boresult
 		}
 		else
 		{
-			if ($content['route_status'] != STATUS_RESULT_OFFICIAL || $content['new_route'] || $content['route_order'] != -1)
+			if ($content['route_status'] != STATUS_RESULT_OFFICIAL || $content['new_route'] || 
+				$content['route_order'] != -1 || $discipline == 'speedrelay')
 			{
 				$readonlys['button[ranking]'] = true;	// only offical results can be commited into the ranking
 			}
@@ -325,7 +326,6 @@ class uiresult extends boresult
 			{
 				$content['no_upload'] = $readonlys['button[upload]'] = true;	// no upload if result offical or general result
 			}
-			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
 			$display = new ranking_display($this->db);
 			// display selection, only if user has rights on the displays
 			if (($sel_options['dsp_id'] = $sel_options['dsp_id2'] = $display->displays()))
@@ -339,7 +339,6 @@ class uiresult extends boresult
 
 						if (is_null($format))
 						{
-							include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
 							$format = new ranking_display_format($this->db);
 						}
 						if ($content['frm_id'.$num] && $format->read($content['frm_id'.$num]))
@@ -593,7 +592,9 @@ class uiresult extends boresult
 		$rows['num_problems'] = $query['num_problems'];
 		$rows['no_delete'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
-		$rows['time_measurement'] = $query['time_measurement'];
+		// disable unused update / start time measurement buttons
+		$readonlys['update'] = ($rows['time_measurement'] = $query['time_measurement']) || 
+			$query['route_status'] == STATUS_RESULT_OFFICIAL;
 		$rows['discipline'] = $query['discipline'];
 
 		// make div. print values available
@@ -622,6 +623,14 @@ class uiresult extends boresult
 		if ($query['ranking'] == 4)
 		{
 			$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
+		}
+		if ($query['route_type'] == TWO_QUALI_BESTOF && $query['route'] == 0)
+		{
+			$rows['sum_or_bestof'] = lang('Best of');
+		}
+		else
+		{
+			$rows['sum_or_bestof'] = lang('Sum');
 		}
 		return $total;
 	}
@@ -1032,7 +1041,6 @@ class uiresult extends boresult
 
 		if (!is_object($GLOBALS['egw']->js))
 		{
-			require_once(EGW_API_INC.'/class.javascript.inc.php');
 			$GLOBALS['egw']->js = new javascript();
 		}
 		$GLOBALS['egw']->js->validate_file('.','ranking','ranking',false);
@@ -1051,6 +1059,25 @@ class uiresult extends boresult
 	/**
 	 * Update a result of a single participant
 	 *
+	 * Lead:  
+	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_height]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_height]').value,
+	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_plus]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_plus]').value);
+	 * Speed links: 
+	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_time]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,
+	 * 		'exec[nm][rows][set][$row_cont[PerId]][eliminated]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);
+	 * Speed rechts: 
+	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,
+	 * 		'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);
+	 * 
 	 * @param string $request_id eTemplate request id
 	 * @param string $name can be repeated multiple time together with value
 	 * @param string $value
@@ -1061,7 +1088,6 @@ class uiresult extends boresult
 		//$start = microtime(true);
 		$response = new xajaxResponse();
 
-		require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate_request.inc.php');
 		if (!($request =& etemplate_request::read($request_id)))
 		{
 			$response->addAlert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
@@ -1070,6 +1096,7 @@ class uiresult extends boresult
 		{
 			$params = func_get_args();
 			array_shift($params);	// request_id
+			$first_name = $params[0];
 			$content = $to_process = array();
 			while(($name = array_shift($params)))
 			{
@@ -1079,7 +1106,7 @@ class uiresult extends boresult
 				etemplate::set_array($content,$name,$value=array_shift($params));
 				//$args .= ",$name='$value'";
 			}
-			//$response->addAlert("ajax_update('$request_id',$PerId$args)");
+			//$response->addAlert("ajax_update('\$request_id',$args)"); return $response->getXML();
 
 			//_debug_array($request->preserv); exit;
 			$content = $content['exec'];
@@ -1123,23 +1150,107 @@ class uiresult extends boresult
 				}
 				else
 				{
-					if($this->route->read($keys) && ($dsp_id=$this->route->data['dsp_id']) && ($frm_id=$this->route->data['frm_id']))
+					$first_name = preg_replace('/^.*\[([^\]]+)\]$/','\\1',$first_name);
+					if($this->route->read($keys))
 					{
-						// add display update(s)
-						include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
-						$display = new ranking_display($this->db);
-						$display->activate($frm_id,$athlete,$dsp_id,$keys['GrpId'],$keys['route_order']);
+						if (($dsp_id=$this->route->data['dsp_id']) && ($frm_id=$this->route->data['frm_id']))
+						{
+							// add display update(s)
+							$display = new ranking_display($this->db);
+							$display->activate($frm_id,$athlete,$dsp_id,$keys['GrpId'],$keys['route_order']);
+						}
+						//$response->addAlert('first_name='.$first_name);
+						switch($first_name)
+						{
+							case 'result_height':
+								$to_update = array(
+									'current_1' => $athlete,
+								);
+								break;
+								
+							case 'result_time':
+								if ($request->preserv['nm']['route'] >= 2)
+								{
+									$to_update = array(
+										'current_1' => $athlete,
+										'current_2' => $this->get_co($keys,$athlete),
+									);
+									break;
+								}
+								else
+								{
+									$to_update = array(
+										'current_1' => $athlete,
+									);
+								}
+								break;
+
+							case 'result_time_r':
+								if ($request->preserv['nm']['route'] >= 2)
+								{
+									$to_update = array(
+										'current_1' => $this->get_co($keys,$athlete),
+										'current_2' => $athlete,
+									);
+								}
+								else
+								{
+									$to_update = array(
+										'current_1' => $athlete,
+									);
+								}
+								break;
+						}
+						$this->route->update($to_update+array(
+							'route_modified' => time(),
+							'route_modifier' => $GLOBALS['egw_info']['user']['account_id'],
+						));
 					}
-					if ($new_result && $new_result['result_rank'] != $old_result['result_rank'])	// the ranking has changed
+					//error_log(__METHOD__."() new_result=".array2string($new_result).", old_result=".array2string($old_result));
+					if ($new_result && ($new_result['result_rank'] != $old_result['result_rank'] ||
+						isset($new_result['time_sum']) && $new_result['time_sum'] != $old_result['time_sum']))	// the ranking has changed
 					{
 						$this->_update_ranks($keys,$response,$request);
 					}
 				}
-				//if ($msg) $response->addAlert($msg);
+				if ($msg) $response->addAlert($msg);
 			}
 		}
 		//error_log("processing of ajax_update took ".sprintf('%4.2lf s',microtime(true)-$start));
 		return $response->getXML();
+	}
+	
+	/**
+	 * Get co-participant for given PerId and route (specified by $keys)
+	 * 
+	 * @param array $keys
+	 * @param int $PerId
+	 * @return NULL|int
+	 */
+	protected function get_co(array $keys,$PerId)
+	{
+		if (!($athletes = $this->route_result->search($keys,false)))
+		{
+			//error_log(__METHOD__."(".array2string($keys).",$PerId) returning NULL (no athletes)");
+			return null;
+		}
+		foreach($athletes as $n => $athlete)
+		{
+			if ($athlete['PerId'] == $PerId)
+			{
+				if ($athlete['start_order'] & 1)
+				{
+					$co = $athletes[$n+1];
+				}
+				else
+				{
+					$co = $athletes[$n-1];
+				}
+				return $co['PerId'];
+			}
+		}
+		//error_log(__METHOD__."(".array2string($keys).",PerId=$PerId) returning NULL (PerId NOT found)".array2string($athletes));
+		return null;
 	}
 
 	/**
@@ -1198,7 +1309,6 @@ class uiresult extends boresult
 		//$start = microtime(true);
 		$response = new xajaxResponse();
 
-		require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate_request.inc.php');
 		if (!($request =& etemplate_request::read($request_id)))
 		{
 			$response->addAlert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
@@ -1216,7 +1326,6 @@ class uiresult extends boresult
 			$response->addAlert("internal error: ".__FILE__.': '.__LINE__);
 			return $this->_stop_time_measurement($response);
 		}
-		require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_time_measurement.inc.php');
 		$timy = new ranking_time_measurement($route['route_time_host'],$route['route_time_port']);
 
 		if (!$timy->is_connected())
@@ -1314,7 +1423,6 @@ class uiresult extends boresult
 		if(($dsp_id=$route['dsp_id']) && ($frm_id=$route['frm_id']))
 		{
 			// add display update(s)
-			include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
 			$display = new ranking_display($this->db);
 			if ($route['dsp_id2'] && $route['frm_id2'])
 			{
@@ -1410,14 +1518,18 @@ class uiresult extends boresult
 
 	function _update_ranks(array $keys,xajaxResponse &$response,etemplate_request &$request)
 	{
-error_log("content[order]=".$request->content['nm']['order'].", changes[order]=".$request->changes['nm']['order']);
+		//error_log("content[order]=".$request->content['nm']['order'].", changes[order]=".$request->changes['nm']['order']);
 		$order = $request->changes['nm']['order'] ? $request->changes['nm']['order'] : $request->content['nm']['order'];
 
 		if ($order != 'result_rank')	// --> update only the rank-values
 		{
-			foreach($this->route_result->search($keys,array('PerId','result_rank'),'','','',false,'AND',false,$keys) as $data)
+			foreach($this->route_result->search($keys,false,'','','',false,'AND',false,$keys) as $data)
 			{
 				$response->addAssign("set[$data[PerId]][result_rank]",'innerHTML',$data['result_rank']);
+				if (isset($data['time_sum']))
+				{
+					$response->addAssign("set[$data[PerId]][time_sum]",'innerHTML',$data['time_sum']);
+				}
 			}
 		}
 		else							// --> submit the form to reload the page
