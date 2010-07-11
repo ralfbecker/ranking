@@ -36,7 +36,7 @@ function wettk_grps($wetid)	// Ermitteln f�r welche Grp Ergebnis da
 	if ($res =my_query("SELECT g.rkey,MAX(r.platz) AS platz,MAX(r.pkt) as pkt".
 	                   " FROM Gruppen g,Results r".
 	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
-	                   " GROUP BY g.rkey"))
+	                   " GROUP BY g.rkey ORDER BY g.name"))
 	{
 		while ($row=mysql_fetch_object($res))
 		{
@@ -48,7 +48,7 @@ function wettk_grps($wetid)	// Ermitteln f�r welche Grp Ergebnis da
 		($res =my_query("SELECT g.rkey,MAX(r.result_rank) AS platz".
 	                   " FROM Gruppen g,RouteResults r".
 	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
-	                   " GROUP BY g.rkey")))
+	                   " GROUP BY g.rkey ORDER BY g.name")))
 	{
 		while ($row=mysql_fetch_object($res))
 		{
