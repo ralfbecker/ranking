@@ -51,12 +51,13 @@ if (isset($GLOBALS['dr_config']['resultservice']))
 $res = my_query($sql="SELECT r.GrpId,r.platz,r.pkt,p.rkey,p.vorname,p.nachname,p.ort,f.nation,f.verband,f.fed_url,p.PerId" .
 		" FROM Personen p,Results r" .
 		" JOIN Athlete2Fed a2f USING(PerId) JOIN Federations f USING(fed_id)".
+		" JOIN Gruppen USING(GrpId)".
 		" WHERE a2f.a2f_end != -1 AND p.PerId=r.PerId AND r.WetId=" . $wettk->WetId .
 		($anz || $nation ? ' AND ' : '').
 		($anz ? ($nation ? '(' : '')." r.Platz<=$anz" : "").
 		($nation ? ($anz ? ' OR' : '')." f.nation='$nation'".($anz ? ')' : '') : '').
 		" AND r.platz > 0".
-		" ORDER BY r.GrpId,r.platz,p.nachname,p.vorname");
+		" ORDER BY Gruppen.name,r.GrpId,r.platz,p.nachname,p.vorname");
 
 if (strstr($_SERVER['PHP_SELF'],'all_result.php')) { // we are NOT included
 ?>
