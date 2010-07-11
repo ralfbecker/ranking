@@ -54,8 +54,10 @@ athletes	ranking	de	Athleten
 attention: merging can not be undone! really want to merge?	ranking	de	ACHTUNG: Vereinigen kann NICHT rückgänig gemacht werden! Wollen Sie die beiden Athleten wirklich vereinigen?
 before	ranking	de	vor
 before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)
+best of two (record format)	ranking	de	Bestes von beiden (Rekord Format)
 better result splits ties	ranking	de	Besseres Ergebnis bricht Gleichstände auf
 birthdate	ranking	de	Geburtsdatum
+birthday	ranking	de	Geburtstag
 birthday, shows only the year	ranking	de	Geburtstag, zeigt nur das Jahr
 birthyear	ranking	de	Jahrgang
 birthyears from	ranking	de	Geburtsjahr von
@@ -63,7 +65,9 @@ body height in centimeter	ranking	de	Körpergröße in Zentimeter
 bonus	ranking	de	Bonus
 bonus: number of tries or no	ranking	de	Bonus: Anzahl Versuche oder Nein
 boulder	ranking	de	Bouldern
-can not be higher as top!	ranking	de	Kann nicht höher als Top sein!
+can not be higher than top!	ranking	de	Darf nicht höher als Top sein!
+can not be higher than tries!	ranking	de	Darf nicht höher als Versuche sein!
+can not be lower than tops!	ranking	de	Darf nicht niedriger als Top sein!
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
 can't connect to time controll program at '%1': %2	ranking	de	Kann nicht mit Zeit Kontrollprogramm auf '%1': %2 verbinden
@@ -73,6 +77,7 @@ can't open connection to displays at %1 !!!	ranking	de	Kann keine Verbindung zu 
 can't open connection to timy at %1 !!!	ranking	de	Kann keine Verbindung zu Timy unter %1 aufbauen!!!
 can't open control port (%1) %2 !!!	ranking	de	Kann Kontroll Port (%1) %2 nicht öffnen !!!
 cannel without saving	ranking	de	Abbrechen ohne zu Speichern
+category not found !!!	ranking	de	Kategorie NICHT gefunden !!!
 cathegories	ranking	de	Kategorien
 cellphone	ranking	de	Mobiltelefon
 changes applied to %1 federations.	ranking	de	Änderungen auf %1 Verbände angewandt.
@@ -93,6 +98,7 @@ competition calendar	ranking	de	Wettkampfkalender
 competition has not yet a startlist	ranking	de	Wettkampf hat noch keine Startliste
 competition logo	ranking	de	Logo des Wettkampfes
 competition name	ranking	de	Wettkampfname
+competition not found !!!	ranking	de	Wettkampf NICHT gefunden !!!
 competition results	ranking	de	Wettkampfergebnisse
 competitions	ranking	de	Wettkämpfe
 competitions counting	ranking	de	zählende Wettkämpfe
@@ -376,6 +382,7 @@ resultservice	ranking	de	Ergebnisservice
 reverse cup (unranked first)	ranking	de	Umgekehrter Cup (nicht gelistet zuerst)
 reverse ranking (unranked first)	ranking	de	Umgekehrte Rangliste (nicht gelistet zuerst)
 route	ranking	de	Route
+route not found !!!	ranking	de	Route NICHT gefunden !!!
 routes	ranking	de	Routen
 rows	ranking	de	Zeilen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
@@ -487,6 +494,7 @@ which view do you want to see, when you start the ranking app?	ranking	de	Welche
 wildcard	ranking	de	Wildcard
 wrong admin-account or -password !!!	ranking	de	Falsches Admin-Konto oder -Passwort !!!
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
+you are not allowed to register for %1!	ranking	de	Sie sind nicht berechtigt für %1 zu registrieren!
 you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizenz beantragen!
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
@@ -495,4 +503,4 @@ you need to mail the downloaded and signed form to the office! please check if y
 you need to select a file first!	ranking	de	Sie müssen zuerst eine Datei auswählen!
 you need to select an other athlete first!	ranking	de	Sie müssen zuerst einen anderen Athleten auswählen!
 you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!
-you are not allowed to register for %1!	ranking	de	Sie sind nicht berechtigt für %1 zu registrieren!
+zip code	ranking	de	Postleitzahl

@@ -27,9 +27,12 @@ define('TWO_QUALI_SPEED',3);
 define('TWOxTWO_QUALI',4);				// two quali rounds on two routes each
 define('TWO_QUALI_ALL_SEED_STAGGER',5);	// lead on 2 routes for all on flash
 define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
+define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
+
 define('LEAD',4);
 define('BOULDER',8);
 define('SPEED',16);
+
 define('STATUS_UNPUBLISHED',0);
 define('STATUS_STARTLIST',1);
 define('STATUS_RESULT_OFFICIAL',2);
@@ -78,6 +81,18 @@ class route_result extends so_sql
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
 	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time >= r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
 
+	/**
+	 * Discipline only set by boresult->save_result, to be used in data2db
+	 * 
+	 * @var string
+	 */
+	var $discipline;
+	/**
+	 * Type of route (how many qualifications) only set by boresult->save_result, to be used in data2db
+	 * 
+	 * @var int
+	 */
+	var $route_type;
 	/**
 	 * constructor of the competition class
 	 */
@@ -629,7 +644,7 @@ class route_result extends so_sql
 							$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) :
 								($data['eliminated_l'] ? lang('fall') : lang('Wildcard'));
 							$data['result_time'] = $data['result_time_l'];
-							$data['eliminated'] = $data['eliminated_l'] || $data['eliminated_r'];
+							$data['eliminated'] = $data['eliminated_l'];
 							$data['result_r'] = (string)$data['eliminated_r'] === '' ?
 								($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') :
 								($data['eliminated_r'] ? lang('fall') : lang('Wildcard'));
@@ -734,7 +749,28 @@ class route_result extends so_sql
 				'result_time_r' => $data['result_time_r'] ? number_format($data['result_time_r'],3) : '',
 				'eliminated_r'  => $data['eliminated_r'],
 			);
-			if ((string)$data['eliminated'] !== '' || $data['eliminated_r'])
+			// speed quali with record format (best of two) AND not eliminated both times
+			if ($this->route_type == TWO_QUALI_BESTOF && $data['route_order'] == 0 &&
+				!((string)$data['eliminated'] !== '' && $data['eliminated_r']))
+			{
+				if ($data['result_time'] && $data['result_time_r'])
+				{
+					$data['result_time'] = round(1000 * (min($data['result_time'],$data['result_time_r'])));
+				}
+				elseif($data['result_time_r'])
+				{
+					$data['result_time'] = round(1000 * $data['result_time_r']);
+				}
+				elseif($data['result_time'])
+				{
+					$data['result_time'] = round(1000 * $data['result_time']);
+				}
+				else
+				{
+					$data['result_time'] = null;
+				}
+			}
+			elseif ((string)$data['eliminated'] !== '' || $data['eliminated_r'])
 			{
 				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ?
 					($data['eliminated'] ? ELIMINATED_TIME : WILDCARD_TIME) : ELIMINATED_TIME));
