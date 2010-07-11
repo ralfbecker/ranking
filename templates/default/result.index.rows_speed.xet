@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
-									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" no_lang="1" id="route_data[route_start]"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description no_lang="1" id="route_data[route_observation_time]"/>
-									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,7 +47,7 @@
 							</columns>
 							<rows>
 								<row>
-									<description no_lang="1" id="route_data[route_result]"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
 									<description no_lang="1" id="route_data[route_judge]"/>
@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.7.002">
+	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.7.003">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -76,7 +76,7 @@
 				<column/>
 				<column width="50"/>
 				<column width="15%"/>
-				<column disabled="@speed_only_one"/>
+				<column width="15%" disabled="@speed_only_one"/>
 				<column disabled="@speed_only_one"/>
 				<column disabled="!@time_measurement"/>
 			</columns>
@@ -97,7 +97,7 @@
 					<nextmatch-sortheader label="Start- number" id="start_order" align="center"/>
 					<nextmatch-sortheader label="Time" id="result_time" align="center"/>
 					<description value="2. Time" align="center"/>
-					<nextmatch-sortheader label="Sum" align="center" id="result_time"/>
+					<nextmatch-sortheader label="@sum_or_bestof" align="center" id="result_time"/>
 					<description value="Actions" align="center" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
@@ -120,6 +120,7 @@
 						<menulist class="$cont[rw_result] leftPad5">
 							<menupopup id="set[$row_cont[PerId]][eliminated]"/>
 						</menulist>
+						<buttononly label="Update" statustext="update time" class="small noPrint" align="center" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);" id="update"/>
 					</hbox>
 					<hbox align="center" options="0,0">
 						<description class="$cont[ro_result]" no_lang="1" id="{$row}[result_r]" readonly="true"/>
@@ -127,9 +128,10 @@
 						<menulist class="$cont[rw_result] leftPad5">
 							<menupopup id="set[$row_cont[PerId]][eliminated_r]"/>
 						</menulist>
+						<buttononly label="Update" statustext="update time" class="small noPrint" align="center" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);" id="update"/>
 					</hbox>
 					<description align="center" id="set[$row_cont[PerId]][time_sum]"/>
-					<buttononly label="Start" statustext="select participant for time measurment" class="small noPrint" align="center" onclick="start_time_measurement(this,$row_cont[PerId]);"/>
+					<buttononly label="Start" statustext="select participant for time measurment" class="small noPrint" align="center" onclick="start_time_measurement(this,$row_cont[PerId]);" id="start_time_measurement"/>
 				</row>
 			</rows>
 		</grid>

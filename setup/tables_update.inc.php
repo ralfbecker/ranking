@@ -1231,3 +1231,71 @@ function ranking_upgrade1_7_004()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.005';
 }
 
+
+/**
+ * Adding columns for current climber, next climber, boulder rotation time
+ * 
+ * @return string
+ */
+function ranking_upgrade1_7_005()
+{
+/*
+   ALTER TABLE `Routes` ADD `current_1` INTEGER;
+   ALTER TABLE `Routes` ADD `current_2` INTEGER;
+   ALTER TABLE `Routes` ADD `current_3` INTEGER;
+   ALTER TABLE `Routes` ADD `current_4` INTEGER;
+   ALTER TABLE `Routes` ADD `current_5` INTEGER;
+   ALTER TABLE `Routes` ADD `current_6` INTEGER;
+   ALTER TABLE `Routes` ADD `current_7` INTEGER;
+   ALTER TABLE `Routes` ADD `current_8` INTEGER;
+   ALTER TABLE `Routes` ADD `next_1` INTEGER;
+   ALTER TABLE `Routes` ADD `next_2` INTEGER;
+   ALTER TABLE `Routes` ADD `next_3` INTEGER;
+   ALTER TABLE `Routes` ADD `next_4` INTEGER;
+   ALTER TABLE `Routes` ADD `next_5` INTEGER;
+   ALTER TABLE `Routes` ADD `next_6` INTEGER;
+   ALTER TABLE `Routes` ADD `next_7` INTEGER;
+   ALTER TABLE `Routes` ADD `next_8` INTEGER;
+   ALTER TABLE `Routes` ADD `boulder_time` INTEGER;
+   ALTER TABLE `Routes` ADD `boulder_startet` BIGINT;
+*/
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','current_1',array(
+		'type' => 'int',
+		'precision' => '4',
+		'comment' => 'current climber, speed left, boulder #1'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','current_2',array(
+		'type' => 'int',
+		'precision' => '4',
+		'comment' => 'current speed right, boulder #2'
+	));
+	for($i = 3; $i <= 8; ++$i)
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','current_'.$i,array(
+			'type' => 'int',
+			'precision' => '4',
+			'comment' => 'current boulder #'.$i
+		));
+	}
+	for($i = 1; $i <= 8; ++$i)
+	{
+		$GLOBALS['egw_setup']->oProc->AddColumn('Routes','next_'.$i,array(
+			'type' => 'int',
+			'precision' => '4',
+			'comment' => 'next for boulder #'.$i
+		));
+	}
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','boulder_time',array(
+		'type' => 'int',
+		'precision' => '4',
+		'comment' => 'boulder rotation time in sec'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','boulder_startet',array(
+		'type' => 'int',
+		'precision' => '8',
+		'comment' => 'last boulder rotation started timestamp'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.006';
+}
+
