@@ -7,12 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_format.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
 
 class ranking_display_bo
@@ -41,7 +39,7 @@ class ranking_display_bo
 	 *
 	 * @return ranking_display_bo
 	 */
-	function ranking_display_bo()
+	function __construct()
 	{
 		if (!is_object($GLOBALS['boresult']))
 		{

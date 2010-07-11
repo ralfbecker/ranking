@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -53,28 +53,19 @@ class ranking_admin_prefs_sidebox_hooks
 					foreach($displays as $dsp_id => $dsp_name)
 					{
 						$file[] = array(
-							'text' => '<a class="textSidebox" href="'.egw::link('/index.php',array(
-									'menuaction' => 'ranking.ranking_display_ui.index',
-									'dsp_id' => $dsp_id,
-								)).
-								'" onclick="window.open(this.href,\'display'.$dsp_id.'\',\'dependent=yes,width=700,height=580,scrollbars=yes,status=yes\');
-								return false;">'.$dsp_name.'</a>',
+							'text' => $dsp_name,
+							'link' => "javascript:egw_openWindowCentered2('".egw::link('/index.php',array(
+								'menuaction' => 'ranking.ranking_display_ui.index',
+								'dsp_id' => $dsp_id,
+							),false)."','display$dsp_id',700,580,'yes')",
 							'no_lang' => true,
-							'link' => false
 						);
 					}
 					if ($GLOBALS['egw_info']['user']['apps']['admin'])
 					{
-						$file[] = array(
-							'text' => '<a class="textSidebox" href="'.egw::link('/index.php',array(
-									'menuaction' => 'ranking.ranking_display_ui.display',
-								)).
-								'" onclick="window.open(this.href,\'_blank\',\'dependent=yes,width=640,height=480,scrollbars=yes,status=yes\');
-								return false;">'.lang('Add').'</a>',
-							'no_lang' => true,
-							'link' => false
-						);
-
+						$file['Add'] = "javascript:egw_openWindowCentered2('".egw::link('/index.php',array(
+							'menuaction' => 'ranking.ranking_display_ui.display',
+						),false)."','display$dsp_id',640,480,'yes')";
 					}
 					display_sidebox($appname,lang('Displays'),$file);
 				}

@@ -7,11 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
-
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.so_sql2.inc.php');
 
 class ranking_display extends so_sql2
 {
@@ -27,7 +25,7 @@ class ranking_display extends so_sql2
 	{
 		if (is_null($db)) $db = $GLOBALS['boranking']->db;
 		
-		$this->so_sql('ranking','Displays',$db);	// calling the constructor of so_sql for Displays table
+		parent::__construct('ranking','Displays',$db);	// calling the constructor of so_sql for Displays table
 	}
 	
 	/**
@@ -266,5 +264,22 @@ class ranking_display extends so_sql2
 		$keys[] = 'dsp_etag=dsp_etag+1';
 		
 		return parent::save($keys);
+	}
+	
+	/**
+	 * Update only the given fields, if the primary key is not given, it will be taken from $this->data
+	 *
+	 * Reimplemented to always increment a column 'dsp_etag' as modification counter
+	 * 
+	 * @param array $fields
+	 * @param boolean $merge=true if true $fields will be merged with $this->data (after update!), otherwise $this->data will be just $fields
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function update($fields,$merge=true)
+	{
+		if (!$fields) $fields = array();
+		$fields[] = 'dsp_etag=dsp_etag+1';
+		
+		return parent::update($fields,$merge);
 	}
 }
