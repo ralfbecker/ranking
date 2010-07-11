@@ -7,12 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
-
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_display_bo.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.uietemplate.inc.php');
 
 class ranking_display_ui extends ranking_display_bo
 {
@@ -28,17 +25,7 @@ class ranking_display_ui extends ranking_display_bo
 	);
 	
 	/**
-	 * Constructor
-	 *
-	 * @return ranking_display_ui
-	 */
-	function ranking_display_ui()
-	{
-		$this->ranking_display_bo();		// calling the constructor of the extended class
-	}
-	
-	/**
-	 * Controll for as display
+	 * Controll for a display
 	 *
 	 * @param array $content=null
 	 * @param string $msg
@@ -425,7 +412,7 @@ class ranking_display_ui extends ranking_display_bo
 			if ($button == 'save' || $button == 'delete')	// close popup and update caller
 			{
 				echo "<html>\n<head>\n<script>$script window.close();</script>\n</head>\n</html>\n";
-				$GLOBALS['egw']->framework->egw_exit();
+				common::egw_exit();
 			}
 		}
 		if ($frm['frm_go_frm_id'] && ($go = $this->format->read($frm['frm_go_frm_id'])))

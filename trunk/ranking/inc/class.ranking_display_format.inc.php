@@ -7,11 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$ 
  */
 
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.so_sql2.inc.php');
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
 
 class ranking_display_format extends so_sql2
@@ -45,7 +44,7 @@ class ranking_display_format extends so_sql2
 
 		if (is_null($db)) $db = $GLOBALS['boresult']->db;
 		
-		$this->so_sql('ranking','DisplayFormats',$db);	// calling the constructor of so_sql for DisplayFormats table
+		parent::__construct('ranking','DisplayFormats',$db);	// calling the constructor of so_sql for DisplayFormats table
 	}
 	
 	/**
