@@ -905,7 +905,7 @@ class route_result extends so_sql
 			case 'lead':
 				$mode = $this->rank_lead;
 				$order_by = 'result_height IS NULL,new_rank ASC';
-				$extra_cols[] = 'result_details';
+				$extra_cols[] = 'result_detail';
 				break;
 			case 'speedrelay':
 			case 'speed':
