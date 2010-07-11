@@ -703,8 +703,14 @@ class boresult extends boranking
 			$keys[$this->route_result->id_col] = $id;
 
 			foreach($old_values as $old) if ($old[$this->route_result->id_col] == $id) break;
-			if ($old[$this->route_result->id_col] != $id) unset($old);
-
+			if ($old[$this->route_result->id_col] != $id)
+			{
+				unset($old);
+			}
+			else
+			{
+				$old['result_time'] = $old['result_time_l'];
+			}
 			// to also check the result_details
 			if ($data['result_details']) $data += $data['result_details'];
 			if ($old && $old['result_details']) $old += $old['result_details'];
