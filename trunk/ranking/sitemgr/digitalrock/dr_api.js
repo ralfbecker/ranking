@@ -8,7 +8,71 @@
  */
 
 /**
- * Constructor for startlist from given json url
+ * Constructor for relay startlist from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ */
+function Relaystartlist(_container,_json_url)
+{
+	Relaystartlist.prototype.update = Startlist.prototype.update;
+	Relaystartlist.prototype.handleResponse = Startlist.prototype.handleResponse;
+
+	Startlist.apply(this, [_container,_json_url,{
+		'start_order': 'StartNr',
+		'team_name': 'Teamname',
+		'team_nation': 'Nation',
+		'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
+		'athletes/0/firstname': '', 
+		'athletes/0/start_number': '', 
+		'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
+		'athletes/1/firstname': '', 
+		'athletes/1/start_number': '', 
+		'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
+		'athletes/2/firstname': '', 
+		'athletes/2/start_number': ''
+	}]);
+}
+
+/**
+ * Constructor for relay result from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ */
+function Relayresultlist(_container,_json_url)
+{
+	Relayresultlist.prototype.update = Startlist.prototype.update;
+	Relayresultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
+
+	Startlist.apply(this, [_container,_json_url,_json_url.match(/detail=0/) ? {
+		'result_rank': 'Rank',
+		'team_name': 'Teamname',
+		'team_nation': 'Nation',
+		'result': 'Sum'
+	} : {
+		'result_rank': 'Rank',
+		'team_name': 'Teamname',
+		'team_nation': 'Nation',
+		'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
+		'athletes/0/firstname': '', 
+		'athletes/0/result_time': '', 
+		'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
+		'athletes/1/firstname': '', 
+		'athletes/1/result_time': '', 
+		'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
+		'athletes/2/firstname': '', 
+		'athletes/2/result_time': '',
+		'result': 'Sum'
+	}]);
+}
+
+/**
+ * Constructor for result from given json url
  * 
  * Table get appended to specified _container
  * 
@@ -17,6 +81,9 @@
  */
 function Resultlist(_container,_json_url)
 {
+	Resultlist.prototype.update = Startlist.prototype.update;
+	Resultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
+
 	Startlist.apply(this, [_container,_json_url,{
 		'result_rank': 'Rank',
 		'lastname' : {'label': 'Name', 'colspan': 2},
@@ -27,24 +94,6 @@ function Resultlist(_container,_json_url)
 		'result': 'Result'
 	}]);
 }
-
-/**
- * Update Startlist from json_url
- */
-Resultlist.prototype.update = function()
-{
-	Startlist.prototype.update.apply(this, []);
-};
-
-/**
- * Callback for loading data via ajax
- * 
- * @param _data route data object
- */            
-Resultlist.prototype.handleResponse = function(_data)
-{
-	Startlist.prototype.handleResponse.apply(this, [_data]);
-};
 
 /**
  * Constructor for startlist from given json url
@@ -275,28 +324,47 @@ Table.prototype.createRow = function(_data,_tag)
 	for(var col in this.columns)
 	{
 		if (--span > 0) continue;
+		
+		var col_data = _data[col];
+		var url = _data.url;
+		// allow /-delemited expressions to index into arrays and objects
+		if (typeof col_data == 'undefined' && col.indexOf('/') != -1)
+		{
+			var parts = col.split('/');
+			col_data = _data;
+			for(var p in parts)
+			{
+				col = parts[p];
+				if (col == 'lastname' || col == 'firstname')
+					url = col_data.url;
+				if (typeof col_data != 'undefined')
+					col_data = col_data[col];
+			}
+		}
+		else if (col.indexOf('/') != -1)
+			col = col.substr(col.lastIndexOf('/')+1);
 
 		var tag = document.createElement(_tag);
 		tag.className = col;
 		$(row).append(tag);
 		
 		// add pstambl link to name & vorname
-		if (typeof _data.url != 'undefined' && (col == 'lastname' || col == 'firstname'))
+		if (typeof url != 'undefined' && (col == 'lastname' || col == 'firstname'))
 		{
 			var a = document.createElement('a');
-			a.href = _data.url;
+			a.href = url;
 			a.target = 'pstambl';
 			$(tag).append(a);
 			tag = a;
 		}
-		if (typeof _data[col] == 'object')
+		if (typeof col_data == 'object' && col_data)
 		{
-			if (_data[col]['colspan'] > 1) tag.colSpan = span = _data[col]['colspan'];
-			$(tag).text(_data[col]['label']);
+			if (col_data['colspan'] > 1) tag.colSpan = span = col_data['colspan'];
+			$(tag).text(col_data['label']);
 		}
 		else
 		{
-			$(tag).text(_data[col]);
+			$(tag).text(col_data ? col_data : '');
 			span = 1;
 		}
 	}

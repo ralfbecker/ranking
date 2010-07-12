@@ -12,7 +12,10 @@
 		<script type="text/javascript">
 			var startlist;
 			$(document).ready(function() {
-				startlist = new Startlist('table','/egroupware/ranking/json.php'+location.search);
+				if (location.search.match(/cat=7[012]/))
+					startlist = new Relaystartlist('table','/egroupware/ranking/json.php'+location.search);
+				else	
+					startlist = new Startlist('table','/egroupware/ranking/json.php'+location.search);
 			});	
 		</script>
 		<input type="button" onclick="startlist.update();" value="Update" />
