@@ -225,7 +225,7 @@ class boresult extends boranking
 	function _randomize_speedrelay(array $keys)
 	{
 		$start_order = null;
-		if (($starter = $this->route_result->search('',true,'RAND()')))
+		if (($starter = $this->route_result->search('',true,'RAND()','','','','AND',false,$keys)))
 		{
 			foreach($starter as $data)
 			{
@@ -1532,9 +1532,21 @@ class boresult extends boranking
 			unset($result['route_names']);
 		}
 	
-		$num_current = $discipline == 'lead' ? 1 :
-			($discipline == 'boulder' ? $route['route_num_problems'] : 2);
-
+		switch($discipline)
+		{
+			case 'lead':
+				$num_current = 1;
+				break;
+			case 'boulder':
+				$num_current = $route['route_num_problems'];
+				break;
+			case 'speed':
+				$num_current = 2;
+				break;
+			case 'speedrelay':
+				$num_current = 3;
+				break;
+		}
 		for($i = 1; $i <= $num_current; ++$i)
 		{
 			$route['current'][] = $route['current_'.$i] ? $route['current_'.$i] : null;
@@ -1647,6 +1659,9 @@ class boresult extends boranking
 			}
 			if ($discipline == 'speedrelay')
 			{
+				unset($row['lastname']);
+				unset($row['firstname']);
+				unset($row['federation']);
 				$athletes[$row['PerId_1']]['start_number'] = $row['start_number_1'];
 				if ($heat > -1) $athletes[$row['PerId_1']]['result_time'] = $row['result_time_1'];
 				$athletes[$row['PerId_2']]['start_number'] = $row['start_number_2'];
