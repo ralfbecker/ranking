@@ -1165,6 +1165,8 @@ class boresult extends boranking
 			'start_number' => $rdata['startfolgenr'] != $rdata['startnummer'] ? $rdata['startnummer'] : null,
 			'result_rank' =>  $rdata['platz'] ? (int)$rdata['platz'] : null,
 		);
+		if (!$rdata['platz']) return $data;	// no result yet
+		
 		switch ($discipline)
 		{
 			case 'lead':
@@ -1541,10 +1543,8 @@ class boresult extends boranking
 				$num_current = $route['route_num_problems'];
 				break;
 			case 'speed':
-				$num_current = 2;
-				break;
 			case 'speedrelay':
-				$num_current = 3;
+				$num_current = 2;
 				break;
 		}
 		for($i = 1; $i <= $num_current; ++$i)
