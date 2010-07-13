@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
-									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" no_lang="1" id="route_data[route_start]"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description no_lang="1" id="route_data[route_observation_time]"/>
-									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,7 +47,7 @@
 							</columns>
 							<rows>
 								<row>
-									<description no_lang="1" id="route_data[route_result]"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
 									<description no_lang="1" id="route_data[route_judge]"/>
@@ -79,7 +79,7 @@
 				<column/>
 				<column/>
 				<column/>
-				<column disabled="1"/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
@@ -130,8 +130,8 @@
 					<menulist class="$cont[rw_result] leftPad5">
 						<menupopup id="set[$row_cont[team_id]][eliminated]" align="center"/>
 					</menulist>
-					<textbox type="float" align="center" id="${row}[result_time]" readonly="true" size="5" precision="%4.2lf"/>
-					<buttononly label="Start" statustext="select participant for time measurment" class="small noPrint" align="center" onclick="start_time_measurement(this,$row_cont[team_id]);"/>
+					<description align="center" id="set[$row_cont[team_id]][time_sum]"/>
+					<buttononly label="Update" statustext="update time" class="small noPrint" align="center" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_2]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_3]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,'exec[nm][rows][set][$row_cont[team_id]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);" id="update"/>
 				</row>
 			</rows>
 		</grid>
