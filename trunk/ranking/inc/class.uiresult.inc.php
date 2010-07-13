@@ -1077,6 +1077,17 @@ class uiresult extends boresult
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);
+	 * Relay:
+	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 		'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,
+	 * 		'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_2]').value,
+	 * 		'exec[nm][rows][set][$row_cont[team_id]][result_time_3]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,
+	 * 		'exec[nm][rows][set][$row_cont[team_id]][eliminated]',
+	 * 		document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);
+	 * 
 	 * 
 	 * @param string $request_id eTemplate request id
 	 * @param string $name can be repeated multiple time together with value
@@ -1123,13 +1134,18 @@ class uiresult extends boresult
 					'GrpId' => $request->preserv['nm']['cat'],
 					'route_order' => $request->preserv['nm']['route'] < 0 ? -1 : $request->preserv['nm']['route'],
 				);
-				list($athlete) = each($content['nm']['rows']['set']);
-				$old_result = $this->route_result->read($keys+array('PerId'=>$athlete));
+				if ($this->route_result->isRelay != ($request->preserv['nm']['discipline'] == 'speedrelay'))
+				{
+					$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+						$request->preserv['nm']['discipline'] == 'speedrelay');
+				}
+				list($id) = each($content['nm']['rows']['set']);
+				$old_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
 
 				if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],
 					$request->preserv['nm']['route_type'],$request->preserv['nm']['discipline']))
 				{
-					$new_result = $this->route_result->read($keys+array('PerId'=>$athlete));
+					$new_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
 					$msg = lang('Heat updated');
 				}
 				else
@@ -1138,7 +1154,7 @@ class uiresult extends boresult
 				}
 				if ($this->error)
 				{
-					foreach($this->error as $PerId => $data)
+					foreach($this->error as $id => $data)
 					{
 						foreach($data as $field => $error)
 						{
@@ -1157,14 +1173,14 @@ class uiresult extends boresult
 						{
 							// add display update(s)
 							$display = new ranking_display($this->db);
-							$display->activate($frm_id,$athlete,$dsp_id,$keys['GrpId'],$keys['route_order']);
+							$display->activate($frm_id,$id,$dsp_id,$keys['GrpId'],$keys['route_order']);
 						}
 						//$response->addAlert('first_name='.$first_name);
 						switch($first_name)
 						{
 							case 'result_height':
 								$to_update = array(
-									'current_1' => $athlete,
+									'current_1' => $id,
 								);
 								break;
 								
@@ -1172,15 +1188,15 @@ class uiresult extends boresult
 								if ($request->preserv['nm']['route'] >= 2)
 								{
 									$to_update = array(
-										'current_1' => $athlete,
-										'current_2' => $this->get_co($keys,$athlete),
+										'current_1' => $id,
+										'current_2' => $this->get_co($keys,$id),
 									);
 									break;
 								}
 								else
 								{
 									$to_update = array(
-										'current_1' => $athlete,
+										'current_1' => $id,
 									);
 								}
 								break;
@@ -1189,16 +1205,25 @@ class uiresult extends boresult
 								if ($request->preserv['nm']['route'] >= 2)
 								{
 									$to_update = array(
-										'current_1' => $this->get_co($keys,$athlete),
-										'current_2' => $athlete,
+										'current_1' => $this->get_co($keys,$id),
+										'current_2' => $id,
 									);
 								}
 								else
 								{
 									$to_update = array(
-										'current_1' => $athlete,
+										'current_1' => $id,
 									);
 								}
+								break;
+								
+							case 'result_time_1':	// relay
+								// we need to check, if id is the co (right climber) or not
+								$co = $this->get_co($keys,$id,$id_isnt_co);
+								$to_update = array(
+									'current_1' => $id_isnt_co ? $id : $co,
+									'current_2' => $id_isnt_co ? $co : $id,
+								);
 								break;
 						}
 						$this->route->update($to_update+array(
@@ -1213,7 +1238,7 @@ class uiresult extends boresult
 						$this->_update_ranks($keys,$response,$request);
 					}
 				}
-				if ($msg) $response->addAlert($msg);
+				if ($msg) $response->assign('msg','innerHTML',$msg);
 			}
 		}
 		//error_log("processing of ajax_update took ".sprintf('%4.2lf s',microtime(true)-$start));
@@ -1221,35 +1246,37 @@ class uiresult extends boresult
 	}
 	
 	/**
-	 * Get co-participant for given PerId and route (specified by $keys)
+	 * Get co-participant for given PerId/team_id and route (specified by $keys)
 	 * 
 	 * @param array $keys
-	 * @param int $PerId
+	 * @param int $id PerId or team_id
+	 * @param boolean $id_isnt_co=null true if id is NOT the co, false otherwise
 	 * @return NULL|int
 	 */
-	protected function get_co(array $keys,$PerId)
+	protected function get_co(array $keys,$id,&$id_isnt_co=null)
 	{
-		if (!($athletes = $this->route_result->search($keys,false)))
+		if (!($results = $this->route_result->search($keys,false,'start_order')))
 		{
-			//error_log(__METHOD__."(".array2string($keys).",$PerId) returning NULL (no athletes)");
+			//error_log(__METHOD__."(".array2string($keys).",$id) returning NULL (no results)");
 			return null;
 		}
-		foreach($athletes as $n => $athlete)
+		foreach($results as $n => $result)
 		{
-			if ($athlete['PerId'] == $PerId)
+			if ($result[$this->route_result->id_col] == $id)
 			{
-				if ($athlete['start_order'] & 1)
+				if (($id_isnt_co = ($result['start_order'] & 1 == 1)))
 				{
-					$co = $athletes[$n+1];
+					$co = $results[$n+1];
 				}
 				else
 				{
-					$co = $athletes[$n-1];
+					$co = $results[$n-1];
 				}
-				return $co['PerId'];
+				error_log(__METHOD__."(".array2string($keys).",{$this->route_result->id_col}=$id,".array2string($id_isnt_co).") returning ".array2string($co[$this->route_result->id_col]));
+				return $co[$this->route_result->id_col];
 			}
 		}
-		//error_log(__METHOD__."(".array2string($keys).",PerId=$PerId) returning NULL (PerId NOT found)".array2string($athletes));
+		//error_log(__METHOD__."(".array2string($keys).",{$this->route_result->id_col}=$id) returning NULL (id NOT found)".array2string($results));
 		return null;
 	}
 
@@ -1525,16 +1552,16 @@ class uiresult extends boresult
 		{
 			foreach($this->route_result->search($keys,false,'','','',false,'AND',false,$keys) as $data)
 			{
-				$response->addAssign("set[$data[PerId]][result_rank]",'innerHTML',$data['result_rank']);
+				$response->assign("set[{$data[$this->route_result->id_col]}][result_rank]",'innerHTML',(string)$data['result_rank']);
 				if (isset($data['time_sum']))
 				{
-					$response->addAssign("set[$data[PerId]][time_sum]",'innerHTML',$data['time_sum']);
+					$response->assign("set[{$data[$this->route_result->id_col]}][time_sum]",'innerHTML',(string)$data['time_sum']);
 				}
 			}
 		}
 		else							// --> submit the form to reload the page
 		{
-			$response->addScript('document.eTemplate.submit();');
+			$response->script('document.eTemplate.submit();');
 		}
 	}
 
