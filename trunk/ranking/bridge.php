@@ -22,7 +22,6 @@ ini_set('display_errors',false);
 if (!extension_loaded('mbstring')) dl('mbstring.so');
 if (ini_get('mbstring.func_overload') != 7) echo "mbstring.func_overload=7 required!!!\n\n";
 
-//$_SERVER['argc']=3; $_SERVER['argv']=array('display.php','ralf','ralbec32');
 if (isset($_SERVER['HTTP_HOST']))	// security precaution: forbit calling display demon as web-page
 {
 	die('<h1>bridge.php must NOT be called as web-page --> exiting !!!</h1>');
@@ -33,7 +32,7 @@ elseif ($_SERVER['argc'] < 6)
 }
 // this is kind of a hack, as the autocreate_session_callback can not change the type of the loaded account-class
 // so we need to make sure the right one is loaded by setting the domain before the header gets included.
-@list(,$_GET['domain']) = explode('@',$_SERVER['argv'][1]);
+@list(,$_REQUEST['domain']) = explode('@',$_SERVER['argv'][1]);
 
 if (!is_writable(ini_get('session.save_path')) && is_dir('/tmp')) ini_set('session.save_path','/tmp');	// regular users may have no rights to apache's session dir
 
