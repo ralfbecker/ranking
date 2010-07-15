@@ -2,6 +2,11 @@
 <?php
 /**
  * eGroupWare digital ROCK Rankings - bridge to old ROCK programs
+ * 
+ * Use fuse and sshfs to mount old granit filesystem to webserver eg:
+ * granit: ssh -R2022:localhost:22 root@www.ifsc-climbing.org
+ * www:    sshfs -o reconnect,cache_stat_timeout=0 -p 2022 ralf@localhost:/var/www/html/2010/10_arco /var/www/ifsc-climbing
+.org/2010/10_arco
  *
  * @link http://www.egroupware.org
  * @package admin
@@ -115,5 +120,5 @@ while(true)
 			echo "Error: $imported\n";
 		}
 	}
-	usleep(100000);	// sleep for a tenth sec
+	usleep(500000);	// sleep for a half sec
 }
