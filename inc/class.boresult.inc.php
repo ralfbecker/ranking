@@ -1558,6 +1558,16 @@ class boresult extends boranking
 			if ((string)$value === '') unset($route[$name]);
 		}
 		$last_modified = (int)$route['route_modified'];
+		
+		// make sure route_result is set, if result is offical (and not if not)
+		if ($route['route_status'] == STATUS_RESULT_OFFICIAL)
+		{
+			if (empty($route['route_result'])) $route['route_result'] = 'official';
+		}
+		else
+		{
+			unset($route['route_result']);
+		}
 
 		// remove not needed route attributes
 		$route = array_diff_key($route,array_flip(array(
