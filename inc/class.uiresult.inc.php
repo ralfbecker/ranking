@@ -646,7 +646,7 @@ class uiresult extends boresult
 	function ajax_set_athlets($comp,$cat,$team_id,$nation)
 	{
 		$response = new xajaxResponse();
-		//$response->alert(__METHOD__."($comp,$cat,$team_id,'$nation')");
+		//$response->alert(__METHOD__."($comp,$cat,$team_id,'$nation')"); return $response->getXML();
 		$starters = $this->get_registered(array(
 			'WetId' => $comp,
 			'GrpId' => $cat,
@@ -684,6 +684,8 @@ class uiresult extends boresult
 		}
 
 		$response->script($script);
+		
+		return $response->getXML();
 	}
 
 	/**
