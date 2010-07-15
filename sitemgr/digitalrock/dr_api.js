@@ -19,8 +19,9 @@ function Relaystartlist(_container,_json_url)
 {
 	Relaystartlist.prototype.update = Startlist.prototype.update;
 	Relaystartlist.prototype.handleResponse = Startlist.prototype.handleResponse;
+ 	Relaystartlist.prototype.setHeader = Startlist.prototype.setHeader;
 
-	Startlist.apply(this, [_container,_json_url,{
+	this.startlist_cols = {
 		'start_order': 'StartNr',
 		'team_name': 'Teamname',
 		'team_nation': 'Nation',
@@ -33,7 +34,8 @@ function Relaystartlist(_container,_json_url)
 		'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
 		'athletes/2/firstname': '', 
 		'athletes/2/start_number': ''
-	}]);
+	};
+	Startlist.apply(this, [_container,_json_url]);
 }
 
 /**
@@ -43,11 +45,12 @@ function Relaystartlist(_container,_json_url)
  * 
  * @param _container
  * @param _json_url url for data to load
- */
+*/
 function Relayresultlist(_container,_json_url)
 {
 	Relayresultlist.prototype.update = Startlist.prototype.update;
 	Relayresultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
+ 	Relayresultlist.prototype.setHeader = Startlist.prototype.setHeader;
 
 	Startlist.apply(this, [_container,_json_url,_json_url.match(/detail=0/) ? {
 		'result_rank': 'Rank',
@@ -83,6 +86,7 @@ function Resultlist(_container,_json_url)
 {
 	Resultlist.prototype.update = Startlist.prototype.update;
 	Resultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
+	Resultlist.prototype.setHeader = Startlist.prototype.setHeader;
 
 	Startlist.apply(this, [_container,_json_url,{
 		'result_rank': 'Rank',
@@ -102,15 +106,16 @@ function Resultlist(_container,_json_url)
  * 
  * @param _container
  * @param _json_url url for data to load
- * @param _columns hash with key => label pairs
- * @param _sort name of column to sort by
+ * @param _columns hash with key => label pairs, defaulting to this.startlist_cols
+ * @param _sort name of column to sort by, defaults to first column
  */
 function Startlist(_container,_json_url,_columns,_sort)
 {
 	this.json_url = _json_url;
 	if (typeof _container == "string") _container = document.getElementById(_container);
 	this.container = _container;
-	if (typeof _columns == 'undefined') _columns = {
+	// set startlist columns, if not set already
+	if (typeof this.startlist_cols == 'undefined') this.startlist_cols = {
 		'start_order': {'label': 'StartNr', 'colspan': 2},
 		'start_number': '',
 		'lastname' : {'label': 'Name', 'colspan': 2},
@@ -118,8 +123,10 @@ function Startlist(_container,_json_url,_columns,_sort)
 		'birthyear' : 'Birthyear',
 		'nation' : 'Nation'
 	};
-	this.columns = _columns;
-	if (typeof _sort == 'undefined') for(_sort in _columns) break;
+	// use starlist columns, if no columns given
+	this.columns = typeof _columns == 'undefined' ? this.startlist_cols : _columns;
+	// if not sort given, use first column
+	if (typeof _sort == 'undefined') for(_sort in this.columns) break;
 	this.sort = _sort;
 
 	this.update();
@@ -149,10 +156,33 @@ Startlist.prototype.update = function()
  */            
 Startlist.prototype.handleResponse = function(_data)
 {
+	// if we have no ranked participant, show a startlist
+	if (!_data.participants[0].result_rank && this.sort == 'result_rank')
+	{
+		this.result_cols = this.columns;
+		this.columns = {
+			'start_order': {'label': 'StartNr', 'colspan': 2},
+			'start_number': '',
+			'lastname' : {'label': 'Name', 'colspan': 2},
+			'firstname' : '',
+			'birthyear' : 'Birthyear',
+			'nation' : 'Nation'
+		};
+		this.sort = 'start_order';
+	}
+	// if we are a result showing a startlist AND have now a ranked participant
+	// --> switch back to result
+	else if(_data.participants[0].result_rank && this.result_cols)
+	{
+		this.columns = this.result_cols;
+		delete this.result_cols;
+		this.sort = 'result_rank';
+		// remove whole table
+		$(this.container).empty();
+		delete this.table;
+	}
 	if (typeof this.table == 'undefined')
 	{
-		var title_prefix = (this.sort == 'start_order' ? 'Startlist' : 'Result')+': ';
-
 		// for general result use one column per heat
 		if (this.columns.result && _data.route_names)
 		{
@@ -173,25 +203,49 @@ Startlist.prototype.handleResponse = function(_data)
 		{
 			this.columns['rank_prev_heat'] = 'previous heat';
 		}
-		document.title = title_prefix+_data.route_name;
 		
 		// header line
-		var header = document.createElement('h1');
-		$(this.container).append(header);
-		header.className = 'listHeader';
-		$(header).text(title_prefix+_data.route_name);
+		this.header = $(document.createElement('h1'));
+		$(this.container).append(this.header);
+		this.header.className = 'listHeader';
 		
 		// create new table
-		this.table = new Table(_data.participants,this.columns,this.sort);
+		this.table = new Table(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
 	
 		$(this.container).append(this.table.dom);
 	}
 	else
 	{
 		// update existing table
-		this.table.update(_data.participants);
+		this.table.update(_data.participants,_data.route_result ? _data.route_quota : null);
+	}
+	// set/update header line
+	this.setHeader(_data);
+
+	if (!_data.route_result) 
+	{
+		var list = this;
+		window.setTimeout(function(){list.update();},10000);
 	}
 };
+
+/**
+ * Set header with a (provisional) Result or Startlist prefix
+ * 
+ * @param _data
+ * @return
+ */
+Startlist.prototype.setHeader = function(_data)
+{
+	var title_prefix = (this.sort == 'start_order' ? 'Startlist' : 
+		(_data.route_result ? 'Result' : 'provisional Result'))+': ';
+
+	var header = title_prefix+_data.route_name;
+	
+	document.title = header;
+	this.header.empty();
+	this.header.text(header);
+}
 
 /**
  * Constructor for table with given data and columns
@@ -202,8 +256,9 @@ Startlist.prototype.handleResponse = function(_data)
  * @param _columns hash with column name => header
  * @param _sort column name to sort by
  * @param _ascending
+ * @param _quota quota if quota line should be drawn in result
  */
-function Table(_data,_columns,_sort,_ascending)
+function Table(_data,_columns,_sort,_ascending,_quota)
 {
 	this.data      = _data;
 	this.columns   = _columns;
@@ -211,6 +266,7 @@ function Table(_data,_columns,_sort,_ascending)
 	this.sort      = _sort;
 	if (typeof _ascending == 'undefined') _ascending = true;
 	this.ascending = _ascending;
+	this.quota = _quota;
 	// hash with PerId => tr containing athlete
 	this.athletes = {};
 	
@@ -243,10 +299,12 @@ function Table(_data,_columns,_sort,_ascending)
  * Update table with new data, trying to re-use existing rows
  * 
  * @param _data array with data for each participant
+ * @param _quota quota if quota line should be drawn in result
  */
-Table.prototype.update = function(_data)
+Table.prototype.update = function(_data,_quota)
 {
 	this.data = _data;
+	if (typeof _quota != 'undefined') this.quota = _quota;
 	//console.log(this.data);
 	this.sortData();
 	
@@ -367,6 +425,13 @@ Table.prototype.createRow = function(_data,_tag)
 			$(tag).text(col_data ? col_data : '');
 			span = 1;
 		}
+	}
+	// add or remove quota line
+	if (this.sort == 'result_rank' && this.quota && _data.result_rank && 
+		_data.result_rank >= 1 && _data.result_rank > this.quota)
+	{
+		row.className = 'quota_line';
+		delete this.quota;	// to set quota line only once
 	}
 	return row;
 };

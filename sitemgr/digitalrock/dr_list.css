@@ -52,3 +52,10 @@ h1 {
 	font-size: 20pt;
 	font-weight: bold;
 }
+
+/**
+ * Quota line
+ */
+.quota_line > td {
+	border-top: 2px solid black;
+}
