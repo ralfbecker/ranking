@@ -1137,7 +1137,7 @@ class boresult extends boranking
 			$this->route->save($route_imported);
 			//_debug_array($this->route->data);
 		}
-		$this->route_result->delete($keys);
+		$this->route_result->delete($keys+array('PerId NOT IN ('.implode(',',array_keys($route['teilnehmer'])),')'));
 		foreach($route['teilnehmer'] as $PerId => $data)
 		{
 			$keys['PerId'] = $PerId;
@@ -1162,7 +1162,7 @@ class boresult extends boranking
 			'PerId' => $PerId,
 			'GrpId' => $GrpId,
 			'start_order' => $rdata['startfolgenr'],
-			'start_number' => $rdata['startfolgenr'] != $rdata['startnummer'] ? $rdata['startnummer'] : null,
+			'start_number' => $rdata['startnummer'], //$rdata['startfolgenr'] != $rdata['startnummer'] ? $rdata['startnummer'] : null,
 			'result_rank' =>  $rdata['platz'] ? (int)$rdata['platz'] : null,
 		);
 		if (!$rdata['platz']) return $data;	// no result yet
