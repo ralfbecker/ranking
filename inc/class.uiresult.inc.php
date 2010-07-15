@@ -443,6 +443,9 @@ class uiresult extends boresult
 			case 'result_top,result_zone':
 				$query['order'] = 'result_top IS NULL,result_top '.$query['sort'].',result_zone IS NULL,result_zone';
 				break;
+			case 'nation':
+				$query['order'] = 'Federations.nation';
+				break;
 		}
 		if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
 		{
