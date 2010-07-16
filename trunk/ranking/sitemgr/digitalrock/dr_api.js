@@ -88,7 +88,13 @@ function Resultlist(_container,_json_url)
 	Resultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
 	Resultlist.prototype.setHeader = Startlist.prototype.setHeader;
 
-	Startlist.apply(this, [_container,_json_url,{
+	Startlist.apply(this, [_container,_json_url,_json_url.match(/detail=0/) ? {
+		'result_rank': 'Rank',
+		'lastname' : {'label': 'Name', 'colspan': 2},
+		'firstname' : '',
+		'nation' : 'Nation',
+		'result': 'Result'
+	} : {
 		'result_rank': 'Rank',
 		'lastname' : {'label': 'Name', 'colspan': 2},
 		'firstname' : '',
@@ -130,6 +136,10 @@ function Startlist(_container,_json_url,_columns,_sort)
 	this.sort = _sort;
 
 	this.update();
+
+	if (_json_url.match(/rotate=/)) {
+		setInterval("up_down();",100);
+	}
 }
 
 /**
@@ -506,3 +516,28 @@ Table.prototype.sortNummeric = function(_a,_b)
 	//console.log('_a[PerId]='+_a['PerId']+': _a['+this.sort+']='+_a[this.sort]+', _b[PerId]='+_b['PerId']+': _b['+this.sort+']='+_b[this.sort]+' returning '+((_b[this.sort] - _a[this.sort]) * (this.ascending ? 1 : -1)));
 	return (_a[this.sort] - _b[this.sort]) * (this.ascending ? 1 : -1);
 };
+
+var scroll_by=1;
+function up_down()
+{
+	var y = 0;
+	var wy = 0;
+	var dy = 0;
+	window.scrollBy(0, scroll_by);
+
+	if (window.pageYOffset) {
+		y = window.pageYOffset;
+		wy = window.innerHeight;
+		dy = document.body.offsetHeight;
+
+	} else if (document.body && document.body.scrollTop) {
+		y = document.body.scrollTop;
+	}
+	//alert("pageYOffset(y)="+pageYOffset+", innerHeight(wy)="+innerHeight+", offsetHeight(dy)="+document.body.offsetHeight);
+	if (y+wy >= dy+scroll_by) {
+		scroll_by = -1;
+	} else if(y <= Math.abs(scroll_by)) {
+		scroll_by = 1;
+	}
+}
+//setInterval("up_down();",200);
