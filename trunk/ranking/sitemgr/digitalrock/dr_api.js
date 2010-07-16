@@ -138,7 +138,7 @@ function Startlist(_container,_json_url,_columns,_sort)
 	this.update();
 
 	if (_json_url.match(/rotate=/)) {
-		setInterval("up_down();",100);
+		window.setInterval("up_down();",20);
 	}
 }
 
@@ -521,23 +521,19 @@ var scroll_by=1;
 function up_down()
 {
 	var y = 0;
-	var wy = 0;
-	var dy = 0;
+	var wy = window.innerHeight;
+	var dy = document.body.offsetHeight;
 	window.scrollBy(0, scroll_by);
 
 	if (window.pageYOffset) {
 		y = window.pageYOffset;
-		wy = window.innerHeight;
-		dy = document.body.offsetHeight;
-
 	} else if (document.body && document.body.scrollTop) {
 		y = document.body.scrollTop;
 	}
 	//alert("pageYOffset(y)="+pageYOffset+", innerHeight(wy)="+innerHeight+", offsetHeight(dy)="+document.body.offsetHeight);
-	if (y+wy >= dy+scroll_by) {
+	if (y+wy >= dy) {
 		scroll_by = -1;
 	} else if(y <= Math.abs(scroll_by)) {
 		scroll_by = 1;
 	}
 }
-//setInterval("up_down();",200);
