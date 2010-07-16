@@ -1117,7 +1117,7 @@ class boresult extends boranking
 		if (!$this->route->read($keys = array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
-			'route_order' => (int)$this->config['rock_import_route'.$n],
+			'route_order' => (int)$heat,
 		)))
 		{
 			// create a new route
