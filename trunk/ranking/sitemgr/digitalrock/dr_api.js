@@ -517,23 +517,47 @@ Table.prototype.sortNummeric = function(_a,_b)
 	return (_a[this.sort] - _b[this.sort]) * (this.ascending ? 1 : -1);
 };
 
+// scroll speed
 var scroll_by=1;
+// sleep on the borders for $sleep_for seconds
+var sleep_for = 4;
+
+// helper variable
+var sleep_until = 0;
 function up_down()
 {
+	// check whether to sleep
+	var now = new Date();
+	if (now.getTime() < sleep_until) {
+		return;
+	}
+	// margin in which to reverse scrolling
+	var margin = 2;
 	var y = 0;
-	var wy = window.innerHeight;
-	var dy = document.body.offsetHeight;
+	var viewHeight = window.innerHeight;
+	var pageHeight = document.body.offsetHeight;
 	window.scrollBy(0, scroll_by);
 
 	if (window.pageYOffset) {
+		// all other browsers
 		y = window.pageYOffset;
 	} else if (document.body && document.body.scrollTop) {
+		// IE
 		y = document.body.scrollTop;
 	}
+
+	var scrollTopPosition = y;
+	var scrollBottomPosition = y + viewHeight;
 	//alert("pageYOffset(y)="+pageYOffset+", innerHeight(wy)="+innerHeight+", offsetHeight(dy)="+document.body.offsetHeight);
-	if (y+wy >= dy) {
+	var do_sleep = false;
+	if (pageHeight - scrollBottomPosition <= margin) {
 		scroll_by = -1;
-	} else if(y <= Math.abs(scroll_by)) {
+		do_sleep = true;
+	} else if(scrollTopPosition <= margin) {
 		scroll_by = 1;
+		do_sleep = true;
+	}
+	if (do_sleep) {
+		sleep_until = now.getTime() + (sleep_for * 1000);
 	}
 }
