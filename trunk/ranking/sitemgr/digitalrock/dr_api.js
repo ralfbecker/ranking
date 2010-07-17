@@ -279,7 +279,10 @@ Startlist.prototype.setHeader = function(_data)
 	var title_prefix = (this.sort == 'start_order' ? 'Startlist' : 
 		(_data.route_result ? 'Result' : 'provisional Result'))+': ';
 
-	var header = title_prefix+_data.route_name;
+	var header = _data.route_name;
+	// if NOT details=0, add prefix before route name
+	if (!this.json_url.match(/details=0/))
+		header = title_prefix+header;
 	
 	document.title = header;
 	this.header.empty();
@@ -489,7 +492,7 @@ Table.prototype.sortData = function()
 			break;
 
 		case 'result_rank':
-			this.data.sort(sortResultRank);
+			//this.data.sort(sortResultRank);
 			break;
 
 		default:
