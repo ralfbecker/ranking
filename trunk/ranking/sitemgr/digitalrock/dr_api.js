@@ -280,8 +280,8 @@ Startlist.prototype.setHeader = function(_data)
 		(_data.route_result ? 'Result' : 'provisional Result'))+': ';
 
 	var header = _data.route_name;
-	// if NOT details=0, add prefix before route name
-	if (!this.json_url.match(/details=0/))
+	// if NOT detail=0, add prefix before route name
+	if (!this.json_url.match(/detail=0/))
 		header = title_prefix+header;
 	
 	document.title = header;
@@ -492,6 +492,7 @@ Table.prototype.sortData = function()
 			break;
 
 		case 'result_rank':
+			// not necessary as server returns them sorted this way
 			//this.data.sort(sortResultRank);
 			break;
 
@@ -517,6 +518,10 @@ function sortStartOrder(_a, _b)
 /**
  * Callback for sort by 'platz' attribute and then 'name' and 'vorname'
  * 
+ * Currently not used, as server returns data already sorted this way
+ * AND our implementation does NOT work in webkit browsers, because
+ * wie return boolean for sort by alphabet
+ *
  * @param _a first object to compare
  * @param _b second object to compare
  * @return int
