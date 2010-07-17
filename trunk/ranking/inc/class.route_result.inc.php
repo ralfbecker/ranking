@@ -77,6 +77,7 @@ class route_result extends so_sql
 	const ACL_FED_JOIN = ' LEFT JOIN Athlete2Fed a2acl_f ON Personen.PerId=a2acl_f.PerId AND a2acl_f.a2f_end=-1 LEFT JOIN Federations acl_fed ON a2acl_f.fed_id=acl_fed.fed_id';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
+	var $rank_lead_countback = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
 	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time >= r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
@@ -941,6 +942,22 @@ class route_result extends so_sql
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
+		}
+		// lead countback
+		elseif ($discipline == 'lead')
+		{
+			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
+			$route_order = $keys['route_order'];
+			if ($keys['route_order'] == 2 && $route_type == TWO_QUALI_ALL)
+			{
+				$extra_cols[] = 'ROUND(('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).'),2) AS rank_prev_heat';
+				$order_by .= ',rank_prev_heat ASC';
+			}
+			elseif ($keys['route_order'] >= 2+(int)($route_type == TWO_QUALI_HALF))
+			{
+				$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
+				$order_by .= ',rank_prev_heat ASC';
+			}
 		}
 		$result = $this->search($keys,$this->id_col.',result_rank',$order_by,$extra_cols);
 
