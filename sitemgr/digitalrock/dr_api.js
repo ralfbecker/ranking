@@ -6,7 +6,13 @@
  * @copyright 2010 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
-
+ 
+/**
+ * Example with multi-result scrolling (use c= and r= for cat and route)
+ *
+ * http://www.ifsc-climbing.org/egroupware/ranking/sitemgr/digitalrock/eliste.html?comp=1251&cat=1&route=2&detail=0&rotate=c=1,r=2:c=2,r=2
+ */
+ 
 /**
  * Constructor for relay startlist from given json url
  * 
@@ -20,6 +26,8 @@ function Relaystartlist(_container,_json_url)
 	Relaystartlist.prototype.update = Startlist.prototype.update;
 	Relaystartlist.prototype.handleResponse = Startlist.prototype.handleResponse;
  	Relaystartlist.prototype.setHeader = Startlist.prototype.setHeader;
+	Relaystartlist.prototype.upDown = Startlist.prototype.upDown;
+	Relaystartlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
 	this.startlist_cols = {
 		'start_order': 'StartNr',
@@ -51,6 +59,8 @@ function Relayresultlist(_container,_json_url)
 	Relayresultlist.prototype.update = Startlist.prototype.update;
 	Relayresultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
  	Relayresultlist.prototype.setHeader = Startlist.prototype.setHeader;
+	Relayresultlist.prototype.upDown = Startlist.prototype.upDown;
+	Relayresultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
 	Startlist.apply(this, [_container,_json_url,_json_url.match(/detail=0/) ? {
 		'result_rank': 'Rank',
@@ -87,6 +97,8 @@ function Resultlist(_container,_json_url)
 	Resultlist.prototype.update = Startlist.prototype.update;
 	Resultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
 	Resultlist.prototype.setHeader = Startlist.prototype.setHeader;
+	Resultlist.prototype.upDown = Startlist.prototype.upDown;
+	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
 	Startlist.apply(this, [_container,_json_url,_json_url.match(/detail=0/) ? {
 		'result_rank': 'Rank',
@@ -134,11 +146,25 @@ function Startlist(_container,_json_url,_columns,_sort)
 	// if not sort given, use first column
 	if (typeof _sort == 'undefined') for(_sort in this.columns) break;
 	this.sort = _sort;
+	
+	// Variables needed for scrolling in upDown
+	// scroll speed
+	this.scroll_by=1;
+	// sleep on the borders for $sleep_for seconds
+	this.sleep_for = 4;
+    // margin in which to reverse scrolling
+    // CAUTION: At the beginning, we scroll pixelwise through the margin, one pixel each sleep_for seconds. Do not change the margin unless you know what you do.
+	this.margin = 2;
+	
+	// helper variable
+	this.sleep_until = 0;
 
 	this.update();
 
-	if (_json_url.match(/rotate=/)) {
-		window.setInterval("up_down();",20);
+	if (this.json_url.match(/rotate=/)) {
+		var list = this;
+		window.scrollBy(0, 20);
+		window.setInterval(function() { list.upDown(); },20);
 	}
 }
 
@@ -209,7 +235,7 @@ Startlist.prototype.handleResponse = function(_data)
 			
 			title_prefix = '';
 		}
-		if (this.columns.result && _data.participants[0].rank_prev_heat)
+		if (this.columns.result && _data.participants[0].rank_prev_heat && ! this.json_url.match(/detail=0/) )
 		{
 			this.columns['rank_prev_heat'] = 'previous heat';
 		}
@@ -360,7 +386,7 @@ Table.prototype.update = function(_data,_quota)
 		pos = row;
 	}
 	// remove further rows / athletes not in this.data
-	if (typeof pos.nextSibling != 'undefined')
+	if (typeof pos != 'undefined' && typeof pos.nextSibling != 'undefined')
 	{
 		$('#'+pos.id+' ~ tr').remove();
 	}
@@ -517,26 +543,19 @@ Table.prototype.sortNummeric = function(_a,_b)
 	return (_a[this.sort] - _b[this.sort]) * (this.ascending ? 1 : -1);
 };
 
-// scroll speed
-var scroll_by=1;
-// sleep on the borders for $sleep_for seconds
-var sleep_for = 4;
-
-// helper variable
-var sleep_until = 0;
-function up_down()
+Startlist.prototype.upDown = function()
 {
 	// check whether to sleep
 	var now = new Date();
-	if (now.getTime() < sleep_until) {
+	// don't sleep during the first run
+	if (now.getTime() < this.sleep_until) {
 		return;
 	}
-	// margin in which to reverse scrolling
-	var margin = 2;
+
 	var y = 0;
 	var viewHeight = window.innerHeight;
 	var pageHeight = document.body.offsetHeight;
-	window.scrollBy(0, scroll_by);
+	window.scrollBy(0, this.scroll_by);
 
 	if (window.pageYOffset) {
 		// all other browsers
@@ -550,14 +569,45 @@ function up_down()
 	var scrollBottomPosition = y + viewHeight;
 	//alert("pageYOffset(y)="+pageYOffset+", innerHeight(wy)="+innerHeight+", offsetHeight(dy)="+document.body.offsetHeight);
 	var do_sleep = false;
-	if (pageHeight - scrollBottomPosition <= margin) {
-		scroll_by = -1;
+	if (pageHeight - scrollBottomPosition <= this.margin) {
+		this.scroll_by = -1;
 		do_sleep = true;
-	} else if(scrollTopPosition <= margin) {
-		scroll_by = 1;
+	} else if(scrollTopPosition <= this.margin) {
+		this.scroll_by = 1;
 		do_sleep = true;
+		// we are at the top of the page. Check whether to switch urls
+		if (this.json_url.match(/rotate=[^&]+/)) {
+			this.rotateURL();
+		}
 	}
 	if (do_sleep) {
-		sleep_until = now.getTime() + (sleep_for * 1000);
+		this.sleep_until = now.getTime() + (this.sleep_for * 1000);
 	}
-}
+};
+
+Startlist.prototype.rotateURL = function() {
+	var rotate_url_matches = this.json_url.match(/rotate=([^&]+)/);
+	var urls = rotate_url_matches[1];
+	//console.log(urls);
+
+
+	var current_cat = this.json_url.match(/cat=([^&]+)/)[1];
+	var current_route = this.json_url.match(/route=([^&]+)/)[1];
+	//console.log(current_cat);
+	var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([\\d]+),r=([\\d]+)");
+	if (! next) {
+	    // take the first argument
+	    next = urls.match("c=([\\d]+),r=([\\d]+)");
+	}
+	//console.log(next);
+	
+	var next_cat = next[1];
+	var next_route = next[2];
+	//console.log("current_cat = " + current_cat + ", current_route = " + current_route + ", next_cat = " + next_cat + ", next_route = " + next_route);
+	this.json_url = this.json_url.replace(/cat=[\d]+/, "cat=" + next_cat);
+	this.json_url = this.json_url.replace(/route=[\d]+/, "route=" + next_route);
+	//console.log(this.json_url);
+	this.update();
+	
+};
+
