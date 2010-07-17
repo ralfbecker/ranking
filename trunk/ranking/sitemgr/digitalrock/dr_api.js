@@ -157,7 +157,10 @@ function Startlist(_container,_json_url,_columns,_sort)
 	this.margin = 2;
 	
 	// helper variable
-	this.sleep_until = 0;
+	var now = new Date();
+	this.sleep_until = now.getTime() + 10000;
+	this.first_run = true;
+	this.do_rotate = false;
 
 	this.update();
 
@@ -547,15 +550,28 @@ Startlist.prototype.upDown = function()
 {
 	// check whether to sleep
 	var now = new Date();
-	// don't sleep during the first run
-	if (now.getTime() < this.sleep_until) {
+	var now_ms = now.getTime();
+	if (now_ms < this.sleep_until) {
+	    // sleep
 		return;
 	}
+	
+	if (this.do_rotate) {
+		this.rotateURL();
+	    // wait for the page to build
+	    this.sleep_until = now.getTime() + 1000;
+	    this.first_run = true;
+	    this.do_rotate = false;
+	    return;
+	}
+	
+	// Do the scrolling
+	window.scrollBy(0, this.scroll_by);
 
+    // Set scrolling and sleeping parameters accordingly
 	var y = 0;
 	var viewHeight = window.innerHeight;
 	var pageHeight = document.body.offsetHeight;
-	window.scrollBy(0, this.scroll_by);
 
 	if (window.pageYOffset) {
 		// all other browsers
@@ -568,46 +584,56 @@ Startlist.prototype.upDown = function()
 	var scrollTopPosition = y;
 	var scrollBottomPosition = y + viewHeight;
 	//alert("pageYOffset(y)="+pageYOffset+", innerHeight(wy)="+innerHeight+", offsetHeight(dy)="+document.body.offsetHeight);
-	var do_sleep = false;
-	if (pageHeight - scrollBottomPosition <= this.margin) {
+	var do_sleep = 0;
+	if (pageHeight <= viewHeight) {
+        // No scrolling at all
+		//console.log("Showing whole page");
+        do_sleep = 2;
+        this.do_rotate = true;
+	} else if (pageHeight - scrollBottomPosition <= this.margin) {
+		// UP
 		this.scroll_by = -1;
-		do_sleep = true;
+		this.first_run = false;
+		do_sleep = 1;
 	} else if(scrollTopPosition <= this.margin) {
+		// DOWN
 		this.scroll_by = 1;
-		do_sleep = true;
-		// we are at the top of the page. Check whether to switch urls
-		if (this.json_url.match(/rotate=[^&]+/)) {
-			this.rotateURL();
+		if (! this.first_run ) { 
+		    do_sleep = 1; 
+		    this.do_rotate = true;
 		}
 	}
-	if (do_sleep) {
-		this.sleep_until = now.getTime() + (this.sleep_for * 1000);
-	}
+	
+	// Arm the sleep timer
+	//if (do_sleep > 0) { console.log("Sleeping for " + do_sleep * this.sleep_for + " seconds"); }
+    this.sleep_until = now.getTime() + (this.sleep_for * 1000 * do_sleep);
+
 };
 
 Startlist.prototype.rotateURL = function() {
 	var rotate_url_matches = this.json_url.match(/rotate=([^&]+)/);
-	var urls = rotate_url_matches[1];
-	//console.log(urls);
+	if (rotate_url_matches) {
+	    var urls = rotate_url_matches[1];
+	    //console.log(urls);
 
 
-	var current_cat = this.json_url.match(/cat=([^&]+)/)[1];
-	var current_route = this.json_url.match(/route=([^&]+)/)[1];
-	//console.log(current_cat);
-	var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([\\d]+),r=([\\d]+)");
-	if (! next) {
-	    // take the first argument
-	    next = urls.match("c=([\\d]+),r=([\\d]+)");
+	    var current_cat = this.json_url.match(/cat=([^&]+)/)[1];
+	    var current_route = this.json_url.match(/route=([^&]+)/)[1];
+	    //console.log(current_cat);
+	    var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([\\d]+),r=([\\d]+)");
+	    if (! next) {
+	        // take the first argument
+	        next = urls.match("c=([\\d]+),r=([\\d]+)");
+	    }
+	    //console.log(next);
+	
+	    var next_cat = next[1];
+	    var next_route = next[2];
+	    //console.log("current_cat = " + current_cat + ", current_route = " + current_route + ", next_cat = " + next_cat + ", next_route = " + next_route);
+	    this.json_url = this.json_url.replace(/cat=[\d]+/, "cat=" + next_cat);
+	    this.json_url = this.json_url.replace(/route=[\d]+/, "route=" + next_route);
+	    //console.log(this.json_url);
+	    this.update();
 	}
-	//console.log(next);
-	
-	var next_cat = next[1];
-	var next_route = next[2];
-	//console.log("current_cat = " + current_cat + ", current_route = " + current_route + ", next_cat = " + next_cat + ", next_route = " + next_route);
-	this.json_url = this.json_url.replace(/cat=[\d]+/, "cat=" + next_cat);
-	this.json_url = this.json_url.replace(/route=[\d]+/, "route=" + next_route);
-	//console.log(this.json_url);
-	this.update();
-	
 };
 
