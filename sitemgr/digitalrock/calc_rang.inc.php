@@ -380,6 +380,14 @@ function get_combined_sql($cat,$comp,$cup,&$max_wettk,&$MinCats)
 
 	if (!$cup)	// combined/overall ranking of one competition
 	{
+		// since 2010 overall ranking requires (again) participation in ALL categories
+		if ((int)$comp->datum >= 2010)
+		{
+			list($cats) = explode('@',$comp->gruppen);
+			$cats = explode(',',$cats);     // all valid cats of competition
+			$cats = array_intersect($cats,array('ICC_F','ICC_FB','ICC_FS'));        // only use female cats for counting
+			$MinCats = count($cats);
+		}
 		return "SELECT sum( PktSystemPkte.pkt ) AS pkt, count( * ) AS num_cats, Personen.*,Federations.*
 FROM Results
 JOIN Personen USING(PerId)".fed_join()."
