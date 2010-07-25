@@ -415,6 +415,7 @@ class boranking extends ranking_so
 				break;
 			}
 		}
+		//echo "<p>".__METHOD__."($date) returning ".array2string($over)."</p>\n";
 		return $over;	// same date ==> not over
 	}
 
@@ -501,11 +502,11 @@ class boranking extends ranking_so
 		}
 		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
 			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
-			((!$nation || $this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER)) ||	// ( user has the necessary registration rights for $nation AND
-			(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
-			 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
+				((!$nation || $this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
+					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
+						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
-		//echo "<p>boranking::registration_check(".print_r($comp,true).",'$nation') = $ret</p>\n";
+		//echo "<p>".__METHOD__."(".array2string($comp).",'$nation') = ".array2string($ret)."</p>\n";
 		return $ret;
 	}
 
