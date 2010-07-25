@@ -7,11 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * result object
@@ -39,7 +37,7 @@ class result extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = translation::charset();
 
 		foreach(array(
 				'athlete'  => 'athlete',
@@ -178,7 +176,7 @@ class result extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
+			$data = translation::convert($data,$this->source_charset);
 		}
 		return $data;
 	}
@@ -197,7 +195,7 @@ class result extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = translation::convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}
@@ -214,9 +212,7 @@ class result extends so_sql
 
 		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
 
-		$this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__);
-
-		return $this->db->next_record() ? $this->db->f(0) : false;
+		return $this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__)->fetchColumn();
 	}
 
 	/**
@@ -231,9 +227,7 @@ class result extends so_sql
 
 		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
 
-		$this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__);
-
-		return $this->db->next_record() ? $this->db->f(0) : false;
+		return $this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__)->fetchColumn();
 	}
 
 	/**
