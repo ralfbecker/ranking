@@ -89,7 +89,7 @@
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
-					<nextmatch-sortheader label="Nation" id="nation"/>
+					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
 					<nextmatch-header label="Sektion" id="verband"/>
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
@@ -108,7 +108,7 @@
 					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1" options="$row_cont[link]"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
-					<description id="{$row}[$cont[fed_col]]" no_lang="1" value="@${row}[$cont[fed_col2]]"/>
+					<description id="{$row}[nation]" no_lang="1" align="center"/>
 					<description id="${row}[verband]"/>
 					<description id="${row}[acl_fed]"/>
 					<description value="$row_cont[plz]" id="${row}[ort]"/>
