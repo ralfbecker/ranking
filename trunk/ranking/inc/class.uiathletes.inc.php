@@ -97,7 +97,8 @@ class uiathletes extends boranking
 				}
 				if ($this->only_nation_athlete) $this->athlete->data['nation'] = $this->only_nation_athlete;
 				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
-				if (!$this->athlete_rights && ($grants = $this->federation->get_user_grants()))
+				//using athlete_rights_no_judge (and NOT athlete_rights) to check if we should look for federation rights, as otherwise judges loose their regular federation rights
+				if (!$this->athlete_rights_no_judge && ($grants = $this->federation->get_user_grants()))
 				{
 					$feds_with_grants = array();
 					foreach($grants as $fed_id => $rights)

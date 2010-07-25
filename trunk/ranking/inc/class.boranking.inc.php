@@ -297,7 +297,12 @@ class boranking extends ranking_so
 		static $acl_cache = array();
 
 		if ($this->is_admin) return true;
-
+		
+		// for ATHLETE rights check $this->athlete_rights, as they also contain rights gained as judge
+		if ($required == EGW_ACL_ATHLETE && in_array($nation,$this->athlete_rights))
+		{
+			return true;
+		}
 		if (!isset($acl_cache[$nation][$required]))
 		{
 			// Result ACL requires _both_ EDIT AND REGISTER rights, acl::check cant check both at once!
