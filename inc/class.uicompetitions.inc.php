@@ -237,10 +237,12 @@ class uicompetitions extends boranking
 		$content['cat_parent_name'] = ($content['nation']? $content['nation'] : 'Int.').' '.lang('Competitions');
 
 		$readonlys = array(
-			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
+			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]] ||
+				!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT),
 			'nation' => !!$this->only_nation_edit,
 			'edit'   => !$view || !$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT),
 		);
+
 		foreach($this->attachment_type as $type => $label)
 		{
 			$readonlys['remove['.$type.']'] = $view || !isset($content['files'][$type]);
@@ -252,7 +254,8 @@ class uicompetitions extends boranking
 				$readonlys[$name] = true;
 			}
 			$readonlys['save'] = $readonlys['apply'] = true;
-			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] = true;
+			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] = 
+				$readonlys['upload_logo'] = $readonlys['upload_sponsors'] = true;
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 
@@ -396,12 +399,13 @@ class uicompetitions extends boranking
 			}
 		}
 		$content['msg'] = $msg ? $msg : $_GET['msg'];
+		$readonlys['nm[rows][edit][0]'] = !$this->edit_rights;
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 		$tmpl->exec('ranking.uicompetitions.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),
 			'cat_id' => array(lang('None')),
-		));
+		),$readonlys);
 	}
 }
