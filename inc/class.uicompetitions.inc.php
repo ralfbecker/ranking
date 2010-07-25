@@ -399,7 +399,7 @@ class uicompetitions extends boranking
 			}
 		}
 		$content['msg'] = $msg ? $msg : $_GET['msg'];
-		$readonlys['nm[rows][edit][0]'] = !$this->edit_rights;
+		$readonlys['nm[rows][edit][0]'] = !$this->edit_rights && !$this->is_admin;
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 		$tmpl->exec('ranking.uicompetitions.index',$content,array(
