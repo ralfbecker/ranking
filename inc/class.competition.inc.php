@@ -476,7 +476,7 @@ class competition extends so_sql
 		$check = array('WetId' => $WetId);
 		if ($GrpId) $check['GrpId'] = $GrpId;
 
-		return $has_results[$WetId][(string)$GrpId] = ExecMethod('ranking.result.has_results',$check);
+		return $has_results[$WetId][(string)$GrpId] = $GLOBALS['boranking']->result->has_results($check);
 	}
 
 	/**
