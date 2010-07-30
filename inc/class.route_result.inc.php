@@ -844,7 +844,7 @@ class route_result extends so_sql
 			}
 		}
 		// boulder result with just the sums (route_num_problems=0)
-		if (isset($data['tops']))
+		elseif (isset($data['tops']))
 		{
 			if (is_numeric($data['zones']))
 			{
