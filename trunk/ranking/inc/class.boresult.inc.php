@@ -1487,19 +1487,18 @@ class boresult extends boranking
 			throw new Exception(lang('Category NOT found !!!'));
 		}
 		//echo "<pre>".print_r($cat,true)."</pre>\n";
-		if (!($discipline = $cat['discipline']))
+		if (!($comp = $this->comp->read($comp)))
 		{
-			if (!($comp = $this->comp->read($comp)))
-			{
-				throw new Exception(lang('Competition NOT found !!!'));
-			}
-			$discipline = $comp['discipline'];
+			throw new Exception(lang('Competition NOT found !!!'));
 		}
-	
+		if (!($discipline = $comp['discipline']))
+		{
+			$discipline = $cat['discipline'];
+		}
 		if (!isset($heat) || !is_numeric($heat)) $heat = -1;	// General result
 	
 		if (!($route = $this->route->read(array(
-			'WetId' => $comp,
+			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $heat,
 		))))
@@ -1518,14 +1517,14 @@ class boresult extends boranking
 			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
 					$discipline == 'speedrelay');
 		}
-		if (!($result = $this->route_result->search(array(),false,'result_rank','','',false,'AND',false,array(
-			'WetId' => $comp,
+		if (!($result = $this->route_result->search(array(),false,'result_rank','','',false,'AND',false,$filter=array(
+			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $heat,
 			'discipline'  => $discipline,
 			'route_type'  => $route['route_type'],
 		)))) $result = array();
-		//echo "<pre>".print_r($result,true)."</pre>\n";
+		//_debug_array($filter); _debug_array($result);
 		
 		// return route_names as part of route, not as participant
 		if (isset($result['route_names']))
@@ -1603,7 +1602,7 @@ class boresult extends boranking
 			}
 			//echo "<pre>".print_r($athletes,true)."</pre>\n";die('Stop');
 		}
-		
+
 		$tn = $unranked = array();
 		foreach($result as $key => $row)
 		{
