@@ -502,11 +502,12 @@ class boranking extends ranking_so
 		}
 		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
 			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
+				in_array($comp['nation'],$this->register_rights) ||	// user has national registration rights OR
 				((!$nation || $this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
 						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
-		//echo "<p>".__METHOD__."(".array2string($comp).",'$nation') = ".array2string($ret)."</p>\n";
+		//error_log(__METHOD__."(".array2string($comp).",'$nation') = ".array2string($ret));
 		return $ret;
 	}
 
