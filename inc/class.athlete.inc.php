@@ -456,7 +456,7 @@ class athlete extends so_sql
 	}
 
 	/**
-	 * checks if an athlete already has results recorded
+	 * checks if an athlete already has results or a result-service result recorded
 	 *
 	 * @param int/array $keys PerId or array with keys of the athlete to check, default null = use keys in data
 	 * @return boolean
@@ -475,9 +475,8 @@ class athlete extends so_sql
 		$PerId = is_numeric($keys) ? $keys : $this->data['PerId'];
 		if ($data_backup) $this->data = $data_backup;
 
-		$this->db->select('Results','count(*)',array('PerId' => $PerId,'platz > 0'),__LINE__,__FILE__);
-
-		return $this->db->next_record() && $this->db->f(0);
+		return $this->db->select('Results','COUNT(*)',array('PerId' => $PerId,'platz > 0'),__LINE__,__FILE__)->fetchColumn() ||
+			$this->db->select('RouteResults','COUNT(*)',array('PerId' => $PerId),__LINE__,__FILE__)->fetchColumn();
 	}
 
 	/**
