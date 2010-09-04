@@ -51,7 +51,7 @@ class ranking_accounting extends boresult
 		$GLOBALS['egw']->session->appsession('accounting','ranking',$query);
 
 		$query['col_filter']['WetId'] = $query['comp'];
-		$query['col_filter']['route_order'] = array(0,1);
+		$query['col_filter']['route_order'] = 0;//array(0,1);
 
 		switch (($order = $query['order']))
 		{
