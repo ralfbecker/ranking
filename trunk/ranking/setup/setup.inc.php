@@ -1,6 +1,6 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - setup
+ * EGroupware digital ROCK Rankings - setup
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
@@ -57,11 +57,11 @@ $setup_info['ranking']['hooks']['calendar_search_union']  = 'ranking_calendar_in
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
 	 'appname' => 'phpgwapi',
-	 'versions' => Array('1.3','1.4','1.5','1.6','1.7')
+	 'versions' => Array('1.7','1.8','1.9')
 );
 $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
-	'versions' => Array('1.3','1.4','1.5','1.6','1.7')
+	'versions' => Array('1.7','1.8','1.9')
 );
 
 
