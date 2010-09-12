@@ -120,6 +120,8 @@ if (!$wettk->nation && (int)$wettk->datum >= 2005 && $wettk->quota && preg_match
 		'lead' => array(1,2),
 		'boulder' => array(5,6),
 		'speed'    => array(23,24),
+		'youth lead' => array(15,16,17,18,19,20),
+		'youth speed' => array(56,57,58,59,60,61),
 	);
 	if ((int)$wettk->datum >= 2008)
 	{
