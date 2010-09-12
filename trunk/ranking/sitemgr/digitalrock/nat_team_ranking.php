@@ -56,6 +56,8 @@ $valid_cats += array(
 	'lead' => array(1,2),
 	'boulder' => array(5,6),
 	'speed'    => array(23,24),
+	'youth lead' => array(15,16,17,18,19,20),
+	'youth speed' => array(56,57,58,59,60,61),
 );
 
 // get all cats from existing results of a comp or cup
@@ -73,7 +75,9 @@ if (!count($cats_found))
 foreach($valid_cats as $name => $vcats)
 {
 	if (count(array_intersect($cats_found,$vcats)) != count($vcats) &&
-		($name != 'overall' || count($cats_found) <= 2))	// show overall if we have more then 2 cats
+		($name != 'overall' || count($cats_found) <= 2 ||	// show overall if we have more then 2 cats
+		// no overall for youth
+		$name == 'overall' && array_intersect($cats_found,array(15,16,17,18,19,20,56,57,58,59,60,61))))
 	{
 		unset($valid_cats[$name]);
 	}

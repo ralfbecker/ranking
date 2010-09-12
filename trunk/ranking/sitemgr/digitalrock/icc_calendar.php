@@ -33,6 +33,7 @@ $cats = array(
 		'serie_reg' => '^[0-9]{2,2}_EY[CS]',
 //		'rang_title'=> '',
 		'bgcolor'   => '#D8E8FF',
+		'nat_team_ranking' => !isset($_REQUEST['year']) || $_REQUEST['year'] >= 2005,
 	),
 	'masters' => array(
 		'label'  => 'Masters',
