@@ -78,7 +78,7 @@ if (!defined('DR_PATH'))	// we are NOT running inside sitemgr
 {
 	echo '<table width="99%" align="center">'."\t<tr>\n\t\t<td>\n";
 }
-echo '<p style="font-size: 120%"><b>'.(defined('DR_PATH') ? $wettk->name : ereg_replace(" - ","<br />",$wettk->name)).'</b><br />'.wettk_datum($wettk)."</p>\n";
+echo '<p style="font-size: 120%"><b>'.(defined('DR_PATH') ? $wettk->name : str_replace(" - ","<br />",$wettk->name)).'</b><br />'.wettk_datum($wettk)."</p>\n";
 if (!defined('DR_PATH'))	// we are NOT running inside sitemgr
 { ?>
 		</td>

@@ -7,7 +7,10 @@ ini_set('mbstring.internal_encoding','utf-8');
 if (!headers_sent()) header('Content-type: text/html; charset=utf-8');
 
 global $gruppe,$grp_inc,$url_drock,$url_icc_info,$t_see_also,$jpgs;
-include_once '.db_rang.php';
+if (!include_once '.db_rang.php')
+{
+	throw new Exception(".db_rang.php NOT found!".' cwd='.getcwd());
+}
 
 if (!$url_drock) $url_drock='http://www.digitalROCK.de';
 if (!$url_icc_info) $url_icc_info='http://www.ifsc-climbing.org';
@@ -184,8 +187,8 @@ function wettk_datum($wettk)
 {
 	if (is_object( $wettk ))
 	{
-		ereg( ".*@(.*)",$wettk->gruppen,$grps );
-		ereg( "([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$wettk->datum,$dats );
+		preg_match( "/.*@(.*)/",$wettk->gruppen,$grps );
+		preg_match( "/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",$wettk->datum,$dats );
 		if ($grps[1] && !($grps[1]+0))	// keine Zahl --> statt Tag+Monat verw.
 		{
 			return ("$grps[1] $dats[1]");
@@ -207,8 +210,8 @@ function grp_in_grps($grp,$grps)
 
 	list($grps) = explode('@',$grps);
 	$grps = preg_replace('/=[^,]*/','',$grps);
-	return stristr( ",".$grps.",",",".$grp."," ) || $grps && eregi( '^'.$grps.'$',$grp ) ||
-		(isset($grp2old[$grp]) && (stristr( ",".$grps.",",",".$grp2old[$grp]."," ) || $grps && eregi( '^'.$grps.'$',$grp2old[$grp] )));
+	return stristr( ",".$grps.",",",".$grp."," ) || $grps && preg_match('/^'.$grps.'$/i',$grp ) ||
+		(isset($grp2old[$grp]) && (stristr( ",".$grps.",",",".$grp2old[$grp]."," ) || $grps && preg_match( '/^'.$grps.'$/i',$grp2old[$grp] )));
 }
 
 function check_group_sql($gruppe)
@@ -231,7 +234,7 @@ function check_group_sql($gruppe)
 function get_max_wettk($serie,$gruppe)
 {
 	$grp = is_object($gruppe) ? $gruppe->rkey : $gruppe;
-	if (eregi($grp.'=[^+]*\+([^,]*)',$serie->gruppen,$matches))
+	if (preg_match($grp.'/=[^+]*\+([^,]*)/i',$serie->gruppen,$matches))
 	{
 		//echo "<p>get_max_wettk($serie->rkey,$grp) = $matches[1]</p>\n";
 		return (int) $matches[1];
@@ -455,7 +458,7 @@ function wettk_link_str($wettk,$text='',$class='')
 
 	if (!stristr($wettk->homepage,'http://'))
 	{
-		if (ereg('^([0-9][0-9]+)_.*',$wettk->homepage,$args))
+		if (preg_match('/^([0-9][0-9]+)_.*/',$wettk->homepage,$args))
 		{
 			$year = $args[1] + ($args[1] < 90 ? 2000 : 1900);
 		}

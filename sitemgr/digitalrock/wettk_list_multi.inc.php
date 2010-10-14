@@ -113,7 +113,7 @@ function get_cats(&$wettk)
 	$group_found = array();
 	foreach ($cats as $key => $cat)
 	{
-		if ($cat['nation'] == $wettk->nation && ereg($cat['wettk_reg'],$wettk->rkey))
+		if ($cat['nation'] == $wettk->nation && preg_match('/'.$cat['wettk_reg'].'/',$wettk->rkey))
 		{
 			list($grps) = explode('@',$wettk->gruppen);
 			if ($grps)
@@ -199,7 +199,7 @@ if ($serien)
 			{
 				foreach($cat['grps'] as $grp => $gname)
 				{
-					if (grp_in_grps($grp,$serie->gruppen) && eregi($cat['serie_reg'],$serie->rkey))
+					if (grp_in_grps($grp,$serie->gruppen) && preg_match('/'.$cat['serie_reg'].'/i',$serie->rkey))
 					{
 						//echo "$cat[label],\n";
 						$cats[$c]['serien'][$serie->rkey] = $serie;
