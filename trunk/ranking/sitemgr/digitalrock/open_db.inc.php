@@ -234,7 +234,7 @@ function check_group_sql($gruppe)
 function get_max_wettk($serie,$gruppe)
 {
 	$grp = is_object($gruppe) ? $gruppe->rkey : $gruppe;
-	if (preg_match($grp.'/=[^+]*\+([^,]*)/i',$serie->gruppen,$matches))
+	if (preg_match('/'.preg_quote($grp).'=[^+]*\+([^,]*)/i',$serie->gruppen,$matches))
 	{
 		//echo "<p>get_max_wettk($serie->rkey,$grp) = $matches[1]</p>\n";
 		return (int) $matches[1];
