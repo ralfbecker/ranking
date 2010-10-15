@@ -48,14 +48,14 @@ if (isset($GLOBALS['dr_config']['resultservice']))
 		$res_service[$row->GrpId] = true;
 	}
 }
-$res = my_query($sql="SELECT r.GrpId,r.platz,r.pkt,p.rkey,p.vorname,p.nachname,p.ort,f.nation,f.verband,f.fed_url,p.PerId" .
-		" FROM Personen p,Results r" .
-		" JOIN Athlete2Fed a2f USING(PerId) JOIN Federations f USING(fed_id)".
+$res = my_query($sql="SELECT r.GrpId,r.platz,r.pkt,p.rkey,p.vorname,p.nachname,p.ort,Federations.nation,verband,fed_url,p.PerId" .
+		" FROM Personen p".
+		" JOIN Results r USING(PerId)".fed_join('p').
 		" JOIN Gruppen USING(GrpId)".
-		" WHERE a2f.a2f_end != -1 AND p.PerId=r.PerId AND r.WetId=" . $wettk->WetId .
+		" WHERE r.WetId=" . $wettk->WetId .
 		($anz || $nation ? ' AND ' : '').
 		($anz ? ($nation ? '(' : '')." r.Platz<=$anz" : "").
-		($nation ? ($anz ? ' OR' : '')." f.nation='$nation'".($anz ? ')' : '') : '').
+		($nation ? ($anz ? ' OR' : '')." Federation.nation='$nation'".($anz ? ')' : '') : '').
 		" AND r.platz > 0".
 		" ORDER BY Gruppen.name,r.GrpId,r.platz,p.nachname,p.vorname");
 
