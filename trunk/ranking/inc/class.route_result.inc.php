@@ -228,7 +228,11 @@ class route_result extends so_sql
 						unset($filter[$col]);
 					}
 				}
-				if ($route_type == TWO_QUALI_ALL && $discipline != 'speed')		// speed stores both results in the first quali
+				if (count($route_names) == 1)
+				{
+					// not yet a 2. route --> show everyone from 1. route (used for xml/json export)
+				}
+				elseif ($route_type == TWO_QUALI_ALL && $discipline != 'speed')		// speed stores both results in the first quali
 				{
 					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL OR r1.result_rank IS NOT NULL)';
 				}
