@@ -460,6 +460,27 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 						++$i;
 					}
 				}
+				if ($year >= 2008 && !$serie->nation && stristr($rkey,'_wc'))	// overall world cup
+				{
+					$i = 0;
+					foreach(array(
+						'MEN overall' => 45,
+						'WOMEN overall' => 42,
+					) as $gname => $grp)
+					{
+						if ($do_list)
+						{
+							echo (!($i & 1) ? "\t\t\t<li>" : ', ').'<a href="'.$GLOBALS['dr_config']['ranglist'].'cat='.$grp.'&amp;cup='.$rkey.'">'.
+								$gname.'</a>'.($i & 1 ? "</li>\n" : '');
+						}
+						else
+						{
+							echo ($i?",\n":'<br />')."\t\t\t".'<a class="mini_link" href="'.$GLOBALS['dr_config']['ranglist'].'cat='.$grp.'&amp;cup='.$rkey.'">'.
+								$gname.'</a>';
+						}
+						++$i;
+					}
+				}
 				if ($year >= 2005 && !$serie->nation && stristr($rkey,'_wc'))	// national team ranking of the cup
 				{
 					// all valid Combinations
@@ -478,7 +499,7 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 						}
 						else
 						{
-							echo ($i?",\n":'')."\t\t\t".'<a class="mini_link" href="'.$GLOBALS['dr_config']['nat_team_ranking'].'cat='.implode(',',$cat_ids).
+							echo ($i?",\n":'<br />')."\t\t\t".'<a class="mini_link" href="'.$GLOBALS['dr_config']['nat_team_ranking'].'cat='.implode(',',$cat_ids).
 								'&amp;cup='.$serie->SerId.'">'.$t_nat_team_ranking.': '.$label.'</a>';
 						}
 						++$i;
