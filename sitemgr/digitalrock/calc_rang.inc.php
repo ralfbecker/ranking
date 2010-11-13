@@ -388,6 +388,7 @@ function get_combined_sql($cat,$comp,$cup,&$max_wettk,&$MinCats)
 			$cats = array_intersect($cats,array('ICC_F','ICC_FB','ICC_FS'));        // only use female cats for counting
 			$MinCats = count($cats);
 		}
+		// not sure if this code is still correct, as it does NOT average ex. aquo points
 		return "SELECT sum( PktSystemPkte.pkt ) AS pkt, count( * ) AS num_cats, Personen.*,Federations.*
 FROM Results
 JOIN Personen USING(PerId)".fed_join()."
@@ -403,20 +404,18 @@ ORDER BY pkt DESC";
 	// combined/overall ranking for a cup
 	$max_wettk = get_max_wettk($cup,$cat);
 
-	// to get the num_cats we join with PktSystemPkte as we need a the points > 0 not just a place!
-	return "SELECT Results.WetId, Results.GrpId, Results.platz, PktSystemPkte.pkt, (
+	// for num_cats we need cup_pkt (cup points) > 0 not just a place!
+	return "SELECT Results.WetId, Results.GrpId, Results.platz, Results.cup_pkt/100.0 AS pkt, (
 	SELECT COUNT( DISTINCT v.GrpId )
 	FROM Results v
-	JOIN PktSystemPkte vp ON v.platz=vp.platz AND vp.PktId=$PktSystem
 	WHERE v.GrpId IN ($cat->GrpIds) AND WetId IN (
 		SELECT WetId
 		FROM Wettkaempfe
 		WHERE serie =$cup->SerId
-	) AND v.platz > 0 AND vp.pkt > 0 AND v.PerId = Results.PerId
+	) AND v.platz > 0 AND v.cup_pkt > 0 AND v.PerId = Results.PerId
 ) AS num_cats, Personen.*,Federations.*
 FROM Results
 JOIN Personen USING(PerId)".fed_join()."
-LEFT JOIN PktSystemPkte ON Results.platz = PktSystemPkte.platz AND PktSystemPkte.PktId=$PktSystem
 WHERE WetId IN (
 	SELECT WetId
 	FROM Wettkaempfe
