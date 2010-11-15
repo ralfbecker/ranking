@@ -47,7 +47,7 @@ class route_result extends so_sql
 	 */
 	const RESULT_TABLE = 'RouteResults';
 	const RELAY_TABLE = 'RelayResults';
-	
+
 	/**
 	 * Maximum number of boulders
 	 *
@@ -58,16 +58,16 @@ class route_result extends so_sql
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 	);
 	var $charset,$source_charset;
-	
+
 	/**
 	 * Class instanciated for relay table
-	 * 
+	 *
 	 * @var boolean
 	 */
 	var $isRelay = false;
 	/**
 	 * Id of an athlete or a team
-	 * 
+	 *
 	 * @var string
 	 */
 	var $id_col = 'PerId';
@@ -84,13 +84,13 @@ class route_result extends so_sql
 
 	/**
 	 * Discipline only set by boresult->save_result, to be used in data2db
-	 * 
+	 *
 	 * @var string
 	 */
 	var $discipline;
 	/**
 	 * Type of route (how many qualifications) only set by boresult->save_result, to be used in data2db
-	 * 
+	 *
 	 * @var int
 	 */
 	var $route_type;
@@ -159,11 +159,11 @@ class route_result extends so_sql
 
 		if (!$only_keys && !$join || $route_order < 0)
 		{
-			if (!$this->isRelay) 
+			if (!$this->isRelay)
 			{
 				$join = self::ATHLETE_JOIN;
 				$extra_cols = array_merge($extra_cols,array('vorname','nachname','Federations.nation AS nation','geb_date','Federations.verband AS verband','ort','plz',));
-	
+
 				//if ($comp_nation == 'SUI')	// ToDo pass nation, so we dont need to do this join for other federations than SAC
 				{
 					$join .= self::ACL_FED_JOIN;
@@ -262,7 +262,7 @@ class route_result extends so_sql
 							if (!$old || $old['org_rank'] < $row['org_rank']) $row['result_rank'] = $n+1;
 							break;		// no further countback
 						}
-						if ($route_type == TWO_QUALI_ALL && $route_order == 1)
+						if (boresult::is_two_quali_all($route_type) && $route_order == 1)
 						{
 							if (!$old || $old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
 							break;		// no further countback
@@ -600,7 +600,7 @@ class route_result extends so_sql
 				}
 				break;
 
-				
+
 			case 'speedrelay':
 				for($i = 1; $i <= 3; ++$i)
 				{
@@ -1136,10 +1136,10 @@ class route_result extends so_sql
 		}
 		return $affected;
 	}
-	
+
 	/**
 	 * which column should get propagated to next heat, depends on isRelay or not
-	 * 
+	 *
 	 * @return string comma separated columns
 	 */
 	function startlist_cols()
