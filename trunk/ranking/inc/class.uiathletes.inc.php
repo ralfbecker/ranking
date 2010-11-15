@@ -55,7 +55,7 @@ class uiathletes extends boranking
 	}
 
 	/**
-	 * Edit a cup
+	 * Edit an athlete
 	 *
 	 * @param array $content
 	 * @param string $msg
@@ -146,7 +146,7 @@ class uiathletes extends boranking
 			{
 				$msg = lang('Athlete is suspended !!!');
 			}
-			elseif (!$view)
+			elseif (!$view && !$this->athlete->data['PerId'])
 			{
 				$msg = lang('Please use ONLY a first capital letter for names, do NOT capitalise the whole word!');
 			}
@@ -164,7 +164,11 @@ class uiathletes extends boranking
 			{
 				$content['athlete_data']['license'] = $content['license'] = $this->athlete->get_license($content['license_year'],$content['license_nation']);
 			}
-			$this->athlete->data['license'] = $content['athlete_data']['license'];
+			// restore some fields set by athlete::read, which are no real athlete fields
+			foreach(array('comp','last_comp','license') as $name)
+			{
+				$this->athlete->data[$name] = $content['athlete_data'][$name];
+			}
 			$old_geb_date = $this->athlete->data['geb_date'];
 
 			$this->athlete->data_merge($content);
@@ -183,6 +187,10 @@ class uiathletes extends boranking
 					{
 						$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
 						$this->athlete->data['geb_date'] = $old_geb_date;
+					}
+					elseif($this->athlete->data['geb_date'] && athlete::age($this->athlete->data['geb_date']) < 10)
+					{
+						$msg .= lang("Athlets need to be at least 10 years old! Maybe wrong date format.");
 					}
 					elseif ($this->athlete->not_unique())
 					{
@@ -418,6 +426,14 @@ class uiathletes extends boranking
 			if ($content['nation'] == 'SUI' && !in_array('SUI',$this->athlete_rights) && !$this->is_admin)
 			{
 				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
+			}
+			// forbid non-admins or users without competition edit rights to change
+			// the name of an athlete who has not climbed for more then one year
+			// (gard against federations "reusing" athlets)
+			if ($this->athlete->data['PerId'] && athlete::age($this->athlete->data['last_comp']) > 1 &&
+				!($this->is_admin || $this->edit_rights[$this->athlete->data['nation']] || $this->edit_rights['NULL']))
+			{
+				$readonlys['vorname'] = $readonlys['nachname'] = true;
 			}
 		}
 		if ($js)
