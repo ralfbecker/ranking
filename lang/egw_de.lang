@@ -51,6 +51,7 @@ athlete including %1 results merged.	ranking	de	Athlet einschließlich %1 Ergebn
 athlete is not in the age-group of that category	ranking	de	Athlet hat NICHT den erforderlichen Jahrgang für diese Kategorie
 athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athletes	ranking	de	Athleten
+athlets need to be at least 10 years old! maybe wrong date format.	ranking	de	Athleten müssen mindestens 10 Jahre alt sein! Eventuell falsches Datumsformat.
 attention: merging can not be undone! really want to merge?	ranking	de	ACHTUNG: Vereinigen kann NICHT rückgänig gemacht werden! Wollen Sie die beiden Athleten wirklich vereinigen?
 before	ranking	de	vor
 before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)

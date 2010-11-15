@@ -137,6 +137,23 @@ class athlete extends so_sql
 	}
 
 	/**
+	 * Get current age from given birthdate
+	 *
+	 * @param string $geb_date
+	 * @return int years of NULL
+	 */
+	public static function age($geb_date)			// $geb_date als YYYY-MM-DD
+	{
+		$geb = explode('-',$geb_date);
+		if (empty($geb_date) || count($geb) != 3) return NULL;
+
+		$today = explode('-',date('Y-m-d'));
+		$age = $today[0] - $geb[0] - ($today[1] < $geb[1] || $today[1] == $geb[1] && $today[2] < $geb[2]);
+
+		return $age;
+	}
+
+	/**
 	 * changes the data from the db-format to our work-format
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
@@ -593,6 +610,9 @@ class athlete extends so_sql
 			$extra_cols[] = 'lic_status AS license';
 		}
 		$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
+
+		// get last competition
+		$extra_cols[] = "(SELECT MAX(datum) FROM $this->result_table WHERE $this->result_table.PerId=$this->table_name.PerId) AS last_comp";
 
 		return parent::read($keys,$extra_cols,$join);
 	}
