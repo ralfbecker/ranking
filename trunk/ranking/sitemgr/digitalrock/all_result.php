@@ -112,7 +112,9 @@ for ($aktGrpId=0;			// noch keine Gruppe
    per_link ($row,$gruppe,false);
    echo "\t</tr>\n";
 }
-if (!$wettk->nation && (int)$wettk->datum >= 2005 && $wettk->quota && preg_match('/^[0-9]{2}_[^I]+/',$wettk->rkey))
+if (!$wettk->nation && $wettk->quota && (
+	(int)$wettk->datum >= 2005 && preg_match('/^[0-9]{2}_[^I]+/',$wettk->rkey) ||	// world cup from 2005 on
+	(int)$wettk->datum >= 2010 && preg_match('/^[0-9]{2}EY[SC]/',$wettk->rkey)))	// european youth from 2010 on
 {
 	// all valid Combinations
 	$valid_cats = array(
