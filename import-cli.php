@@ -109,7 +109,11 @@ function usage($ret=0)
 	{
 		echo "\t$num\t$label\n";
 	}
-	echo "\t".TWO_QUALI_SPEED."\ttwo qualifications speed\n";
+	echo "  Speed types:\n";
+	foreach($GLOBALS['boresult']->quali_types_speed as $num => $label)
+	{
+		echo "\t$num\t$label\n";
+	}
 	echo "--set-status sets the status of an imported heat, default 'result official':\n";
 	foreach($GLOBALS['boresult']->stati as $num => $label)
 	{
