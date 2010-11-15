@@ -189,9 +189,9 @@ while(($arg = array_shift($arguments)) && substr($arg,0,2) == '--')
 			break;
 		case '--quali-type':
 			$route_type = (int)array_shift($arguments);
-			if (!isset($boresult->quali_types[$route_type]) && $route_type !== TWO_QUALI_SPEED)
+			if (!isset($boresult->quali_types[$route_type]) && !isset($boresult->quali_types_speed[$route_type]))
 			{
-				echo "Error: not existing status!\n";
+				echo "Error: not existing quali-type!\n";
 				usage(10);
 			}
 			break;
