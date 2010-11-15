@@ -297,7 +297,7 @@ class boranking extends ranking_so
 		static $acl_cache = array();
 
 		if ($this->is_admin) return true;
-		
+
 		// for ATHLETE rights check $this->athlete_rights, as they also contain rights gained as judge
 		if ($required == EGW_ACL_ATHLETE && in_array($nation,$this->athlete_rights))
 		{
@@ -1712,12 +1712,12 @@ class boranking extends ranking_so
 		{
 			throw new Exception(lang('Error: while saving !!!'));
 		}
-		// merge licenses
-		$this->athlete->merge_licenses($from['PerId'],$to['PerId']);
 		// merge result service data
 		$this->route_result->merge($from['PerId'],$to['PerId']);
 		// merge result data
 		$merged = $this->result->merge($from['PerId'],$to['PerId']);
+		// merge licenses
+		$this->athlete->merge_licenses($from['PerId'],$to['PerId']);
 
 		$this->athlete->delete(array('PerId' => $from['PerId']));
 

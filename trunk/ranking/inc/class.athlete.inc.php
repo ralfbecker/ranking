@@ -681,6 +681,9 @@ class athlete extends so_sql
 	/**
 	 * Merge the licenses from athlete $from to athlete $to
 	 *
+	 * If both have applied, confirmed or suspended licenses, the information in $to has precedence,
+	 * while the status of suspended or confirmed is maintained.
+	 *
 	 * @param int $from
 	 * @param int $to
 	 * @return int number of merged licenses
@@ -691,9 +694,51 @@ class athlete extends so_sql
 		{
 			return false;
 		}
-		$this->db->update(self::LICENSE_TABLE,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
 
-		return $this->db->affected_rows();
+		$updated = 0;
+		foreach($this->db->select(self::LICENSE_TABLE,'*',array('PerId' => array($from,$to)),__LINE__,__FILE__,false,'ORDER BY lic_year,PerId='.(int)$from,'ranking') as $row)
+		{
+			if ($row['PerId'] == $to)
+			{
+				$to_row = $row;
+				continue;
+			}
+			// now we are in the from row and $to_row contains the last $to license row
+			if ($to_row && $to_row['lic_year'] != $row['lic_year']) $to_row = null;	// different year
+
+			// no license for to --> update PerId in from row
+			if (!$to_row)
+			{
+				$this->db->update(self::LICENSE_TABLE,array('PerId'=>$to),array(
+					'PerId' => $from,
+					'lic_year' => $row['lic_year'],
+				),__LINE__,__FILE__,'ranking');
+				$updated += $this->db->affected_rows();
+				continue;
+			}
+			$need_update = false;
+			// merge license info from $to_row and $row and store it in $to_row
+			foreach(array('a' => 'lic_applied','c' => 'lic_confirmed','s' => 'lic_suspended') as $status => $name)
+			{
+				if (!$to_row[$name] && $row[$name])
+				{
+					$to_row[$name] = $row[$name];
+					$to_row[$name.'_by'] = $row[$name.'_by'];
+					if ($to_row['lic_status'] != 's') $to_row['lic_status'] = $status;
+					$need_update = true;
+				}
+			}
+			if ($need_update)
+			{
+				$this->db->update(self::LICENSE_TABLE,$to_row,array(
+					'PerId' => $to,
+					'lic_year' => $to_row['lic_year'],
+				),__LINE__,__FILE__,'ranking');
+				$updated += $this->db->affected_rows();
+			}
+		}
+
+		return $updated;
 	}
 
 	/**
