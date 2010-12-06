@@ -6,7 +6,8 @@ if (!strlen($date_format)) $date_format = '%d.%m.%y';
 $anz_year = strlen($anz_year) ? intval($anz_year) : 1;	// number of years before/after are shown
 if (!($year = intval($_SERVER['QUERY_STRING'])))
 {
-	$year = intval($_REQUEST['year']) ? intval($_REQUEST['year']) : date('Y');
+	$year = intval($_REQUEST['year']) ? intval($_REQUEST['year']) :
+		date('Y')+(int)(date('m') >= 12);	// already show next year in December
 }
 if ($year < 100)
 {
