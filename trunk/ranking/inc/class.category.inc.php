@@ -170,9 +170,11 @@ class category extends so_sql
 	{
 		//echo "<p>category::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
-		unset($criteria['rls']);	// is always set
-		unset($criteria['vor_rls']);
-
+		if (is_array($criteria))
+		{
+			unset($criteria['rls']);	// is always set
+			unset($criteria['vor_rls']);
+		}
 		if ($this->cache)
 		{
 			switch (count($criteria)+count($filter))
