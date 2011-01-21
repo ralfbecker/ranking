@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -32,7 +32,7 @@ class ranking_admin_prefs_sidebox_hooks
 				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
 				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.uicompetitions.index')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.uicups.index')),
-				//'Categories'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking.cat_edit')),
+				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index')),
 				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.index')),
 				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.uiresult.index')),
 				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.result')),

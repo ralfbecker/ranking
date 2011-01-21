@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -73,6 +73,13 @@ class category extends so_sql
 	var $charset,$source_charset;
 
 	/**
+	 * SQL for results column, counting results from all *Results tables for given GrpId
+	 *
+	 * @var string
+	 */
+	var $results_col;
+
+	/**
 	 * constructor of the category class
 	 */
 	function category($source_charset='',$db=null)
@@ -82,6 +89,28 @@ class category extends so_sql
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = $GLOBALS['egw']->translation->charset();
+
+		// get counts from all *Results tables
+		foreach(array('Results','RouteResults','RelayResults') as $table)
+		{
+			$counts[] = "(SELECT COUNT(*) FROM $table WHERE $table.GrpId=Gruppen.GrpId)";
+		}
+		$this->results_col = implode('+',$counts).' AS results';
+	}
+
+	/**
+	 * deletes row representing keys in internal data or the supplied $keys if != null
+	 *
+	 * @param array|int $keys=null if given array with col => value pairs to characterise the rows to delete, or integer autoinc id
+	 * @return int|boolean affected rows, should be 1 if ok, 0 if an error, false if not found or category has results
+	 */
+	function delete($keys=null)
+	{
+		if (!$this->read($keys,array($this->results_col)) || $this->data['results'])
+		{
+			return false;	// not found or permission denied as Grp has results
+		}
+		return parent::delete($keys);
 	}
 
 	/**
@@ -178,8 +207,13 @@ class category extends so_sql
 
 	/**
 	 * read a category, reimplemented to use the cache
+	 *
+	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
+	 * @param string|array $extra_cols='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
+	 * @return array|boolean data if row could be retrived else False
 	 */
-	function read($keys)
+	function read($keys,$extra_cols='',$join='')
 	{
 		// replace only key with new one if neccessary
 		if ((!is_array($keys) && !is_numeric($keys) || is_array($keys) && $keys['rkey']) &&
@@ -191,7 +225,7 @@ class category extends so_sql
 		{
 			$keys = is_numeric($keys) ? array('GrpId' => (int) $keys) : array('rkey' => $keys);
 		}
-		if ($this->cache && count($keys) == 1 && ($keys['GrpId'] || $keys['rkey']))
+		if (!$extra_cols && !$join && $this->cache && count($keys) == 1 && ($keys['GrpId'] || $keys['rkey']))
 		{
 			list($key,$val) = each($keys);
 			foreach($this->cache as $cat)
@@ -203,7 +237,7 @@ class category extends so_sql
 			}
 			return false;
 		}
-		return parent::read($keys);
+		return parent::read($keys,$extra_cols,$join);
 	}
 
 	/**
