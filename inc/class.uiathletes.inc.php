@@ -36,6 +36,13 @@ class uiathletes extends boranking
 	 */
 	var $tmpl;
 
+	/**
+	 * Minimum age for athletes
+	 *
+	 * @var int
+	 */
+	const MINIMUM_AGE = 5;
+
 	function uiathletes()
 	{
 		$this->boranking();
@@ -188,9 +195,9 @@ class uiathletes extends boranking
 						$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
 						$this->athlete->data['geb_date'] = $old_geb_date;
 					}
-					elseif($this->athlete->data['geb_date'] && athlete::age($this->athlete->data['geb_date']) < 10)
+					elseif($this->athlete->data['geb_date'] && athlete::age($this->athlete->data['geb_date']) < self::MINIMUM_AGE)
 					{
-						$msg .= lang("Athlets need to be at least 10 years old! Maybe wrong date format.");
+						$msg .= lang("Athlets need to be at least %1 years old! Maybe wrong date format.",self::MINIMUM_AGE);
 					}
 					elseif ($this->athlete->not_unique())
 					{
