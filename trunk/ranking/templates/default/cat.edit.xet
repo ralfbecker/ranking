@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.cat.edit" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%\0">
+			<columns>
+				<column/>
+				<column/>
+				<column width="10%"/>
+				<column width="50%"/>
+			</columns>
+			<rows>
+				<row height="20">
+					<description span="all" class="redItalic" id="msg"/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row class="th">
+					<description value="Key" options=",,,rkey"/>
+					<textbox size="8" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'NAT_{F|M}_??' NAT=nation, F|M=gender, ?? = A|B|J for juniors + S|B|D for disciplin" needed="1"/>
+					<description span="all" class="gray" value="GrpId" no_lang="1" align="right" id="GrpId"/>
+					<description/>
+				</row>
+				<row class="row">
+					<description value="Nation" options=",,,nation"/>
+					<menulist span="all">
+						<menupopup id="nation"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Name" options=",,,name"/>
+					<textbox size="40" maxlength="40" span="all" id="name" statustext="full cathegory name (must not be empty)" needed="1"/>
+				</row>
+				<row class="row">
+					<description class="nowrap" value="Gender"/>
+					<menulist span="all">
+						<menupopup id="sex" statustext="if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Birthyears from" options=",,,from_year"/>
+					<int id="from_year" statustext="which birthyear are allowd in this cathegory, if it is limited on this"/>
+					<description value="to year" options=",,,to_year"/>
+					<int id="to_year" statustext="which birthyear are allowd in this cathegory, if it is limited on this"/>
+				</row>
+				<row class="row">
+					<description options=",,,discipline" value="Discipline"/>
+					<menulist span="all">
+						<menupopup options="None" id="discipline"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Rankingsystem" options=",,,rls"/>
+					<menulist span="all">
+						<menupopup id="rls" statustext="select how the ranking should be calculated" needed="1" no_lang="1"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="previous Rankingsystem" options=",,,vor_rls"/>
+					<menulist>
+						<menupopup no_lang="1" id="vor_rls" statustext="which rankingsystem was used before, if any" options="None"/>
+					</menulist>
+					<description value="before" options=",,,vor"/>
+					<menulist>
+						<menupopup type="select-number" id="vor" statustext="before which year the old system was used (first year of new system)" options="None,1990,2020"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Cuppattern" options=",,,serien_pat"/>
+					<textbox size="8" maxlength="8" id="serien_pat" statustext="how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year" span="all"/>
+				</row>
+				<row>
+					<hbox span="3">
+						<button label="Save" id="button[save]" statustext="Saves the changes made"/>
+						<button label="Apply" id="button[apply]" statustext="Applies the changes made"/>
+						<button label="Cancel" id="button[cancel]" statustext="exists without saving the changes" onclick="window.close();"/>
+					</hbox>
+					<button label="Delete" id="button[delete]" statustext="Delete this category" onclick="return confirm('Delete this category');" align="right"/>
+				</row>
+			</rows>
+		</grid>
+		<styles>.gray { color: gray; }</styles>
+	</template>
+</overlay>

@@ -100,3 +100,4 @@ $setup_info['ranking']['depends'][] = array(
 
 
 
+$setup_info['ranking']['only_db'] = array('none');
