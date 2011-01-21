@@ -51,7 +51,7 @@ athlete including %1 results merged.	ranking	en	Athlete including %1 results mer
 athlete is not in the age-group of that category	ranking	en	Athlete is NOT in the age-group of that category
 athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athletes	ranking	en	Athletes
-athlets need to be at least 10 years old! maybe wrong date format.	ranking	en	Athlets need to be at least 10 years old! Maybe wrong date format.
+athlets need to be at least %1 years old! maybe wrong date format.	ranking	en	Athlets need to be at least %1 years old! Maybe wrong date format.
 attention: merging can not be undone! really want to merge?	ranking	en	ATTENTION: merging can NOT be undone! Really want to merge?
 before	ranking	en	before
 before which year the old system was used (first year of new system)	ranking	en	before which year the old system was used (first year of new system)
