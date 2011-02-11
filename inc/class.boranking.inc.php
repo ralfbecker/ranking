@@ -434,7 +434,7 @@ class boranking extends ranking_so
 		}
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = (mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
-		echo "<p>".__METHOD__."($comp[rkey]: $comp[name] ($comp[datum])) distance=$distance</p>\n";
+		//echo "<p>".__METHOD__."($comp[rkey]: $comp[name] ($comp[datum])) distance=$distance</p>\n";
 		return $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) &&
 			($allow_before && $distance > 0 || abs($distance) <= $this->judge_right_days);
 	}
