@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
+					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
-									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
+									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
+									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_data[route_start]" no_lang="1"/>
+									<description span="all" no_lang="1" id="route_data[route_start]"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description id="route_data[route_observation_time]" no_lang="1"/>
-									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
+									<description no_lang="1" id="route_data[route_observation_time]"/>
+									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,7 +47,7 @@
 							</columns>
 							<rows>
 								<row>
-									<description id="route_data[route_result]" no_lang="1"/>
+									<description no_lang="1" id="route_data[route_result]"/>
 								</row>
 								<row>
 									<description no_lang="1" id="route_data[route_judge]"/>
@@ -126,7 +126,7 @@
 					</hbox>
 					<description/>
 					<description/>
-					<button image="delete" class="noPrint" label="Delete" align="center" id="delete[$row_cont[PerId]]" onclick="return confirm('Delete this participant (can NOT be undone)');"/>
+					<button image="delete" class="noPrint" label="Delete" align="center" id="delete[$row_cont[PerId]]" onclick="return confirm('$row_cont[vorname] $row_cont[nachname]:\\n'+egw::lang('Delete this participant (can NOT be undone)') );"/>
 				</row>
 			</rows>
 		</grid>

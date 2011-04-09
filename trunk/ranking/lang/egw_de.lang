@@ -129,6 +129,7 @@ delete this competition	ranking	de	Diesen Wettkampf löschen
 delete this cup	ranking	de	Diesen Cup löschen
 delete this federation	ranking	de	Diesen Verband löschen
 delete this heat including all results	ranking	de	Löscht diese Runde einschließlich der Ergebnisse
+delete this participant (can not be undone)	ranking	de	Diesen Teilnehmer löschen (kann NICHT rückgänig gemacht werden)
 deletes this cup	ranking	de	Löscht diesen Cup
 delimiter	ranking	de	Begrenzungszeichen
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
