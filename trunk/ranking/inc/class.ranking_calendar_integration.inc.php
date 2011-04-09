@@ -40,7 +40,7 @@ class ranking_calendar_integration
 
 		$app_cols = array(
 			'cal_id' => $GLOBALS['egw']->db->concat("'".self::APP_NAME."'",'WetId'),
-			'cal_title' => 'dru_bez',
+			'cal_title' => 'CASE WHEN dru_bez THEN dru_bez ELSE name END',
 			'cal_description' => 'name',
 			'cal_start' => 'UNIX_TIMESTAMP(datum)',
 			'cal_end' => "UNIX_TIMESTAMP(ADDDATE(datum,CASE WHEN INSTR(gruppen,'@') > 0 AND SUBSTR(gruppen,INSTR(gruppen,'@')+1) > 0 THEN SUBSTR(gruppen,INSTR(gruppen,'@')+1) ELSE 2 END))-1",
