@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - result UI
+ * EGroupware digital ROCK Rankings - result UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-11 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -317,7 +317,7 @@ class uiresult extends boresult
 		}
 		else
 		{
-			if ($content['route_status'] != STATUS_RESULT_OFFICIAL || $content['new_route'] || 
+			if ($content['route_status'] != STATUS_RESULT_OFFICIAL || $content['new_route'] ||
 				$content['route_order'] != -1 || $discipline == 'speedrelay')
 			{
 				$readonlys['button[ranking]'] = true;	// only offical results can be commited into the ranking
@@ -519,7 +519,7 @@ class uiresult extends boresult
 			$rows[$k]['verband'] = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /','',$row['verband']);
 
 			if (!$need_start_number && $row['start_number']) $need_start_number = true;
-			
+
 			if ($query['discipline'] == 'speedrelay')
 			{
 				if ($query['route'] > 0)
@@ -534,9 +534,9 @@ class uiresult extends boresult
 						if ($row['PerId_'.$i] > 0) $PerIds[$row['PerId_'.$i]] = $row['PerId_'.$i];
 					}
 					if (count($PerIds) < 3) $titles[''] = lang('None');
-					if ($PerIds) $titles += egw_link::titles('ranking',$PerIds);	
-					$rows['sel_options']['set['.$row['team_id'].'][PerId_1]'] = 
-						$rows['sel_options']['set['.$row['team_id'].'][PerId_2]'] = 
+					if ($PerIds) $titles += egw_link::titles('ranking',$PerIds);
+					$rows['sel_options']['set['.$row['team_id'].'][PerId_1]'] =
+						$rows['sel_options']['set['.$row['team_id'].'][PerId_2]'] =
 						$rows['sel_options']['set['.$row['team_id'].'][PerId_3]'] = $titles;
 
 					$readonlys['set['.$row['team_id'].'][team_nation]'] = true;
@@ -568,7 +568,7 @@ class uiresult extends boresult
 		$rows['no_delete'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
 		// disable unused update / start time measurement buttons
-		$readonlys['update'] = ($rows['time_measurement'] = $query['time_measurement']) || 
+		$readonlys['update'] = ($rows['time_measurement'] = $query['time_measurement']) ||
 			$query['route_status'] == STATUS_RESULT_OFFICIAL;
 		$rows['discipline'] = $query['discipline'];
 
@@ -601,6 +601,7 @@ class uiresult extends boresult
 		}
 		if ($query['route_type'] == TWO_QUALI_BESTOF && $query['route'] == 0)
 		{
+			$rows['show_second_lane'] = true;
 			$rows['sum_or_bestof'] = lang('Best of');
 		}
 		else
@@ -609,10 +610,10 @@ class uiresult extends boresult
 		}
 		return $total;
 	}
-	
+
 	/**
 	 * Set options of the three athlete selectboxes, after nation changed
-	 * 
+	 *
 	 * @param int $comp
 	 * @param int $cat
 	 * @param int $team_id
@@ -659,7 +660,7 @@ class uiresult extends boresult
 		}
 
 		$response->script($script);
-		
+
 		return $response->getXML();
 	}
 
@@ -928,8 +929,8 @@ class uiresult extends boresult
 		// no startlist, no rights at all or result offical -->disable all update possebilities
 		if (($readonlys['button[apply]'] =
 			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || 
-			$route['route_status'] == STATUS_RESULT_OFFICIAL || 
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+			$route['route_status'] == STATUS_RESULT_OFFICIAL ||
 			$content['nm']['route_order'] < 0 || $content['nm']['show_result'] > 1))
 		{
 			$sel_options['result_plus'] = $this->plus;
@@ -1036,19 +1037,19 @@ class uiresult extends boresult
 	/**
 	 * Update a result of a single participant
 	 *
-	 * Lead:  
+	 * Lead:
 	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_height]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_height]').value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_plus]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_plus]').value);
-	 * Speed links: 
+	 * Speed links:
 	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_time]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][eliminated]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);
-	 * Speed rechts: 
+	 * Speed rechts:
 	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,
@@ -1064,8 +1065,8 @@ class uiresult extends boresult
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,
 	 * 		'exec[nm][rows][set][$row_cont[team_id]][eliminated]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);
-	 * 
-	 * 
+	 *
+	 *
 	 * @param string $request_id eTemplate request id
 	 * @param string $name can be repeated multiple time together with value
 	 * @param string $value
@@ -1160,7 +1161,7 @@ class uiresult extends boresult
 									'current_1' => $id,
 								);
 								break;
-								
+
 							case 'result_time':
 								if ($request->preserv['nm']['route'] >= 2)
 								{
@@ -1193,7 +1194,7 @@ class uiresult extends boresult
 									);
 								}
 								break;
-								
+
 							case 'result_time_1':	// relay
 								// we need to check, if id is the co (right climber) or not
 								$co = $this->get_co($keys,$id,$id_isnt_co);
@@ -1221,10 +1222,10 @@ class uiresult extends boresult
 		//error_log("processing of ajax_update took ".sprintf('%4.2lf s',microtime(true)-$start));
 		return $response->getXML();
 	}
-	
+
 	/**
 	 * Get co-participant for given PerId/team_id and route (specified by $keys)
-	 * 
+	 *
 	 * @param array $keys
 	 * @param int $id PerId or team_id
 	 * @param boolean $id_isnt_co=null true if id is NOT the co, false otherwise
@@ -1274,7 +1275,7 @@ class uiresult extends boresult
 		{
 			switch($discipline)
 			{
-				case 'speedrelay': 
+				case 'speedrelay':
 					return 'ranking.result.index.rows_relay_general';
 				default:
 					return 'ranking.result.index.rows_general';
@@ -1294,7 +1295,7 @@ class uiresult extends boresult
 		// startlist
 		switch($discipline)
 		{
-			case 'speedrelay': 
+			case 'speedrelay':
 				return 'ranking.result.index.rows_relay';
 			default:
 				return 'ranking.result.index.rows_startlist';

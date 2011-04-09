@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - result business object/logic
+ * EGroupware digital ROCK Rankings - result business object/logic
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-11 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -193,6 +193,18 @@ class boresult extends boranking
 			$route_type == TWO_QUALI_ALL_SEED_STAGGER,															// true = stagger, false = no stagger
 			$old_startlist);
 
+		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF)	// set 2. lane for record format
+		{
+			unset($starter);
+			$anz = count($starters[1]);
+			foreach($starters[1] as &$starter)
+			{
+				$starter['start_order2'] = $starter['start_order'] <= floor($anz/2) ?
+					$starter['start_order'] + ceil($anz/2) :	// (bigger) first half
+					$starter['start_order'] - floor($anz/2);	// (smaller) second half
+			}
+		}
+
 		// delete existing starters
 		$this->route_result->delete($keys);
 
@@ -215,7 +227,7 @@ class boresult extends boranking
 		}
 		return $num;
 	}
-	
+
 	/**
 	 * Randomize a startlist for speedrelay qualification
 	 *
@@ -235,10 +247,10 @@ class boresult extends boranking
 		}
 		return $start_order;
 	}
-	
+
 	/**
 	 * Get registered athletes for given competition and category
-	 * 
+	 *
 	 * @param array $keys array with values for WetId and GrpId
 	 * @param boolean $only_nations=false only return array with nations (as key and value)
 	 * @return array
@@ -290,7 +302,9 @@ class boresult extends boranking
 				break;
 
 			default:
-				$order = $discipline == 'speed' ? 1|4 :		// 5 = reverse of ranking for speed
+				$order = $discipline == 'speed' ?
+					// speed: 0 = random for bestof/record format, 5 = reverse of ranking
+					($route_type == TWO_QUALI_BESTOF ? 0 : 1|4) :
 					// 9 = distribution by ranking, 0 = random
 					(in_array($route_type,array(TWO_QUALI_HALF,TWO_QUALI_ALL_SEED_STAGGER,TWOxTWO_QUALI)) ? 1|8 : 0);
 				break;
@@ -328,7 +342,10 @@ class boresult extends boranking
 				'start_order' => $start_order,
 			)+(isset($starter['start_number']) ? array(
 				'start_number' => $starter['start_number'],
+			) : array())+(isset($starter['start_order2']) ? array(
+				'start_order2' => $starter['start_order2']
 			) : array()));
+
 			if ($this->route_result->save() == 0) $num++;
 		}
 		return $num;
@@ -1078,10 +1095,10 @@ class boresult extends boranking
 		}
 		$this->_bridge_log("**** bridge run finished");
 	}
-	
+
 	/**
 	 * Import an ROCK export file into result-service
-	 * 
+	 *
 	 * @param string $file full path to export file
 	 * @param array $comp result service competition
 	 * @param int $route result service route_order
@@ -1102,7 +1119,7 @@ class boresult extends boranking
 		}
 
 		if (!$cat) $cat = $route['GrpId'];
-		
+
 		if (!$cat || !($cat = $this->cats->read($cat)) ||
 			!in_array($cat['rkey'],$comp['gruppen']) || $route['GrpId'] != $cat['GrpId'])
 		{
@@ -1166,7 +1183,7 @@ class boresult extends boranking
 			'result_rank' =>  $rdata['platz'] ? (int)$rdata['platz'] : null,
 		);
 		if (!$rdata['platz']) return $data;	// no result yet
-		
+
 		switch ($discipline)
 		{
 			case 'lead':
@@ -1441,13 +1458,13 @@ class boresult extends boranking
 		}
 		return $GLOBALS['boresult'];
 	}
-	
+
 	/**
 	 * Get URL for athlete profile
-	 * 
+	 *
 	 * Currently /pstambl.php is used for every HTTP_HOST not www.ifsc-climbing.org,
 	 * for which /index.php?page_name=pstambl is used.
-	 * 
+	 *
 	 * @param array $athlete
 	 * @param int $cat=null
 	 * @return string
@@ -1472,7 +1489,7 @@ class boresult extends boranking
 
 	/**
 	 * Export route for xml or json access
-	 * 
+	 *
 	 * @param int $comp
 	 * @param int|string $cat
 	 * @param int $heat=-1
@@ -1481,7 +1498,7 @@ class boresult extends boranking
 	function export_route($comp,$cat,$heat=-1)
 	{
 		$start = microtime(true);
-	
+
 		if (!($cat = $this->cats->read($cat)))
 		{
 			throw new Exception(lang('Category NOT found !!!'));
@@ -1496,7 +1513,7 @@ class boresult extends boranking
 			$discipline = $cat['discipline'];
 		}
 		if (!isset($heat) || !is_numeric($heat)) $heat = -1;	// General result
-	
+
 		if (!($route = $this->route->read(array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
@@ -1506,12 +1523,12 @@ class boresult extends boranking
 			throw new Exception(lang('Route NOT found !!!'));
 		}
 		//printf("<p>reading route+result took %4.2lf s</p>\n",microtime(true)-$start);
-	
+
 		//echo "<pre>".print_r($route,true)."</pre>\n";
-	
+
 		// append category name to route name
 		$route['route_name'] .= ' '.$cat['name'];
-		
+
 		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
 		{
 			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
@@ -1533,14 +1550,14 @@ class boresult extends boranking
 			'route_type'  => $route['route_type'],
 		)))) $result = array();
 		//_debug_array($filter); _debug_array($result);
-		
+
 		// return route_names as part of route, not as participant
 		if (isset($result['route_names']))
 		{
 			$route['route_names'] = $result['route_names'];
 			unset($result['route_names']);
 		}
-	
+
 		switch($discipline)
 		{
 			case 'lead':
@@ -1565,7 +1582,7 @@ class boresult extends boranking
 			if ((string)$value === '') unset($route[$name]);
 		}
 		$last_modified = (int)$route['route_modified'];
-		
+
 		// make sure route_result is set, if result is offical (and not if not)
 		if ($route['route_status'] == STATUS_RESULT_OFFICIAL)
 		{
@@ -1588,7 +1605,7 @@ class boresult extends boranking
 			'next_1','next_2','next_3','next_4','next_5','next_6','next_7','next_8',
 		)));
 		if ($discipline != 'boulder') unset($route['route_num_problems']);
-		
+
 		if ($discipline == 'speedrelay')	// fetch athlete names
 		{
 			foreach($result as $key => $row)
@@ -1619,7 +1636,7 @@ class boresult extends boranking
 				$row['quali_points'] = number_format($row['quali_points'],2);
 			}
 			if ($row['result_modified'] > $last_modified) $last_modified = $row['result_modified'];
-			
+
 			if ($heat == -1)	// rename result to result0 for general result
 			{
 				$row['result0'] = $row['result'];
@@ -1630,7 +1647,7 @@ class boresult extends boranking
 			$row['lastname']  = $row['nachname'];
 			$row['federation']= $row['verband'];
 			if ($row['PerId']) $row['url'] = self::profile_url($row,$cat['GrpId']);
-			
+
 			// remove &nbsp; in lead results
 			if ($discipline == 'lead')
 			{
@@ -1697,7 +1714,7 @@ class boresult extends boranking
 			}
 			// always return result attribute
 			if ($heat != -1 && !isset($row['result'])) $row['result'] = '';
-			
+
 			// remove not needed attributes
 			$row = array_diff_key($row,array_flip(array(
 				// remove keys, they are already in route
@@ -1725,7 +1742,7 @@ class boresult extends boranking
 				'start_number_1','start_number_2','start_number_3',
 				'result_time_1','result_time_2','result_time_3',
 			)));
-			
+
 			ksort($row);
 			if ($row['result_rank'])
 			{
@@ -1738,20 +1755,20 @@ class boresult extends boranking
 			$last_rank = $row['result_rank'];
 		}
 		$tn = array_merge($tn,$unranked);
-	
+
 		$ret = $route+array(
 			'discipline'    => $discipline,
 			'participants'  => $tn,
 			'last_modified' => $last_modified,
 		);
 		$ret['etag'] = md5(serialize($ret));
-	
+
 		return $ret;
 	}
-	
+
 	/**
 	 * Fix ordering of result (so it is identical in xml/json and UI)
-	 * 
+	 *
 	 * @param array $query
 	 * @param boolean $isRelay=false
 	 */

@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - setup
+ * EGroupware digital ROCK Rankings - setup
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -274,7 +274,8 @@ $phpgw_baseline = array(
 			'start_order' => array('type' => 'int','precision' => '2'),
 			'start_number' => array('type' => 'int','precision' => '2'),
 			'result_rank' => array('type' => 'int','precision' => '2'),
-			'result_detail' => array('type' => 'varchar','precision' => '255')
+			'result_detail' => array('type' => 'varchar','precision' => '255'),
+			'start_order2' => array('type' => 'int','precision' => '2','comment' => 'start order 2. route record format')
 		),
 		'pk' => array('WetId','GrpId','route_order','PerId'),
 		'fk' => array(),
