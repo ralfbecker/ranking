@@ -141,6 +141,14 @@ foreach($valid as $key => $c)
 $cats = implode(',',$valid);
 $cat_names = implode(', ',$cat_names);
 
+$quota = $wettk->quota;
+// force quota for youth to 1, to allow to use a higher quota for registration, it still need to be set!
+if (substr($name,0,5) == 'youth')
+{
+	$quota = 1;
+}
+//echo "<p>$name: quota=$quota</p>\n"; exit;
+
 if ($cup)
 {
 	if ($cat->GrpId != $valid[0])
@@ -228,7 +236,7 @@ for ($last_nation = '', $last_cat = $last_comp = $anz = $pkte = 0;
 
 	if ($row->GrpId != $last_cat) $anz = 0;	// quota counts for each cat
 
-	if (++$anz > $wettk->quota) {
+	if (++$anz > $quota) {
 		//echo "<p>NOT counting: ".print_r($row,true)."</p>\n";
 		continue;
 	}
