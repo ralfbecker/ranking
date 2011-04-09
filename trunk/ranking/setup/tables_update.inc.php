@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - setup
+ * EGroupware digital ROCK Rankings - setup
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -1079,11 +1079,11 @@ function ranking_upgrade1_7_001()
 
 /**
  * Add cat_id, modified and modifier colums to Wettkaempfe table
- * 
+ *
  * ALTER TABLE `Wettkaempfe` ADD `cat_id` INTEGER
  * ALTER TABLE `Wettkaempfe` ADD `modified` TIMESTAMP NOT NULL
  * ALTER TABLE `Wettkaempfe` ADD `modifier` INTEGER
- * 
+ *
  * @param egw_db $db=null
  * @return string
  */
@@ -1114,7 +1114,7 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 		'type' => 'int',
 		'precision' => '4'
 	));
-	
+
 	$nations = array(
 		'int' => array(
 			'int_adult'   => '^[0-9]{2,2}_(WC|WM|EM|EC|LC|TR|AM|AC|SM|LM|NAC){1,1}.*',
@@ -1140,7 +1140,7 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 	foreach($nations as $nation => $cats)
 	{
 		$nat_parent = ranking_so::cat_rkey2id($nation,$nation.' competitions');
-		
+
 		foreach($GLOBALS['egw_setup']->oProc->m_odb->select('Wettkaempfe','WetId,rkey,gruppen',array(
 			'nation' => $nation != 'int' ? $nation : null,
 		),__LINE__,__FILE__,false,'','ranking') as $row)
@@ -1163,7 +1163,7 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 			$GLOBALS['egw_setup']->oProc->m_odb->query('UPDATE Wettkaempfe SET cat_id='.(int)$cat_id.' WHERE WetId='.(int)$row['WetId'],__LINE__,__FILE__);
 		}
 	}
-	
+
 	$GLOBALS['egw_setup']->oProc->m_odb->query_log = false;
 
 	if (!is_null($db))
@@ -1214,7 +1214,7 @@ function ranking_upgrade1_7_003()
 
 /**
  * Add speedrelay discipline to categories table
- * 
+ *
  * @return string
  */
 function ranking_upgrade1_7_004()
@@ -1234,7 +1234,7 @@ function ranking_upgrade1_7_004()
 
 /**
  * Adding columns for current climber, next climber, boulder rotation time
- * 
+ *
  * @return string
  */
 function ranking_upgrade1_7_005()
@@ -1297,5 +1297,20 @@ function ranking_upgrade1_7_005()
 	));
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.7.006';
+}
+
+/**
+ * add start_order2 column for record format / two lane
+ */
+function ranking_upgrade1_7_006()
+{
+	/* ALTER TABLE `RouteResults` ADD `start_order2` SMALLINT */
+	$GLOBALS['egw_setup']->oProc->AddColumn('RouteResults','start_order2',array(
+		'type' => 'int',
+		'precision' => '2',
+		'comment' => 'start order 2. route record format'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.001';
 }
 
