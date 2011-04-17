@@ -199,7 +199,7 @@ class boresult extends boranking
 			$anz = count($starters[1]);
 			foreach($starters[1] as &$starter)
 			{
-				$starter['start_order2'] = $starter['start_order'] <= floor($anz/2) ?
+				$starter['start_order2n'] = $starter['start_order'] <= floor($anz/2) ?
 					$starter['start_order'] + ceil($anz/2) :	// (bigger) first half
 					$starter['start_order'] - floor($anz/2);	// (smaller) second half
 			}
@@ -342,8 +342,8 @@ class boresult extends boranking
 				'start_order' => $start_order,
 			)+(isset($starter['start_number']) ? array(
 				'start_number' => $starter['start_number'],
-			) : array())+(isset($starter['start_order2']) ? array(
-				'start_order2' => $starter['start_order2']
+			) : array())+(isset($starter['start_order2n']) ? array(
+				'start_order2n' => $starter['start_order2n']
 			) : array()));
 
 			if ($this->route_result->save() == 0) $num++;

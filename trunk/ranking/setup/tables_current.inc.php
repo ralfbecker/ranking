@@ -275,7 +275,7 @@ $phpgw_baseline = array(
 			'start_number' => array('type' => 'int','precision' => '2'),
 			'result_rank' => array('type' => 'int','precision' => '2'),
 			'result_detail' => array('type' => 'varchar','precision' => '255'),
-			'start_order2' => array('type' => 'int','precision' => '2','comment' => 'start order 2. route record format')
+			'start_order2n' => array('type' => 'int','precision' => '2','comment' => 'start order 2. route record format')
 		),
 		'pk' => array('WetId','GrpId','route_order','PerId'),
 		'fk' => array(),

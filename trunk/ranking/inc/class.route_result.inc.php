@@ -754,8 +754,8 @@ class route_result extends so_sql
 				'result_time_r' => $data['result_time_r'] ? number_format($data['result_time_r'],3) : '',
 				'eliminated_r'  => $data['eliminated_r'],
 			);
-			// speed quali with record format (best of two) AND not eliminated both times
-			if ($this->route_type == TWO_QUALI_BESTOF && $data['route_order'] == 0 &&
+			// speed with record format (best of two) AND not eliminated both times
+			if ($this->route_type == TWO_QUALI_BESTOF &&	// best of mode is quali AND final!
 				!((string)$data['eliminated'] !== '' && $data['eliminated_r']))
 			{
 				if ($data['result_time'] && $data['result_time_r'])

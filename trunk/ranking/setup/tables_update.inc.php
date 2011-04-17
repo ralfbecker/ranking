@@ -1314,3 +1314,11 @@ function ranking_upgrade1_7_006()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.001';
 }
 
+
+function ranking_upgrade1_9_001()
+{
+	$GLOBALS['egw_setup']->oProc->RenameColumn('RouteResults','start_order2','start_order2n');
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.002';
+}
+
