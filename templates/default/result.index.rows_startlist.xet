@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
-									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" no_lang="1" id="route_data[route_start]"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description no_lang="1" id="route_data[route_observation_time]"/>
-									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,7 +47,7 @@
 							</columns>
 							<rows>
 								<row>
-									<description no_lang="1" id="route_data[route_result]"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
 									<description no_lang="1" id="route_data[route_judge]"/>
@@ -90,7 +90,7 @@
 					<nextmatch-sortheader label="Start- order" id="start_order" align="center"/>
 					<nextmatch-sortheader label="Start- number" id="start_number" align="center" class="noPrint"/>
 					<nextmatch-header label="Start- number" id="printnumber" align="center" class="onlyPrint"/>
-					<nextmatch-sortheader label="2. Lane" id="start_order2"/>
+					<nextmatch-sortheader label="2. Lane" id="start_order2n"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
@@ -111,7 +111,7 @@
 					<description id="{$row}[start_order]" no_lang="1" align="center"/>
 					<textbox size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[PerId]][start_number]" no_lang="1" class="noPrint" align="center"/>
 					<description class="onlyPrint" id="{$row}[start_number]" no_lang="1" align="center"/>
-					<description id="{$row}[start_order2]" no_lang="1" align="center"/>
+					<description id="{$row}[start_order2n]" no_lang="1" align="center"/>
 					<description id="{$row}[nachname]" no_lang="1" class="lastname leftPad5" options="$row_cont[link]"/>
 					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
 					<description no_lang="1" align="center" id="{$row}[birthyear]"/>

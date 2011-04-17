@@ -599,9 +599,9 @@ class uiresult extends boresult
 		{
 			$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 		}
-		if ($query['route_type'] == TWO_QUALI_BESTOF && $query['route'] == 0)
+		if ($query['route_type'] == TWO_QUALI_BESTOF)	// best of mode is quali AND final!
 		{
-			$rows['show_second_lane'] = true;
+			$rows['show_second_lane'] = $query['route'] == 0;	// 2. lane is only in quali
 			$rows['sum_or_bestof'] = lang('Best of');
 		}
 		else

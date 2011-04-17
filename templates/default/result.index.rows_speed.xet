@@ -8,7 +8,7 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
 					<groupbox rows="1" cols="1" class="extra_startlist">
@@ -22,17 +22,17 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
-									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" no_lang="1" id="route_data[route_start]"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description no_lang="1" id="route_data[route_observation_time]"/>
-									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -47,7 +47,7 @@
 							</columns>
 							<rows>
 								<row>
-									<description no_lang="1" id="route_data[route_result]"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
 									<description no_lang="1" id="route_data[route_judge]"/>
@@ -97,7 +97,7 @@
 					<nextmatch-header label="License" align="center" id="PerId"/>
 					<nextmatch-sortheader label="Start- number" align="center" id="start_order"/>
 					<nextmatch-sortheader label="Time" align="center" id="result_time"/>
-					<nextmatch-sortheader label="2. Lane" id="start_order2" align="center"/>
+					<nextmatch-sortheader label="2. Lane" id="start_order2n" align="center"/>
 					<description align="center" value="2. Time"/>
 					<nextmatch-sortheader label="@sum_or_bestof" align="center" id="result_time"/>
 					<description align="center" value="Actions" class="noPrint"/>
@@ -124,7 +124,7 @@
 						</menulist>
 						<buttononly label="Update" align="center" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);" id="update" statustext="update time" class="small noPrint"/>
 					</hbox>
-					<description no_lang="1" align="center" id="${row}[start_order2]"/>
+					<description no_lang="1" align="center" id="${row}[start_order2n]"/>
 					<hbox align="center" options="0,0">
 						<description no_lang="1" readonly="true" id="{$row}[result_r]" class="$cont[ro_result]"/>
 						<textbox type="float" size="5" precision="%4.2lf" id="set[$row_cont[PerId]][result_time_r]" class="$cont[rw_result]"/>
