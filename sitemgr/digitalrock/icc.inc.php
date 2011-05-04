@@ -71,6 +71,12 @@ $icc_youth = array(
 	'ICC_M_A' => 'male youth A',
 	'ICC_F_B' => 'female youth B',
 	'ICC_M_B' => 'male youth B',
+	'ICC_FBJ' => 'female juniors boulder',
+	'ICC_MBJ' => 'male juniors boulder',
+	'ICC_FBA' => 'female youth A boulder',
+	'ICC_MBA' => 'male youth A boulder',
+	'ICC_FBB' => 'female youth B boulder',
+	'ICC_MBB' => 'male youth B boulder',
 	'ICC_FSJ' => 'female juniors speed',
 	'ICC_MSJ' => 'male juniors speed',
 	'ICC_FSA' => 'female youth A speed',
@@ -78,5 +84,3 @@ $icc_youth = array(
 	'ICC_FSB' => 'female youth B speed',
 	'ICC_MSB' => 'male youth B speed',
 );
-
-?>
