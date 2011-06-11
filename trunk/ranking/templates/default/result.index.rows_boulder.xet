@@ -8,10 +8,10 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox cols="1" rows="1" class="extra_startlist">
+					<groupbox rows="1" cols="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -27,7 +27,7 @@
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description id="route_data[route_start]" no_lang="1" span="all"/>
+									<description span="all" id="route_data[route_start]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox cols="1" rows="1" class="extra_result">
+					<groupbox rows="1" cols="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -50,7 +50,7 @@
 									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description id="route_data[route_judge]" no_lang="1"/>
+									<description no_lang="1" id="route_data[route_judge]"/>
 								</row>
 							</rows>
 						</grid>
@@ -89,138 +89,138 @@
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
-					<template class="onlyPrint" id="ranking.result.header$cont[calendar]" span="all"/>
+					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
+					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
-					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
+					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
 					<nextmatch-sortheader label="Nation" id="nation"/>
 					<nextmatch-header label="Sektion" id="verband"/>
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
-					<nextmatch-header align="center" label="License" id="PerId"/>
-					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
-					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
-					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
+					<nextmatch-header label="License" align="center" id="PerId"/>
+					<nextmatch-sortheader label="Start- number" align="center" id="start_order"/>
+					<nextmatch-sortheader label="Sum" align="center" id="result_top,result_zone"/>
+					<nextmatch-sortheader label="Sum" align="center" id="result_top,result_zone"/>
 					<description align="center" value="1" class="place"/>
 					<description value="2" class="place"/>
 					<description value="3" class="place"/>
-					<description value="4" no_lang="1" class="place"/>
+					<description no_lang="1" value="4" class="place"/>
 					<description value="5" class="place"/>
 					<description value="6" class="place"/>
 					<description value="7" class="place"/>
 					<description value="8" class="place"/>
-					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
+					<nextmatch-sortheader label="previous heat" align="center" id="rank_prev_heat"/>
 				</row>
 				<row class="onlyPrint" part="footer">
-					<template class="onlyPrint" id="ranking.result.footer" span="all"/>
+					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
 				</row>
 				<row class="row $row_cont[quota_class]">
-					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
-					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
-					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
-					<description id="${row}[nation]" no_lang="1"/>
+					<description no_lang="1" readonly="true" align="center" id="{$row}[result_rank]" class="place"/>
+					<description no_lang="1" id="{$row}[nachname]" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description no_lang="1" id="{$row}[vorname]" options="$row_cont[link]" class="leftPad5"/>
+					<description align="center" no_lang="1" id="{$row}[birthyear]"/>
+					<description no_lang="1" id="${row}[nation]"/>
 					<description id="${row}[verband]"/>
 					<description id="${row}[acl_fed]"/>
-					<description value="$row_cont[plz]" id="${row}[ort]"/>
-					<description align="center" id="{$row}[PerId]" no_lang="1"/>
-					<description align="center" value="$row_cont[start_order]" id="{$row}[start_number]" no_lang="1"/>
-					<description align="center" id="{$row}[result]" no_lang="1"/>
+					<description id="${row}[ort]" value="$row_cont[plz]"/>
+					<description no_lang="1" align="center" id="{$row}[PerId]"/>
+					<description align="center" no_lang="1" id="{$row}[start_number]" value="$row_cont[start_order]"/>
+					<description no_lang="1" align="center" id="{$row}[result]"/>
 					<vbox options="0,0">
 						<hbox align="right" class="noPrint" options="0,0">
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: total number or no" label="Top" id="set[$row_cont[PerId]][tops]" onchange="check_tops(this)" options=" ,1,8"/>
+								<menupopup type="select-number" class="noPrint noWrap" label="Top" onchange="check_tops(this)" id="set[$row_cont[PerId]][tops]" options=" ,1,8" statustext="Top: total number or no"/>
 							</menulist>
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries" label="Tries" id="set[$row_cont[PerId]][top_tries]" onchange="check_top(this)" options="No,1,30"/>
+								<menupopup type="select-number" class="noPrint noWrap" label="Tries" onchange="check_top(this)" id="set[$row_cont[PerId]][top_tries]" options="No,1,30" statustext="Top: number of tries"/>
 							</menulist>
 						</hbox>
 						<hbox align="right" class="noPrint" options="0,0">
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: total number or no" label="Bonus" id="set[$row_cont[PerId]][zones]" onchange="check_zones(this)" options=" ,1,8"/>
+								<menupopup type="select-number" class="noPrint noWrap" label="Bonus" onchange="check_zones(this)" id="set[$row_cont[PerId]][zones]" options=" ,1,8" statustext="Bonus: total number or no"/>
 							</menulist>
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: number of tries" label="Tries" id="set[$row_cont[PerId]][zone_tries]" options="No,1,30"/>
+								<menupopup type="select-number" class="noPrint noWrap" label="Tries" id="set[$row_cont[PerId]][zone_tries]" options="No,1,30" statustext="Bonus: number of tries"/>
 							</menulist>
 						</hbox>
-						<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
+						<description no_lang="1" id="{$row}[result]" class="onlyPrint noWrap"/>
 					</vbox>
 					<vbox options="0,0">
-						<menulist>
-							<menupopup type="select-number" align="right" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="set[$row_cont[PerId]][top1]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint noWrap" label="Top" align="right" onchange="check_top(this)" id="set[$row_cont[PerId]][top1]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" align="right" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="set[$row_cont[PerId]][zone1]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint noWrap" label="Bonus" align="right" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone1]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder1]" class="onlyPrint"/>
 					</vbox>
 					<box options="0,0">
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top2]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_top(this)" id="set[$row_cont[PerId]][top2]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone2]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone2]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder2]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder2]" class="onlyPrint"/>
 					</box>
 					<box options="0,0">
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top3]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_top(this)" id="set[$row_cont[PerId]][top3]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone3]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone3]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder3]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder3]" class="onlyPrint"/>
 					</box>
 					<box options="0,0">
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top4]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_top(this)" id="set[$row_cont[PerId]][top4]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone4]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone4]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder4]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder4]" class="onlyPrint"/>
 					</box>
 					<box options="0,0">
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top5]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_top(this)" id="set[$row_cont[PerId]][top5]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone5]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone5]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder5]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder5]" class="onlyPrint"/>
 					</box>
 					<box options="0,0">
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top6]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_top(this)" id="set[$row_cont[PerId]][top6]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone6]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone6]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder6]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder6]" class="onlyPrint"/>
 					</box>
 					<box options="0,0">
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top7]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_top(this)" id="set[$row_cont[PerId]][top7]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone7]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone7]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder7]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder7]" class="onlyPrint"/>
 					</box>
 					<box options="0,0">
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top8]" onchange="check_top(this)" options="No,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_top(this)" id="set[$row_cont[PerId]][top8]" options="No,1,20" statustext="Top: number of tries or no"/>
 						</menulist>
-						<menulist>
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone8]" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" onchange="check_bonus(this)" id="set[$row_cont[PerId]][zone8]" options=" ,1,20" statustext="Bonus: Number of tries or no"/>
 						</menulist>
-						<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
+						<description no_lang="1" id="{$row}[boulder8]" class="onlyPrint"/>
 					</box>
-					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
+					<description align="center" no_lang="1" id="{$row}[rank_prev_heat]" class="place"/>
 				</row>
 			</rows>
 		</grid>
