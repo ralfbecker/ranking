@@ -418,8 +418,8 @@ squad	ranking	en	Squad
 start	ranking	en	Start
 start heat	ranking	en	Start round
 start order	ranking	en	Start order
-start- number	ranking	en	start- number
-start- order	ranking	en	start- order
+start- number	ranking	en	Bib- number
+start- order	ranking	en	Start- order
 startdate	ranking	en	Startdate
 startdate (first heat, not registration) of the competition (must not be empty)	ranking	en	startdate (first round, not registration) of the competition (must not be empty)
 starting time	ranking	en	Starting time
@@ -428,7 +428,7 @@ startlist for category %1 generated	ranking	en	Startlist for category %1 generat
 startlist generated	ranking	en	Startlist generated
 startlist pdf	ranking	en	Startlist PDF
 startlists	ranking	en	Startlists
-startnumber	ranking	en	Startnumber
+startnumber	ranking	en	Bibnumber
 startorder	ranking	en	Startorder
 street	ranking	en	Street
 street, postcode	ranking	en	street, postcode
