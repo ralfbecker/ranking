@@ -282,7 +282,7 @@ class athlete extends so_sql
 	{
 		//echo "<p>athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
-		if ($only_keys === true) $only_keys = self::ATHLETE_TABLE.'.PerID';
+		if ($only_keys === true) $only_keys = self::ATHLETE_TABLE.'.PerId';
 
 		if ($join === true || is_numeric($join))
 		{

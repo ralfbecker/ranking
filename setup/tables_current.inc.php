@@ -401,5 +401,22 @@ $phpgw_baseline = array(
 		'fk' => array(),
 		'ix' => array(),
 		'uc' => array()
+	),
+	'RouteHolds' => array(
+		'fd' => array(
+			'hold_id' => array('type' => 'auto','nullable' => False),
+			'WetId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'GrpId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'route_order' => array('type' => 'int','precision' => '2','nullable' => False),
+			'hold_topo' => array('type' => 'int','precision' => '2','nullable' => False),
+			'hold_xpercent' => array('type' => 'int','precision' => '4','nullable' => False),
+			'hold_ypercent' => array('type' => 'int','precision' => '4','nullable' => False),
+			'hold_height' => array('type' => 'int','precision' => '4'),
+			'hold_type' => array('type' => 'int','precision' => '2','nullable' => False,'default' => '0')
+		),
+		'pk' => array('hold_id'),
+		'fk' => array(),
+		'ix' => array(array('WetId','GrpId','route_order','hold_topo')),
+		'uc' => array()
 	)
 );
