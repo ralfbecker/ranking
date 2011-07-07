@@ -225,7 +225,17 @@ class category extends so_sql
 		}
 		if (!is_array($keys))
 		{
-			$keys = is_numeric($keys) ? array('GrpId' => (int) $keys) : array('rkey' => $keys);
+			// some caching in $this->data
+			if (is_numeric($keys))
+			{
+				if ((int)$keys == $this->data['GrpId']) return $this->data;
+				$keys = array('GrpId' => (int) $keys);
+			}
+			else
+			{
+				if ($keys === $this->data['rkey']) return $this->data;
+				$keys = array('rkey' => $keys);
+			}
 		}
 		if (!$extra_cols && !$join && $this->cache && count($keys) == 1 && ($keys['GrpId'] || $keys['rkey']))
 		{

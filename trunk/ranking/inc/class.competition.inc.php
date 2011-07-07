@@ -38,7 +38,7 @@ class competition extends so_sql
 	);
 	var $vfs_pdf_dir = '';
 	var $result_table = 'Results';
-	
+
 	/**
 	 * Timestaps that need to be adjusted to user-time on reading or saving
 	 *
@@ -285,6 +285,8 @@ class competition extends so_sql
 	/**
 	 * Read a competition, reimplemented to allow to pass WetId or rkey instead of the array
 	 *
+	 * Do some caching to avoid reading the same competition multiple times;
+	 *
 	 * @param mixed $keys array with keys, or WetId or rkey
 	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
 	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
@@ -294,7 +296,17 @@ class competition extends so_sql
 	{
 		if ($keys && !is_array($keys))
 		{
-			$keys = is_numeric($keys) ? array('WetId' => (int) $keys) : array('rkey' => $keys);
+			// some caching in $this->data
+			if (is_numeric($keys))
+			{
+				if ((int)$keys == $this->data['WetId']) return $this->data;
+				$keys = array('WetId' => (int) $keys);
+			}
+			else
+			{
+				if ($keys === $this->data['rkey']) return $this->data;
+				$keys = array('rkey' => $keys);
+			}
 		}
 		return parent::read($keys,$extra_cols,$join);
 	}
@@ -685,7 +697,7 @@ class competition extends so_sql
 
 	/**
 	 * saves the content of data to the db
-	 * 
+	 *
 	 * Reimplemented to automatic update modifier and modified time
 	 *
 	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
@@ -695,10 +707,10 @@ class competition extends so_sql
 	function save($keys=null,$extra_where=null)
 	{
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
-		
+
 		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 		$this->data['modified'] = $this->now;
-		
+
 		return parent::save(null,$extra_where);
 	}
 }

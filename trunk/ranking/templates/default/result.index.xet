@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox rows="1" cols="1" class="extra_startlist">
+					<groupbox cols="1" rows="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -22,24 +22,24 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
-									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" no_lang="1" id="route_data[route_start]"/>
+									<description id="route_data[route_start]" no_lang="1" span="all"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description no_lang="1" id="route_data[route_observation_time]"/>
-									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox rows="1" cols="1" class="extra_result">
+					<groupbox cols="1" rows="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -47,10 +47,10 @@
 							</columns>
 							<rows>
 								<row>
-									<description no_lang="1" id="route_data[route_result]"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_data[route_judge]"/>
+									<description id="route_data[route_judge]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -81,51 +81,51 @@
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
-					<template span="all" class="onlyPrint" id="ranking.result.header$cont[calendar]"/>
+					<template id="ranking.result.header$cont[calendar]" span="all"/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
+					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
-					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
+					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
 					<nextmatch-sortheader label="Nation" id="nation"/>
 					<nextmatch-header label="Sektion" id="verband"/>
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
-					<nextmatch-header label="License" align="center" id="PerId"/>
-					<nextmatch-sortheader label="Start- number" align="center" id="start_order"/>
-					<nextmatch-sortheader label="Height" align="center" id="result_height"/>
-					<nextmatch-sortheader label="previous heat" align="center" id="rank_prev_heat"/>
+					<nextmatch-header align="center" label="License" id="PerId"/>
+					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
+					<nextmatch-sortheader align="center" label="Height" id="result_height"/>
+					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
 					<description align="center" value="Actions" class="$cont[rw_result]"/>
 				</row>
 				<row class="onlyPrint" part="footer">
-					<template span="all" class="onlyPrint" id="ranking.result.footer"/>
+					<template id="ranking.result.footer" span="all"/>
 				</row>
 				<row class="row $row_cont[quota_class]">
-					<description no_lang="1" readonly="true" align="center" id="{$row}[result_rank]" class="place"/>
-					<description no_lang="1" id="{$row}[nachname]" options="$row_cont[link]" class="lastname leftPad5"/>
-					<description no_lang="1" id="{$row}[vorname]" options="$row_cont[link]" class="leftPad5"/>
-					<description align="center" no_lang="1" id="{$row}[birthyear]"/>
-					<description no_lang="1" id="{$row}[nation]"/>
+					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
+					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
+					<description id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
 					<description id="${row}[acl_fed]"/>
-					<description id="${row}[ort]" value="$row_cont[plz]"/>
-					<description no_lang="1" align="center" id="{$row}[PerId]"/>
-					<description align="center" no_lang="1" id="{$row}[start_number]" value="$row_cont[start_order]"/>
+					<description value="$row_cont[plz]" id="${row}[ort]"/>
+					<description align="center" id="{$row}[PerId]" no_lang="1"/>
+					<description align="center" value="$row_cont[start_order]" id="{$row}[start_number]" no_lang="1"/>
 					<hbox align="center" options="0,0">
-						<description no_lang="1" readonly="true" id="{$row}[result]" class="$cont[ro_result]"/>
-						<textbox type="float" size="5" precision="%4.2lf" onchange="handle_plus(this,form::name('set[$row_cont[PerId]][result_plus]'));" id="set[$row_cont[PerId]][result_height]" class="$cont[rw_result]"/>
-						<menulist>
-							<menupopup class="$cont[rw_result] leftPad5" no_lang="1" id="set[$row_cont[PerId]][result_plus]"/>
+						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
+						<textbox type="float" id="set[$row_cont[PerId]][result_height]" onchange="handle_plus(this,form::name('set[$row_cont[PerId]][result_plus]'));" size="5" precision="%4.2lf" class="$cont[rw_result]"/>
+						<menulist class="$cont[rw_result] leftPad5">
+							<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1"/>
 						</menulist>
 					</hbox>
-					<description align="center" no_lang="1" id="{$row}[rank_prev_heat]" class="place"/>
-					<buttononly label="Update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_height]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_height]').value,'exec[nm][rows][set][$row_cont[PerId]][result_plus]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_plus]').value);" align="center" id="apply" statustext="Apply the changes of this athlete only" class="small $cont[rw_result]"/>
+					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
+					<buttononly align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_height]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_height]').value,'exec[nm][rows][set][$row_cont[PerId]][result_plus]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_plus]').value);" class="small $cont[rw_result]"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.result.index" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.measurement" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -134,45 +134,130 @@
 				<row class="noPrint">
 					<hbox options="0,0">
 						<menulist>
-							<menupopup class="rightPad5" onchange="1" no_lang="1" id="nm[calendar]" statustext="Select calendar"/>
+							<menupopup id="nm[topo]" onchange="load_topo(this.value);"/>
+						</menulist>
+						<menulist class="leftPad5">
+							<menupopup id="nm[PerId]" onchange="change_athlete(this);" options="Edit topo"/>
+						</menulist>
+						<textbox type="float" blur="height" id="result_height" onchange="handle_plus(this,form::name('result_plus'));" size="5" precision="%4.2lf" class="leftPad5"/>
+						<menulist class="leftPad5">
+							<menupopup id="result_plus"/>
+						</menulist>
+						<buttononly label="Update" id="button[update]" onclick="update_athlete();" class="leftPad5"/>
+						<buttononly label="Print" onclick="print_topo(); return false;" options="print" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row>
+					<box class="topoContainer">
+						<image src="transparent" options=",,,,topo"/>
+					</box>
+				</row>
+				<row>
+					<box id="hold_popup" class="action_popup">
+						<textbox type="float" label="Height" id="hold_height"/>
+						<hbox>
+							<buttononly label="Save" id="button[save]" onclick="hold_popup_submit(this);"/>
+							<buttononly label="Cancel" id="button[cancel]" onclick="hold_popup_close();"/>
+							<buttononly label="Delete" id="button[delete]" onclick="hold_popup_submit(this);"/>
+						</hbox>
+					</box>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			div.topoContainer {
+  position: relative;
+  overflow: auto;
+  height: 500px;
+}
+#topo {
+   width: 100%;
+   position: relative;
+   cursor: crosshair;
+}
+div.topoHandhold {
+   position: absolute;
+   cursor: pointer;
+}
+div.topoHandhold img {
+   position: relative;
+   top: -8px;
+   left: -8px;
+   z-index: 10;
+}
+div.topoHandhold span {
+   position: relative;
+   top: -12px;
+   left: -5px;
+   z-index: 20;
+}
+
+.action_popup {
+	position: fixed;
+	top: 300px;
+	left: 450px;
+	z-index: 20000;
+	display: none;
+	border: 2px ridge black;
+	border-radius: 10px;
+	box-shadow: 8px 8px 8px black;
+	padding: 5px;
+	background-color: white;
+}
+
+		</styles>
+	</template>
+	<template id="ranking.result.index" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row class="noPrint" disabled="@nm[cat]">
+					<hbox options="0,0">
+						<menulist class="rightPad5">
+							<menupopup statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
 						</menulist>
 						<menulist>
-							<menupopup onchange="1" no_lang="1" id="nm[comp]" options="Select competition"/>
+							<menupopup id="nm[comp]" no_lang="1" onchange="1" options="Select competition"/>
 						</menulist>
 					</hbox>
 				</row>
 				<row class="noPrint" disabled="!@nm[comp]">
 					<hbox no_lang="1" onchange="1" options="0,0">
-						<menulist>
-							<menupopup class="bold" no_lang="1" onchange="1" id="nm[cat]" options="Select category"/>
+						<menulist class="bold">
+							<menupopup id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
 						</menulist>
 						<hbox align="right" options="0,0">
 							<image src="ajax-loader" class="ajax-loader"/>
-							<description no_lang="1" id="msg" class="redItalic"/>
+							<description id="msg" no_lang="1" class="redItalic"/>
 						</hbox>
 					</hbox>
 				</row>
 				<row class="noPrint" disabled="@no_route_selection">
 					<hbox options="0,0">
-						<menulist span="all">
-							<menupopup class="header rightPad5" onchange="1" no_lang="1" id="nm[show_result]" statustext="Select type of list to show"/>
+						<menulist span="all" class="header rightPad5">
+							<menupopup statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
 						</menulist>
-						<menulist>
-							<menupopup class="header" onchange="1" no_lang="1" id="nm[route]" statustext="Select heat"/>
+						<menulist class="header">
+							<menupopup statustext="Select heat" id="nm[route]" no_lang="1" onchange="1"/>
 						</menulist>
-						<button label="Edit this heat" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" id="button[edit]" image="edit" class="leftPad5 noPrint"/>
-						<button label="Add a new heat" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" id="button[new]" image="new" class="leftPad5 noPrint"/>
+						<button label="Edit this heat" id="button[edit]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="edit" class="leftPad5 noPrint"/>
+						<button label="Add a new heat" id="button[new]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="new" class="leftPad5 noPrint"/>
 						<button label="Download" id="button[download]" image="filesave" class="leftPad5 noPrint"/>
-						<menulist>
-							<menupopup class="noPrint leftPad5" onchange="1" id="nm[ranking]" options="display no ranking"/>
+						<menulist class="noPrint leftPad5">
+							<menupopup id="nm[ranking]" onchange="1" options="display no ranking"/>
 						</menulist>
 					</hbox>
 				</row>
-				<row disabled="!@nm[route]">
-					<nextmatch span="all" id="nm" options="ranking.result.index.rows_lead"/>
+				<row disabled="@no_list">
+					<nextmatch id="nm" options="ranking.result.index.rows_lead" span="all"/>
 				</row>
-				<row class="noPrint" disabled="!@nm[route]">
-					<button label="Update" id="button[apply]" statustext="Apply the changes made"/>
+				<row class="noPrint" disabled="@no_list">
+					<button statustext="Apply the changes made" label="Update" id="button[apply]"/>
+				</row>
+				<row disabled="!@nm[show_result]=4">
+					<template id="ranking.result.measurement"/>
 				</row>
 			</rows>
 		</grid>

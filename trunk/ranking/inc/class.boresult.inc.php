@@ -70,6 +70,13 @@ class boresult extends boranking
 	 */
 	var $rock_bridge_log = '/tmp/rock_bridge.log';
 
+	/**
+	 * Instance of boresult, if instancated
+	 *
+	 * @var boresult
+	 */
+	public static $instance;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -96,6 +103,9 @@ class boresult extends boranking
 			'-1' => '-',
 			TOP_PLUS => lang('Top'),
 		);
+
+		// makeing the boresult object availible for other objects
+		self::$instance = $this;
 	}
 
 	/**
@@ -107,6 +117,28 @@ class boresult extends boranking
 	function boresult()
 	{
 		self::__construct();
+	}
+
+	/**
+	 * Convert athlete array to a string
+	 *
+	 * @param array $athlete array with values for 'vorname', 'nachname', 'nation' and optional 'start_order', 'start_number', 'result_rank', 'result'
+	 * @param boolean $show_result=true
+	 * @return string nachname, vorname (nation) prefixed with rank for start-number and postfixed with result
+	 */
+	public static function athlete2string(array $athlete, $show_result=true)
+	{
+		$str = $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')';
+
+		if ($show_result && $athlete['result_rank'])
+		{
+			$str = $athlete['result_rank'].'. '.$str.' '.str_replace('&nbsp;','',$athlete['result']);
+		}
+		elseif (!$show_result && $athlete['start_order'])
+		{
+			$str = $athlete['start_order'].' '.($athlete['start_number'] ? '('.$athlete['start_number'].') ' : '').$str;
+		}
+		return $str;
 	}
 
 	/**

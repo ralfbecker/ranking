@@ -45,9 +45,9 @@ class uiresult extends boresult
 		if (!($ok = $this->init_route($content,$comp,$cat,$discipline)))
 		{
 			$js = "alert('".addslashes(lang('Permission denied !!!'))."'); window.close();";
-			$GLOBALS['egw']->common->egw_header();
-			echo "<html><head><script>".$js."</script></head></html>\n";
-			$GLOBALS['egw']->common->egw_exit();
+			common::egw_header();
+			echo '<html><head><script type="text/javascript">'.$js."</script></head></html>\n";
+			common::egw_exit();
 		}
 		elseif(is_string($ok))
 		{
@@ -66,11 +66,19 @@ class uiresult extends boresult
 			}
 			$readonlys['button[save]'] = $readonlys['button[apply]'] = true;
 		}
-		elseif ($content['button'])
+		elseif ($content['button'] || $content['topos']['delete'])
 		{
-			list($button) = each($content['button']);
-			unset($content['button']);
-
+			if ($content['topos']['delete'])
+			{
+				list($topo) = each($content['topos']['delete']);
+				unset($content['topos']);
+				$button = 'delete_topo';
+			}
+			else
+			{
+				list($button) = each($content['button']);
+				unset($content['button']);
+			}
 			// reload the parent window
 			$param = array(
 				'menuaction' => 'ranking.uiresult.index',
@@ -110,7 +118,11 @@ class uiresult extends boresult
 						break;
 					}
 					$param['msg'] = $msg = lang('Heat saved');
-
+					if ($content['topo_upload'])
+					{
+						$msg .= "\n".ranking_measurement::save_topo($content, $content['topo_upload'], $topo_path) ?
+							lang('Topo uploaded as %1.', $topo_path) : lang('Error uploading topo!');
+					}
 					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
 
 					// if route is saved the first time, try getting a startlist (from registration or a previous heat)
@@ -231,6 +243,23 @@ class uiresult extends boresult
 					}
 					break;
 
+				case 'topo_upload':
+					if ($content['topo_upload'])
+					{
+						$msg .= ranking_measurement::save_topo($content, $content['topo_upload'], $topo_path) ?
+							lang('Topo uploaded as %1.', $topo_path) : lang('Error uploading topo!');
+					}
+					else
+					{
+						$msg .= lang('Error: no file to upload selected');
+					}
+					break;
+
+				case 'delete_topo':
+					$msg .= ranking_measurement::delete_topo($content, $topo) ?
+						lang('Topo deleted.') : lang('Permission denied!');
+					break;
+
 				case 'ranking':
 					$param['msg'] = $msg = $this->import_ranking($content,$comp['nation'] != 'NULL' ? $comp['nation'] : null);
 					break;
@@ -238,13 +267,13 @@ class uiresult extends boresult
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent
 			{
 				$js .= 'window.close();';
-				echo "<html><head><script>".$js."</script></head></html>\n";
-				$GLOBALS['egw']->common->egw_exit();
+				echo '<html><head><script type="text/javascript">'.$js."</script></head></html>\n";
+				common::egw_exit();
 			}
 		}
 		$content += array(
 			'msg' => $msg,
-			'js'  => $js ? "<script>$js</script>" : '',
+			'js'  => $js ? '<script type="text/javascript">'.$js."</script>" : '',
 		);
 		$readonlys['button[delete]'] = $content['new_route'] || $view;
 		$readonlys['route_type'] = !!$content['route_order'];	// can only be set in the first route/quali
@@ -256,6 +285,14 @@ class uiresult extends boresult
 			'discipline'  => $discipline,
 			'no_display'  => true,		// we enable it later, for some cases (judge and display-rights)
 		));
+		if ($this->is_judge($comp) || $this->is_admin)
+		{
+			$content['topos'] = ranking_measurement::get_topos($preserv);
+		}
+		else
+		{
+			$readonlys['tabs']['measure'] = true;	// measurement tab only for judges
+		}
 		if ($discipline != 'boulder')
 		{
 			$tmpl->disable_cells('route_num_problems');
@@ -402,7 +439,7 @@ class uiresult extends boresult
 		unset($query_in['return']);	// no need to save
 		$query = $query_in;
 		unset($query['rows']);		// no need to save, can not unset($query_in['rows']), as this is $rows !!!
-		$GLOBALS['egw']->session->appsession('result','ranking',$query);
+		egw_cache::setSession('ranking', 'result', $query);
 
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['GrpId'] = $query['cat'];
@@ -621,7 +658,7 @@ class uiresult extends boresult
 	 */
 	function ajax_set_athlets($comp,$cat,$team_id,$nation)
 	{
-		$response = new xajaxResponse();
+		$response = egw_json_response::get();
 		//$response->alert(__METHOD__."($comp,$cat,$team_id,'$nation')"); return $response->getXML();
 		$starters = $this->get_registered(array(
 			'WetId' => $comp,
@@ -680,7 +717,7 @@ class uiresult extends boresult
 		}
 		if (!is_array($content))
 		{
-			$content = array('nm' => $GLOBALS['egw']->session->appsession('result','ranking'));
+			$content = array('nm' => egw_cache::getSession('ranking', 'result', $query));
 			if (!is_array($content['nm']) || !$content['nm']['get_rows'])
 			{
 				if (!is_array($content['nm'])) $content['nm'] = array();
@@ -773,6 +810,10 @@ class uiresult extends boresult
 				$content['nm']['show_result'] = $this->has_results($keys) ? '1' : '0';
 			}
 			if (is_numeric($keys['route_order'])) $route = $this->route->read($keys);
+		}
+		elseif ($content['nm']['show_result'] == 4 && is_numeric($keys['route_order']))
+		{
+			// measurement
 		}
 		elseif ($comp && $cat && $keys['route_order'] >= 0 && !$this->has_startlist($keys))
 		{
@@ -924,6 +965,11 @@ class uiresult extends boresult
 			$keys['route_order'] = $content['nm']['route'] = '0';
 			if (!($route = $this->route->read($keys))) $keys['route_order'] = $content['nm']['route'] = '';
 		}
+		// add measurement for judges and admins, if on a regular lead route (not on general result)
+		if ($comp && ($this->is_judge($comp) || $this->is_admin) && $content['nm']['route'] != -1 && $content['nm']['discipline'] == 'lead')
+		{
+			$sel_options['show_result'][4] = lang('Measurement');
+		}
 		//_debug_array($sel_options);
 
 		// no startlist, no rights at all or result offical -->disable all update possebilities
@@ -931,7 +977,7 @@ class uiresult extends boresult
 			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 			$route['route_status'] == STATUS_RESULT_OFFICIAL ||
-			$content['nm']['route_order'] < 0 || $content['nm']['show_result'] > 1))
+			$content['nm']['route_order'] < 0 || $content['nm']['show_result'] > 1 && $content['nm']['show_result'] != 4))
 		{
 			$sel_options['result_plus'] = $this->plus;
 			$content['nm']['readonly'] = true;
@@ -975,13 +1021,20 @@ class uiresult extends boresult
 		{
 			$content['nm']['route'] = -2;
 		}
+		elseif ($content['nm']['show_result'] == 4)
+		{
+			// measurement code is in extra class
+			ranking_measurement::measurement($content, $sel_options, $readonlys);
+			// measurement need to store nm, as it does NOT call get_rows!
+			egw_cache::setSession('ranking', 'result', $content['nm']);
+		}
 		elseif ($content['nm']['show_result'] || $content['nm']['route'] < 0)
 		{
 			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -1 ? 2 : 3) : 1;
 		}
 		if ($content['nm']['route'] < 0)	// general result --> hide show_route selection
 		{
-			$sel_options['show_result'] = array(-1 => '');
+			$sel_options['show_result'] = array(2 => ' ');
 			$readonlys['nm[show_result]'] = true;
 		}
 		if ($content['nm']['discipline'] == 'speedrelay')
@@ -1010,6 +1063,8 @@ class uiresult extends boresult
 		{
 			$tmpl->disable_cells('nm[ranking]');	// dont show ranking in result of via sitemgr
 		}
+		// do we show the start- or result-list?
+		$content['no_list'] = (string)$content['nm']['route'] === '' || $content['nm']['show_result'] == 4;
 		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],$content['nm']['discipline']);
 		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_
 		$content['nm']['route_quota'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_quota'] : 0;
@@ -1017,10 +1072,6 @@ class uiresult extends boresult
 		// should we show the result offical footer?
 		$content['nm']['result_official'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL;
 
-		if (!is_object($GLOBALS['egw']->js))
-		{
-			$GLOBALS['egw']->js = new javascript();
-		}
 		$GLOBALS['egw']->js->validate_file('.','ranking','ranking',false);
 
 		// create a nice header
@@ -1075,7 +1126,7 @@ class uiresult extends boresult
 	function ajax_update($request_id,$name,$value)
 	{
 		//$start = microtime(true);
-		$response = new xajaxResponse();
+		$response = egw_json_response::get();
 
 		if (!($request =& etemplate_request::read($request_id)))
 		{
@@ -1220,7 +1271,6 @@ class uiresult extends boresult
 			}
 		}
 		//error_log("processing of ajax_update took ".sprintf('%4.2lf s',microtime(true)-$start));
-		return $response->getXML();
 	}
 
 	/**
@@ -1312,7 +1362,7 @@ class uiresult extends boresult
 	function ajax_time_measurement($request_id,$PerId)
 	{
 		//$start = microtime(true);
-		$response = new xajaxResponse();
+		$response = egw_json_response::get();
 
 		if (!($request =& etemplate_request::read($request_id)))
 		{
@@ -1521,7 +1571,7 @@ class uiresult extends boresult
 		return $this->_stop_time_measurement($response,lang('Time measured'));
 	}
 
-	function _update_ranks(array $keys,xajaxResponse &$response,etemplate_request &$request)
+	function _update_ranks(array $keys,egw_json_response $response,etemplate_request $request)
 	{
 		//error_log("content[order]=".$request->content['nm']['order'].", changes[order]=".$request->changes['nm']['order']);
 		$order = $request->changes['nm']['order'] ? $request->changes['nm']['order'] : $request->content['nm']['order'];

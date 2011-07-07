@@ -1,7 +1,156 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.route" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.result.route.general" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="280">
+			<columns>
+				<column width="116"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Status"/>
+					<hbox options="0,0" span="all">
+						<menulist>
+							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
+						</menulist>
+						<button statustext="Import the result into the ranking" label="Import into ranking" id="button[ranking]" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row class="row" disabled="@no_startlist">
+					<description value="Startlist"/>
+					<hbox options="0,0" span="all">
+						<button label="Generate Startlist" id="button[startlist]"/>
+						<menulist class="leftPad5">
+							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10"/>
+						</menulist>
+						<menulist class="leftPad5">
+							<menupopup statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order"/>
+						</menulist>
+					</hbox>
+				</row>
+				<row class="row" disabled="@route_order=-1">
+					<description value="Isolation" options="route_iso_open"/>
+					<hbox options="0,0" span="all">
+						<textbox blur="opens" id="route_iso_open" size="20" maxlength="40"/>
+						<textbox blur="closes" label="-" id="route_iso_close" size="20" maxlength="40"/>
+					</hbox>
+				</row>
+				<row class="row" disabled="@route_order=-1">
+					<description value="Start heat" options=",,,route_start"/>
+					<textbox blur="time" id="route_start" size="64" maxlength="64" span="all" class="inputFullWidth"/>
+					<description/>
+				</row>
+				<row class="row" disabled="@route_order=-1">
+					<description value="Observation time" options=",,,route_observation_time"/>
+					<hbox options="0,0" span="all">
+						<textbox id="route_observation_time" size="20" maxlength="40"/>
+						<textbox label="Climbing time" id="route_climbing_time" size="20" maxlength="40" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row class="row">
+					<description value="Quota" options=",,,route_quota"/>
+					<int id="route_quota"/>
+					<description/>
+				</row>
+				<row class="row">
+					<description value="Result official"/>
+					<textbox blur="time" id="route_result" size="64" maxlength="80" span="all" class="inputFullWidth"/>
+					<description/>
+				</row>
+				<row class="row">
+					<description value="Judge" options=",,,route_judge"/>
+					<textbox blur="name(s)" id="route_judge" size="64" maxlength="80" span="all" class="inputFullWidth"/>
+					<description/>
+				</row>
+				<row class="row" disabled="@no_upload">
+					<description value="Import file"/>
+					<hbox options="0,0" span="all">
+						<file id="file"/>
+						<button label="Upload" id="button[upload]" class="leftPad5"/>
+						<menulist class="leftPad5">
+							<menupopup id="upload_options" options="Options"/>
+						</menulist>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.route.comment" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="280">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row valign="top">
+					<textbox multiline="true" id="route_comments" rows="20" cols="95" span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.route.measure" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="280">
+			<columns>
+				<column width="120"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row" disabled="@no_display">
+					<description value="Display"/>
+					<hbox options="0,0" span="all">
+						<menulist>
+							<menupopup label="1. Display" id="dsp_id" onchange="1" options="None"/>
+						</menulist>
+						<menulist class="leftPad5">
+							<menupopup type="select-number" label="Line" id="frm_line" options=",1,$cont[max_line]"/>
+						</menulist>
+						<menulist class="leftPad5">
+							<menupopup label="2. Display" id="dsp_id2" onchange="1" options="None"/>
+						</menulist>
+						<menulist class="leftPad5">
+							<menupopup type="select-number" label="Line" id="frm_line2" options=",1,$cont[max_line2]"/>
+						</menulist>
+					</hbox>
+				</row>
+				<row class="row" disabled="!@discipline=speed">
+					<description value="Time measurement"/>
+					<hbox options="0,0" span="all">
+						<textbox blur="Host" statustext="Hostname or IP the Timy control program is running, eg. localhost" id="route_time_host"/>
+						<int blur="Port" id="route_time_port" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row class="row" disabled="@no_upload">
+					<description value="Upload topo" options=",,,topo_upload"/>
+					<hbox options="0,0">
+						<file id="topo_upload"/>
+						<button label="Upload" id="button[topo_upload]" class="leftPad5"/>
+					</hbox>
+					<description/>
+				</row>
+				<row valign="top" height="180">
+					<grid width="100%" id="topos">
+						<columns>
+							<column/>
+							<column/>
+							<column/>
+							<column width="16"/>
+						</columns>
+						<rows>
+							<row class="row" disabled="!@0">
+								<vfs-mime id="$row"/>
+								<vfs id="$row" readonly="true"/>
+								<vfs-size id="$row"/>
+								<button label="Delete" id="delete[$row_cont]" onclick="return confirm('Delete this topo');" image="delete"/>
+							</row>
+						</rows>
+					</grid>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.route" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column width="120"/>
@@ -10,14 +159,14 @@
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description span="all" class="redItalic" align="center" id="msg" no_lang="1"/>
+					<description align="center" id="msg" no_lang="1" span="all" class="redItalic"/>
 					<description/>
 					<description/>
 				</row>
 				<row class="th" height="28">
 					<description value="Competition"/>
 					<menulist span="all">
-						<menupopup id="WetId" onchange="1" no_lang="1" readonly="true"/>
+						<menupopup id="WetId" no_lang="1" onchange="1" readonly="true"/>
 					</menulist>
 				</row>
 				<row class="row">
@@ -25,12 +174,12 @@
 					<menulist>
 						<menupopup id="GrpId" no_lang="1" readonly="true"/>
 					</menulist>
-					<hbox onchange="1" options="0,0" align="right">
+					<hbox align="right" onchange="1" options="0,0">
 						<menulist>
 							<menupopup id="discipline" readonly="true"/>
 						</menulist>
 						<menulist class="leftPad5">
-							<menupopup type="select-number" options=",3,8,1" id="route_num_problems" statustext="Number of problems"/>
+							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,8,1"/>
 						</menulist>
 					</hbox>
 				</row>
@@ -40,115 +189,36 @@
 						<menupopup id="route_order" no_lang="1" readonly="true"/>
 					</menulist>
 					<menulist class="noWrap">
-						<menupopup id="route_type" align="right" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;"/>
+						<menupopup align="right" id="route_type" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;"/>
 					</menulist>
 				</row>
 				<row class="th">
 					<description value="Name"/>
-					<textbox id="route_name" size="64" maxlength="80" span="all" class="inputFullWidth" needed="1" statustext="Qualification, 1/2-Final, ..."/>
+					<textbox statustext="Qualification, 1/2-Final, ..." id="route_name" needed="1" size="64" maxlength="80" span="all" class="inputFullWidth"/>
 					<description/>
 				</row>
-				<row class="row">
-					<description value="Status"/>
-					<hbox span="all" options="0,0">
-						<menulist>
-							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
-						</menulist>
-						<button id="button[ranking]" label="Import into ranking" statustext="Import the result into the ranking" class="leftPad5"/>
-					</hbox>
-				</row>
-				<row class="row" disabled="@no_startlist">
-					<description value="Startlist"/>
-					<hbox span="all" options="0,0">
-						<button id="button[startlist]" label="Generate Startlist"/>
-						<menulist class="leftPad5">
-							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10"/>
-						</menulist>
-						<menulist class="leftPad5">
-							<menupopup id="slist_order" statustext="Select order for qualification startlist or use default" options="Use default order"/>
-						</menulist>
-					</hbox>
-				</row>
-				<row class="row" disabled="@route_order=-1">
-					<description options="route_iso_open" value="Isolation"/>
-					<hbox options="0,0" span="all">
-						<textbox id="route_iso_open" size="20" maxlength="40" blur="opens"/>
-						<textbox id="route_iso_close" size="20" maxlength="40" label="-" blur="closes"/>
-					</hbox>
-				</row>
-				<row class="row" disabled="@route_order=-1">
-					<description options=",,,route_start" value="Start heat"/>
-					<textbox size="64" maxlength="64" id="route_start" blur="time" span="all" class="inputFullWidth"/>
-					<description/>
-				</row>
-				<row class="row" disabled="@route_order=-1">
-					<description value="Observation time" options=",,,route_observation_time"/>
-					<hbox options="0,0" span="all">
-						<textbox size="20" maxlength="40" id="route_observation_time"/>
-						<textbox id="route_climbing_time" size="20" maxlength="40" class="leftPad5" label="Climbing time"/>
-					</hbox>
-				</row>
-				<row class="row">
-					<description options=",,,route_quota" value="Quota"/>
-					<int id="route_quota"/>
-					<description/>
-				</row>
-				<row class="row">
-					<description value="Result official"/>
-					<textbox size="64" maxlength="80" id="route_result" blur="time" span="all" class="inputFullWidth"/>
-					<description/>
-				</row>
-				<row class="row">
-					<description options=",,,route_judge" value="Judge"/>
-					<textbox size="64" maxlength="80" id="route_judge" blur="name(s)" span="all" class="inputFullWidth"/>
-					<description/>
-				</row>
-				<row class="row" valign="top">
-					<description options=",,,route_comments" value="Comments"/>
-					<textbox multiline="true" rows="4" cols="52" id="route_comments" span="all"/>
-				</row>
-				<row class="row" disabled="@no_upload">
-					<description value="Import file"/>
-					<hbox options="0,0" span="all">
-						<file id="file"/>
-						<button id="button[upload]" label="Upload" class="leftPad5"/>
-						<menulist class="leftPad5">
-							<menupopup id="upload_options" options="Options"/>
-						</menulist>
-					</hbox>
-				</row>
-				<row class="row" disabled="@no_display">
-					<description value="Display"/>
-					<hbox options="0,0" span="all">
-						<menulist>
-							<menupopup options="None" id="dsp_id" onchange="1" label="1. Display"/>
-						</menulist>
-						<menulist class="leftPad5">
-							<menupopup type="select-number" id="frm_line" options=",1,$cont[max_line]" label="Line"/>
-						</menulist>
-						<menulist class="leftPad5">
-							<menupopup options="None" id="dsp_id2" onchange="1" label="2. Display"/>
-						</menulist>
-						<menulist class="leftPad5">
-							<menupopup type="select-number" id="frm_line2" options=",1,$cont[max_line2]" label="Line"/>
-						</menulist>
-					</hbox>
-				</row>
-				<row class="row" disabled="!@discipline=speed">
-					<description value="Time measurement"/>
-					<hbox options="0,0" span="all">
-						<textbox id="route_time_host" blur="Host" statustext="Hostname or IP the Timy control program is running, eg. localhost"/>
-						<int id="route_time_port" class="leftPad5" blur="Port"/>
-					</hbox>
+				<row>
+					<tabbox id="tabs" span="all">
+						<tabs>
+							<tab label="General" statustext=""/>
+							<tab label="Comment" statustext=""/>
+							<tab label="Measurement" statustext=""/>
+						</tabs>
+						<tabpanels>
+							<template id="ranking.result.route.general"/>
+							<template id="ranking.result.route.comment"/>
+							<template id="ranking.result.route.measure"/>
+						</tabpanels>
+					</tabbox>
 				</row>
 				<row>
 					<hbox span="2">
-						<button label="Save" id="button[save]" statustext="Saves the changes made"/>
-						<button id="button[apply]" label="Apply" statustext="Apply the changes made"/>
-						<button id="button[cancel]" label="Cancel" statustext="Cannel without saving" onclick="window.close();"/>
+						<button statustext="Saves the changes made" label="Save" id="button[save]"/>
+						<button statustext="Apply the changes made" label="Apply" id="button[apply]"/>
+						<button statustext="Cannel without saving" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 						<html id="js"/>
 					</hbox>
-					<button id="button[delete]" label="Delete" align="right" statustext="Delete this heat including all results" onclick="return confirm('Delete this heat including all results');"/>
+					<button align="right" statustext="Delete this heat including all results" label="Delete" id="button[delete]" onclick="return confirm('Delete this heat including all results');"/>
 				</row>
 			</rows>
 		</grid>

@@ -1322,3 +1322,42 @@ function ranking_upgrade1_9_001()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.002';
 }
 
+/**
+ * Table for handholds of graphical measurement
+CREATE TABLE `RouteHolds` (
+`hold_id`                INTEGER NOT NULL AUTO_INCREMENT,
+`WetId`                  INTEGER NOT NULL,
+`GrpId`                  INTEGER NOT NULL,
+`route_order`            SMALLINT NOT NULL,
+`hold_topo`              SMALLINT NOT NULL,
+`hold_xpercent`          INTEGER NOT NULL,
+`hold_ypercent`          INTEGER NOT NULL,
+`hold_height`            INTEGER,
+`hold_type`              SMALLINT NOT NULL DEFAULT 0,
+                 PRIMARY KEY (`hold_id`)
+)CHARACTER SET utf8
+ALTER TABLE `RouteHolds` ADD  INDEX `RouteHolds_WetId_GrpId_route_order_hold_topo`  (`WetId`, `GrpId`, `route_order`, `hold_topo`)
+ */
+function ranking_upgrade1_9_002()
+{
+	$GLOBALS['egw_setup']->oProc->CreateTable('RouteHolds',array(
+		'fd' => array(
+			'hold_id' => array('type' => 'auto','nullable' => False),
+			'WetId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'GrpId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'route_order' => array('type' => 'int','precision' => '2','nullable' => False),
+			'hold_topo' => array('type' => 'int','precision' => '2','nullable' => False),
+			'hold_xpercent' => array('type' => 'int','precision' => '4','nullable' => False),
+			'hold_ypercent' => array('type' => 'int','precision' => '4','nullable' => False),
+			'hold_height' => array('type' => 'int','precision' => '4'),
+			'hold_type' => array('type' => 'int','precision' => '2','nullable' => False,'default' => '0')
+		),
+		'pk' => array('hold_id'),
+		'fk' => array(),
+		'ix' => array(array('WetId','GrpId','route_order','hold_topo')),
+		'uc' => array()
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.003';
+}
+

@@ -135,6 +135,12 @@ class route_result extends so_sql
 		//echo "<p>".__METHOD__."(crit=".print_r($criteria,true).",only_keys=".print_r($only_keys,true).",order_by=$order_by,extra_cols=".print_r($extra_cols,true).",$wildcard,$empty,$op,$start,filter=".print_r($filter,true).",join=$join)</p>\n";
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 
+		// avoid PerId is ambigous SQL error
+		if (is_array($criteria) && isset($criteria[$this->id_col]))
+		{
+			$criteria[$this->table_name.'.'.$this->id_col] = $criteria[$this->id_col];
+			unset($criteria[$this->id_col]);
+		}
 		if (is_array($filter) && array_key_exists('route_type',$filter))	// pseudo-filter to transport the route_type
 		{
 			$route_type = $filter['route_type'];
