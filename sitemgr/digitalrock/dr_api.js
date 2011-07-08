@@ -1,5 +1,7 @@
 /**
  * digital ROCK jQuery based Javascript API
+ * 
+ * We only use jQuery() here (not $() or $j()!) to be able to run as well inside EGroupware as with stock jQuery from googleapis.
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
@@ -150,7 +152,7 @@ function Startlist(_container,_json_url,_columns,_sort)
 	// Variables needed for scrolling in upDown
 	// scroll speed
 	this.scroll_by=1;
-	// sleep on the borders for $sleep_for seconds
+	// sleep on the borders for sleep_for seconds
 	this.sleep_for = 4;
     // margin in which to reverse scrolling
     // CAUTION: At the beginning, we scroll pixelwise through the margin, one pixel each sleep_for seconds. Do not change the margin unless you know what you do.
@@ -176,7 +178,7 @@ function Startlist(_container,_json_url,_columns,_sort)
  */
 Startlist.prototype.update = function()
 {
-	$.ajax({
+	jQuery.ajax({
 		url: this.json_url,
 		async: true,
 		context: this,
@@ -217,7 +219,7 @@ Startlist.prototype.handleResponse = function(_data)
 		delete this.result_cols;
 		this.sort = 'result_rank';
 		// remove whole table
-		$(this.container).empty();
+		jQuery(this.container).empty();
 		delete this.table;
 	}
 	if (typeof this.table == 'undefined')
@@ -244,14 +246,14 @@ Startlist.prototype.handleResponse = function(_data)
 		}
 		
 		// header line
-		this.header = $(document.createElement('h1'));
-		$(this.container).append(this.header);
+		this.header = jQuery(document.createElement('h1'));
+		jQuery(this.container).append(this.header);
 		this.header.className = 'listHeader';
 		
 		// create new table
 		this.table = new Table(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
 	
-		$(this.container).append(this.table.dom);
+		jQuery(this.container).append(this.table.dom);
 	}
 	else
 	{
@@ -261,6 +263,7 @@ Startlist.prototype.handleResponse = function(_data)
 	// set/update header line
 	this.setHeader(_data);
 
+	// if route is NOT offical, update list every 10 sec
 	if (!_data.route_result) 
 	{
 		var list = this;
@@ -317,13 +320,13 @@ function Table(_data,_columns,_sort,_ascending,_quota)
 	// header
 	this.dom = document.createElement('table');
 	var thead = document.createElement('thead');
-	$(this.dom).append(thead);
+	jQuery(this.dom).append(thead);
 	var row = this.createRow(this.columns,'th');
-	$(thead).append(row);
+	jQuery(thead).append(row);
 	
 	// athlets
 	var tbody = document.createElement('tbody');
-	$(this.dom).append(tbody);
+	jQuery(this.dom).append(tbody);
 	for(i in this.data)
 	{
 		if (this.sort == 'result_rank' && 
@@ -332,7 +335,7 @@ function Table(_data,_columns,_sort,_ascending,_quota)
 			break;	// no more ranked competitiors
 		}
 		var row = this.createRow(this.data[i]);
-		$(tbody).append(row);
+		jQuery(tbody).append(row);
 	}
 	//console.log(this.athletes);
 }
@@ -372,9 +375,9 @@ Table.prototype.update = function(_data,_quota)
 		// search athlete in tbody
 		if (typeof row != 'undefined')
 		{
-//			$(row).detach();
+//			jQuery(row).detach();
 //			this.updateRow(row,data);
-			$(row).remove();
+			jQuery(row).remove();
 		}
 //		else
 		{
@@ -383,18 +386,18 @@ Table.prototype.update = function(_data,_quota)
 		// no child in tbody --> append row
 		if (typeof pos == 'undefined')
 		{
-			$(tbody).prepend(row);
+			jQuery(tbody).prepend(row);
 		}
 		else
 		{
-			$(pos).after(row);
+			jQuery(pos).after(row);
 		}
 		pos = row;
 	}
 	// remove further rows / athletes not in this.data
 	if (typeof pos != 'undefined' && typeof pos.nextSibling != 'undefined')
 	{
-		$('#'+pos.id+' ~ tr').remove();
+		jQuery('#'+pos.id+' ~ tr').remove();
 	}
 };
 
@@ -446,7 +449,7 @@ Table.prototype.createRow = function(_data,_tag)
 
 		var tag = document.createElement(_tag);
 		tag.className = col;
-		$(row).append(tag);
+		jQuery(row).append(tag);
 		
 		// add pstambl link to name & vorname
 		if (typeof url != 'undefined' && (col == 'lastname' || col == 'firstname'))
@@ -454,17 +457,17 @@ Table.prototype.createRow = function(_data,_tag)
 			var a = document.createElement('a');
 			a.href = url;
 			a.target = 'pstambl';
-			$(tag).append(a);
+			jQuery(tag).append(a);
 			tag = a;
 		}
 		if (typeof col_data == 'object' && col_data)
 		{
 			if (col_data['colspan'] > 1) tag.colSpan = span = col_data['colspan'];
-			$(tag).text(col_data['label']);
+			jQuery(tag).text(col_data['label']);
 		}
 		else
 		{
-			$(tag).text(col_data ? col_data : '');
+			jQuery(tag).text(col_data ? col_data : '');
 			span = 1;
 		}
 	}
