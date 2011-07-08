@@ -421,13 +421,14 @@ $j(document).ready(function(){
 	 * Get all uploaded topos of a given route
 	 *
 	 * @param array $route values for keys 'WetId', 'GrpId', 'route_order'
+	 * @param boolean $check_perms=true check if user has necessary permissions to upload/delete topo - is a judge or admin
 	 * @param array &$comp=null on return competition array
 	 * @param array &$cat=null on return category array
 	 * @return array of vfs pathes
 	 */
-	public static function get_topos(array $route, &$comp=null, &$cat=null)
+	public static function get_topos(array $route, $check_perms=true, &$comp=null, &$cat=null)
 	{
-		$topos = egw_vfs::find(self::get_topo_dir($route,false, true, $comp, $cat),$p=array(
+		$topos = egw_vfs::find(self::get_topo_dir($route,false, $check_perms, $comp, $cat),$p=array(
 			'maxdepth' => 1,
 			'name' => $route['route_order'].'?_*',
 			'mime' => 'image',

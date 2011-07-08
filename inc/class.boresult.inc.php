@@ -123,18 +123,18 @@ class boresult extends boranking
 	 * Convert athlete array to a string
 	 *
 	 * @param array $athlete array with values for 'vorname', 'nachname', 'nation' and optional 'start_order', 'start_number', 'result_rank', 'result'
-	 * @param boolean $show_result=true
+	 * @param boolean|string $show_result=true false: startnumber, null: only name, true: rank&result, 'rank': just rank
 	 * @return string nachname, vorname (nation) prefixed with rank for start-number and postfixed with result
 	 */
 	public static function athlete2string(array $athlete, $show_result=true)
 	{
-		$str = $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')';
+		$str = strtoupper($athlete['nachname']).' '.$athlete['vorname'].' '.$athlete['nation'];
 
 		if ($show_result && $athlete['result_rank'])
 		{
-			$str = $athlete['result_rank'].'. '.$str.' '.str_replace('&nbsp;','',$athlete['result']);
+			$str = $athlete['result_rank'].'. '.$str.($show_result !== 'rank' ? ' '.str_replace('&nbsp;','',$athlete['result']) : '');
 		}
-		elseif (!$show_result && $athlete['start_order'])
+		elseif ($show_result == false && $athlete['start_order'])
 		{
 			$str = $athlete['start_order'].' '.($athlete['start_number'] ? '('.$athlete['start_number'].') ' : '').$str;
 		}
