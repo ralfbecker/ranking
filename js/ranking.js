@@ -22,7 +22,7 @@ function handle_plus(height,plus_sel_id)
 	{
 		var plus = height.value.replace(/(.*)(t|top|\+|\-)$/i,'$2');
 
-		document.getElementById(plus_sel_id).value = plus == '+' ? 1 : (plus == '-' ? -1 : 9999);
+		document.getElementById(plus_sel_id).value = plus == '+' ? 1 : (plus == '-' ? -1 : TOP_PLUS);
 		height.value = height.value.replace(/(.*)(t|top|\+|\-)$/i,'$1');
 	}
 }
@@ -142,6 +142,13 @@ function start_time_measurement(button,athlete)
 }
 
 /**
+ * LEAD measurement
+ */
+
+var TOP_HEIGHT = 999;	// everything >= TOP_HEIGHT means top (server defines it as 99999999 for DB!)
+var TOP_PLUS = 9999;	// option-value of 'Top' in plus selectbox
+
+/**
  * Change athlete, onchange for ahtlete selection
  * 
  * @param selectbox
@@ -151,7 +158,7 @@ function change_athlete(selectbox)
 	if (selectbox.value)
 	{
 		unmark_holds();
-		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete',selectbox.form.etemplate_exec_id.value, selectbox.value);
+		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value);
 	}
 	else
 	{
@@ -171,23 +178,24 @@ function update_athlete(scroll_mark)
 	
 	if (PerId)
 	{
-		var height,plus = document.getElementById('exec[result_plus]').value;
-		if (plus == 9999)
+		var height = document.getElementById('exec[result_height]');
+		var plus   = document.getElementById('exec[result_plus]');
+		// top?
+		if (plus.value == TOP_PLUS || height.value >= TOP_HEIGHT)
 		{
-			height = document.getElementById('exec[result_height]').value = '';
+			height.value = '';
+			plus.value   = TOP_PLUS;
 		}
-		else
-		{
-			height = document.getElementById('exec[result_height]').value;
-			
-			if (typeof scroll_mark == 'undefined' || scroll_mark)
-			{	 
-				var holds = getHoldsByHeight(height);
+		if (typeof scroll_mark == 'undefined' || scroll_mark)
+		{	 
+			var holds = getHoldsByHeight(plus.value == TOP_PLUS ? TOP_HEIGHT : height.value);
+			if (holds.length)
+			{
 				holds[0].scrollIntoView(false);
 				mark_holds(holds);
 			}
 		}
-		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, height, plus);				
+		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, height.value, plus.value);				
 	}
 }
 
@@ -242,9 +250,18 @@ function topo_clicked(e)
 	var topo = e.target;
 	//console.log(topo);
 	
-	$j('#msg').text('topo_clicked() x='+e.offsetX+'/'+topo.width+', y='+e.offsetY+'/'+topo.height);
-	//add_handhold({'xpercent':100.0*e.offsetX/topo.width, 'ypercent': 100.0*e.offsetY/topo.height, 'height': 'Test'});
-	xajax_doXMLHTTP('ranking_measurement::ajax_save_hold',{'xpercent':100.0*e.offsetX/topo.width, 'ypercent': 100.0*e.offsetY/topo.height});
+	var PerId = document.getElementById('exec[nm][PerId]').value;
+	
+	if (!PerId)
+	{
+		//$j('#msg').text('topo_clicked() x='+e.offsetX+'/'+topo.width+', y='+e.offsetY+'/'+topo.height);
+		//add_handhold({'xpercent':100.0*e.offsetX/topo.width, 'ypercent': 100.0*e.offsetY/topo.height, 'height': 'Test'});
+		xajax_doXMLHTTP('ranking_measurement::ajax_save_hold',{'xpercent':100.0*e.offsetX/topo.width, 'ypercent': 100.0*e.offsetY/topo.height});
+	}
+	else
+	{
+		// measurement mode
+	}
 }
 
 var activ_hold;
@@ -266,9 +283,14 @@ function hold_clicked(e)
 	if (!PerId)	// edit topo mode
 	{
 		var popup = document.getElementById('exec[hold_popup]');
+		var height = document.getElementById('exec[hold_height]');
+		var top = document.getElementById('exec[hold_top]');
 		
 		popup.style.display = 'block';
-		document.getElementById('exec[hold_height]').value = active_hold.data('hold').height;
+		if (!(height.disabled = top.checked = active_hold.data('hold').height == TOP_HEIGHT))
+		{
+			height.value = active_hold.data('hold').height;
+		}
 	}
 	else	// measuring an athlete
 	{
@@ -298,7 +320,8 @@ function hold_popup_submit(button)
 {
 	if (button.name == 'exec[button][save]')
 	{
-		active_hold.data('hold').height = document.getElementById('exec[hold_height]').value;
+		active_hold.data('hold').height = document.getElementById('exec[hold_top]').checked ?
+			TOP_HEIGHT : document.getElementById('exec[hold_height]').value;
 		xajax_doXMLHTTP('ranking_measurement::ajax_save_hold',active_hold.data('hold'));
 	}
 	else
@@ -324,12 +347,12 @@ function add_handhold(hold)
 	container.className = 'topoHandhold';
 	container.style.left = hold.xpercent+'%';
 	container.style.top = (y_ratio*hold.ypercent)+'%';
-	container.title = hold.height;
+	container.title = hold.height >= TOP_HEIGHT ? 'Top' : hold.height;
 	var img = document.createElement('img');
-	img.src = window.egw_webserverUrl+'/phpgwapi/templates/default/images/timesheet.png';
+	img.src = window.egw_webserverUrl+'/ranking/templates/default/images/griff32.png';
 	$j(container).append(img);
 	var span = document.createElement('span');
-	$j(span).text(hold.height);
+	$j(span).text(hold.height >= TOP_HEIGHT ? 'Top' : hold.height);
 	$j(container).append(span);
 	$j(container).data('hold',hold);
 	$j(container).click(hold_clicked);
@@ -405,10 +428,13 @@ $j(document).ready(function(){
 	$j('#topo').click(topo_clicked);
 
 	// mark current athlets height, require timeout as for some reason DOM is not yet ready
-	var height = document.getElementById('exec[result_height]');
-	if (height && height.value) window.setTimeout(function() {
-		var holds = getHoldsByHeight(height.value);
-		holds[0].scrollIntoView(false);
-		mark_holds(holds);
+	var height = parseFloat(document.getElementById('exec[result_height]').value);
+	var plus = document.getElementById('exec[result_plus]').value;
+	window.setTimeout(function() {
+		var holds = getHoldsByHeight(plus == TOP_PLUS ? TOP_HEIGHT : (height ? height : 1));
+		if (holds.length) {
+			holds[0].scrollIntoView(false);
+			if (height || plus == TOP_PLUS) mark_holds(holds);
+		}
 	},300);
 });

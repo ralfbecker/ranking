@@ -154,7 +154,10 @@
 				</row>
 				<row>
 					<box id="hold_popup" class="action_popup">
-						<textbox type="float" label="Height" id="hold_height"/>
+						<hbox>
+							<textbox type="float" label="Height" id="hold_height"/>
+							<checkbox label="Top" id="hold_top" onchange="var height=document.getElementById(form::name('hold_height')); if (this.checked) height.value=''; height.disabled = this.checked;  if (!this.checked) height.focus();"/>
+						</hbox>
 						<hbox>
 							<buttononly label="Save" id="button[save]" onclick="hold_popup_submit(this);"/>
 							<buttononly label="Cancel" id="button[cancel]" onclick="hold_popup_close();"/>
@@ -184,6 +187,7 @@ div.topoHandhold img {
    top: -8px;
    left: -8px;
    z-index: 10;
+   width: 16px;
 }
 div.topoHandhold span {
    position: relative;
