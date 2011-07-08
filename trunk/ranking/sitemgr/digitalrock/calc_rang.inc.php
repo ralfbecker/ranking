@@ -44,6 +44,10 @@ function calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret
 
 	$cache_file = $GLOBALS['cache_dir'].'/'.implode('-',$cache_keys).'.php';
 
+	if ($GLOBALS['cache_time'] && !file_exists($GLOBALS['cache_dir']))
+	{
+		mkdir($GLOBALS['cache_dir']);
+	}
 	if ($GLOBALS['cache_time'] && file_exists($cache_file) && filesize($cache_file))
 	{
 		if(time()-filemtime($cache_file) < $GLOBALS['cache_time'] && include($cache_file))
