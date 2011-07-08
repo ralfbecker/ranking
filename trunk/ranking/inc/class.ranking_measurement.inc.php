@@ -113,6 +113,13 @@ $j(document).ready(function(){
 		{
 			$msg = lang('Nothing to update');
 		}
+		// update current participant
+		boresult::$instance->route->update($keys+array(
+			'current_1' => $PerId,
+			'route_modified' => time(),
+			'route_modifier' => $GLOBALS['egw_info']['user']['account_id'],
+		),false);
+
 		if (boresult::$instance->error)
 		{
 			foreach($this->error as $id => $data)
@@ -143,7 +150,7 @@ $j(document).ready(function(){
 	 * @param string $request_id eTemplate request id
 	 * @param int $PerId
 	 */
-	public static function ajax_load_athlete($request_id, $PerId)
+	public static function ajax_load_athlete($PerId)
 	{
 		$query =& self::get_check_session();
 
@@ -160,15 +167,11 @@ $j(document).ready(function(){
 			$response->assign('exec[result_height]', 'value', $data['result_height'] && $data['result_plus'] != TOP_PLUS ? $data['result_height'] : '');
 			$response->assign('exec[result_plus]', 'value', (int)$data['result_plus']);
 
-			if ($data['result_plus'] == TOP_PLUS)
-			{
-				// todo scroll to top
-				//$response->alert('Top');
-			}
-			else
-			{
-				$response->script('var holds=getHoldsByHeight('.($data['result_height'] ? $data['result_height'] : 1).'); holds[0].scrollIntoView(false); mark_holds(holds);');
-			}
+			$response->script($s='var holds=getHoldsByHeight('.
+				($data['result_plus'] == TOP_PLUS ? 999 : ($data['result_height'] ? $data['result_height'] : 1))
+				.'); if (holds.length) { holds[0].scrollIntoView(false);'.
+				($data['result_height'] || $data['result_plus'] == TOP_PLUS ? 'mark_holds(holds);' : '').'}');
+
 			$query['PerId'] = $PerId;
 
 			$response->jquery('#msg', 'text', array(boresult::athlete2string($data)));
@@ -381,11 +384,13 @@ $j(document).ready(function(){
 	 * @param array $route
 	 * @param boolean $create=true true create directory, if it does not exist
 	 * @param boolean $check_perms=true check if user has necessary permissions to upload/delete topo - is a judge or admin
+	 * @param array &$comp=null on return competition array
+	 * @param array &$cat=null on return category array
 	 * @throws egw_exception_wrong_userinput
 	 * @throws egw_exception_wrong_parameter
 	 * @return string vfs directory name
 	 */
-	public static function get_topo_dir(array $route, $create=true, $check_perms=true)
+	public static function get_topo_dir(array $route, $create=true, $check_perms=true, &$comp=null, &$cat=null)
 	{
 		$dir = boresult::$instance->config['vfs_pdf_dir'];
 		if ($dir[0] != '/' || !egw_vfs::file_exists($dir) || !egw_vfs::is_dir($dir))
@@ -400,11 +405,11 @@ $j(document).ready(function(){
 		{
 			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
 		}
-		if (!($grp = boresult::$instance->cats->read($route['GrpId'])))
+		if (!($cat = boresult::$instance->cats->read($route['GrpId'])))
 		{
 			throw new egw_exception_wrong_parameter("Category $route[GrpId] NOT found!");
 		}
-		$dir .= '/'.(int)$comp['datum'].'/'.$comp['rkey'].'/'.$grp['rkey'];
+		$dir .= '/'.(int)$comp['datum'].'/'.$comp['rkey'].'/'.$cat['rkey'];
 		if (!egw_vfs::file_exists($dir) && !egw_vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
 		{
 			throw new egw_exception_wrong_userinput(lang('Can NOT create topo directory %1!',$dir));
@@ -416,11 +421,13 @@ $j(document).ready(function(){
 	 * Get all uploaded topos of a given route
 	 *
 	 * @param array $route values for keys 'WetId', 'GrpId', 'route_order'
+	 * @param array &$comp=null on return competition array
+	 * @param array &$cat=null on return category array
 	 * @return array of vfs pathes
 	 */
-	public static function get_topos(array $route)
+	public static function get_topos(array $route, &$comp=null, &$cat=null)
 	{
-		$topos = egw_vfs::find(self::get_topo_dir($route,false),$p=array(
+		$topos = egw_vfs::find(self::get_topo_dir($route,false, true, $comp, $cat),$p=array(
 			'maxdepth' => 1,
 			'name' => $route['route_order'].'?_*',
 			'mime' => 'image',
