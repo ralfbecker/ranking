@@ -176,7 +176,7 @@ function Startlist(_container,_json_url,_columns,_sort)
  */
 Startlist.prototype.update = function()
 {
-	$j.ajax({
+	$.ajax({
 		url: this.json_url,
 		async: true,
 		context: this,
@@ -217,7 +217,7 @@ Startlist.prototype.handleResponse = function(_data)
 		delete this.result_cols;
 		this.sort = 'result_rank';
 		// remove whole table
-		$j(this.container).empty();
+		$(this.container).empty();
 		delete this.table;
 	}
 	if (typeof this.table == 'undefined')
@@ -244,14 +244,14 @@ Startlist.prototype.handleResponse = function(_data)
 		}
 		
 		// header line
-		this.header = $j(document.createElement('h1'));
-		$j(this.container).append(this.header);
+		this.header = $(document.createElement('h1'));
+		$(this.container).append(this.header);
 		this.header.className = 'listHeader';
 		
 		// create new table
 		this.table = new Table(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
 	
-		$j(this.container).append(this.table.dom);
+		$(this.container).append(this.table.dom);
 	}
 	else
 	{
@@ -317,13 +317,13 @@ function Table(_data,_columns,_sort,_ascending,_quota)
 	// header
 	this.dom = document.createElement('table');
 	var thead = document.createElement('thead');
-	$j(this.dom).append(thead);
+	$(this.dom).append(thead);
 	var row = this.createRow(this.columns,'th');
-	$j(thead).append(row);
+	$(thead).append(row);
 	
 	// athlets
 	var tbody = document.createElement('tbody');
-	$j(this.dom).append(tbody);
+	$(this.dom).append(tbody);
 	for(i in this.data)
 	{
 		if (this.sort == 'result_rank' && 
@@ -332,7 +332,7 @@ function Table(_data,_columns,_sort,_ascending,_quota)
 			break;	// no more ranked competitiors
 		}
 		var row = this.createRow(this.data[i]);
-		$j(tbody).append(row);
+		$(tbody).append(row);
 	}
 	//console.log(this.athletes);
 }
@@ -372,9 +372,9 @@ Table.prototype.update = function(_data,_quota)
 		// search athlete in tbody
 		if (typeof row != 'undefined')
 		{
-//			$j(row).detach();
+//			$(row).detach();
 //			this.updateRow(row,data);
-			$j(row).remove();
+			$(row).remove();
 		}
 //		else
 		{
@@ -383,18 +383,18 @@ Table.prototype.update = function(_data,_quota)
 		// no child in tbody --> append row
 		if (typeof pos == 'undefined')
 		{
-			$j(tbody).prepend(row);
+			$(tbody).prepend(row);
 		}
 		else
 		{
-			$j(pos).after(row);
+			$(pos).after(row);
 		}
 		pos = row;
 	}
 	// remove further rows / athletes not in this.data
 	if (typeof pos != 'undefined' && typeof pos.nextSibling != 'undefined')
 	{
-		$j('#'+pos.id+' ~ tr').remove();
+		$('#'+pos.id+' ~ tr').remove();
 	}
 };
 
@@ -446,7 +446,7 @@ Table.prototype.createRow = function(_data,_tag)
 
 		var tag = document.createElement(_tag);
 		tag.className = col;
-		$j(row).append(tag);
+		$(row).append(tag);
 		
 		// add pstambl link to name & vorname
 		if (typeof url != 'undefined' && (col == 'lastname' || col == 'firstname'))
@@ -454,17 +454,17 @@ Table.prototype.createRow = function(_data,_tag)
 			var a = document.createElement('a');
 			a.href = url;
 			a.target = 'pstambl';
-			$j(tag).append(a);
+			$(tag).append(a);
 			tag = a;
 		}
 		if (typeof col_data == 'object' && col_data)
 		{
 			if (col_data['colspan'] > 1) tag.colSpan = span = col_data['colspan'];
-			$j(tag).text(col_data['label']);
+			$(tag).text(col_data['label']);
 		}
 		else
 		{
-			$j(tag).text(col_data ? col_data : '');
+			$(tag).text(col_data ? col_data : '');
 			span = 1;
 		}
 	}
