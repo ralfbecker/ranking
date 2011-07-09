@@ -966,9 +966,13 @@ class uiresult extends boresult
 			if (!($route = $this->route->read($keys))) $keys['route_order'] = $content['nm']['route'] = '';
 		}
 		// add measurement for judges and admins, if on a regular lead route (not on general result)
-		if ($comp && ($this->is_judge($comp) || $this->is_admin) && $content['nm']['route'] != -1 && $content['nm']['discipline'] == 'lead')
+		if ($comp && $cat && ($this->is_judge($comp) || $this->is_admin) && $content['nm']['route'] != -1 && $content['nm']['discipline'] == 'lead')
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
+		}
+		elseif($content['nm']['show_result'] == 4)
+		{
+			$content['nm']['show_result'] = 0;	// switch measurement off, if eg. no cat selected
 		}
 		//_debug_array($sel_options);
 
