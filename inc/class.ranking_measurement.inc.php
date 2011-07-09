@@ -70,14 +70,12 @@ class ranking_measurement
 		if ($content['nm']['topo'])
 		{
 			$content['transparent'] = egw::link(egw_vfs::download_url($content['nm']['topo']));
-			if (($holds = self::get_holds(self::query2keys($content['nm']))))
-			{
-				$GLOBALS['egw_info']['flags']['java_script'] .= '<script type="text/javascript">
-$j(document).ready(function(){
-	show_handholds('.json_encode($holds).');
+			$holds = self::get_holds(self::query2keys($content['nm']));
+			$GLOBALS['egw_info']['flags']['java_script'] .= "<script type=\"text/javascript\">
+\$j(document).ready(function(){
+	init_topo(".json_encode($holds).");
 });
-</script>'."\n";
-			}
+</script>\n";
 		}
 	}
 
@@ -168,7 +166,7 @@ $j(document).ready(function(){
 			$response->assign('exec[result_plus]', 'value', (int)$data['result_plus']);
 
 			$response->script($s='var holds=getHoldsByHeight('.
-				($data['result_plus'] == TOP_PLUS ? 999 : ($data['result_height'] ? $data['result_height'] : 1))
+				($data['result_plus'] == TOP_PLUS ? 'TOP_HEIGHT' : ($data['result_height'] ? $data['result_height'] : 1))
 				.'); if (holds.length) { holds[0].scrollIntoView(false);'.
 				($data['result_height'] || $data['result_plus'] == TOP_PLUS ? 'mark_holds(holds);' : '').'}');
 

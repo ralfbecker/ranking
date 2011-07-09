@@ -383,6 +383,10 @@ function remove_handholds()
  */
 function recalc_handhold_positions()
 {
+	// resize topoContainer to full page height
+	var topo_pos = $j('div.topoContainer').offset();
+	$j('div.topoContainer').height($j(window).height()-topo_pos.top-$j('#divGenTime').height()-$j('#divPoweredBy').height()-20);
+
 	var y_ratio = $j('#topo').height() / $j('div.topoContainer').height();	
 	$j('div.topoHandhold').each(function(index,container){
 		container.style.top = (y_ratio*$j(container).data('hold').ypercent)+'%';
@@ -420,21 +424,23 @@ function getHoldsByHeight(height)
 }
 
 /**
- * Initialise all required handlers, once DOM is ready
+ * Init topo stuff, get's call on document.ready via $GLOBALS['egw_info']['flags']['java_script']
+ * 
+ * @param array holds
  */
-$j(document).ready(function(){
+function init_topo(holds)
+{
 	$j(window).resize(recalc_handhold_positions);
 	$j('#topo').load(recalc_handhold_positions);
 	$j('#topo').click(topo_clicked);
-
-	// mark current athlets height, require timeout as for some reason DOM is not yet ready
+	if (holds && holds.length) show_handholds(holds);
+	
+	// mark current athlets height
 	var height = parseFloat(document.getElementById('exec[result_height]').value);
 	var plus = document.getElementById('exec[result_plus]').value;
-	window.setTimeout(function() {
-		var holds = getHoldsByHeight(plus == TOP_PLUS ? TOP_HEIGHT : (height ? height : 1));
-		if (holds.length) {
-			holds[0].scrollIntoView(false);
-			if (height || plus == TOP_PLUS) mark_holds(holds);
-		}
-	},300);
-});
+	var current = getHoldsByHeight(plus == TOP_PLUS ? TOP_HEIGHT : (height ? height : 1));
+	if (current.length) {
+		current[0].scrollIntoView(false);
+		if (height || plus == TOP_PLUS) mark_holds(current);
+	}
+}
