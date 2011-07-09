@@ -251,7 +251,7 @@ class ranking_topo
 	 */
 	public static function showAthletes($image, $width, $height, $getHoldXY, $color, array $ranking, $margin=50, $current=null, $current_color=null)
 	{
-		$bgcolor = imagecolorallocatealpha($image, 128, 128, 128, 32);	// alpha: 0=full - 127=transparent
+		$bgcolor = imagecolorallocatealpha($image, 128, 128, 128, 16);	// alpha: 0=full - 127=transparent, rounded corners are always 0=full!
 		$bordercolor = imagecolorallocate($image, 0, 0, 0);
 		$y_free = 0;	// to NOT write one athlete of the other
 		$last_height='none';	// height of last athelete, to suppress multiple lines
@@ -275,20 +275,22 @@ class ranking_topo
 				{
 					$yt = $y_free+self::$fontsize+12;
 				}
-				// rectangle coordinates
+				// rectangle coordinates (using fontsize for y, so boxes are all the same hight, independend if text contains kerning like "g")
 				$x1 = $box[6] + $xt - 8;
-				$y1 = $box[7] + $yt - 8;
+				$y1 = -self::$fontsize + $yt - 8;
 				$x2 = $box[2] + $xt + 8;
-				$y_free = $y2 = $box[3] + $yt + 8;
-				//error_log("box=".array2string($box)." --> upper-left: $x1, $y1, lower-right: $x2, $y2");
+				$y_free = $y2 = self::$fontsize/12 + $yt + 8;
+				//error_log("box=".array2string($box)." fontsize=".self::$fontsize." --> upper-left: $x1, $y1, lower-right: $x2, $y2");
 
 				// check if text is in window
 				if ($y2 > $height) break;
 
 				// draw rectangle
-				imagefilledrectangle($image, $x1, $y1, $x2, $y2, $bgcolor);
 				imagesetthickness($image, 1);
-				imagerectangle($image, $x1, $y1, $x2, $y2, $bordercolor);
+				//imagefilledrectangle($image, $x1, $y1, $x2, $y2, $bgcolor);
+				//imagerectangle($image, $x1, $y1, $x2, $y2, $bordercolor);
+				self::round_corners($image, $x1, $y1, $x2, $y2, 7, $bordercolor, $bgcolor);
+
 				// draw text
 				imagefttext($image, self::$fontsize, 0, $xt, $yt, $col, self::$fontfile, $text);
 				if ($margin > 0 && $last_height != $athlete['result_height'])
@@ -296,10 +298,10 @@ class ranking_topo
 					imagesetthickness($image, 3);
 					//imagesetstyle($image, array($col, $col, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT));
 					imageantialias($image, false);
-					imageline($image, $x > $width/2 ? $x-16 : $x+16, $y, $x > $width/2 ? $x2+5 : $x1-5, ($y1+$y2)/2, $col);
+					imageline($image, $x > $width/2 ? $x-16 : $x+16, $y, $x > $width/2 ? $x2+5 : $x1-5, ($y1+$y2)/2-1, $col);
 					imageantialias($image, true);
-					imageline($image, $x > $width/2 ? $x-16 : $x+16, $y-1, $x > $width/2 ? $x2+5 : $x1-5, ($y1+$y2)/2-1, $col);
-					imageline($image, $x > $width/2 ? $x-16 : $x+16, $y+1, $x > $width/2 ? $x2+5 : $x1-5, ($y1+$y2)/2+1, $col);
+					imageline($image, $x > $width/2 ? $x-16 : $x+16, $y-1, $x > $width/2 ? $x2+5 : $x1-5, ($y1+$y2-1)/2-1, $col);
+					imageline($image, $x > $width/2 ? $x-16 : $x+16, $y+1, $x > $width/2 ? $x2+5 : $x1-5, ($y1+$y2-1)/2-1, $col);
 					imageantialias($image, false);
 					$last_height = $athlete['result_height'];
 				}
@@ -365,7 +367,7 @@ class ranking_topo
 		{
 			$x = ($x - $x_min) * ($width-1) / ($x_max - $x_min);
 			$y = ($y - $y_min) * ($height-1) / ($y_max - $y_min);
-			error_log(__METHOD__.'('.array2string($hold).", w=$src_width, h=$src_height, x=$x_min, y=$y_min, x=$x_max, y=$y_max, w=$width, h=$height) return array(x=$x, y=$y)");
+			//error_log(__METHOD__.'('.array2string($hold).", w=$src_width, h=$src_height, x=$x_min, y=$y_min, x=$x_max, y=$y_max, w=$width, h=$height) return array(x=$x, y=$y)");
 		}
 		//error_log(__METHOD__.'('.array2string($hold).", $src_width, $src_height) return array(x=$x, y=$y)");
 		return array($x, $y);
@@ -427,6 +429,50 @@ class ranking_topo
 		{
 			new boresult();
 		}
+	}
+
+	/**
+	 * Draw a rectangle with rounded corners
+	 *
+	 * imagefillarc does NOT support alpha, therefore bgcolor should contain only a little alpha, eg. 10 looks still ok
+	 *
+	 * @param resource $image
+	 * @param int $x1
+	 * @param int $y1
+	 * @param int $x2
+	 * @param int $y2
+	 * @param int $radius
+	 * @param int $color bordercolor
+	 * @param int $bgcolor=0 background-color
+	 */
+	public static function round_corners($image,$x1,$y1,$x2,$y2,$radius,$color,$bgcolor=0,$radiusy=null)
+	{
+		if (is_null($radiusy)) $radiusy = $radius;
+		if (2*$radiusy > $y2-$y1) $radiusy = (int)(($y2-$y1)/2);
+		if (2*$radius > $x2-$x1)  $radius = (int)(($x2-$x1)/2);
+
+		if ($bgcolor)	// background
+		{
+			// pies at corners
+			imagefilledarc($image, $x1+$radius, $y1+$radiusy, 2*$radius, 2*$radiusy, 180, 270, $bgcolor, IMG_ARC_PIE);
+			imagefilledarc($image, $x2-$radius, $y1+$radiusy, 2*$radius, 2*$radiusy, 270, 360, $bgcolor, IMG_ARC_PIE);
+			imagefilledarc($image, $x2-$radius, $y2-$radiusy, 2*$radius, 2*$radiusy, 0, 90, $bgcolor, IMG_ARC_PIE);
+			imagefilledarc($image, $x1+$radius, $y2-$radiusy, 2*$radius, 2*$radiusy, 90, 180, $bgcolor, IMG_ARC_PIE);
+
+			// 3 rectangles filling the rest
+			imagefilledrectangle($image, $x1+$radius+1, $y1, $x2-$radius-1, $y1+$radiusy-1, $bgcolor);
+			imagefilledrectangle($image, $x1, $y1+$radius, $x2, $y2-$radiusy, $bgcolor);
+			imagefilledrectangle($image, $x1+$radius+1, $y2-$radiusy+1, $x2-$radius, $y2-1, $bgcolor);
+		}
+		// border: 4 corners and lines inbetween
+		imagearc($image, $x1+$radius, $y1+$radiusy, 2*$radius, 2*$radiusy, 180, 270, $color);
+		imageline($image, $x1+$radius, $y1, $x2-$radius, $y1, $color);
+		imagearc($image, $x2-$radius, $y1+$radiusy, 2*$radius, 2*$radiusy, 270, 360, $color);
+		imageline($image, $x2, $y1+$radiusy, $x2, $y2-$radiusy, $color);
+		imagearc($image, $x2-$radius, $y2-$radiusy, 2*$radius, 2*$radiusy, 0, 90, $color);
+		imageline($image, $x1+$radius, $y2, $x2-$radius, $y2, $color);
+		imagearc($image, $x1+$radius, $y2-$radiusy, 2*$radius, 2*$radiusy, 90, 180, $color);
+		imageline($image, $x1, $y1+$radiusy, $x1, $y2-$radiusy, $color);
 	}
 }
 ranking_topo::init_static();
