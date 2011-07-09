@@ -7,8 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 /*
@@ -17,10 +17,20 @@
 */
 $GLOBALS['egw_info']['server']['found_validation_hook'] = True;
 
+if (!is_object($GLOBALS['boresult']))
+{
+	try {
+		$GLOBALS['boresult'] = CreateObject('ranking.boresult');
+	}
+	catch(Exception $e) {
+		$GLOBALS['config_error'] .= "Invalid DB configuration!";
+	}
+}
+
 function final_validation($settings)
 {
 	//echo "final_validation(\$settings) \$settings="; _debug_array($settings);
-	
+
 	$install_async_job = false;
 
 	for($n = 1; $n <= 2; ++$n)
@@ -30,7 +40,7 @@ function final_validation($settings)
 			list(,$comp) = explode('.',$route);
 			$year = (int) $comp + 2000;
 			$file = $settings['rock_import_path'].'/'.$year.'/'.$comp.'/'.$route.'.php';
-	
+
 			if (!file_exists($file))
 			{
 				$GLOBALS['config_error'] .= "File '$file' does NOT exist !!!\n";
@@ -54,9 +64,9 @@ function _set_async_job($start=true)
 	//echo "<p>boresultr::set_async_job(".($start?'true':'false').")</p>\n";
 
 	require_once(EGW_API_INC.'/class.asyncservice.inc.php');
-	
+
 	$async = new asyncservice();
-	
+
 	if ($start === !$async->read('ranking-import-rock'))
 	{
 		if ($start)
