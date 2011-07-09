@@ -7,13 +7,18 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 if (!is_object($GLOBALS['boresult']))
 {
-	$GLOBALS['boresult'] =& CreateObject('ranking.boresult');
+	try {
+		$GLOBALS['boresult'] = CreateObject('ranking.boresult');
+	}
+	catch(Exception $e) {
+		echo "<p style='color: red; font-size: 120%;'>".$e->getMessage()."</p>\n";
+	}
 }
 
 function _options_from($options,$value,$add_not_set=true)
@@ -32,33 +37,33 @@ function _options_from($options,$value,$add_not_set=true)
 
 function rock_import_calendar($config)
 {
-	return _options_from($GLOBALS['boresult']->ranking_nations,$config['rock_import_calendar'],false);
+	return _options_from($GLOBALS['boresult'] ? $GLOBALS['boresult']->ranking_nations : null,$config['rock_import_calendar'],false);
 }
-						
+
 function rock_import_comp($config)
 {
-	return _options_from($GLOBALS['boresult']->comp->names(array(
+	return _options_from($GLOBALS['boresult'] ? $GLOBALS['boresult']->comp->names(array(
 		'nation' => $config['rock_import_calendar'],
 		'datum >= '.$GLOBALS['boresult']->db->quote(date('Y-m-d',time()-10*24*3600)),
 		'gruppen IS NOT NULL',
-	),0,'datum ASC'),$config['rock_import_comp']);
+	),0,'datum ASC') : null,$config['rock_import_comp']);
 }
 
 function rock_import_cat1($config)
 {
-	return _options_from($config['rock_import_comp'] && ($comp = $GLOBALS['boresult']->comp->read($config['rock_import_comp'])) ?
+	return _options_from($config['rock_import_comp'] && $GLOBALS['boresult'] && ($comp = $GLOBALS['boresult']->comp->read($config['rock_import_comp'])) ?
 		$GLOBALS['boresult']->cats->names(array('rkey' => $comp['gruppen']),0) : null,$config['rock_import_cat1']);
 }
 
 function rock_import_cat2($config)
 {
-	return _options_from($config['rock_import_comp'] && ($comp = $GLOBALS['boresult']->comp->read($config['rock_import_comp'])) ?
+	return _options_from($config['rock_import_comp'] && $GLOBALS['boresult'] && ($comp = $GLOBALS['boresult']->comp->read($config['rock_import_comp'])) ?
 		$GLOBALS['boresult']->cats->names(array('rkey' => $comp['gruppen']),0) : null,$config['rock_import_cat2']);
 }
 
 function _get_routes($comp,$cat)
 {
-	if (!$comp || !$cat) return null;
+	if (!$comp || !$cat || !$GLOBALS['boresult']) return null;
 
 	$routes = $GLOBALS['boresult']->route->query_list('route_name','route_order',array(
 		'WetId' => $comp,
