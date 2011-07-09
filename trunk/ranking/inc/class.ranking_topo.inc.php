@@ -53,11 +53,11 @@ class ranking_topo
 	 * @param int $height=null 4/3 ratio of $width
 	 * @param int $margin=50 >0: distance of text from left or right page-border (incl. line to name), <0: distance from hold (no line!)
 	 * @param int $icon='griff32' hold icon
-	 * @param int $src=false show source image with bounding boxes
+	 * @param int $src=0 0: show scaled image, 1: show source image unscaled, 2: show source image with bounding boxes, 3: black background, no scaling
 	 * @param int $topo=0
 	 */
 	public static function render($comp,$cat,$route,$place=1,$num=8,$width=1024,$height=null,
-		$margin=50,$icon='griff32',$src=false,$topo=0)
+		$margin=50,$icon='griff32',$src=0,$topo=0)
 	{
 		$start = microtime(true);
 
@@ -82,8 +82,22 @@ class ranking_topo
 			throw new egw_exception_wrong_parameter(lang('Route NOT found !!!'));
 		}
 
+		// src==3: no image in background for keying in liveimage
+		if ($src == 3)
+		{
+			if (!($info = getimagesize(egw_vfs::PREFIX.$path)))
+			{
+				throw new egw_exception_wrong_parameter("Could not getimagesize('$path')!");
+			}
+			list($src_width, $src_height) = $info;
+
+			if (!($src_image = imagecreatetruecolor($src_width, $src_height)))
+			{
+				throw new egw_exception_wrong_parameter("Could not imagecreatetruecolor($width, $height)!");
+			}
+		}
 		// topo image
-		if (!($src_image = imagecreatefromjpeg(egw_vfs::PREFIX.$path)))
+		elseif (!($src_image = imagecreatefromjpeg(egw_vfs::PREFIX.$path)))
 		{
 			throw new egw_exception_wrong_parameter("Could not imagecreatefromjpeg('$path')!");
 		}
@@ -95,9 +109,9 @@ class ranking_topo
 		$color = imagecolorallocate($src_image, 255,   255,   0);
 		$color2 = imagecolorallocatealpha($src_image, 255, 255, 0, 120);
 		$current_color = imagecolorallocate($src_image, 255,   0,   0);
-		// create destination image
+		// create destination image, if needed (src=0)
 		if (!(int)$height) $height = (int)(3*$width/4);
-		if (!($image = imagecreatetruecolor($width, $height)))
+		if (!$src && !($image = imagecreatetruecolor($width, $height)))
 		{
 			throw new egw_exception_wrong_parameter("Could not imagecreatetruecolor($width, $height)!");
 		}
@@ -108,14 +122,14 @@ class ranking_topo
 		$y_min *= $src_height/100.0;
 		$y_max *= $src_height/100.0;
 		//error_log(array2string($bbox)." w=$src_width, h=$src_height: $x_min, $y_min, $x_max, $y_max");
-		if ($src) imagerectangle($src_image, $x_min, $y_min, $x_max, $y_max, $color);
+		if ($src == 2) imagerectangle($src_image, $x_min, $y_min, $x_max, $y_max, $color);
 
 		// add an absolute margin (in px) around the bbox
 		if (($x_min -= abs($margin)) < 0) $x_min = 0;
 		if (($y_min -= 1.5*abs($margin)) < 0) $y_min = 0;
 		if (($x_max += abs($margin)) >= $src_width) $x_max = $src_width-1;
 		if (($y_max += 1.5*abs($margin)) >= $src_height) $y_max = $src_height-1;
-		if ($src) imagerectangle($src_image, $x_min, $y_min, $x_max, $y_max, $current_color);
+		if ($src == 2) imagerectangle($src_image, $x_min, $y_min, $x_max, $y_max, $current_color);
 
 		$bbox_w = $x_max-$x_min;
 		$bbox_h = $y_max-$y_min;
@@ -158,7 +172,7 @@ class ranking_topo
 		}
 		if ($src)
 		{
-			imagerectangle($src_image, $x_min, $y_min, $x_max, $y_max, $color);
+			if ($src == 2) imagerectangle($src_image, $x_min, $y_min, $x_max, $y_max, $color);
 
 			// function to scale hold coordinates
 			$getHoldXY = create_function('$hold', "return ranking_topo::getHoldXY(\$hold,$src_width,$src_height);");
@@ -252,7 +266,7 @@ class ranking_topo
 	public static function showAthletes($image, $width, $height, $getHoldXY, $color, array $ranking, $margin=50, $current=null, $current_color=null)
 	{
 		$bgcolor = imagecolorallocatealpha($image, 128, 128, 128, 16);	// alpha: 0=full - 127=transparent, rounded corners are always 0=full!
-		$bordercolor = imagecolorallocate($image, 0, 0, 0);
+		$bordercolor = imagecolorallocate($image, 64, 64, 64);
 		$y_free = 0;	// to NOT write one athlete of the other
 		$last_height='none';	// height of last athelete, to suppress multiple lines
 		//imageantialias($image, true); does NOT work with imagethickness :-(
