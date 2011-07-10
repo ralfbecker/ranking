@@ -822,6 +822,9 @@ class boresult extends boranking
 			$n = $this->route_result->update_ranking($keys,$route_type,$discipline);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
+		// update the export_route cache
+		$this->export_route($keys['WetId'], $keys['GrpId'], $keys['route_order'], true);	// true = update cache now
+
 		return $modified ? $modified : $n;
 	}
 
@@ -1520,21 +1523,100 @@ class boresult extends boranking
 	}
 
 	/**
-	 * Export route for xml or json access
+	 * Livetime of cache entries
+	 *
+	 * Can be fairly high, as cache is kept consistent, by calls from boresult::save_result to immediatly update the cache
+	 * and calls to boresult::delete_export_route_cache() to invalidate it from route and route_result classes for deletes or updates.
+	 *
+	 * @var int
+	 */
+	const EXPORT_ROUTE_TTL = 86400;
+
+	/**
+	 * Export route for xml or json access, cached access
+	 *
+	 * Get's called from save_result with $update_cache===true, to keep the cache updated
 	 *
 	 * @param int $comp
 	 * @param int|string $cat
 	 * @param int $heat=-1
+	 * @param boolean $update_cache=false false: read result from cache, false: update cache, before using it
 	 * @return array
 	 */
-	function export_route($comp,$cat,$heat=-1)
+	public static function export_route($comp,$cat,$heat=-1,$update_cache=false)
+	{
+		// normalise cat, we only want to cache one - the numeric - id
+		if (!is_numeric($cat))
+		{
+			$cat = strtolower($cat);
+			$cat_rkey2id = egw_cache::getInstance('ranking', 'cat_rkey2id');
+			if (!isset($cat_rkey2id[$cat]))
+			{
+				if (!isset(self::$instance)) new boresult();
+				if (!($cat_arr = self::$instance->cats->read($cat)))
+				{
+					throw new Exception(lang('Category NOT found !!!'));
+				}
+				$cat_rkey2id[$cat] = $cat_arr['GrpId'];
+				egw_cache::setInstance('ranking', 'cat_rkey2id', $cat_rkey2id);
+			}
+			$cat = $cat_rkey2id[$cat];
+		}
+		// can we use the cached data und do we have it?
+		$location = 'export_route:'.$comp.':'.$cat.':'.$heat;
+		if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)) !== false)
+		{
+			if (!isset(self::$instance)) new boresult();
+
+			$data = self::$instance->_export_route($comp, $cat, $heat);
+			egw_cache::setInstance('ranking', $location, $data, self::EXPORT_ROUTE_TTL);
+
+			// update general result too?
+			if ($update_cache && $heat > 0)
+			{
+				egw_cache::setInstance('ranking', 'export_route:'.$comp.':'.$cat.':-1',
+					self::$instance->_export_route($comp, $cat, -1), self::EXPORT_ROUTE_TTL);
+			}
+		}
+		return $data;
+	}
+
+	/**
+	 * Delete export cache for given route and additionaly the general result
+	 *
+	 * @param int|array $comp WetId or array with values for WetId, GrpId and route_order
+	 * @param int $cat=null GrpId
+	 * @param int $route_order=null
+	 */
+	public static function delete_export_route_cache($comp, $cat=null, $route_order=null)
+	{
+		if (is_array($comp))
+		{
+			$cat = $comp['GrpId'];
+			$route_order = $comp['route_order'];
+			$comp = $comp['WetId'];
+		}
+		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':'.$route_order);
+		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':-1');
+	}
+
+	/**
+	 * Export route for xml or json access, cache-free version
+	 *
+	 * @param int $comp
+	 * @param int|string|array $cat
+	 * @param int $heat=-1
+	 * @return array
+	 */
+	protected  function _export_route($comp,$cat,$heat=-1)
 	{
 		$start = microtime(true);
 
-		if (!($cat = $this->cats->read($cat)))
+		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
 			throw new Exception(lang('Category NOT found !!!'));
 		}
+
 		//echo "<pre>".print_r($cat,true)."</pre>\n";
 		if (!($comp = $this->comp->read($comp)))
 		{

@@ -71,6 +71,8 @@ class route extends so_sql
 			*/
 			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
 			$this->db->delete('RelayResults',$keys,__LINE__,__FILE__);
+
+			boresult::delete_export_route_cache($keys);
 		}
 		return $ret;
 	}
@@ -114,12 +116,12 @@ class route extends so_sql
 		}
 		return $ret;
 	}
-	
+
 	/**
 	 * saves the content of data to the db
 	 *
 	 * Reimplemented to update modified, modifier and reset current_*, next_* if result offical.
-	 * 
+	 *
 	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
 	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
@@ -127,7 +129,7 @@ class route extends so_sql
 	function save($keys=null,$extra_where=null)
 	{
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
-		
+
 		// unset current and next id's
 		if ($this->data['route_status'] == STATUS_RESULT_OFFICIAL)
 		{
@@ -139,6 +141,8 @@ class route extends so_sql
 		}
 		$this->data['route_modified'] = time();
 		$this->data['route_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
+
+		boresult::delete_export_route_cache($this->data);
 
 		return parent::save(null,$extra_where);
 	}

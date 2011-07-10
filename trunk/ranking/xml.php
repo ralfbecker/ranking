@@ -3,7 +3,7 @@
  * EGroupware digital ROCK Rankings webservice access: xml
  *
  * Usage: http://www.digitalrock.de/egroupware/json.php?comp=yyy&cat=zzz[&route=xxx][&debug=1]
- * 
+ *
  * @param comp competition number
  * @param cat  category number or rkey
  * @param route -1 = general result (default)
@@ -46,12 +46,10 @@ function check_anon_access(&$anon_account)
 	return true;
 }
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-$boresult = new boresult();
-
-try 
+try
 {
-	$route = $boresult->export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
+	require_once EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php';
+	$route = boresult::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
 }
 catch(Exception $e)
 {
@@ -72,7 +70,6 @@ if (!isset($_GET['debug']) || !$_GET['debug'])
 	$xml->openURI('php://output');
 	header('Content-Type: application/xml; charset='.$encoding);
 	header('Etag: "'.$route['etag'].'"');
-	
 }
 else
 {
