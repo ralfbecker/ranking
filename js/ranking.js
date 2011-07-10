@@ -158,7 +158,7 @@ function change_athlete(selectbox)
 	if (selectbox.value)
 	{
 		unmark_holds();
-		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value);
+		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value, { 'exec[result_height]': 'result_height', 'exec[result_plus]': 'result_plus' });
 	}
 	else
 	{
@@ -195,7 +195,7 @@ function update_athlete(scroll_mark)
 				mark_holds(holds);
 			}
 		}
-		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, height.value, plus.value);				
+		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { 'result_height': height.value, 'result_plus': plus.value}, 1);				
 	}
 }
 
@@ -443,4 +443,158 @@ function init_topo(holds)
 		current[0].scrollIntoView(false);
 		if (height || plus == TOP_PLUS) mark_holds(current);
 	}
+}
+
+/**
+ * Boulder measurement
+ */
+
+/**
+ * [Try] button clicked --> update number
+ * 
+ * @param input type="button" button
+ */
+function try_clicked(button)
+{
+	var label = button.value;
+	var num = try_num();
+	try_num(++num);
+	
+	var bonus = document.getElementById('exec[zone]');
+	if (num == 1 && bonus && bonus.value !== '0')
+	{
+		bonus.value = '0';
+		// store on server
+		update_boulder();
+	}
+}
+
+/**
+ * Get number of try from label of try button
+ * 
+ * @param int set_value 0: reset, 1: set to 1, if not already higher
+ * @returns int number of try
+ */
+function try_num(set_value)
+{
+	var try_button = document.getElementById('exec[button][try]');
+
+	var num = parseInt(try_button.value);
+	if (isNaN(num)) num = 0;
+	
+	if (typeof set_value != 'undefined')
+	{
+		var label = try_button.value;
+		label = label.replace(/^[0-9]+. /,'');
+		
+		if (set_value == 0 || num < set_value) num = set_value;
+		
+		try_button.value = (num ? ''+num+'. ' : '')+label;
+	}
+	return num;
+}
+
+/**
+ * Bonus button clicked
+ * 
+ * @param button
+ */
+function bonus_clicked(button)
+{
+	var bonus = document.getElementById('exec[zone]');
+	
+	if (!bonus.value || bonus.value == '0')
+	{
+		bonus.value = try_num(1);
+	
+		if (!bonus.isNaN) update_boulder();
+	}
+}
+
+/**
+ * Bonus button clicked
+ * 
+ * @param button
+ */
+function top_clicked(button)
+{
+	var bonus = document.getElementById('exec[zone]');
+	var top = document.getElementById('exec[top]');
+	var num = try_num(1);
+
+	if (!num.isNaN)
+	{
+		if(!bonus.value) bonus.value = num;
+		top.value = num;
+		
+		update_boulder();
+	}
+}
+
+/**
+ * Sending bonus and top for PerId to server
+ */
+function update_boulder()
+{
+	var n = document.getElementById('exec[nm][boulder_n]').value;
+	var PerId = document.getElementById('exec[nm][PerId]').value;
+
+	if (PerId && n)
+	{
+		var update = {};
+		update['top'+n] = 0+document.getElementById('exec[top]').value;	// 0+ is required, as backend doesn't store zones with empty top!
+		update['zone'+n] = document.getElementById('exec[zone]').value;
+
+		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n);				
+	}
+}
+
+/**
+ * Init boulder measurement
+ */
+function init_boulder()
+{
+	var PerId = document.getElementById('exec[nm][PerId]').value;
+	var n = document.getElementById('exec[nm][boulder_n]').value;
+
+	document.getElementById('exec[button][update]').disabled = !PerId || !n;
+	document.getElementById('exec[button][try]').disabled = !PerId || !n;
+	document.getElementById('exec[button][bonus]').disabled = !PerId || !n;
+	document.getElementById('exec[button][top]').disabled = !PerId || !n;
+}
+
+/**
+ * Boulder or athlete changed
+ * 
+ * @param selectbox
+ */
+function boulder_changed(selectbox)
+{
+	var PerId = document.getElementById('exec[nm][PerId]').value;
+	var n = document.getElementById('exec[nm][boulder_n]').value;
+	
+	// ToDo load values from server
+	if (PerId && n)
+	{
+		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_load_athlete', PerId, { 'exec[zone]': 'zone'+n, 'exec[top]': 'top'+n } );
+	}
+	else
+	{
+		document.getElementById('exec[zone]').value = document.getElementById('exec[top]').value = '';
+	}
+	try_num(0);
+	init_boulder();
+}
+
+/**
+ * Go to next athlete
+ */
+function boulder_next()
+{
+	var PerId = document.getElementById('exec[nm][PerId]');
+	
+	PerId.selectedIndex++;
+
+	// need to call this manually, as changing selectedIndex does NOT trigger onchange
+	boulder_changed(PerId);
 }

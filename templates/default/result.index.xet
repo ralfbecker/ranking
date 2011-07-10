@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox cols="1" rows="1" class="extra_startlist">
+					<groupbox class="extra_startlist" cols="1" rows="1">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox cols="1" rows="1" class="extra_result">
+					<groupbox class="extra_result" cols="1" rows="1">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -125,92 +125,6 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.result.measurement" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%">
-			<columns>
-				<column/>
-			</columns>
-			<rows>
-				<row class="noPrint">
-					<hbox options="0,0">
-						<menulist>
-							<menupopup id="nm[topo]" onchange="load_topo(this.value);"/>
-						</menulist>
-						<menulist class="leftPad5">
-							<menupopup id="nm[PerId]" onchange="change_athlete(this);" options="Edit topo"/>
-						</menulist>
-						<textbox type="float" blur="height" id="result_height" onchange="handle_plus(this,form::name('result_plus'));" size="5" precision="%4.2lf" class="leftPad5"/>
-						<menulist class="leftPad5">
-							<menupopup id="result_plus"/>
-						</menulist>
-						<buttononly label="Update" id="button[update]" onclick="update_athlete();" class="leftPad5"/>
-						<buttononly label="Print" onclick="print_topo(); return false;" options="print" class="leftPad5"/>
-					</hbox>
-				</row>
-				<row>
-					<box class="topoContainer">
-						<image src="transparent" options=",,,,topo"/>
-					</box>
-				</row>
-				<row>
-					<box id="hold_popup" class="action_popup">
-						<hbox>
-							<textbox type="float" label="Height" id="hold_height"/>
-							<checkbox label="Top" id="hold_top" onchange="var height=document.getElementById(form::name('hold_height')); if (this.checked) height.value=''; height.disabled = this.checked;  if (!this.checked) height.focus();"/>
-						</hbox>
-						<hbox>
-							<buttononly label="Save" id="button[save]" onclick="hold_popup_submit(this);"/>
-							<buttononly label="Cancel" id="button[cancel]" onclick="hold_popup_close();"/>
-							<buttononly label="Delete" id="button[delete]" onclick="hold_popup_submit(this);"/>
-						</hbox>
-					</box>
-				</row>
-			</rows>
-		</grid>
-		<styles>
-			div.topoContainer {
-  position: relative;
-  overflow: auto;
-  height: 500px;
-}
-#topo {
-   width: 100%;
-   position: relative;
-   cursor: crosshair;
-}
-div.topoHandhold {
-   position: absolute;
-   cursor: pointer;
-}
-div.topoHandhold img {
-   position: relative;
-   top: -8px;
-   left: -8px;
-   z-index: 10;
-   width: 16px;
-}
-div.topoHandhold span {
-   position: relative;
-   top: -12px;
-   left: -5px;
-   z-index: 20;
-}
-
-.action_popup {
-	position: fixed;
-	top: 300px;
-	left: 450px;
-	z-index: 20000;
-	display: none;
-	border: 2px ridge black;
-	border-radius: 10px;
-	box-shadow: 8px 8px 8px black;
-	padding: 5px;
-	background-color: white;
-}
-
-		</styles>
-	</template>
 	<template id="ranking.result.index" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
@@ -261,7 +175,7 @@ div.topoHandhold span {
 					<button statustext="Apply the changes made" label="Update" id="button[apply]"/>
 				</row>
 				<row disabled="!@nm[show_result]=4">
-					<template id="ranking.result.measurement"/>
+					<template id="@measurement_template"/>
 				</row>
 			</rows>
 		</grid>

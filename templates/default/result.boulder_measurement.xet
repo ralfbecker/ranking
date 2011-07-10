@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.boulder_measurement" template="" lang="" group="0" version="1.9.001">
+		<grid width="x">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row height="60">
+					<description value="Boulder" options=",,,PerId"/>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup type="select-number" id="nm[boulder_n]" onchange="boulder_changed(this);" options=",1,10"/>
+						</menulist>
+					</hbox>
+					<menulist>
+						<menupopup label="Athlete" id="nm[PerId]" onchange="boulder_changed(this);" options="Select one"/>
+					</menulist>
+				</row>
+				<row height="60">
+					<description value="Top" options=",,,top"/>
+					<menulist>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" id="top" onchange="check_top(this)" options="No,1,20"/>
+					</menulist>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,20"/>
+						</menulist>
+						<description/>
+						<buttononly align="right" label="Update" id="button[update]" onclick="update_boulder();" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row>
+					<hbox span="all" class="buttonBox">
+						<buttononly label="Try" id="button[try]" onclick="try_clicked(this);" class="bigButton"/>
+						<buttononly label="Bonus" id="button[bonus]" onclick="bonus_clicked(this);" class="bigButton"/>
+						<buttononly label="Top" id="button[top]" onclick="top_clicked(this);" class="bigButton"/>
+						<buttononly label="&gt;&gt;" id="button[next]" onclick="boulder_next();" class="bigButton"/>
+					</hbox>
+					<description/>
+					<description/>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.bigButton input {
+   font-size: 250%;
+}
+table.buttonBox {
+   padding-top: 10px;
+}
+		</styles>
+	</template>
+</overlay>
