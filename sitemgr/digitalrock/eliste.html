@@ -16,6 +16,7 @@
 					resultlist = new Relayresultlist('table','/egroupware/ranking/json.php'+location.search);
 				else	
 					resultlist = new Resultlist('table','/egroupware/ranking/json.php'+location.search);
+				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});	
 		</script>
 		<input type="button" onclick="resultlist.update();" value="Update" />

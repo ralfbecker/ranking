@@ -16,6 +16,7 @@
 					startlist = new Relaystartlist('table','/egroupware/ranking/json.php'+location.search);
 				else	
 					startlist = new Startlist('table','/egroupware/ranking/json.php'+location.search);
+				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});	
 		</script>
 		<input type="button" onclick="startlist.update();" value="Update" />

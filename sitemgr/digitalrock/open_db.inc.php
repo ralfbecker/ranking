@@ -62,9 +62,11 @@ function do_header($head_title,$title,$align="center",$raise=0,$target='profil',
 			echo "<base target='$target'>\n";
 		}
 		if ($raise) {
+			// focus window and hide location bar for mobil browsers
 ?>
    <script language="JavaScript">
       window.focus();
+      window.setTimeout(function(){window.scrollTo(0, 1);}, 100);
    </script>
 <?php
 		}
