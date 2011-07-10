@@ -106,7 +106,7 @@ class route_result extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = is_object($GLOBALS['egw']->translation) ? $GLOBALS['egw']->translation->charset() : 'iso-8859-1';
+		$this->charset = translation::charset();
 	}
 
 	/**
@@ -1048,13 +1048,33 @@ class route_result extends so_sql
 			$old_prev_rank = $data['rank_prev_heat'];
 			$old_rank = $data['new_rank'];
 		}
+		if ($modified) boresult::delete_export_route_cache($keys);
+
 		return $modified;
+	}
+
+	/**
+	 * saves the content of data to the db
+	 *
+	 * Reimplemented to remove cached results
+	 *
+	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function save($keys=null,$extra_where=null)
+	{
+		if ((!$err = parent::save($keys, $extra_where)))
+		{
+			boresult::delete_export_route_cache($this->data);
+		}
+		return $err;
 	}
 
 	/**
 	 * Delete a participant from a route and renumber the starting-order of the following participants
 	 *
-	 * @param array $keys required 'WetId', $this->id_col, possible 'GrpId', 'route_number'
+	 * @param array $keys required 'WetId', $this->id_col, possible 'GrpId', 'route_order'
 	 * @return boolean true if participant was successful deleted, false otherwise
 	 */
 	function delete_participant($keys)
@@ -1062,6 +1082,8 @@ class route_result extends so_sql
 		$to_delete = $this->search($keys,true,'','start_order');
 
 		if (!$this->delete($keys)) return false;
+
+		boresult::delete_export_route_cache($keys);
 
 		foreach($to_delete as $data)
 		{
