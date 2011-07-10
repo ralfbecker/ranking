@@ -14,7 +14,7 @@
 /**
  * Measurement plugin for lead competitions
  */
-class ranking_measurement
+class ranking_measurement extends ranking_boulder_measurement
 {
 	/**
 	 * Lead measurement specific code called from uiresult::index for show_result==4
@@ -80,99 +80,25 @@ class ranking_measurement
 	}
 
 	/**
-	 * Update result of a participant
-	 *
-	 * @param int $PerId
-	 * @param int|float $height
-	 * @param string $plus
-	 * @param boolean $set_current=true make $PerId the current participant of the route
-	 */
-	public static function ajax_update_result($PerId,$height,$plus,$set_current=true)
-	{
-		$query =& self::get_check_session();
-
-		$response = egw_json_response::get();
-
-		$keys = self::query2keys($query);
-		unset($keys['hold_topo']);
-		//$response->alert(__METHOD__."($PerId, $height, '$plus', $set_current) ".array2string($keys));
-
-		//error_log(__METHOD__."($PerId, $height, $plus, $set_current)");
-		if (boresult::$instance->save_result($keys,array(
-			$PerId => array(
-				'result_height' => $height,
-				'result_plus'   => $plus,
-			)),$query['route_type'],$query['discipline']))
-		{
-			list($new_result) = boresult::$instance->route_result->search($keys+array('PerId' => $PerId),false);
-			$msg = boresult::athlete2string($new_result,true);
-		}
-		else
-		{
-			$msg = lang('Nothing to update');
-		}
-		// update current participant
-		boresult::$instance->route->update($keys+array(
-			'current_1' => $PerId,
-			'route_modified' => time(),
-			'route_modifier' => $GLOBALS['egw_info']['user']['account_id'],
-		),false);
-
-		if (boresult::$instance->error)
-		{
-			foreach($this->error as $id => $data)
-			{
-				foreach($data as $field => $error)
-				{
-					$errors[$error] = $error;
-				}
-			}
-			$response->addAlert(lang('Error').': '.implode(', ',$errors));
-			$msg = '';
-		}
-		elseif (boresult::$instance->route->read($keys) &&
-			($dsp_id=boresult::$instance->route->data['dsp_id']) &&
-			($frm_id=boresult::$instance->route->data['frm_id']))
-		{
-			// add display update(s)
-			$display = new ranking_display($this->db);
-			$display->activate($frm_id,$id,$dsp_id,$keys['GrpId'],$keys['route_order']);
-		}
-		//$response->alert(__METHOD__."($PerId, $height, '$plus', $set_current) $msg");
-		$response->jquery('#msg', 'text', array($msg));
-	}
-
-	/**
 	 * Load data of a given athlete
 	 *
-	 * @param string $request_id eTemplate request id
+	 * Extended to mark the hold
+	 *
 	 * @param int $PerId
+	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
 	 */
-	public static function ajax_load_athlete($PerId)
+	public static function ajax_load_athlete($PerId,array $update)
 	{
-		$query =& self::get_check_session();
+		parent::ajax_load_athlete($PerId, $update, $data);
 
-		$response = egw_json_response::get();
-
-		//$response->alert(__METHOD__."($PerId) ".array2string(self::query2keys($query)));
-		$keys = self::query2keys($query);
-		unset($keys['hold_topo']);
-		$keys['PerId'] = $PerId;
-
-		if (list($data) = boresult::$instance->route_result->search($keys,false))
+		if ($data)
 		{
-			//$response->alert(__METHOD__."($PerId) ".array2string($data));
-			$response->assign('exec[result_height]', 'value', $data['result_height'] && $data['result_plus'] != TOP_PLUS ? $data['result_height'] : '');
-			$response->assign('exec[result_plus]', 'value', (int)$data['result_plus']);
+			$response = egw_json_response::get();
 
 			$response->script($s='var holds=getHoldsByHeight('.
 				($data['result_plus'] == TOP_PLUS ? 'TOP_HEIGHT' : ($data['result_height'] ? $data['result_height'] : 1))
 				.'); if (holds.length) { holds[0].scrollIntoView(false);'.
 				($data['result_height'] || $data['result_plus'] == TOP_PLUS ? 'mark_holds(holds);' : '').'}');
-
-			$query['PerId'] = $PerId;
-
-			$response->jquery('#msg', 'text', array(boresult::athlete2string($data)));
 		}
 	}
 
@@ -216,28 +142,6 @@ class ranking_measurement
 	}
 
 	/**
-	 * Get session data and check if user has judge or admin rights
-	 *
-	 * @param array &$comp=null on return competition array
-	 * @throws egw_exception_wrong_parameter
-	 * @return array reference to ranking result session array
-	 */
-	public static function &get_check_session(&$comp=null)
-	{
-		$query =& egw_cache::getSession('ranking', 'result');
-
-		if (!($comp = boresult::$instance->comp->read($query['comp'])))
-		{
-			throw new egw_exception_wrong_parameter("Competition $query[comp] NOT found!");
-		}
-		if (!boresult::$instance->is_admin && !boresult::$instance->is_judge($comp))
-		{
-			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
-		}
-		return $query;
-	}
-
-	/**
 	 * Load topo data from server
 	 *
 	 * @param string $path
@@ -259,14 +163,12 @@ class ranking_measurement
 	 * @param array $query
 	 * @return array
 	 */
-	private static function query2keys(array $query)
+	protected static function query2keys(array $query)
 	{
-		return array(
-			'WetId' => $query['comp'],
-			'GrpId' => $query['cat'],
-			'route_order' => $query['route'],
-			'hold_topo' => (int)substr(egw_vfs::basename($query['topo']),1),
-		);
+		$keys = parent::query2keys($query);
+		$keys['hold_topo'] = (int)substr(egw_vfs::basename($query['topo']),1);
+
+		return $keys;
 	}
 
 	const HOLDS_TABLE = 'RouteHolds';
@@ -457,17 +359,4 @@ class ranking_measurement
 		}
 		return false;
 	}
-
-	/**
-	 * Init static vars
-	 */
-	public static function init_static()
-	{
-		include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-		if (!isset(boresult::$instance))
-		{
-			new boresult();
-		}
-	}
 }
-ranking_measurement::init_static();

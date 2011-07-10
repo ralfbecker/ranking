@@ -909,7 +909,7 @@ class uiresult extends boresult
 
 		if ($content['nm']['route'] < 2) unset($sel_options['eliminated'][0]);
 		unset($sel_options['eliminated_r'][0]);
-		for($i=1; $i <= $route['route_num_problems']; ++$i)
+		for($i=''; $i <= $route['route_num_problems']; ++$i)
 		{
 			$sel_options['zone'.$i] = array(lang('No'));
 		}
@@ -966,7 +966,8 @@ class uiresult extends boresult
 			if (!($route = $this->route->read($keys))) $keys['route_order'] = $content['nm']['route'] = '';
 		}
 		// add measurement for judges and admins, if on a regular lead route (not on general result)
-		if ($comp && $cat && ($this->is_judge($comp) || $this->is_admin) && $content['nm']['route'] != -1 && $content['nm']['discipline'] == 'lead')
+		if ($comp && $cat && ($this->is_judge($comp) || $this->is_admin) && $content['nm']['route'] != -1 &&
+			in_array($content['nm']['discipline'], array('lead','boulder')))
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
 		}
@@ -1028,7 +1029,17 @@ class uiresult extends boresult
 		elseif ($content['nm']['show_result'] == 4)
 		{
 			// measurement code is in extra class
-			ranking_measurement::measurement($content, $sel_options, $readonlys);
+			switch($content['nm']['discipline'])
+			{
+				case 'lead':
+					ranking_measurement::measurement($content, $sel_options, $readonlys);
+					$content['measurement_template'] = 'ranking.result.measurement';
+					break;
+				case 'boulder':
+					ranking_boulder_measurement::measurement($content, $sel_options, $readonlys);
+					$content['measurement_template'] = 'ranking.result.boulder_measurement';
+					break;
+			}
 			// measurement need to store nm, as it does NOT call get_rows!
 			egw_cache::setSession('ranking', 'result', $content['nm']);
 		}
