@@ -66,3 +66,42 @@
 .result {
 	white-space: nowrap;
 }
+
+/**
+ * New boulder result display
+ */
+div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+	margin-right: 2px;
+	background-size: 100%;
+	position: relative;
+}
+
+div.boulderNone {
+	background-image: url(../../templates/default/images/boulderNone.png);
+}
+
+div.boulderTop {
+	background-image: url(../../templates/default/images/boulderTop.png);
+}
+
+div.boulderBonus {
+	background-image: url(../../templates/default/images/boulderBonus.png);
+}
+
+div.bonusTries, div.topTries {
+	position: absolute;
+	font-size: 90%;
+	font-weight: bold;
+	color: white;
+}
+div.bonusTries {
+	right: 3px;
+	bottom: 1px;
+}
+div.topTries {
+	left: 3px;
+	top: 1px;	
+}

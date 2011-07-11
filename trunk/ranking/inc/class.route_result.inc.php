@@ -569,7 +569,7 @@ class route_result extends so_sql
 					for($i=1; $i <= self::MAX_BOULDERS; ++$i)
 					{
 						$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
-							($data['zone'.$i] ? 'b'.$data['zone'.$i] : '');
+							((string)$data['zone'.$i] !== '' ? 'b'.$data['zone'.$i] : '');
 					}
 				}
 				$suffix = '';	// general result can have route_order as suffix
