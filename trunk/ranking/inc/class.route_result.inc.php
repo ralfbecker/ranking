@@ -827,7 +827,8 @@ class route_result extends so_sql
 			}
 		}
 		// saving the boulder results, if there are any
-		if (isset($data['top1']))
+		if (isset($data['top1']) || isset($data['top2']) || isset($data['top3']) || isset($data['top4']) ||
+			isset($data['top5']) || isset($data['top6']) || isset($data['top7']) || isset($data['top8']))
 		{
 			$data['result_top'] = $data['result_zone'] = $data['result_detail'] = null;
 			for($i = 1; $i <= self::MAX_BOULDERS; ++$i)
