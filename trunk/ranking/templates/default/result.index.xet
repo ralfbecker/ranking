@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox class="extra_startlist" cols="1" rows="1">
+					<groupbox cols="1" rows="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox class="extra_result" cols="1" rows="1">
+					<groupbox cols="1" rows="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -146,6 +146,7 @@
 						<menulist class="bold">
 							<menupopup id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
 						</menulist>
+						<hidden id="comp[WetId]"/>
 						<hbox align="right" options="0,0">
 							<image src="ajax-loader" class="ajax-loader"/>
 							<description id="msg" no_lang="1" class="redItalic"/>
@@ -163,6 +164,7 @@
 						<button label="Edit this heat" id="button[edit]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="edit" class="leftPad5 noPrint"/>
 						<button label="Add a new heat" id="button[new]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiresult.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="new" class="leftPad5 noPrint"/>
 						<button label="Download" id="button[download]" image="filesave" class="leftPad5 noPrint"/>
+						<buttononly label="Result" id="result_popup" onclick="window.open(egw::link('/ranking/sitemgr/digitalrock/eliste.html','comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank'); return false;" options="view" class="leftPad5"/>
 						<menulist class="noPrint leftPad5">
 							<menupopup id="nm[ranking]" onchange="1" options="display no ranking"/>
 						</menulist>

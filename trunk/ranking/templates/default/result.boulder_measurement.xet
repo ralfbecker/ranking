@@ -13,7 +13,7 @@
 					<description value="Boulder" options=",,,PerId"/>
 					<hbox options="0,0">
 						<menulist>
-							<menupopup type="select-number" id="nm[boulder_n]" onchange="boulder_changed(this);" options=",1,10"/>
+							<menupopup type="select-number" id="nm[boulder_n]" onchange="boulder_changed(this);" options=",1,{$cont[nm][num_problems]}"/>
 						</menulist>
 					</hbox>
 					<menulist>
@@ -35,7 +35,7 @@
 				</row>
 				<row>
 					<hbox span="all" class="buttonBox">
-						<buttononly label="Try" id="button[try]" onclick="try_clicked(this);" class="bigButton"/>
+						<buttononly label="Try" id="button[try]" onclick="try_clicked(this);" class="tryButton"/>
 						<buttononly label="Bonus" id="button[bonus]" onclick="bonus_clicked(this);" class="bigButton"/>
 						<buttononly label="Top" id="button[top]" onclick="top_clicked(this);" class="bigButton"/>
 						<buttononly label="&gt;&gt;" id="button[next]" onclick="boulder_next();" class="bigButton"/>
@@ -46,11 +46,24 @@
 			</rows>
 		</grid>
 		<styles>
-			.bigButton input {
+			.bigButton input, .tryButton input {
    font-size: 250%;
+   border-radius: 20px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+.tryButton input {
+   width: 4em;
 }
 table.buttonBox {
    padding-top: 10px;
+   padding-bottom: 10px;
+}
+#table h1 {
+  display: none;
+}
+select {
+  font-size: 150%;
 }
 		</styles>
 	</template>

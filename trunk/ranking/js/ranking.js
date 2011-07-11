@@ -461,7 +461,9 @@ function try_clicked(button)
 	try_num(++num);
 	
 	var bonus = document.getElementById('exec[zone]');
-	if (num == 1 && bonus && bonus.value !== '0')
+
+	// set bonus 'No'=0, for 1. try, if there's no bonus yet
+	if (num == 1 && bonus && bonus.value === '')
 	{
 		bonus.value = '0';
 		// store on server
@@ -506,6 +508,7 @@ function bonus_clicked(button)
 	if (!bonus.value || bonus.value == '0')
 	{
 		bonus.value = try_num(1);
+		check_bonus(bonus);
 	
 		if (!bonus.isNaN) update_boulder();
 	}
@@ -526,6 +529,7 @@ function top_clicked(button)
 	{
 		if(!bonus.value) bonus.value = num;
 		top.value = num;
+		check_top(top);
 		
 		update_boulder();
 	}
@@ -542,15 +546,17 @@ function update_boulder()
 	if (PerId && n)
 	{
 		var update = {};
-		update['top'+n] = 0+document.getElementById('exec[top]').value;	// 0+ is required, as backend doesn't store zones with empty top!
+		update['top'+n] = parseInt(0+document.getElementById('exec[top]').value);	// parseInt(0+ is required, as backend doesn't store zones with empty top!
 		update['zone'+n] = document.getElementById('exec[zone]').value;
 
 		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n);				
 	}
 }
 
+var resultlist;
+
 /**
- * Init boulder measurement
+ * Init boulder measurement or update button state
  */
 function init_boulder()
 {
@@ -561,6 +567,17 @@ function init_boulder()
 	document.getElementById('exec[button][try]').disabled = !PerId || !n;
 	document.getElementById('exec[button][bonus]').disabled = !PerId || !n;
 	document.getElementById('exec[button][top]').disabled = !PerId || !n;
+	
+	if (!document.getElementById('table'))
+	{
+		var table = document.createElement('div');
+		table.id = 'table';
+		$j(document.forms.eTemplate).append(table);
+		resultlist = new Resultlist('table',egw_webserverUrl+'/ranking/json.php'+
+			'?comp='+document.getElementById('exec[comp][WetId]').value+
+			'&cat='+document.getElementById('exec[nm][cat]').value+
+			'&route='+document.getElementById('exec[nm][route]').value);
+	}
 }
 
 /**
