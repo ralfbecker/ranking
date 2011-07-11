@@ -16,77 +16,6 @@
  */
  
 /**
- * Constructor for relay startlist from given json url
- * 
- * Table get appended to specified _container
- * 
- * @param _container
- * @param _json_url url for data to load
- */
-function Relaystartlist(_container,_json_url)
-{
-	Relaystartlist.prototype.update = Startlist.prototype.update;
-	Relaystartlist.prototype.handleResponse = Startlist.prototype.handleResponse;
- 	Relaystartlist.prototype.setHeader = Startlist.prototype.setHeader;
-	Relaystartlist.prototype.upDown = Startlist.prototype.upDown;
-	Relaystartlist.prototype.rotateURL = Startlist.prototype.rotateURL;
-
-	this.startlist_cols = {
-		'start_order': 'StartNr',
-		'team_name': 'Teamname',
-		'team_nation': 'Nation',
-		'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
-		'athletes/0/firstname': '', 
-		'athletes/0/start_number': '', 
-		'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
-		'athletes/1/firstname': '', 
-		'athletes/1/start_number': '', 
-		'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
-		'athletes/2/firstname': '', 
-		'athletes/2/start_number': ''
-	};
-	Startlist.apply(this, [_container,_json_url]);
-}
-
-/**
- * Constructor for relay result from given json url
- * 
- * Table get appended to specified _container
- * 
- * @param _container
- * @param _json_url url for data to load
-*/
-function Relayresultlist(_container,_json_url)
-{
-	Relayresultlist.prototype.update = Startlist.prototype.update;
-	Relayresultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
- 	Relayresultlist.prototype.setHeader = Startlist.prototype.setHeader;
-	Relayresultlist.prototype.upDown = Startlist.prototype.upDown;
-	Relayresultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
-
-	Startlist.apply(this, [_container,_json_url,_json_url.match(/detail=0/) ? {
-		'result_rank': 'Rank',
-		'team_name': 'Teamname',
-		'team_nation': 'Nation',
-		'result': 'Sum'
-	} : {
-		'result_rank': 'Rank',
-		'team_name': 'Teamname',
-		'team_nation': 'Nation',
-		'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
-		'athletes/0/firstname': '', 
-		'athletes/0/result_time': '', 
-		'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
-		'athletes/1/firstname': '', 
-		'athletes/1/result_time': '', 
-		'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
-		'athletes/2/firstname': '', 
-		'athletes/2/result_time': '',
-		'result': 'Sum'
-	}]);
-}
-
-/**
  * Constructor for result from given json url
  * 
  * Table get appended to specified _container
@@ -97,27 +26,120 @@ function Relayresultlist(_container,_json_url)
 function Resultlist(_container,_json_url)
 {
 	Resultlist.prototype.update = Startlist.prototype.update;
-	Resultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
+	//Resultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
 	Resultlist.prototype.setHeader = Startlist.prototype.setHeader;
 	Resultlist.prototype.upDown = Startlist.prototype.upDown;
 	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
-	Startlist.apply(this, [_container,_json_url,_json_url.match(/detail=0/) ? {
+	Startlist.apply(this, [_container,_json_url,{
 		'result_rank': 'Rank',
 		'lastname' : {'label': 'Name', 'colspan': 2},
 		'firstname' : '',
 		'nation' : 'Nation',
-		'result': 'Result'
-	} : {
-		'result_rank': 'Rank',
-		'lastname' : {'label': 'Name', 'colspan': 2},
-		'firstname' : '',
-		'birthyear' : 'Birthyear',
-		'nation' : 'Nation',
-//		'startnummer': 'StartNr',
 		'result': 'Result'
 	}]);
 }
+
+/**
+ * Callback for loading data via ajax
+ * 
+ * Reimplemented to use different columns depending on discipline
+ * 
+ * @param _data route data object
+ */            
+Resultlist.prototype.handleResponse = function(_data)
+{
+	console.log(_data);
+	if (typeof this.discipline == 'undefined')
+	{
+		this.discipline = _data.discipline;
+
+		var detail = this.json_url.match(/detail=([^&]+)/);
+
+		switch(this.discipline)
+		{
+			case 'boulder':
+				if (!detail || detail[1] == 2)
+				{
+					delete this.columns.result;
+					this.columns.boulder = Resultlist.prototype.getBoulderResult;
+					if (detail && detail[1] == 2) this.columns.result = 'Sum';
+				}
+				break;
+
+			case 'speedrelay':
+				this.columns = detail && detail[1] == 0 ? {
+					'result_rank': 'Rank',
+					'team_name': 'Teamname',
+					'team_nation': 'Nation',
+					'result': 'Sum'
+				} : {
+					'result_rank': 'Rank',
+					'team_name': 'Teamname',
+					'team_nation': 'Nation',
+					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
+					'athletes/0/firstname': '', 
+					'athletes/0/result_time': '', 
+					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
+					'athletes/1/firstname': '', 
+					'athletes/1/result_time': '', 
+					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
+					'athletes/2/firstname': '', 
+					'athletes/2/result_time': '',
+					'result': 'Sum'
+				};
+				break;
+		}
+	}
+	Startlist.prototype.handleResponse.apply(this, [_data]);
+};
+
+/**
+ * Get DOM nodes for display of graphical boulder-result
+ * 
+ * @param _data
+ * @param _tag 'th' for header, 'td' for data rows
+ * @return DOM node
+ */
+Resultlist.prototype.getBoulderResult = function(_data,_tag)
+{
+	if (_tag == 'th') return 'Result';
+
+	var tag = document.createElement('div');
+	
+	for(var i=1; typeof _data['boulder'+i] != 'undefined'; ++i)
+	{
+		var boulder = document.createElement('div');
+		var result = _data['boulder'+i];
+		if (result && result != 'b0')
+		{
+			var top_tries = result.match(/t([0-9]+)/);
+			var bonus_tries = result.match(/b([0-9]+)/);
+			if (top_tries)
+			{
+				boulder.className = 'boulderTop';
+				var top_text = document.createElement('div');
+				top_text.className = 'topTries';
+				jQuery(top_text).text(top_tries[1]);
+				jQuery(boulder).append(top_text);
+			}
+			else
+			{
+				boulder.className = 'boulderBonus';
+			}
+			var bonus_text = document.createElement('div');
+			bonus_text.className = 'bonusTries';
+			jQuery(bonus_text).text(bonus_tries[1]);
+			jQuery(boulder).append(bonus_text);
+		}
+		else
+		{
+			boulder.className = result ? 'boulderNone' : 'boulder';
+		}
+		jQuery(tag).append(boulder);
+	}
+	return tag;
+};
 
 /**
  * Constructor for startlist from given json url
@@ -135,7 +157,7 @@ function Startlist(_container,_json_url,_columns,_sort)
 	if (typeof _container == "string") _container = document.getElementById(_container);
 	this.container = _container;
 	// set startlist columns, if not set already
-	if (typeof this.startlist_cols == 'undefined') this.startlist_cols = {
+	this.startlist_cols = {
 		'start_order': {'label': 'StartNr', 'colspan': 2},
 		'start_number': '',
 		'lastname' : {'label': 'Name', 'colspan': 2},
@@ -197,18 +219,36 @@ Startlist.prototype.update = function()
  */            
 Startlist.prototype.handleResponse = function(_data)
 {
+	//console.log(_data);
+	if (typeof this.discipline == 'undefined')
+	{
+		this.discipline = _data.discipline;
+
+		switch(this.discipline)
+		{
+			case 'speedrelay':
+				this.columns = this.startlist_cols = {
+					'start_order': 'StartNr',
+					'team_name': 'Teamname',
+					'team_nation': 'Nation',
+					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
+					'athletes/0/firstname': '', 
+					'athletes/0/start_number': '', 
+					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
+					'athletes/1/firstname': '', 
+					'athletes/1/start_number': '', 
+					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
+					'athletes/2/firstname': '', 
+					'athletes/2/start_number': ''
+				};
+				break;
+		}
+	}
 	// if we have no ranked participant, show a startlist
 	if (!_data.participants[0].result_rank && this.sort == 'result_rank')
 	{
 		this.result_cols = this.columns;
-		this.columns = {
-			'start_order': {'label': 'StartNr', 'colspan': 2},
-			'start_number': '',
-			'lastname' : {'label': 'Name', 'colspan': 2},
-			'firstname' : '',
-			'birthyear' : 'Birthyear',
-			'nation' : 'Nation'
-		};
+		this.columns = this.startlist_cols;
 		this.sort = 'start_order';
 	}
 	// if we are a result showing a startlist AND have now a ranked participant
@@ -290,7 +330,7 @@ Startlist.prototype.setHeader = function(_data)
 	document.title = header;
 	this.header.empty();
 	this.header.text(header);
-}
+};
 
 /**
  * Constructor for table with given data and columns
@@ -428,8 +468,17 @@ Table.prototype.createRow = function(_data,_tag)
 	{
 		if (--span > 0) continue;
 		
-		var col_data = _data[col];
 		var url = _data.url;
+		
+		// if object has a special getter func, call it
+		if (typeof this.columns[col] == 'function')
+		{
+			var col_data = this.columns[col].call(this,_data,_tag);
+		}
+		else
+		{
+			var col_data = _data[col];
+		}
 		// allow /-delemited expressions to index into arrays and objects
 		if (typeof col_data == 'undefined' && col.indexOf('/') != -1)
 		{
@@ -462,8 +511,15 @@ Table.prototype.createRow = function(_data,_tag)
 		}
 		if (typeof col_data == 'object' && col_data)
 		{
-			if (col_data['colspan'] > 1) tag.colSpan = span = col_data['colspan'];
-			jQuery(tag).text(col_data['label']);
+			if (typeof col_data.nodeName != 'undefined')
+			{
+				jQuery(tag).append(col_data);
+			}
+			else
+			{
+				if (col_data['colspan'] > 1) tag.colSpan = span = col_data['colspan'];
+				jQuery(tag).text(col_data['label']);
+			}
 		}
 		else
 		{
