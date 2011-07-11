@@ -34,6 +34,9 @@ class ranking_boulder_measurement
 		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
 			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
 
+		egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
+		egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
+
 		$keys = self::query2keys($content['nm']);
 		// if we have a startlist, add participants to sel_options
 		if (boresult::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
@@ -76,7 +79,7 @@ class ranking_boulder_measurement
 		$keys = self::query2keys($query);
 		//$response->alert(__METHOD__."($PerId, ".array2string($update).", $set_current) ".array2string($keys));
 
-		//error_log(__METHOD__."($PerId, $height, $plus, $set_current)");
+		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
 		if (boresult::$instance->save_result($keys,array($PerId => $update),$query['route_type'],$query['discipline']))
 		{
 			list($new_result) = boresult::$instance->route_result->search($keys+array('PerId' => $PerId),false);
@@ -97,7 +100,7 @@ class ranking_boulder_measurement
 		}
 		if (boresult::$instance->error)
 		{
-			foreach($this->error as $id => $data)
+			foreach(boresult::$instance->error as $id => $data)
 			{
 				foreach($data as $field => $error)
 				{
@@ -117,6 +120,7 @@ class ranking_boulder_measurement
 		}
 		//$response->alert(__METHOD__."($PerId, $height, '$plus', $set_current) $msg");
 		$response->jquery('#msg', 'text', array($msg));
+		$response->script('if (typeof resultlist != "undefined") resultlist.update();');
 	}
 
 	/**
@@ -142,6 +146,11 @@ class ranking_boulder_measurement
 			foreach($update as $id => $key)
 			{
 				$response->assign($id, 'value', (string)$data[$key]);
+				// for boulder
+				if (strpos($key,'zone') === 0)
+				{
+					$query['boulder_n'] = (int)substr($key,4);
+				}
 			}
 			$query['PerId'] = $PerId;
 
