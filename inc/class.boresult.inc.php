@@ -760,14 +760,12 @@ class boresult extends boranking
 			{
 				$old['result_time'] = $old['result_time_l'];
 			}
-			if (isset($data['top1']))	// boulder result
+			// boulder result
+			for ($i=1; $i <= route_result::MAX_BOULDERS && isset($data['top'.$i]); ++$i)
 			{
-				for ($i=1; $i <= 6 && isset($data['top'.$i]); ++$i)
+				if ($data['top'.$i] && (int)$data['top'.$i] < (int)$data['zone'.$i])
 				{
-					if ($data['top'.$i] && (int)$data['top'.$i] < (int)$data['zone'.$i])
-					{
-						$this->error[$id]['zone'.$i] = lang('Can NOT be higher than top!');
-					}
+					$this->error[$id]['zone'.$i] = lang('Can NOT be higher than top!');
 				}
 			}
 			if (isset($data['tops']))	// boulder result with just the sums
@@ -798,12 +796,14 @@ class boresult extends boranking
 						++$modified;
 						continue;
 					}
-					//echo "<p>--> saving $PerId because $key='$val' changed, was '{$old[$key]}'</p>\n";
+					error_log(__METHOD__."() --> saving #$id because $key='$val' changed, was '{$old[$key]}'");
 					$data['result_modified'] = time();
 					$data['result_modifier'] = $this->user;
 
-					$this->route_result->init($old ? $old : $keys);
+					$this->route_result->read($keys);
+					//error_log(__METHOD__."() old: route_result->data=".array2string($this->route_result->data));
 					$this->route_result->save($data);
+					//error_log(__METHOD__."() new: route_result->data=".array2string($this->route_result->data));
 					++$modified;
 					break;
 				}
