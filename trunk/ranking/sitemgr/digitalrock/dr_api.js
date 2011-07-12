@@ -49,7 +49,7 @@ function Resultlist(_container,_json_url)
  */            
 Resultlist.prototype.handleResponse = function(_data)
 {
-	console.log(_data);
+	//console.log(_data);
 	if (typeof this.discipline == 'undefined')
 	{
 		this.discipline = _data.discipline;
@@ -683,21 +683,20 @@ Startlist.prototype.rotateURL = function() {
 	    var urls = rotate_url_matches[1];
 	    //console.log(urls);
 
-
 	    var current_cat = this.json_url.match(/cat=([^&]+)/)[1];
 	    var current_route = this.json_url.match(/route=([^&]+)/)[1];
 	    //console.log(current_cat);
-	    var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([\\d]+),r=([\\d]+)");
+	    var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([0-9_a-z]+),r=([\\d]+)");
 	    if (! next) {
 	        // take the first argument
-	        next = urls.match("c=([\\d]+),r=([\\d]+)");
+	        next = urls.match("c=([0-9_a-z]+),r=([\\d]+)");
 	    }
 	    //console.log(next);
 	
 	    var next_cat = next[1];
 	    var next_route = next[2];
 	    //console.log("current_cat = " + current_cat + ", current_route = " + current_route + ", next_cat = " + next_cat + ", next_route = " + next_route);
-	    this.json_url = this.json_url.replace(/cat=[\d]+/, "cat=" + next_cat);
+	    this.json_url = this.json_url.replace(/cat=[0-9_a-z]+/, "cat=" + next_cat);
 	    this.json_url = this.json_url.replace(/route=[\d]+/, "route=" + next_route);
 	    //console.log(this.json_url);
 	    this.update();
@@ -719,4 +718,3 @@ function load_css(href)
 	cssnode.href = href;
 	headID.appendChild(cssnode);
 }
-
