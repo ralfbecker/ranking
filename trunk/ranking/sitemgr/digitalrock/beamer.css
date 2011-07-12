@@ -1,0 +1,64 @@
+/**
+ * digital ROCK CSS for beamer / videowalls
+ *
+ * @link http://www.digitalrock.de
+ * @author Ralf Becker <RalfBecker@digitalROCK.de>
+ * @copyright 2011 by RalfBecker@digitalROCK.de
+ * @version $Id$
+ */
+
+a {
+	color:yellow;
+	text-decoration: none;
+}
+
+td,th {
+	font-family: Helvetica,Arial,sans-serif;
+	font-size:32pt;
+	font-weight: bold;
+	background-color: black;
+	color: yellow;
+}
+
+td.details,th.details {
+	font-size:20pt;
+}
+
+th {
+	background-color: blue;
+	color: white;
+	font-size:28pt;
+}
+
+body {
+	margin:0px;
+	background-color: black;
+}
+
+h1 {
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: 30pt;
+	font-weight: bolder;
+	color:white;
+}
+
+p {
+	font-family: Helvetica,Arial,sans-serif;
+	margin-left:5px;
+	margin-top:0px;
+	font-size20pt;
+}
+
+/**
+ * Boulder graphics same size as td font
+ */
+div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {
+	width: 32px;
+	height: 32px;
+}
+/**
+ * Do NOT display bonus or top tries
+ */
+div.bonusTries, div.topTries {
+	display: none;
+}
