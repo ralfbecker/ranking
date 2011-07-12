@@ -46,10 +46,17 @@ class ranking_admin_prefs_sidebox_hooks
 
 			if (is_object($GLOBALS['uiresult']))	// we show the displays menu only if we are in the result-service
 			{
+				$file = array();
+				$file[] = array(
+					'text' => lang('Beamer / videowalls'),
+					'link' => "javascript:egw_openWindowCentered2('".egw::link('/index.php',array(
+						'menuaction' => 'ranking.ranking_beamer.beamer',
+					),false)."','beamer',1024,768,'yes')",
+					'no_lang' => true,
+				);
 				if (($displays = $GLOBALS['uiresult']->display->displays()) || $GLOBALS['egw_info']['user']['apps']['admin'])
 				{
 					if (!is_array($displays)) $displays = array();
-					$file = array();
 					foreach($displays as $dsp_id => $dsp_name)
 					{
 						$file[] = array(
@@ -67,8 +74,8 @@ class ranking_admin_prefs_sidebox_hooks
 							'menuaction' => 'ranking.ranking_display_ui.display',
 						),false)."','display$dsp_id',640,480,'yes')";
 					}
-					display_sidebox($appname,lang('Displays'),$file);
 				}
+				display_sidebox($appname,lang('Displays'),$file);
 			}
 		}
 

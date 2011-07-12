@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.beamer" template="" lang="" group="0" version="1.9.001">
+		<grid width="x">
+			<columns>
+				<column width="150"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="noPrint" disabled="@nm[cat]" part="header">
+					<hbox options="0,0" span="all">
+						<menulist class="rightPad5">
+							<menupopup statustext="Select calendar" id="calendar" no_lang="1" onchange="1"/>
+						</menulist>
+						<menulist>
+							<menupopup id="comp" no_lang="1" onchange="1" options="Select competition"/>
+						</menulist>
+					</hbox>
+				</row>
+				<row part="header">
+					<hbox options="0,0" span="all">
+						<menulist>
+							<menupopup id="detail" onchange="1" options="Default details"/>
+						</menulist>
+						<checkbox label="Startlist" id="startlist" onchange="1" class="leftPad5"/>
+						<checkbox label="Beamer" id="beamer" onchange="1" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row part="footer">
+					<hbox options="0,0" span="all">
+						<textbox id="href" size="-100" span="all"/>
+						<button label="Go" id="go" onclick="document.location = document.getElementById(form::name('href')).value; return false;"/>
+					</hbox>
+				</row>
+				<row disabled="!@comp">
+					<menulist>
+						<menupopup id="cat[$row]" no_lang="1" onchange="1" options="Select category"/>
+					</menulist>
+					<menulist>
+						<menupopup statustext="Select heat" id="route[$row]" no_lang="1" onchange="1" options="Select heat"/>
+					</menulist>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.ajax-loader { display: none; }
+		</styles>
+	</template>
+</overlay>
