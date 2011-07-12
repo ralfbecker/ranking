@@ -704,3 +704,19 @@ Startlist.prototype.rotateURL = function() {
 	}
 };
 
+/**
+ * Dynamically load a css file
+ * 
+ * @param href url to css file
+ */
+function load_css(href)
+{
+	//Get the head node and append a new link node with the stylesheet url to it
+	var headID = document.getElementsByTagName('head')[0];
+	var cssnode = document.createElement('link');
+	cssnode.type = "text/css";
+	cssnode.rel = "stylesheet";
+	cssnode.href = href;
+	headID.appendChild(cssnode);
+}
+
