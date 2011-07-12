@@ -822,8 +822,8 @@ class boresult extends boranking
 			$n = $this->route_result->update_ranking($keys,$route_type,$discipline);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
-		// update the export_route cache
-		$this->export_route($keys['WetId'], $keys['GrpId'], $keys['route_order'], true);	// true = update cache now
+		// delete the export_route cache
+		boresult::delete_export_route_cache($keys);
 
 		return $modified ? $modified : $n;
 	}

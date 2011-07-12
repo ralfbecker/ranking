@@ -146,4 +146,20 @@ class route extends so_sql
 
 		return parent::save(null,$extra_where);
 	}
+
+	/**
+	 * Update only the given fields, if the primary key is not given, it will be taken from $this->data
+	 *
+	 * Reimplemented to delete the export-route cache
+	 *
+	 * @param array $fields
+	 * @param boolean $merge=true if true $fields will be merged with $this->data (after update!), otherwise $this->data will be just $fields
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function update($fields,$merge=true)
+	{
+		boresult::delete_export_route_cache($merge ? array_merge($this->data,fields) : $fields);
+
+		return parent::update($fields,$merge);
+	}
 }
