@@ -26,18 +26,11 @@
 function Resultlist(_container,_json_url)
 {
 	Resultlist.prototype.update = Startlist.prototype.update;
-	//Resultlist.prototype.handleResponse = Startlist.prototype.handleResponse;
 	Resultlist.prototype.setHeader = Startlist.prototype.setHeader;
 	Resultlist.prototype.upDown = Startlist.prototype.upDown;
 	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
-	Startlist.apply(this, [_container,_json_url,{
-		'result_rank': 'Rank',
-		'lastname' : {'label': 'Name', 'colspan': 2},
-		'firstname' : '',
-		'nation' : 'Nation',
-		'result': 'Result'
-	}]);
+	Startlist.apply(this, [_container,_json_url]);
 }
 
 /**
@@ -49,47 +42,48 @@ function Resultlist(_container,_json_url)
  */            
 Resultlist.prototype.handleResponse = function(_data)
 {
-	//console.log(_data);
-	if (typeof this.discipline == 'undefined')
+	var detail = this.json_url.match(/detail=([^&]+)/);
+
+	switch(_data.discipline)
 	{
-		this.discipline = _data.discipline;
+		case 'speedrelay':
+			this.result_cols = detail && detail[1] == 0 ? {
+				'result_rank': 'Rank',
+				'team_name': 'Teamname',
+				'team_nation': 'Nation',
+				'result': 'Sum'
+			} : {
+				'result_rank': 'Rank',
+				'team_name': 'Teamname',
+				'team_nation': 'Nation',
+				'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
+				'athletes/0/firstname': '', 
+				'athletes/0/result_time': '', 
+				'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
+				'athletes/1/firstname': '', 
+				'athletes/1/result_time': '', 
+				'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
+				'athletes/2/firstname': '', 
+				'athletes/2/result_time': '',
+				'result': 'Sum'
+			};
+			break;
 
-		var detail = this.json_url.match(/detail=([^&]+)/);
-
-		switch(this.discipline)
-		{
-			case 'boulder':
-				if (!detail || detail[1] == 2)
-				{
-					delete this.columns.result;
-					this.columns.boulder = Resultlist.prototype.getBoulderResult;
-					if (detail && detail[1] == 2) this.columns.result = 'Sum';
-				}
-				break;
-
-			case 'speedrelay':
-				this.columns = detail && detail[1] == 0 ? {
-					'result_rank': 'Rank',
-					'team_name': 'Teamname',
-					'team_nation': 'Nation',
-					'result': 'Sum'
-				} : {
-					'result_rank': 'Rank',
-					'team_name': 'Teamname',
-					'team_nation': 'Nation',
-					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
-					'athletes/0/firstname': '', 
-					'athletes/0/result_time': '', 
-					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
-					'athletes/1/firstname': '', 
-					'athletes/1/result_time': '', 
-					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
-					'athletes/2/firstname': '', 
-					'athletes/2/result_time': '',
-					'result': 'Sum'
-				};
-				break;
-		}
+		default:
+			this.result_cols = {
+				'result_rank': 'Rank',
+				'lastname' : {'label': 'Name', 'colspan': 2},
+				'firstname' : '',
+				'nation' : 'Nation',
+				'result': 'Result'
+			};
+			if (_data.discipline == 'boulder' && (!detail || detail[1] == 2))
+			{
+				delete this.result_cols.result;
+				this.result_cols.boulder = Resultlist.prototype.getBoulderResult;
+				if (detail && detail[1] == 2) this.result_cols.result = 'Sum';
+			}
+			break;
 	}
 	Startlist.prototype.handleResponse.apply(this, [_data]);
 };
@@ -148,28 +142,12 @@ Resultlist.prototype.getBoulderResult = function(_data,_tag)
  * 
  * @param _container
  * @param _json_url url for data to load
- * @param _columns hash with key => label pairs, defaulting to this.startlist_cols
- * @param _sort name of column to sort by, defaults to first column
  */
-function Startlist(_container,_json_url,_columns,_sort)
+function Startlist(_container,_json_url)
 {
 	this.json_url = _json_url;
 	if (typeof _container == "string") _container = document.getElementById(_container);
 	this.container = _container;
-	// set startlist columns, if not set already
-	this.startlist_cols = {
-		'start_order': {'label': 'StartNr', 'colspan': 2},
-		'start_number': '',
-		'lastname' : {'label': 'Name', 'colspan': 2},
-		'firstname' : '',
-		'birthyear' : 'Birthyear',
-		'nation' : 'Nation'
-	};
-	// use starlist columns, if no columns given
-	this.columns = typeof _columns == 'undefined' ? this.startlist_cols : _columns;
-	// if not sort given, use first column
-	if (typeof _sort == 'undefined') for(_sort in this.columns) break;
-	this.sort = _sort;
 	
 	// Variables needed for scrolling in upDown
 	// scroll speed
@@ -220,48 +198,62 @@ Startlist.prototype.update = function()
 Startlist.prototype.handleResponse = function(_data)
 {
 	//console.log(_data);
-	if (typeof this.discipline == 'undefined')
-	{
-		this.discipline = _data.discipline;
 
-		switch(this.discipline)
-		{
-			case 'speedrelay':
-				this.columns = this.startlist_cols = {
-					'start_order': 'StartNr',
-					'team_name': 'Teamname',
-					'team_nation': 'Nation',
-					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
-					'athletes/0/firstname': '', 
-					'athletes/0/start_number': '', 
-					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
-					'athletes/1/firstname': '', 
-					'athletes/1/start_number': '', 
-					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
-					'athletes/2/firstname': '', 
-					'athletes/2/start_number': ''
-				};
-				break;
-		}
-	}
-	// if we have no ranked participant, show a startlist
-	if (!_data.participants[0].result_rank && this.sort == 'result_rank')
+	switch(_data.discipline)
 	{
-		this.result_cols = this.columns;
+		case 'speedrelay':
+			this.startlist_cols = {
+				'start_order': 'StartNr',
+				'team_name': 'Teamname',
+				'team_nation': 'Nation',
+				'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
+				'athletes/0/firstname': '', 
+				'athletes/0/start_number': '', 
+				'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
+				'athletes/1/firstname': '', 
+				'athletes/1/start_number': '', 
+				'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
+				'athletes/2/firstname': '', 
+				'athletes/2/start_number': ''
+			};
+			break;
+			
+		default:
+			this.startlist_cols = {
+				'start_order': {'label': 'StartNr', 'colspan': 2},
+				'start_number': '',
+				'lastname' : {'label': 'Name', 'colspan': 2},
+				'firstname' : '',
+				'birthyear' : 'Birthyear',
+				'nation' : 'Nation'
+			};
+			break;
+	}
+	var sort;
+	// if we have no result columns or no ranked participant, show a startlist
+	if (typeof this.result_cols == 'undefined' || !_data.participants[0].result_rank)
+	{
 		this.columns = this.startlist_cols;
-		this.sort = 'start_order';
+		sort = 'start_order';
 	}
 	// if we are a result showing a startlist AND have now a ranked participant
 	// --> switch back to result
-	else if(_data.participants[0].result_rank && this.result_cols)
+	else
 	{
 		this.columns = this.result_cols;
-		delete this.result_cols;
-		this.sort = 'result_rank';
-		// remove whole table
-		jQuery(this.container).empty();
-		delete this.table;
+		sort = 'result_rank';
 	}
+
+	// remove whole table, if discipline or startlist/resultlist (detemined by sort) changed
+	if (this.discipline && this.discipline != _data.discipline ||
+		this.sort && this.sort != sort)
+	{
+		jQuery(this.container).empty();
+		delete this.table;		
+	}
+	this.discipline = _data.discipline;
+	this.sort = sort;
+
 	if (typeof this.table == 'undefined')
 	{
 		// for general result use one column per heat
@@ -307,7 +299,7 @@ Startlist.prototype.handleResponse = function(_data)
 	if (!_data.route_result) 
 	{
 		var list = this;
-		window.setTimeout(function(){list.update();},10000);
+		this.update_handle = window.setTimeout(function(){list.update();},10000);
 	}
 };
 
@@ -699,6 +691,9 @@ Startlist.prototype.rotateURL = function() {
 	    this.json_url = this.json_url.replace(/cat=[0-9_a-z]+/, "cat=" + next_cat);
 	    this.json_url = this.json_url.replace(/route=[\d]+/, "route=" + next_route);
 	    //console.log(this.json_url);
+
+	    // cancel the currently pending request before starting a new one.
+	    window.clearTimeout(this.update_handle);
 	    this.update();
 	}
 };
