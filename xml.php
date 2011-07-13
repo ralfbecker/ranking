@@ -127,6 +127,7 @@ function write_participant($xml,$participant)
 	{
 		if (!is_array($value))
 		{
+			//error_log(__METHOD__.'(,'.array2string($participant).') name='.array2string($name).', value='.array2string($value));
 			$xml->writeElement($name,(string)$value);
 		}
 		elseif($value)
