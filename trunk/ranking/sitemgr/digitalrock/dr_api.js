@@ -77,7 +77,11 @@ Resultlist.prototype.handleResponse = function(_data)
 				'nation' : 'Nation',
 				'result': 'Result'
 			};
-			if (_data.discipline == 'boulder' && (!detail || detail[1] == 2))
+			// route defaults to -1 if not set or empty
+			var route = this.json_url.match(/route=([0-9]+)/);
+			route = route && route[1] !== '' ? route[1] : -1;
+			// for boulder heats use new display, but not for general result!
+			if (_data.discipline == 'boulder' && (!detail || detail[1] == 2) && route != -1)
 			{
 				delete this.result_cols.result;
 				this.result_cols.boulder = Resultlist.prototype.getBoulderResult;
