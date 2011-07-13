@@ -1,0 +1,26 @@
+#!/bin/bash
+
+[ $# -lt 1 ] && {
+	echo "Usage: $0 WetId [database]"
+	echo "	WetId: integer competition ID"
+	echo " "
+	echo "Dump result service data of a single competitions, eg. to import it into an other database."
+	echo "Previous data of that competition gets deleted by SQL DELETE statements prefixing the dump!"
+	echo "Data of holds and topos is NOT included!"
+	echo " "
+	echo "Example: $0 123 | ssh -C HOST mysql rang"
+	exit 1;
+}
+WetId=$1
+db_name=${2:-rang}
+tables="Routes RouteResults RelayResults"
+
+# delete previous data
+for table in $tables
+do
+	echo "DELETE FROM \`$table\` WHERE WetId=$WetId;"
+done
+
+# dump the data
+#echo mysqldump --skip-opt $db_name $tables\|grep "VALUES ($WetId,"
+mysqldump --skip-opt $db_name $tables|grep "VALUES ($WetId,"
