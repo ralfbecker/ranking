@@ -1019,7 +1019,7 @@ class boresult extends boranking
 	/**
 	 * Upload a route as csv file
 	 *
-	 * @param array $keys WetId, GrpId, route_order
+	 * @param array $keys WetId, GrpId, route_order and optional 'route_type and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param string/int error message or number of lines imported
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
@@ -1031,17 +1031,56 @@ class boresult extends boranking
 		{
 			return lang('Permission denied !!!');
 		}
-		$csv = $this->parse_csv($keys,$file,false,$add_athletes);
+		$route_type = $keys['route_type'];
+		$discipline = $keys['discipline'];
+		$keys = array_intersect_key($keys, array_flip(array('WetId','GrpId','route_order')));
 
-		if (!is_array($csv)) return $csv;
+		if (!isset($route_type))
+		{
+			if (!($route = $this->route->read($keys)))
+			{
+				return lang('Route NOT found!').' keys='.array2string($keys);
+			}
+			$route_type = $route['route_type'];
+		}
+		if (!isset($discipline))
+		{
+			$comp = $this->comp->read($keys['WetId']);
+			if (!$comp['dicipline']) $cat = $this->cats->read($keys['GrpId']);
+			$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		}
+		if (is_resource($file))
+		{
+			$head = fread($file, 10);
+			fseek($file, 0, SEEK_SET);
+		}
+		else
+		{
+			$head = file_get_contents($file,false,null,0,10);
+		}
+		if (strpos($head,'<?xml') === 0)
+		{
+			$data = $this->parse_xml($keys+array(
+				'route_type' => $route_type,
+				'discipline' => $discipline,
+			),$file,$add_athletes);
+		}
+		else
+		{
+			$data = $this->parse_csv($keys,$file,false,$add_athletes);
+		}
+		if (!is_array($data)) return $data;
 
+		$this->route_result->route_type = $route_type;
+		$this->route_result->discipline = $discipline;
+		// todo speedrelay
 		$this->route_result->delete(array(
 			'WetId'    => $keys['WetId'],
 			'GrpId'    => $keys['GrpId'],
 			'route_order' => $keys['route_order'],
 		));
 		//_debug_array($lines);
-		foreach($csv as $line)
+		foreach($data as $line)
 		{
 			$this->route_result->init($line);
 			$this->route_result->save(array(
@@ -1049,7 +1088,203 @@ class boresult extends boranking
 				'result_modified' => time(),
 			));
 		}
-		return count($csv);
+		return count($data);
+	}
+
+	/**
+	 * XMLReader instace of parse_xml
+	 *
+	 * @var XMLReader
+	 */
+	private $reader;
+
+	/**
+	 * Parse xml file or Zingerle's ClimbingData.xsd schema
+	 *
+	 * Schema DTD is in /ranking/doc/ClimbingData.xsd, URL http://tempuri.org/ClimbingData.xsd gives 404 Not Found
+	 *
+	 * That schema can NOT create routes, as it only contains start-numbers, no PerId's!!!!
+	 *
+	 * @param array $keys WetId, GrpId, route_order and optional 'route_type' and 'discipline'
+	 * @param string|FILE $file uploaded file name or handle
+	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
+	 * @return array|string array with imported data (array of array for route_result->save) or string with error message
+	 */
+	protected function parse_xml($keys,$file,$add_athletes=false)
+	{
+		$route_type = $keys['route_type'];
+		$discipline = $keys['discipline'];
+		$keys = array_intersect_key($keys, array_flip(array('WetId','GrpId','route_order')));
+
+		if (!isset($route_type))
+		{
+			if (!($route = $this->route->read($keys)))
+			{
+				return lang('Route NOT found!').' keys='.array2string($keys);
+			}
+			$route_type = $route['route_type'];
+		}
+		if (!isset($discipline))
+		{
+			$comp = $this->comp->read($keys['WetId']);
+			if (!$comp['dicipline']) $cat = $this->cats->read($keys['GrpId']);
+			$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		}
+		$this->route_result->route_type = $route_type;
+		$this->route_result->discipline = $discipline;
+
+		if (!($participants = $this->route_result->search(array(),false,'','','',false,'AND',false,$keys+array(
+			'discipline'  => $discipline,
+			'route_type'  => $route_type,
+		))))
+		{
+			return lang('No participants yet!').' '.lang('ClimbingData xml files can only set results, not create NEW participants!');
+		}
+		$this->reader = new XMLReader();
+		if (is_resource($file))
+		{
+			$this->reader->XML(stream_get_contents($file));
+		}
+		elseif (!$this->reader->open($file))
+		{
+			return lang('Could not open %1!',$file);
+		}
+		if (!$this->reader->setSchema(EGW_SERVER_ROOT.'/ranking/doc/ClimbingData.xsd'))
+		{
+			return lang('XML file uses unknown schema (format)!');
+		}
+		$results = $settings = array();
+		while ($this->reader->read())
+		{
+			if ($this->reader->nodeType == XMLReader::ELEMENT)
+			{
+				switch ($this->reader->name)
+				{
+					case 'Settings':
+						$settings = $this->read_node();
+						break;
+
+					case 'Results':
+						$results[] = $this->read_node();
+						break;
+				}
+			}
+		}
+		//_debug_array($settings);
+		switch($settings['Mode'])
+		{
+			case 'IndividualQualification':
+			case 'IndividualFinals':
+				if ($discipline != 'speed')
+				{
+					return lang('Wrong Mode="%1" for discipline "%2"!',$settings['Mode'],$discipline);
+				}
+				if (($keys['route_order'] < 2) != ($settings['Mode'] == 'IndividualQualification'))
+				{
+					return lang('Wrong Mode="%1" for this heat (qualification - final mismatch)!',$settings['Mode'],$discipline);
+
+				}
+				break;
+			case 'TeamQualivication':
+			case 'TeamFinals':
+				if ($discipline != 'speedrelay')
+				{
+					return lang('Wrong Mode="%1" for discipline "%2"!',$settings['Mode'],$discipline);
+				}
+				if (($keys['route_order'] < 2) != ($settings['Mode'] == 'TeamQualification'))
+				{
+					return lang('Wrong Mode="%1" for this heat (qualification - final mismatch)!',$settings['Mode'],$discipline);
+				}
+				break;
+			default:
+				return lang('Unknown Mode="%1"!',$settings['Mode']);
+		}
+		//_debug_array($results);
+		//_debug_array($participants);
+		$data = array();
+		foreach($results as $result)
+		{
+			if (!$result['StartNumber'])
+			{
+				continue;	// ignore records without startnumber (not sure how they get into the xml file, but they are!)
+			}
+			$participant = null;
+			foreach($participants as $p)
+			{
+				if ($result['StartNumber'] == ($p['start_number'] ? $p['start_number'] : $p['start_order']))
+				{
+					$participant = $keys+array_intersect_key($p, array_flip(array('PerId', 'start_order', 'start_number', 'start_order2n')));
+					break;
+				}
+			}
+			if (!$participant)
+			{
+				return lang('No participant with startnumber "%1"!',$result['StartNumber']).' '.array2string($result);
+			}
+			switch($settings['Mode'])
+			{
+				case 'IndividualQualification':
+					$participant['result_time'] = self::parse_time($result['Run1'],$participant['eliminated']);
+					$participant['result_time_r'] = self::parse_time($result['Run2'],$participant['eliminated_r']);
+					$participant['result_rank'] = $result['Rank'];
+					break;
+				case 'IndividualFinals':
+					$participant['result_time'] = self::parse_time($result['Run1'],$participant['eliminated']);
+					$participant['result_rank'] = $result['Rank'];
+					break;
+				case 'TeamQualivication':
+				case 'TeamFinals':
+					return "TeamRelay NOT yet implemented!";
+			}
+			//error_log($p['nachname'].': '.array2string($participant));
+			$data[] = $participant;
+		}
+		if (!is_resource($file)) $this->reader->close();
+
+		return $data;
+	}
+
+	/**
+	 * Parse time from xml file m:ss.ddd
+	 *
+	 * @param string $str
+	 * @param string &$eliminated=null on return '' or 1 if climber took a fall, no time
+	 * @return double|string
+	 */
+	static function parse_time($str,&$eliminated=null)
+	{
+		$eliminated = '';
+		if (!isset($str))
+		{
+			$eliminated = '1';
+			return '';
+		}
+		list($time,$secs) = explode(':',$str);
+		if (isset($secs))
+		{
+			$time = 60.0 * $time + $secs;
+		}
+		return $time;
+	}
+
+	/**
+	 * Return (flat) array of all child nodes
+	 *
+	 * @return array
+	 */
+	private function read_node()
+	{
+		$nodeName = $this->reader->name;
+
+		$data = array();
+		while($this->reader->read() && !($this->reader->nodeType == XMLReader::END_ELEMENT && $this->reader->name == $nodeName))
+		{
+			if ($this->reader->nodeType == XMLReader::ELEMENT)
+			{
+				$data[$this->reader->name] = trim($this->reader->readString());
+			}
+		}
+		return $data;
 	}
 
 	/**
