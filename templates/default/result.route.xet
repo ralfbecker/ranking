@@ -121,6 +121,11 @@
 						<int blur="Port" id="route_time_port" class="leftPad5"/>
 					</hbox>
 				</row>
+				<row class="row" valign="top">
+					<description value="Routejudges" options=",,,route_judges"/>
+					<listbox type="select-account" id="route_judges" rows="5"/>
+					<description/>
+				</row>
 				<row class="row" disabled="@no_upload">
 					<description value="Upload topo" options=",,,topo_upload"/>
 					<hbox options="0,0">
@@ -129,7 +134,7 @@
 					</hbox>
 					<description/>
 				</row>
-				<row valign="top" height="180">
+				<row valign="top" height="120">
 					<grid width="100%" id="topos">
 						<columns>
 							<column/>

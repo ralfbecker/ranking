@@ -719,9 +719,10 @@ class boresult extends boranking
 
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) &&
+			!$this->is_judge($comp, false, $keys))	// check additionally for route_judges
 		{
-			return $this->error = false;
+			return $this->error = false;	// permission denied
 		}
 		// setting discipline and route_type to allow using it in route_result->save()/->data2db
 		$this->route_result->discipline = $discipline;
@@ -796,7 +797,7 @@ class boresult extends boranking
 						++$modified;
 						continue;
 					}
-					error_log(__METHOD__."() --> saving #$id because $key='$val' changed, was '{$old[$key]}'");
+					//error_log(__METHOD__."() --> saving #$id because $key='$val' changed, was '{$old[$key]}'");
 					$data['result_modified'] = time();
 					$data['result_modifier'] = $this->user;
 

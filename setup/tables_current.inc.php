@@ -251,7 +251,8 @@ $phpgw_baseline = array(
 			'next_7' => array('type' => 'int','precision' => '4','comment' => 'next for boulder #7'),
 			'next_8' => array('type' => 'int','precision' => '4','comment' => 'next for boulder #8'),
 			'boulder_time' => array('type' => 'int','precision' => '4','comment' => 'boulder rotation time in sec'),
-			'boulder_startet' => array('type' => 'int','precision' => '8','comment' => 'last boulder rotation started timestamp')
+			'boulder_startet' => array('type' => 'int','precision' => '8','comment' => 'last boulder rotation started timestamp'),
+			'route_judges' => array('type' => 'varchar','precision' => '255','comment' => 'judges for just that route')
 		),
 		'pk' => array('WetId','GrpId','route_order'),
 		'fk' => array(),

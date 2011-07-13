@@ -420,13 +420,15 @@ class boranking extends ranking_so
 	}
 
 	/**
-	 * checks if user is a judge of a given competition, this counts only 2 weeks before and after the competition!!!
+	 * checks if user is a judge of a given competition, this counts only 1 week (see judge_right_days) before and after the competition!!!
 	 *
 	 * @param array|int $comp competitiion array or id
 	 * @param boolean $allow_before=false grant judge-rights unlimited time before the competition
+	 * @param array $route=null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
+	 * 	if route judges should be checked too, default null=no route judges
 	 * @return boolean
 	 */
-	function is_judge($comp,$allow_before=false)
+	function is_judge($comp,$allow_before=false,array $route=null)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
@@ -435,8 +437,19 @@ class boranking extends ranking_so
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = (mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
 		//echo "<p>".__METHOD__."($comp[rkey]: $comp[name] ($comp[datum])) distance=$distance</p>\n";
-		return $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) &&
+
+		$is_judge = $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) &&
 			($allow_before && $distance > 0 || abs($distance) <= $this->judge_right_days);
+
+		if (!$is_judge && $route && (is_array($route) && isset($route['route_judges']) ||
+			($route = $this->route->read($route))) && $route['route_judges'] &&
+			$route['route_status'] != STATUS_RESULT_OFFICIAL &&			// only 'til result is offical
+			$distance < 0 && abs($distance) <= $this->judge_right_days)	// and only after competitions started
+		{
+			$is_judge = in_array($this->user, explode(',',$route['route_judges']));
+		}
+		//if (!$is_judge) error_log(__METHOD__."(#$comp[WetId]=$comp[rkey], $allow_before, ".array2string($route).") distance=$distance, route_judges=$route[route_judges] returning ".array2string($is_judge).' '.function_backtrace());
+		return $is_judge;
 	}
 
 	/**
