@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ClimbingData" targetNamespace="http://tempuri.org/ClimbingData.xsd" xmlns:mstns="http://tempuri.org/ClimbingData.xsd" xmlns="http://tempuri.org/ClimbingData.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="ClimbingData" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="ClimbingData" msprop:Generator_UserDSName="ClimbingData">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Results" msdata:Locale="" msprop:Generator_TableClassName="ResultsDataTable" msprop:Generator_TableVarName="tableResults" msprop:Generator_TablePropName="Results" msprop:Generator_RowDeletingName="ResultsRowDeleting" msprop:Generator_UserTableName="Results" msprop:Generator_RowChangingName="ResultsRowChanging" msprop:Generator_RowEvHandlerName="ResultsRowChangeEventHandler" msprop:Generator_RowDeletedName="ResultsRowDeleted" msprop:Generator_RowEvArgName="ResultsRowChangeEvent" msprop:Generator_RowChangedName="ResultsRowChanged" msprop:Generator_RowClassName="ResultsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Rank" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="Rank" msprop:Generator_ColumnVarNameInTable="columnRank" msprop:Generator_ColumnPropNameInTable="RankColumn" msprop:Generator_UserColumnName="Rank" type="xs:string" minOccurs="0" />
+              <xs:element name="StartNumber" msprop:nullValue="_throw" msprop:Generator_ColumnPropNameInRow="StartNumber" msprop:Generator_ColumnVarNameInTable="columnStartNumber" msprop:Generator_ColumnPropNameInTable="StartNumberColumn" msprop:Generator_UserColumnName="StartNumber">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="5" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Run1" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run1" msprop:Generator_ColumnVarNameInTable="columnRun1" msprop:Generator_ColumnPropNameInTable="Run1Column" msprop:Generator_UserColumnName="Run1" type="xs:string" minOccurs="0" />
+              <xs:element name="Run2" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run2" msprop:Generator_ColumnVarNameInTable="columnRun2" msprop:Generator_ColumnPropNameInTable="Run2Column" msprop:Generator_UserColumnName="Run2" type="xs:string" minOccurs="0" />
+              <xs:element name="Run3" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run3" msprop:Generator_ColumnVarNameInTable="columnRun3" msprop:Generator_ColumnPropNameInTable="Run3Column" msprop:Generator_UserColumnName="Run3" type="xs:string" minOccurs="0" />
+              <xs:element name="Run4" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run4" msprop:Generator_ColumnVarNameInTable="columnRun4" msprop:Generator_ColumnPropNameInTable="Run4Column" msprop:Generator_UserColumnName="Run4" type="xs:string" minOccurs="0" />
+              <xs:element name="Run5" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run5" msprop:Generator_ColumnVarNameInTable="columnRun5" msprop:Generator_ColumnPropNameInTable="Run5Column" msprop:Generator_UserColumnName="Run5" type="xs:string" minOccurs="0" />
+              <xs:element name="Run6" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run6" msprop:Generator_ColumnVarNameInTable="columnRun6" msprop:Generator_ColumnPropNameInTable="Run6Column" msprop:Generator_UserColumnName="Run6" type="xs:string" minOccurs="0" />
+              <xs:element name="Run7" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run7" msprop:Generator_ColumnVarNameInTable="columnRun7" msprop:Generator_ColumnPropNameInTable="Run7Column" msprop:Generator_UserColumnName="Run7" type="xs:string" minOccurs="0" />
+              <xs:element name="Run8" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Run8" msprop:Generator_ColumnVarNameInTable="columnRun8" msprop:Generator_ColumnPropNameInTable="Run8Column" msprop:Generator_UserColumnName="Run8" type="xs:string" minOccurs="0" />
+              <xs:element name="TeamTotalRun1" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TeamTotalRun1" msprop:Generator_ColumnVarNameInTable="columnTeamTotalRun1" msprop:Generator_ColumnPropNameInTable="TeamTotalRun1Column" msprop:Generator_UserColumnName="TeamTotalRun1" type="xs:string" minOccurs="0" />
+              <xs:element name="TeamTotalRun2" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TeamTotalRun2" msprop:Generator_ColumnVarNameInTable="columnTeamTotalRun2" msprop:Generator_ColumnPropNameInTable="TeamTotalRun2Column" msprop:Generator_UserColumnName="TeamTotalRun2" type="xs:string" minOccurs="0" />
+              <xs:element name="BestRun" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="BestRun" msprop:Generator_ColumnVarNameInTable="columnBestRun" msprop:Generator_ColumnPropNameInTable="BestRunColumn" msprop:Generator_UserColumnName="BestRun" type="xs:string" minOccurs="0" />
+              <xs:element name="ResultValue" msprop:Generator_ColumnVarNameInTable="columnResultValue" msprop:Generator_ColumnPropNameInRow="ResultValue" msprop:Generator_ColumnPropNameInTable="ResultValueColumn" msprop:Generator_UserColumnName="ResultValue" type="xs:int" default="0" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Settings" msdata:Locale="" msprop:Generator_TableClassName="SettingsDataTable" msprop:Generator_TableVarName="tableSettings" msprop:Generator_TablePropName="Settings" msprop:Generator_RowDeletingName="SettingsRowDeleting" msprop:Generator_UserTableName="Settings" msprop:Generator_RowChangingName="SettingsRowChanging" msprop:Generator_RowEvHandlerName="SettingsRowChangeEventHandler" msprop:Generator_RowDeletedName="SettingsRowDeleted" msprop:Generator_RowEvArgName="SettingsRowChangeEvent" msprop:Generator_RowChangedName="SettingsRowChanged" msprop:Generator_RowClassName="SettingsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Mode" msprop:Generator_ColumnVarNameInTable="columnMode" msprop:Generator_ColumnPropNameInRow="Mode" msprop:Generator_ColumnPropNameInTable="ModeColumn" msprop:Generator_UserColumnName="Mode" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Results" />
+      <xs:field xpath="mstns:StartNumber" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>
