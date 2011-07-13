@@ -1952,6 +1952,7 @@ class boresult extends boranking
 			'route_status',	// 'route_result' is set if result is official
 			'slist_order',
 			'next_1','next_2','next_3','next_4','next_5','next_6','next_7','next_8',
+			'RelayResults.*',	// not needed and gives warning in xml export
 		)));
 		if ($discipline != 'boulder') unset($route['route_num_problems']);
 
@@ -2090,6 +2091,7 @@ class boresult extends boranking
 				'PerId_1','PerId_2','PerId_3',
 				'start_number_1','start_number_2','start_number_3',
 				'result_time_1','result_time_2','result_time_3',
+				'RelayResults.*',	// not needed and gives warning in xml export
 			)));
 
 			ksort($row);
