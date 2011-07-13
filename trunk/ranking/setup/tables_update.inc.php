@@ -1361,3 +1361,15 @@ function ranking_upgrade1_9_002()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.003';
 }
 
+
+function ranking_upgrade1_9_003()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','route_judges',array(
+		'type' => 'varchar',
+		'precision' => '255',
+		'comment' => 'judges for just that route'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.004';
+}
+

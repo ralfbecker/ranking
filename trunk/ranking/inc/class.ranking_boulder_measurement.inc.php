@@ -188,7 +188,7 @@ class ranking_boulder_measurement
 		{
 			throw new egw_exception_wrong_parameter("Competition $query[comp] NOT found!");
 		}
-		if (!boresult::$instance->is_admin && !boresult::$instance->is_judge($comp))
+		if (!boresult::$instance->is_admin && !boresult::$instance->is_judge($comp, false, self::query2keys($query)))
 		{
 			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
 		}
