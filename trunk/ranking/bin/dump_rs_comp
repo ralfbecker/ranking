@@ -1,11 +1,17 @@
 #!/bin/bash
 
+delete=
+[ "$1" == '--delete' ] && {
+	delete=true
+	shift
+}
+
 [ $# -lt 1 ] && {
-	echo "Usage: $0 WetId [database]"
+	echo "Usage: [--delete] $0 WetId [database]"
+	echo "	--delete: use DELETE and INSERT INTO, otherwise REPLACE INTO is used
 	echo "	WetId: integer competition ID"
 	echo " "
 	echo "Dump result service data of a single competitions, eg. to import it into an other database."
-	echo "Previous data of that competition gets deleted by SQL DELETE statements prefixing the dump!"
 	echo "Data of holds and topos is NOT included!"
 	echo " "
 	echo "Example: $0 123 | ssh -C HOST mysql rang"
@@ -16,11 +22,16 @@ db_name=${2:-rang}
 tables="Routes RouteResults RelayResults"
 
 # delete previous data
-for table in $tables
-do
-	echo "DELETE FROM \`$table\` WHERE WetId=$WetId;"
-done
+[ "$delete" == "true" ] && {
+	for table in $tables
+	do
+		echo "DELETE FROM \`$table\` WHERE WetId=$WetId;"
+	done
 
-# dump the data
-#echo mysqldump --skip-opt $db_name $tables\|grep "VALUES ($WetId,"
-mysqldump --skip-opt $db_name $tables|grep "VALUES ($WetId,"
+	mysqldump --skip-opt $db_name $tables|grep "VALUES ($WetId,"
+	exit $?
+}
+
+# replace data only
+mysqldump --skip-opt $db_name $tables|grep "VALUES ($WetId,"|sed 's/^INSERT INTO/REPLACE INTO/'
+exit $?
