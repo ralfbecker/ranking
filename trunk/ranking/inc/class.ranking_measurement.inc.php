@@ -288,11 +288,11 @@ class ranking_measurement extends ranking_boulder_measurement
 	 * @param array &$cat=null on return category array
 	 * @throws egw_exception_wrong_userinput
 	 * @throws egw_exception_wrong_parameter
-	 * @return string vfs directory name
+	 * @return string|boolean vfs directory name or false if directory does not exists and !$create
 	 */
 	public static function get_topo_dir(array $route, $create=true, $check_perms=true, &$comp=null, &$cat=null)
 	{
-		$dir = boresult::$instance->config['vfs_pdf_dir'];
+		$dir = boresult::$instance->config['vfs_topo_dir'];
 		if ($dir[0] != '/' || !egw_vfs::file_exists($dir) || !egw_vfs::is_dir($dir))
 		{
 			throw new egw_exception_wrong_userinput(lang('Wrong or NOT configured VFS directory').': '.$dir);
@@ -310,9 +310,14 @@ class ranking_measurement extends ranking_boulder_measurement
 			throw new egw_exception_wrong_parameter("Category $route[GrpId] NOT found!");
 		}
 		$dir .= '/'.(int)$comp['datum'].'/'.$comp['rkey'].'/'.$cat['rkey'];
-		if (!egw_vfs::file_exists($dir) && !egw_vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
+		if (!egw_vfs::file_exists($dir))
 		{
-			throw new egw_exception_wrong_userinput(lang('Can NOT create topo directory %1!',$dir));
+			if (!$create) return false;
+
+			if (!egw_vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
+			{
+				throw new egw_exception_wrong_userinput(lang('Can NOT create topo directory %1!',$dir));
+			}
 		}
 		return $dir;
 	}
@@ -328,11 +333,16 @@ class ranking_measurement extends ranking_boulder_measurement
 	 */
 	public static function get_topos(array $route, $check_perms=true, &$comp=null, &$cat=null)
 	{
-		$topos = egw_vfs::find(self::get_topo_dir($route,false, $check_perms, $comp, $cat),$p=array(
-			'maxdepth' => 1,
-			'name' => $route['route_order'].'?_*',
-			'mime' => 'image',
-		));
+		$topos = array();
+
+		if (($dir = self::get_topo_dir($route,false, $check_perms, $comp, $cat)))
+		{
+			$topos = egw_vfs::find($dir,$p=array(
+				'maxdepth' => 1,
+				'name' => $route['route_order'].'?_*',
+				'mime' => 'image',
+			));
+		}
 		return $topos;
 	}
 
@@ -347,7 +357,7 @@ class ranking_measurement extends ranking_boulder_measurement
 	{
 		$dir = self::get_topo_dir($route, false, true);	// true = check judge perms
 
-		if (strpos($topo, $dir.'/') === 0)	// topo is inside regular topo-dir
+		if ($dir && strpos($topo, $dir.'/') === 0)	// topo is inside regular topo-dir
 		{
 			self::delete_hold(array(
 				'WetId' => $route['WetId'],
