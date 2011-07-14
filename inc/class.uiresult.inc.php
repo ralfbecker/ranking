@@ -347,7 +347,7 @@ class uiresult extends boresult
 		{
 			foreach($this->route->db_cols as $col)
 			{
-				$readonlys[$col] = true;
+				$readonlys[$col] = $readonlys['button[upload]'] = true;
 			}
 			$readonlys['button[upload]'] = $readonlys['button[ranking]'] = $readonlys['button[startlist]'] = $readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] = true;
 			$content['no_upload'] = true;
@@ -359,7 +359,7 @@ class uiresult extends boresult
 			{
 				$readonlys['button[ranking]'] = true;	// only offical results can be commited into the ranking
 			}
-			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
+			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1 || $content['discipline'] != 'lead')
 			{
 				$content['no_upload'] = $readonlys['button[upload]'] = true;	// no upload if result offical or general result
 			}

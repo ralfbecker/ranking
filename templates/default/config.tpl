@@ -15,6 +15,10 @@
     <td>{lang_VFS_directory_for_the_pdf_files_(excluding_the_year)}</td>
     <td><input name="newsettings[vfs_pdf_dir]" value="{value_vfs_pdf_dir}"></td>
    </tr>
+   <tr class="row_off">
+    <td>{lang_VFS_directory_for_topo_files_(excluding_the_year)}</td>
+    <td><input name="newsettings[vfs_topo_dir]" value="{value_vfs_topo_dir}"></td>
+   </tr>
    <tr class="th">
     <td colspan="2"><b>{lang_Ranking_database}</b> ({lang_only_fill_values_different_from_eGW}):</td>
    </tr>
@@ -56,20 +60,20 @@
    <tr class="row_off">
     <td>Path for rock files to import (without year):</td>
     <td>
-     <input name="newsettings[rock_import_path]" value="{value_rock_import_path}"> 
+     <input name="newsettings[rock_import_path]" value="{value_rock_import_path}">
     </td>
    </tr>
    <tr class="row_on">
     <td>1. route to import (rock-route/category/heat):</td>
     <td>
-    	<input name="newsettings[rock_import1]" value="{value_rock_import1}"> 
+    	<input name="newsettings[rock_import1]" value="{value_rock_import1}">
     	<select name="newsettings[rock_import_cat1]">{hook_rock_import_cat1}</select>
      	<select name="newsettings[rock_import_route1]">{hook_rock_import_route1}</select>
    </td>
    <tr class="row_off">
     <td>2. route to import (rock-route/category/heat):</td>
     <td>
-    	<input name="newsettings[rock_import2]" value="{value_rock_import2}"> 
+    	<input name="newsettings[rock_import2]" value="{value_rock_import2}">
     	<select name="newsettings[rock_import_cat2]">{hook_rock_import_cat2}</select>
      	<select name="newsettings[rock_import_route2]">{hook_rock_import_route2}</select>
    </td>
