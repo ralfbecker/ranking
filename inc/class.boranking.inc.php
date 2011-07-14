@@ -428,7 +428,7 @@ class boranking extends ranking_so
 	 * 	if route judges should be checked too, default null=no route judges
 	 * @return boolean
 	 */
-	function is_judge($comp,$allow_before=false,array $route=null)
+	function is_judge($comp,$allow_before=false,$route=null)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
