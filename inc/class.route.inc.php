@@ -139,6 +139,10 @@ class route extends so_sql
 			}
 			$this->data['boulder_started'] = null;
 		}
+		if (isset($this->data['route_judges']) && is_array($this->data['route_judges']))
+		{
+			$this->data['route_judges'] = implode(',',$this->data['route_judges']);
+		}
 		$this->data['route_modified'] = time();
 		$this->data['route_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 
