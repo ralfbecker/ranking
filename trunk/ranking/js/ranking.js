@@ -542,6 +542,8 @@ function update_boulder()
 {
 	var n = document.getElementById('exec[nm][boulder_n]').value;
 	var PerId = document.getElementById('exec[nm][PerId]').value;
+	var GrpId = document.getElementById('exec[nm][cat]').value;
+	var route_order = document.getElementById('exec[nm][route]').value;
 
 	if (PerId && n)
 	{
@@ -549,7 +551,7 @@ function update_boulder()
 		update['top'+n] = parseInt(0+document.getElementById('exec[top]').value);	// parseInt(0+ is required, as backend doesn't store zones with empty top!
 		update['zone'+n] = document.getElementById('exec[zone]').value;
 
-		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n);				
+		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'GrpId': GrpId, 'route_order': route_order});				
 	}
 }
 
