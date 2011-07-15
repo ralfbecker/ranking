@@ -70,13 +70,14 @@ class ranking_boulder_measurement
 	 * @param array $update
 	 * @param int $set_current=1 make $PerId the current participant of the route
 	 */
-	public static function ajax_update_result($PerId,$update,$set_current=1)
+	public static function ajax_update_result($PerId,$update,$set_current=1, $state=null)
 	{
 		$query =& self::get_check_session();
 
 		$response = egw_json_response::get();
 
 		$keys = self::query2keys($query);
+		if ($state) $keys = array_merge($keys,$state);
 		//$response->alert(__METHOD__."($PerId, ".array2string($update).", $set_current) ".array2string($keys));
 
 		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
