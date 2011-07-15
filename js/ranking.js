@@ -37,7 +37,7 @@ function check_top(top)
 {
 	var bonus = document.getElementById(top.name.replace(/top/g,'zone'));
 
-	if (bonus && !bonus.value && parseInt(top.value) > 0) bonus.value = top.value;
+	if (bonus && (!bonus.value || bonus.value == '0') && parseInt(top.value) > 0) bonus.value = top.value;
 
 	if (bonus && parseInt(top.value) > 0 && parseInt(top.value) < parseInt(bonus.value))
 	{
@@ -527,7 +527,7 @@ function top_clicked(button)
 
 	if (!num.isNaN)
 	{
-		if(!bonus.value) bonus.value = num;
+		if(!bonus.value || bonus.value == '0') bonus.value = num;
 		top.value = num;
 		check_top(top);
 		
