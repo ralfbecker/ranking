@@ -1059,7 +1059,7 @@ class boresult extends boranking
 			$head = file_get_contents($file,false,null,0,10);
 		}
 		$need_update_ranking = false;
-		if (strpos($head,'<?xml') === 0 || $discipline == 'speedrelay')	// no csv import for speedrelay
+		if (($xml = strpos($head,'<?xml') === 0 || $discipline == 'speedrelay'))	// no csv import for speedrelay
 		{
 			$data = $this->parse_xml($keys+array(
 				'route_type' => $route_type,
@@ -1074,12 +1074,15 @@ class boresult extends boranking
 
 		$this->route_result->route_type = $route_type;
 		$this->route_result->discipline = $discipline;
-		// todo speedrelay
-		$this->route_result->delete(array(
-			'WetId'    => $keys['WetId'],
-			'GrpId'    => $keys['GrpId'],
-			'route_order' => $keys['route_order'],
-		));
+
+		if (!$xml)
+		{
+			$this->route_result->delete(array(
+				'WetId'    => $keys['WetId'],
+				'GrpId'    => $keys['GrpId'],
+				'route_order' => $keys['route_order'],
+			));
+		}
 		//_debug_array($lines);
 		foreach($data as $line)
 		{
@@ -1283,16 +1286,20 @@ class boresult extends boranking
 	static function parse_time($str,&$eliminated=null)
 	{
 		$eliminated = '';
-		if (!isset($str))
+		if (!isset($str) || (string)$str == '')
+		{
+			// empty / not set
+		}
+		elseif (preg_match('/^([0-9]*:)?([0-9.]+)$/', $str, $matches))
+		{
+			$time = 60.0 * $matches[1] + $matches[2];
+		}
+		else
 		{
 			$eliminated = '1';
-			return '';
+			$time = '';
 		}
-		list($time,$secs) = explode(':',$str);
-		if (isset($secs))
-		{
-			$time = 60.0 * $time + $secs;
-		}
+		//echo __METHOD__.'('.array2string($str).') eliminated='.array2string($eliminated).' returning '.array2string($time)."\n";
 		return $time;
 	}
 
