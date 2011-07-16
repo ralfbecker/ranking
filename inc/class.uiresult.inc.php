@@ -359,7 +359,7 @@ class uiresult extends boresult
 			{
 				$readonlys['button[ranking]'] = true;	// only offical results can be commited into the ranking
 			}
-			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1 || $content['discipline'] != 'lead')
+			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
 			{
 				$content['no_upload'] = $readonlys['button[upload]'] = true;	// no upload if result offical or general result
 			}

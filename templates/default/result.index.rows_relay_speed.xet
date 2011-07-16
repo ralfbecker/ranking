@@ -69,6 +69,7 @@
 				<column/>
 				<column/>
 				<column/>
+				<column/>
 				<column width="5%"/>
 				<column/>
 				<column/>
@@ -87,6 +88,7 @@
 				</row>
 				<row class="th" part="header">
 					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
+					<nextmatch-sortheader label="ID" id="team_id" class="noPrint"/>
 					<nextmatch-sortheader label="Nation" id="team_nation"/>
 					<nextmatch-sortheader label="Teamname" id="team_name" class="leftPad5"/>
 					<nextmatch-header label="Athlete 1" id="PerId_1" class="leftPad5"/>
@@ -107,6 +109,7 @@
 				</row>
 				<row class="x $row_cont[class]">
 					<description align="center" id="set[$row_cont[team_id]][result_rank]" no_lang="1" readonly="true" class="place"/>
+					<description id="${row}[team_id]" class="noPrint"/>
 					<description id="${row}[team_nation]" no_lang="1"/>
 					<description id="${row}[team_name]" no_lang="1"/>
 					<link-entry id="${row}[PerId_1]" no_lang="1" readonly="true" options="ranking"/>
@@ -128,7 +131,7 @@
 						<description id="${row}[result_time_3]" readonly="true" class="$cont[ro_result]"/>
 					</hbox>
 					<menulist class="$cont[rw_result]">
-						<menupopup align="center" class="$cont[rw_result] leftPad5" id="set[$row_cont[team_id]][eliminated]"/>
+						<menupopup align="center" class="$cont[rw_result]" id="set[$row_cont[team_id]][eliminated]"/>
 					</menulist>
 					<description align="center" id="set[$row_cont[team_id]][time_sum]"/>
 					<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_2]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_3]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,'exec[nm][rows][set][$row_cont[team_id]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);" class="small $cont[rw_result]"/>
