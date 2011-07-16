@@ -1,5 +1,5 @@
 /**
- * digital ROCK jQuery based Javascript API Lars
+ * digital ROCK jQuery based Javascript API
  * 
  * We only use jQuery() here (not $() or $j()!) to be able to run as well inside EGroupware as with stock jQuery from googleapis.
  *
@@ -27,6 +27,7 @@ function Resultlist(_container,_json_url)
 {
 	Resultlist.prototype.update = Startlist.prototype.update;
 	Resultlist.prototype.setHeader = Startlist.prototype.setHeader;
+	Resultlist.prototype.currentTopPosition = Startlist.prototype.currentTopPosition;
 	Resultlist.prototype.upDown = Startlist.prototype.upDown;
 	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
@@ -155,7 +156,11 @@ function Startlist(_container,_json_url)
 	
 	// Variables needed for scrolling in upDown
 	// scroll speed
-	this.scroll_by=1;
+	this.scroll_by = 1;
+  	// scroll interval, miliseconds (will be changed on resized windows where scroll_by is increased, so a constant scrolling speed is maintained)
+	this.scroll_interval = 20;
+	// current scrolling direction. 1: down, -1: up
+	this.scroll_dir = 1;
 	// sleep on the borders for sleep_for seconds
 	this.sleep_for = 4;
     // margin in which to reverse scrolling
@@ -172,8 +177,9 @@ function Startlist(_container,_json_url)
 
 	if (this.json_url.match(/rotate=/)) {
 		var list = this;
-		window.scrollBy(0, 20);
-		window.setInterval(function() { list.upDown(); },20);
+		// 20110716: This doesn't seem to be needed anymore. Comment it for now.
+		//window.scrollBy(0, 20);
+		this.scroll_interval_handle = window.setInterval(function() { list.upDown(); },20);
 	}
 }
 
@@ -609,33 +615,13 @@ Table.prototype.sortNummeric = function(_a,_b)
 	return (_a[this.sort] - _b[this.sort]) * (this.ascending ? 1 : -1);
 };
 
-Startlist.prototype.upDown = function()
+/**
+ * Return the current scrolling position, which is the top of the current view.
+ */
+
+Startlist.prototype.currentTopPosition = function()
 {
-	// check whether to sleep
-	var now = new Date();
-	var now_ms = now.getTime();
-	if (now_ms < this.sleep_until) {
-	    // sleep
-		return;
-	}
-	
-	if (this.do_rotate) {
-		this.rotateURL();
-	    // wait for the page to build
-	    this.sleep_until = now.getTime() + 1000;
-	    this.first_run = true;
-	    this.do_rotate = false;
-	    return;
-	}
-	
-	// Do the scrolling
-	window.scrollBy(0, this.scroll_by);
-
-    // Set scrolling and sleeping parameters accordingly
 	var y = 0;
-	var viewHeight = window.innerHeight;
-	var pageHeight = document.body.offsetHeight;
-
 	if (window.pageYOffset) {
 		// all other browsers
 		y = window.pageYOffset;
@@ -643,7 +629,59 @@ Startlist.prototype.upDown = function()
 		// IE
 		y = document.body.scrollTop;
 	}
+	return y;
+};
 
+Startlist.prototype.upDown = function()
+{
+	// check whether to sleep
+	var now = new Date();
+	var now_ms = now.getTime();
+	if (now_ms < this.sleep_until) {
+	    // sleep: in this case we do nothing
+		return;
+	}
+	
+	if (this.do_rotate) {
+	    // we scheduled a rotation. Do it and then return.
+		this.rotateURL();
+	    // wait for the page to build
+	    this.sleep_until = now.getTime() + 1000;
+	    this.first_run = true;
+	    this.do_rotate = false;
+            // reset scroll_by and scroll_interval, which might have been changed when the windows was resized.
+	    this.scroll_by = 1;
+	    this.scroll_interval = 20;
+	    //console.log("reset scroll_by to " + this.scroll_by);
+	    return;
+	}
+
+	// Get current position
+	var y = 0;
+	var viewHeight = window.innerHeight;
+	var pageHeight = document.body.offsetHeight;
+
+	y = this.currentTopPosition();
+
+	// Do the scrolling
+	window.scrollBy(0, this.scroll_by * this.scroll_dir);
+
+	// Check, if scrolling worked
+	var new_y = 0;
+	new_y = this.currentTopPosition();
+	if (y == new_y) {
+		this.scroll_by += 1;
+		//console.log("increased scroll_by to " + this.scroll_by);
+		// reconfigure the scroll interval to maintain a constant speed
+		this.scroll_interval *=  this.scroll_by;
+		this.scroll_interval /= (this.scroll_by - 1);
+		//console.log("scroll_interval is now " + this.scroll_interval + " ms");
+		window.clearInterval(this.scroll_interval_handle);
+		var list = this;
+		this.scroll_interval_handle = window.setInterval(function() { list.upDown(); }, this.scroll_interval);
+	}
+
+        // Set scrolling and sleeping parameters accordingly
 	var scrollTopPosition = y;
 	var scrollBottomPosition = y + viewHeight;
 	//alert("pageYOffset(y)="+pageYOffset+", innerHeight(wy)="+innerHeight+", offsetHeight(dy)="+document.body.offsetHeight);
@@ -653,14 +691,14 @@ Startlist.prototype.upDown = function()
 		//console.log("Showing whole page");
         do_sleep = 2;
         this.do_rotate = true;
-	} else if (pageHeight - scrollBottomPosition <= this.margin) {
+	} else if (( this.scroll_dir != -1) && (pageHeight - scrollBottomPosition <= this.margin)) {
 		// UP
-		this.scroll_by = -1;
+		this.scroll_dir = -1;
 		this.first_run = false;
 		do_sleep = 1;
-	} else if(scrollTopPosition <= this.margin) {
+	} else if (( this.scroll_dir != 1) && (scrollTopPosition <= this.margin)) {
 		// DOWN
-		this.scroll_by = 1;
+		this.scroll_dir = 1;
 		if (! this.first_run ) { 
 		    do_sleep = 1; 
 		    this.do_rotate = true;
