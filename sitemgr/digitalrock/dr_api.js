@@ -1,5 +1,5 @@
 /**
- * digital ROCK jQuery based Javascript API
+ * digital ROCK jQuery based Javascript API Lars
  * 
  * We only use jQuery() here (not $() or $j()!) to be able to run as well inside EGroupware as with stock jQuery from googleapis.
  *

@@ -147,7 +147,7 @@
 							<menupopup id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
 						</menulist>
 						<hidden id="comp[WetId]"/>
-						<hbox align="right" options="0,0">
+						<hbox options="0,0" class="leftPad5">
 							<image src="ajax-loader" class="ajax-loader"/>
 							<description id="msg" no_lang="1" class="redItalic"/>
 						</hbox>
