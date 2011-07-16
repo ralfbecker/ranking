@@ -85,6 +85,11 @@ class ranking_boulder_measurement
 		{
 			list($new_result) = boresult::$instance->route_result->search($keys+array('PerId' => $PerId),false);
 			$msg = boresult::athlete2string($new_result,true);
+			if ($query['discipline'] == 'boulder')
+			{
+				$msg = ($update['top'.$set_current] ? 't'.$update['top'.$set_current].' ' : '').
+					'b'.$update['zone'.$set_current].': '.$msg;
+			}
 		}
 		else
 		{
