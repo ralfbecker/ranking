@@ -1022,7 +1022,6 @@ class boresult extends boranking
 	 *
 	 * @param array $keys WetId, GrpId, route_order and optional 'route_type and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
-	 * @param string/int error message or number of lines imported
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
 	 * @return int/string integer number of imported results or string with error message
 	 */
@@ -1059,12 +1058,13 @@ class boresult extends boranking
 		{
 			$head = file_get_contents($file,false,null,0,10);
 		}
-		if (strpos($head,'<?xml') === 0)
+		$need_update_ranking = false;
+		if (strpos($head,'<?xml') === 0 || $discipline == 'speedrelay')	// no csv import for speedrelay
 		{
 			$data = $this->parse_xml($keys+array(
 				'route_type' => $route_type,
 				'discipline' => $discipline,
-			),$file,$add_athletes);
+			),$file,$add_athletes,$need_update_ranking);
 		}
 		else
 		{
@@ -1089,6 +1089,10 @@ class boresult extends boranking
 				'result_modified' => time(),
 			));
 		}
+		if ($need_update_ranking)
+		{
+			$this->route_result->update_ranking($keys,$route_type,$discipline);
+		}
 		return count($data);
 	}
 
@@ -1109,10 +1113,12 @@ class boresult extends boranking
 	 * @param array $keys WetId, GrpId, route_order and optional 'route_type' and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
+	 * @param boolean &$rank_missing=false on return, true if at least one rank is missing, false otherwise
 	 * @return array|string array with imported data (array of array for route_result->save) or string with error message
 	 */
-	protected function parse_xml($keys,$file,$add_athletes=false)
+	protected function parse_xml($keys,$file,$add_athletes=false,&$rank_missing=false)
 	{
+		$rank_missing = false;
 		$route_type = $keys['route_type'];
 		$discipline = $keys['discipline'];
 		$keys = array_intersect_key($keys, array_flip(array('WetId','GrpId','route_order')));
@@ -1186,7 +1192,7 @@ class boresult extends boranking
 
 				}
 				break;
-			case 'TeamQualivication':
+			case 'TeamQualification':
 			case 'TeamFinals':
 				if ($discipline != 'speedrelay')
 				{
@@ -1212,7 +1218,15 @@ class boresult extends boranking
 			$participant = null;
 			foreach($participants as $p)
 			{
-				if ($result['StartNumber'] == ($p['start_number'] ? $p['start_number'] : $p['start_order']))
+				if ($discipline == 'speedrelay' && $result['StartNumber'] == $p['team_id'])
+				{
+					$participant = $keys+array_intersect_key($p, array_flip(array(
+						'team_id', 'start_order', 'team_nation', 'team_name',
+						'PerId_1','PerId_2','PerId_3','start_number_1','start_number_2','start_number_3',
+					)));
+					break;
+				}
+				elseif ($discipline != 'speedrelay' && $result['StartNumber'] == ($p['start_number'] ? $p['start_number'] : $p['start_order']))
 				{
 					$participant = $keys+array_intersect_key($p, array_flip(array('PerId', 'start_order', 'start_number', 'start_order2n')));
 					break;
@@ -1227,16 +1241,30 @@ class boresult extends boranking
 				case 'IndividualQualification':
 					$participant['result_time'] = self::parse_time($result['Run1'],$participant['eliminated']);
 					$participant['result_time_r'] = self::parse_time($result['Run2'],$participant['eliminated_r']);
-					$participant['result_rank'] = $result['Rank'];
 					break;
 				case 'IndividualFinals':
 					$participant['result_time'] = self::parse_time($result['Run1'],$participant['eliminated']);
-					$participant['result_rank'] = $result['Rank'];
 					break;
-				case 'TeamQualivication':
+				case 'TeamQualification':
+					$participant['result_time'] = $result['ResultValue'] / 1000.0;
+					$start = isset($result['BestRun']) && $result['BestRun'] == $result['TeamTotalRun1'] ||
+						!isset($result['TeamTotalRun2']) ? 1 : 5;
+					for ($i = 1; $i <= 3; ++$i, ++$start)
+					{
+						$participant['result_time_'.$i] = $result['Run'.$start];
+					}
+					break;
 				case 'TeamFinals':
-					return "TeamRelay NOT yet implemented!";
+					$participant['result_time'] = $result['ResultValue'] / 1000.0;
+					for ($start = 1; $i <= 3; ++$start)
+					{
+						$participant['result_time_'.$start] = $result['Run'.$start];
+					}
+					break;
 			}
+			$participant['result_rank'] = $result['Rank'];
+			if (!$result['Rank']) $rank_missing = true;
+
 			//error_log($p['nachname'].': '.array2string($participant));
 			$data[] = $participant;
 		}
