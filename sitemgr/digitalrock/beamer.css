@@ -13,7 +13,7 @@ a {
 }
 
 td,th {
-	font-family: Helvetica,Arial,sans-serif;
+	font-family: "Arial Narrow",Arial,Helvetica,sans-serif;
 	font-size:32pt;
 	font-weight: bold;
 	background-color: black;
@@ -36,17 +36,17 @@ body {
 }
 
 h1 {
-	font-family: Helvetica,Arial,sans-serif;
+	font-family: "Arial Narrow",Arial,Helvetica,sans-serif;
 	font-size: 30pt;
 	font-weight: bolder;
 	color:white;
 }
 
 p {
-	font-family: Helvetica,Arial,sans-serif;
+	font-family: "Arial Narrow",Arial,Helvetica,sans-serif;
 	margin-left:5px;
 	margin-top:0px;
-	font-size20pt;
+	font-size:20pt;
 }
 
 /**
