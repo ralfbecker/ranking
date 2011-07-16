@@ -159,13 +159,14 @@ while (true)
 			if (!isset($timestamps[$file]) && $first_run && $check_existing || isset($timestamps[$file]) && $timestamps[$file] < $mtime)
 			{
 				//echo "$file: isset()=".array2string(isset($timestamps[$file])).", first_run=".array2string($first_run).", check_existing=".array2string($check_existing)."\n";
-				echo "$file modified ".date('Y-m-d H:i:s',$mtime)." needs importing\n";
+				echo "\n$file modified ".date('Y-m-d H:i:s',$mtime)." needs importing\n";
 
 				try {
 					check_import($path.'/'.$file,$cat,$route);
 				}
 				catch(Exception $e) {
-					echo $e->getMessage();
+					echo $e->getMessage()."\n";
+					echo $e->getTraceAsString()."\n";
 				}
 			}
 			$timestamps[$file] = $mtime;
@@ -192,7 +193,7 @@ function check_import($path,$cat,$route)
 	{
 		throw new Exception("Category '$cat' not found!",7);
 	}
-	if (!($route = $boresult->route->read(array(
+	if (!($route = $boresult->route->read($keys=array(
 		'WetId' => $comp['WetId'],
 		'GrpId' => $cat['GrpId'],
 		'route_order' => $route,
@@ -204,10 +205,10 @@ function check_import($path,$cat,$route)
 	{
 		throw new Exception("Route result already offical!",9);
 	}
-	$imported = $boresult->upload($content,$path);
+	$imported = $boresult->upload($keys,$path);
 	if (!is_numeric($imported))
 	{
 		throw new Exception($imported,10);
 	}
-	echo "$num_imported results imported.\n";
+	echo "$imported results imported.\n";
 }
