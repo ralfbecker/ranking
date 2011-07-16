@@ -174,6 +174,8 @@ function change_athlete(selectbox)
  */
 function update_athlete(scroll_mark)
 {
+	var GrpId = document.getElementById('exec[nm][cat]').value;
+	var route_order = document.getElementById('exec[nm][route]').value;
 	var PerId = document.getElementById('exec[nm][PerId]').value;
 	
 	if (PerId)
@@ -195,7 +197,8 @@ function update_athlete(scroll_mark)
 				mark_holds(holds);
 			}
 		}
-		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { 'result_height': height.value, 'result_plus': plus.value}, 1);				
+		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { 'result_height': height.value, 'result_plus': plus.value}, 1, {
+			'GrpId': GrpId, 'route_order': route_order});				
 	}
 }
 
@@ -612,7 +615,7 @@ function boulder_next()
 {
 	var PerId = document.getElementById('exec[nm][PerId]');
 	
-	PerId.selectedIndex++;
+	PerId.selectedIndex = PerId.selectedIndex + 1;	// ++ works NOT reliable ...
 
 	// need to call this manually, as changing selectedIndex does NOT trigger onchange
 	boulder_changed(PerId);
