@@ -8,10 +8,10 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
+					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox rows="1" cols="1" class="extra_startlist">
+					<groupbox class="extra_startlist" cols="1" rows="1">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -27,7 +27,7 @@
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_data[route_start]" no_lang="1"/>
+									<description id="route_data[route_start]" no_lang="1" span="all"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox rows="1" cols="1" class="extra_result">
+					<groupbox class="extra_result" cols="1" rows="1">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -50,7 +50,7 @@
 									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_data[route_judge]"/>
+									<description id="route_data[route_judge]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -83,55 +83,55 @@
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
-					<template span="all" id="ranking.result.header$cont[calendar]"/>
+					<template id="ranking.result.header$cont[calendar]" span="all"/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
+					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
 					<nextmatch-sortheader label="Nation" id="team_nation"/>
 					<nextmatch-sortheader label="Teamname" id="team_name" class="leftPad5"/>
 					<nextmatch-header label="Athlete 1" id="PerId_1" class="leftPad5"/>
-					<nextmatch-sortheader label="Start- number" id="start_number_1" align="center"/>
-					<nextmatch-sortheader label="Time" id="result_time_1" align="center"/>
+					<nextmatch-sortheader align="center" label="Start- number" id="start_number_1"/>
+					<nextmatch-sortheader align="center" label="Time" id="result_time_1"/>
 					<nextmatch-header label="Athlete 2" id="PerId_2"/>
-					<nextmatch-sortheader label="Start- number" id="start_number_2" align="center"/>
-					<nextmatch-sortheader label="Time" id="result_time_2" align="center"/>
+					<nextmatch-sortheader align="center" label="Start- number" id="start_number_2"/>
+					<nextmatch-sortheader align="center" label="Time" id="result_time_2"/>
 					<nextmatch-header label="Athlete 3" id="PerId_3"/>
-					<nextmatch-sortheader label="Start- number" id="start_number_3" align="center"/>
-					<nextmatch-sortheader label="Time" id="result_time_3" align="center"/>
-					<nextmatch-header label="Eliminated"/>
-					<nextmatch-sortheader label="Sum" align="center" id="result_time"/>
-					<description class="noPrint" value="Actions" align="center"/>
+					<nextmatch-sortheader align="center" label="Start- number" id="start_number_3"/>
+					<nextmatch-sortheader align="center" label="Time" id="result_time_3"/>
+					<nextmatch-header label="Eliminated" class="$cont[rw_result]"/>
+					<nextmatch-sortheader align="center" label="Sum" id="result_time"/>
+					<description align="center" value="Actions" class="$cont[rw_result]"/>
 				</row>
 				<row class="onlyPrint" part="footer">
-					<template span="all" id="ranking.result.footer"/>
+					<template id="ranking.result.footer" span="all"/>
 				</row>
 				<row class="x $row_cont[class]">
-					<description id="set[$row_cont[team_id]][result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
+					<description align="center" id="set[$row_cont[team_id]][result_rank]" no_lang="1" readonly="true" class="place"/>
 					<description id="${row}[team_nation]" no_lang="1"/>
 					<description id="${row}[team_name]" no_lang="1"/>
-					<link-entry options="ranking" id="${row}[PerId_1]" no_lang="1" readonly="true"/>
-					<description id="${row}[start_number_1]" no_lang="1" align="center"/>
+					<link-entry id="${row}[PerId_1]" no_lang="1" readonly="true" options="ranking"/>
+					<description align="center" id="${row}[start_number_1]" no_lang="1"/>
 					<hbox align="center">
-						<textbox type="float" id="set[$row_cont[team_id]][result_time_1]" size="5" precision="%4.2lf" class="$cont[rw_result]"/>
-						<description id="${row}[result_time_1]" class="$cont[ro_result]" readonly="true"/>
+						<textbox type="float" id="set[$row_cont[team_id]][result_time_1]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
+						<description id="${row}[result_time_1]" readonly="true" class="$cont[ro_result]"/>
 					</hbox>
-					<link-entry options="ranking" id="${row}[PerId_2]" no_lang="1" readonly="true"/>
-					<description id="${row}[start_number_2]" no_lang="1" align="center"/>
+					<link-entry id="${row}[PerId_2]" no_lang="1" readonly="true" options="ranking"/>
+					<description align="center" id="${row}[start_number_2]" no_lang="1"/>
 					<hbox align="center">
-						<textbox type="float" id="set[$row_cont[team_id]][result_time_2]" size="5" precision="%4.2lf" class="$cont[rw_result]"/>
-						<description id="${row}[result_time_2]" class="$cont[ro_result]" readonly="true"/>
+						<textbox type="float" id="set[$row_cont[team_id]][result_time_2]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
+						<description id="${row}[result_time_2]" readonly="true" class="$cont[ro_result]"/>
 					</hbox>
-					<link-entry options="ranking" id="${row}[PerId_3]" no_lang="1" readonly="true"/>
-					<description id="${row}[start_number_3]" no_lang="1" align="center"/>
+					<link-entry id="${row}[PerId_3]" no_lang="1" readonly="true" options="ranking"/>
+					<description align="center" id="${row}[start_number_3]" no_lang="1"/>
 					<hbox align="center">
-						<textbox type="float" id="set[$row_cont[team_id]][result_time_3]" size="5" precision="%4.2lf" class="$cont[rw_result]"/>
-						<description id="${row}[result_time_3]" class="$cont[ro_result]" readonly="true"/>
+						<textbox type="float" id="set[$row_cont[team_id]][result_time_3]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
+						<description id="${row}[result_time_3]" readonly="true" class="$cont[ro_result]"/>
 					</hbox>
-					<menulist class="$cont[rw_result] leftPad5">
-						<menupopup id="set[$row_cont[team_id]][eliminated]" align="center"/>
+					<menulist class="$cont[rw_result]">
+						<menupopup align="center" class="$cont[rw_result] leftPad5" id="set[$row_cont[team_id]][eliminated]"/>
 					</menulist>
 					<description align="center" id="set[$row_cont[team_id]][time_sum]"/>
-					<buttononly label="Update" statustext="update time" class="small noPrint" align="center" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_2]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_3]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,'exec[nm][rows][set][$row_cont[team_id]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);" id="update"/>
+					<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_2]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_3]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,'exec[nm][rows][set][$row_cont[team_id]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);" class="small $cont[rw_result]"/>
 				</row>
 			</rows>
 		</grid>
