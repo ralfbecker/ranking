@@ -551,7 +551,8 @@ function update_boulder()
 	if (PerId && n)
 	{
 		var update = {};
-		update['top'+n] = parseInt(0+document.getElementById('exec[top]').value);	// parseInt(0+ is required, as backend doesn't store zones with empty top!
+		var top = document.getElementById('exec[top]').value;
+		update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
 		update['zone'+n] = document.getElementById('exec[zone]').value;
 
 		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'GrpId': GrpId, 'route_order': route_order});				
