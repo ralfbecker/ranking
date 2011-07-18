@@ -8,10 +8,10 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
+					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox rows="1" cols="1" class="extra_startlist">
+					<groupbox cols="1" rows="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -27,7 +27,7 @@
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_data[route_start]" no_lang="1"/>
+									<description id="route_data[route_start]" no_lang="1" span="all"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox rows="1" cols="1" class="extra_result">
+					<groupbox cols="1" rows="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -50,7 +50,7 @@
 									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_data[route_judge]"/>
+									<description id="route_data[route_judge]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -67,8 +67,8 @@
 			<columns>
 				<column width="5%"/>
 				<column width="5%"/>
-				<column width="5%"/>
 				<column width="5%" disabled="!@show_second_lane"/>
+				<column width="5%"/>
 				<column/>
 				<column/>
 				<column/>
@@ -80,53 +80,56 @@
 				<column disabled="@no_ranking"/>
 				<column width="15%"/>
 				<column width="30%"/>
+				<column width="50" disabled="!@show_ability"/>
 				<column disabled="@no_delete"/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
-					<template span="all" id="ranking.result.header$cont[calendar]"/>
+					<template id="ranking.result.header$cont[calendar]" span="all"/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader label="Start- order" id="start_order" align="center"/>
-					<nextmatch-sortheader label="Start- number" id="start_number" align="center" class="noPrint"/>
-					<nextmatch-header label="Start- number" id="printnumber" align="center" class="onlyPrint"/>
+					<nextmatch-sortheader align="center" label="Start- order" id="start_order"/>
+					<nextmatch-header align="center" label="Start- number" id="printnumber" class="onlyPrint"/>
 					<nextmatch-sortheader label="2. Lane" id="start_order2n"/>
+					<nextmatch-sortheader align="center" label="Start- number" id="start_number" class="noPrint"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
-					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
-					<nextmatch-sortheader label="Nation" id="nation" align="center"/>
+					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
+					<nextmatch-sortheader align="center" label="Nation" id="nation"/>
 					<nextmatch-header label="Sektion" id="verband"/>
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
-					<nextmatch-header label="License" id="PerId" align="center"/>
-					<description value="Ranking" align="center"/>
+					<nextmatch-header align="center" label="License" id="PerId"/>
+					<description align="center" value="Ranking"/>
 					<nextmatch-header label="Result" id="jury_result"/>
 					<nextmatch-header label="Remark" id="remark"/>
-					<description class="noPrint" value="Delete" align="center"/>
+					<nextmatch-header label="Ability" id="ability_percent" class="leftPad5"/>
+					<description align="center" value="Delete" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
-					<template span="all" id="ranking.result.footer"/>
+					<template id="ranking.result.footer" span="all"/>
 				</row>
 				<row class="x $row_cont[class]">
-					<description id="{$row}[start_order]" no_lang="1" align="center"/>
-					<textbox size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" id="set[$row_cont[PerId]][start_number]" no_lang="1" class="noPrint" align="center"/>
-					<description class="onlyPrint" id="{$row}[start_number]" no_lang="1" align="center"/>
-					<description id="{$row}[start_order2n]" no_lang="1" align="center"/>
-					<description id="{$row}[nachname]" no_lang="1" class="lastname leftPad5" options="$row_cont[link]"/>
-					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
-					<description no_lang="1" align="center" id="{$row}[birthyear]"/>
-					<description id="{$row}[nation]" no_lang="1" align="center"/>
+					<description align="center" id="{$row}[start_order]" no_lang="1"/>
+					<description align="center" id="{$row}[start_number]" no_lang="1" class="onlyPrint"/>
+					<description align="center" id="{$row}[start_order2n]" no_lang="1"/>
+					<textbox align="center" id="set[$row_cont[PerId]][start_number]" no_lang="1" size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" class="noPrint"/>
+					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
+					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
 					<description id="${row}[acl_fed]"/>
 					<description value="$row_cont[plz]" id="${row}[ort]"/>
-					<description id="${row}[PerId]" no_lang="1" align="center"/>
+					<description align="center" id="${row}[PerId]" no_lang="1"/>
 					<hbox no_lang="1" options="0,0">
-						<description no_lang="1" id="${row}[ranking_place]" class="place"/>
-						<description no_lang="1" id="${row}[ranking_points]" align="right"/>
+						<description id="${row}[ranking_place]" no_lang="1" class="place"/>
+						<description align="right" id="${row}[ranking_points]" no_lang="1"/>
 					</hbox>
 					<description/>
 					<description/>
-					<button image="delete" class="noPrint" label="Delete" align="center" id="delete[$row_cont[PerId]]" onclick="return confirm('$row_cont[vorname] $row_cont[nachname]:\\n'+egw::lang('Delete this participant (can NOT be undone)') );"/>
+					<textbox type="float" id="set[$row_cont[PerId]][ability_percent]"/>
+					<button align="center" label="Delete" id="delete[$row_cont[PerId]]" onclick="return confirm('$row_cont[vorname] $row_cont[nachname]:\\n'+egw::lang('Delete this participant (can NOT be undone)') );" image="delete" class="noPrint"/>
 				</row>
 			</rows>
 		</grid>

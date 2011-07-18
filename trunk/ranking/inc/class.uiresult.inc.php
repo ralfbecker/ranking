@@ -604,6 +604,7 @@ class uiresult extends boresult
 		$rows['num_problems'] = $query['num_problems'];
 		$rows['no_delete'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
+		$rows['show_ability'] = self::needAbilityPercent($query['cat']);
 		// disable unused update / start time measurement buttons
 		$readonlys['update'] = ($rows['time_measurement'] = $query['time_measurement']) ||
 			$query['route_status'] == STATUS_RESULT_OFFICIAL;
@@ -646,6 +647,17 @@ class uiresult extends boresult
 			$rows['sum_or_bestof'] = lang('Sum');
 		}
 		return $total;
+	}
+
+	/**
+	 * Check if cat is a paraclimbing one, using an ability percentage
+	 *
+	 * @param int $cat
+	 * @return boolean
+	 */
+	static function needAbilityPercent($cat)
+	{
+		return in_array($cat, array(95, 96));
 	}
 
 	/**
