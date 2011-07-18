@@ -8,10 +8,10 @@
 			</columns>
 			<rows>
 				<row disabled="!@comp_sponsors">
-					<image src="comp_sponsors" class="comp_sponsors" align="center"/>
+					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox rows="1" cols="1" class="extra_startlist">
+					<groupbox cols="1" rows="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -27,7 +27,7 @@
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" id="route_data[route_start]" no_lang="1"/>
+									<description id="route_data[route_start]" no_lang="1" span="all"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox rows="1" cols="1" class="extra_result">
+					<groupbox cols="1" rows="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -50,7 +50,7 @@
 									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_data[route_judge]"/>
+									<description id="route_data[route_judge]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -78,63 +78,66 @@
 				<column width="15%"/>
 				<column width="5%" disabled="!@show_second_lane"/>
 				<column width="15%" disabled="@speed_only_one"/>
+				<column disabled="!@show_ability"/>
 				<column disabled="@speed_only_one"/>
 				<column disabled="!@time_measurement"/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
-					<template span="all" id="ranking.result.header$cont[calendar]"/>
+					<template id="ranking.result.header$cont[calendar]" span="all"/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
+					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
-					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
-					<nextmatch-sortheader label="Nation" align="center" id="nation"/>
+					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
+					<nextmatch-sortheader align="center" label="Nation" id="nation"/>
 					<nextmatch-header label="Sektion" id="verband"/>
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
-					<nextmatch-header label="License" align="center" id="PerId"/>
-					<nextmatch-sortheader label="Start- number" align="center" id="start_order"/>
-					<nextmatch-sortheader label="Time" align="center" id="result_time"/>
-					<nextmatch-sortheader label="2. Lane" id="start_order2n" align="center"/>
+					<nextmatch-header align="center" label="License" id="PerId"/>
+					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
+					<nextmatch-sortheader align="center" label="Time" id="result_time"/>
+					<nextmatch-sortheader align="center" label="2. Lane" id="start_order2n"/>
 					<description align="center" value="2. Time"/>
-					<nextmatch-sortheader label="@sum_or_bestof" align="center" id="result_time"/>
+					<nextmatch-header align="center" label="Ability" id="ability_percent"/>
+					<nextmatch-sortheader align="center" label="@sum_or_bestof" id="result_time"/>
 					<description align="center" value="Actions" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
-					<template span="all" id="ranking.result.footer"/>
+					<template id="ranking.result.footer" span="all"/>
 				</row>
 				<row class="x $row_cont[class] $row_cont[quota_class]">
-					<description no_lang="1" readonly="true" align="center" id="set[$row_cont[PerId]][result_rank]" class="place"/>
-					<description no_lang="1" id="{$row}[nachname]" options="$row_cont[link]" class="lastname leftPad5"/>
-					<description no_lang="1" id="{$row}[vorname]" options="$row_cont[link]" class="leftPad5"/>
-					<description align="center" no_lang="1" id="{$row}[birthyear]"/>
-					<description no_lang="1" align="center" id="{$row}[nation]"/>
+					<description align="center" id="set[$row_cont[PerId]][result_rank]" no_lang="1" readonly="true" class="place"/>
+					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
+					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
 					<description id="${row}[acl_fed]"/>
-					<description id="${row}[ort]" value="$row_cont[plz]"/>
-					<description no_lang="1" align="center" id="${row}[PerId]"/>
-					<description align="center" no_lang="1" id="{$row}[start_number]" value="$row_cont[start_order]"/>
+					<description value="$row_cont[plz]" id="${row}[ort]"/>
+					<description align="center" id="${row}[PerId]" no_lang="1"/>
+					<description align="center" value="$row_cont[start_order]" id="{$row}[start_number]" no_lang="1"/>
 					<hbox align="center" options="0,0">
-						<description no_lang="1" readonly="true" id="{$row}[result]" class="$cont[ro_result]"/>
-						<textbox type="float" size="5" precision="%4.2lf" id="set[$row_cont[PerId]][result_time]" class="$cont[rw_result]"/>
+						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
+						<textbox type="float" id="set[$row_cont[PerId]][result_time]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
 						<menulist>
 							<menupopup class="$cont[rw_result] leftPad5" id="set[$row_cont[PerId]][eliminated]"/>
 						</menulist>
-						<buttononly label="Update" align="center" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);" id="update" statustext="update time" class="small noPrint"/>
+						<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);" class="small noPrint"/>
 					</hbox>
-					<description no_lang="1" align="center" id="${row}[start_order2n]"/>
+					<description align="center" id="${row}[start_order2n]" no_lang="1"/>
 					<hbox align="center" options="0,0">
-						<description no_lang="1" readonly="true" id="{$row}[result_r]" class="$cont[ro_result]"/>
-						<textbox type="float" size="5" precision="%4.2lf" id="set[$row_cont[PerId]][result_time_r]" class="$cont[rw_result]"/>
+						<description id="{$row}[result_r]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
+						<textbox type="float" id="set[$row_cont[PerId]][result_time_r]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
 						<menulist>
 							<menupopup class="$cont[rw_result] leftPad5" id="set[$row_cont[PerId]][eliminated_r]"/>
 						</menulist>
-						<buttononly label="Update" align="center" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);" id="update" statustext="update time" class="small noPrint"/>
+						<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);" class="small noPrint"/>
 					</hbox>
+					<textbox type="float" align="center" id="${row}[ability_percent]" readonly="true"/>
 					<description align="center" id="set[$row_cont[PerId]][time_sum]"/>
-					<buttononly label="Start" align="center" onclick="start_time_measurement(this,$row_cont[PerId]);" id="start_time_measurement" statustext="select participant for time measurment" class="small noPrint"/>
+					<buttononly align="center" statustext="select participant for time measurment" label="Start" id="start_time_measurement" onclick="start_time_measurement(this,$row_cont[PerId]);" class="small noPrint"/>
 				</row>
 			</rows>
 		</grid>

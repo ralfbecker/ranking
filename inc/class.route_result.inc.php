@@ -620,7 +620,7 @@ class route_result extends so_sql
 			case 'speed':
 				if ($data['result_time'])	// speed result
 				{
-					if (!array_key_exists('result_time2',$data))
+					if (!array_key_exists('result_time2',$data) && !$data['ability_percent'])
 					{
 						if ($data['result_detail'])
 						{
@@ -691,6 +691,10 @@ class route_result extends so_sql
 				{
 					$data['nachname'] = '-- '.lang('Wildcard').' --';
 				}
+				elseif ($data['result_detail'] && ($detail = unserialize($data['result_detail'])) && isset($detail['ability_percent']))
+				{
+					$data['ability_percent'] = $detail['ability_percent'];
+				}
 				break;
 		}
 		$this->_shorten_name($data['nachname']);
@@ -752,7 +756,7 @@ class route_result extends so_sql
 			unset($data['result_plus']);	// no plus without height
 		}
 		// speed
-		if ($data['result_time_r'] || isset($data['eliminated_r']))	// result on 2. speed route
+		if ($data['result_time_r'] || isset($data['eliminated_r']) || $data['ability_percent'])	// result on 2. speed route
 		{
 			$data['result_detail'] = array(
 				'result_time_l' => $data['result_time'] ? number_format($data['result_time'],3) : '',
@@ -790,6 +794,11 @@ class route_result extends so_sql
 			{
 				$data['result_time'] = $data['result_time']+$data['result_time_r'] ?
 					round(1000 * ($data['result_time']+$data['result_time_r'])) : null;
+
+				if ($data['ability_percent'] && !is_null($data['result_time']))
+				{
+					$data['result_time'] = round($data['ability_percent']*$data['result_time']/100.0);
+				}
 			}
 		}
 		// speed relay, todo: eliminated
@@ -867,6 +876,8 @@ class route_result extends so_sql
 			}
 			unset($data['result_detail']);	// do NOT store existing problem specific results
 		}
+		if (isset($data['ability_percent'])) $data['result_detail']['ability_percent'] = $data['ability_percent'];
+
 		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
 
 		return $data;
@@ -888,7 +899,7 @@ class route_result extends so_sql
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
 		}
-		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries') as $name)
+		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent') as $name)
 		{
 			if (isset($new[$name])) $this->data[$name] = $new[$name];
 		}
