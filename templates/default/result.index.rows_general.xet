@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox rows="1" cols="1" class="extra_startlist">
+					<groupbox cols="1" rows="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -22,24 +22,24 @@
 							<rows>
 								<row>
 									<description value="Isolation zone"/>
-									<description no_lang="1" id="route_data[route_iso_open]" value="opens"/>
-									<description no_lang="1" id="route_data[route_iso_close]" value="closes"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
 								</row>
 								<row>
 									<description value="Starting time"/>
-									<description span="all" no_lang="1" id="route_data[route_start]"/>
+									<description id="route_data[route_start]" no_lang="1" span="all"/>
 								</row>
 								<row>
 									<description value="Observation time"/>
-									<description no_lang="1" id="route_data[route_observation_time]"/>
-									<description no_lang="1" id="route_data[route_climbing_time]" value="Climbing time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox rows="1" cols="1" class="extra_result">
+					<groupbox cols="1" rows="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -47,10 +47,10 @@
 							</columns>
 							<rows>
 								<row>
-									<description no_lang="1" id="route_data[route_result]"/>
+									<description id="route_data[route_result]" no_lang="1"/>
 								</row>
 								<row>
-									<description no_lang="1" id="route_data[route_judge]"/>
+									<description id="route_data[route_judge]" no_lang="1"/>
 								</row>
 							</rows>
 						</grid>
@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.7.002">
+	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.7.003">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -73,6 +73,7 @@
 				<column/>
 				<column/>
 				<column/>
+				<column width="50"/>
 				<column/>
 				<column disabled="!@route_names[6]"/>
 				<column disabled="!@route_names[5]"/>
@@ -81,52 +82,93 @@
 				<column disabled="!@route_names[2]"/>
 				<column/>
 				<column disabled="!@route_names[1]"/>
+				<column disabled="!@show_ability"/>
 				<column disabled="!@route_type=/(TWO_QUALI_ALL|TWOxTWO_QUALI)/"/>
 			</columns>
 			<rows>
-				<row class="onlyPrint" part="header">
-					<template span="all" id="ranking.result.header$cont[calendar]"/>
+				<row part="header">
+					<template id="ranking.result.header$cont[calendar]" span="all" class="onlyPrint"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader label="Rank" align="center" id="result_rank"/>
+					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
-					<nextmatch-sortheader label="Birthyear" align="center" id="geb_date"/>
+					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
 					<nextmatch-sortheader label="Nation" id="nation"/>
 					<nextmatch-header label="Sektion" id="verband"/>
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
-					<nextmatch-header label="License" id="PerId" align="center"/>
-					<nextmatch-sortheader label="@route_names[6]" id="result_rank4" align="center" no_lang="1"/>
-					<nextmatch-sortheader label="@route_names[5]" id="result_rank4" align="center" no_lang="1"/>
-					<nextmatch-sortheader label="@route_names[4]" id="result_rank4" align="center" no_lang="1"/>
-					<nextmatch-sortheader label="@route_names[3]" id="result_rank3" align="center" no_lang="1"/>
-					<nextmatch-sortheader label="@route_names[2]" id="result_rank2" align="center" no_lang="1"/>
-					<nextmatch-sortheader label="@route_names[0]" id="result_rank0" align="center" no_lang="1"/>
-					<nextmatch-sortheader label="@route_names[1]" id="result_rank1" align="center" no_lang="1"/>
-					<nextmatch-sortheader label="Points" align="center" id="quali_points"/>
+					<nextmatch-sortheader label="start- number" id="start_order"/>
+					<nextmatch-header align="center" label="License" id="PerId"/>
+					<nextmatch-sortheader align="center" label="@route_names[6]" id="result_rank4" no_lang="1"/>
+					<nextmatch-sortheader align="center" label="@route_names[5]" id="result_rank4" no_lang="1"/>
+					<nextmatch-sortheader align="center" label="@route_names[4]" id="result_rank4" no_lang="1"/>
+					<nextmatch-sortheader align="center" label="@route_names[3]" id="result_rank3" no_lang="1"/>
+					<nextmatch-sortheader align="center" label="@route_names[2]" id="result_rank2" no_lang="1"/>
+					<nextmatch-sortheader align="center" label="@route_names[0]" id="result_rank0" no_lang="1"/>
+					<nextmatch-sortheader align="center" label="@route_names[1]" id="result_rank1" no_lang="1"/>
+					<nextmatch-header align="center" label="Ability" id="ability_percent"/>
+					<nextmatch-sortheader align="center" label="Points" id="quali_points"/>
 				</row>
-				<row class="onlyPrint" part="footer">
-					<template span="all" id="ranking.result.footer"/>
+				<row part="footer">
+					<template id="ranking.result.footer" span="all" class="onlyPrint"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="row $row_cont[quota_class]">
-					<description id="{$row}[result_rank]" no_lang="1" class="place" readonly="true" align="center"/>
-					<description id="{$row}[nachname]" class="lastname leftPad5" no_lang="1" options="$row_cont[link]"/>
-					<description id="{$row}[vorname]" no_lang="1" class="leftPad5" options="$row_cont[link]"/>
+					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
+					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
 					<description id="${row}[acl_fed]"/>
 					<description value="$row_cont[plz]" id="${row}[ort]"/>
-					<description id="{$row}[PerId]" no_lang="1" align="center"/>
-					<description id="{$row}[result6]" no_lang="1" align="center"/>
-					<description id="{$row}[result5]" no_lang="1" align="center"/>
-					<description id="{$row}[result4]" no_lang="1" align="center"/>
-					<description id="{$row}[result3]" no_lang="1" align="center"/>
-					<description id="{$row}[result2]" no_lang="1" align="center"/>
-					<description id="{$row}[result]" no_lang="1" align="center"/>
-					<description id="{$row}[result1]" no_lang="1" align="center"/>
-					<textbox type="float" id="{$row}[quali_points]" no_lang="1" align="center" precision="%4.2lf" readonly="true"/>
+					<description align="center" value="$row_cont[start_order]" id="{$row}[start_number]" no_lang="1"/>
+					<description align="center" id="{$row}[PerId]" no_lang="1"/>
+					<description align="center" id="{$row}[result6]" no_lang="1"/>
+					<description align="center" id="{$row}[result5]" no_lang="1"/>
+					<description align="center" id="{$row}[result4]" no_lang="1"/>
+					<description align="center" id="{$row}[result3]" no_lang="1"/>
+					<description align="center" id="{$row}[result2]" no_lang="1"/>
+					<description align="center" id="{$row}[result]" no_lang="1"/>
+					<description align="center" id="{$row}[result1]" no_lang="1"/>
+					<textbox type="float" align="center" id="${row}[ability_percent]" readonly="true"/>
+					<textbox type="float" align="center" id="{$row}[quali_points]" no_lang="1" readonly="true" precision="%4.2lf"/>
 				</row>
 			</rows>
 		</grid>
