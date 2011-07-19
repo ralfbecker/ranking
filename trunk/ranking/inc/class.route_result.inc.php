@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-11 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -28,6 +28,7 @@ define('TWOxTWO_QUALI',4);				// two quali rounds on two routes each
 define('TWO_QUALI_ALL_SEED_STAGGER',5);	// lead on 2 routes for all on flash
 define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
 define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
+define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
 
 define('LEAD',4);
 define('BOULDER',8);
@@ -78,6 +79,8 @@ class route_result extends so_sql
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
 	var $rank_lead_countback = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
+	// "points" for TWO_QUALI_ALL_SUM: height-sum incl. plus/minus counting +/- 1cm
+	var $rank_lead_sum = 'CASE WHEN RouteResults.result_height IS NULL THEN r1.result_height/1000.0+r1.result_plus/100.0 WHEN r1.result_height IS NULL THEN RouteResults.result_height/1000.0+RouteResults.result_plus/100.0 ELSE (RouteResults.result_height+r1.result_height)/1000.0+(RouteResults.result_plus+r1.result_plus)/100.0 END';
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
 	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time >= r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
@@ -238,7 +241,7 @@ class route_result extends so_sql
 				{
 					// not yet a 2. route --> show everyone from 1. route (used for xml/json export)
 				}
-				elseif ($route_type == TWO_QUALI_ALL && $discipline != 'speed')		// speed stores both results in the first quali
+				elseif (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_SUM)) && $discipline != 'speed')		// speed stores both results in the first quali
 				{
 					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL OR r1.result_rank IS NOT NULL)';
 				}
@@ -270,7 +273,14 @@ class route_result extends so_sql
 						}
 						if (boresult::is_two_quali_all($route_type) && $route_order == 1)
 						{
-							if (!$old || $old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
+							if ($route_type == TWO_QUALI_ALL_SUM)	// sum is in quali_points and higher points are better
+							{
+								if (!$old || $old['quali_points'] > $row['quali_points']) $row['result_rank'] = $n+1;
+							}
+							else	// original quali_points --> lower points are better
+							{
+								if (!$old || $old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
+							}
 							break;		// no further countback
 						}
 						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
@@ -327,6 +337,10 @@ class route_result extends so_sql
 	 */
 	function _sql_rank_prev_heat($route_order,$route_type)
 	{
+		if ($route_order == 2 && $route_type == TWO_QUALI_ALL_SUM)
+		{
+			return $this->rank_lead_sum;
+		}
 		if ($route_order == 2 && boresult::is_two_quali_all($route_type))
 		{
 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
@@ -429,6 +443,7 @@ class route_result extends so_sql
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order,$route_type).')';
 				$order_by = array($product);
+				if ($route_type == TWO_QUALI_ALL_SUM) $order_by[0] .= ' DESC';
 				$extra_cols[] = "$product AS quali_points";
 			}
 			else
@@ -558,6 +573,10 @@ class route_result extends so_sql
 				{
 					$data['rank_prev_heat'] = unserialize($data['rank_prev_heat']);
 					$data['rank_prev_heat'] = sprintf('%4.2lf',$data['rank_prev_heat']['qoints']);
+				}
+				if ($data['ability_percent'] && $data['result_height'])
+				{
+					$data['result_height'] /= 100.0/$data['ability_percent'];
 				}
 				break;
 
@@ -876,8 +895,11 @@ class route_result extends so_sql
 			}
 			unset($data['result_detail']);	// do NOT store existing problem specific results
 		}
-		if (isset($data['ability_percent'])) $data['result_detail']['ability_percent'] = $data['ability_percent'];
-
+		if (isset($data['ability_percent']))
+		{
+			if ($data['result_height']) $data['result_height'] *= 100.0/$data['ability_percent'];
+			$data['result_detail']['ability_percent'] = $data['ability_percent'];
+		}
 		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
 
 		return $data;

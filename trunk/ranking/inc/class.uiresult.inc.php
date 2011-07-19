@@ -579,6 +579,16 @@ class uiresult extends boresult
 					$readonlys['set['.$row['team_id'].'][team_nation]'] = true;
 				}
 			}
+			if ($row['ability_percent'] && $query['route'] == -1 && $query['discipline'] == 'lead')
+			{
+				foreach(array('result','result1') as $n)
+				{
+					if (preg_match('/^([0-9.]+)(\\+|-|&nbsp;)?$/',$row[$n],$matches))
+					{
+						$rows[$k][$n] = str_replace('.00','',number_format($matches[1]/100.0*$row['ability_percent'],2)).$matches[2];
+					}
+				}
+			}
 		}
 		// disable print-only start-number
 		$rows['no_printnumber'] = !$need_start_number;
