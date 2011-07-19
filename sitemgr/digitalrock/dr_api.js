@@ -720,10 +720,10 @@ Startlist.prototype.rotateURL = function() {
 	    var current_cat = this.json_url.match(/cat=([^&]+)/)[1];
 	    var current_route = this.json_url.match(/route=([^&]+)/)[1];
 	    //console.log(current_cat);
-	    var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([0-9_a-z]+),r=([\\d]+)");
+	    var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([0-9_a-z]+),r=([-?\\d]+)");
 	    if (! next) {
-	        // take the first argument
-	        next = urls.match("c=([0-9_a-z]+),r=([\\d]+)");
+	        // at the end of the list, take the first argument
+	        next = urls.match("c=([0-9_a-z]+),r=([-?\\d]+)");
 	    }
 	    //console.log(next);
 	
