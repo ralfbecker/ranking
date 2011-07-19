@@ -34,7 +34,7 @@ class ranking_measurement extends ranking_boulder_measurement
 			);
 		}
 		// no topo selected or topo no longer there, use the first one, if existing
-		if ($sel_options['topo'] && !$content['nm']['topo'] || !isset($sel_options['topo'][$content['nm']['topo']]))
+		if ($sel_options['topo'] && (!$content['nm']['topo'] || !isset($sel_options['topo'][$content['nm']['topo']])))
 		{
 			$content['nm']['topo'] = key($sel_options['topo']);
 		}
