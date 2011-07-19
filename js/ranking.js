@@ -257,9 +257,11 @@ function topo_clicked(e)
 	
 	if (!PerId)
 	{
-		//$j('#msg').text('topo_clicked() x='+e.offsetX+'/'+topo.width+', y='+e.offsetY+'/'+topo.height);
-		//add_handhold({'xpercent':100.0*e.offsetX/topo.width, 'ypercent': 100.0*e.offsetY/topo.height, 'height': 'Test'});
-		xajax_doXMLHTTP('ranking_measurement::ajax_save_hold',{'xpercent':100.0*e.offsetX/topo.width, 'ypercent': 100.0*e.offsetY/topo.height});
+		var x = e.offsetX ? e.offsetX : e.layerX - $j(e.target).position().left;	// FF has not offsetX/Y
+		var y = e.offsetY ? e.offsetY : e.layerY - $j(e.target).position().top;
+		//$j('#msg').text('topo_clicked() x='+x+'/'+topo.width+', y='+y+'/'+topo.height);
+		//add_handhold({'xpercent':100.0*x/topo.width, 'ypercent': 100.0*y/topo.height, 'height': 'Test'});
+		xajax_doXMLHTTP('ranking_measurement::ajax_save_hold',{'xpercent':100.0*x/topo.width, 'ypercent': 100.0*y/topo.height});
 	}
 	else
 	{
