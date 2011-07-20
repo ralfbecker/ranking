@@ -93,7 +93,9 @@ class ranking_beamer
 				$cats[$n] = $content['cat'][$i];
 				$routes[$n] = $content['route'][$i];
 
-				$sel_options["route[$n]"] = boresult::$instance->route->query_list('route_name','route_order',array(
+				$sel_options["route[$n]"] = array(
+					'-1' => lang('General result'),
+				)+boresult::$instance->route->query_list('route_name','route_order',array(
 						'WetId' => $comp['WetId'],
 						'GrpId' => $content['cat'][$i],
 					),'route_order DESC');
