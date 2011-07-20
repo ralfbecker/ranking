@@ -203,7 +203,8 @@ class uiresult extends boresult
 					{
 						$param['msg'] = ($msg .= lang('Error: no file to upload selected'));
 					}
-					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'],$content['upload_options'] & 2)))
+					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'],
+						$content['upload_options'] & 2,$content['upload_options'] & 4)))
 					{
 						// set number of problems from csv file
 						if ($content['route_num_problems'])
@@ -318,6 +319,10 @@ class uiresult extends boresult
 					'title' => 'add not existing athletes to the database, use with caution!',
 				),
 				3 => 'all above',
+				5 => array(	// 1=delete result|4=ignore comp and heat
+					'label' => 'ignore competition',
+					'title' => 'imports a result from a different competition and heat, use with care',
+				),
 			),
 			'slist_order' => self::slist_order_options($comp['serie']),
 		);
@@ -1013,7 +1018,8 @@ class uiresult extends boresult
 		{
 			unset($content['nm']['readonly']);
 		}
-		$readonlys['button[download]'] = $keys['route_order'] < 0 || !$this->has_startlist($keys);
+		// enabling download for general result too (if we have at least a quali startlist)
+		$readonlys['button[download]'] = !($this->has_startlist($keys) || $keys['route_order'] == -1 && $this->has_startlist(array('route_order'=>0)+$keys));
 		$content['no_route_selection'] = !$cat; 	// no cat selected
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
 		{
