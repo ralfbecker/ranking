@@ -975,11 +975,19 @@ class boresult extends boranking
 					$name2csv['result'] = 'time-left';
 					$name2csv['result_r'] = 'time-right';
 					break;
+				case 'lead':
+					if ($keys['route_order'] == -1 && self::is_two_quali_all($keys['route_type']))
+					{
+						unset($name2csv['result']);
+						$name2csv['quali_points'] = 'result';
+					}
 			}
 			echo implode(';',$name2csv)."\n";
-			$charset = $GLOBALS['egw']->translation->charset();
+			$charset = translation::charset();
 			foreach($athletes as $athlete)
 			{
+				if (!$athlete['PerId']) continue;	// general results contain such a (wrong) entry ...
+
 				$values = array();
 				foreach($name2csv as $name => $csv)
 				{
@@ -1011,7 +1019,7 @@ class boresult extends boranking
 					$values[$csv] = $val;
 				}
 				// convert by default to iso-8859-1, as this seems to be the default of excel
-				echo $GLOBALS['egw']->translation->convert(implode(';',$values),$charset,
+				echo translation::convert(implode(';',$values),$charset,
 					$_GET['charset'] ? $_GET['charset'] : 'iso-8859-1')."\n";
 			}
 			$GLOBALS['egw']->common->egw_exit();
@@ -1024,9 +1032,10 @@ class boresult extends boranking
 	 * @param array $keys WetId, GrpId, route_order and optional 'route_type and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
+	 * @param boolean $ignore_comp_heat=false ignore WetId and route_order, default do NOT
 	 * @return int/string integer number of imported results or string with error message
 	 */
-	function upload($keys,$file,$add_athletes=false)
+	function upload($keys,$file,$add_athletes=false,$ignore_comp_heat=false)
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) // permission denied
 		{
@@ -1069,7 +1078,7 @@ class boresult extends boranking
 		}
 		else
 		{
-			$data = $this->parse_csv($keys,$file,false,$add_athletes);
+			$data = $this->parse_csv($keys,$file,false,$add_athletes,$ignore_comp_heat);
 		}
 		if (!is_array($data)) return $data;
 
