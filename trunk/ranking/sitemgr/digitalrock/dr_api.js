@@ -13,6 +13,12 @@
  * Example with multi-result scrolling (use c= and r= for cat and route)
  *
  * http://www.ifsc-climbing.org/egroupware/ranking/sitemgr/digitalrock/eliste.html?comp=1251&cat=1&route=2&detail=0&rotate=c=1,r=2:c=2,r=2
+ * 
+ * You can also supply an optional parameter w= (think of German "Wettkampf" as "c" was already taken) to rotate though different competitions (the first of which is specified by the "comp" parameter in the original URL.
+ *
+ * Example https://rb66.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?comp=1395&beamer=1&cat=1&route=0&rotate=w=1395,c=1,r=0:w=1396,c=1,r=0
+ * 
+ * The interesting part here is rotate=w=1395,c=1,r=0:w=1396,c=1,r=0
  */
  
 /**
@@ -30,6 +36,7 @@ function Resultlist(_container,_json_url)
 	Resultlist.prototype.currentTopPosition = Startlist.prototype.currentTopPosition;
 	Resultlist.prototype.upDown = Startlist.prototype.upDown;
 	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
+
 
 	Startlist.apply(this, [_container,_json_url]);
 }
@@ -717,19 +724,37 @@ Startlist.prototype.rotateURL = function() {
 	    var urls = rotate_url_matches[1];
 	    //console.log(urls);
 
+	
+
+	    var current_comp = this.json_url.match(/comp=([^&]+)/)[1];
 	    var current_cat = this.json_url.match(/cat=([^&]+)/)[1];
 	    var current_route = this.json_url.match(/route=([^&]+)/)[1];
 	    //console.log(current_cat);
-	    var next = urls.match("c=" + current_cat + ",r=" + current_route + ":c=([0-9_a-z]+),r=([-?\\d]+)");
+
+
+
+	    var next = urls.match("(?:^|:|w=" + current_comp + ",)" + "c=" + current_cat + ",r=" + current_route + ":(?:w=([0-9_a-z]+),)?" +  "c=([0-9_a-z]+),r=(-?[\\d]+)");
+	    //console.log(next);
 	    if (! next) {
 	        // at the end of the list, take the first argument
-	        next = urls.match("c=([0-9_a-z]+),r=([-?\\d]+)");
+	        next = urls.match("^(?:w=([0-9_a-z]+),)?" + "c=([0-9_a-z]+),r=(-?[\\d]+)");
+		//console.log("starting over");
+		//console.log(next);
 	    }
-	    //console.log(next);
-	
+
+	    // We might not find a next competition in the rotate parameter
+	    var next_comp = current_comp;
+	    if (next.length == 4) {
+	    	next_comp = next[1];
+		// remove the competition value from next in order to parse cat & route
+		next.splice(1,1);
+	    }
+
+	    // Extract category and route
 	    var next_cat = next[1];
 	    var next_route = next[2];
 	    //console.log("current_cat = " + current_cat + ", current_route = " + current_route + ", next_cat = " + next_cat + ", next_route = " + next_route);
+	    this.json_url = this.json_url.replace(/comp=[0-9_a-z]+/, "comp=" + next_comp);
 	    this.json_url = this.json_url.replace(/cat=[0-9_a-z]+/, "cat=" + next_cat);
 	    this.json_url = this.json_url.replace(/route=[\d]+/, "route=" + next_route);
 	    //console.log(this.json_url);
@@ -755,3 +780,4 @@ function load_css(href)
 	cssnode.href = href;
 	headID.appendChild(cssnode);
 }
+
