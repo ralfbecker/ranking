@@ -133,7 +133,7 @@ class boresult extends boranking
 
 		if ($show_result && $athlete['result_rank'])
 		{
-			$str = $athlete['result_rank'].'. '.$str.($show_result !== 'rank' ? ' '.str_replace('&nbsp;','',$athlete['result']) : '');
+			$str = $athlete['result_rank'].'. '.$str.($show_result !== 'rank' ? ' '.str_replace('&nbsp;',' ',$athlete['result']) : '');
 		}
 		elseif ($show_result == false && $athlete['start_order'])
 		{

@@ -52,7 +52,6 @@
 #topo {
    width: 100%;
    position: relative;
-   cursor: crosshair;
 }
 div.topoHandhold {
    position: absolute;

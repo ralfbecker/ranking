@@ -38,6 +38,10 @@ class ranking_measurement extends ranking_boulder_measurement
 		{
 			$content['nm']['topo'] = key($sel_options['topo']);
 		}
+		elseif (!$sel_options['topo'])
+		{
+			$content['nm']['topo'] = '';
+		}
 		if (count($sel_options['topo']) <= 1)
 		{
 			$sel_options['topo'][$content['nm']['topo']] = ' ';
@@ -86,10 +90,11 @@ class ranking_measurement extends ranking_boulder_measurement
 	 *
 	 * @param int $PerId
 	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
+	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
 	 */
-	public static function ajax_load_athlete($PerId,array $update)
+	public static function ajax_load_athlete($PerId,array $update, array $state=null)
 	{
-		parent::ajax_load_athlete($PerId, $update, $data);
+		parent::ajax_load_athlete($PerId, $update, $state, $data);
 
 		if ($data)
 		{
