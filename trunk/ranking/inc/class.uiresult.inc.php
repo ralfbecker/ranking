@@ -686,7 +686,7 @@ class uiresult extends boresult
 	function ajax_set_athlets($comp,$cat,$team_id,$nation)
 	{
 		$response = egw_json_response::get();
-		//$response->alert(__METHOD__."($comp,$cat,$team_id,'$nation')"); return $response->getXML();
+		//$response->alert(__METHOD__."($comp,$cat,$team_id,'$nation')"); return;
 		$starters = $this->get_registered(array(
 			'WetId' => $comp,
 			'GrpId' => $cat,
@@ -724,8 +724,6 @@ class uiresult extends boresult
 		}
 
 		$response->script($script);
-
-		return $response->getXML();
 	}
 
 	/**
@@ -1189,7 +1187,7 @@ class uiresult extends boresult
 				etemplate::set_array($content,$name,$value=array_shift($params));
 				//$args .= ",$name='$value'";
 			}
-			//$response->addAlert("ajax_update('\$request_id',$args)"); return $response->getXML();
+			//$response->addAlert("ajax_update('\$request_id',$args)"); return;
 
 			//_debug_array($request->preserv); exit;
 			$content = $content['exec'];
@@ -1647,7 +1645,5 @@ class uiresult extends boresult
 	{
 		$response->addScript("set_style_by_class('td','ajax-loader','display','none'); document.getElementById('msg').innerHTML='".
 			htmlspecialchars($msg)."';");
-
-		return $response->getXML();
 	}
 }
