@@ -1033,7 +1033,7 @@ class uiresult extends boresult
 		{
 			$last_heat = $keys;
 			$last_heat['route_order'] = $this->route_result->get_max_order($comp['WetId'],$cat['GrpId']);
-			if (!$this->has_results($last_heat) && ($last_heat['route_order'] >= 3 || !in_array($route['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI))))
+			if (!$this->is_admin && !$this->has_results($last_heat) && ($last_heat['route_order'] >= 3 || !in_array($route['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI))))
 			{
 				$last_heat = $this->route->read($last_heat);
 				$tmpl->set_cell_attribute('button[new]','onclick',"alert('".
