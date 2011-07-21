@@ -44,6 +44,13 @@ $cats = array(
 //		'rang_title'=> 'CUWR continuously updated WORLDRANKING',
 		'bgcolor'   => '#F0F0F0',
 	),
+	'para' => array(
+		'label'  => 'Paraclimbing',
+		'nation' => '',
+		'grps'	 => $icc_para,
+		'wettk_reg' => '^[0-9]{2,2}_PE.*',
+		'bgcolor'   => '#F0F0F0',
+	),
 );
 
 do_header ($t_calendar,'','',0,'',2);

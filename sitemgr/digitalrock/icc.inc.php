@@ -84,3 +84,20 @@ $icc_youth = array(
 	'ICC_FSB' => 'female youth B speed',
 	'ICC_MSB' => 'male youth B speed',
 );
+
+$icc_para = array(
+	'ICC_F_AA' => 'WOMEN amputee arm PD',
+	'ICC_F_AL' => 'WOMEN amputee leg PD',
+	'ICC_F_AN' => 'WOMEN arthritis+neurological PD',
+	'ICC_F_B1' => 'WOMEN visual impairment B1',
+	'ICC_F_B2' => 'WOMEN visual impairment B2',
+	'ICC_F_B3' => 'WOMEN visual impairment B3',
+	'ICC_M_AA' => 'MEN amputee arm PD',
+	'ICC_M_AL' => 'MEN amputee leg PD',
+	'ICC_M_AB' => 'MEN amputee both leg PD',
+	'ICC_M_AD' => 'MEN complete neurolog. leg disablity PD',
+	'ICC_M_AN' => 'MEN arthritis+neurological PD',
+	'ICC_M_B1' => 'MEN visual impairment B1',
+	'ICC_M_B2' => 'MEN visual impairment B2',
+	'ICC_M_B3' => 'MEN visual impairment B3',
+);
