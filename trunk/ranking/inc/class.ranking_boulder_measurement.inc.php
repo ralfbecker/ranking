@@ -69,15 +69,15 @@ class ranking_boulder_measurement
 	 * @param int $PerId
 	 * @param array $update
 	 * @param int $set_current=1 make $PerId the current participant of the route
+	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
 	 */
 	public static function ajax_update_result($PerId,$update,$set_current=1, $state=null)
 	{
-		$query =& self::get_check_session();
+		$query =& self::get_check_session($comp,$state);
 
 		$response = egw_json_response::get();
 
 		$keys = self::query2keys($query);
-		if ($state) $keys = array_merge($keys,$state);
 		//$response->alert(__METHOD__."($PerId, ".array2string($update).", $set_current) ".array2string($keys));
 
 		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
@@ -134,11 +134,12 @@ class ranking_boulder_measurement
 	 *
 	 * @param int $PerId
 	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
+	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
 	 * @param array &$data=null on return athlete data for extending class
 	 */
-	public static function ajax_load_athlete($PerId,array $update, array &$data=null)
+	public static function ajax_load_athlete($PerId,array $update, array $state=null, array &$data=null)
 	{
-		$query =& self::get_check_session();
+		$query =& self::get_check_session($comp,$state);
 
 		$response = egw_json_response::get();
 
@@ -148,9 +149,13 @@ class ranking_boulder_measurement
 
 		if (list($data) = boresult::$instance->route_result->search($keys,false))
 		{
-			//$response->alert(__METHOD__."($PerId, $n) ".array2string($data));
+			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			foreach($update as $id => $key)
 			{
+				if ($key === 'result_plus' && (string)$data['result_plus'] === '')
+				{
+					$data['result_plus'] = '0';	// null or '' is NOT understood, must be '0'
+				}
 				$response->assign($id, 'value', (string)$data[$key]);
 				// for boulder
 				if (strpos($key,'zone') === 0)
@@ -183,12 +188,21 @@ class ranking_boulder_measurement
 	 * Get session data and check if user has judge or admin rights
 	 *
 	 * @param array &$comp=null on return competition array
+	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
 	 * @throws egw_exception_wrong_parameter
 	 * @return array reference to ranking result session array
 	 */
-	public static function &get_check_session(&$comp=null)
+	public static function &get_check_session(&$comp=null,array $state=null)
 	{
 		$query =& egw_cache::getSession('ranking', 'result');
+
+		if ($state)	// merge optional state
+		{
+			foreach(array('WetId' => 'comp', 'GrpId' => 'cat', 'route_order' => 'route') as $from => $to)
+			{
+				if (isset($state[$from])) $query[$to] = $state[$from];
+			}
+		}
 
 		if (!($comp = boresult::$instance->comp->read($query['comp'])))
 		{

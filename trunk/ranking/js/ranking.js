@@ -157,8 +157,14 @@ function change_athlete(selectbox)
 {
 	if (selectbox.value)
 	{
+		var WetId = document.getElementById('exec[comp][WetId]').value;
+		var GrpId = document.getElementById('exec[nm][cat]').value;
+		var route_order = document.getElementById('exec[nm][route]').value;
+
 		unmark_holds();
-		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value, { 'exec[result_height]': 'result_height', 'exec[result_plus]': 'result_plus' });
+		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value, 
+			{ 'exec[result_height]': 'result_height', 'exec[result_plus]': 'result_plus' },
+			{ 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order });
 	}
 	else
 	{
@@ -174,6 +180,7 @@ function change_athlete(selectbox)
  */
 function update_athlete(scroll_mark)
 {
+	var WetId = document.getElementById('exec[comp][WetId]').value;
 	var GrpId = document.getElementById('exec[nm][cat]').value;
 	var route_order = document.getElementById('exec[nm][route]').value;
 	var PerId = document.getElementById('exec[nm][PerId]').value;
@@ -198,7 +205,7 @@ function update_athlete(scroll_mark)
 			}
 		}
 		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { 'result_height': height.value, 'result_plus': plus.value}, 1, {
-			'GrpId': GrpId, 'route_order': route_order});				
+			'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});				
 	}
 }
 
@@ -545,6 +552,7 @@ function top_clicked(button)
  */
 function update_boulder()
 {
+	var WetId = document.getElementById('exec[comp][WetId]').value;
 	var n = document.getElementById('exec[nm][boulder_n]').value;
 	var PerId = document.getElementById('exec[nm][PerId]').value;
 	var GrpId = document.getElementById('exec[nm][cat]').value;
@@ -557,7 +565,7 @@ function update_boulder()
 		update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
 		update['zone'+n] = document.getElementById('exec[zone]').value;
 
-		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'GrpId': GrpId, 'route_order': route_order});				
+		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});				
 	}
 }
 
@@ -601,7 +609,12 @@ function boulder_changed(selectbox)
 	// ToDo load values from server
 	if (PerId && n)
 	{
-		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_load_athlete', PerId, { 'exec[zone]': 'zone'+n, 'exec[top]': 'top'+n } );
+		var WetId = document.getElementById('exec[comp][WetId]').value;
+		var GrpId = document.getElementById('exec[nm][cat]').value;
+		var route_order = document.getElementById('exec[nm][route]').value;
+
+		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_load_athlete', PerId, { 'exec[zone]': 'zone'+n, 'exec[top]': 'top'+n },
+			{ 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
 	}
 	else
 	{
