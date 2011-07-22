@@ -756,15 +756,13 @@ Startlist.prototype.rotateURL = function() {
 
 	    // We might not find a next competition in the rotate parameter
 	    var next_comp = current_comp;
-	    if (next.length == 4) {
+	    if (next[1]) {
 	    	next_comp = next[1];
-		// remove the competition value from next in order to parse cat & route
-		next.splice(1,1);
 	    }
 
 	    // Extract category and route
-	    var next_cat = next[1];
-	    var next_route = next[2];
+	    var next_cat = next[2];
+	    var next_route = next[3];
 	    //console.log("current_cat = " + current_cat + ", current_route = " + current_route + ", next_cat = " + next_cat + ", next_route = " + next_route);
 	    this.json_url = this.json_url.replace(/comp=[0-9_a-z]+/, "comp=" + next_comp);
 	    this.json_url = this.json_url.replace(/cat=[0-9_a-z]+/, "cat=" + next_cat);
