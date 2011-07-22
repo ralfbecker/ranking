@@ -495,6 +495,7 @@ class uiresult extends boresult
 			$rows[] = array(
 				'team_id' => 0,
 				'start_order' => count($rows)+1,
+				'class' => 'noPrint',	// dont print add-team-row
 			);
 			$readonlys['delete[0]'] = true;
 			++$total;
@@ -520,7 +521,7 @@ class uiresult extends boresult
 				$rows[$k]['ranking_place'] = $ranking[$row['PerId']]['platz'];
 				$rows[$k]['ranking_points'] = $ranking[$row['PerId']]['pkt'];
 			}
-			$rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on';
+			if (!isset($rows[$k]['class'])) $rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on';
 			if (substr($query['discipline'],0,5) == 'speed' && $query['route'] >= 2 &&
 				(strstr($query['template'],'startlist') && $order == 'start_order' ||
 				!strstr($query['template'],'startlist') && !$row['result_rank'] && $order == 'result_rank'))
