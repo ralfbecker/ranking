@@ -1150,6 +1150,11 @@ class boresult extends boranking
 			if (!$comp['dicipline']) $cat = $this->cats->read($keys['GrpId']);
 			$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
 		}
+		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
+		{
+			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+				$discipline == 'speedrelay');
+		}
 		$this->route_result->route_type = $route_type;
 		$this->route_result->discipline = $discipline;
 
@@ -1211,10 +1216,11 @@ class boresult extends boranking
 				{
 					return lang('Wrong Mode="%1" for discipline "%2"!',$settings['Mode'],$discipline);
 				}
+				/* as Arco 2011 used only on run per team, qualification used "TeamFinals" mode too
 				if (($keys['route_order'] < 2) != ($settings['Mode'] == 'TeamQualification'))
 				{
 					return lang('Wrong Mode="%1" for this heat (qualification - final mismatch)!',$settings['Mode'],$discipline);
-				}
+				}*/
 				break;
 			default:
 				return lang('Unknown Mode="%1"!',$settings['Mode']);
@@ -1269,7 +1275,7 @@ class boresult extends boranking
 					break;
 				case 'TeamFinals':
 					$participant['result_time'] = $result['ResultValue'] / 1000.0;
-					for ($start = 1; $i <= 3; ++$start)
+					for ($start = 1; $start <= 3; ++$start)
 					{
 						$participant['result_time_'.$start] = $result['Run'.$start];
 					}
@@ -1845,6 +1851,9 @@ class boresult extends boranking
 		}
 		// can we use the cached data und do we have it?
 		$location = 'export_route:'.$comp.':'.$cat.':'.$heat;
+		// switch caching off for speed-cli.php, as it can not (un)set the cache,
+		// because of permissions of /tmp/egw_cache only writable by webserver-user
+		// for all other purposes caching is ok and should be enabled
 		if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)) !== false)
 		{
 			if (!isset(self::$instance)) new boresult();
