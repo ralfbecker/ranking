@@ -414,8 +414,15 @@ Table.prototype.update = function(_data,_quota)
 	for(i in this.data)
 	{
 		var data = this.data[i];
-		var row = athletes[data.PerId];
-		
+		var row;
+		if (data.PerId != 'undefined')
+		{
+			row = athletes[data.PerId];
+		}
+		else if (data.team_id != 'undefined')
+		{
+			row = athletes[data.team_id];
+		}
 		if (this.sort == 'result_rank' && 
 			(typeof data.result_rank == 'undefined' || data.result_rank < 1))
 		{
@@ -471,6 +478,11 @@ Table.prototype.createRow = function(_data,_tag)
 	{
 		row.id = _data.PerId;
 		this.athletes[_data.PerId] = row;
+	}
+	else if (typeof _data.team_id != 'undefined' && _data.team_id > 0)
+	{
+		row.id = _data.team_id;
+		this.athletes[_data.team_id] = row;
 	}
 	var span = 1;
 	for(var col in this.columns)
