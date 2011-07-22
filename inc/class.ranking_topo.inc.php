@@ -55,9 +55,10 @@ class ranking_topo
 	 * @param int $icon='griff32' hold icon
 	 * @param int $src=0 0: show scaled image, 1: show source image unscaled, 2: show source image with bounding boxes, 3: black background, no scaling
 	 * @param int $topo=0
+	 * @param boolean $png=true true: create png (with transparency for $src=3) or false: create jpeg image, default png
 	 */
 	public static function render($comp,$cat,$route,$place=1,$num=8,$width=1024,$height=null,
-		$margin=50,$icon='griff32',$src=0,$topo=0)
+		$margin=50,$icon='griff32',$src=0,$topo=0,$png=true)
 	{
 		$start = microtime(true);
 
@@ -94,6 +95,12 @@ class ranking_topo
 			if (!($src_image = imagecreatetruecolor($src_width, $src_height)))
 			{
 				throw new egw_exception_wrong_parameter("Could not imagecreatetruecolor($width, $height)!");
+			}
+			if ($png)	// do a png with transparent background (images needs to be filled with transparent color!)
+			{
+				imagesavealpha($src_image,true);
+				$trans_color = imagecolorallocatealpha($src_image, 255, 255, 255, 127);
+				imagefill($src_image, 0, 0, $trans_color);
 			}
 		}
 		// topo image
@@ -183,8 +190,7 @@ class ranking_topo
 			// add athletes on destination
 			self::showAthletes($src_image, $src_width, $src_height, $getHoldXY, $color, $ranking, $margin, $route['current_1'], $current_color);
 
-			header('Content-Type: image/jpeg');
-			imagejpeg($src_image);
+			$image = $src_image;
 		}
 		else
 		{
@@ -201,7 +207,14 @@ class ranking_topo
 
 			// add athletes on destination
 			self::showAthletes($image, $width, $height, $getHoldXY, $color, $ranking, $margin, $route['current_1'], $current_color);
-
+		}
+		if ($png)
+		{
+			header('Content-Type: image/png');
+			imagepng($image);
+		}
+		else
+		{
 			header('Content-Type: image/jpeg');
 			imagejpeg($image);
 		}

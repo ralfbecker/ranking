@@ -52,13 +52,14 @@ $height = (int)$_GET['height'] > 0 ? (int)$_GET['height'] : null;	// null = 4/3 
 $topo = isset($_GET['topo']) ? (int)$_GET['topo'] : 0;
 $margin = is_numeric($_GET['margin']) ? (int)$_GET['margin'] : 50;
 $src = (int)$_GET['src'];
-$icon = $_GET['icon'] ? basename($_GET['icon']) : 'griff32';
+$icon = $_GET['icon'] ? basename($_GET['icon']) : 'griff32blau';
+$png = isset($_GET['png']) ? (boolean) $png : $src == 3;
 ranking_topo::$fontsize = (int)$_GET['fontsize'] > 0 ? (int)$_GET['fontsize'] : 18;
 ranking_topo::$fontfile = '/Library/Fonts/Arial Bold.ttf';
 
 try
 {
-	ranking_topo::render($_GET['comp'],$_GET['cat'],$_GET['route'],$place,$num,$width,$height,$margin,$icon,$src,$topo);
+	ranking_topo::render($_GET['comp'],$_GET['cat'],$_GET['route'],$place,$num,$width,$height,$margin,$icon,$src,$topo,$png);
 }
 // exceptin handler
 catch(Exception $e)
