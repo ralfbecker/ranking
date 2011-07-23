@@ -162,6 +162,7 @@ while (true)
 				echo "\n$file modified ".date('Y-m-d H:i:s',$mtime)." needs importing\n";
 
 				try {
+					usleep(200000);	// Zingerle software does 2 write operations and timestamps have only 1 sec accurancy
 					check_import($path.'/'.$file,$cat,$route);
 				}
 				catch(Exception $e) {
