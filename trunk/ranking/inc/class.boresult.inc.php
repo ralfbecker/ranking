@@ -621,6 +621,7 @@ class boresult extends boranking
 		// reindex by _new_ start_order
 		foreach($starters as &$starter)
 		{
+			unset($starter['result_rank']);
 			$start_order = (int)(($starter['start_order']+1)/2);
 			$starters_by_startorder[$start_order] =& $starter;
 		}
@@ -1068,13 +1069,12 @@ class boresult extends boranking
 		{
 			$head = file_get_contents($file,false,null,0,10);
 		}
-		$need_update_ranking = false;
 		if (($xml = strpos($head,'<?xml') === 0 || $discipline == 'speedrelay'))	// no csv import for speedrelay
 		{
 			$data = $this->parse_xml($keys+array(
 				'route_type' => $route_type,
 				'discipline' => $discipline,
-			),$file,$add_athletes,$need_update_ranking);
+			),$file,$add_athletes);
 		}
 		else
 		{
@@ -1102,7 +1102,7 @@ class boresult extends boranking
 				'result_modified' => time(),
 			));
 		}
-		if ($need_update_ranking)
+		if ($xml)	// Zingerle timing ranks are NOT according to rules --> do an own ranking
 		{
 			$this->route_result->update_ranking($keys,$route_type,$discipline);
 		}
@@ -1126,10 +1126,9 @@ class boresult extends boranking
 	 * @param array $keys WetId, GrpId, route_order and optional 'route_type' and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
-	 * @param boolean &$rank_missing=false on return, true if at least one rank is missing, false otherwise
 	 * @return array|string array with imported data (array of array for route_result->save) or string with error message
 	 */
-	protected function parse_xml($keys,$file,$add_athletes=false,&$rank_missing=false)
+	protected function parse_xml($keys,$file,$add_athletes=false)
 	{
 		$rank_missing = false;
 		$route_type = $keys['route_type'];
@@ -1253,7 +1252,8 @@ class boresult extends boranking
 			}
 			if (!$participant)
 			{
-				return lang('No participant with startnumber "%1"!',$result['StartNumber']).' '.array2string($result);
+				echo lang('No participant with startnumber "%1"!',$result['StartNumber']).' '.array2string($result);
+				continue;
 			}
 			switch($settings['Mode'])
 			{
@@ -1262,7 +1262,7 @@ class boresult extends boranking
 					$participant['result_time_r'] = self::parse_time($result['Run2'],$participant['eliminated_r']);
 					break;
 				case 'IndividualFinals':
-					$participant['result_time'] = self::parse_time($result['Run1'],$participant['eliminated']);
+					$participant['result_time'] = self::parse_time($result['BestRun'],$participant['eliminated']);
 					break;
 				case 'TeamQualification':
 					$participant['result_time'] = $result['ResultValue'] / 1000.0;
@@ -1270,19 +1270,18 @@ class boresult extends boranking
 						!isset($result['TeamTotalRun2']) ? 1 : 5;
 					for ($i = 1; $i <= 3; ++$i, ++$start)
 					{
-						$participant['result_time_'.$i] = $result['Run'.$start];
+						$participant['result_time_'.$i] = self::parse_time($result['Run'.$start]);
 					}
 					break;
 				case 'TeamFinals':
 					$participant['result_time'] = $result['ResultValue'] / 1000.0;
 					for ($start = 1; $start <= 3; ++$start)
 					{
-						$participant['result_time_'.$start] = $result['Run'.$start];
+						$participant['result_time_'.$start] = self::parse_time($result['Run'.$start],$participant['eliminated']);
+						if ($participant['eliminated']) break;
 					}
 					break;
 			}
-			$participant['result_rank'] = $result['Rank'];
-			if (!$result['Rank']) $rank_missing = true;
 
 			//error_log($p['nachname'].': '.array2string($participant));
 			$data[] = $participant;

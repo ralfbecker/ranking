@@ -510,6 +510,14 @@ class route_result extends so_sql
 				$data['discipline'] = 'boulder';
 			}
 		}
+		if ($data['result_detail'])
+		{
+			foreach(unserialize($data['result_detail']) as $name => $value)
+			{
+				$data[$name] = $value;
+			}
+			unset($data['result_detail']);
+		}
 		switch($data['discipline'])
 		{
 			default:
@@ -559,12 +567,12 @@ class route_result extends so_sql
 						}
 					}
 				}
-				if ($data['result_detail'])
+				/*if ($data['result_detail'])
 				{
 					$data += unserialize($data['result_detail']);
-					unset($data['result_detail']);
+					unset($data['result_detail']);*/
 					if ($data['qoints'] && $data['result_rank'] && !$data['general_result']) $data['result'] .= '&nbsp;&nbsp;'.sprintf('%4.2lf',$data['qoints']);
-				}
+				//}
 				if ($data['other_detail'])
 				{
 					$data['other_detail'] = unserialize($data['other_detail']);
@@ -581,16 +589,16 @@ class route_result extends so_sql
 				break;
 
 			case 'boulder':
-				if ($data['result_detail'])	// boulder result
+				/*if ($data['result_detail'])	// boulder result
 				{
 					$data += unserialize($data['result_detail']);
-					unset($data['result_detail']);
+					unset($data['result_detail']);*/
 					for($i=1; $i <= self::MAX_BOULDERS; ++$i)
 					{
 						$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
 							((string)$data['zone'.$i] !== '' ? 'b'.$data['zone'.$i] : '');
 					}
-				}
+				//}
 				$suffix = '';	// general result can have route_order as suffix
 				while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
 				{
@@ -637,18 +645,18 @@ class route_result extends so_sql
 				}
 				// fall through
 			case 'speed':
-				if ($data['result_time'])	// speed result
+				if ($data['result_time'] || $data['eliminated'] || $data['eliminated_r'])	// speed result
 				{
 					if (!array_key_exists('result_time2',$data) && !$data['ability_percent'])
 					{
-						if ($data['result_detail'])
+						/*if ($data['result_detail'])
 						{
 							foreach(unserialize($data['result_detail']) as $name => $value)
 							{
 								$data[$name] = $value;
 							}
 							unset($data['result_detail']);
-						}
+						}*/
 						if ($data['result_time'])
 						{
 							$data['result_time'] *= 0.001;
@@ -710,7 +718,7 @@ class route_result extends so_sql
 				{
 					$data['nachname'] = '-- '.lang('Wildcard').' --';
 				}
-				elseif ($data['result_detail'] && ($detail = unserialize($data['result_detail'])) && isset($detail['ability_percent']))
+				elseif (/*$data['result_detail'] && ($detail = unserialize($data['result_detail'])) &&*/ isset($detail['ability_percent']))
 				{
 					$data['ability_percent'] = $detail['ability_percent'];
 				}
@@ -801,7 +809,7 @@ class route_result extends so_sql
 				}
 				else
 				{
-					$data['result_time'] = null;
+					$data['result_time'] = round(1000 * ELIMINATED_TIME);
 				}
 			}
 			elseif ((string)$data['eliminated'] !== '' || $data['eliminated_r'])
