@@ -3,11 +3,22 @@
 /**
  * Ranking - Import - Command line interface
  *
+ * Following patch is neccessary in class.boresult.inc.php to disable caching, as cache is not accessable by cli program:
+ *
+ *		$location = 'export_route:'.$comp.':'.$cat.':'.$heat;
+ *		// switch caching off for speed-cli.php, as it can not (un)set the cache,
+ *		// because of permissions of /tmp/egw_cache only writable by webserver-user
+ *		// for all other purposes caching is ok and should be enabled
+ *-		if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)) !== false)
+ *+		//if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)) !== false)
+ *		{
+ *			if (!isset(self::$instance)) new boresult();
+ *
  * @link http://www.digitalrock.de
  * @link http://www.egroupware.org
  * @package ranking
  * @author Ralf Becker <RalfBecker-AT-outdoor-training.de>
- * @copyright (c) 2008 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
+ * @copyright (c) 2011 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @version $Id$
  */
