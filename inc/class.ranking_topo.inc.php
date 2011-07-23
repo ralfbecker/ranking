@@ -433,14 +433,17 @@ class ranking_topo
 	static public function getRanking(array $keys, $current=null, $num=3, $place=1)
 	{
 		$athletes = array();
-		foreach(boresult::$instance->route_result->search($keys,false,'result_rank ASC') as $athlete)
+		if (($ranking = boresult::$instance->route_result->search($keys,false,'result_rank ASC')))
 		{
-			if ($athlete['result_rank'] < $place) continue;
-			if ($athlete['result_rank'] >= $place+$num && (!$current || isset($athletes[$current]))) break;
-
-			if ($athlete['result_rank'] < $place+$num || $current && $athlete['PerId'] == $current)
+			foreach($ranking as $athlete)
 			{
-				$athletes[$athlete['PerId']] = $athlete;
+				if ($athlete['result_rank'] < $place) continue;
+				if ($athlete['result_rank'] >= $place+$num && (!$current || isset($athletes[$current]))) break;
+
+				if ($athlete['result_rank'] < $place+$num || $current && $athlete['PerId'] == $current)
+				{
+					$athletes[$athlete['PerId']] = $athlete;
+				}
 			}
 		}
 		return $athletes;
