@@ -8,7 +8,7 @@ delete=
 
 [ $# -lt 1 ] && {
 	echo "Usage: [--delete] $0 WetId [database]"
-	echo "	--delete: use DELETE and INSERT INTO, otherwise REPLACE INTO is used
+	echo "	--delete: use DELETE and INSERT INTO, otherwise REPLACE INTO is used"
 	echo "	WetId: integer competition ID"
 	echo " "
 	echo "Dump result service data of a single competitions, eg. to import it into an other database."
