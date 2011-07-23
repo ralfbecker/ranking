@@ -85,11 +85,18 @@ Resultlist.prototype.handleResponse = function(_data)
 			break;
 
 		default:
-			this.result_cols = {
+			this.result_cols = detail && detail[1] == '0' ? {
 				'result_rank': 'Rank',
 				'lastname' : {'label': 'Name', 'colspan': 2},
 				'firstname' : '',
 				'nation' : 'Nation',
+				'result': 'Result'
+			} : {
+				'result_rank': 'Rank',
+				'lastname' : {'label': 'Name', 'colspan': 2},
+				'firstname' : '',
+				'nation' : 'Nation',
+				'start_number': 'StartNr',
 				'result': 'Result'
 			};
 			// route defaults to -1 if not set or empty
