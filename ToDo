@@ -1,0 +1,14 @@
+Arco World Championship July 2011
+---------------------------------
+- "fall" and "false start" as additional status for each speed run
+--> BestOf mode 2. false start --> "eliminated", even if there is a valid run
+- display of speed result contains two times "fall"
+- speed result shows update button, even if no rights to change result (eg. anonymous)
+- measurement should NOT be available after result official
+- FF you can not define handholds
+- speed pairing has no header and footer
+- for startorder in final, rules require countback to worldranking
+- beamer on speed general result does NOT include new rounds in speed final
+
+Mid-term:
+- periodic update of results incl. pairing (by using beamer widget with doubleclick to edit)
