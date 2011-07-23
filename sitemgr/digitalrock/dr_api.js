@@ -55,15 +55,17 @@ Resultlist.prototype.handleResponse = function(_data)
 	switch(_data.discipline)
 	{
 		case 'speedrelay':
-			this.result_cols = detail && detail[1] == 0 ? {
+			this.result_cols = !detail ? {	// default detail
 				'result_rank': 'Rank',
 				'team_name': 'Teamname',
-				'team_nation': 'Nation',
+				'athletes/0/lastname': 'Athlete #1',
+				'athletes/1/lastname': 'Athlete #2',
+				'athletes/2/lastname': 'Athlete #3',
 				'result': 'Sum'
-			} : {
+			} : (detail[1] == '1' ? {	// detail=1
 				'result_rank': 'Rank',
 				'team_name': 'Teamname',
-				'team_nation': 'Nation',
+				//'team_nation': 'Nation',
 				'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
 				'athletes/0/firstname': '', 
 				'athletes/0/result_time': '', 
@@ -74,7 +76,12 @@ Resultlist.prototype.handleResponse = function(_data)
 				'athletes/2/firstname': '', 
 				'athletes/2/result_time': '',
 				'result': 'Sum'
-			};
+			} : {	// detail=0
+				'result_rank': 'Rank',
+				'team_name': 'Teamname',
+				'team_nation': 'Nation',
+				'result': 'Sum'				
+			});
 			break;
 
 		default:
@@ -215,24 +222,35 @@ Startlist.prototype.update = function()
 Startlist.prototype.handleResponse = function(_data)
 {
 	//console.log(_data);
+	var detail = this.json_url.match(/detail=([^&]+)/);
 
 	switch(_data.discipline)
 	{
 		case 'speedrelay':
-			this.startlist_cols = {
+			this.startlist_cols = !detail ? {	// default detail
 				'start_order': 'StartNr',
 				'team_name': 'Teamname',
-				'team_nation': 'Nation',
+				'athletes/0/lastname': 'Athlete #1',
+				'athletes/1/lastname': 'Athlete #2',
+				'athletes/2/lastname': 'Athlete #3'
+			} : (detail[1] ? {	// detail=1
+				'start_order': 'StartNr',
+				'team_name': 'Teamname',
+				//'team_nation': 'Nation',
 				'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
 				'athletes/0/firstname': '', 
-				'athletes/0/start_number': '', 
+				'athletes/0/result_time': '', 
 				'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
 				'athletes/1/firstname': '', 
-				'athletes/1/start_number': '', 
+				'athletes/1/result_time': '', 
 				'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
 				'athletes/2/firstname': '', 
-				'athletes/2/start_number': ''
-			};
+				'athletes/2/result_time': ''
+			} : {	// detail=0
+				'start_order': 'StartNr',
+				'team_name': 'Teamname',
+				'team_nation': 'Nation'	
+			});
 			break;
 			
 		default:
