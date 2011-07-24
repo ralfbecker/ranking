@@ -286,6 +286,28 @@ Startlist.prototype.handleResponse = function(_data)
 		sort = 'result_rank';
 	}
 
+	// keep route_names to detect additional routes on updates
+	if (typeof this.route_names == 'undefined')
+	{ 
+		this.route_names = _data.route_names;
+	}
+	// remove whole table, if the discipline is speed and the number of route_names changes
+	if (_data.discipline == 'speed' && this.json_url.match(/route=-1/) ) // && this.route_names != _data.route_names)
+	{
+		for (var i=2; i < 10; i++) 
+		{
+			if (typeof _data.route_names[i] != typeof this.route_names[i])
+			{
+				// there was an update of the route_names array
+				this.route_names = _data.route_names;
+				jQuery(this.container).empty();
+				delete this.table;
+				break;
+			}
+		}
+	}
+	//console.log(this);
+
 	// remove whole table, if discipline or startlist/resultlist (detemined by sort) changed
 	if (this.discipline && this.discipline != _data.discipline ||
 		this.sort && this.sort != sort)
@@ -761,14 +783,10 @@ Startlist.prototype.rotateURL = function() {
 	    var urls = rotate_url_matches[1];
 	    //console.log(urls);
 
-	
-
 	    var current_comp = this.json_url.match(/comp=([^&]+)/)[1];
 	    var current_cat = this.json_url.match(/cat=([^&]+)/)[1];
 	    var current_route = this.json_url.match(/route=([^&]+)/)[1];
 	    //console.log(current_cat);
-
-
 
 	    var next = urls.match("(?:^|:|w=" + current_comp + ",)" + "c=" + current_cat + ",r=" + current_route + ":(?:w=([0-9_a-z]+),)?" +  "c=([0-9_a-z]+),r=(-?[\\d]+)");
 	    //console.log(next);
@@ -815,4 +833,3 @@ function load_css(href)
 	cssnode.href = href;
 	headID.appendChild(cssnode);
 }
-
