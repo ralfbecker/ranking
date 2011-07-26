@@ -13,30 +13,41 @@
 				<column/>
 				<column/>
 				<column/>
+				<column/>
+				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-sortheader label="Date" align="center" id="datum"/>
+					<nextmatch-sortheader align="center" label="Date" id="datum"/>
 					<nextmatch-sortheader label="Name" id="name"/>
-					<nextmatch-filterheader options="Nation..." align="center" id="nation" no_lang="1"/>
-					<nextmatch-filterheader options="Cup..." id="serie" align="center" no_lang="1"/>
+					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..."/>
+					<nextmatch-filterheader align="center" id="serie" no_lang="1" options="Cup..."/>
 					<nextmatch-sortheader label="Category" id="cat_id"/>
-					<nextmatch-sortheader label="Key" align="center" id="rkey"/>
+					<nextmatch-sortheader align="center" label="Quota" id="quota"/>
+					<nextmatch-sortheader label="Deadline" id="deadline"/>
+					<nextmatch-accountfilter id="judges" options="Judges"/>
+					<nextmatch-sortheader align="center" label="Key" id="rkey"/>
 					<nextmatch-sortheader label="Last modified" id="modified"/>
-					<description value="Status" align="center"/>
-					<description value="Action" align="center"/>
+					<description align="center" value="Status"/>
+					<description align="center" value="Action"/>
 				</row>
 				<row class="nmr">
-					<date options="Y-m-d" align="center" id="${row}[datum]" readonly="true"/>
-					<html class="ml10" no_lang="1" id="${row}[name]"/>
-					<description id="${row}[nation]" align="center" no_lang="1"/>
+					<date align="center" id="${row}[datum]" readonly="true" options="Y-m-d"/>
+					<html id="${row}[name]" no_lang="1" class="ml10"/>
+					<description align="center" id="${row}[nation]" no_lang="1"/>
 					<menulist>
 						<menupopup align="center" id="${row}[serie]" no_lang="1" readonly="true"/>
 					</menulist>
 					<menulist>
 						<menupopup type="select-cat" id="${row}[cat_id]" readonly="true"/>
 					</menulist>
-					<description no_lang="1" align="center" id="${row}[rkey]"/>
+					<int align="center" id="${row}[quota]" readonly="true"/>
+					<date id="${row}[deadline]" readonly="true" options="Y-m-d"/>
+					<menulist>
+						<menupopup type="select-account" id="${row}[judges]" readonly="true"/>
+					</menulist>
+					<description align="center" id="${row}[rkey]" no_lang="1"/>
 					<vbox options="0,0">
 						<date-time id="${row}[modified]" readonly="true"/>
 						<menulist>
@@ -44,14 +55,14 @@
 						</menulist>
 					</vbox>
 					<hbox>
-						<image options="@${row}[pdf][info][link]" src="${row}[pdf][info][icon]" statustext="View the attached PDF" label="@${row}[pdf][info][label]" no_lang="1"/>
-						<image options="@${row}[pdf][startlist][link]" src="${row}[pdf][startlist][icon]" statustext="View the attached PDF" label="@${row}[pdf][startlist][label]" no_lang="1"/>
-						<image options="@${row}[pdf][result][link]" src="${row}[pdf][result][icon]" statustext="View the attached PDF" label="@${row}[pdf][result][label]" no_lang="1"/>
+						<image statustext="View the attached PDF" label="@${row}[pdf][info][label]" src="${row}[pdf][info][icon]" no_lang="1" options="@${row}[pdf][info][link]"/>
+						<image statustext="View the attached PDF" label="@${row}[pdf][startlist][label]" src="${row}[pdf][startlist][icon]" no_lang="1" options="@${row}[pdf][startlist][link]"/>
+						<image statustext="View the attached PDF" label="@${row}[pdf][result][label]" src="${row}[pdf][result][icon]" no_lang="1" options="@${row}[pdf][result][link]"/>
 					</hbox>
 					<hbox align="center">
-						<button label="View" id="view[$row_cont[WetId]]" image="view" statustext="View this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.view&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
-						<button label="Edit" id="edit[$row_cont[WetId]]" image="edit" statustext="Edit this competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
-						<button id="delete[$row_cont[WetId]]" image="delete" label="Delete" onclick="return confirm('Delete this competition');" statustext="Delete this competition"/>
+						<button statustext="View this competition" label="View" id="view[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.view&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="view"/>
+						<button statustext="Edit this competition" label="Edit" id="edit[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="edit"/>
+						<button statustext="Delete this competition" label="Delete" id="delete[$row_cont[WetId]]" onclick="return confirm('Delete this competition');" image="delete"/>
 					</hbox>
 				</row>
 			</rows>
@@ -67,13 +78,13 @@
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description class="redItalic" id="msg" align="center" no_lang="1"/>
+					<description align="center" id="msg" no_lang="1" class="redItalic"/>
 				</row>
 				<row>
-					<nextmatch options="ranking.comp.list.rows" id="nm"/>
+					<nextmatch id="nm" options="ranking.comp.list.rows"/>
 				</row>
 				<row>
-					<button label="Add" id="nm[rows][edit][0]" statustext="Add a new competition" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
+					<button statustext="Add a new competition" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
 				</row>
 			</rows>
 		</grid>
