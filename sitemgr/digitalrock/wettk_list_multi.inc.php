@@ -46,10 +46,15 @@ function wettk_grps($wetid)	// Ermitteln f�r welche Grp Ergebnis da
 		}
 	}
 	if (isset($GLOBALS['dr_config']['resultservice']) &&
-		($res =my_query("SELECT g.rkey,MAX(r.result_rank) AS platz".
+		($res =my_query("(SELECT g.rkey,MAX(r.result_rank) AS platz".
 	                   " FROM Gruppen g,RouteResults r".
 	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
-	                   " GROUP BY g.rkey ORDER BY g.name")))
+	                   " GROUP BY g.rkey ORDER BY g.name)".
+	                   "UNION".
+					   "(SELECT g.rkey,MAX(r.result_rank) AS platz".
+	                   " FROM Gruppen g,RelayResults r".
+	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
+	                   " GROUP BY g.rkey ORDER BY g.name)")))
 	{
 		while ($row=mysql_fetch_object($res))
 		{
@@ -70,7 +75,7 @@ function result($wettk,$grp,$rgrps,$grp_name,$no_result=True)		// Link auf Wettk
 	$grp_name = str_replace('<br />',' ',$grp_name);
 	if (isset($rgrps[0][$grp]) && $rgrps[0][$grp])
 	{
-		return '<a class="mini_link" href="'.$GLOBALS['dr_config']['resultservice'].'comp='.$wettk->rkey.'&amp;cat='.$grp.'" title="'.$t_show_result.'">'.$grp_name.'</a>';
+		return '<a class="mini_link" href="'.$GLOBALS['dr_config']['resultservice'].'comp='.$wettk->WetId.'&amp;cat='.$grp.'" title="'.$t_show_result.'">'.$grp_name.'</a>';
 	}
 	elseif (isset($rgrps[$grp]) && $rgrps[$grp] == 0)
 	{
