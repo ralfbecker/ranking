@@ -13,7 +13,7 @@ $cats=prepare_var('cat','strtoupper',array('GET',1));
 $cup=prepare_var('cup','strtoupper',array('GET',2));
 $show_calc=prepare_var('show_calc','intval',array('GET'));
 // allow to simulate overall ranking for years before 2008
-if (($test_overall = prepare_var('test_overall','intval',array('GET'))) && !$cup && $wettk)
+if (($test_overall = (boolean)$_GET['test_overall']) && !$cup && $wettk)
 {
 	$test_overall = '&test_overall=1';
 }
