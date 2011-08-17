@@ -341,10 +341,18 @@ Startlist.prototype.handleResponse = function(_data)
 			this.columns['rank_prev_heat'] = 'previous heat';
 		}
 		
-		// header line
+		// competition
+		this.comp_header = jQuery(document.createElement('h1'));
+		jQuery(this.container).append(this.comp_header);
+		this.comp_header.addClass('compHeader');
+		// result date
+		this.result_date = jQuery(document.createElement('h3'));
+		jQuery(this.container).append(this.result_date);
+		this.result_date.addClass('resultDate');
+		// route header
 		this.header = jQuery(document.createElement('h1'));
 		jQuery(this.container).append(this.header);
-		this.header.className = 'listHeader';
+		this.header.addClass('listHeader');
 		
 		// create new table
 		this.table = new Table(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
@@ -384,6 +392,11 @@ Startlist.prototype.setHeader = function(_data)
 		header = title_prefix+header;
 	
 	document.title = header;
+	
+	this.comp_header.empty();
+	this.comp_header.text(_data.comp_name);
+	this.result_date.empty();
+	this.result_date.text(_data.route_result);
 	this.header.empty();
 	this.header.text(header);
 };
