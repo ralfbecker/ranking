@@ -62,3 +62,10 @@ div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {
 div.bonusTries, div.topTries {
 	display: none;
 }
+
+/**
+ * Do not display competition name and result date
+ */
+.compHeader, .resultDate {
+	display: none;
+}

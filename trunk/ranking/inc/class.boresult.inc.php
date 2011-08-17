@@ -1931,6 +1931,7 @@ class boresult extends boranking
 
 		// append category name to route name
 		$route['route_name'] .= ' '.$cat['name'];
+		$route['comp_name'] = $comp['name'];
 
 		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
 		{
