@@ -39,7 +39,7 @@ else
 		'ranglist' => 'ranglist.php?',
 		'nat_team_ranking' => 'nat_team_ranking.php?',
 		'startlist' => '/egroupware/ranking/starter.php?',
-		'resultservice' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html?',
+		'resultservice' => '/egroupware/ranking/result.php?'
 	);
 }
 

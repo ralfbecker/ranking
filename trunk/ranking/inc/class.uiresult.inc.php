@@ -618,7 +618,7 @@ class uiresult extends boresult
 		}
 		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'];
 		$rows['num_problems'] = $query['num_problems'];
-		$rows['no_delete'] = $query['readonly'];
+		$rows['readonly'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
 		$rows['show_ability'] = self::needAbilityPercent($query['cat']);
 		// disable unused update / start time measurement buttons
