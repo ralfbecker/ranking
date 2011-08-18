@@ -776,6 +776,7 @@ class uiresult extends boresult
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
 			$readonlys['nm[calendar]'] = $readonlys['nm[comp]'] = true;
+			$tmpl->disable_cells('nm[calendar]');
 		}
 		if ($this->only_nation)
 		{
@@ -1020,6 +1021,7 @@ class uiresult extends boresult
 		// enabling download for general result too (if we have at least a quali startlist)
 		$readonlys['button[download]'] = !($this->has_startlist($keys) || $keys['route_order'] == -1 && $this->has_startlist(array('route_order'=>0)+$keys));
 		$content['no_route_selection'] = !$cat; 	// no cat selected
+		$content['no_compsel'] = $cat && $content['nm']['show_result'] == 4;	// no competition selection in measurement, if a cat is selected
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
 		{
 			$readonlys['button[edit]'] = $readonlys['button[new]'] = true;
