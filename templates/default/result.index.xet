@@ -77,7 +77,7 @@
 				<column width="50"/>
 				<column width="15%"/>
 				<column disabled="@no_prev_heat"/>
-				<column/>
+				<column disabled="@readonly"/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">

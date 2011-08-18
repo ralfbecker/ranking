@@ -81,7 +81,7 @@
 				<column width="15%"/>
 				<column width="30%"/>
 				<column width="50" disabled="!@show_ability"/>
-				<column disabled="@no_delete"/>
+				<column disabled="@readonly"/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
