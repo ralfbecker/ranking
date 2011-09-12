@@ -57,6 +57,7 @@ $valid_cats += array(
 	'boulder' => array(5,6),
 	'speed'    => array(23,24),
 	'youth lead' => array(15,16,17,18,19,20),
+	'youth boulder' => array(79,80,81,82,83,84),
 	'youth speed' => array(56,57,58,59,60,61),
 );
 
@@ -77,7 +78,7 @@ foreach($valid_cats as $name => $vcats)
 	if (count(array_intersect($cats_found,$vcats)) != count($vcats) &&
 		($name != 'overall' || count($cats_found) <= 2 ||	// show overall if we have more then 2 cats
 		// no overall for youth
-		$name == 'overall' && array_intersect($cats_found,array(15,16,17,18,19,20,56,57,58,59,60,61))))
+		$name == 'overall' && array_intersect($cats_found,array(15,16,17,18,19,20,56,57,58,59,60,61,79,80,81,82,83,84))))
 	{
 		unset($valid_cats[$name]);
 	}
