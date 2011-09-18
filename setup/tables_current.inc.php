@@ -63,7 +63,7 @@ $phpgw_baseline = array(
 			'pkte' => array('type' => 'int','precision' => '4','nullable' => False),
 			'split_by_places' => array('type' => 'varchar','precision' => '12','nullable' => False,'default' => 'no'),
 			'nation' => array('type' => 'char','precision' => '5'),
-			'gruppen' => array('type' => 'varchar','precision' => '128'),
+			'gruppen' => array('type' => 'varchar','precision' => '255'),
 			'presets' => array('type' => 'text')
 		),
 		'pk' => array('SerId'),
