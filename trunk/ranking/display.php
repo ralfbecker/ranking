@@ -1,4 +1,4 @@
-#!/usr/bin/php -qC
+#!/usr/bin/php -qC -d mbstring.func_overload=7
 <?php
 /**
  * eGroupWare digital ROCK Rankings - display "demon"
@@ -6,7 +6,7 @@
  * @link http://www.egroupware.org
  * @package admin
  * @author Ralf Becker <RalfBecker-AT-outdoor-training.de>
- * @copyright (c) 2007 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
+ * @copyright (c) 2007-11 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @version $Id$
  */
@@ -35,7 +35,10 @@ elseif ($_SERVER['argc'] < 3)
 // so we need to make sure the right one is loaded by setting the domain before the header gets included.
 @list(,$_GET['domain']) = explode('@',$_SERVER['argv'][1]);
 
-if (!is_writable(ini_get('session.save_path')) && is_dir('/tmp')) ini_set('session.save_path','/tmp');	// regular users may have no rights to apache's session dir
+if (!is_writable(ini_get('session.save_path')) && is_dir('/tmp')) {
+	ini_set('session.save_path','/tmp');	// regular users may have no rights to apache's session dir
+	ini_set('session.save_handler','files');
+}
 
 $GLOBALS['egw_info'] = array(
 	'flags' => array(
@@ -50,7 +53,7 @@ ob_end_flush();
 
 /**
  * callback if the session-check fails, redirects via xajax to login.php
- * 
+ *
  * @param array &$account account_info with keys 'login', 'passwd' and optional 'passwd_type'
  * @return boolean/string true if we allow the access and account is set, a sessionid or false otherwise
  */
@@ -103,8 +106,22 @@ $bo->display->update(array(
 
 // some test output for special chars          012345678901234567 (geht bis 13)
 //$test = $GLOBALS['egw']->translation->convert('ÄÖÜßäöüéèÉçáëóÁÈćŠ','utf-8');
-//$bo->display->update(array('dsp_current' => $GLOBALS['egw']->translation->convert($test,'utf-8'),'dsp_timeout'=>microtime(true)+10)); 
+//$bo->display->update(array('dsp_current' => $GLOBALS['egw']->translation->convert($test,'utf-8'),'dsp_timeout'=>microtime(true)+10));
 //$bo->display->output(); sleep(10);	// this source is utf-8
+
+// Mac OS X seems to lack time_sleep_until ...
+if (!function_exists('time_sleep_until')) {
+   function time_sleep_until($future) {
+       $sleep = ($future - microtime(1))*1000000;
+       if ($sleep<=0) {
+           trigger_error("Time in past", E_USER_WARNING);
+           return false;
+       }
+
+       usleep($sleep);
+       return true;
+   }
+}
 
 $time = microtime(true);
 $next_line = false;
@@ -155,7 +172,7 @@ while(true)
 
 	// debug output
 	printf("\r%d(%d)-%d: %-20s %.1lf (%ds) --> %d  ",$bo->format->frm_line,$bo->format->frm_id,$bo->display->dsp_line,$show,$sleep_until,$timeout,$bo->format->frm_go_frm_id);
-	
+
 	// wait til our timeout or someone changes the current active format
 	$next_line = true;
 	while (($time = microtime(true)) < $sleep_until)
