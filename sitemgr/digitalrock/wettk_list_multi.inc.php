@@ -32,7 +32,7 @@ if (!is_array($cats))
 	);
 }
 
-function wettk_grps($wetid)	// Ermitteln f�r welche Grp Ergebnis da
+function wettk_grps($wetid)	// check for which categories we have a result
 {
 	if ($res =my_query("SELECT g.rkey,MAX(r.platz) AS platz,MAX(r.pkt) as pkt".
 	                   " FROM Gruppen g,Results r".
@@ -107,9 +107,14 @@ function ranglist($wkey,$grp)	// Link auf Rangliste zum Datum $wettk
 		$gname[$grp].($gruppe->rls ? '</A>' : '' )."</td>\n";
 }
 
+/**
+ * Since when categorising of competition uses cat_id instead of regular expression for rkey
+ */
+$cats_use_cat_id_since = 2011;
+
 function get_cats(&$wettk)
 {
-	global $cats;
+	global $cats,$cats_use_cat_id_since;
 
 	if (isset($wettk->cats))
 	{
@@ -119,7 +124,9 @@ function get_cats(&$wettk)
 	$group_found = array();
 	foreach ($cats as $key => $cat)
 	{
-		if ($cat['nation'] == $wettk->nation && preg_match('/'.$cat['wettk_reg'].'/',$wettk->rkey))
+		if ($cat['nation'] == $wettk->nation &&
+			((int)$wettk->datum >= $cats_use_cat_id_since && in_array($wettk->cat_id, (array)$cat['cat_id']) ||
+			 (int)$wettk->datum <  $cats_use_cat_id_since && preg_match('/'.$cat['wettk_reg'].'/',$wettk->rkey)))
 		{
 			list($grps) = explode('@',$wettk->gruppen);
 			if ($grps)
@@ -351,7 +358,9 @@ if ($mode != 2)
 					{
 						$minis .= ($minis?"\n| ":'').'<a class="mini_link" href="'.$prefix.$infos.'" target="_blank" title="'.$t_show_infos.'">'.$t_infos.'</a>';
 					}
-					echo '<tr bgcolor="'.$cat['bgcolor'].'">'."\n\t".'<td class="comp_date">'.wettk_datum($wettk)."</td>\n";
+//_debug_array($wettk);
+					echo '<tr bgcolor="'.$cat['bgcolor'].'">'."\n\t".'<td class="comp_date">'.wettk_datum($wettk).
+						'<br/>'.$wettk->cat_id."</td>\n";
 					$wettk_class = $wettk->serie && ($wettk->faktor > 0.0 || $wettk->nation != 'GER') ? 'comp_cup' : 'comp';
 					$wettk_label = str_replace('#','<font color="red">###</font> ',wettk_link_str($wettk,$wettk->name,'comp_link',!file_exists($result)));
 					echo "\t".'<td><span class="'.$wettk_class.'">'.$wettk_label.'</span><br />'.$minis."</td>\n";

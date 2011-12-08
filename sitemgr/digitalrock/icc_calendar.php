@@ -24,6 +24,7 @@ $cats = array(
 		'rang_title'=> 'Worldranking',
 		'bgcolor'   => '#B8C8FF',
 		'nat_team_ranking' => !isset($_REQUEST['year']) || $_REQUEST['year'] >= 2005,
+		'cat_id' => array(52,53),
 	),
 	'youth' => array(
 		'label'  => 'Youth/EYC',
@@ -34,6 +35,7 @@ $cats = array(
 //		'rang_title'=> '',
 		'bgcolor'   => '#D8E8FF',
 		'nat_team_ranking' => !isset($_REQUEST['year']) || $_REQUEST['year'] >= 2005,
+		'cat_id' => array(55),
 	),
 	'masters' => array(
 		'label'  => 'Masters',
@@ -43,6 +45,7 @@ $cats = array(
 //		'serie_reg' => '^[0-9]{2,2}_(WC|TR){1,1}.*',
 //		'rang_title'=> 'CUWR continuously updated WORLDRANKING',
 		'bgcolor'   => '#F0F0F0',
+		'cat_id' => array(55,68),
 	),
 	'para' => array(
 		'label'  => 'Paraclimbing',
@@ -50,6 +53,7 @@ $cats = array(
 		'grps'	 => $icc_para,
 		'wettk_reg' => '^[0-9]{2,2}_PE.*',
 		'bgcolor'   => '#F0F0F0',
+		'cat_id' => array(53,68),
 	),
 );
 
@@ -107,5 +111,3 @@ $anz_year = 0;
 include ('wettk_list_multi.inc.php');
 
 do_footer ();
-
-?>
