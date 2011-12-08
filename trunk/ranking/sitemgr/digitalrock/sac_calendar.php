@@ -84,7 +84,7 @@ $cats = array(
 //		'serie_reg' => '',
 		'rang_title'=> '',
 		'bgcolor'   => '#F0F0F0',
-		'cat_id'    => array(64),	// needs own category, as we have not groups to distinguiche from sui_local!
+		'cat_id'    => array(84),	// needs own category, as we have not groups to distinguiche from sui_local!
 	),
 );
 
