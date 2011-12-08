@@ -48,8 +48,15 @@ function check_anon_access(&$anon_account)
 
 try
 {
-	require_once EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php';
-	$route = boresult::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
+	if (isset($_GET['nation']))
+	{
+		$export = new ranking_export();
+		$result = $export->export_calendar($_GET['nation'], $_GET['year']);
+	}
+	else
+	{
+		$result = ranking_export::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
+	}
 }
 catch(Exception $e)
 {
@@ -67,21 +74,21 @@ $encoding = translation::charset();
 if (!isset($_GET['debug']) || !$_GET['debug'])
 {
 	header('Content-Type: application/json; charset='.$encoding);
-	header('Etag: "'.$route['etag'].'"');
+	if ($result['etag']) header('Etag: "'.$result['etag'].'"');
 }
 else
 {
 	header('Content-Type: text/html; charset='.$encoding);
 }
 
-$json = json_encode($route);
+$json = json_encode($result);
 
 if (isset($_GET['debug']) && $_GET['debug'])
 {
 	switch($_GET['debug'])
 	{
 		case 2:
-			echo "<pre>".print_r($route,true)."</pre>\n";
+			echo "<pre>".print_r($result,true)."</pre>\n";
 			// fall through
 		default:
 			echo "<pre>".htmlspecialchars($json)."</pre>\n";

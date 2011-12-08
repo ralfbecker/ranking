@@ -400,4 +400,21 @@ class result extends so_sql
 
 		return parent::save();
 	}
+
+	/**
+	 * Check the status / existance of start list or result for all categories of given competitions
+	 *
+	 * @param int|array $comps
+	 * @return array of WetId => GrpId => status: 0=result, 3=startlist, 4=starters
+	 */
+	function result_status($comps)
+	{
+		$status = array();
+		foreach($this->db->select($this->table_name,'WetId,GrpId,MAX(platz) AS platz,MAX(pkt) AS pkt',array('WetId' => $comps),
+			__LINE__,__FILE__,false,'GROUP BY WetId,GrpId') as $row)
+		{
+			$status[$row['WetId']][$row['GrpId']] = $row['platz'] ? 0 : ($row['pkt'] > 64 ? 3 : 4);
+		}
+		return $status;
+	}
 }

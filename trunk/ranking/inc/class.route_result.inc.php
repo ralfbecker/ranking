@@ -1206,4 +1206,25 @@ class route_result extends so_sql
 		}
 		return $cols;
 	}
+
+
+	/**
+	 * Check the status / existance of start list or result for all categories of given competitions
+	 *
+	 * @param int|array $comps
+	 * @param array $status=array() result of result::result_status to get a combined array (status 0 get NOT overwritten!)
+	 * @return array of WetId => GrpId => status: 1=result, 2=startlist
+	 */
+	function result_status($comps,$status=array())
+	{
+		foreach($this->db->select($this->table_name,'WetId,GrpId,MAX(result_rank) AS rank',array('WetId' => $comps),
+			__LINE__,__FILE__,false,'GROUP BY WetId,GrpId') as $row)
+		{
+			if (!isset($status[$row['WetId']][$row['GrpId']]) || $status[$row['WetId']][$row['GrpId']] > 2)
+			{
+				$status[$row['WetId']][$row['GrpId']] = $row['rank'] ? 1 : 2;
+			}
+		}
+		return $status;
+	}
 }

@@ -48,8 +48,17 @@ function check_anon_access(&$anon_account)
 
 try
 {
-	require_once EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php';
-	$route = boresult::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
+	if (isset($_GET['nation']))
+	{
+		$export = new ranking_export();
+		$result = $export->export_calendar($_GET['nation'], $_GET['year']);
+		$root_tag = 'calendar';
+	}
+	else
+	{
+		$result = ranking_export::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
+		$root_tag = 'route';
+	}
 }
 catch(Exception $e)
 {
@@ -69,7 +78,7 @@ if (!isset($_GET['debug']) || !$_GET['debug'])
 {
 	$xml->openURI('php://output');
 	header('Content-Type: application/xml; charset='.$encoding);
-	header('Etag: "'.$route['etag'].'"');
+	if ($result['etag']) header('Etag: "'.$result['etag'].'"');
 }
 else
 {
@@ -79,9 +88,9 @@ else
 $xml->setIndent(true);
 $xml->setIndentString("\t");
 $xml->startDocument('1.0',$encoding);
-$xml->startElement('route');
+$xml->startElement($root_tag);
 
-foreach($route as $name => &$value)
+foreach($result as $name => &$value)
 {
 	if (!is_array($value))
 	{
@@ -109,10 +118,10 @@ foreach($route as $name => &$value)
 					$xml->writeElement($name,$val);
 				}
 			}
-			else	// only participants get here
+			else	// only participants / arrays get here
 			{
 				$xml->startElement($name);
-				write_participant($xml,$val);
+				write_array($xml,$val);
 				$xml->endElement();
 			}
 		}
@@ -121,14 +130,21 @@ foreach($route as $name => &$value)
 }
 $xml->endElement();
 
-function write_participant($xml,$participant)
+function write_array($xml,$arr)
 {
-	foreach($participant as $name => &$value)
+	//error_log(__METHOD__.'(,'.array2string($participant).')');
+	foreach($arr as $name => &$value)
 	{
 		if (!is_array($value))
 		{
 			//error_log(__METHOD__.'(,'.array2string($participant).') name='.array2string($name).', value='.array2string($value));
 			$xml->writeElement($name,(string)$value);
+		}
+		elseif($name == 'cup')
+		{
+			$xml->startElement($name);
+			write_array($xml,$value);
+			$xml->endElement();
 		}
 		elseif($value)
 		{
@@ -136,9 +152,16 @@ function write_participant($xml,$participant)
 			$xml->startElement($name.'s');
 			foreach($value as $id => &$val)
 			{
-				$xml->startElement($name);
-				write_participant($xml,$val);
-				$xml->endElement();
+				if (is_array($val))
+				{
+					$xml->startElement($name);
+					write_array($xml,$val);
+					$xml->endElement();
+				}
+				else
+				{
+					$xml->writeElement($name,(string)$val);
+				}
 			}
 			$xml->endElement();
 		}
@@ -150,7 +173,7 @@ if (isset($_GET['debug']) && $_GET['debug'])
 	switch($_GET['debug'])
 	{
 		case 2:
-			echo "<pre>".print_r($route,true)."</pre>\n";
+			echo "<pre>".print_r($result,true)."</pre>\n";
 			// fall through
 		default:
 			echo "<pre>".htmlspecialchars($xml->outputMemory(true));
