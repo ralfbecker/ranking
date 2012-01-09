@@ -1,18 +1,18 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - Hooks: diverse static methods to be called as hooks
+ * EGroupware digital ROCK Rankings - Hooks: diverse static methods to be called as hooks
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 /**
- * eGroupWare digital ROCK Rankings - Hooks: diverse static methods to be called as hooks
+ * Rankings - Hooks: diverse static methods to be called as hooks
  */
 class ranking_admin_prefs_sidebox_hooks
 {
@@ -30,7 +30,7 @@ class ranking_admin_prefs_sidebox_hooks
 			$file = array(
 				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.uiathletes.index')),
 				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
-				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.uicompetitions.index')),
+				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.uicups.index')),
 				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index')),
 				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.index')),
@@ -130,7 +130,7 @@ class ranking_admin_prefs_sidebox_hooks
 	static function hook_settings($hook_data)
 	{
 		$ranking_views = array(
-			'ranking.uicompetitions.index'   => lang('Competitions'),
+			'ranking.ranking_competition_ui.index'   => lang('Competitions'),
 			'ranking.uicups.index'           => lang('Cups'),
 		//	'ranking.uicats.index'           => lang('Categories'),
 			'ranking.uiathletes.index'       => lang('Athletes'),

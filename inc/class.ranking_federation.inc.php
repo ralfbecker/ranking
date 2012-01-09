@@ -1,17 +1,15 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - federation storage object
+ * EGroupware digital ROCK Rankings - federation storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2008-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * Federation object
@@ -76,13 +74,26 @@ class ranking_federation extends so_sql
 	/**
 	 * Return a list of federation names indexed by fed_id, evtl. of a given nation only
 	 *
-	 * @param string $nation=null
+	 * @param string $nation=null string to limit result to a given nation
+	 * @param bool $only_direct_children=false true to return only direct children of given nation federation(s)
 	 * @return array
 	 */
-	function federations($nation=null)
+	function federations($nation=null,$only_direct_children=false)
 	{
 		$feds = array();
 		$where = $nation ? array('nation' => $nation) : array();
+		if ($only_direct_children)
+		{
+			if ($nation)
+			{
+				$nations_feds = 'SELECT fed_id FROM '.self::FEDERATIONS_TABLE.' WHERE nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
+				$where[] = "fed_parent IN ($nations_feds)";
+			}
+			else
+			{
+				$where[] = "fed_parent IS NULL";
+			}
+		}
 		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$where,__LINE__,__FILE__,false,
 			'ORDER BY nation ASC,verband ASC',self::APPLICATION) as $fed)
 		{
@@ -252,46 +263,63 @@ class ranking_federation extends so_sql
 	static $grant_types = array(
 		'athletes' => EGW_ACL_ATHLETE,	// edit athletes
 		'register' => EGW_ACL_REGISTER,	// register athletes for national competitions
+		'edit' => EGW_ACL_EDIT,		// edit competitions
+		'read' => EGW_ACL_READ,		// read competitions
 	);
 
 	/**
 	 * Read ACL grants of a federation
 	 *
-	 * @param int $fed_id=null default use fed_id of this object
+	 * @param int|string $fed_id=null default use fed_id (or nation, if no parent) of this object
 	 * @return array
 	 */
 	function get_grants($fed_id=null)
 	{
-		if (is_null($fed_id)) $fed_id = $this->data['fed_id'];
+		if (is_null($fed_id))
+		{
+			$fed_id = $this->data['fed_parent'] ? $this->data['fed_id'] : $this->data['nation'];
+		}
+		$location = is_numeric($fed_id) ? self::ACL_LOCATION_PREFIX.$fed_id : $fed_id;
 
 		foreach(self::$grant_types as $name => $right)
 		{
-			$grants[$name] = $GLOBALS['egw']->acl->get_ids_for_location(self::ACL_LOCATION_PREFIX.$fed_id,$right,self::APPLICATION);
+			$grants[$name] = $GLOBALS['egw']->acl->get_ids_for_location($location,$right,self::APPLICATION);
 		}
+		//error_log(__METHOD__."('$fed_id') returning ".array2string($grants));
 		return $grants;
 	}
 
 	/**
 	 * Delete ACL grants of a federation
 	 *
-	 * @param int $fed_id=null default use fed_id of this object
+	 * @param int|string $fed_id=null default use fed_id (or nation, if no parent) of this object
 	 */
 	function delete_grants($fed_id=null)
 	{
-		if (is_null($fed_id)) $fed_id = $this->data['fed_id'];
+		if (is_null($fed_id))
+		{
+			$fed_id = $this->data['fed_parent'] ? $this->data['fed_id'] : $this->data['nation'];
+		}
+		//error_log(__METHOD__."('$fed_id')");
+		$location = is_numeric($fed_id) ? self::ACL_LOCATION_PREFIX.$fed_id : $fed_id;
 
-		$GLOBALS['egw']->acl->delete_repository(self::APPLICATION,self::ACL_LOCATION_PREFIX.$fed_id,false);
+		$GLOBALS['egw']->acl->delete_repository(self::APPLICATION,$location,false);
 	}
 
 	/**
 	 * Set ACL grants of a federation
 	 *
 	 * @param array $grants
-	 * @param int $fed_id=null default use fed_id of this object
+	 * @param int|string $fed_id=null default use fed_id (or nation, if no parent) of this object
 	 */
 	function set_grants(array $grants,$fed_id=null)
 	{
-		if (is_null($fed_id)) $fed_id = $this->data['fed_id'];
+		if (is_null($fed_id))
+		{
+			$fed_id = $this->data['fed_parent'] ? $this->data['fed_id'] : $this->data['nation'];
+		}
+		//error_log(__METHOD__.'('.array2string($grants).",'$fed_id')");
+		$location = is_numeric($fed_id) ? self::ACL_LOCATION_PREFIX.$fed_id : $fed_id;
 
 		$this->delete_grants($fed_id);
 
@@ -310,7 +338,7 @@ class ranking_federation extends so_sql
 			if ($rights)	// only write rights if there are some
 			{
 				//echo "$nation: $account = $rights<br>";
-				$GLOBALS['egw']->acl->add_repository(self::APPLICATION,self::ACL_LOCATION_PREFIX.$fed_id,$account,$rights);
+				$GLOBALS['egw']->acl->add_repository(self::APPLICATION,$location,$account,$rights);
 			}
 		}
 	}

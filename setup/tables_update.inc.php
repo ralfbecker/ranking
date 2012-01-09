@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -1382,5 +1382,29 @@ function ranking_upgrade1_9_004()
 	));
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.005';
+}
+
+/**
+ * Add colum to:
+ * - make a competition owned by a federation, rather then a nation
+ * - change how athlets are displayed in starlist and results
+ *
+ * ALTER TABLE  `Wettkaempfe`
+ * 	ADD  `fed_id` INT NULL ,
+ * 	ADD  `display_athlete` ENUM(  'nation',  'pc_city',  'federation',  'nation_pc_city' ) NULL
+ */
+function ranking_upgrade1_9_005()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','fed_id',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','display_athlete',array(
+		'type' => 'varchar',
+		'precision' => '20',
+		'comment' => 'nation, pc_city, federation, pc_city_nation, NULL=default'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.006';
 }
 

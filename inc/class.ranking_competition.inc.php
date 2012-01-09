@@ -1,20 +1,20 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - competition storage object
+ * EGroupware digital ROCK Rankings - competition storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 /**
  * competition object
  */
-class competition extends so_sql
+class ranking_competition extends so_sql
 {
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 		'durartion' => 'duration'
@@ -38,6 +38,13 @@ class competition extends so_sql
 	);
 	var $vfs_pdf_dir = '';
 	var $result_table = 'Results';
+	/**
+	 * Values for display_athlete column
+	 */
+	const NATION = 'nation';
+	const FEDERATION = 'federation';
+	const PC_CITY = 'pc_city';
+	const NATION_PC_CITY = 'nation_pc_city';
 
 	/**
 	 * Timestaps that need to be adjusted to user-time on reading or saving
