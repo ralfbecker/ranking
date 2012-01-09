@@ -17,36 +17,36 @@
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-filterheader options="Nation..." align="center" id="nation" no_lang="1"/>
+					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..."/>
 					<nextmatch-sortheader label="Nationname" id="fed_nationname"/>
-					<nextmatch-filterheader options="Continent" id="fed_continent"/>
+					<nextmatch-filterheader id="fed_continent" options="Continent"/>
 					<nextmatch-sortheader label="Name" id="verband"/>
 					<nextmatch-sortheader label="Shortcut" id="fed_shortcut"/>
-					<nextmatch-sortheader label="Athletes" align="center" id="num_athletes"/>
+					<nextmatch-sortheader align="center" label="Athletes" id="num_athletes"/>
 					<nextmatch-sortheader label="Parent federation" id="fed_parent"/>
-					<nextmatch-sortheader label="Children" align="center" id="num_children"/>
-					<nextmatch-sortheader label="Key" align="center" id="fed_id"/>
+					<nextmatch-sortheader align="center" label="Children" id="num_children"/>
+					<nextmatch-sortheader align="center" label="Key" id="fed_id"/>
 					<hbox align="center">
-						<description value="Action" align="center"/>
-						<button image="check" label="Check all" id="check_all" statustext="Check all" onclick="toggle_all(this.form,form::name('checked[]')); return false;" needed="1" align="right"/>
+						<description align="center" value="Action"/>
+						<button align="right" statustext="Check all" label="Check all" id="check_all" needed="1" onclick="toggle_all(this.form,form::name('checked[]')); return false;" image="check"/>
 					</hbox>
 				</row>
 				<row class="row">
-					<description id="${row}[nation]" align="center" no_lang="1"/>
+					<description align="center" id="${row}[nation]" no_lang="1"/>
 					<description id="${row}[fed_nationname]"/>
 					<menulist>
 						<menupopup id="${row}[fed_continent]" readonly="true"/>
 					</menulist>
-					<description no_lang="1" id="${row}[verband]" options=",$row_cont[fed_url],,,_blank"/>
+					<description id="${row}[verband]" no_lang="1" href="$row_cont[fed_url]" extra_link_target="_blank"/>
 					<description id="${row}[fed_shortcut]"/>
-					<description id="${row}[num_athletes]" align="center"/>
+					<description align="center" id="${row}[num_athletes]"/>
 					<description id="${row}[parent_name]"/>
-					<description id="${row}[num_children]" align="center"/>
-					<description no_lang="1" align="center" id="${row}[fed_id]"/>
+					<description align="center" id="${row}[num_children]"/>
+					<description align="center" id="${row}[fed_id]" no_lang="1"/>
 					<hbox align="center">
-						<button label="Edit" id="edit[$row_cont[fed_id]]" image="edit" statustext="Edit this competition"/>
-						<button id="delete[$row_cont[fed_id]]" image="delete" label="Delete" onclick="return confirm('Delete this federation');" statustext="Delete this federation" align="center"/>
-						<checkbox id="checked[]" options="$row_cont[fed_id]" statustext="Select multiple federations for a further action" align="right"/>
+						<button statustext="Edit this competition" label="Edit" id="edit[$row_cont[fed_id]]" image="edit"/>
+						<button align="center" statustext="Delete this federation" label="Delete" id="delete[$row_cont[fed_id]]" onclick="return confirm('Delete this federation');" image="delete"/>
+						<checkbox align="right" statustext="Select multiple federations for a further action" id="checked[]" options="$row_cont[fed_id]"/>
 					</hbox>
 				</row>
 			</rows>
@@ -55,24 +55,24 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
-	<template id="ranking.federation.index" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.federation.index" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description class="redItalic" id="msg" align="center" no_lang="1"/>
+					<description align="center" id="msg" no_lang="1" class="redItalic"/>
 				</row>
 				<row>
-					<nextmatch options="ranking.federation.index.rows" id="nm"/>
+					<nextmatch id="nm" options="ranking.federation.index.rows"/>
 				</row>
 				<row disabled="!@is_admin">
 					<hbox align="right">
 						<menulist>
-							<menupopup id="action" options="Select an action" onchange="1"/>
+							<menupopup id="action" onchange="1" options="Select an action"/>
 						</menulist>
-						<button image="arrow_ltr" label="Check all" id="check_all" statustext="Check all" onclick="toggle_all(this.form,form::name('nm[rows][checked][]')); return false;" needed="1" class="checkAllArrow"/>
+						<button statustext="Check all" label="Check all" id="check_all" needed="1" onclick="toggle_all(this.form,form::name('nm[rows][checked][]')); return false;" image="arrow_ltr" class="checkAllArrow"/>
 					</hbox>
 				</row>
 				<row>
@@ -85,9 +85,9 @@
 							</columns>
 							<rows>
 								<row>
-									<description value="Nation" options=",,,nation"/>
+									<description value="Nation" for="nation"/>
 									<hbox options="0,0">
-										<textbox size="3" maxlength="3" id="nation" onchange="1" class="inputRequired"/>
+										<textbox id="nation" onchange="1" size="3" maxlength="3" class="inputRequired"/>
 										<textbox id="fed_nationname" size="60" maxlength="80" class="leftPad5"/>
 										<menulist class="leftPad5">
 											<menupopup id="fed_continent" options="Select one"/>
@@ -97,26 +97,27 @@
 								<row>
 									<description value="Name"/>
 									<hbox options="0,0">
-										<textbox size="80" maxlength="80" id="verband" class="inputRequired"/>
-										<textbox id="fed_shortcut" size="10" maxlength="20" class="leftPad5" statustext="Shortcut"/>
+										<textbox id="verband" size="80" maxlength="80" class="inputRequired"/>
+										<textbox statustext="Shortcut" id="fed_shortcut" size="10" maxlength="20" class="leftPad5"/>
 									</hbox>
 								</row>
 								<row>
-									<description options=",,,fed_url" value="Website"/>
-									<textbox size="95" maxlength="128" id="fed_url"/>
+									<description value="Website" for="fed_url"/>
+									<textbox id="fed_url" size="95" maxlength="128"/>
 								</row>
 								<row>
-									<description value="Parent federation" options=",,,fed_parent"/>
+									<description value="Parent federation" for="fed_parent"/>
 									<menulist>
-										<menupopup options="None" id="fed_parent"/>
+										<menupopup id="fed_parent" options="None"/>
 									</menulist>
 								</row>
-								<row>
-									<description options="3,,0,0" value="Edit athlete"/>
+								<row valign="top">
+									<description value="Rechte" font_style="3" activate_links="0" for="0"/>
 									<hbox options="0,0">
-										<listbox type="select-account" rows="5" id="acl[edit]"/>
-										<description value="National registration"/>
-										<listbox type="select-account" rows="5" class="leftPad5" id="acl[register]"/>
+										<listbox type="select-account" label="Edit athlete" id="grants[athletes]" rows="5" options="both"/>
+										<listbox type="select-account" label="registration" id="grants[register]" rows="5" options="both" class="leftPad5"/>
+										<listbox type="select-account" label="Edit competition" id="grants[edit]" rows="5" options="both" class="leftPad5"/>
+										<listbox type="select-account" label="Read competition" id="grants[read]" rows="5" options="both" class="leftPad5"/>
 									</hbox>
 								</row>
 							</rows>
@@ -126,8 +127,8 @@
 				<row>
 					<hbox>
 						<button label="Save" id="button[save]"/>
-						<button id="button[apply]" label="Apply"/>
-						<button id="button[cancel]" label="Cancel"/>
+						<button label="Apply" id="button[apply]"/>
+						<button label="Cancel" id="button[cancel]"/>
 					</hbox>
 				</row>
 			</rows>

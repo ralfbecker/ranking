@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -42,7 +42,7 @@
 					<menulist>
 						<menupopup type="select-cat" id="${row}[cat_id]" readonly="true"/>
 					</menulist>
-					<int align="center" id="${row}[quota]" readonly="true"/>
+					<textbox type="integer" align="center" id="${row}[quota]" readonly="true"/>
 					<date id="${row}[deadline]" readonly="true" options="Y-m-d"/>
 					<menulist>
 						<menupopup type="select-account" id="${row}[judges]" readonly="true"/>
@@ -55,13 +55,13 @@
 						</menulist>
 					</vbox>
 					<hbox>
-						<image statustext="View the attached PDF" label="@${row}[pdf][info][label]" src="${row}[pdf][info][icon]" no_lang="1" options="@${row}[pdf][info][link]"/>
-						<image statustext="View the attached PDF" label="@${row}[pdf][startlist][label]" src="${row}[pdf][startlist][icon]" no_lang="1" options="@${row}[pdf][startlist][link]"/>
-						<image statustext="View the attached PDF" label="@${row}[pdf][result][label]" src="${row}[pdf][result][icon]" no_lang="1" options="@${row}[pdf][result][link]"/>
+						<image statustext="View the attached PDF" label="@${row}[pdf][info][label]" src="${row}[pdf][info][icon]" no_lang="1" href="@${row}[pdf][info][link]"/>
+						<image statustext="View the attached PDF" label="@${row}[pdf][startlist][label]" src="${row}[pdf][startlist][icon]" no_lang="1" href="@${row}[pdf][startlist][link]"/>
+						<image statustext="View the attached PDF" label="@${row}[pdf][result][label]" src="${row}[pdf][result][icon]" no_lang="1" href="@${row}[pdf][result][link]"/>
 					</hbox>
 					<hbox align="center">
-						<button statustext="View this competition" label="View" id="view[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.view&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="view"/>
-						<button statustext="Edit this competition" label="Edit" id="edit[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="edit"/>
+						<button statustext="View this competition" label="View" id="view[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_competition_ui.view&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="view"/>
+						<button statustext="Edit this competition" label="Edit" id="edit[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_competition_ui.edit&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="edit"/>
 						<button statustext="Delete this competition" label="Delete" id="delete[$row_cont[WetId]]" onclick="return confirm('Delete this competition');" image="delete"/>
 					</hbox>
 				</row>
@@ -84,7 +84,7 @@
 					<nextmatch id="nm" options="ranking.comp.list.rows"/>
 				</row>
 				<row>
-					<button statustext="Add a new competition" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.uicompetitions.edit'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
+					<button statustext="Add a new competition" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_competition_ui.edit'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
 				</row>
 			</rows>
 		</grid>

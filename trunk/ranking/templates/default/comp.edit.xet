@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.comp.edit.general" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.comp.edit.general" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -11,22 +11,28 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Startdate" options=",,,datum"/>
-					<date options="Y-m-d" id="datum" statustext="startdate (first heat, not registration) of the competition (must not be empty)" needed="1"/>
-					<description value="Duration or textual date" options=",,,duration"/>
-					<textbox size="15" id="duration" statustext="duration in days or textual competition-date like 'mid July'"/>
+					<description value="Startdate" for="datum"/>
+					<date statustext="startdate (first heat, not registration) of the competition (must not be empty)" id="datum" needed="1" options="Y-m-d"/>
+					<description value="Duration or textual date" for="duration"/>
+					<textbox statustext="duration in days or textual competition-date like 'mid July'" id="duration" size="15"/>
 				</row>
 				<row class="row" valign="top" height="100">
-					<description value="Cathegories" options=",,,gruppen"/>
-					<listbox rows="6" id="gruppen" statustext="which cathegories are competing" no_lang="1"/>
-					<description options=",,,discipline" value="Discipline"/>
+					<description value="Cathegories" for="gruppen"/>
+					<listbox statustext="which cathegories are competing" id="gruppen" no_lang="1" rows="6"/>
+					<description value="Discipline" for="discipline"/>
 					<menulist>
-						<menupopup options="set by category" id="discipline"/>
+						<menupopup id="discipline" options="set by category"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Homepage" options=",,,homepage"/>
-					<textbox size="100" maxlength="128" id="homepage" statustext="used to preset a link in rankings and competition-calendar" span="all"/>
+					<description value="Homepage" for="homepage"/>
+					<textbox statustext="used to preset a link in rankings and competition-calendar" id="homepage" size="100" maxlength="128" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Display athlete" for="display_athlete"/>
+					<menulist span="all">
+						<menupopup id="display_athlete"/>
+					</menulist>
 				</row>
 			</rows>
 		</grid>
@@ -41,27 +47,27 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Pointalocation" options=",,,pkte"/>
+					<description value="Pointalocation" for="pkte"/>
 					<menulist>
-						<menupopup no_lang="1" id="pkte" statustext="defines how many points gets awarded for each place in the ranking (not cup)"/>
+						<menupopup statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" options=",,,pkt_bis"/>
+					<description value="til place" for="pkt_bis"/>
 					<menulist>
-						<menupopup type="select-percent" id="pkt_bis" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)"/>
+						<menupopup type="select-percent" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Factor" options=",,,faktor"/>
-					<textbox type="float" id="faktor" statustext="all points gets multiplicated with this factor, eg. for different competition types" span="all"/>
+					<description value="Factor" for="faktor"/>
+					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Fieldfactorpoints" options=",,,feld_pkte"/>
+					<description value="Fieldfactorpoints" for="feld_pkte"/>
 					<menulist>
-						<menupopup no_lang="1" id="feld_pkte" statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used"/>
+						<menupopup statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" options=",,,feld_bis"/>
+					<description value="til place" for="feld_bis"/>
 					<menulist>
-						<menupopup type="select-percent" id="feld_bis" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%"/>
+						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 					</menulist>
 				</row>
 				<row height="100" disabled="!@dru_bez">
@@ -80,42 +86,42 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Information PDF" options=",,,upload_info"/>
-					<image options="@files[info][link],_blank" label="@files[info][file]" statustext="click to view" src="files[info][icon]" no_lang="1"/>
-					<button image="delete" label="Remove the attached PDF" id="remove[info]" onclick="return confirm('Remove the attached PDF');"/>
-					<file id="upload_info" statustext="each new upload will overwrite the previous one"/>
+					<description value="Information PDF" for="upload_info"/>
+					<image statustext="click to view" label="@files[info][file]" src="files[info][icon]" no_lang="1" href="@files[info][link]" extra_link_target="_blank"/>
+					<button label="Remove the attached PDF" id="remove[info]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<file statustext="each new upload will overwrite the previous one" id="upload_info"/>
 				</row>
 				<row class="row">
-					<description value="Startlist PDF" options=",,,upload_startlist"/>
-					<image options="@files[startlist][link],_blank" label="@files[startlist][file]" statustext="click to view" src="files[startlist][icon]"/>
-					<button image="delete" label="Remove the attached PDF" id="remove[startlist]" onclick="return confirm('Remove the attached PDF');"/>
-					<file id="upload_startlist" statustext="each new upload will overwrite the previous one"/>
+					<description value="Startlist PDF" for="upload_startlist"/>
+					<image statustext="click to view" label="@files[startlist][file]" src="files[startlist][icon]" href="@files[startlist][link]" extra_link_target="_blank"/>
+					<button label="Remove the attached PDF" id="remove[startlist]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<file statustext="each new upload will overwrite the previous one" id="upload_startlist"/>
 				</row>
 				<row class="row">
-					<description value="Result PDF" options=",,,upload_result"/>
-					<image options="@files[result][link],_blank" label="@files[result][file]" statustext="click to view" src="files[result][icon]"/>
-					<button image="delete" label="Remove the attached PDF" id="remove[result]" onclick="return confirm('Remove the attached PDF');"/>
-					<file id="upload_result" statustext="each new upload will overwrite the previous one"/>
+					<description value="Result PDF" for="upload_result"/>
+					<image statustext="click to view" label="@files[result][file]" src="files[result][icon]" href="@files[result][link]" extra_link_target="_blank"/>
+					<button label="Remove the attached PDF" id="remove[result]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<file statustext="each new upload will overwrite the previous one" id="upload_result"/>
 				</row>
 				<row class="th">
-					<description span="all" value="Resultservice"/>
+					<description value="Resultservice" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Competition logo"/>
-					<image src="files[logo][icon]" class="previewImage" label="@files[logo][file]"/>
-					<button image="delete" label="Remove the grafic" id="remove[logo]" onclick="return confirm('Remove the grafic');"/>
-					<file id="upload_logo" statustext="each new upload will overwrite the previous one"/>
+					<image label="@files[logo][file]" src="files[logo][icon]" class="previewImage"/>
+					<button label="Remove the grafic" id="remove[logo]" onclick="return confirm('Remove the grafic');" image="delete"/>
+					<file statustext="each new upload will overwrite the previous one" id="upload_logo"/>
 				</row>
 				<row class="row">
 					<description value="Sponsor logos"/>
-					<image src="files[sponsors][icon]" class="previewImage" label="@files[sponsors][file]"/>
-					<button image="delete" label="Remove the grafic" id="remove[sponsors]" onclick="return confirm('Remove the grafic');"/>
-					<file id="upload_sponsors" statustext="each new upload will overwrite the previous one"/>
+					<image label="@files[sponsors][file]" src="files[sponsors][icon]" class="previewImage"/>
+					<button label="Remove the grafic" id="remove[sponsors]" onclick="return confirm('Remove the grafic');" image="delete"/>
+					<file statustext="each new upload will overwrite the previous one" id="upload_sponsors"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -124,16 +130,16 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description options=",,,deadline" value="Registration deadline"/>
-					<date options="Y-m-d" id="deadline" statustext="Until which date (incl.) are registrations allowed"/>
+					<description value="Registration deadline" for="deadline"/>
+					<date statustext="Until which date (incl.) are registrations allowed" id="deadline" options="Y-m-d"/>
 					<checkbox label="No complimentary list (over quota)" id="no_complimentary"/>
 				</row>
 				<row class="row">
-					<description options=",,,quota" value="Quota"/>
+					<description value="Quota" for="quota"/>
 					<menulist>
-						<menupopup type="select-number" options="Select one,1,10,1" id="quota"/>
+						<menupopup type="select-number" id="quota" options="Select one,1,10,1"/>
 					</menulist>
-					<grid spacing="0" padding="1" id="quota_extra">
+					<grid spacing="0" padding="1">
 						<columns>
 							<column/>
 							<column/>
@@ -142,36 +148,36 @@
 						<rows>
 							<row>
 								<menulist class="selectboxFullWidth">
-									<menupopup options="Federation" id="${row}[fed]"/>
+									<menupopup class="selectboxFullWidth" id="${row}[fed]" options="Federation"/>
 								</menulist>
 								<menulist class="selectboxFullWidth">
-									<menupopup options="Category" id="${row}[cat]"/>
+									<menupopup class="selectboxFullWidth" id="${row}[cat]" options="Category"/>
 								</menulist>
 								<menulist>
-									<menupopup type="select-number" options="None,1,10" id="${row}[num]"/>
+									<menupopup type="select-number" id="${row}[num]" options="None,1,10"/>
 								</menulist>
 							</row>
 						</rows>
 					</grid>
 				</row>
 				<row class="row">
-					<description options=",,,host_quota" value="Host quota"/>
+					<description value="Host quota" for="host_quota"/>
 					<menulist>
-						<menupopup type="select-number" options="None,1,10,1" id="host_quota"/>
+						<menupopup type="select-number" id="host_quota" options="None,1,10,1"/>
 					</menulist>
 					<menulist>
-						<menupopup options="Select one" id="host_nation" label="Host nation" no_lang="1"/>
+						<menupopup label="Host nation" id="host_nation" no_lang="1" options="Select one"/>
 					</menulist>
 				</row>
 				<row class="th">
-					<description span="all" value="Prequalified competitiors"/>
+					<description value="Prequalified competitiors" span="all"/>
 				</row>
 				<row class="row">
-					<description options=",,,prequal_ranking" value="from the ranking"/>
+					<description value="from the ranking" for="prequal_ranking"/>
 					<menulist>
-						<menupopup type="select-number" options="None,1,15,1" id="prequal_ranking"/>
+						<menupopup type="select-number" id="prequal_ranking" options="None,1,15,1"/>
 					</menulist>
-					<grid spacing="0" padding="1" id="prequal_extra">
+					<grid spacing="0" padding="1">
 						<columns>
 							<column/>
 							<column/>
@@ -179,21 +185,21 @@
 						<rows>
 							<row>
 								<menulist>
-									<menupopup options="Category" id="${row}[cat]"/>
+									<menupopup id="${row}[cat]" options="Category"/>
 								</menulist>
 								<menulist>
-									<menupopup type="select-number" options="None,1,30" id="${row}[num]"/>
+									<menupopup type="select-number" id="${row}[num]" options="None,1,30"/>
 								</menulist>
 							</row>
 						</rows>
 					</grid>
 				</row>
 				<row class="row" valign="top">
-					<description options=",,,prequal_comps" value="from other competitions"/>
+					<description value="from other competitions" for="prequal_comps"/>
 					<menulist>
-						<menupopup type="select-number" options="None,1,10" id="prequal_comp"/>
+						<menupopup type="select-number" id="prequal_comp" options="None,1,10"/>
 					</menulist>
-					<listbox rows="3" id="prequal_comps" no_lang="1"/>
+					<listbox id="prequal_comps" no_lang="1" rows="3"/>
 				</row>
 			</rows>
 		</grid>
@@ -206,13 +212,13 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description options=",,,judges" value="Judges"/>
-					<listbox type="select-account" rows="14" id="judges" statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition"/>
+					<description value="Judges" for="judges"/>
+					<listbox type="select-account" statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition" id="judges" rows="14"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.comp.edit" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%\0">
 			<columns>
 				<column width="15%"/>
@@ -223,42 +229,46 @@
 			</columns>
 			<rows>
 				<row>
-					<description span="4" class="redItalic" id="msg" no_lang="1"/>
+					<description id="msg" no_lang="1" span="4" class="redItalic"/>
 				</row>
 				<row class="th">
-					<description value="Nation" options=",,,nation"/>
+					<description value="Nation" for="nation"/>
 					<menulist>
-						<menupopup id="nation" statustext="nation if national competition or internatinal" no_lang="1" onchange="1"/>
+						<menupopup statustext="nation if national competition or internatinal" id="nation" no_lang="1" onchange="1"/>
 					</menulist>
-					<description value="Cup" options=",,,serie"/>
+					<description value="Cup" for="serie"/>
 					<menulist span="all">
-						<menupopup id="serie" onchange="1" no_lang="1"/>
+						<menupopup id="serie" no_lang="1" onchange="1"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Name" options=",,,name"/>
-					<textbox size="100" maxlength="100" id="name" statustext="full competition name (must not be empty)" span="all" needed="1"/>
+					<description value="Name" for="name"/>
+					<textbox statustext="full competition name (must not be empty)" id="name" needed="1" size="100" maxlength="100" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Shortcut" options=",,,dru_bez"/>
-					<textbox size="20" maxlength="20" id="dru_bez" statustext="short for display in rankings / tables"/>
-					<description options=",,,rkey" value="Key"/>
-					<textbox size="8" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " span="all"/>
+					<description value="Shortcut" for="dru_bez"/>
+					<textbox statustext="short for display in rankings / tables" id="dru_bez" size="20" maxlength="20"/>
+					<description value="Key" for="rkey"/>
+					<textbox statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " id="rkey" size="8" maxlength="8" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Category"/>
+					<menulist>
+						<menupopup type="select-cat" id="cat_id" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
+					</menulist>
+					<description value="Federation"/>
 					<menulist span="all">
-						<menupopup type="select-cat" options="$cont[cat_parent_name],,,,$cont[cat_parent]" id="cat_id"/>
+						<menupopup id="fed_id" options="national federation"/>
 					</menulist>
 				</row>
 				<row>
-					<tabbox span="all" id="general|ranking|files|startlist|judges">
+					<tabbox id="general|ranking|files|startlist|judges" span="all">
 						<tabs>
-							<tab label="General" statustext=""/>
-							<tab label="Ranking" statustext=""/>
-							<tab label="Files" statustext=""/>
-							<tab label="Startlist" statustext=""/>
-							<tab label="Judges" statustext=""/>
+							<tab id="general" label="General"/>
+							<tab id="ranking" label="Ranking"/>
+							<tab id="files" label="Files"/>
+							<tab id="startlist" label="Startlist"/>
+							<tab id="judges" label="Judges"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.comp.edit.general"/>
@@ -270,14 +280,14 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox rows="1" cols="4" span="3">
-						<button id="edit" label="Edit" statustext="Edit this competition"/>
-						<button label="Save" id="save" statustext="saves the changes made"/>
-						<button label="Apply" id="apply" statustext="saves the changes made"/>
-						<button label="Cancel" id="cancel" statustext="aborts without saving changes" onclick="window.close();"/>
+					<hbox cols="4" rows="1" span="3">
+						<button statustext="Edit this competition" label="Edit" id="edit"/>
+						<button statustext="saves the changes made" label="Save" id="save"/>
+						<button statustext="saves the changes made" label="Apply" id="apply"/>
+						<button statustext="aborts without saving changes" label="Cancel" id="cancel" onclick="window.close();"/>
 					</hbox>
 					<description onclick="return confirm('Delete this competition');"/>
-					<button label="Delete" id="delete" statustext="Delete this competition" align="right" onclick="return confirm('Delete this competition');"/>
+					<button align="right" statustext="Delete this competition" label="Delete" id="delete" onclick="return confirm('Delete this competition');"/>
 				</row>
 			</rows>
 		</grid>

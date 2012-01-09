@@ -631,20 +631,29 @@ class uiresult extends boresult
 		{
 			$rows[$name] =& $query[$name];
 		}
-		switch((string)$comp['nation'])
+		// what columns to show for an athlete: can be set per comp. or has a national default
+		switch($comp['display_athlete'] ? $comp['display_athlete'] : (string)$comp['nation'])
 		{
 			case '':	// international
+			case ranking_competition::NATION:
 				$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 				break;
+			default:
 			case 'GER':
+			case ranking_competition::FEDERATION:
 				$rows['fed_label'] = 'Sektion';
 				$rows['no_ort'] = $rows['no_nation'] = $rows['no_acl_fed'] = true;
 				break;
 			case 'SUI':
-			default:
 				$rows['fed_label'] = 'Sektion';
 				$rows['acl_fed_label'] = 'Regionalzentrum';
 				$rows['no_nation'] = $rows['no_PerId'] = true;
+				break;
+			case ranking_competition::PC_CITY:
+				$rows['no_nation'] = $rows['no_verband'] = $rows['no_acl_fed'] = $rows['no_PerId'] = true;
+				break;
+			case ranking_competition::NATION_PC_CITY:
+				$rows['no_verband'] = $rows['no_acl_fed'] = $rows['no_PerId'] = true;
 				break;
 		}
 		// jury list --> switch extra columns on and all federation columns off

@@ -5,7 +5,7 @@
  * @link http://www.digitalrock.de
  * @package ranking
  * @author Ralf Becker <RalfBecker-AT-outdoor-training.de>
- * @copyright (c) 2010 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
+ * @copyright (c) 2010-12 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
  * @version $Id$
  */
 
@@ -100,7 +100,7 @@ class ranking_calendar_integration
 				)
 			),
 			'edit_link' => array(
-				'edit' => array('menuaction' => 'ranking.uicompetitions.edit'),
+				'edit' => array('menuaction' => 'ranking.ranking_competition_ui.edit'),
 				'edit_id' => 'WetId',
 				'edit_popup' => '900x400',
 			),

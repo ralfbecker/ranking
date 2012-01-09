@@ -139,6 +139,7 @@ digital rock	ranking	en	digital ROCK
 discipline	ranking	en	Discipline
 display	ranking	en	Display
 display #%1 not found!!!	ranking	en	Display #%1 not found!!!
+display athlete	ranking	en	Display athlete
 display cup	ranking	en	display cup
 display no ranking	ranking	en	display no ranking
 display ranking	ranking	en	display ranking
@@ -288,6 +289,7 @@ nation if national competition or none for an internatinal one	ranking	en	nation
 nation the athlete is competing for	ranking	en	nation the athlete is competing for
 nation to use (empty = international)	ranking	en	Nation to use (empty = international)
 nation, birthyear and gender have to be identical to merge, the names have to be similar!	ranking	en	Nation, birthyear and gender have to be identical to merge, the names have to be similar!
+national federation	ranking	en	national Federation
 national registration	ranking	en	National registration
 national team ranking	ranking	en	National team ranking
 nationname	ranking	en	Nationname
@@ -321,6 +323,8 @@ pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete 
 pairing speed final	ranking	en	Pairing speed final
 parent federation	ranking	en	Parent federation
 participant deleted	ranking	en	Participant deleted
+pc city	ranking	en	PC City
+pc city (nation)	ranking	en	PC City (Nation)
 perid	ranking	en	PerId
 permission denied !!!	ranking	en	Permission denied !!!
 personal profile	ranking	en	Personal profile

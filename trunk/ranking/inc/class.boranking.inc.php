@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - ranking business object/logic
+ * EGroupware digital ROCK Rankings - ranking business object/logic
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -190,14 +190,16 @@ class boranking extends ranking_so
 		{
 			$this->maxmatches = (int) $GLOBALS['egw_info']['user']['preferences']['common']['maxmatchs'];
 		}
-
 		// read the nation ACL
 		foreach($GLOBALS['egw']->acl->read() as $data)	// uses the users account and it's memberships
 		{
-			if ($data['appname'] != 'ranking' || $data['location'] == 'run' || $data['location'][0] == ranking_federation::ACL_LOCATION_PREFIX)
+			if ($data['appname'] != 'ranking' || $data['location'] == 'run')	// || $data['location'][0] == ranking_federation::ACL_LOCATION_PREFIX)
 			{
 				continue;
 			}
+			$location = $data['location'];
+			if ($location[0] == ranking_federation::ACL_LOCATION_PREFIX) $location = substr($location,1);
+
 			foreach(array(
 				'read_rights'     => EGW_ACL_READ,
 				'edit_rights'     => EGW_ACL_EDIT,
@@ -205,9 +207,9 @@ class boranking extends ranking_so
 				'register_rights' => EGW_ACL_REGISTER,
 			) as $var => $right)
 			{
-				if (($data['rights'] & $right) && !in_array($data['location'],$this->$var))
+				if (($data['rights'] & $right) && !in_array($location,$this->$var))
 				{
-					$this->{$var}[] = $data['location'];
+					$this->{$var}[] = $location;
 				}
 			}
 		}
@@ -313,12 +315,16 @@ class boranking extends ranking_so
 			}
 			else
 			{
-				$acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($nation ? $nation : 'NULL',$required,'ranking') ||
+				$location = is_numeric($nation) ? ranking_federation::ACL_LOCATION_PREFIX.$nation :
+					($nation ? $nation : 'NULL');
+				$acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($location,$required,'ranking') ||
 					($required == EGW_ACL_ATHLETE || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
 			}
 		}
 		// check competition specific judges rights for REGISTER and RESULT too
-		return $acl_cache[$nation][$required] || $comp && in_array($required,array(EGW_ACL_REGISTER,EGW_ACL_RESULT)) && $this->is_judge($comp);
+		$granted = $acl_cache[$nation][$required] || $comp && in_array($required,array(EGW_ACL_REGISTER,EGW_ACL_RESULT)) && $this->is_judge($comp);
+		//error_log(__METHOD__."('$nation', $required, ".array2string($comp).') returning '.array2string($granted));
+		return $granted;
 	}
 
 	/**

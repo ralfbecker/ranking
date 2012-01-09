@@ -89,7 +89,7 @@ class ranking_so
 		'rls'     => 'rls_system',
 		'cats'    => 'category',
 		'cup'     => 'cup',
-		'comp'    => 'competition',
+		'comp'    => 'ranking_competition',
 		'athlete' => 'athlete',
 		'result'  => 'result',
 		'route'   => 'route',
@@ -144,7 +144,7 @@ class ranking_so
 		}
 		return $db;
 	}
-	
+
 	/**
 	 * Name of parent cat of all comptition cats
 	 */
@@ -152,7 +152,7 @@ class ranking_so
 
 	/**
 	 * Get category by it's rkey (symbolic shortcut)
-	 * 
+	 *
 	 * @param string $rkey
 	 * @param string $name='' name to create category if not found
 	 * @param int $parent=null parent for new categories, if not $global_parent
@@ -187,7 +187,7 @@ class ranking_so
 			{
 				if (!is_array($cat['data'])) $cat['data'] = unserialize($cat['data']);
 				if (!$cat['data']) $cat['data'] = array();
-				
+
 				if (isset($cat['data']['rkey']) && $cat['data']['rkey'] == $rkey)
 				{
 					$rkey2id[$rkey] = $cat['id'];

@@ -1,20 +1,19 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - competition UI
+ * EGroupware digital ROCK Rankings - competition UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
 
-class uicompetitions extends boranking
+class ranking_competition_ui extends boranking
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -25,6 +24,13 @@ class uicompetitions extends boranking
 		'view'  => true,
 	);
 	var $attachment_type = array();
+	var $display_athlete_types = array(
+		'' => 'Default',
+		ranking_competition::NATION => 'Nation',
+		ranking_competition::FEDERATION => 'Federation',
+		ranking_competition::PC_CITY => 'PC City',
+		ranking_competition::NATION_PC_CITY => 'Nation PC City',
+	);
 
 	function __construct()
 	{
@@ -48,6 +54,39 @@ class uicompetitions extends boranking
 	}
 
 	/**
+	 * Check and set nation&fed_id depending on only_nation_edit
+	 */
+	private function check_set_nation_fed_id()
+	{
+		if ($this->only_nation_edit)
+		{
+			if (is_numeric($this->only_nation_edit) && ($fed = $this->federation->read($this->only_nation_edit)))
+			{
+				$this->comp->data['fed_id'] = $this->only_nation_edit;
+				$this->comp->data['nation'] = $fed['nation'];
+			}
+			else
+			{
+				$this->comp->data['nation'] = $this->only_nation_edit;
+			}
+		}
+	}
+
+	/**
+	 * Check if curent user has edit rights for a competition
+	 *
+	 * @parm array $comp=null default $this->comp->data
+	 * @return boolean
+	 */
+	private function check_edit_acl($comp=null)
+	{
+		if (is_null($comp)) $comp = $this->comp->data;
+
+		return $this->acl_check($comp['nation'],EGW_ACL_EDIT) ||
+			$comp['fed_id'] && $this->acl_check($comp['fed_id'],EGW_ACL_EDIT);
+	}
+
+	/**
 	 * Edit a competition
 	 *
 	 * @param array $content
@@ -64,26 +103,29 @@ class uicompetitions extends boranking
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
 		{
-			if (!$_GET['WetId'] && !$_GET['rkey'])
+			if (!$_GET['WetId'] && !$_GET['rkey'] && $this->only_nation_edit)
 			{
-				$this->comp->data['nation'] = $this->only_nation_edit;
+				$this->check_set_nation_fed_id();
 			}
 			// we have no edit-rights for that nation
-			if (!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
+			if (!$this->check_edit_acl())
 			{
 				$view = true;
 			}
 		}
 		else
 		{
-			//echo "<br>uicompetitions::edit: content ="; _debug_array($content);
+			//echo "<br>ranking_competition_ui::edit: content ="; _debug_array($content);
 			$this->comp->data = $content['comp_data'];
 			$old_rkey = $content['comp_data']['rkey'];
 			unset($content['comp_data']);
 
-			$view = $content['view'] && !($content['edit'] && $this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT));
+			$view = $content['view'] && !($content['edit'] && $this->check_edit_acl());
 
-			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
+			if (!$view && $this->only_nation_edit)
+			{
+				$this->check_set_nation_fed_id();
+			}
 			if (!$content['cat_id']) $content['cat_id'] = ranking_so::cat_rkey2id($content['nation']);
 
 			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] &&
@@ -95,9 +137,9 @@ class uicompetitions extends boranking
 				}
 			}
 			$this->comp->data_merge($content);
-			//echo "<br>uicompetitions::edit: comp->data ="; _debug_array($this->comp->data);
+			//echo "<br>ranking_competition_ui::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (!$view  && ($content['save'] || $content['apply']) && $this->acl_check($content['nation'],EGW_ACL_EDIT))
+			if (!$view  && ($content['save'] || $content['apply']) && $this->check_edit_acl())
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -176,7 +218,7 @@ class uicompetitions extends boranking
 			if ($content['delete'])
 			{
 				$link = egw::link('/index.php',array(
-					'menuaction' => 'ranking.uicompetitions.index',
+					'menuaction' => 'ranking.ranking_competition_ui.index',
 					'delete' => $this->comp->data['WetId'],
 				));
 				$js = "window.opener.location='$link';";
@@ -188,7 +230,7 @@ class uicompetitions extends boranking
 			}
 			if (!empty($js)) $GLOBALS['egw']->js->set_onload($js);
 
-			if ($content['remove'] && $this->acl_check($content['nation'],EGW_ACL_EDIT))
+			if ($content['remove'] && $this->check_edit_acl())
 			{
 				list($type) = each($content['remove']);
 
@@ -200,7 +242,7 @@ class uicompetitions extends boranking
 		$content = $this->comp->data + array(
 			'msg'  => $msg,
 			'tabs' => $content['tabs'],
-			'referer' => $content['referer'] ? $content['referer'] : 
+			'referer' => $content['referer'] ? $content['referer'] :
 				common::get_referer('/index.php?menuaction=ranking.uicompetition.index'),
 		);
 		foreach((array) $this->comp->attachments(null,false,false) as $type => $linkdata)
@@ -214,7 +256,7 @@ class uicompetitions extends boranking
 		}
 		$content['quota_extra'][] = array('fed' => '');		// one extra line to add a new fed or cat value
 		$content['prequal_extra'][] = array('cat' => '');
-		
+
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
@@ -231,6 +273,8 @@ class uicompetitions extends boranking
 			)),
 			'host_nation' => $this->athlete->distinct_list('nation'),
 			'discipline' => $this->disciplines,
+			'display_athlete' => $this->display_athlete_types,
+			'fed_id'       => $this->federation->federations($this->comp->data['nation'], true),
 		);
 		// select a category parent fitting to the nation
 		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
@@ -238,9 +282,10 @@ class uicompetitions extends boranking
 
 		$readonlys = array(
 			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]] ||
-				!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT),
+				!$this->check_edit_acl(),
 			'nation' => !!$this->only_nation_edit,
-			'edit'   => !$view || !$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT),
+			'fed_id' => is_numeric($this->only_nation_edit),
+			'edit'   => !$view || !$this->check_edit_acl(),
 		);
 
 		foreach($this->attachment_type as $type => $label)
@@ -254,12 +299,12 @@ class uicompetitions extends boranking
 				$readonlys[$name] = true;
 			}
 			$readonlys['save'] = $readonlys['apply'] = true;
-			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] = 
+			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] =
 				$readonlys['upload_logo'] = $readonlys['upload_sponsors'] = true;
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 
-		$tmpl->exec('ranking.uicompetitions.edit',$content,
+		$tmpl->exec('ranking.ranking_competition_ui.edit',$content,
 			$sel_options,$readonlys,array(
 				'comp_data' => $this->comp->data,
 				'view' => $view,
@@ -286,7 +331,7 @@ class uicompetitions extends boranking
 			}
 		}
 		$nation = $query['col_filter']['nation'];
-		
+
 		if ($query['cat_id'])
 		{
 			$query['col_filter']['cat_id'] = $GLOBALS['egw']->categories->return_all_children($query['cat_id']);
@@ -323,14 +368,14 @@ class uicompetitions extends boranking
 					'label'=> $this->attachment_type[$type],
 				);
 			}
-			$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = !$this->acl_check($row['nation'],EGW_ACL_EDIT);
+			$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = !$this->check_edit_acl($row);
 		}
 		// set the cups based on the selected nation
 		$rows['sel_options']['serie'] = $cups;
-		
+
 		if ($this->debug)
 		{
-			echo "<p>uicompetitions::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
+			echo "<p>ranking_competition_ui::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
 			_debug_array($readonlys);
 		}
 		return $total;
@@ -380,7 +425,7 @@ class uicompetitions extends boranking
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
-				'get_rows'       =>	'ranking.uicompetitions.get_rows',
+				'get_rows'       =>	'ranking.ranking_competition_ui.get_rows',
 				'no_filter'      => True,// I  disable the 1. filter
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
@@ -402,7 +447,7 @@ class uicompetitions extends boranking
 		$readonlys['nm[rows][edit][0]'] = !$this->edit_rights && !$this->is_admin;
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
-		$tmpl->exec('ranking.uicompetitions.index',$content,array(
+		$tmpl->exec('ranking.ranking_competition_ui.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),
 			'cat_id' => array(lang('None')),

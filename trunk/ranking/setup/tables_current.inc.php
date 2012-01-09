@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -45,7 +45,9 @@ $phpgw_baseline = array(
 			'no_complimentary' => array('type' => 'bool'),
 			'cat_id' => array('type' => 'int','precision' => '4'),
 			'modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
-			'modifier' => array('type' => 'int','precision' => '4')
+			'modifier' => array('type' => 'int','precision' => '4'),
+			'fed_id' => array('type' => 'int','precision' => '4'),
+			'display_athlete' => array('type' => 'varchar','precision' => '20','comment' => 'nation, pc_city, federation, pc_city_nation, NULL=default')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),

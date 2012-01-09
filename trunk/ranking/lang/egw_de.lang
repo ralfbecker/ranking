@@ -139,6 +139,7 @@ digital rock	ranking	de	digital ROCK
 discipline	ranking	de	Disziplin
 display	ranking	de	Anzeige
 display #%1 not found!!!	ranking	de	Anzeige #%1 nicht gefunden!!!
+display athlete	ranking	de	Athlet anzeigen
 display cup	ranking	de	Cup anzeigen
 display no ranking	ranking	de	Rangliste nicht anzeigen
 display ranking	ranking	de	Rangliste anzeigen
@@ -288,6 +289,7 @@ nation if national competition or none for an internatinal one	ranking	de	Nation
 nation the athlete is competing for	ranking	de	Nation für die der Athlete startet
 nation to use (empty = international)	ranking	de	Nation (leer = international)
 nation, birthyear and gender have to be identical to merge, the names have to be similar!	ranking	de	Nation, Geburtsjahr und Geschlecht müssen identisch sein zum Vereinigen, die Namen müssen ähnlich sein!
+national federation	ranking	de	nationaler Verband
 national registration	ranking	de	Nationale Registrierung
 national team ranking	ranking	de	Nationen-Team-Rangliste
 nationname	ranking	de	Name des Landes
@@ -321,6 +323,8 @@ pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Ath
 pairing speed final	ranking	de	Paarungen Speed Finale
 parent federation	ranking	de	übergeordneter Verband
 participant deleted	ranking	de	Teilnehmer gelöscht
+pc city	ranking	de	PLZ Ort
+pc city (nation)	ranking	de	PLZ Ort (Nation)
 perid	ranking	de	PerId
 permission denied !!!	ranking	de	Zugriff verweigert !!!
 personal profile	ranking	de	Persönliches Profil
