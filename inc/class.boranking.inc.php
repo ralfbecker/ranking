@@ -207,7 +207,7 @@ class boranking extends ranking_so
 				'register_rights' => EGW_ACL_REGISTER,
 			) as $var => $right)
 			{
-				if (($data['rights'] & $right) && !in_array($location,$this->$var) && (!is_numeric($location) || $rights == EGW_ACL_EDIT))
+				if (($data['rights'] & $right) && !in_array($location,$this->$var) && (!is_numeric($location) || $right == EGW_ACL_EDIT))
 				{
 					$this->{$var}[] = $location;
 				}
