@@ -1408,3 +1408,30 @@ function ranking_upgrade1_9_005()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.006';
 }
 
+/**
+ * Add column with modification timestamp, last modifier and fed_id
+ *
+ * ALTER TABLE `Serien`
+ * 	ADD `modified` TIMESTAMP NOT NULL,
+ * 	ADD `modifier` INTEGER,
+ * 	ADD `fed_id` INTEGER
+ */
+function ranking_upgrade1_9_006()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','modified',array(
+		'type' => 'timestamp',
+		'nullable' => False,
+		'default' => 'current_timestamp'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','modifier',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','fed_id',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.007';
+}
+

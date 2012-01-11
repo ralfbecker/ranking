@@ -403,6 +403,39 @@ class boranking extends ranking_so
 	}
 
 	/**
+	 * Check if curent user has edit rights for a competition
+	 *
+	 * @parm array $comp competition or cup data
+	 * @return boolean
+	 */
+	function acl_check_comp(array $comp)
+	{
+		return $this->acl_check($comp['nation'],EGW_ACL_EDIT) ||
+			$comp['fed_id'] && $this->acl_check($comp['fed_id'],EGW_ACL_EDIT);
+	}
+
+	/**
+	 * Check and set nation&fed_id depending on only_nation_edit
+	 *
+	 * @parm array $comp=null default $this->comp->data
+	 */
+	function check_set_nation_fed_id(array &$comp)
+	{
+		if ($this->only_nation_edit)
+		{
+			if (is_numeric($this->only_nation_edit) && ($fed = $this->federation->read($this->only_nation_edit)))
+			{
+				$comp['fed_id'] = $this->only_nation_edit;
+				$comp['nation'] = $fed['nation'];
+			}
+			else
+			{
+				$comp['nation'] = $this->only_nation_edit;
+			}
+		}
+	}
+
+	/**
 	 * Checks if a given date is "over": today > $date
 	 *
 	 * @param string $date as 'Y-m-d'

@@ -54,39 +54,6 @@ class ranking_competition_ui extends boranking
 	}
 
 	/**
-	 * Check and set nation&fed_id depending on only_nation_edit
-	 */
-	private function check_set_nation_fed_id()
-	{
-		if ($this->only_nation_edit)
-		{
-			if (is_numeric($this->only_nation_edit) && ($fed = $this->federation->read($this->only_nation_edit)))
-			{
-				$this->comp->data['fed_id'] = $this->only_nation_edit;
-				$this->comp->data['nation'] = $fed['nation'];
-			}
-			else
-			{
-				$this->comp->data['nation'] = $this->only_nation_edit;
-			}
-		}
-	}
-
-	/**
-	 * Check if curent user has edit rights for a competition
-	 *
-	 * @parm array $comp=null default $this->comp->data
-	 * @return boolean
-	 */
-	private function check_edit_acl($comp=null)
-	{
-		if (is_null($comp)) $comp = $this->comp->data;
-
-		return $this->acl_check($comp['nation'],EGW_ACL_EDIT) ||
-			$comp['fed_id'] && $this->acl_check($comp['fed_id'],EGW_ACL_EDIT);
-	}
-
-	/**
 	 * Edit a competition
 	 *
 	 * @param array $content
@@ -105,10 +72,10 @@ class ranking_competition_ui extends boranking
 		{
 			if (!$_GET['WetId'] && !$_GET['rkey'] && $this->only_nation_edit)
 			{
-				$this->check_set_nation_fed_id();
+				$this->check_set_nation_fed_id($this->comp->data);
 			}
 			// we have no edit-rights for that nation
-			if (!$this->check_edit_acl())
+			if (!$this->acl_check_comp($this->comp->data))
 			{
 				$view = true;
 			}
@@ -120,11 +87,11 @@ class ranking_competition_ui extends boranking
 			$old_rkey = $content['comp_data']['rkey'];
 			unset($content['comp_data']);
 
-			$view = $content['view'] && !($content['edit'] && $this->check_edit_acl());
+			$view = $content['view'] && !($content['edit'] && $this->acl_check_comp($this->comp->data));
 
 			if (!$view && $this->only_nation_edit)
 			{
-				$this->check_set_nation_fed_id();
+				$this->check_set_nation_fed_id($this->comp->data);
 			}
 			if (!$content['cat_id']) $content['cat_id'] = ranking_so::cat_rkey2id($content['nation']);
 
@@ -139,7 +106,7 @@ class ranking_competition_ui extends boranking
 			$this->comp->data_merge($content);
 			//echo "<br>ranking_competition_ui::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (!$view  && ($content['save'] || $content['apply']) && $this->check_edit_acl())
+			if (!$view  && ($content['save'] || $content['apply']) && $this->acl_check_comp($this->comp->data))
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -230,7 +197,7 @@ class ranking_competition_ui extends boranking
 			}
 			if (!empty($js)) $GLOBALS['egw']->js->set_onload($js);
 
-			if ($content['remove'] && $this->check_edit_acl())
+			if ($content['remove'] && $this->acl_check_comp($this->comp->data))
 			{
 				list($type) = each($content['remove']);
 
@@ -261,7 +228,8 @@ class ranking_competition_ui extends boranking
 			'pkte'      => $this->pkt_names,
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
 			'serie'     => array(0 => lang('none')) + $this->cup->names(array(
-				'nation'=> $this->comp->data['nation'])),
+				'nation'=> $this->comp->data['nation'],
+				'fed_id'=> $this->comp->data['fed_id'])),
 			'nation'    => $this->ranking_nations,
 			'fed'       => $this->federation->get_competition_federations($this->comp->data['nation']),
 			'gruppen'   => $this->cats->names(array('nation' => $this->comp->data['nation'])),
@@ -280,27 +248,23 @@ class ranking_competition_ui extends boranking
 		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
 		$content['cat_parent_name'] = ($content['nation']? $content['nation'] : 'Int.').' '.lang('Competitions');
 
-		$readonlys = array(
-			'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]] ||
-				!$this->check_edit_acl(),
-			'nation' => !!$this->only_nation_edit,
-			'fed_id' => is_numeric($this->only_nation_edit),
-			'edit'   => !$view || !$this->check_edit_acl(),
-		);
-
-		foreach($this->attachment_type as $type => $label)
-		{
-			$readonlys['remove['.$type.']'] = $view || !isset($content['files'][$type]);
-		}
 		if ($view)
 		{
-			foreach($this->comp->data as $name => $val)
-			{
-				$readonlys[$name] = true;
-			}
-			$readonlys['save'] = $readonlys['apply'] = true;
-			$readonlys['upload_info'] = $readonlys['upload_startlist'] = $readonlys['upload_result'] =
-				$readonlys['upload_logo'] = $readonlys['upload_sponsors'] = true;
+			$readonlys = array(
+				'__ALL__' => true,
+				'cancel' => false,
+			);
+		}
+		else
+		{
+			$readonlys = array(
+				'delete' => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]] ||
+					!$this->acl_check_comp($this->comp->data),
+				'nation' => !!$this->only_nation_edit,
+				'fed_id' => is_numeric($this->only_nation_edit),
+				'edit'   => !$view || !$this->acl_check_comp($this->comp->data),
+			);
+
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 
@@ -368,7 +332,7 @@ class ranking_competition_ui extends boranking
 					'label'=> $this->attachment_type[$type],
 				);
 			}
-			$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = !$this->check_edit_acl($row);
+			$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = !$this->acl_check_comp($row);
 		}
 		// set the cups based on the selected nation
 		$rows['sel_options']['serie'] = $cups;
@@ -403,8 +367,7 @@ class ranking_competition_ui extends boranking
 			{
 				$id = (int)$_GET['delete'];
 			}
-			if (!$this->is_admin && $this->comp->read(array('WetId' => $id)) &&
-				!$this->acl_check($this->comp->data['nation'],EGW_ACL_EDIT))
+			if (!$this->comp->read(array('WetId' => $id)) || !$this->acl_check_comp($this->comp->data))
 			{
 				$msg = lang('Permission denied !!!');
 			}

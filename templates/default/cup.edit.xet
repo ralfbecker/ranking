@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.cup.edit.general" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+	<template id="ranking.cup.edit.general" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="180" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column/>
 			</columns>
 			<rows>
 				<row class="row" valign="top" height="115">
-					<description options=",,,gruppen" value="Categories"/>
-					<listbox rows="6" no_lang="1" id="gruppen"/>
+					<description value="Categories" for="gruppen"/>
+					<listbox id="gruppen" no_lang="1" rows="9"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="1.7.001">
-		<grid width="100%\0">
+	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="180" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -24,8 +24,8 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description class="nowrap" value="competitions counting" options=",,,max_serie"/>
-					<int id="max_serie" statustext="number of competitions counting for the cup (empty for all)"/>
+					<description value="competitions counting" for="max_serie" class="nowrap"/>
+					<textbox type="integer" statustext="number of competitions counting for the cup (empty for all)" id="max_serie"/>
 					<grid padding="0">
 						<columns>
 							<column/>
@@ -34,35 +34,35 @@
 						<rows>
 							<row>
 								<menulist>
-									<menupopup options="Select category" id="per_cat[$row]"/>
+									<menupopup id="per_cat[$row]" options="Select category"/>
 								</menulist>
-								<int id="max_per[$row]" statustext="number of competitions counting for the cup"/>
+								<textbox type="integer" statustext="number of competitions counting for the cup" id="max_per[$row]"/>
 							</row>
 						</rows>
 					</grid>
 				</row>
 				<row class="row">
-					<description value="Pointalocation" options=",,,pkte"/>
+					<description value="Pointalocation" for="pkte"/>
 					<menulist>
-						<menupopup no_lang="1" id="pkte" statustext="defines how many points gets awarded for each place in the cup (not ranking)"/>
+						<menupopup statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Factor" options=",,,faktor"/>
-					<textbox type="float" id="faktor" statustext="all points gets multiplicated with this factor, eg. for different competition types"/>
+					<description value="Factor" for="faktor"/>
+					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor"/>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Better result splits ties" options=",,,split_by_places"/>
+					<description value="Better result splits ties" for="split_by_places"/>
 					<menulist>
-						<menupopup id="split_by_places" statustext="Use better result to break ties in the ranking"/>
+						<menupopup statustext="Use better result to break ties in the ranking" id="split_by_places"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description options=",,,max_rang" value="counting for rankings"/>
-					<int id="max_rang" statustext="maximum number of competition counting for the ranking (empty for all)"/>
+					<description value="counting for rankings" for="max_rang"/>
+					<textbox type="integer" statustext="maximum number of competition counting for the ranking (empty for all)" id="max_rang"/>
 					<description/>
 				</row>
 			</rows>
@@ -71,7 +71,7 @@
 			.nowrap { white-space: nowrap; }\r\n.gray { color: gray; }
 		</styles>
 	</template>
-	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -81,84 +81,92 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Pointalocation" options=",,,pkte"/>
+					<description value="Pointalocation" for="pkte"/>
 					<menulist>
-						<menupopup no_lang="1" id="pkte" statustext="defines how many points gets awarded for each place in the ranking (not cup)"/>
+						<menupopup statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" options=",,,pkt_bis"/>
+					<description value="til place" for="pkt_bis"/>
 					<menulist>
-						<menupopup type="select-percent" id="pkt_bis" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)"/>
+						<menupopup type="select-percent" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Factor" options=",,,faktor"/>
-					<textbox type="float" id="faktor" statustext="all points gets multiplicated with this factor, eg. for different competition types" span="all"/>
+					<description value="Factor" for="faktor"/>
+					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Fieldfactorpoints" options=",,,feld_pkte"/>
+					<description value="Fieldfactorpoints" for="feld_pkte"/>
 					<menulist>
-						<menupopup no_lang="1" id="feld_pkte" statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used"/>
+						<menupopup statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" options=",,,feld_bis"/>
+					<description value="til place" for="feld_bis"/>
 					<menulist>
-						<menupopup type="select-percent" id="feld_bis" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%"/>
+						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 					</menulist>
-				</row>
-				<row height="100" disabled="!@dru_bez">
-					<description span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.cup.edit.presets" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%">
+	<template id="ranking.cup.edit.presets" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="180" overflow="hidden">
 			<columns>
 				<column width="15%"/>
 				<column/>
 			</columns>
 			<rows>
 				<row class="th">
-					<description span="all" value="Presets for competitions"/>
+					<description value="Presets for competitions" span="all"/>
 				</row>
 				<row class="row_off">
-					<description options=",,,presets[name]" value="Competition name"/>
-					<textbox size="100" maxlength="100" no_lang="1" id="presets[name]"/>
+					<description value="Competition name" for="presets[name]"/>
+					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
 				</row>
 				<row>
-					<template content="presets" span="all" id="ranking.comp.edit.ranking"/>
+					<template id="ranking.comp.edit.ranking" content="presets" span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.cup.edit" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%\0">
+	<template id="ranking.cup.edit" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="170">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
-				<column/>
+				<column width="100"/>
 				<column/>
 			</columns>
 			<rows>
 				<row>
-					<description span="3" class="redItalic" no_lang="1" id="msg"/>
+					<description id="msg" no_lang="1" span="3" class="redItalic"/>
 				</row>
 				<row class="th">
-					<description value="Name" options=",,,name"/>
-					<textbox size="64" maxlength="64" id="name" statustext="full cup name (must not be empty)" span="all"/>
+					<description value="Name" for="name"/>
+					<textbox statustext="full cup name (must not be empty)" id="name" needed="1" size="64" maxlength="64" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Nation" options=",,,nation"/>
+					<description value="Nation" for="nation"/>
 					<menulist>
-						<menupopup id="nation" statustext="nation if national competition or none for an internatinal one" no_lang="1"/>
+						<menupopup statustext="nation if national competition or none for an internatinal one" id="nation" no_lang="1"/>
 					</menulist>
-					<textbox size="10" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" label="Key" span="all"/>
+					<description value="Federation"/>
+					<menulist span="all">
+						<menupopup id="fed_id" options="national federation"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Category"/>
+					<menulist>
+						<menupopup type="select-cat" id="presets[cat_id]" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
+					</menulist>
+					<description value="Key"/>
+					<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" id="rkey" size="10" maxlength="8"/>
 				</row>
 				<row>
-					<tabbox span="all" id="general|ranking|presets">
+					<tabbox id="general|ranking|presets" span="all">
 						<tabs>
-							<tab label="Categories" statustext=""/>
-							<tab label="Ranking" statustext=""/>
-							<tab label="Presets" statustext=""/>
+							<tab id="general" label="Categories"/>
+							<tab id="ranking" label="Ranking"/>
+							<tab id="presets" label="Presets"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.cup.edit.general"/>
@@ -168,13 +176,13 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox rows="1" cols="4" span="3">
-						<button id="edit" label="Edit" statustext="Edit this cup"/>
-						<button label="Save" id="save" statustext="saves the changes made"/>
-						<button label="Apply" id="apply" statustext="apply the changes made"/>
-						<button label="Cancel" id="cancel" statustext="aborts without saving changes"/>
+					<hbox cols="4" rows="1" span="3">
+						<button statustext="Edit this cup" label="Edit" id="edit"/>
+						<button statustext="saves the changes made" label="Save" id="save"/>
+						<button statustext="apply the changes made" label="Apply" id="apply"/>
+						<button statustext="aborts without saving changes" label="Cancel" id="cancel"/>
 					</hbox>
-					<button label="Delete" id="delete" statustext="deletes this cup" align="right" onclick="return confirm('deletes this cup');"/>
+					<button align="right" statustext="deletes this cup" label="Delete" id="delete" onclick="return confirm('deletes this cup');"/>
 				</row>
 			</rows>
 		</grid>

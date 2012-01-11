@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.cup.list.rows" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.cup.list.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -9,24 +9,32 @@
 				<column/>
 				<column/>
 				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-sortheader label="Year" align="center" id="year"/>
+					<nextmatch-sortheader align="center" label="Year" id="year"/>
 					<nextmatch-sortheader label="Name" id="name"/>
-					<nextmatch-filterheader align="center" options="Nation..." id="nation" no_lang="1"/>
-					<nextmatch-sortheader label="Key" align="center" id="rkey"/>
-					<description value="Action" align="center"/>
+					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..."/>
+					<nextmatch-sortheader align="center" label="Key" id="rkey"/>
+					<nextmatch-sortheader label="Last modified" id="modified"/>
+					<description align="center" value="Action"/>
 				</row>
 				<row class="row">
 					<description align="center" id="${row}[year]" no_lang="1"/>
-					<html class="ml10" no_lang="1" id="${row}[name]"/>
-					<description no_lang="1" align="center" id="${row}[nation]"/>
-					<description no_lang="1" align="center" id="${row}[rkey]"/>
+					<html id="${row}[name]" no_lang="1" class="ml10"/>
+					<description align="center" id="${row}[nation]" no_lang="1"/>
+					<description align="center" id="${row}[rkey]" no_lang="1"/>
+					<vbox options="0,0">
+						<date-time id="${row}[modified]" readonly="true"/>
+						<menulist>
+							<menupopup type="select-account" id="${row}[modifier]" readonly="true"/>
+						</menulist>
+					</vbox>
 					<hbox align="center">
-						<button label="View" align="center" id="view[$row_cont[SerId]]" image="view" statustext="View this cup"/>
-						<button label="Edit" align="center" id="edit[$row_cont[SerId]]" image="edit" statustext="Edit this cup"/>
-						<button label="Delete" align="center" id="delete[$row_cont[SerId]]" image="delete" onclick="return confirm('Delete this cup');" statustext="Delete this cup"/>
+						<button align="center" statustext="View this cup" label="View" id="view[$row_cont[SerId]]" image="view"/>
+						<button align="center" statustext="Edit this cup" label="Edit" id="edit[$row_cont[SerId]]" image="edit"/>
+						<button align="center" statustext="Delete this cup" label="Delete" id="delete[$row_cont[SerId]]" onclick="return confirm('Delete this cup');" image="delete"/>
 					</hbox>
 				</row>
 			</rows>
@@ -35,7 +43,7 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
-	<template id="ranking.cup.list" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.cup.list" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -43,11 +51,15 @@
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description span="all" class="redItalic" id="msg" no_lang="1"/>
+					<description id="msg" no_lang="1" span="all" class="redItalic"/>
 					<description/>
 				</row>
 				<row>
-					<nextmatch options="ranking.cup.list.rows" span="all" align="center" id="nm"/>
+					<nextmatch align="center" id="nm" options="ranking.cup.list.rows" span="all"/>
+				</row>
+				<row>
+					<button statustext="add a new cup" label="Add" id="nm[rows][edit][0]"/>
+					<description/>
 				</row>
 			</rows>
 		</grid>

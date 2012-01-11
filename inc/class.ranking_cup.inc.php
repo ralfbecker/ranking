@@ -1,20 +1,20 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - cup storage object
+ * EGroupware digital ROCK Rankings - cup storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 /**
  * cup object
  */
-class cup extends so_sql
+class ranking_cup extends so_sql
 {
 	var $charset,$source_charset;
 	/**
@@ -23,6 +23,13 @@ class cup extends so_sql
 	 * @var category
 	 */
 	var $cats;
+
+	/**
+	 * Timestaps that need to be adjusted to user-time on reading or saving
+	 *
+	 * @var array
+	 */
+	var $timestamps = array('modified');
 
 	/**
 	 * constructor of the cup class
@@ -37,7 +44,7 @@ class cup extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = translation::charset();
 
 		foreach(array(
 				'cats'  => 'category',
@@ -54,19 +61,6 @@ class cup extends so_sql
 	}
 
 	/**
-	 * PHP4 constructor
-	 *
-	 * @param string $source_charset
-	 * @param egw_db $db
-	 * @deprecated use __construct
-	 * @return cup
-	 */
-	function cup($source_charset='',$db=null)
-	{
-		self::__construct($source_charset,$db);
-	}
-
-	/**
 	 * changes the data from the db-format to our work-format
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
@@ -74,13 +68,13 @@ class cup extends so_sql
 	 */
 	function db2data($data=0)
 	{
-		if (!is_array($data))
+		if (($intern = !is_array($data)))
 		{
 			$data =& $this->data;
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
+			$data = translation::convert($data,$this->source_charset);
 		}
 		if ($data['gruppen'])
 		{
@@ -100,7 +94,7 @@ class cup extends so_sql
 		}
 		if ($data['presets']) $data['presets'] = (array) @unserialize($data['presets']);
 
-		return $data;
+		return parent::db2data($intern ? null : $data);	// important to use null, if $intern!
 	}
 
 	/**
@@ -111,7 +105,7 @@ class cup extends so_sql
 	 */
 	function data2db($data=0)
 	{
-		if (!is_array($data))
+		if (($intern = !is_array($data)))
 		{
 			$data =& $this->data;
 		}
@@ -139,11 +133,7 @@ class cup extends so_sql
 		}
 		if (is_array($data['presets'])) $data['presets'] = serialize($data['presets']);
 
-		if (count($data) && $this->source_charset)
-		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
-		}
-		return $data;
+		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
 	}
 
 	/**
@@ -236,5 +226,24 @@ class cup extends so_sql
 			$keys = is_numeric($keys) ? array('SerId' => (int) $keys) : array('rkey' => $keys);
 		}
 		return parent::read($keys,$extra_cols,$join);
+	}
+
+	/**
+	 * saves the content of data to the db
+	 *
+	 * Reimplemented to automatic update modifier and modified time
+	 *
+	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function save($keys=null,$extra_where=null)
+	{
+		if (is_array($keys) && count($keys)) $this->data_merge($keys);
+
+		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
+		$this->data['modified'] = $this->now;
+
+		return parent::save(null,$extra_where);
 	}
 }

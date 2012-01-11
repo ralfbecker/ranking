@@ -88,7 +88,7 @@ class ranking_so
 		'pkte'    => 'pktsystem',
 		'rls'     => 'rls_system',
 		'cats'    => 'category',
-		'cup'     => 'cup',
+		'cup'     => 'ranking_cup',
 		'comp'    => 'ranking_competition',
 		'athlete' => 'athlete',
 		'result'  => 'result',
