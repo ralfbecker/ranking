@@ -21,15 +21,15 @@
 				<row class="th">
 					<nextmatch-sortheader align="center" label="Date" id="datum"/>
 					<nextmatch-sortheader label="Name" id="name"/>
-					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..."/>
-					<nextmatch-filterheader align="center" id="serie" no_lang="1" options="Cup..."/>
+					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..." class="selectboxFullWidth"/>
+					<nextmatch-filterheader align="center" id="serie" no_lang="1" options="Cup..." class="selectboxFullWidth"/>
 					<nextmatch-sortheader label="Category" id="cat_id"/>
 					<nextmatch-sortheader align="center" label="Quota" id="quota"/>
 					<nextmatch-sortheader label="Deadline" id="deadline"/>
-					<nextmatch-accountfilter id="judges" options="Judges"/>
+					<nextmatch-accountfilter id="judges" options="Judges" class="selectboxFullWidth"/>
 					<nextmatch-sortheader align="center" label="Key" id="rkey"/>
 					<nextmatch-sortheader label="Last modified" id="modified"/>
-					<description align="center" value="Status"/>
+					<nextmatch-header align="center" label="Status" id="status"/>
 					<description align="center" value="Action"/>
 				</row>
 				<row class="nmr">
