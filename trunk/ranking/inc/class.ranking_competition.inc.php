@@ -196,6 +196,7 @@ class ranking_competition extends so_sql
 				$data[$name] = $extra ? implode(',',$extra) : null;
 			}
 		}
+		if (isset($data['serie']) && (string)$data['serie'] === '0') $data['serie'] = null;
 		if (count($data) && $this->source_charset)
 		{
 			$data = translation::convert($data,$this->charset,$this->source_charset);
