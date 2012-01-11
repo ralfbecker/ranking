@@ -143,15 +143,18 @@ class ranking_cup extends so_sql
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
-		unset($criteria['pkte']);	// is always set
-		unset($criteria['split_by_places']);
-		if ($criteria['nation'] == 'NULL') $criteria['nation'] = null;
+		if (is_array($criteria))
+		{
+			unset($criteria['pkte']);	// is always set
+			unset($criteria['split_by_places']);
+			if ($criteria['nation'] == 'NULL') $criteria['nation'] = null;
+		}
 		if ($filter['nation'] == 'NULL') $filter['nation'] = null;
 
 		if ($extra_cols && !is_array($extra_cols)) $extra_cols = array($extra_cols);
 		$extra_cols[] = 'IF(LEFT(rkey,2)>80,1900,2000)+LEFT(rkey,2) AS year';
 
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 	}
 
 	/**
