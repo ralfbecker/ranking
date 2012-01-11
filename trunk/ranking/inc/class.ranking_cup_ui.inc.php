@@ -1,20 +1,19 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - cups UI
+ * EGroupware digital ROCK Rankings - cups UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
 
-class uicups extends boranking
+class ranking_cup_ui extends boranking
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -52,19 +51,22 @@ class uicups extends boranking
 		{
 			if (!$_GET['SerId'] && !$_GET['rkey'])
 			{
-				$this->cup->data['nation'] = $this->edit_rights[0];
+				$this->check_set_nation_fed_id($this->cup->data);
 			}
 			// we have no edit-rights for that nation
-			if (!$this->acl_check($this->cup->data['nation'],EGW_ACL_EDIT))
+			if (!$this->acl_check_comp($this->cup->data))
 			{
 				$view = true;
 			}
 		}
 		else
 		{
-			$view = $content['view'] && !($content['edit'] && $this->acl_check($content['nation'],EGW_ACL_EDIT));
+			$view = $content['view'] && !($content['edit'] && $this->acl_check_comp($this->cup->data));
 
-			if (!$view && $this->only_nation_edit) $content['nation'] = $this->only_nation_edit;
+			if (!$view && $this->only_nation_edit)
+			{
+				$this->check_set_nation_fed_id($this->cup->data);
+			}
 
 			if (!$view && is_array($content['max_per']))
 			{
@@ -77,14 +79,14 @@ class uicups extends boranking
 					}
 				}
 			}
-			//echo "<br>uicups::edit: content ="; _debug_array($content);
+			//echo "<br>ranking_cup_ui::edit: content ="; _debug_array($content);
 			$this->cup->data = $content['cup_data'];
 			unset($content['cup_data']);
 			$this->cup->data_merge($content);
 
-			//echo "<br>uicups::edit: cup->data ="; _debug_array($this->cup->data);
+			//echo "<br>ranking_cup_ui::edit: cup->data ="; _debug_array($this->cup->data);
 
-			if (($content['save'] || $content['apply']) && $this->acl_check($content['nation'],EGW_ACL_EDIT))
+			if (($content['save'] || $content['apply']) && $this->acl_check_comp($this->cup->data))
 			{
 				if (!$this->cup->data['rkey'])
 				{
@@ -107,9 +109,9 @@ class uicups extends boranking
 			}
 			if ($content['cancel'])
 			{
-				$tmpl->location(array('menuaction'=>'ranking.uicups.index'));
+				$tmpl->location(array('menuaction'=>'ranking.ranking_cup_ui.index'));
 			}
-			if ($content['delete'] && $this->acl_check($content['nation'],EGW_ACL_EDIT))
+			if ($content['delete'] && $this->acl_check_comp($this->cup->data))
 			{
 				$this->index(array(
 					'nm' => array(
@@ -136,6 +138,7 @@ class uicups extends boranking
 			'nation'    => $this->ranking_nations,
 			'gruppen'   => $this->cats->names(array('nation' => $this->cup->data['nation'])),
 			'split_by_places' => $this->split_by_places,
+			'fed_id'       => $this->federation->federations($this->cup->data['nation'], true),
 		);
 		$content['per_cat'] = $content['max_per'] = array();
 		foreach($this->cup->data['max_per_cat'] as $rkey => $max)
@@ -148,27 +151,24 @@ class uicups extends boranking
 		{
 			$sel_options['per_cat'][$rkey] = $sel_options['gruppen'][$rkey];
 		}
-		$readonlys = array(
-			'delete' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]],
-			'nation' => !!$this->only_nation_edit,
-			'edit'   => !($view && $this->acl_check($content['nation'],EGW_ACL_EDIT)),
-		);
 		if ($view)
 		{
-			foreach($this->cup->data as $name => $val)
-			{
-				$readonlys[$name] = true;
-			}
-			$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
-			$readonlys['presets[name]'] = true;
-			$readonlys['presets'] = array();
-			foreach(array('name','pkte','pkt_bis','faktor','feld_pkte','feld_bis') as $name)
-			{
-				$readonlys['presets'][$name] = true;
-			}
+			$readonlys = array(
+				'__ALL__' => true,
+				'cancel' => false,
+			);
+		}
+		else
+		{
+			$readonlys = array(
+				'delete' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]],
+				'nation' => !!$this->only_nation_edit,
+				'fed_id' => is_numeric($this->only_nation_edit),
+				'edit'   => !($view && $this->acl_check($content['nation'],EGW_ACL_EDIT)),
+			);
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('cup'));
-		$tmpl->exec('ranking.uicups.edit',$content,
+		$tmpl->exec('ranking.ranking_cup_ui.edit',$content,
 			$sel_options,$readonlys,array(
 				'cup_data' => $this->cup->data,
 				'view' => $view,
@@ -203,14 +203,14 @@ class uicups extends boranking
 		$readonlys = array();
 		foreach($rows as $row)
 		{
-			if (!$this->acl_check($row['nation'],EGW_ACL_EDIT))
+			if (!$this->acl_check_comp($row))
 			{
 				$readonlys["edit[$row[SerId]]"] = $readonlys["delete[$row[SerId]]"] = true;
 			}
 		}
 		if ($this->debug)
 		{
-			echo "<p>uicups::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
+			echo "<p>ranking_cup_ui::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
 			_debug_array($readonlys);
 		}
 		return $total;
@@ -243,21 +243,20 @@ class uicups extends boranking
 			{
 				case 'view':
 					$tmpl->location(array(
-						'menuaction' => 'ranking.uicups.view',
+						'menuaction' => 'ranking.ranking_cup_ui.view',
 						'SerId'      => $id,
 					));
 					break;
 
 				case 'edit':
 					$tmpl->location(array(
-						'menuaction' => 'ranking.uicups.edit',
+						'menuaction' => 'ranking.ranking_cup_ui.edit',
 						'SerId'      => $id,
 					));
 					break;
 
 				case 'delete':
-					if (!$this->is_admin && $this->cup->read(array('SerId' => $id)) &&
-						!in_array($this->cup->data['nation'],$this->edit_rights))
+					if (!$this->cup->read(array('SerId' => $id)) || !$this->acl_check_comp($this->cup->data))
 					{
 						$msg = lang('Permission denied !!!');
 					}
@@ -276,7 +275,7 @@ class uicups extends boranking
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
-				'get_rows'       =>	'ranking.uicups.get_rows',
+				'get_rows'       =>	'ranking.ranking_cup_ui.get_rows',
 				'no_filter'      => True,// I  disable the 1. filter
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 				'no_cat'         => True,// I  disable the cat-selectbox
@@ -293,7 +292,7 @@ class uicups extends boranking
 		$content['msg'] = $msg;
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('cups');
-		$tmpl->exec('ranking.uicups.index',$content,array(
+		$tmpl->exec('ranking.ranking_cup_ui.index',$content,array(
 			'nation' => $this->ranking_nations,
 		));
 	}

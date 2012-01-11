@@ -66,7 +66,10 @@ $phpgw_baseline = array(
 			'split_by_places' => array('type' => 'varchar','precision' => '12','nullable' => False,'default' => 'no'),
 			'nation' => array('type' => 'char','precision' => '5'),
 			'gruppen' => array('type' => 'varchar','precision' => '255'),
-			'presets' => array('type' => 'text')
+			'presets' => array('type' => 'text'),
+			'modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
+			'modifier' => array('type' => 'int','precision' => '4'),
+			'fed_id' => array('type' => 'int','precision' => '4')
 		),
 		'pk' => array('SerId'),
 		'fk' => array(),

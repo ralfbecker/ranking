@@ -31,7 +31,7 @@ class ranking_admin_prefs_sidebox_hooks
 				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.uiathletes.index')),
 				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
 				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index')),
-				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.uicups.index')),
+				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index')),
 				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index')),
 				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.index')),
 				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.uiresult.index')),
@@ -131,7 +131,7 @@ class ranking_admin_prefs_sidebox_hooks
 	{
 		$ranking_views = array(
 			'ranking.ranking_competition_ui.index'   => lang('Competitions'),
-			'ranking.uicups.index'           => lang('Cups'),
+			'ranking.ranking_cup_ui.index'           => lang('Cups'),
 		//	'ranking.uicats.index'           => lang('Categories'),
 			'ranking.uiathletes.index'       => lang('Athletes'),
 			'ranking.uiregistration.index'   => lang('Registration'),
