@@ -9,7 +9,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top" height="115">
-					<description value="Categories" for="gruppen"/>
+					<description for="gruppen" value="Categories"/>
 					<listbox id="gruppen" no_lang="1" rows="9"/>
 				</row>
 			</rows>
@@ -24,7 +24,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description value="competitions counting" for="max_serie" class="nowrap"/>
+					<description for="max_serie" value="competitions counting" class="nowrap"/>
 					<textbox type="integer" statustext="number of competitions counting for the cup (empty for all)" id="max_serie"/>
 					<grid padding="0">
 						<columns>
@@ -42,26 +42,26 @@
 					</grid>
 				</row>
 				<row class="row">
-					<description value="Pointalocation" for="pkte"/>
+					<description for="pkte" value="Pointalocation"/>
 					<menulist>
 						<menupopup statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Factor" for="faktor"/>
+					<description for="faktor" value="Factor"/>
 					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor"/>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Better result splits ties" for="split_by_places"/>
+					<description for="split_by_places" value="Better result splits ties"/>
 					<menulist>
 						<menupopup statustext="Use better result to break ties in the ranking" id="split_by_places"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="counting for rankings" for="max_rang"/>
+					<description for="max_rang" value="counting for rankings"/>
 					<textbox type="integer" statustext="maximum number of competition counting for the ranking (empty for all)" id="max_rang"/>
 					<description/>
 				</row>
@@ -81,25 +81,25 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Pointalocation" for="pkte"/>
+					<description for="pkte" value="Pointalocation"/>
 					<menulist>
 						<menupopup statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" for="pkt_bis"/>
+					<description for="pkt_bis" value="til place"/>
 					<menulist>
 						<menupopup type="select-percent" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Factor" for="faktor"/>
+					<description for="faktor" value="Factor"/>
 					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Fieldfactorpoints" for="feld_pkte"/>
+					<description for="feld_pkte" value="Fieldfactorpoints"/>
 					<menulist>
 						<menupopup statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" for="feld_bis"/>
+					<description for="feld_bis" value="til place"/>
 					<menulist>
 						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 					</menulist>
@@ -118,11 +118,11 @@
 					<description value="Presets for competitions" span="all"/>
 				</row>
 				<row class="row_off">
-					<description value="Competition name" for="presets[name]"/>
+					<description for="presets[name]" value="Competition name"/>
 					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
 				</row>
 				<row>
-					<template id="ranking.comp.edit.ranking" content="presets" span="all"/>
+					<template content="presets" id="ranking.comp.edit.ranking" span="all"/>
 				</row>
 			</rows>
 		</grid>
@@ -133,18 +133,19 @@
 				<column width="15%"/>
 				<column width="20%"/>
 				<column width="100"/>
-				<column/>
 			</columns>
 			<rows>
 				<row>
-					<description id="msg" no_lang="1" span="3" class="redItalic"/>
+					<description id="msg" no_lang="1" span="all" class="redItalic"/>
+					<description/>
+					<description/>
 				</row>
 				<row class="th">
-					<description value="Name" for="name"/>
+					<description for="name" value="Name"/>
 					<textbox statustext="full cup name (must not be empty)" id="name" needed="1" size="64" maxlength="64" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Nation" for="nation"/>
+					<description for="nation" value="Nation"/>
 					<menulist>
 						<menupopup statustext="nation if national competition or none for an internatinal one" id="nation" no_lang="1"/>
 					</menulist>
@@ -162,11 +163,11 @@
 					<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" id="rkey" size="10" maxlength="8"/>
 				</row>
 				<row>
-					<tabbox id="general|ranking|presets" span="all">
+					<tabbox id="ranking.cup.edit.general|ranking.cup.edit.ranking|ranking.cup.edit.presets" span="all">
 						<tabs>
-							<tab id="general" label="Categories"/>
-							<tab id="ranking" label="Ranking"/>
-							<tab id="presets" label="Presets"/>
+							<tab id="ranking.cup.edit.general" label="Categories"/>
+							<tab id="ranking.cup.edit.ranking" label="Ranking"/>
+							<tab id="ranking.cup.edit.presets" label="Presets"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.cup.edit.general"/>
@@ -176,12 +177,13 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox cols="4" rows="1" span="3">
+					<hbox cols="4" rows="1" span="2">
 						<button statustext="Edit this cup" label="Edit" id="edit"/>
 						<button statustext="saves the changes made" label="Save" id="save"/>
 						<button statustext="apply the changes made" label="Apply" id="apply"/>
-						<button statustext="aborts without saving changes" label="Cancel" id="cancel"/>
+						<button statustext="aborts without saving changes" label="Cancel" id="cancel" onclick="window.close();"/>
 					</hbox>
+					<button label="Copy" id="copy"/>
 					<button align="right" statustext="deletes this cup" label="Delete" id="delete" onclick="return confirm('deletes this cup');"/>
 				</row>
 			</rows>

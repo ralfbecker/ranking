@@ -190,6 +190,13 @@ class ranking_competition_ui extends boranking
 				));
 				$js = "window.opener.location='$link';";
 			}
+			if ($content['copy'])
+			{
+				unset($this->comp->data['WetId']);
+				unset($this->comp->data['rkey']);
+				unset($this->comp->data['datum']);
+				$msg .= lang('Entry copied - edit and save the copy now.');
+			}
 			if ($content['save'] || $content['delete'])
 			{
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
@@ -264,7 +271,12 @@ class ranking_competition_ui extends boranking
 				'fed_id' => is_numeric($this->only_nation_edit),
 				'edit'   => !$view || !$this->acl_check_comp($this->comp->data),
 			);
-
+			// if only federation rights (no national rights), switch of ranking tab, to not allow changes there
+			if (!$this->acl_check($this->comp->data['nation'], EGW_ACL_EDIT))
+			{
+				$readonlys['tabs'] = array('ranking' => true);
+				// ToDo: limit category to state category(s)
+			}
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 

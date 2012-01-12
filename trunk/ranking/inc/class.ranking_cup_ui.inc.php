@@ -86,7 +86,7 @@ class ranking_cup_ui extends boranking
 
 			//echo "<br>ranking_cup_ui::edit: cup->data ="; _debug_array($this->cup->data);
 
-			if (($content['save'] || $content['apply']) && $this->acl_check_comp($this->cup->data))
+			if (!$view && ($content['save'] || $content['apply']) && $this->acl_check_comp($this->cup->data))
 			{
 				if (!$this->cup->data['rkey'])
 				{
@@ -106,29 +106,36 @@ class ranking_cup_ui extends boranking
 
 					if ($content['save']) $content['cancel'] = true;	// leave dialog now
 				}
-			}
-			if ($content['cancel'])
-			{
-				$tmpl->location(array('menuaction'=>'ranking.ranking_cup_ui.index'));
+				$link = egw::link('/index.php',array(
+					'menuaction' => 'ranking.ranking_cup_ui.index',
+					'msg' => $msg,
+				));
+				$js = "window.opener.location='$link';";
 			}
 			if ($content['delete'] && $this->acl_check_comp($this->cup->data))
 			{
-				$this->index(array(
-					'nm' => array(
-						'rows' => array(
-							'delete' => array(
-								$this->cup->data['SerId'] => 'delete'
-							)
-						)
-					)
+				$link = egw::link('/index.php',array(
+					'menuaction' => 'ranking.ranking_cup_ui.index',
+					'delete' => $this->cup->data['SerId'],
 				));
-				return;
+				$js = "window.opener.location='$link';";
 			}
+			if ($content['copy'])
+			{
+				unset($this->cup->data['SerId']);
+				unset($this->cup->data['rkey']);
+				$msg .= lang('Entry copied - edit and save the copy now.');
+			}
+			if ($content['save'] || $content['delete'])
+			{
+				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
+				common::egw_exit();
+			}
+			if (!empty($js)) $GLOBALS['egw']->js->set_onload($js);
 		}
-		$tabs = 'general|ranking|presets';
 		$content = $this->cup->data + array(
 			'msg' => $msg,
-			$tabs => $content[$tabs],
+			'tabs' => $content['tabs'],
 		);
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,
@@ -166,6 +173,13 @@ class ranking_cup_ui extends boranking
 				'fed_id' => is_numeric($this->only_nation_edit),
 				'edit'   => !($view && $this->acl_check($content['nation'],EGW_ACL_EDIT)),
 			);
+			// if only federation rights (no national rights), switch of ranking tab, to not allow changes there
+			if (!$this->acl_check($this->comp->data['nation'], EGW_ACL_EDIT))
+			{
+				$readonlys['tabs'] = array('presets' => true);
+				$readonlys['max_rang'] = true;
+				// ToDo: limit category to state category(s)
+			}
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('cup'));
 		$tmpl->exec('ranking.ranking_cup_ui.edit',$content,
