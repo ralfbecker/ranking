@@ -31,8 +31,8 @@
 					<nextmatch-sortheader label="Sektion" id="verband"/>
 					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id"/>
 					<nextmatch-sortheader label="License" id="license"/>
-					<nextmatch-header label="Total" align="right"/>
-					<nextmatch-header label="Federation" align="right"/>
+					<nextmatch-header align="right" label="Total"/>
+					<nextmatch-header align="right" label="Federation"/>
 				</row>
 				<row class="th" disabled="!@total" part="footer">
 					<description value="Sum"/>
@@ -46,11 +46,11 @@
 					<description/>
 					<description/>
 					<description/>
-					<textbox type="float" id="total" readonly="true" min="2" align="right"/>
-					<textbox type="float" min="2" id="fed" readonly="true" align="right"/>
+					<textbox type="float" align="right" id="total" readonly="true" precision="2"/>
+					<textbox type="float" align="right" id="fed" readonly="true" precision="2"/>
 				</row>
 				<row class="row">
-					<description id="${row}[start_number]" value="$row_cont[start_order]" align="center"/>
+					<description align="center" value="$row_cont[start_order]" id="${row}[start_number]"/>
 					<menulist>
 						<menupopup id="${row}[GrpId]" readonly="true"/>
 					</menulist>
@@ -59,7 +59,7 @@
 					<description id="${row}[strasse]"/>
 					<description id="${row}[plz]"/>
 					<description id="${row}[ort]"/>
-					<date options="Y-m-d" id="${row}[geb_date]" readonly="true" label="%s ($row_cont[age])"/>
+					<date label="%s ($row_cont[age])" id="${row}[geb_date]" readonly="true" options="Y-m-d"/>
 					<description id="${row}[verband]" readonly="true"/>
 					<menulist>
 						<menupopup id="${row}[acl_fed_id]" readonly="true"/>
@@ -67,28 +67,33 @@
 					<menulist>
 						<menupopup id="${row}[license]" readonly="true"/>
 					</menulist>
-					<textbox type="float" min="2" id="${row}[total]" readonly="true" align="right"/>
-					<textbox type="float" min="2" id="${row}[fed]" readonly="true" align="right"/>
+					<textbox type="float" align="right" id="${row}[total]" readonly="true" precision="2"/>
+					<textbox type="float" align="right" id="${row}[fed]" readonly="true" precision="2"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.accounting.index" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.accounting.index" template="" lang="" group="0" version="1.9.001">
 		<grid>
 			<columns>
 				<column/>
 			</columns>
 			<rows>
 				<row>
-					<menulist class="noPrint">
-						<menupopup label="Competition" id="nm[comp]" onchange="1" options="Select one"/>
-					</menulist>
+					<hbox onchange="1" options="0,0" class="noPrint">
+						<menulist>
+							<menupopup id="nm[calendar]" onchange="1"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup id="nm[comp]" onchange="1" options="Select competition"/>
+						</menulist>
+					</hbox>
 				</row>
 				<row disabled="!@nm[comp]">
-					<nextmatch options="ranking.accounting.index.rows" span="all" id="nm"/>
+					<nextmatch id="nm" options="ranking.accounting.index.rows" span="all"/>
 				</row>
 				<row disabled="!@nm[comp]">
-					<groupbox class="fees" align="center">
+					<groupbox align="center" class="fees">
 						<caption label="Fees"/>
 						<grid id="fees">
 							<columns>
@@ -104,21 +109,21 @@
 									<description value="Mitglied"/>
 									<description value="Nichtmitglied"/>
 									<description value="Startgeld"/>
-									<description value="SAC Anteil"/>
+									<description value="Verband-Anteil"/>
 								</row>
 								<row class="row">
 									<description value="bis 19 Jahre"/>
-									<textbox type="float" id="member_til19" align="center"/>
-									<textbox type="float" id="non_til19" align="center"/>
-									<textbox type="float" id="entry_til19" align="center"/>
-									<textbox type="float" id="fed_til19" align="center"/>
+									<textbox type="float" align="center" id="member_til19"/>
+									<textbox type="float" align="center" id="non_til19"/>
+									<textbox type="float" align="center" id="entry_til19"/>
+									<textbox type="float" align="center" id="fed_til19"/>
 								</row>
 								<row class="row">
 									<description value="ab 20 Jahre"/>
-									<textbox type="float" id="member_20plus" align="center"/>
-									<textbox type="float" id="non_20plus" align="center"/>
-									<textbox type="float" id="entry_20plus" align="center"/>
-									<textbox type="float" id="fed_20plus" align="center"/>
+									<textbox type="float" align="center" id="member_20plus"/>
+									<textbox type="float" align="center" id="non_20plus"/>
+									<textbox type="float" align="center" id="entry_20plus"/>
+									<textbox type="float" align="center" id="fed_20plus"/>
 								</row>
 								<row class="noPrint" disabled="@no_save">
 									<description/>

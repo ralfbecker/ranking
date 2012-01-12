@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - resultservice accounting for SAC
+ * EGroupware digital ROCK Rankings - resultservice accounting for competitions
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2009 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2009-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -27,13 +27,6 @@ class ranking_accounting extends boresult
 	var $public_functions = array(
 		'index' => true,
 	);
-
-	function __construct()
-	{
-		$start = microtime(true);
-		$this->boresult();
-		error_log("boresult constructor took ".sprintf('%4.2lf s',microtime(true)-$start));
-	}
 
 	/**
 	 * query the start or result list
@@ -169,56 +162,40 @@ class ranking_accounting extends boresult
 					)
 				);
 			}
-			if ($_GET['calendar']) $content['nm']['calendar'] = $_GET['calendar'];
-			if ($_GET['comp']) $content['nm']['comp'] = $_GET['comp'];
-			if ($_GET['cat']) $content['nm']['cat'] = $_GET['cat'];
-			if (is_numeric($_GET['route'])) $content['nm']['route'] = $_GET['route'];
-			if ($_GET['msg']) $msg = $_GET['msg'];
-			if (isset($_GET['show_result'])) $content['nm']['show_result'] = (int)$_GET['show_result'];
-
-			// currently only used by SUI
-			$content['nm']['calendar'] = 'SUI';
 		}
 		if (is_array($content['fees']) && $content['fees']['save'])
 		{
 			unset($content['fees']['save']);
-			self::save_fees($content['fees'],$content['nm']['comp']);
+			self::save_fees($content['fees'],$content['nm']['calendar']);
 		}
-		else
+		elseif ($content['nm']['calendar'])
 		{
-			$content['fees'] = self::get_fees($content['nm']['comp']);
+			$content['fees'] = self::get_fees($content['nm']['calendar']);
 		}
 		$content['nm']['fees'] = $content['fees'];
 
-		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
+		if ($this->only_nation)
+		{
+			$content['nm']['calendar'] = $this->only_nation;
+			$tmpl->disable_cells('nm[calendar]');
+		}
+		if($content['nm']['comp'] && ($comp = $this->comp->read($content['nm']['comp'])) &&
+			$comp['nation'] != ($content['nm']['calendar']=='NULL'?null:$content['nm']['calendar']))
+		{
+			unset($content['nm']['comp']);
+			unset($comp);
+		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name]</p>\n";
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
 			$readonlys['nm[calendar]'] = $readonlys['nm[comp]'] = true;
-		}
-		if ($this->only_nation)
-		{
-			$calendar = $this->only_nation;
-			$tmpl->disable_cells('nm[calendar]');
-		}
-		elseif ($comp && !$content['nm']['calendar'])
-		{
-			$calendar = $comp['nation'] ? $comp['nation'] : 'NULL';
-		}
-		elseif ($content['nm']['calendar'])
-		{
-			$calendar = $content['nm']['calendar'];
-		}
-		else
-		{
-			list($calendar) = each($this->ranking_nations);
 		}
 		$readonlys['fees'] = $content['fees']['no_save'] = !$this->is_admin && !in_array($content['nm']['calendar'],$this->edit_rights);
 
 		$sel_options = array(
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
-				'nation' => $calendar,
+				'nation' => $content['nm']['calendar'],
 				'datum < '.$this->db->quote(date('Y-m-d',time()+14*24*3600)),	// starting 14 days from now
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
@@ -235,26 +212,33 @@ class ranking_accounting extends boresult
 	 * Save the fees
 	 *
 	 * @param array $fees values for keys (member|non|entry|fed)_(til19|20plus)
-	 * @param int $comp=null competition
+	 * @param string $calendar calendar nation
 	 */
-	static function save_fees(array $fees,$comp=null)
+	static function save_fees(array $fees,$calendar)
 	{
 		//_debug_array($fees);
-		config::save_value('fees',$fees,'ranking');
+		config::save_value('fees-'.$calendar,$fees,'ranking');
 	}
 
 	/**
 	 * Get the fees
 	 *
-	 * @param int $comp=null competition
+	 * @param string $calendar calendar nation
 	 * @return array with values for keys (member|non|entry|fed)_(til19|20plus)
 	 */
-	static function get_fees($comp=null)
+	static function get_fees($calendar)
 	{
 		$config = config::read('ranking');
 		//_debug_array($config);
 
-		return isset($config['fees']) && is_array($config['fees']) ? $config['fees'] : array();
+		$name = 'fees-'.$calendar;
+		// support for old SUI name
+		if (isset($config['fees']) && !isset($config[$name]))
+		{
+			$config[$name] = $config['fees'];
+		}
+
+		return isset($config[$name]) && is_array($config[$name]) ? $config[$name] : array();
 	}
 
 	/**
