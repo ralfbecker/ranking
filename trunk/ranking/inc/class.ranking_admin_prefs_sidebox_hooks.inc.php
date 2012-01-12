@@ -37,11 +37,8 @@ class ranking_admin_prefs_sidebox_hooks
 				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.uiresult.index')),
 				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.result')),
 				'Ranking'       => egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
+				'Accounting'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index')),
 			);
-			if (is_object($GLOBALS['boranking']) && in_array('SUI',$GLOBALS['boranking']->ranking_nations))
-			{
-				$file['Accounting'] = egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index'));
-			}
 			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 
 			if (is_object($GLOBALS['uiresult']))	// we show the displays menu only if we are in the result-service
