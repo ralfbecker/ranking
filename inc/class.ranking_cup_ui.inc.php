@@ -186,7 +186,7 @@ class ranking_cup_ui extends boranking
 			$sel_options,$readonlys,array(
 				'cup_data' => $this->cup->data,
 				'view' => $view,
-			));
+			),2);
 	}
 
 	/**
