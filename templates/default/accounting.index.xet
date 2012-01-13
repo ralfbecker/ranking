@@ -13,7 +13,8 @@
 				<column/>
 				<column/>
 				<column/>
-				<column disabled="!@acl_fed_label"/>
+				<column/>
+				<column/>
 				<column/>
 				<column/>
 				<column/>
@@ -29,13 +30,15 @@
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="Sektion" id="verband"/>
-					<nextmatch-sortheader label="@acl_fed_label" id="acl_fed_id"/>
+					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id"/>
+					<nextmatch-sortheader label="Landesverband" id="fed_parent"/>
 					<nextmatch-sortheader label="License" id="license"/>
 					<nextmatch-header align="right" label="Total"/>
 					<nextmatch-header align="right" label="Federation"/>
 				</row>
 				<row class="th" disabled="!@total" part="footer">
 					<description value="Sum"/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -63,6 +66,9 @@
 					<description id="${row}[verband]" readonly="true"/>
 					<menulist>
 						<menupopup id="${row}[acl_fed_id]" readonly="true"/>
+					</menulist>
+					<menulist>
+						<menupopup id="${row}[fed_parent]" readonly="true"/>
 					</menulist>
 					<menulist>
 						<menupopup id="${row}[license]" readonly="true"/>

@@ -74,7 +74,7 @@ class ranking_accounting extends boresult
 		//echo $total; _debug_array($rows); //die('Stop');
 
 		$rows['total'] = $rows['fed'] = 0.0;
-		$acl_feds = array();
+		$feds = array();
 		foreach($rows as $k => &$row)
 		{
 			if (!is_int($k)) continue;
@@ -91,13 +91,13 @@ class ranking_accounting extends boresult
 				$rows['fed'] += $row['fed'];
 			}
 			// for GER/DAV use fed_parent instead acl_fed_id
-			if ($query['calendar'] == 'GER')
+			if ($row['fed_parent'] && !in_array($row['fed_parent'],$feds))
 			{
-				$row['acl_fed_id'] = $row['fed_parent'];
+				$feds[] = $row['fed_parent'];
 			}
-			if ($row['acl_fed_id'] && !in_array($row['acl_fed_id'],$acl_feds))
+			if ($row['acl_fed_id'] && !in_array($row['acl_fed_id'],$feds))
 			{
-				$acl_feds[] = $row['acl_fed_id'];
+				$feds[] = $row['acl_fed_id'];
 			}
 			$row['total'] = etemplate::number_format($row['total'],2);
 			$row['fed'] = etemplate::number_format($row['fed'],2);
@@ -112,22 +112,26 @@ class ranking_accounting extends boresult
 			);
 		}
 		$rows['license_year'] = (int)$comp['datum'];
-		$acl_feds = $this->federation->query_list('verband','fed_id',array('fed_id' => $acl_feds));
-		foreach($acl_feds as $fed_id => &$name)
+		$feds = $this->federation->query_list('verband','fed_id',array('fed_id' => $feds));
+		foreach($feds as $fed_id => &$name)
 		{
 			$name = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club|SAC-Regionalzentrum|Landes(fach)?verband( Bergsport und Klettern)?) /','',$name);
 			$name = preg_replace('/ (des DAV e.V.|für Sport- und Wettkampfklettern e.V.|Sektionenverband)$/','',$name);
 		}
-		$rows['sel_options']['acl_fed_id'] = $acl_feds;
+		$rows['sel_options']['acl_fed_id'] = $rows['sel_options']['fed_parent'] = $feds;
 
 		switch($query['calendar'])
 		{
 			case 'SUI':
-				$rows['acl_fed_label'] = 'Regionalzentrum';
+				$rows['no_fed_parent'] = true;
 				break;
 
 			case 'GER':
-				$rows['acl_fed_label'] = 'Landesverband';
+				$rows['no_acl_fed_id'] = true;
+				break;
+
+			default:
+				$rows['no_fed_parent'] = $rows['no_acl_fed_id'] = true;
 				break;
 		}
 		//echo $total; _debug_array($rows); die('Stop');
