@@ -90,6 +90,11 @@ class ranking_accounting extends boresult
 				$rows['total'] += $row['total'];
 				$rows['fed'] += $row['fed'];
 			}
+			// for GER/DAV use fed_parent instead acl_fed_id
+			if ($query['calendar'] == 'GER')
+			{
+				$row['acl_fed_id'] = $row['fed_parent'];
+			}
 			if ($row['acl_fed_id'] && !in_array($row['acl_fed_id'],$acl_feds))
 			{
 				$acl_feds[] = $row['acl_fed_id'];
@@ -110,9 +115,21 @@ class ranking_accounting extends boresult
 		$acl_feds = $this->federation->query_list('verband','fed_id',array('fed_id' => $acl_feds));
 		foreach($acl_feds as $fed_id => &$name)
 		{
-			$name = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club|SAC-Regionalzentrum) /','',$name);
+			$name = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club|SAC-Regionalzentrum|Landes(fach)?verband( Bergsport und Klettern)?) /','',$name);
+			$name = preg_replace('/ (des DAV e.V.|für Sport- und Wettkampfklettern e.V.|Sektionenverband)$/','',$name);
 		}
 		$rows['sel_options']['acl_fed_id'] = $acl_feds;
+
+		switch($query['calendar'])
+		{
+			case 'SUI':
+				$rows['acl_fed_label'] = 'Regionalzentrum';
+				break;
+
+			case 'GER':
+				$rows['acl_fed_label'] = 'Landesverband';
+				break;
+		}
 		//echo $total; _debug_array($rows); die('Stop');
 
 		return $total;

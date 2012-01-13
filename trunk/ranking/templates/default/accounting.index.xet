@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.accounting.index.rows" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.accounting.index.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -13,7 +13,7 @@
 				<column/>
 				<column/>
 				<column/>
-				<column/>
+				<column disabled="!@acl_fed_label"/>
 				<column/>
 				<column/>
 				<column/>
@@ -29,7 +29,7 @@
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="Sektion" id="verband"/>
-					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id"/>
+					<nextmatch-sortheader label="@acl_fed_label" id="acl_fed_id"/>
 					<nextmatch-sortheader label="License" id="license"/>
 					<nextmatch-header align="right" label="Total"/>
 					<nextmatch-header align="right" label="Federation"/>
