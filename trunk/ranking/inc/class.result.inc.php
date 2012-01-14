@@ -30,17 +30,17 @@ class result extends so_sql
 	/**
 	 * constructor of the competition class
 	 */
-	function result($source_charset='',$db=null,$vfs_pdf_dir='')
+	function __construct($source_charset='',$db=null,$vfs_pdf_dir='')
 	{
 		//$this->debug = 1;
-		$this->so_sql('ranking',$this->result_table,$db);	// call constructor of extended class
+		parent::__construct('ranking',$this->result_table,$db);	// call constructor of extended class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = translation::charset();
 
 		foreach(array(
-				'athlete'  => 'athlete',
+				'athlete'  => 'ranking_athlete',
 			) as $var => $class)
 		{
 			$egw_name = /*'ranking_'.*/$class;
