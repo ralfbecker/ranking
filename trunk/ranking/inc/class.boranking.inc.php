@@ -378,6 +378,11 @@ class boranking extends ranking_so
 			$check = false;
 			$which = 'national sub-federation rights allow NOT to apply for an international license!';
 		}
+		elseif(is_null($license) && $this->is_selfservice() == $athlete['PerId'])
+		{
+			$check = true;
+			$which = 'athlete selfservice';
+		}
 		// now check if user has rights for the athletes federation (or a parent fed of it)
 		else
 		{
@@ -400,6 +405,20 @@ class boranking extends ranking_so
 		}
 		//error_log(__METHOD__."(".array2string($athlete).",$required,".array2string($comp).",$license) ".($check?'TRUE':'FALSE')." ($which)");
 		return $check;
+	}
+
+	/**
+	 * Check or set if we do athlete selfservice
+	 *
+	 * @param int $set=null
+	 * @return int
+	 */
+	function is_selfservice($set=null)
+	{
+		$ret = $set ? egw_cache::setSession('ranking', 'selfservice', $set) :
+			($GLOBALS['egw']->session->session_flags == 'A' ? egw_cache::getSession('ranking', 'selfservice') : null);
+		//error_log(__METHOD__.'('.array2string($set).') returning '.array2string($ret)." (egw_cache::getSession('ranking', 'selfservice')=".array2string(egw_cache::getSession('ranking', 'selfservice')).')');
+		return $ret;
 	}
 
 	/**
