@@ -47,15 +47,15 @@ class ranking_so
 	 */
 	private $cats;
 	/**
-	 * @var cup
+	 * @var ranking_cup
 	 */
 	private $cup;
 	/**
-	 * @var competition
+	 * @var ranking_competition
 	 */
 	private $comp;
 	/**
-	 * @var athlete
+	 * @var ranking_athlete
 	 */
 	private $athlete;
 	/**
