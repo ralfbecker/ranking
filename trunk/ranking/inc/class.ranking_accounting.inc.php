@@ -12,7 +12,6 @@
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.athlete.inc.php');
 
 class ranking_accounting extends boresult
 {
@@ -61,8 +60,8 @@ class ranking_accounting extends boresult
 		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 //		$total = $this->route_result->get_rows($query,$rows,$readonlys);
-		// we use athlete::get_rows, to also get the license data (joined with the results table)
-		$join = ' JOIN '.route_result::RESULT_TABLE.' ON '.athlete::ATHLETE_TABLE.'.PerId='.route_result::RESULT_TABLE. '.PerId AND '.
+		// we use ranking_athlete::get_rows, to also get the license data (joined with the results table)
+		$join = ' JOIN '.route_result::RESULT_TABLE.' ON '.ranking_athlete::ATHLETE_TABLE.'.PerId='.route_result::RESULT_TABLE. '.PerId AND '.
 			$this->db->expression(route_result::RESULT_TABLE,$query['col_filter']);
 		// col_filter is only for license-date, other filters are already used in the above join
 		$query['col_filter'] = array(

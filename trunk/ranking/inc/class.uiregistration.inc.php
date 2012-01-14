@@ -1,18 +1,17 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - registration UI
+ * EGroupware digital ROCK Rankings - registration UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
 
 class uiregistration extends boranking
 {
@@ -38,7 +37,7 @@ class uiregistration extends boranking
 	 */
 	function get_rows($query,&$rows,&$readonlys)
 	{
-		//echo "uiathletes::get_rows() query="; _debug_array($query);
+		//echo "ranking_athlete_ui::get_rows() query="; _debug_array($query);
 		foreach(array('vorname','nachname') as $name)
 		{
 			$filter = array('nation' => $query['col_filter']['nation']);

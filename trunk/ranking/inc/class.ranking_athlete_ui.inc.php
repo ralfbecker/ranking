@@ -1,21 +1,20 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - athletes UI
+ * EGroupware digital ROCK Rankings - athletes UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.athlete.inc.php');	// for ACL_DENY_*
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
+require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_athlete.inc.php');	// for ACL_DENY_*
 
-class uiathletes extends boranking
+class ranking_athlete_ui extends boranking
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -43,9 +42,9 @@ class uiathletes extends boranking
 	 */
 	const MINIMUM_AGE = 5;
 
-	function uiathletes()
+	function __construct()
 	{
-		$this->boranking();
+		parent::__construct();
 
 		$this->tmpl = new etemplate;
 
@@ -143,7 +142,7 @@ class uiathletes extends boranking
 				$view = true;
 			}
 			$content['referer'] = preg_match('/menuaction=([^&]+)/',$_SERVER['HTTP_REFERER'],$matches) ?
-				$matches[1] : 'ranking.uiathletes.index';
+				$matches[1] : 'ranking.ranking_athlete_ui.index';
 
 			if ($content['referer'] == 'ranking.uiregistration.add' || $_GET['apply_license'])
 			{
@@ -164,14 +163,14 @@ class uiathletes extends boranking
 
 			if (!$view && $this->only_nation_athlete) $content['nation'] = $this->only_nation_athlete;
 
-			//echo "<br>uiathletes::edit: content ="; _debug_array($content);
+			//echo "<br>ranking_athlete_ui::edit: content ="; _debug_array($content);
 			$this->athlete->init($content['athlete_data']);
 			// reload license, if nation or year changed
 			if ($content['old_license_nation'] != $content['license_nation'])
 			{
 				$content['athlete_data']['license'] = $content['license'] = $this->athlete->get_license($content['license_year'],$content['license_nation']);
 			}
-			// restore some fields set by athlete::read, which are no real athlete fields
+			// restore some fields set by ranking_athlete::read, which are no real athlete fields
 			foreach(array('comp','last_comp','license') as $name)
 			{
 				$this->athlete->data[$name] = $content['athlete_data'][$name];
@@ -180,7 +179,7 @@ class uiathletes extends boranking
 
 			$this->athlete->data_merge($content);
 			$this->athlete->data['acl_fed_id'] = (int)$content['acl_fed_id']['fed_id'];
-			//echo "<br>uiathletes::edit: athlete->data ="; _debug_array($this->athlete->data);
+			//echo "<br>ranking_athlete_ui::edit: athlete->data ="; _debug_array($this->athlete->data);
 
 			if (($content['save'] || $content['apply']) || $content['apply_license'])
 			{
@@ -195,7 +194,7 @@ class uiathletes extends boranking
 						$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
 						$this->athlete->data['geb_date'] = $old_geb_date;
 					}
-					elseif($this->athlete->data['geb_date'] && athlete::age($this->athlete->data['geb_date']) < self::MINIMUM_AGE)
+					elseif($this->athlete->data['geb_date'] && ranking_athlete::age($this->athlete->data['geb_date']) < self::MINIMUM_AGE)
 					{
 						$msg .= lang("Athlets need to be at least %1 years old! Maybe wrong date format.",self::MINIMUM_AGE);
 					}
@@ -286,7 +285,7 @@ class uiathletes extends boranking
 							if (file_exists($this->license_form_name($content['license_nation'],$content['license_year'])) && !$required_missing)
 							{
 								$link = $GLOBALS['egw']->link('/index.php',array(
-									'menuaction' => 'ranking.uiathletes.licenseform',
+									'menuaction' => 'ranking.ranking_athlete_ui.licenseform',
 									'PerId' => $this->athlete->data['PerId'],
 									'license_year' => $content['license_year'],
 									'license_nation' => $content['license_nation'],
@@ -307,7 +306,7 @@ class uiathletes extends boranking
 					$msg .= lang('Permission denied !!!').' ('.$this->athlete->data['nation'].')';
 				}
 				$link = $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => $content['referer'],//'ranking.uiathletes.index',
+					'menuaction' => $content['referer'],//'ranking.ranking_athlete_ui.index',
 					'msg' => $msg,
 				)+($content['row'] ? array('row['.$content['row'].']' => $this->athlete->data['PerId']) : array()));
 				if (!$required_missing) $js = "window.opener.location='$link'; $js";
@@ -315,7 +314,7 @@ class uiathletes extends boranking
 			if ($content['delete'])
 			{
 				$link = $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.uiathletes.index',
+					'menuaction' => 'ranking.ranking_athlete_ui.index',
 					'delete' => $this->athlete->data['PerId'],
 				));
 				$js = "window.opener.location='$link';";
@@ -341,7 +340,7 @@ class uiathletes extends boranking
 						$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
 						if ($this->athlete->data['comp']) array_unshift($this->athlete->data['comp'],false);	// reindex with 1
 						$link = $GLOBALS['egw']->link('/index.php',array(
-							'menuaction' => $content['referer'],//'ranking.uiathletes.index',
+							'menuaction' => $content['referer'],//'ranking.ranking_athlete_ui.index',
 							'msg' => $msg,
 						));
 						$js = "window.opener.location='$link';";
@@ -437,7 +436,7 @@ class uiathletes extends boranking
 			// forbid non-admins or users without competition edit rights to change
 			// the name of an athlete who has not climbed for more then one year
 			// (gard against federations "reusing" athlets)
-			if ($this->athlete->data['PerId'] && athlete::age($this->athlete->data['last_comp']) > 1 &&
+			if ($this->athlete->data['PerId'] && ranking_athlete::age($this->athlete->data['last_comp']) > 1 &&
 				!($this->is_admin || $this->edit_rights[$this->athlete->data['nation']] || $this->edit_rights['NULL']))
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = true;
@@ -454,7 +453,7 @@ class uiathletes extends boranking
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$this->tmpl->read('ranking.athlete.edit');
-		$this->tmpl->exec('ranking.uiathletes.edit',$content,
+		$this->tmpl->exec('ranking.ranking_athlete_ui.edit',$content,
 			$sel_options,$readonlys,array(
 				'athlete_data' => $this->athlete->data,
 				'view' => $view,
@@ -476,7 +475,7 @@ class uiathletes extends boranking
 	 */
 	function get_rows(&$query_in,&$rows,&$readonlys)
 	{
-		//echo "uiathletes::get_rows() query="; _debug_array($query_in);
+		//echo "ranking_athlete_ui::get_rows() query="; _debug_array($query_in);
 		if (!$query_in['csv_export'])	// only store state if NOT called as csv export
 		{
 			$GLOBALS['egw']->session->appsession('ranking','athlete_state',$query_in);
@@ -622,7 +621,7 @@ class uiathletes extends boranking
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
-				'get_rows'       =>	'ranking.uiathletes.get_rows',
+				'get_rows'       =>	'ranking.ranking_athlete_ui.get_rows',
 				'filter_no_lang' => True,
 				'filter_label'   => lang('Category'),
 				'filter2_label'  => 'License',
@@ -676,7 +675,7 @@ class uiathletes extends boranking
 		$this->tmpl->read('ranking.athlete.index');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
 		$this->set_ui_state();
-		$this->tmpl->exec('ranking.uiathletes.index',$content,array(
+		$this->tmpl->exec('ranking.ranking_athlete_ui.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'filter2'=> array('' => 'All')+$this->license_labels,

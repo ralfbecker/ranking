@@ -205,7 +205,12 @@ $phpgw_baseline = array(
 			'homepage' => array('type' => 'varchar','precision' => '60'),
 			'mobil' => array('type' => 'varchar','precision' => '20'),
 			'acl' => array('type' => 'int','precision' => '4','default' => '0'),
-			'freetext' => array('type' => 'longtext')
+			'freetext' => array('type' => 'longtext'),
+			'modified' => array('type' => 'timestamp','default' => 'current_timestamp'),
+			'modifier' => array('type' => 'int','precision' => '4'),
+			'password' => array('type' => 'varchar','precision' => '128'),
+			'recover_pw_hash' => array('type' => 'varchar','precision' => '32'),
+			'recover_pw_time' => array('type' => 'timestamp')
 		),
 		'pk' => array('PerId'),
 		'fk' => array(),

@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - athlete storage object
+ * EGroupware digital ROCK Rankings - athlete storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -23,7 +23,7 @@ define('ACL_DENY_PROFILE',128);
 /**
  * Athlete object
  */
-class athlete extends so_sql
+class ranking_athlete extends so_sql
 {
 	var $charset,$source_charset;
 	const ATHLETE_TABLE = 'Personen';
@@ -81,6 +81,13 @@ class athlete extends so_sql
 	 * @var boranking
 	 */
 	var $boranking;
+
+	/**
+	 * Timestaps that need to be adjusted to user-time on reading or saving
+	 *
+	 * @var array
+	 */
+	var $timestamps = array('modified','recover_pw_hash');
 
 	/**
 	 * Initialise the static vars of this class, called by including the class
@@ -183,7 +190,7 @@ class athlete extends so_sql
 			{
 				if ($acl & $n) $data['acl'][] = $n;
 			}
-			// echo "<p>athlete::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
+			// echo "<p>ranking_athlete::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
 
 			// blank out the acl'ed fields, if user has no athletes rights
 			if (is_object($GLOBALS['boranking']) && !$GLOBALS['boranking']->acl_check_athlete($data))
@@ -232,7 +239,7 @@ class athlete extends so_sql
 			{
 				$data['acl'] |= $n;
 			}
-			//echo "<p>athlete::data2db() acl=".print_r($acl,true)."=$data[acl]</p>\n";
+			//echo "<p>ranking_athlete::data2db() acl=".print_r($acl,true)."=$data[acl]</p>\n";
 		}
 		if ($data['practice'] && $data['practice'] < 100)
 		{
@@ -280,7 +287,7 @@ class athlete extends so_sql
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
 	{
-		//echo "<p>athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
+		//echo "<p>ranking_athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
 		if ($only_keys === true) $only_keys = self::ATHLETE_TABLE.'.PerId';
 
@@ -408,7 +415,7 @@ class athlete extends so_sql
 	 */
 	function distinct_list($column,$keys='')
 	{
-		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),")</p>\n"; $start = microtime(true);
+		//echo "<p>ranking_athlete::distinct_list('$column',".print_r($keys,true),")</p>\n"; $start = microtime(true);
 
 		static $cache;
 		$cache_key = $column.'-'.serialize($keys);
@@ -436,7 +443,7 @@ class athlete extends so_sql
 			$val = $data[$column];
 			$values[$val] = $val;
 		}
-		//echo "<p>athlete::distinct_list('$column',".print_r($keys,true),") took ".round(1000*(microtime(true)-$start))."ms</p>\n";
+		//echo "<p>ranking_athlete::distinct_list('$column',".print_r($keys,true),") took ".round(1000*(microtime(true)-$start))."ms</p>\n";
 		return $cache[$cache_key] =& $values;
 	}
 
@@ -694,7 +701,7 @@ class athlete extends so_sql
 		{
 			$this->data['license'] = $status;
 		}
-		//echo "athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
+		//echo "ranking_athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
 		return $this->db->affected_rows();
 	}
 
@@ -873,6 +880,9 @@ class athlete extends so_sql
 		{
 			list($this->data['fed_id']) = each($feds);
 		}
+		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
+		$this->data['modified'] = $this->now;
+
 		if (!($err = parent::save()) && $this->data['fed_id'])
 		{
 			$this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']);
@@ -995,4 +1005,4 @@ class athlete extends so_sql
 		return $result;
 	}
 }
-athlete::init_static();
+ranking_athlete::init_static();

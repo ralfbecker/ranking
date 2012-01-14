@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - result storage object
+ * EGroupware digital ROCK Rankings - result storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -76,7 +76,7 @@ class result extends so_sql
 		{
 			unset($filter['nation']);
 
-			if ($join) $filter[] = $this->db->expression(athlete::FEDERATIONS_TABLE,array('nation' => $keys['nation']));
+			if ($join) $filter[] = $this->db->expression(ranking_athlete::FEDERATIONS_TABLE,array('nation' => $keys['nation']));
 
 			unset($keys['nation']);
 		}
@@ -97,11 +97,11 @@ class result extends so_sql
 			$cols = false;
 			if ($join === true)
 			{
-				$join = 'JOIN '.athlete::ATHLETE_TABLE.' USING(PerId)'.athlete::FEDERATIONS_JOIN;
+				$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
 
 				if (!$extra_cols)
 				{
-					$extra_cols = "nachname,vorname,nation,".athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
+					$extra_cols = "nachname,vorname,nation,".ranking_athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
 				}
 				else
 				{
@@ -306,8 +306,8 @@ class result extends so_sql
 	{
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,".
-			athlete::FEDERATIONS_TABLE.".nation,verband,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId".
-			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
+			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId".
+			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.platz > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND w.serie='.(int) $cup['SerId'].
@@ -334,8 +334,8 @@ class result extends so_sql
 	{
 		$results = array();
 		foreach($this->db->query($sql="SELECT $this->athlete_table.*,".
-			athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
-			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".athlete::FEDERATIONS_JOIN.
+			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
+			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
 			' AND r.GrpId '.(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
