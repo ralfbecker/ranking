@@ -68,7 +68,6 @@ class ranking_athlete_ui extends boranking
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
-		$tabs = 'contact|profile|freetext|other|pictures|results';
 		if ($_GET['rkey'] || $_GET['PerId'])
 		{
 			if (!in_array($license_nation = strip_tags($_GET['license_nation']),$this->license_nations))
@@ -263,7 +262,7 @@ class ranking_athlete_ui extends boranking
 									{
 										if (!$required_missing) $msg .= ', '.lang('Required information missing, application rejected!');
 										$this->tmpl->set_validation_error($name,lang('Field must not be empty !!!'));
-										$content[$tabs] = 'contact';
+										$content['tabs'] = 'contact';
 										$required_missing = $name;
 									}
 								}
@@ -310,6 +309,7 @@ class ranking_athlete_ui extends boranking
 					'msg' => $msg,
 				)+($content['row'] ? array('row['.$content['row'].']' => $this->athlete->data['PerId']) : array()));
 				if (!$required_missing) $js = "window.opener.location='$link'; $js";
+//if (!$required_missing) $js = "window.opener.location=window.opener.location+'&msg=".addslashes($msg)."'; $js";
 			}
 			if ($content['delete'])
 			{
@@ -322,7 +322,7 @@ class ranking_athlete_ui extends boranking
 			if ($content['save'] || $content['delete'] || $content['cancel'])
 			{
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
-				$GLOBALS['egw']->common->egw_exit();
+				common::egw_exit();
 			}
 			if ($content['merge'] && $this->athlete->data['PerId'])
 			{
@@ -355,7 +355,7 @@ class ranking_athlete_ui extends boranking
 		$content = $this->athlete->data + array(
 			'msg' => $msg,
 			'is_admin' => $this->is_admin,
-			$tabs => $content[$tabs],
+			'tabs' => $content['tabs'],
 			'foto' => $this->athlete->picture_url().'?'.time(),
 			'license_year' => $content['license_year'],
 			'license_nation' => $content['license_nation'],
@@ -441,14 +441,17 @@ class ranking_athlete_ui extends boranking
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = true;
 			}
+			// forbid athlete selfservice to change certain fields
+			if ($this->is_selfservice() == $this->athlete->data['PerId'])
+			{
+				$readonlys['vorname'] = $readonlys['nachname'] = $readonlys['geb_date'] = true;
+				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
+				// 'til we have some kind of review mechanism
+				$readonlys['tabs']['pictures'] = true;
+			}
 		}
 		if ($js)
 		{
-			if (!is_object($GLOBALS['egw']->js))
-			{
-				include_once(EGW_API_INC.'/class.javascript.inc.php');
-				$GLOBALS['egw']->js = new javascript();
-			}
 			$GLOBALS['egw']->js->set_onload($js);
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
@@ -720,13 +723,218 @@ class ranking_athlete_ui extends boranking
 		{
 			if (is_array($value)) continue;
 			// the rtf seems to use iso-8859-1
-			$replace['$$'.$name.'$$'] = $value = $GLOBALS['egw']->translation->convert($value,$egw_charset,'iso-8859-1');
+			$replace['$$'.$name.'$$'] = $value = translation::convert($value,$egw_charset,'iso-8859-1');
 		}
-		include_once(EGW_API_INC.'/class.browser.inc.php');
-		$browser = new browser();
 		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
-		$browser->content_header($file,'text/rtf');
+		html::content_header($file,'text/rtf');
 		echo str_replace(array_keys($replace),array_values($replace),$form);
 		$GLOBALS['egw']->common->egw_exit();
+	}
+
+	/**
+	 * Athlete selfservie: edit profile, register for competitions
+	 *
+	 * @param int $PerId
+	 * @param string $action 'profile'
+	 */
+	function selfservice($PerId, $action)
+	{
+		if (!$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId &&
+			$this->selfservice_auth($PerId, $action) != $PerId)
+		{
+			return;
+		}
+		switch($action)
+		{
+			case 'profile':
+				egw::redirect_link('/index.php',array(
+					'menuaction' => 'ranking.ranking_athlete_ui.edit',
+					'PerId' => $PerId,
+				));
+				break;
+
+			default:
+				throw new egw_exception_wrong_parameter("Unknown action '$action'!");
+		}
+	}
+
+	/**
+	 * Time in which athlets have to use the password-recovery-link in sec
+	 */
+	const RECOVERY_TIMEOUT = 14400;
+	/**
+	 * Number of unsuccessful logins, after which login get suspended
+	 */
+	const LOGIN_FAILURES = 3;
+	/**
+	 * How long login get suspended
+	 */
+	const LOGIN_SUSPENDED = 1800;
+
+	/**
+	 * Athlete selfservice: password check and recovery
+	 *
+	 * @param int $PerId
+	 * @param string $action
+	 * @return int PerId if we are authenticated for it nor null if not
+	 */
+	function selfservice_auth($PerId, $action)
+	{
+		unset($this->athlete->acl2clear[ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
+		if (!$PerId || !($athlete = $this->athlete->read($PerId)))
+		{
+			throw new egw_exception_wrong_userinput("Athlete NOT found!");
+		}
+		echo "<style type='text/css'>
+	body {
+		margin: 10px !important;
+	}
+	p, td {
+		font-size: 14px;
+	}
+	p.error {
+		color: red;
+	}
+</style>\n";
+		echo "<h1>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
+
+		$recovery_link = egw::link('/ranking/athlete.php', array(
+			'PerId' => $athlete['PerId'],
+			'action'  => 'recovery',
+		));
+		if (empty($athlete['password']) || in_array($action,array('recovery','password','set')))
+		{
+			if (empty($athlete['password']) && !in_array($action,array('password','set')))
+			{
+				echo "<p class='error'>".lang("You have not yet a password set!")."</p>\n";
+			}
+			if (empty($athlete['email']) || strpos($athlete['email'],'@') === false)
+			{
+				echo "<p>".lang('Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.')."</p>\n";
+			}
+			elseif ($action == 'recovery')
+			{
+				// create and store recovery hash and time
+				$this->athlete->update(array(
+					'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
+					'recover_pw_time' => $this->athlete->now,
+				));
+				$link = egw::link('/ranking/athlete.php', array(
+					'PerId' => $athlete['PerId'],
+					'action'  => 'password',
+					'hash' => $this->athlete->data['recover_pw_hash'],
+				));
+				// ToDo mail hash to athlete
+				//echo "<p>*** TEST *** Click <a href='$link'>here</a> to set a password *** TEST ***</p>\n";
+				echo "<p>".lang('An EMail with instructions how to set or recover your password has been send to you.')."</p>\n";
+			}
+			elseif ($action == 'password' || $action == 'set')
+			{
+				if ($_GET['hash'] != $athlete['recover_pw_hash'])
+				{
+					echo "<p class='error'>".lang("The link you clicked or entered is NOT correct, maybe a typo!")."</p>\n";
+					echo "<p>".lang("Try again or have a %1new mail send to you%2.","<a href='$recovery_link'>","</a>")."</p>\n";
+				}
+				elseif (($this->athlete->now - strtotime($athlete['recover_pw_time'])) > self::RECOVERY_TIMEOUT)
+				{
+					echo "<p class='error'>".lang('The link is expired, please have a %1new mail send to you%2.',"<a href='$recovery_link'>","</a>")."</p>\n";
+				}
+				else
+				{
+					if ($action == 'set')
+					{
+						if ($_POST['password'] != $_POST['password2'])
+						{
+							echo "<p class='error'>".lang('Both password do NOT match!')."</p>\n";
+						}
+						elseif(($msg = auth::crackcheck($_POST['password'])))
+						{
+							echo "<p class='error'>".$msg."</p>\n";
+						}
+						else
+						{
+							// store new password
+							if (!$this->athlete->update(array(
+								'recover_pw_hash' => null,
+								'recover_pw_time' => null,
+								'password' => auth::encrypt_ldap($_POST['password'],'sha512_crypt'),
+							)))
+							{
+								echo "<h1>".lang('Your new password is now active.')."</h1>\n";
+								common::egw_exit();
+							}
+							else
+							{
+								echo "<p>".lang('An error happend, while storing your password!')."</p>\n";
+							}
+						}
+						echo "<p>".lang('Please try again ...')."</p>\n";
+					}
+					$link = egw::link('/ranking/athlete.php', array(
+						'PerId' => $athlete['PerId'],
+						'action'  => 'set',
+						'hash' => $athlete['recover_pw_hash'],
+					));
+					echo "<p>".lang("Please enter your new password:")."</p>\n";
+					echo "<form action='$link' method='POST'>\n<table>\n";
+					echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' /></td></tr>\n";
+					echo "<tr><td>".lang('Repeat')."</td><td><input type='password' name='password2' /></td>";
+					echo "<td><input type='submit' value='".lang('Set password')."' /></td></tr>\n";
+					echo "</table>\n</form>\n";
+				}
+			}
+			else
+			{
+				echo "<p><a href='$recovery_link'>".lang('Click here to have a mail send to your stored EMail address with instructions how to set your password.')."</a></p>\n";
+			}
+		}
+		else
+		{
+			if (!empty($_POST['password']))
+			{
+				if ($athlete['login_failed'] >= self::LOGIN_FAILURES &&
+					($this->athlete->now - strtotime($athlete['last_login'])) < self::LOGIN_SUSPENDED)
+				{
+					$this->athlete->update(array(
+						'last_login' => $this->athlete->now,
+						'login_failed=login_failed+1',
+					));
+					error_log(__METHOD__."($PerId, '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
+					echo "<p class='error'>".lang('Login suspended, too many unsuccessful tries!')."</p>\n";
+					echo "<p>".lang('Try again after %1 minutes.',self::LOGIN_SUSPENDED/60)."</p>\n";
+					common::egw_exit();
+				}
+				elseif (!$loged_in && !auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
+				{
+					$this->athlete->update(array(
+						'last_login' => $this->athlete->now,
+						'login_failed=login_failed+1',
+					));
+					error_log(__METHOD__."($PerId, '$action') wrong password, {$this->athlete->data['login_failed']} failure");
+					echo "<p class='error'>".lang('Password you entered is NOT correct!')."</p>\n";
+				}
+				else
+				{
+					$this->athlete->update(array(
+						'last_login' => $this->athlete->now,
+						'login_failed' => 0,
+					));
+					error_log(__METHOD__."($PerId, '$action') successful login");
+					// store successful selfservice login
+					$this->is_selfservice($PerId);
+
+					return $PerId;	// we are now authenticated for $PerId
+				}
+			}
+			$link = egw::link('/ranking/athlete.php', array(
+				'PerId' => $athlete['PerId'],
+				'action'  => $action,
+			));
+			echo "<p>".lang("Please enter your password to log in or click %1here%2 if you forgot it.","<a href='$recovery_link'>","</a>")."</p>\n";
+			echo "<form action='$link' method='POST'>\n";
+			echo "<p>".lang('Password')." <input type='password' name='password' />\n";
+			echo "<input type='submit' value='".lang('Login')."' /></p>\n";
+			echo "</form>\n";
+		}
 	}
 }

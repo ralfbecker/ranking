@@ -210,7 +210,9 @@ $phpgw_baseline = array(
 			'modifier' => array('type' => 'int','precision' => '4'),
 			'password' => array('type' => 'varchar','precision' => '128'),
 			'recover_pw_hash' => array('type' => 'varchar','precision' => '32'),
-			'recover_pw_time' => array('type' => 'timestamp')
+			'recover_pw_time' => array('type' => 'timestamp'),
+			'last_login' => array('type' => 'timestamp'),
+			'login_failed' => array('type' => 'int', 'precision' => '4','default' => '0','nullable' => False),
 		),
 		'pk' => array('PerId'),
 		'fk' => array(),

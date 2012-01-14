@@ -87,7 +87,7 @@ class ranking_athlete extends so_sql
 	 *
 	 * @var array
 	 */
-	var $timestamps = array('modified','recover_pw_hash');
+	var $timestamps = array('modified','recover_pw_hash','last_login');
 
 	/**
 	 * Initialise the static vars of this class, called by including the class

@@ -82,7 +82,8 @@ if ($pers->email && !($pers->acl & (2|128)))
 	$name = mailto($pers->email,$name);
 }
 $name = '<b>'.$name.'</b><br />'.$homepage.($gruppe->nation ? $pers->ort : $pers->nation).
-	($pers->verband ? '<br />'.htmlspecialchars($pers->verband) : '');
+	($pers->verband ? '<br />'.($pers->fed_url ? '<a href="'.htmlspecialchars((!stristr($pers->fed_url,'://') ? 'http://' : '').$pers->fed_url).'" target="_blank">' : '').
+		htmlspecialchars($pers->verband).($pers->fed_url ? '</a>' : '') : '');
 
 if (defined('DR_PATH'))
 {
@@ -210,8 +211,13 @@ if ($anz_wk)
 }
 echo "</table>\n<p>";
 
+echo "<div style='position: relative; width: 100%'>\n";
 if (!$all && $anz_wk > $anz_best)
 {
 	echo '<a href="'.$GLOBALS['dr_config']['pstambl'].'all=1&amp;person='.$pers->PerId.'&amp;cat='.$gruppe->GrpId.'#results">show all results</a>.'."\n";
 }
+$link = 'https://'.$_SERVER['HTTP_HOST']."/egroupware/ranking/athlete.php?PerId=$pers->PerId&amp;action=profile";
+echo "<a href=\"javascript:window.open('$link','_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes')\" style='position: absolute; right:10px'>Edit this profile</a>\n";
+echo "</div>\n";
+
 do_footer ();

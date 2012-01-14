@@ -1436,14 +1436,16 @@ function ranking_upgrade1_9_006()
 }
 
 /**
- * Add colum for password (incl. recovery) and modification time, modifier
+ * Add colums for login password (incl. recovery) and modification time, modifier
  *
  * ALTER TABLE `Personen`
  * 	ADD `modified` TIMESTAMP,
  * 	ADD `modifier` INTEGER,
  * 	ADD `password` VARCHAR(128),
  * 	ADD `recover_pw_hash` VARCHAR(32),
- * 	ADD `recover_pw_time` DATETIME
+ * 	ADD `recover_pw_time` DATETIME,
+ * 	ADD `last_login` DATETIME,
+ * 	ADD `login_failed` INTEGER NOT NULL DEFAULT '0'
  */
 function ranking_upgrade1_9_007()
 {
@@ -1465,6 +1467,15 @@ function ranking_upgrade1_9_007()
 	));
 	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','recover_pw_time',array(
 		'type' => 'timestamp'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','last_login',array(
+		'type' => 'timestamp'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','login_failed',array(
+		'type' => 'int',
+		'precision' => '4',
+		'default' => '0',
+		'nullable' => False
 	));
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.008';
