@@ -26,9 +26,9 @@ if (!($view = $GLOBALS['egw']->session->appsession('menuaction','ranking')) &&
 }
 // fix old class-names stored in user prefs
 $old2new = array(
-	'uicompetitions' => 'ranking_competition_ui',
-	'uicups' => 'ranking_cup_ui',
-	'uiathlets' => 'ranking_athlete_ui',
+	'ranking.uicompetitions.index' => 'ranking.ranking_competition_ui.index',
+	'ranking.uicups.index' => 'ranking.ranking_cup_ui.index',
+	'ranking.uiathletes.index' => 'ranking.ranking_athlete_ui.index',
 );
 if (isset($old2new[$view])) $view = $old2new[$view];
 
