@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.register.add.rows" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.register.add.rows" template="" lang="" group="0" version="1.9.001">
 		<grid>
 			<columns>
 				<column/>
@@ -14,8 +14,8 @@
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-filterheader options="Lastname..." no_lang="1" id="nachname"/>
-					<nextmatch-filterheader options="Firstname..." id="vorname" no_lang="1"/>
+					<nextmatch-filterheader id="nachname" no_lang="1" options="Lastname..."/>
+					<nextmatch-filterheader id="vorname" no_lang="1" options="Firstname..."/>
 					<nextmatch-sortheader label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader label="Last competition" id="last_comp"/>
@@ -23,28 +23,28 @@
 						<description id="license_nation"/>
 						<description value="License" id="license_year"/>
 					</vbox>
-					<description value="Action" align="center"/>
+					<description align="center" value="Action"/>
 				</row>
 				<row class="row">
-					<description no_lang="1" id="${row}[nachname]" class="lastname"/>
-					<description no_lang="1" id="${row}[vorname]"/>
-					<date id="${row}[geb_date]" readonly="true" options="Y-m-d" align="center"/>
-					<description no_lang="1" id="${row}[ort]"/>
-					<date id="${row}[last_comp]" readonly="true" options="Y-m-d" align="center"/>
+					<description id="${row}[nachname]" no_lang="1" class="lastname"/>
+					<description id="${row}[vorname]" no_lang="1"/>
+					<date align="center" id="${row}[geb_date]" readonly="true" options="Y-m-d"/>
+					<description id="${row}[ort]" no_lang="1"/>
+					<date align="center" id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
 					<hbox options="0,0">
 						<menulist>
 							<menupopup id="${row}[license]" readonly="true"/>
 						</menulist>
-						<button class="small" label="Apply for" id="apply_license[$row_cont[PerId]]" statustext="Applies for the license and downloads the necessary form to mail to the office" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+						<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" class="small"/>
 					</hbox>
 					<hbox options="0,0">
-						<button class="small" label="Register" id="register[$row_cont[PerId]]" statustext="Register this athlete for the selected category" onclick="$row_cont[confirm]opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;"/>
+						<button statustext="Register this athlete for the selected category" label="Register" id="register[$row_cont[PerId]]" onclick="$row_cont[confirm]opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;" class="small"/>
 					</hbox>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.register.add" template="" lang="" group="0" version="1.0.0.001">
+	<template id="ranking.register.add" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column width="83"/>
@@ -53,23 +53,23 @@
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
+					<description align="center" id="msg" no_lang="1" span="all" class="redItalic"/>
 					<description/>
 					<description/>
 				</row>
 				<row class="th">
-					<description options=",,,comp" value="Competition"/>
-					<textbox id="comp_name" onchange="1" size="Select one" no_lang="1" readonly="true" span="all"/>
+					<description value="Competition" for="comp"/>
+					<textbox id="comp_name" no_lang="1" onchange="1" readonly="true" size="Select one" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Category" options=",,,cat"/>
+					<description value="Category" for="cat"/>
 					<menulist>
 						<menupopup id="cat" no_lang="1" onchange="1"/>
 					</menulist>
 					<checkbox label="show athlets from all categories" id="show_all" onchange="1"/>
 				</row>
 				<row disabled="!@cat">
-					<nextmatch span="all" id="nm" options="ranking.register.add.rows"/>
+					<nextmatch id="nm" options="ranking.register.add.rows" span="all"/>
 				</row>
 				<row valign="top">
 					<button label="Close" onclick="window.close()"/>

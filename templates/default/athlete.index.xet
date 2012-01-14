@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.athlete.index.rows" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.athlete.index.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column width="7%"/>
@@ -14,23 +14,24 @@
 				<column/>
 				<column disabled="@no_license"/>
 				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="th">
 					<vbox options="0,0">
-						<nextmatch-sortheader id="PerId" label="License"/>
-						<nextmatch-filterheader options="Nation..." id="nation" no_lang="1"/>
+						<nextmatch-sortheader label="License" id="PerId"/>
+						<nextmatch-filterheader id="nation" no_lang="1" options="Nation..."/>
 					</vbox>
 					<vbox options="0,0">
-						<nextmatch-sortheader id="_nachname" label="Last name"/>
-						<nextmatch-filterheader id="nachname" options="All" no_lang="1" class="selectboxFullWidth"/>
+						<nextmatch-sortheader label="Last name" id="_nachname"/>
+						<nextmatch-filterheader id="nachname" no_lang="1" options="All" class="selectboxFullWidth"/>
 					</vbox>
 					<vbox options="0,0">
-						<nextmatch-sortheader id="_vorname" label="First name"/>
-						<nextmatch-filterheader id="vorname" options="All" no_lang="1" class="selectboxFullWidth"/>
+						<nextmatch-sortheader label="First name" id="_vorname"/>
+						<nextmatch-filterheader id="vorname" no_lang="1" options="All" class="selectboxFullWidth"/>
 					</vbox>
-					<nextmatch-filterheader options="Gender..." id="sex" align="center"/>
-					<nextmatch-sortheader id="geb_date" align="center" label="Birthdate"/>
+					<nextmatch-filterheader align="center" id="sex" options="Gender..."/>
+					<nextmatch-sortheader align="center" label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<vbox options="0,0">
 						<nextmatch-sortheader label="Federation" id="verband"/>
@@ -43,28 +44,35 @@
 						</menulist>
 						<description value="License" id="license_year" no_lang="1"/>
 					</vbox>
-					<description value="Action" align="center"/>
+					<nextmatch-sortheader label="Last modified" id="modified"/>
+					<description align="center" value="Action"/>
 				</row>
 				<row class="row">
-					<description id="${row}[PerId]" align="center" no_lang="1" value="$row_cont[nation]"/>
+					<description align="center" value="$row_cont[nation]" id="${row}[PerId]" no_lang="1"/>
 					<description id="${row}[nachname]" no_lang="1" class="lastname leftPad5"/>
-					<description class="ml10 leftPad5" no_lang="1" id="${row}[vorname]"/>
+					<description id="${row}[vorname]" no_lang="1" class="ml10 leftPad5"/>
 					<menulist>
 						<menupopup align="center" id="${row}[sex]" readonly="true"/>
 					</menulist>
 					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
-					<description no_lang="1" id="${row}[ort]"/>
+					<description id="${row}[ort]" no_lang="1"/>
 					<description id="${row}[verband]" no_lang="1"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
 					<hbox options="0,0">
 						<menulist>
 							<menupopup id="${row}[license]" readonly="true"/>
 						</menulist>
-						<button class="small" label="Apply for" id="apply_license[$row_cont[PerId]]" statustext="Applies for the license and downloads the necessary form to mail to the office" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+						<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" class="small"/>
 					</hbox>
+					<vbox options="0,0">
+						<date-time id="${row}[modified]" readonly="true"/>
+						<menulist>
+							<menupopup type="select-account" id="${row}[modifier]" readonly="true"/>
+						</menulist>
+					</vbox>
 					<hbox options="0,0">
-						<button label="Edit" id="edit[$row_cont[PerId]]" image="edit" statustext="Edit this athlete" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=$row_cont[PerId]&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
-						<button id="delete[$row_cont[PerId]]" image="delete" label="Delete" onclick="return confirm('Delete this athlete');" statustext="Delete this athlete"/>
+						<button statustext="Edit this athlete" label="Edit" id="edit[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" image="edit"/>
+						<button statustext="Delete this athlete" label="Delete" id="delete[$row_cont[PerId]]" onclick="return confirm('Delete this athlete');" image="delete"/>
 					</hbox>
 				</row>
 			</rows>
@@ -73,20 +81,20 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
-	<template id="ranking.athlete.index" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.athlete.index" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description class="redItalic" id="msg" align="center" no_lang="1"/>
+					<description align="center" id="msg" no_lang="1" class="redItalic"/>
 				</row>
 				<row>
-					<nextmatch options="ranking.athlete.index.rows" id="nm"/>
+					<nextmatch id="nm" options="ranking.athlete.index.rows"/>
 				</row>
 				<row>
-					<button label="Add" id="nm[rows][edit][0]" statustext="add a new athlete" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+					<button statustext="add a new athlete" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_thlete_ui.edit'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
 				</row>
 			</rows>
 		</grid>

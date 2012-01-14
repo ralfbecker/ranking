@@ -28,7 +28,7 @@ class ranking_admin_prefs_sidebox_hooks
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
 
 			$file = array(
-				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.uiathletes.index')),
+				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index')),
 				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
 				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index')),
@@ -130,7 +130,7 @@ class ranking_admin_prefs_sidebox_hooks
 			'ranking.ranking_competition_ui.index'   => lang('Competitions'),
 			'ranking.ranking_cup_ui.index'           => lang('Cups'),
 		//	'ranking.uicats.index'           => lang('Categories'),
-			'ranking.uiathletes.index'       => lang('Athletes'),
+			'ranking.ranking_athlete_ui.index'       => lang('Athletes'),
 			'ranking.uiregistration.index'   => lang('Registration'),
 			'ranking.uiresult.index'         => lang('Resultservice'),
 			'ranking.uiregistration.result'  => lang('Results'),
@@ -162,11 +162,11 @@ class ranking_admin_prefs_sidebox_hooks
 			'title' => 'ranking.athlete.link_title',
 //			'titles' => 'ranking.athlete.link_titles',
 			'view' => array(
-				'menuaction' => 'ranking.uiathletes.edit'
+				'menuaction' => 'ranking.ranking_athlete_ui.edit'
 			),
 			'view_id' => 'PerId',
 			'add' => array(
-				'menuaction' => 'ranking.uiathletes.edit'
+				'menuaction' => 'ranking.ranking_athlete_ui.edit'
 			),
 			'add_popup'  => '850x450',
 		);

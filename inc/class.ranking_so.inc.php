@@ -1,13 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - storage object
+ * EGroupware digital ROCK Rankings - storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -90,7 +90,7 @@ class ranking_so
 		'cats'    => 'category',
 		'cup'     => 'ranking_cup',
 		'comp'    => 'ranking_competition',
-		'athlete' => 'athlete',
+		'athlete' => 'ranking_athlete',
 		'result'  => 'result',
 		'route'   => 'route',
 		'route_result'  => 'route_result',

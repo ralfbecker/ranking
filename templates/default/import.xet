@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.isolation" template="" lang="" group="0" version="1.3.001">
-		<groupbox rows="1" cols="1" class="extra_startlist">
+	<template id="ranking.result.isolation" template="" lang="" group="0" version="1.7.001">
+		<groupbox cols="1" rows="1" class="extra_startlist">
 			<caption label="Isolation zone and starting time"/>
 			<grid padding="5">
 				<columns>
@@ -18,7 +18,7 @@
 					</row>
 					<row>
 						<description value="Starting time"/>
-						<description span="all" id="route_start" no_lang="1"/>
+						<description id="route_start" no_lang="1" span="all"/>
 					</row>
 					<row>
 						<description value="Observation time"/>
@@ -29,11 +29,11 @@
 			</grid>
 		</groupbox>
 		<styles>
-			.extra_startlist { margin-top: 20px; }
+			.extra_startlist { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.official" template="" lang="" group="0" version="1.3.001">
-		<groupbox rows="1" cols="1" class="extra_result">
+	<template id="ranking.result.official" template="" lang="" group="0" version="1.7.001">
+		<groupbox cols="1" rows="1" class="extra_result">
 			<caption label="Result official"/>
 			<grid>
 				<columns>
@@ -44,13 +44,13 @@
 						<description id="route_result" no_lang="1"/>
 					</row>
 					<row>
-						<description no_lang="1" id="route_judge"/>
+						<description id="route_judge" no_lang="1"/>
 					</row>
 				</rows>
 			</grid>
 		</groupbox>
 		<styles>
-			.extra_result { margin-top: 20px; }
+			.extra_result { margin-top: 10px; }
 		</styles>
 	</template>
 	<template id="ranking.import" template="" lang="" group="0" version="1.5.001">
@@ -60,26 +60,26 @@
 			</columns>
 			<rows>
 				<row disabled="!@msg">
-					<description class="redItalic" id="msg"/>
+					<description id="msg" class="redItalic"/>
 				</row>
 				<row class="noPrint">
 					<hbox options="0,0">
 						<menulist class="rightPad5">
-							<menupopup id="keys[calendar]" onchange="1" no_lang="1" statustext="Select calendar"/>
+							<menupopup statustext="Select calendar" id="keys[calendar]" no_lang="1" onchange="1"/>
 						</menulist>
 						<menulist>
-							<menupopup id="keys[comp]" onchange="1" options="Select competition" no_lang="1"/>
+							<menupopup id="keys[comp]" no_lang="1" onchange="1" options="Select competition"/>
 						</menulist>
 					</hbox>
 				</row>
 				<row class="noPrint" disabled="!@keys[comp]">
 					<menulist class="bold">
-						<menupopup id="keys[cat]" no_lang="1" options="Select category" onchange="1"/>
+						<menupopup id="keys[cat]" no_lang="1" onchange="1" options="Select category"/>
 					</menulist>
 				</row>
 				<row>
 					<menulist>
-						<menupopup id="keys[route]" label="Import"/>
+						<menupopup label="Import" id="keys[route]"/>
 					</menulist>
 				</row>
 				<row disabled="!@import">
@@ -91,21 +91,21 @@
 						<rows>
 							<row class="th">
 								<description value="Header"/>
-								<description id="header[$c]" value="$c:"/>
+								<description value="$c:" id="header[$c]"/>
 							</row>
 							<row class="th">
 								<description value="Import as"/>
 								<menulist>
-									<menupopup options="Ignore" id="as[$c]"/>
+									<menupopup id="as[$c]" options="Ignore"/>
 								</menulist>
 							</row>
 							<row class="row {$cont[detection][$row][row]}">
 								<hbox options="0,0">
-									<link-entry options="ranking" id="athlete[$row]"/>
-									<buttononly id="add[$row]" options="new" label="Add" align="right" disabled="true" onclick="window.open(egw::link('/index.php','menuaction=ranking.uiathletes.edit$row_cont[presets]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" statustext="Add new athlete with the given data"/>
-									<buttononly id="edit[$row]" options="edit" label="Edit" align="right" onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.uiathletes.edit&amp;PerId=')+document.getElementById(form::name('athlete[$row][id]')).value, '_blank', '850', '450', 'yes'); return false;" statustext="Edit athlete"/>
+									<link-entry id="athlete[$row]" options="ranking"/>
+									<buttononly align="right" disabled="true" statustext="Add new athlete with the given data" label="Add" id="add[$row]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit$row_cont[presets]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" options="new"/>
+									<buttononly align="right" statustext="Edit athlete" label="Edit" id="edit[$row]" onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=')+document.getElementById(form::name('athlete[$row][id]')).value, '_blank', '850', '450', 'yes'); return false;" options="edit"/>
 								</hbox>
-								<checkbox id="replace[$row][$c]" statustext="@detection[$row][help-$c]" label="@{$row}[$c]" class="{$cont[detection][$row][$c]}" readonly="true"/>
+								<checkbox statustext="@detection[$row][help-$c]" label="@{$row}[$c]" id="replace[$row][$c]" readonly="true" class="{$cont[detection][$row][$c]}"/>
 							</row>
 						</rows>
 					</grid>
@@ -113,9 +113,9 @@
 				<row disabled="@import">
 					<hbox options="0,0">
 						<file id="file"/>
-						<button id="button[upload]" class="leftPad5" label="Upload" onclick="if(document.getElementById(form::name('file')).value) return true; alert('You need to select a file first!'); return false;"/>
+						<button label="Upload" id="button[upload]" onclick="if(document.getElementById(form::name('file')).value) return true; alert('You need to select a file first!'); return false;" class="leftPad5"/>
 						<menulist class="leftPad5">
-							<menupopup id="delimiter" label="Delimiter"/>
+							<menupopup label="Delimiter" id="delimiter"/>
 						</menulist>
 						<menulist class="leftPad5">
 							<menupopup label="Import Charset" id="charset"/>
@@ -128,19 +128,19 @@
 							<menupopup id="license" options="Set license to"/>
 						</menulist>
 						<button label="Import" id="button[import]"/>
-						<button label="Update" id="button[apply]" statustext="Apply the changes made"/>
+						<button statustext="Apply the changes made" label="Update" id="button[apply]"/>
 						<button label="Detect athletes" id="button[detect]"/>
-						<button id="button[cancel]" label="Cancel"/>
+						<button label="Cancel" id="button[cancel]"/>
 					</hbox>
 				</row>
 				<row class="onlyPrint" disabled="!@nm[show_result]=0">
-					<template span="all" id="ranking.result.isolation"/>
+					<template id="ranking.result.isolation" span="all"/>
 				</row>
 				<row class="onlyPrint" disabled="!@result_official">
-					<template span="all" id="ranking.result.official"/>
+					<template id="ranking.result.official" span="all"/>
 				</row>
 				<row class="onlyPrint">
-					<template id="ranking.import"/>
+					<template id="ranking.result.header{$cont[nm][calendar]}"/>
 				</row>
 			</rows>
 		</grid>
