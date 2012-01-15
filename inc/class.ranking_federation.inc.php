@@ -456,4 +456,46 @@ class ranking_federation extends so_sql
 		//_debug_array($feds);
 		return $feds;
 	}
+
+	/**
+	 * Get federation-contact information for a given athlete or fed_id's
+	 *
+	 * @param array $athlete_or_fed_ids athlete array (fed_id, fed_acl_id, fed_parent) or given array of fed_id's
+	 * @param string $type='athletes'
+	 * @return string html with comma-separated contact-names with mailto-links
+	 */
+	function get_contacts(array $athlete_or_fed_ids, $type='athletes')
+	{
+		if (isset($athlete_or_fed_ids['PerId']))
+		{
+			$fed_ids = array($athlete_or_fed_ids['fed_id'],$athlete_or_fed_ids['nation']);
+			if ($athlete_or_fed_ids['fed_parent']) $fed_ids[] = $athlete_or_fed_ids['fed_parent'];
+			if ($athlete_or_fed_ids['acl_fed_id']) $fed_ids[] = $athlete_or_fed_ids['acl_fed_id'];
+		}
+		else
+		{
+			$fed_ids = $athlete_or_fed_ids;
+		}
+		$contacts = array();
+		foreach($fed_ids as $fed_id)
+		{
+			$grants = $this->get_grants($fed_id);
+			if (!$grants[$type]) continue;
+			//echo $fed_id; _debug_array($grants);
+			foreach((array)$grants[$type] as $account_id)
+			{
+				if ($account_id < 0) $account_id = $GLOBALS['egw']->accounts->members($account_id,true);
+				foreach((array)$account_id as $account_id)
+				{
+					if (($account = $GLOBALS['egw']->accounts->read($account_id)) && $account['account_email'])
+					{
+						//echo $account_id; _debug_array($account);
+						$contacts[$account_id] = '<a href="mailto:'.$account['account_email'].'">'.
+							$account['account_firstname'].' '.$account['account_lastname'].'</a>';
+					}
+				}
+			}
+		}
+		return implode(", ", $contacts);
+	}
 }

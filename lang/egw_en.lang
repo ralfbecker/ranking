@@ -9,6 +9,7 @@
 %1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 %1. heat	ranking	en	%1. Round
+%1. topo	ranking	en	%1. topo
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 (%1 athletes not from %2 skipped)	ranking	en	(%1 athletes not from %2 skipped)
 1. display	ranking	en	1. Display
@@ -35,6 +36,8 @@ administrated by: parent federation	ranking	en	Administrated by: parent federati
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
+an email with instructions how to (re-)set your password has been sent to you.	ranking	en	An EMail with instructions how to (re-)set your password has been sent to you.
+an error happend, while storing your password!	ranking	en	An error happend, while storing your password!
 applied	ranking	en	applied
 applied for a %1 license	ranking	en	Applied for a %1 license
 applies for the license and downloads the necessary form to mail to the office	ranking	en	Applies for the license and downloads the necessary form to mail to the office
@@ -53,6 +56,7 @@ athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athletes	ranking	en	Athletes
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	en	Athlets need to be at least %1 years old! Maybe wrong date format.
 attention: merging can not be undone! really want to merge?	ranking	en	ATTENTION: merging can NOT be undone! Really want to merge?
+beamer / videowalls	ranking	en	Beamer / videowalls
 before	ranking	en	before
 before which year the old system was used (first year of new system)	ranking	en	before which year the old system was used (first year of new system)
 best of	ranking	en	Best of
@@ -66,11 +70,13 @@ birthyears from	ranking	en	Birthyears from
 body height in centimeter	ranking	en	body height in centimeter
 bonus	ranking	en	Bonus
 bonus: number of tries or no	ranking	en	Bonus: Number of tries or no
+both password do not match!	ranking	en	Both password do NOT match!
 boulder	ranking	en	boulder
 can not be higher than top!	ranking	en	Can NOT be higher than top!
 can not be higher than tries!	ranking	en	Can NOT be higher than tries!
 can not be lower than tops!	ranking	en	Can NOT be lower than tops!
 can not create directory '%1' !!!	ranking	en	Can not create directory '%1' !!!
+can not create topo directory %1!	ranking	en	Can NOT create topo directory %1!
 can not move '%1' to %2 !!!	ranking	en	Can not move '%1' to %2 !!!
 can't connect to time controll program at '%1': %2	ranking	en	Can't connect to time controll program at '%1': %2
 can't find co-participant!	ranking	en	Can't find co-participant!
@@ -86,10 +92,12 @@ changes applied to %1 federations.	ranking	en	Changes applied to %1 federations.
 check all	ranking	en	Check all
 children	ranking	en	Children
 city	ranking	en	City
+click here to have a mail send to your stored email address with instructions how to set your password.	ranking	en	Click here to have a mail send to your stored EMail address with instructions how to set your password.
 click to view	ranking	en	click to view
 climbing professional	ranking	en	Climbing professional
 climbing since (years)	ranking	en	climbing since (years)
 climbing time	ranking	en	Climbing time
+climbingdata xml files can only set results, not create new participants!	ranking	en	ClimbingData xml files can only set results, not create NEW participants!
 clone of	ranking	en	Clone of
 closes	ranking	en	closes
 columns	ranking	en	Columns
@@ -109,6 +117,7 @@ complimentary	ranking	en	Complimentary
 confirmed	ranking	en	confirmed
 contact	ranking	en	Contact
 copy current formats to the new competition, which does not have any formats yet?	ranking	en	Copy current formats to the new competition, which does not have any formats yet?
+could not open %1!	ranking	en	Could not open %1!
 counting for rankings	ranking	en	counting for rankings
 create new federation: %1 (%2)	ranking	en	Create new federation: %1 (%2)
 cup	ranking	en	Cup
@@ -168,9 +177,12 @@ entry not found !!!	ranking	en	Entry not found !!!
 error attaching the picture	ranking	en	Error attaching the picture
 error deleting federation!	ranking	en	Error deleting federation!
 error deleting format!	ranking	en	Error deleting format!
+error deleting handhold!	ranking	en	Error deleting handhold!
 error saving display!	ranking	en	Error saving display!
 error saving federation!	ranking	en	Error saving federation!
 error saving format!	ranking	en	Error saving format!
+error storing handhold!	ranking	en	Error storing handhold!
+error uploading topo!	ranking	en	Error uploading topo!
 error writing to display!!!	ranking	en	Error writing to display!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: dataline %1 contains %2 instead of %3 columns !!!	ranking	en	Error: dataline %1 contains %2 instead of %3 columns !!!
@@ -274,14 +286,17 @@ last competition	ranking	en	Last competition
 lead	ranking	en	lead
 license number	ranking	en	License number
 line	ranking	en	Line
+login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too many unsuccessful tries!
 male	ranking	en	male
 max	ranking	en	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
+measurement	ranking	en	Measurement
 measurement aborted!	ranking	en	Measurement aborted!
 merge	ranking	en	Merge
 merge selected federations with the one opened for editing	ranking	en	Merge selected federations with the one opened for editing
 merges this entry into the selected one.	ranking	en	Merges this entry into the selected one.
 minus	ranking	en	minus
+more	ranking	en	More
 name(s)	ranking	en	name(s)
 nation	ranking	en	Nation
 nation acl	common	en	Nation ACL
@@ -299,6 +314,8 @@ no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	en	No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!
 no complimentary list (over quota)	ranking	en	No complimentary list (over quota)
 no federation selected to edit!	ranking	en	No federation selected to edit!
+no participant with startnumber "%1"!	ranking	en	No participant with startnumber "%1"!
+no participants yet!	ranking	en	No participants yet!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous round!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	en	No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!
@@ -324,6 +341,7 @@ pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete 
 pairing speed final	ranking	en	Pairing speed final
 parent federation	ranking	en	Parent federation
 participant deleted	ranking	en	Participant deleted
+password you entered is not correct!	ranking	en	Password you entered is NOT correct!
 pc city	ranking	en	PC City
 pc city (nation)	ranking	en	PC City (Nation)
 perid	ranking	en	PerId
@@ -335,6 +353,10 @@ picture attached	ranking	en	Picture attached
 picture resized to %1 pixel	ranking	en	Picture resized to %1 pixel
 place	ranking	en	Place
 place of birth	ranking	en	Place of birth
+please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	en	Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.
+please enter your new password:	ranking	en	Please enter your new password:
+please enter your password to log in or %1click here%2, if you forgot it.	ranking	en	Please enter your password to log in or %1click here%2, if you forgot it.
+please try again ...	ranking	en	Please try again ...
 please use only a first capital letter for names, do not capitalise the whole word!	ranking	en	Please use ONLY a first capital letter for names, do NOT capitalise the whole word!
 plus	ranking	en	plus
 pointalocation	ranking	en	Pointalocation
@@ -377,6 +399,7 @@ registration for this competition is over!	ranking	en	Registration for this comp
 remove the attached pdf	ranking	en	Remove the attached PDF
 remove the grafic	ranking	en	Remove the grafic
 removed the %1	ranking	en	Removed the %1
+repeat	ranking	en	Repeat
 replace: %1	ranking	en	replace: %1
 required information missing, application rejected!	ranking	en	Required information missing, application rejected!
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
@@ -391,6 +414,7 @@ reverse cup (unranked first)	ranking	en	reverse cup (unranked first)
 reverse ranking (unranked first)	ranking	en	reverse ranking (unranked first)
 route	ranking	en	Route
 route not found !!!	ranking	en	Route NOT found !!!
+route not found!	ranking	en	Route NOT found!
 routes	ranking	en	Routes
 rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
@@ -408,15 +432,18 @@ select type of list to show	ranking	en	Select type of list to show
 serid	ranking	en	SerId
 set by category	ranking	en	set by category
 set license to	ranking	en	Set license to
+set password	ranking	en	Set password
 short for display in rankings / tables	ranking	en	short for display in rankings / tables
 shortcut	ranking	en	Shortcut
 show athlets from all categories	ranking	en	show athlets from all categories
 show jurylist	ranking	en	show jurylist
+show password	ranking	en	show password
 since	ranking	en	since
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
 small final	ranking	en	Small final
 someone already applied for a %1 license!	ranking	en	Someone already applied for a %1 license!
+sorry, an error happend sending your email (%1), please try again later or %2contact us%3.	ranking	en	Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.
 speed	ranking	en	speed
 sponsor logos	ranking	en	Sponsor logos
 squad	ranking	en	Squad
@@ -445,6 +472,8 @@ target for result service (default: resultservice)	ranking	en	Target for result 
 target for start lists (default: startlist)	ranking	en	Target for start lists (default: startlist)
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
+the link is expired, please have a %1new mail send to you%2.	ranking	en	The link is expired, please have a %1new mail send to you%2.
+the link you clicked or entered is not correct, maybe a typo!	ranking	en	The link you clicked or entered is NOT correct, maybe a typo!
 this athlete has no license!	ranking	en	This athlete has NO license!
 this module displays calendar, results and rankings	ranking	en	This module displays calendar, results and rankings
 this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
@@ -457,7 +486,11 @@ time measurement	ranking	en	Time measurement
 to year	ranking	en	to year
 top	ranking	en	Top
 top: number of tries or no	ranking	en	Top: number of tries or no
+topo deleted.	ranking	en	Topo deleted.
+topo uploaded as %1.	ranking	en	Topo uploaded as %1.
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
+try again after %1 minutes.	ranking	en	Try again after %1 minutes.
+try again or have a %1new mail send to you%2.	ranking	en	Try again or have a %1new mail send to you%2.
 two * two qualification	ranking	en	two * two Qualification
 two qualification	ranking	en	two Qualification
 two qualification for all, flash one after the other	ranking	en	two Qualification for all, flash one after the other
@@ -468,6 +501,7 @@ type of display	ranking	en	Type of display
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
+unknown mode="%1"!	ranking	en	Unknown Mode="%1"!
 unpublished	ranking	en	unpublished
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
 up	ranking	en	Up
@@ -482,6 +516,7 @@ use regular registration to apply for a license first.	ranking	en	Use regular re
 use the acl to hide the birthdate, you can't remove it !!!	ranking	en	Use the ACL to hide the birthdate, you can't remove it !!!
 used to preset a link in rankings and competition-calendar	ranking	en	used to preset a link in rankings and competition-calendar
 vfs directory for the pdf files (excluding the year)	admin	en	VFS directory for the pdf files (excluding the year)
+vfs directory for topo files (excluding the year)	admin	en	VFS directory for topo files (excluding the year)
 vfs path for pictures of the athletes	ranking	en	VFS path for pictures of the athletes
 view %1	ranking	en	view %1
 view the attached pdf	ranking	en	View the attached PDF
@@ -501,14 +536,22 @@ which rankingsystem was used before, if any	ranking	en	which rankingsystem was u
 which view do you want to see, when you start the ranking app?	ranking	en	Which view do you want to see, when you start the ranking app?
 wildcard	ranking	en	Wildcard
 wrong admin-account or -password !!!	ranking	en	Wrong admin-account or -password !!!
+wrong mode="%1" for discipline "%2"!	ranking	en	Wrong Mode="%1" for discipline "%2"!
+wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	en	Wrong Mode="%1" for this heat (qualification - final mismatch)!
+wrong or not configured vfs directory	ranking	en	Wrong or NOT configured VFS directory
+xml file uses unknown schema (format)!	ranking	en	XML file uses unknown schema (format)!
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you are not allowed to register for %1!	ranking	en	You are not allowed to register for %1!
 you are not permitted to apply for a license!	ranking	en	You are not permitted to apply for a license!
 you can only create a new heat, if the previous one '%1' has a result!	ranking	en	You can only create a new round, if the previous one '%1' has a result!
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last round, not one in between!
+you have not yet a password set!	ranking	en	You have not yet a password set!
+you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	en	You have to act on the instructions in the next %1 hours, or %2request a new mail%3.
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	en	You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue
 you need to select a file first!	ranking	en	You need to select a file first!
 you need to select an other athlete first!	ranking	en	You need to select an other athlete first!
 you need to select some federations first!	ranking	en	You need to select some federations first!
+your new password is now active.	ranking	en	Your new password is now active.
+your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	en	Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.
 zip code	ranking	en	Zip Code
