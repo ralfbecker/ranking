@@ -778,7 +778,7 @@ class ranking_athlete_ui extends boranking
 	 * @param string $action
 	 * @return int PerId if we are authenticated for it nor null if not
 	 */
-	function selfservice_auth($PerId, $action)
+	private function selfservice_auth($PerId, $action)
 	{
 		unset($this->athlete->acl2clear[ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
 		if (!$PerId || !($athlete = $this->athlete->read($PerId)))
@@ -810,7 +810,8 @@ class ranking_athlete_ui extends boranking
 			}
 			if (empty($athlete['email']) || strpos($athlete['email'],'@') === false)
 			{
-				echo "<p>".lang('Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.')."</p>\n";
+				echo "<p>".lang('Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.',
+					$this->federation->get_contacts($athlete))."</p>\n";
 			}
 			elseif ($action == 'recovery')
 			{
@@ -824,9 +825,25 @@ class ranking_athlete_ui extends boranking
 					'action'  => 'password',
 					'hash' => $this->athlete->data['recover_pw_hash'],
 				));
-				// ToDo mail hash to athlete
-				//echo "<p>*** TEST *** Click <a href='$link'>here</a> to set a password *** TEST ***</p>\n";
-				echo "<p>".lang('An EMail with instructions how to set or recover your password has been send to you.')."</p>\n";
+				if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
+				// mail hash to athlete
+				//echo "<p>*** TEST *** <a href='$link'>Click here</a> to set a password *** TEST ***</p>\n";
+				try {
+					$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
+					self::mail("$athlete[vorname] $athlete[$nachname] <$athlete[email]>",
+						$athlete+array(
+							'LINK' => preg_match('/\.txt$/',$template) ? $link : '<a href="'.$link.'">'.$link.'<a>',
+							'SERVER_NAME' => $_SERVER['SERVER_NAME'],
+							'RECOVERY_TIMEOUT' => self::RECOVERY_TIMEOUT/3600,	// in hours (not sec)
+						), $template);
+					echo "<p>".lang('An EMail with instructions how to (re-)set your password has been sent to you.')."</p>\n".
+						"<p>".lang('You have to act on the instructions in the next %1 hours, or %2request a new mail%3.',
+							self::RECOVERY_TIMEOUT/3600,"<a href='$recovery_link'>","</a>")."</p>\n";
+				}
+				catch (Exception $e) {
+					echo "<p>".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
+						$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
+				}
 			}
 			elseif ($action == 'password' || $action == 'set')
 			{
@@ -841,7 +858,7 @@ class ranking_athlete_ui extends boranking
 				}
 				else
 				{
-					if ($action == 'set')
+					if ($action == 'set' && $_SERVER['REQUEST_METHOD'] == 'POST')
 					{
 						if ($_POST['password'] != $_POST['password2'])
 						{
@@ -875,10 +892,12 @@ class ranking_athlete_ui extends boranking
 						'action'  => 'set',
 						'hash' => $athlete['recover_pw_hash'],
 					));
-					echo "<p>".lang("Please enter your new password:")."</p>\n";
+					echo "<p>".lang("Please enter your new password:")."<br />\n".
+						'('.lang('Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.',7).")</p>\n";
 					echo "<form action='$link' method='POST'>\n<table>\n";
-					echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' /></td></tr>\n";
-					echo "<tr><td>".lang('Repeat')."</td><td><input type='password' name='password2' /></td>";
+					echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' value='".htmlspecialchars($_POST['password'])."' /></td>".
+						"<td><label><input type='checkbox' onclick=\"this.form.password.type=this.form.password2.type=this.checked?'text':'password';\">".lang('show password')."</label></td></tr>\n";
+					echo "<tr><td>".lang('Repeat')."</td><td><input type='password' name='password2' value='".htmlspecialchars($_POST['password2'])."' /></td>";
 					echo "<td><input type='submit' value='".lang('Set password')."' /></td></tr>\n";
 					echo "</table>\n</form>\n";
 				}
@@ -930,11 +949,65 @@ class ranking_athlete_ui extends boranking
 				'PerId' => $athlete['PerId'],
 				'action'  => $action,
 			));
-			echo "<p>".lang("Please enter your password to log in or click %1here%2 if you forgot it.","<a href='$recovery_link'>","</a>")."</p>\n";
+			echo "<p>".lang("Please enter your password to log in or %1click here%2, if you forgot it.","<a href='$recovery_link'>","</a>")."</p>\n";
 			echo "<form action='$link' method='POST'>\n";
 			echo "<p>".lang('Password')." <input type='password' name='password' />\n";
 			echo "<input type='submit' value='".lang('Login')."' /></p>\n";
 			echo "</form>\n";
 		}
+	}
+
+	/**
+	 * Sending a templated email
+	 *
+	 * @param string $email email address(es comma-separated), or rfc822 "Name <email@domain.com>"
+	 * @param array $replacements name => value pairs, can be used as $$name$$ in template
+	 * @param string $template filename of template, first line is subject, type depends on .txt extension
+	 * @param string $from='digtal ROCK <info@digitalrock.de>'
+	 * @throws Exception on error
+	 */
+	private static function mail($email, array $replacements, $template, $from='digtal ROCK <info@digitalrock.de>')
+	{
+		//$email = "$replacements[vorname] $replacements[nachname] <info@digitalrock.de>";
+		$is_txt = preg_match('/\.txt$/', $template);
+		if (!($body = file_get_contents($template)))
+		{
+			throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
+		}
+		$replace = array();
+		foreach($replacements as $name => $value)
+		{
+			$replace['$$'.$name.'$$'] = $value;
+		}
+		$body = strtr($body, $replace);
+		list($subject,$body) = preg_split("/\r?\n/",$body,2);
+
+		$mailer = new send();
+		$mailer->IsHTML(!$is_txt);
+
+		if (preg_match_all('/"?(.+)"?<(.+)>,?/',$email,$matches))
+		{
+			$names = $matches[1];
+			$addresses = $matches[2];
+		}
+		else
+		{
+			$addresses = preg_split('/, */',trim($email));
+			$names = array();
+		}
+		foreach($addresses as $n => $address)
+		{
+			$mailer->AddAddress($address,$names[$n]);
+		}
+		$mailer->Subject = $subject;
+		$mailer->Body = $body;
+
+		$mailer->From = $from;
+		if (preg_match('/"?(.+)"?<(.+)>,?/',$from,$matches))
+		{
+			$mailer->FromName = $matches[1];
+			$mailer->From = $matches[2];
+		}
+		$mailer->Send();
 	}
 }

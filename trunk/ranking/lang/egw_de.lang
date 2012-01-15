@@ -9,6 +9,7 @@
 %1, %2 deleted for category %3	ranking	de	%1, %2 gelöscht für Kategorie %3
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
 %1. heat	ranking	de	%1. Runde
+%1. topo	ranking	de	%1. Topo
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
 (%1 athletes not from %2 skipped)	ranking	de	(%1 Athleten nicht aus %2 überlesen)
 1. display	ranking	de	1. Display
@@ -35,6 +36,8 @@ administrated by: parent federation	ranking	de	Verwaltet von: übergeordnetem Ve
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
+an email with instructions how to (re-)set your password has been sent to you.	ranking	de	Eine EMail mit Anleitung wie das Passwort (zurück) gesetzt wird wurde an Dich versandt.
+an error happend, while storing your password!	ranking	de	Ein Fehler passierte, beim Speichern Deines Passwortes!
 applied	ranking	de	beantragt
 applied for a %1 license	ranking	de	%1 Lizenz beantragt
 applies for the license and downloads the necessary form to mail to the office	ranking	de	Beantragt eine Lizenz und lädt das notwendige Forumlar herunter damit es an das Büro geschickt werden kann
@@ -53,6 +56,7 @@ athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athletes	ranking	de	Athleten
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	de	Athleten müssen mindestens %1 Jahre alt sein! Eventuell falsches Datumsformat.
 attention: merging can not be undone! really want to merge?	ranking	de	ACHTUNG: Vereinigen kann NICHT rückgänig gemacht werden! Wollen Sie die beiden Athleten wirklich vereinigen?
+beamer / videowalls	ranking	de	Beamer / Videowand
 before	ranking	de	vor
 before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)
 best of	ranking	de	Beste
@@ -66,11 +70,13 @@ birthyears from	ranking	de	Geburtsjahr von
 body height in centimeter	ranking	de	Körpergröße in Zentimeter
 bonus	ranking	de	Bonus
 bonus: number of tries or no	ranking	de	Bonus: Anzahl Versuche oder Nein
+both password do not match!	ranking	de	Beide Passwörter stimmen NICHT überein!
 boulder	ranking	de	Bouldern
 can not be higher than top!	ranking	de	Darf nicht höher als Top sein!
 can not be higher than tries!	ranking	de	Darf nicht höher als Versuche sein!
 can not be lower than tops!	ranking	de	Darf nicht niedriger als Top sein!
 can not create directory '%1' !!!	ranking	de	Kann Verzeichnis '%1' nicht anlegen !!!
+can not create topo directory %1!	ranking	de	Kann Topo-Verzeichnis %1 nicht anlegen!
 can not move '%1' to %2 !!!	ranking	de	Kann '%1' nicht nach %2 verschieben !!!
 can't connect to time controll program at '%1': %2	ranking	de	Kann nicht mit Zeit Kontrollprogramm auf '%1': %2 verbinden
 can't find co-participant!	ranking	de	Kann zweiten Teilnehmer (Co) nicht finden!
@@ -86,10 +92,12 @@ changes applied to %1 federations.	ranking	de	Änderungen auf %1 Verbände angew
 check all	ranking	de	Alle auswählen
 children	ranking	de	Kinder
 city	ranking	de	Stadt
+click here to have a mail send to your stored email address with instructions how to set your password.	ranking	de	Hier klicken damit eine Mail an Deine gespeicherte EMail Adresse Versand wird mit Anweisungen wie man das Passwort setzt.
 click to view	ranking	de	anklicken zum Anzeigen
 climbing professional	ranking	de	Profi
 climbing since (years)	ranking	de	klettert seit (Jahren)
 climbing time	ranking	de	Kletterzeit
+climbingdata xml files can only set results, not create new participants!	ranking	de	ClimbingData xml Dateien können nur Ergebnisse setzten, aber keine Teilnehmer anlegen!
 clone of	ranking	de	Klone von
 closes	ranking	de	schließt
 columns	ranking	de	Spalten
@@ -109,6 +117,7 @@ complimentary	ranking	de	Zusätzlich
 confirmed	ranking	de	bestätigt
 contact	ranking	de	Kontakt
 copy current formats to the new competition, which does not have any formats yet?	ranking	de	Sollen die aktuellen Formate zum neuen Wettkampf, der noch keine Formate hat, kopiert werden?
+could not open %1!	ranking	de	Kann %1 nicht öffnen!
 counting for rankings	ranking	de	zählend für die Rangliste
 create new federation: %1 (%2)	ranking	de	Lege neuen Verband an: %1 (%2)
 cup	ranking	de	Cup
@@ -168,9 +177,12 @@ entry not found !!!	ranking	de	Eintrag nicht gefunden !!!
 error attaching the picture	ranking	de	Fehler beim Anhängen des Bildes
 error deleting federation!	ranking	de	Fehler beim Löschen des Verbandes!
 error deleting format!	ranking	de	Fehler beim Löschen des Formats!
+error deleting handhold!	ranking	de	Fehler beim Löschen des Griffs!
 error saving display!	ranking	de	Fehler beim Speichern der Anzeige!
 error saving federation!	ranking	de	Fehler beim Speichern des Verbandes!
 error saving format!	ranking	de	Fehler beim Speichern des Formats!
+error storing handhold!	ranking	de	Fehler beim Speichern des Griffs!
+error uploading topo!	ranking	de	Fehler beim Hochladen des Topo!
 error writing to display!!!	ranking	de	Fehler beim Schreiben zur Anzeige!!!
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
 error: dataline %1 contains %2 instead of %3 columns !!!	ranking	de	Fehler: Datenzeile %1 enthält %2 statt %3 Spalten !!!
@@ -274,14 +286,17 @@ last competition	ranking	de	Letzter Wettkampf
 lead	ranking	de	Schwierigkeit
 license number	ranking	de	Lizenznummer
 line	ranking	de	Zeile
+login suspended, too many unsuccessful tries!	ranking	de	Login ausgesetzt, zu viele erfolglosen Versuche!
 male	ranking	de	männlich
 max	ranking	de	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
+measurement	ranking	de	Messung
 measurement aborted!	ranking	de	Messung abgebrochen!
 merge	ranking	de	Vereinigen
 merge selected federations with the one opened for editing	ranking	de	Vereinige ausgewählte Verbände mit dem zu Bearbeiten geöffneten
 merges this entry into the selected one.	ranking	de	Vereinige diesen Eintrag mit und IN dem ausgewählten
 minus	ranking	de	minus
+more	ranking	de	Mehr
 name(s)	ranking	de	Namen
 nation	ranking	de	Nation
 nation acl	common	de	Nationen ACL
@@ -299,6 +314,8 @@ no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	de	Kein Wettkampf (&comp=XYZ) und kein Cup (&cup=XYZ) über die URL ausgewählt!
 no complimentary list (over quota)	ranking	de	Keine Komplimentärliste (über die Quote hinaus)
 no federation selected to edit!	ranking	de	Kein Verband zum bearbeiten ausgewählt!
+no participant with startnumber "%1"!	ranking	de	Kein Teilnehmer mit Startnummer '%1'!
+no participants yet!	ranking	de	Noch keine Teilnehmer!
 no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Runde angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
@@ -324,6 +341,7 @@ pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Ath
 pairing speed final	ranking	de	Paarungen Speed Finale
 parent federation	ranking	de	übergeordneter Verband
 participant deleted	ranking	de	Teilnehmer gelöscht
+password you entered is not correct!	ranking	de	Das eingegebene Passwort ist NICHT korrekt!
 pc city	ranking	de	PLZ Ort
 pc city (nation)	ranking	de	PLZ Ort (Nation)
 perid	ranking	de	PerId
@@ -335,6 +353,10 @@ picture attached	ranking	de	Bild angehangen
 picture resized to %1 pixel	ranking	de	Bild auf %1 Pixel verkleinert
 place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
+please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	de	Bitte kontakte Deinen Verband%1 um Deine EMail Adresse einzutragen, damit wir Dir ein Passwort zusenden können.
+please enter your new password:	ranking	de	Bitte neues Passwort eingeben:
+please enter your password to log in or %1click here%2, if you forgot it.	ranking	de	Zur Anmeldung bitte Passwort eingeben oder %1hier klicken%2, falls Du es vergesse hast.
+please try again ...	ranking	de	Bitte nochmal versuchen ...
 please use only a first capital letter for names, do not capitalise the whole word!	ranking	de	Bitte NUR einen ersten Großbuchstaben verwenden, NICHT das ganze Wort großschreiben!
 plus	ranking	de	plus
 pointalocation	ranking	de	Punkteverteilung
@@ -377,6 +399,7 @@ registration for this competition is over!	ranking	de	Die Registrierung für die
 remove the attached pdf	ranking	de	Das angehangene PDF löschen
 remove the grafic	ranking	de	Bild entfernen
 removed the %1	ranking	de	Das %1 wurde gelöscht
+repeat	ranking	de	Wiederholen
 replace: %1	ranking	de	Ersetze: %1
 required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
@@ -391,6 +414,7 @@ reverse cup (unranked first)	ranking	de	Umgekehrter Cup (nicht gelistet zuerst)
 reverse ranking (unranked first)	ranking	de	Umgekehrte Rangliste (nicht gelistet zuerst)
 route	ranking	de	Route
 route not found !!!	ranking	de	Route NICHT gefunden !!!
+route not found!	ranking	de	Route NICHT gefunden!
 routes	ranking	de	Routen
 rows	ranking	de	Zeilen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
@@ -408,15 +432,18 @@ select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 serid	ranking	de	SerId
 set by category	ranking	de	nach der Kategorie
 set license to	ranking	de	Setze Lizenz als
+set password	ranking	de	Passwort setzen
 short for display in rankings / tables	ranking	de	kürzere Schreibweise für Ranglisten / Tabellen
 shortcut	ranking	de	Abkürzung
 show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
 show jurylist	ranking	de	Juryliste anzeigen
+show password	ranking	de	Passwort anzeigen
 since	ranking	de	seit
 since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
 size (cm)	ranking	de	Größe (cm)
 small final	ranking	de	Kleines Finale
 someone already applied for a %1 license!	ranking	de	Jemand hat bereits die %1 Lizenz beantragt!
+sorry, an error happend sending your email (%1), please try again later or %2contact us%3.	ranking	de	Entschuldigung, es gab eine Fehler beim Sender Deiner EMail (%1), bitter versuch es später nochmal oder %2benachrichtige uns%3.
 speed	ranking	de	Geschwindigkeit
 sponsor logos	ranking	de	Sponsorenlogo(s)
 squad	ranking	de	Kader
@@ -445,6 +472,8 @@ target for result service (default: resultservice)	ranking	de	Ziel (target) für
 target for start lists (default: startlist)	ranking	de	Ziel (target) für Startlisten (Vorgabe: startlist)
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
+the link is expired, please have a %1new mail send to you%2.	ranking	de	Der Link ist abgelaufen, bitte eine %1neue Mail anfordern%2.
+the link you clicked or entered is not correct, maybe a typo!	ranking	de	Der angeklickte oder eingegebenen Link ist NICHT korrekt, evtl. ein Tipfehler!
 this athlete has no license!	ranking	de	Dieser Athlete hat KEINE Lizenz!
 this module displays calendar, results and rankings	ranking	de	Dieses Module zeigt Kalender, Ergebnisse und Ranglisten an
 this module displays information from the ranking app.	ranking	de	Dieses Modul zeigt Informationen der Ranglisten Anwendung.
@@ -457,7 +486,11 @@ time measurement	ranking	de	Zeitmessung
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
 top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein
+topo deleted.	ranking	de	Topo gelöscht.
+topo uploaded as %1.	ranking	de	Topo hochgeladen als %1.
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
+try again after %1 minutes.	ranking	de	Bitte nach %1 Minuten nochmal versuchen.
+try again or have a %1new mail send to you%2.	ranking	de	Nochmal versuchen oder %1neue Mail anfordern%2.
 two * two qualification	ranking	de	zwei * zwei Qualifikationen für alle
 two qualification	ranking	de	zwei Qualifikationen
 two qualification for all, flash one after the other	ranking	de	zwei Qualifikationen für alle, Flash nacheinander
@@ -468,6 +501,7 @@ type of display	ranking	de	Typ der Anzeige
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
 unknown category or not a category of this competition	ranking	de	Unbekannte Kategorie oder nicht eine Kategorie dieses Wettkampfes
+unknown mode="%1"!	ranking	de	Unbekannter Modus="%1"!
 unpublished	ranking	de	unveröffentlicht
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt
 up	ranking	de	Nach oben
@@ -482,6 +516,7 @@ use regular registration to apply for a license first.	ranking	de	Benutzen Sie z
 use the acl to hide the birthdate, you can't remove it !!!	ranking	de	Benutzen sie die Zugangscontrolle um das Geburtsdatum nicht anzuzeigen, Sie dürfen es nicht löschen !!!
 used to preset a link in rankings and competition-calendar	ranking	de	wird benutzt um einen Verweis in der Rangliste oder dem Wettkampfkalender anzuzeigen
 vfs directory for the pdf files (excluding the year)	admin	de	VFS Verzeichnis für PDF Dateien (ohne die Jahreszahl)
+vfs directory for topo files (excluding the year)	admin	de	VFS Verzeichnis für Topo Dateien (ohne das Jahr)
 vfs path for pictures of the athletes	ranking	de	VFS Pfad für Bilder der Athleten
 view %1	ranking	de	%1 anzeigen
 view the attached pdf	ranking	de	Angehangenes PDF anzeigen
@@ -501,14 +536,22 @@ which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem 
 which view do you want to see, when you start the ranking app?	ranking	de	Welche Ansicht soll angezeigt werden, wenn sie die Ranglistenanwendung starten?
 wildcard	ranking	de	Wildcard
 wrong admin-account or -password !!!	ranking	de	Falsches Admin-Konto oder -Passwort !!!
+wrong mode="%1" for discipline "%2"!	ranking	de	Falscher Modus="%1" für Disziplin "%2"!
+wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	de	Falscher Modus="%1" für diese Runde (Qualifikation - Finale passen nicht zusammen)
+wrong or not configured vfs directory	ranking	de	Falsch oder NICHT konfiguriertes VFS Verzeichnis
+xml file uses unknown schema (format)!	ranking	de	XML Datei benutzt unbekanntes Schema (Format)!
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
 you are not allowed to register for %1!	ranking	de	Sie sind nicht berechtigt für %1 zu registrieren!
 you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizenz beantragen!
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
+you have not yet a password set!	ranking	de	Du hast noch kein Passwort gesetzt!
+you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	de	Du musst den Anweisungen innerhalb der nächsten %1 Stunden folgen, oder %2eine neue Mail anfordern%3.
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden!  Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (einige können für den öffentlichen Zugriff gesperrt werden). Fortfahren
 you need to select a file first!	ranking	de	Sie müssen zuerst eine Datei auswählen!
 you need to select an other athlete first!	ranking	de	Sie müssen zuerst einen anderen Athleten auswählen!
 you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!
+your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
+your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 zip code	ranking	de	Postleitzahl
