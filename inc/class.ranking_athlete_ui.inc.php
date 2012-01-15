@@ -308,8 +308,10 @@ class ranking_athlete_ui extends boranking
 					'menuaction' => $content['referer'],//'ranking.ranking_athlete_ui.index',
 					'msg' => $msg,
 				)+($content['row'] ? array('row['.$content['row'].']' => $this->athlete->data['PerId']) : array()));
-				if (!$required_missing) $js = "window.opener.location='$link'; $js";
-//if (!$required_missing) $js = "window.opener.location=window.opener.location+'&msg=".addslashes($msg)."'; $js";
+				if (!$required_missing && $this->is_selfservice() != $this->athlete->data['PerId'])
+				{
+					$js = "window.opener.location='$link'; $js";
+				}
 			}
 			if ($content['delete'])
 			{
@@ -715,7 +717,7 @@ class ranking_athlete_ui extends boranking
 		if (!$this->athlete->read($_GET) ||
 			!($form = file_get_contents($this->license_form_name($nation,$year))))
 		{
-			$GLOBALS['egw']->common->egw_exit();
+			common::egw_exit();
 		}
 		$egw_charset = $GLOBALS['egw']->translation->charset();
 		$replace = array();
@@ -728,7 +730,7 @@ class ranking_athlete_ui extends boranking
 		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
 		html::content_header($file,'text/rtf');
 		echo str_replace(array_keys($replace),array_values($replace),$form);
-		$GLOBALS['egw']->common->egw_exit();
+		common::egw_exit();
 	}
 
 	/**
@@ -739,8 +741,24 @@ class ranking_athlete_ui extends boranking
 	 */
 	function selfservice($PerId, $action)
 	{
+		unset($this->athlete->acl2clear[ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
+		if (!$PerId || !($athlete = $this->athlete->read($PerId)))
+		{
+			throw new egw_exception_wrong_userinput("Athlete NOT found!");
+		}
+		static $nation2lang = array(
+			'AUT' => 'de',
+			'GER' => 'de',
+			'SUI' => 'de',
+		);
+		$lang = isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
+		if (translation::$userlang !== $lang)
+		{
+			translation::$userlang = $lang;
+			translation::init();
+		}
 		if (!$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId &&
-			$this->selfservice_auth($PerId, $action) != $PerId)
+			$this->selfservice_auth($athlete, $action) != $PerId)
 		{
 			return;
 		}
@@ -774,17 +792,12 @@ class ranking_athlete_ui extends boranking
 	/**
 	 * Athlete selfservice: password check and recovery
 	 *
-	 * @param int $PerId
+	 * @param array $athlete
 	 * @param string $action
 	 * @return int PerId if we are authenticated for it nor null if not
 	 */
-	private function selfservice_auth($PerId, $action)
+	private function selfservice_auth(array $athlete, $action)
 	{
-		unset($this->athlete->acl2clear[ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
-		if (!$PerId || !($athlete = $this->athlete->read($PerId)))
-		{
-			throw new egw_exception_wrong_userinput("Athlete NOT found!");
-		}
 		echo "<style type='text/css'>
 	body {
 		margin: 10px !important;
@@ -918,7 +931,7 @@ class ranking_athlete_ui extends boranking
 						'last_login' => $this->athlete->now,
 						'login_failed=login_failed+1',
 					));
-					error_log(__METHOD__."($PerId, '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
+					error_log(__METHOD__."($athlete[PerId], '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
 					echo "<p class='error'>".lang('Login suspended, too many unsuccessful tries!')."</p>\n";
 					echo "<p>".lang('Try again after %1 minutes.',self::LOGIN_SUSPENDED/60)."</p>\n";
 					common::egw_exit();
@@ -929,7 +942,7 @@ class ranking_athlete_ui extends boranking
 						'last_login' => $this->athlete->now,
 						'login_failed=login_failed+1',
 					));
-					error_log(__METHOD__."($PerId, '$action') wrong password, {$this->athlete->data['login_failed']} failure");
+					error_log(__METHOD__."($athlete[PerId], '$action') wrong password, {$this->athlete->data['login_failed']} failure");
 					echo "<p class='error'>".lang('Password you entered is NOT correct!')."</p>\n";
 				}
 				else
@@ -938,11 +951,11 @@ class ranking_athlete_ui extends boranking
 						'last_login' => $this->athlete->now,
 						'login_failed' => 0,
 					));
-					error_log(__METHOD__."($PerId, '$action') successful login");
+					error_log(__METHOD__."($athlete[PerId], '$action') successful login");
 					// store successful selfservice login
-					$this->is_selfservice($PerId);
+					$this->is_selfservice($athlete['PerId']);
 
-					return $PerId;	// we are now authenticated for $PerId
+					return $athlete['PerId'];	// we are now authenticated for $athlete['PerId']
 				}
 			}
 			$link = egw::link('/ranking/athlete.php', array(
