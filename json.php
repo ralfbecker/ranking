@@ -95,6 +95,11 @@ if (isset($_GET['debug']) && $_GET['debug'])
 			break;
 	}
 }
+// jsonp callback
+elseif ($_GET['callback'])
+{
+	echo $_GET['callback'].'('.$json.");\n";
+}
 else
 {
 	echo $json;
