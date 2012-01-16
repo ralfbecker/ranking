@@ -1485,6 +1485,7 @@ function ranking_upgrade1_9_007()
  * Add column to allow selfregistration of ahtletes for a competition
  *
  * ALTER TABLE `Wettkaempfe` ADD `selfregister` TINYINT NOT NULL DEFAULT 0
+ * ALTER TABLE `Wettkaempfe` ADD `open_comp` TINYINT NOT NULL DEFAULT 0
  */
 function ranking_upgrade1_9_008()
 {
