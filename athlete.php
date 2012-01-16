@@ -35,5 +35,5 @@ function check_anon_access(&$anon_account)
 	return true;
 }
 
-$athlete_ui = new ranking_athlete_ui();
-$athlete_ui->selfservice($_GET['PerId'], $_GET['action']);
+$selfservice = new ranking_selfservice();
+$selfservice->selfservice($_GET['PerId'], $_GET['action']);

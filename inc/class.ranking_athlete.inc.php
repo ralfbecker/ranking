@@ -11,15 +11,6 @@
  * @version $Id$
  */
 
-define('ACL_DENY_BIRTHDAY',1);
-define('ACL_DENY_EMAIL',2);
-define('ACL_DENY_PHONE',4);
-define('ACL_DENY_FAX',8);
-define('ACL_DENY_CELLPHONE',16);
-define('ACL_DENY_STREET',32);
-define('ACL_DENY_CITY',64);
-define('ACL_DENY_PROFILE',128);
-
 /**
  * Athlete object
  */
@@ -32,6 +23,16 @@ class ranking_athlete extends so_sql
 	const FEDERATIONS_TABLE = 'Federations';
 	const FEDERATIONS_JOIN = ' JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 JOIN Federations USING(fed_id) LEFT JOIN Athlete2Fed acl ON Personen.PerId=acl.PerId AND acl.a2f_end=-1';
 	const LICENSE_TABLE = 'Licenses';
+
+	const ACL_DENY_BIRTHDAY = 1;
+	const ACL_DENY_EMAIL = 2;
+	const ACL_DENY_PHONE = 4;
+	const ACL_DENY_FAX = 8;
+	const ACL_DENY_CELLPHONE = 16;
+	const ACL_DENY_STREET = 32;
+	const ACL_DENY_CITY = 64;
+	const ACL_DENY_PROFILE = 128;
+
 	/**
 	 * extra colums of the federation table (initialisied in init_static)
 	 *
@@ -59,14 +60,14 @@ class ranking_athlete extends so_sql
 	var $picture_url = '/jpgs';
 	var $picture_path = '../../../jpgs';
 	var $acl2clear = array(
-		ACL_DENY_BIRTHDAY  => array('geb_date'),
-		ACL_DENY_EMAIL     => array('email'),
-		ACL_DENY_PHONE     => array('tel'),
-		ACL_DENY_FAX       => array('fax'),
-		ACL_DENY_CELLPHONE => array('mobil'),
-		ACL_DENY_STREET    => array('strasse','plz'),
-		ACL_DENY_CITY      => array('ort'),
-		ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','sex','nation','verband','license','acl','last_comp',
+		self::ACL_DENY_BIRTHDAY  => array('geb_date'),
+		self::ACL_DENY_EMAIL     => array('email'),
+		self::ACL_DENY_PHONE     => array('tel'),
+		self::ACL_DENY_FAX       => array('fax'),
+		self::ACL_DENY_CELLPHONE => array('mobil'),
+		self::ACL_DENY_STREET    => array('strasse','plz'),
+		self::ACL_DENY_CITY      => array('ort'),
+		self::ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','sex','nation','verband','license','acl','last_comp',
 			'platz','pkt','WetId','GrpId'),		// otherwise they get no points in the ranking!
 	);
 	/**
@@ -258,12 +259,12 @@ class ranking_athlete extends so_sql
 
 		// switching everything off, but the city
 		$this->data['acl'] = array(
-			ACL_DENY_BIRTHDAY,
-			ACL_DENY_CELLPHONE,
-			ACL_DENY_EMAIL,
-			ACL_DENY_FAX,
-			ACL_DENY_PHONE,
-			ACL_DENY_STREET,
+			self::ACL_DENY_BIRTHDAY,
+			self::ACL_DENY_CELLPHONE,
+			self::ACL_DENY_EMAIL,
+			self::ACL_DENY_FAX,
+			self::ACL_DENY_PHONE,
+			self::ACL_DENY_STREET,
 		);
 	}
 

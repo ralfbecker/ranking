@@ -94,7 +94,7 @@
 					<nextmatch id="nm" options="ranking.athlete.index.rows"/>
 				</row>
 				<row>
-					<button statustext="add a new athlete" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_thlete_ui.edit'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+					<button statustext="add a new athlete" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
 				</row>
 			</rows>
 		</grid>

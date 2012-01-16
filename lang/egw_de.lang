@@ -36,6 +36,8 @@ administrated by: parent federation	ranking	de	Verwaltet von: übergeordnetem Ve
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
+allow athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
+allowed without extra confirmation	ranking	de	Erlaubt ohne extra Bestätigung
 an email with instructions how to (re-)set your password has been sent to you.	ranking	de	Eine EMail mit Anleitung wie das Passwort (zurück) gesetzt wird wurde an Dich versandt.
 an error happend, while storing your password!	ranking	de	Ein Fehler passierte, beim Speichern Deines Passwortes!
 applied	ranking	de	beantragt
@@ -105,7 +107,10 @@ comments	ranking	de	Kommentare
 competition	ranking	de	Wettkampf
 competition already has a result for this category!	ranking	de	Der Wettkampf hat bereits ein Ergebnis für diese Kategorie!
 competition calendar	ranking	de	Wettkampfkalender
+competition does not allow self-registration!	ranking	de	Der Wettkampf erlaubt keine Selbstregistrierung!
+competition has no categories you are allowed to register for!	ranking	de	Der Wettkampf hat keine Kategorien in denen Du Dich registrieren darfst!
 competition has not yet a startlist	ranking	de	Wettkampf hat noch keine Startliste
+competition is not open to your federation!	ranking	de	Der Wettkampf ist nicht offen für Deinen Verband!
 competition logo	ranking	de	Logo des Wettkampfes
 competition name	ranking	de	Wettkampfname
 competition not found !!!	ranking	de	Wettkampf NICHT gefunden !!!
@@ -212,6 +217,7 @@ family name of the athlete in latin chars! accents and umlauts are ok	ranking	de
 fax	ranking	de	Fax
 federation	ranking	de	Verband
 federation deleted.	ranking	de	Verband gelöscht.
+federation needs to confirm	ranking	de	Verband muss bestätigen
 federation saved.	ranking	de	Verband gespeichert.
 federations	ranking	de	Verbände
 fees	ranking	de	Gebühren
@@ -320,6 +326,7 @@ no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Ru
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
 no startlist or result yet!	ranking	de	Bisher keine Startliste oder Ergebnis!
+not allowed	ranking	de	Nicht erlaubt
 not used at the moment	ranking	de	im Moment nicht benutzt
 nothing to apply!	ranking	de	Nichts anzuwenden!
 nothing to update	ranking	de	Nichts zu aktualisieren
@@ -330,6 +337,7 @@ observation time	ranking	de	Besichtigungszeit
 on how many routes is the first round	ranking	de	Auf wievielen Routen findet die erste Runde statt
 one qualification	ranking	de	eine Qualifikation
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
+open comp.	ranking	de	Offener Wettk.
 opens	ranking	de	öffnet
 or	ranking	de	oder
 other sports	ranking	de	Andere Sportarten
@@ -353,6 +361,7 @@ picture attached	ranking	de	Bild angehangen
 picture resized to %1 pixel	ranking	de	Bild auf %1 Pixel verkleinert
 place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
+please check the categories you want to register for:	ranking	de	Bitte Kategorien abhaken für die Du registrieren willst:
 please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	de	Bitte kontakte Deinen Verband%1 um Deine EMail Adresse einzutragen, damit wir Dir ein Passwort zusenden können.
 please enter your new password:	ranking	de	Bitte neues Passwort eingeben:
 please enter your password to log in or %1click here%2, if you forgot it.	ranking	de	Zur Anmeldung bitte Passwort eingeben oder %1hier klicken%2, falls Du es vergesse hast.
@@ -429,6 +438,7 @@ select multiple federations for a further action	ranking	de	Mehrere Verbände f�
 select order for qualification startlist or use default	ranking	de	Sortierung für Startliste der Qualifikation wählen oder Vorgabe verwenden
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
+selfregister	ranking	de	Selbstregistrierung
 serid	ranking	de	SerId
 set by category	ranking	de	nach der Kategorie
 set license to	ranking	de	Setze Lizenz als

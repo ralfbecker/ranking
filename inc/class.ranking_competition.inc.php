@@ -46,6 +46,18 @@ class ranking_competition extends so_sql
 	const PC_CITY = 'pc_city';
 	const NATION_PC_CITY = 'nation_pc_city';
 
+	var $selfregister_types = array(
+		0 => 'Not allowed',
+		1 => 'Federation needs to confirm',
+		2 => 'Allowed without extra confirmation',
+	);
+	var $open_comp_types = array(
+		0 => 'No',
+		1 => 'National',
+		2 => 'D,A,CH',
+		3 => 'International',
+	);
+
 	/**
 	 * Timestaps that need to be adjusted to user-time on reading or saving
 	 *
@@ -720,5 +732,102 @@ class ranking_competition extends so_sql
 		$this->data['modified'] = $this->now;
 
 		return parent::save(null,$extra_where);
+	}
+
+	/**
+	 * Format competition date-span using datum and duration fields and user-prefs for date-format
+	 *
+	 * @param array $comp=null default use internal data
+	 * @return string
+	 */
+	function datespan(array $comp=null)
+	{
+		if (is_null($comp))
+		{
+			$comp = $this->data;
+		}
+		if (!($format = $GLOBALS['egw_info']['user']['preferences']['common']['dateformat'])) $format = 'Y-m-d';
+
+		list($y,$m,$d) = explode('-',$comp['datum']);
+
+		// non-numeric duration, eg. "Feburar" or "end" --> return it with year appended
+		if ($comp['duration'] && !is_numeric($comp['duration']))
+		{
+			return $comp['duration'].' '.$y;
+		}
+		// default duration since 2001 is 2 days, before it was 1 day
+		$duration = $comp['duration'] ? $comp['duration'] : ($y >= 2001 ? 2 : 1);
+
+		list($end_y,$end_m,$end_d) = explode('-',date('Y-m-d',mktime(0,0,0,$m,$d+$duration-1,$y)));
+		//echo "format=$format, datum=$comp[datum], duration=$duration, end=$end_y-$end_m-$end_d";
+		// end is in same month --> just replace d with d - $end_$
+		if ($m == $end_m)
+		{
+			if ($duration > 1) $format = str_replace('d','d'.($duration > 2 ? ' - '.$end_d : ' / '.$end_d),$format);
+
+			return date($format,mktime(0,0,0,$m,$d,$y));
+		}
+		// end is in different month
+		$sep = $format[1];
+		$fmts = explode($sep,$format);
+		if (($year_first = strtolower($format[0]) == 'y'))
+		{
+			$year_fmt = array_shift($fmts);
+		}
+		else
+		{
+			$year_fmt = array_pop($fmts);
+		}
+		$dm_fmt = implode($sep,$fmts);
+		$dm = date($dm_fmt.($year_first?'':$sep),mktime(0,0,0,$m,$d,$y)).' - '.
+			date($dm_fmt.($year_first?$sep:''),mktime(0,0,0,$end_m,$end_d,$end_y));
+		if ($year_fmt == 'y') $end_y = sprintf('%02d',$end_y % 100);
+
+		return $year_first ? $end_y.$sep.$dm : $dm.$sep.$end_y;
+	}
+
+	/**
+	 * Checks if given athlete is allowed to start, because of his federation and the open-ness of the comp
+	 *
+	 * @param array $athlete values for keys nation, fed_id, fed_parent, acl_fed_id
+	 * @param array $comp=null default use internal data
+	 * @return boolean true if athlete is allowed to register, false if not
+	 */
+	function open_comp_match(array $athlete, array $comp=null)
+	{
+		if (is_null($comp))
+		{
+			$comp = $this->data;
+		}
+		switch($comp['open_comp'])
+		{
+			case 3:	// international
+				$ret = true;
+				break;
+
+			case 2: // D,A,CH
+				$ret = in_array($athlete['nation'],array('GER','AUT','SUI'));
+				break;
+
+			case 1:	// national
+				$ret = $athlete['nation'] == $comp['nation'];
+				break;
+
+			case 0:	// closed to comp. federation
+				if ($comp['fed_id'])
+				{
+					$ret = $comp['fed_id'] == $athlete['fed_id'] ||
+						$athlete['fed_parent'] && $athlete['fed_parent'] == $comp['fed_id'] ||	// Landesverband
+						$athlete['acl_fed_id'] && $athlete['acl_fed_id'] == $comp['fed_id'];	// Regionalzentrum
+					break;
+				}
+				else
+				{
+					$ret = !$comp['nation'] || $athlete['nation'] == $comp['nation'];
+				}
+				break;
+		}
+		//error_log(__METHOD__."({'$athlete[nachname] $athlete[vorname] ($athlete[nation])', fed_id=$athlete[fed_id], lv=$athlete[fed_parent], rz=$athlete[acl_fed_id]}, {'$comp[name]', nation='$comp[nation]', fed_id=$comp[fed_id], open_comp=$comp[open_comp]}) returning ".array2string($ret));
+		return $ret;
 	}
 }

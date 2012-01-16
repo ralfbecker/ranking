@@ -12,7 +12,6 @@
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_athlete.inc.php');	// for ACL_DENY_*
 
 class ranking_athlete_ui extends boranking
 {
@@ -49,14 +48,14 @@ class ranking_athlete_ui extends boranking
 		$this->tmpl = new etemplate;
 
 		$this->acl_deny_labels = array(
-			ACL_DENY_BIRTHDAY	=> lang('birthday, shows only the year'),
-			ACL_DENY_EMAIL		=> lang('email'),
-			ACL_DENY_PHONE		=> lang('phone'),
-			ACL_DENY_FAX		=> lang('fax'),
-			ACL_DENY_CELLPHONE	=> lang('cellphone'),
-			ACL_DENY_STREET		=> lang('street, postcode'),
-			ACL_DENY_CITY		=> lang('city'),
-			ACL_DENY_PROFILE	=> lang('complete profile'),
+			ranking_athlete::ACL_DENY_BIRTHDAY	=> lang('birthday, shows only the year'),
+			ranking_athlete::ACL_DENY_EMAIL		=> lang('email'),
+			ranking_athlete::ACL_DENY_PHONE		=> lang('phone'),
+			ranking_athlete::ACL_DENY_FAX		=> lang('fax'),
+			ranking_athlete::ACL_DENY_CELLPHONE	=> lang('cellphone'),
+			ranking_athlete::ACL_DENY_STREET		=> lang('street, postcode'),
+			ranking_athlete::ACL_DENY_CITY		=> lang('city'),
+			ranking_athlete::ACL_DENY_PROFILE	=> lang('complete profile'),
 		);
 	}
 
@@ -444,7 +443,7 @@ class ranking_athlete_ui extends boranking
 				$readonlys['vorname'] = $readonlys['nachname'] = true;
 			}
 			// forbid athlete selfservice to change certain fields
-			if ($this->is_selfservice() == $this->athlete->data['PerId'])
+			if ($this->athlete->data['PerId'] && $this->is_selfservice() == $this->athlete->data['PerId'])
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = $readonlys['geb_date'] = true;
 				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
@@ -731,296 +730,5 @@ class ranking_athlete_ui extends boranking
 		html::content_header($file,'text/rtf');
 		echo str_replace(array_keys($replace),array_values($replace),$form);
 		common::egw_exit();
-	}
-
-	/**
-	 * Athlete selfservie: edit profile, register for competitions
-	 *
-	 * @param int $PerId
-	 * @param string $action 'profile'
-	 */
-	function selfservice($PerId, $action)
-	{
-		unset($this->athlete->acl2clear[ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
-		if (!$PerId || !($athlete = $this->athlete->read($PerId)))
-		{
-			throw new egw_exception_wrong_userinput("Athlete NOT found!");
-		}
-		static $nation2lang = array(
-			'AUT' => 'de',
-			'GER' => 'de',
-			'SUI' => 'de',
-		);
-		$lang = isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
-		if (translation::$userlang !== $lang)
-		{
-			translation::$userlang = $lang;
-			translation::init();
-		}
-		if (!$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId &&
-			$this->selfservice_auth($athlete, $action) != $PerId)
-		{
-			return;
-		}
-		switch($action)
-		{
-			case 'profile':
-				egw::redirect_link('/index.php',array(
-					'menuaction' => 'ranking.ranking_athlete_ui.edit',
-					'PerId' => $PerId,
-				));
-				break;
-
-			default:
-				throw new egw_exception_wrong_parameter("Unknown action '$action'!");
-		}
-	}
-
-	/**
-	 * Time in which athlets have to use the password-recovery-link in sec
-	 */
-	const RECOVERY_TIMEOUT = 14400;
-	/**
-	 * Number of unsuccessful logins, after which login get suspended
-	 */
-	const LOGIN_FAILURES = 3;
-	/**
-	 * How long login get suspended
-	 */
-	const LOGIN_SUSPENDED = 1800;
-
-	/**
-	 * Athlete selfservice: password check and recovery
-	 *
-	 * @param array $athlete
-	 * @param string $action
-	 * @return int PerId if we are authenticated for it nor null if not
-	 */
-	private function selfservice_auth(array $athlete, $action)
-	{
-		echo "<style type='text/css'>
-	body {
-		margin: 10px !important;
-	}
-	p, td {
-		font-size: 14px;
-	}
-	p.error {
-		color: red;
-	}
-</style>\n";
-		echo "<h1>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
-
-		$recovery_link = egw::link('/ranking/athlete.php', array(
-			'PerId' => $athlete['PerId'],
-			'action'  => 'recovery',
-		));
-		if (empty($athlete['password']) || in_array($action,array('recovery','password','set')))
-		{
-			if (empty($athlete['password']) && !in_array($action,array('password','set')))
-			{
-				echo "<p class='error'>".lang("You have not yet a password set!")."</p>\n";
-			}
-			if (empty($athlete['email']) || strpos($athlete['email'],'@') === false)
-			{
-				echo "<p>".lang('Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.',
-					$this->federation->get_contacts($athlete))."</p>\n";
-			}
-			elseif ($action == 'recovery')
-			{
-				// create and store recovery hash and time
-				$this->athlete->update(array(
-					'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
-					'recover_pw_time' => $this->athlete->now,
-				));
-				$link = egw::link('/ranking/athlete.php', array(
-					'PerId' => $athlete['PerId'],
-					'action'  => 'password',
-					'hash' => $this->athlete->data['recover_pw_hash'],
-				));
-				if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
-				// mail hash to athlete
-				//echo "<p>*** TEST *** <a href='$link'>Click here</a> to set a password *** TEST ***</p>\n";
-				try {
-					$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
-					self::mail("$athlete[vorname] $athlete[$nachname] <$athlete[email]>",
-						$athlete+array(
-							'LINK' => preg_match('/\.txt$/',$template) ? $link : '<a href="'.$link.'">'.$link.'<a>',
-							'SERVER_NAME' => $_SERVER['SERVER_NAME'],
-							'RECOVERY_TIMEOUT' => self::RECOVERY_TIMEOUT/3600,	// in hours (not sec)
-						), $template);
-					echo "<p>".lang('An EMail with instructions how to (re-)set your password has been sent to you.')."</p>\n".
-						"<p>".lang('You have to act on the instructions in the next %1 hours, or %2request a new mail%3.',
-							self::RECOVERY_TIMEOUT/3600,"<a href='$recovery_link'>","</a>")."</p>\n";
-				}
-				catch (Exception $e) {
-					echo "<p>".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
-						$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
-				}
-			}
-			elseif ($action == 'password' || $action == 'set')
-			{
-				if ($_GET['hash'] != $athlete['recover_pw_hash'])
-				{
-					echo "<p class='error'>".lang("The link you clicked or entered is NOT correct, maybe a typo!")."</p>\n";
-					echo "<p>".lang("Try again or have a %1new mail send to you%2.","<a href='$recovery_link'>","</a>")."</p>\n";
-				}
-				elseif (($this->athlete->now - strtotime($athlete['recover_pw_time'])) > self::RECOVERY_TIMEOUT)
-				{
-					echo "<p class='error'>".lang('The link is expired, please have a %1new mail send to you%2.',"<a href='$recovery_link'>","</a>")."</p>\n";
-				}
-				else
-				{
-					if ($action == 'set' && $_SERVER['REQUEST_METHOD'] == 'POST')
-					{
-						if ($_POST['password'] != $_POST['password2'])
-						{
-							echo "<p class='error'>".lang('Both password do NOT match!')."</p>\n";
-						}
-						elseif(($msg = auth::crackcheck($_POST['password'])))
-						{
-							echo "<p class='error'>".$msg."</p>\n";
-						}
-						else
-						{
-							// store new password
-							if (!$this->athlete->update(array(
-								'recover_pw_hash' => null,
-								'recover_pw_time' => null,
-								'password' => auth::encrypt_ldap($_POST['password'],'sha512_crypt'),
-							)))
-							{
-								echo "<h1>".lang('Your new password is now active.')."</h1>\n";
-								common::egw_exit();
-							}
-							else
-							{
-								echo "<p>".lang('An error happend, while storing your password!')."</p>\n";
-							}
-						}
-						echo "<p>".lang('Please try again ...')."</p>\n";
-					}
-					$link = egw::link('/ranking/athlete.php', array(
-						'PerId' => $athlete['PerId'],
-						'action'  => 'set',
-						'hash' => $athlete['recover_pw_hash'],
-					));
-					echo "<p>".lang("Please enter your new password:")."<br />\n".
-						'('.lang('Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.',7).")</p>\n";
-					echo "<form action='$link' method='POST'>\n<table>\n";
-					echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' value='".htmlspecialchars($_POST['password'])."' /></td>".
-						"<td><label><input type='checkbox' onclick=\"this.form.password.type=this.form.password2.type=this.checked?'text':'password';\">".lang('show password')."</label></td></tr>\n";
-					echo "<tr><td>".lang('Repeat')."</td><td><input type='password' name='password2' value='".htmlspecialchars($_POST['password2'])."' /></td>";
-					echo "<td><input type='submit' value='".lang('Set password')."' /></td></tr>\n";
-					echo "</table>\n</form>\n";
-				}
-			}
-			else
-			{
-				echo "<p><a href='$recovery_link'>".lang('Click here to have a mail send to your stored EMail address with instructions how to set your password.')."</a></p>\n";
-			}
-		}
-		else
-		{
-			if (!empty($_POST['password']))
-			{
-				if ($athlete['login_failed'] >= self::LOGIN_FAILURES &&
-					($this->athlete->now - strtotime($athlete['last_login'])) < self::LOGIN_SUSPENDED)
-				{
-					$this->athlete->update(array(
-						'last_login' => $this->athlete->now,
-						'login_failed=login_failed+1',
-					));
-					error_log(__METHOD__."($athlete[PerId], '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
-					echo "<p class='error'>".lang('Login suspended, too many unsuccessful tries!')."</p>\n";
-					echo "<p>".lang('Try again after %1 minutes.',self::LOGIN_SUSPENDED/60)."</p>\n";
-					common::egw_exit();
-				}
-				elseif (!$loged_in && !auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
-				{
-					$this->athlete->update(array(
-						'last_login' => $this->athlete->now,
-						'login_failed=login_failed+1',
-					));
-					error_log(__METHOD__."($athlete[PerId], '$action') wrong password, {$this->athlete->data['login_failed']} failure");
-					echo "<p class='error'>".lang('Password you entered is NOT correct!')."</p>\n";
-				}
-				else
-				{
-					$this->athlete->update(array(
-						'last_login' => $this->athlete->now,
-						'login_failed' => 0,
-					));
-					error_log(__METHOD__."($athlete[PerId], '$action') successful login");
-					// store successful selfservice login
-					$this->is_selfservice($athlete['PerId']);
-
-					return $athlete['PerId'];	// we are now authenticated for $athlete['PerId']
-				}
-			}
-			$link = egw::link('/ranking/athlete.php', array(
-				'PerId' => $athlete['PerId'],
-				'action'  => $action,
-			));
-			echo "<p>".lang("Please enter your password to log in or %1click here%2, if you forgot it.","<a href='$recovery_link'>","</a>")."</p>\n";
-			echo "<form action='$link' method='POST'>\n";
-			echo "<p>".lang('Password')." <input type='password' name='password' />\n";
-			echo "<input type='submit' value='".lang('Login')."' /></p>\n";
-			echo "</form>\n";
-		}
-	}
-
-	/**
-	 * Sending a templated email
-	 *
-	 * @param string $email email address(es comma-separated), or rfc822 "Name <email@domain.com>"
-	 * @param array $replacements name => value pairs, can be used as $$name$$ in template
-	 * @param string $template filename of template, first line is subject, type depends on .txt extension
-	 * @param string $from='digtal ROCK <info@digitalrock.de>'
-	 * @throws Exception on error
-	 */
-	private static function mail($email, array $replacements, $template, $from='digtal ROCK <info@digitalrock.de>')
-	{
-		//$email = "$replacements[vorname] $replacements[nachname] <info@digitalrock.de>";
-		$is_txt = preg_match('/\.txt$/', $template);
-		if (!($body = file_get_contents($template)))
-		{
-			throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
-		}
-		$replace = array();
-		foreach($replacements as $name => $value)
-		{
-			$replace['$$'.$name.'$$'] = $value;
-		}
-		$body = strtr($body, $replace);
-		list($subject,$body) = preg_split("/\r?\n/",$body,2);
-
-		$mailer = new send();
-		$mailer->IsHTML(!$is_txt);
-
-		if (preg_match_all('/"?(.+)"?<(.+)>,?/',$email,$matches))
-		{
-			$names = $matches[1];
-			$addresses = $matches[2];
-		}
-		else
-		{
-			$addresses = preg_split('/, */',trim($email));
-			$names = array();
-		}
-		foreach($addresses as $n => $address)
-		{
-			$mailer->AddAddress($address,$names[$n]);
-		}
-		$mailer->Subject = $subject;
-		$mailer->Body = $body;
-
-		$mailer->From = $from;
-		if (preg_match('/"?(.+)"?<(.+)>,?/',$from,$matches))
-		{
-			$mailer->FromName = $matches[1];
-			$mailer->From = $matches[2];
-		}
-		$mailer->Send();
 	}
 }

@@ -36,6 +36,8 @@ administrated by: parent federation	ranking	en	Administrated by: parent federati
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
+allow athletes to register themself for this competition	ranking	en	Allow athletes to register themself for this competition
+allowed without extra confirmation	ranking	en	Allowed without extra confirmation
 an email with instructions how to (re-)set your password has been sent to you.	ranking	en	An EMail with instructions how to (re-)set your password has been sent to you.
 an error happend, while storing your password!	ranking	en	An error happend, while storing your password!
 applied	ranking	en	applied
@@ -105,7 +107,10 @@ comments	ranking	en	Comments
 competition	ranking	en	Competition
 competition already has a result for this category!	ranking	en	Competition already has a result for this category!
 competition calendar	ranking	en	Competition calendar
+competition does not allow self-registration!	ranking	en	Competition does NOT allow self-registration!
+competition has no categories you are allowed to register for!	ranking	en	Competition has no categories you are allowed to register for!
 competition has not yet a startlist	ranking	en	Competition has not yet a startlist
+competition is not open to your federation!	ranking	en	Competition is NOT open to your federation!
 competition logo	ranking	en	Competition logo
 competition name	ranking	en	Competition name
 competition not found !!!	ranking	en	Competition NOT found !!!
@@ -212,6 +217,7 @@ family name of the athlete in latin chars! accents and umlauts are ok	ranking	en
 fax	ranking	en	Fax
 federation	ranking	en	Federation
 federation deleted.	ranking	en	Federation deleted.
+federation needs to confirm	ranking	en	Federation needs to confirm
 federation saved.	ranking	en	Federation saved.
 federations	ranking	en	Federations
 fees	ranking	en	Fees
@@ -320,6 +326,7 @@ no quota set in the previous heat!!!	ranking	en	No quota set in the previous rou
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	en	No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!
 no startlist or result yet!	ranking	en	No startlist or result yet!
+not allowed	ranking	en	Not allowed
 not used at the moment	ranking	en	not used at the moment
 nothing to apply!	ranking	en	Nothing to apply!
 nothing to update	ranking	en	Nothing to update
@@ -330,6 +337,7 @@ observation time	ranking	en	Observation time
 on how many routes is the first round	ranking	en	On how many routes is the first round
 one qualification	ranking	en	one Qualification
 only fill values different from egw	admin	en	only fill values different from eGW
+open comp.	ranking	en	Open comp.
 opens	ranking	en	opens
 or	ranking	en	or
 other sports	ranking	en	other sports
@@ -353,6 +361,7 @@ picture attached	ranking	en	Picture attached
 picture resized to %1 pixel	ranking	en	Picture resized to %1 pixel
 place	ranking	en	Place
 place of birth	ranking	en	Place of birth
+please check the categories you want to register for:	ranking	en	Please check the categories you want to register for:
 please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	en	Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.
 please enter your new password:	ranking	en	Please enter your new password:
 please enter your password to log in or %1click here%2, if you forgot it.	ranking	en	Please enter your password to log in or %1click here%2, if you forgot it.
@@ -429,6 +438,7 @@ select multiple federations for a further action	ranking	en	Select multiple fede
 select order for qualification startlist or use default	ranking	en	Select order for qualification startlist or use default
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
+selfregister	ranking	en	Selfregister
 serid	ranking	en	SerId
 set by category	ranking	en	set by category
 set license to	ranking	en	Set license to

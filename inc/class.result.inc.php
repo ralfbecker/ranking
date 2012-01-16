@@ -129,7 +129,7 @@ class result extends so_sql
 				$join = ",$this->cat_table WHERE $this->result_table.GrpId=$this->cat_table.GrpId";
 				$extra_cols = 'name,rkey';
 			}
-			return $this->search($keys,'DISTINCT GrpId',$order ? $order : 'rkey,name',$extra_cols,'',false,'AND',false,$filter,$join);
+			return $this->search($keys,"DISTINCT $this->result_table.GrpId AS GrpId",$order ? $order : 'rkey,name',$extra_cols,'',false,'AND',false,$filter,$join);
 		}
 		// result of single person
 		return parent::read($keys,$extra_cols,$join !== true ? $join : '');

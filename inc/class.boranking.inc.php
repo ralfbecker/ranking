@@ -965,6 +965,7 @@ class boranking extends ranking_so
 	function register($comp,$cat,$athlete,$mode=0)
 	{
 		if ($this->debug) echo "<p>boranking::register($comp,$cat,".(is_array($athlete)?$athlete['PerId']:$athlete).",$mode)</p>\n";
+		if (is_array($comp)) $comp = $comp['WetId'];
 		if (!$comp || !$cat || !$athlete) return false;
 
 		if ((int)$mode == 2)	// de-register
