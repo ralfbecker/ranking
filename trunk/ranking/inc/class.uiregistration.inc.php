@@ -258,7 +258,7 @@ class uiregistration extends boranking
 			}
 		}
 		$allow_register_everyone = $this->is_admin || $this->is_judge($comp) ||		// limit non-judge to feds user has registration rights
-			// national edit rights allow to register foreing athlets for national competition
+			// national edit rights allow to register foreign athlets for national competition
 			in_array($comp['nation'],$this->register_rights) && in_array($comp['nation'],$this->edit_rights);
 		$select_options = array(
 			'calendar' => $this->ranking_nations,

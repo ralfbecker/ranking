@@ -1481,3 +1481,27 @@ function ranking_upgrade1_9_007()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.008';
 }
 
+/**
+ * Add column to allow selfregistration of ahtletes for a competition
+ *
+ * ALTER TABLE `Wettkaempfe` ADD `selfregister` TINYINT NOT NULL DEFAULT 0
+ */
+function ranking_upgrade1_9_008()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','selfregister',array(
+		'type' => 'int',
+		'precision' => '1',
+		'nullable' => False,
+		'default' => '0',
+		'comment' => '0=no, 1=fed.to confirm, 2=register'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','open_comp',array(
+		'type' => 'int',
+		'precision' => '1',
+		'nullable' => False,
+		'default' => '0',
+		'comment' => '0=No, 1=national, 2=DACH, 3=int.'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.009';
+}

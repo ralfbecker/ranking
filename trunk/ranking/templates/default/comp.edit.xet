@@ -30,8 +30,12 @@
 				</row>
 				<row class="row">
 					<description value="Display athlete" for="display_athlete"/>
-					<menulist span="all">
+					<menulist>
 						<menupopup id="display_athlete"/>
+					</menulist>
+					<description value="Selfregister" for="selfregister"/>
+					<menulist>
+						<menupopup statustext="Allow athletes to register themself for this competition" id="selfregister"/>
 					</menulist>
 				</row>
 			</rows>
@@ -230,9 +234,11 @@
 				</row>
 				<row class="th">
 					<description value="Nation" for="nation"/>
-					<menulist>
-						<menupopup statustext="nation if national competition or internatinal" id="nation" no_lang="1" onchange="1"/>
-					</menulist>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup statustext="nation if national competition or internatinal" id="nation" no_lang="1" onchange="1"/>
+						</menulist>
+					</hbox>
 					<description value="Cup" for="serie"/>
 					<menulist span="all">
 						<menupopup id="serie" no_lang="1" onchange="1"/>
@@ -249,13 +255,19 @@
 					<textbox statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " id="rkey" size="8" maxlength="8" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Category"/>
+					<description value="Open comp." for="open_comp"/>
 					<menulist>
-						<menupopup type="select-cat" id="cat_id" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
+						<menupopup id="open_comp"/>
 					</menulist>
 					<description value="Federation"/>
 					<menulist span="all">
 						<menupopup id="fed_id" options="national federation"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Category" for="cat_id"/>
+					<menulist span="all">
+						<menupopup type="select-cat" id="cat_id" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
 					</menulist>
 				</row>
 				<row>

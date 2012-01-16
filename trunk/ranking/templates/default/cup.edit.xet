@@ -9,7 +9,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top" height="115">
-					<description for="gruppen" value="Categories"/>
+					<description value="Categories" for="gruppen"/>
 					<listbox id="gruppen" no_lang="1" rows="9"/>
 				</row>
 			</rows>
@@ -24,7 +24,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description for="max_serie" value="competitions counting" class="nowrap"/>
+					<description value="competitions counting" for="max_serie" class="nowrap"/>
 					<textbox type="integer" statustext="number of competitions counting for the cup (empty for all)" id="max_serie"/>
 					<grid padding="0">
 						<columns>
@@ -42,26 +42,26 @@
 					</grid>
 				</row>
 				<row class="row">
-					<description for="pkte" value="Pointalocation"/>
+					<description value="Pointalocation" for="pkte"/>
 					<menulist>
 						<menupopup statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description for="faktor" value="Factor"/>
+					<description value="Factor" for="faktor"/>
 					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor"/>
 					<description/>
 				</row>
 				<row class="row">
-					<description for="split_by_places" value="Better result splits ties"/>
+					<description value="Better result splits ties" for="split_by_places"/>
 					<menulist>
 						<menupopup statustext="Use better result to break ties in the ranking" id="split_by_places"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description for="max_rang" value="counting for rankings"/>
+					<description value="counting for rankings" for="max_rang"/>
 					<textbox type="integer" statustext="maximum number of competition counting for the ranking (empty for all)" id="max_rang"/>
 					<description/>
 				</row>
@@ -81,25 +81,25 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description for="pkte" value="Pointalocation"/>
+					<description value="Pointalocation" for="pkte"/>
 					<menulist>
 						<menupopup statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
 					</menulist>
-					<description for="pkt_bis" value="til place"/>
+					<description value="til place" for="pkt_bis"/>
 					<menulist>
 						<menupopup type="select-percent" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description for="faktor" value="Factor"/>
+					<description value="Factor" for="faktor"/>
 					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor" span="all"/>
 				</row>
 				<row class="row">
-					<description for="feld_pkte" value="Fieldfactorpoints"/>
+					<description value="Fieldfactorpoints" for="feld_pkte"/>
 					<menulist>
 						<menupopup statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
 					</menulist>
-					<description for="feld_bis" value="til place"/>
+					<description value="til place" for="feld_bis"/>
 					<menulist>
 						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 					</menulist>
@@ -117,12 +117,18 @@
 				<row class="th">
 					<description value="Presets for competitions" span="all"/>
 				</row>
-				<row class="row_off">
-					<description for="presets[name]" value="Competition name"/>
+				<row class="row">
+					<description value="Competition name" for="presets[name]"/>
 					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
 				</row>
+				<row class="row">
+					<description value="Selfregister"/>
+					<menulist>
+						<menupopup statustext="Allows athletes to register themself for this competition" id="presets[selfregister]"/>
+					</menulist>
+				</row>
 				<row>
-					<template content="presets" id="ranking.comp.edit.ranking" span="all"/>
+					<template id="ranking.comp.edit.ranking" content="presets" span="all"/>
 				</row>
 			</rows>
 		</grid>

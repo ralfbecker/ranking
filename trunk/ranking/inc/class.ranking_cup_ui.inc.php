@@ -146,6 +146,7 @@ class ranking_cup_ui extends boranking
 			'gruppen'   => $this->cats->names(array('nation' => $this->cup->data['nation'])),
 			'split_by_places' => $this->split_by_places,
 			'fed_id'       => $this->federation->federations($this->cup->data['nation'], true),
+			'selfregister' => $this->comp->selfregister_types,
 		);
 		$content['per_cat'] = $content['max_per'] = array();
 		foreach($this->cup->data['max_per_cat'] as $rkey => $max)

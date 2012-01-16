@@ -47,7 +47,9 @@ $phpgw_baseline = array(
 			'modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
 			'modifier' => array('type' => 'int','precision' => '4'),
 			'fed_id' => array('type' => 'int','precision' => '4'),
-			'display_athlete' => array('type' => 'varchar','precision' => '20','comment' => 'nation, pc_city, federation, pc_city_nation, NULL=default')
+			'display_athlete' => array('type' => 'varchar','precision' => '20','comment' => 'nation, pc_city, federation, pc_city_nation, NULL=default'),
+			'selfregister' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=no, 1=fed.to confirm, 2=register'),
+			'open_comp' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=No, 1=national, 2=DACH, 3=int.')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),
@@ -212,7 +214,7 @@ $phpgw_baseline = array(
 			'recover_pw_hash' => array('type' => 'varchar','precision' => '32'),
 			'recover_pw_time' => array('type' => 'timestamp'),
 			'last_login' => array('type' => 'timestamp'),
-			'login_failed' => array('type' => 'int', 'precision' => '4','default' => '0','nullable' => False),
+			'login_failed' => array('type' => 'int','precision' => '4','default' => '0','nullable' => False)
 		),
 		'pk' => array('PerId'),
 		'fk' => array(),

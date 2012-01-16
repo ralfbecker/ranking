@@ -340,6 +340,14 @@ if ($mode != 2)
 
 						}
 					}
+					// add selfregister link if enabled and registration deadline (or if not set comp. date) is not over
+					if ($wettk->selfregister && !date_over($wettk->deadline?$wettk->deadline:$wettk->datum))
+					{
+						$t_register = 'Anmelden';
+						$t_selfregister = 'sich selbst für diesen Wettkampf anmelden';
+						$link = 'https://'.$_SERVER['HTTP_HOST']."/egroupware/ranking/athlete.php?action=register-$wettk->WetId";
+						$minis .= ($minis?"\n| ":'')."<a class='mini_link' href=\"javascript:window.open('$link','_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes')\" title='$t_selfregister'>$t_register</a>";
+					}
 					if (file_exists($file_prefix.$result))
 					{
 						$minis .= ($minis?"\n| ":'').'<a class="mini_link" href="'.$prefix.$result.'" target="_blank" title="'.$t_show_result.'">'.$t_result.'</a>';
