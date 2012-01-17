@@ -252,7 +252,8 @@ class uiregistration extends boranking
 			{
 				$nation = $this->only_nation_register;
 			}
-			else
+			// do not set nation for sitemgr, if multiple nation (or LV's exist), as sitemgr can NOT change it!
+			elseif (!$tmpl->sitemgr)
 			{
 				list($nation) = @each($this->federation->get_user_grants());
 			}
