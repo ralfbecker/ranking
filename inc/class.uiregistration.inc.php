@@ -252,10 +252,17 @@ class uiregistration extends boranking
 			{
 				$nation = $this->only_nation_register;
 			}
-			// do not set nation for sitemgr, if multiple nation (or LV's exist), as sitemgr can NOT change it!
-			elseif (!$tmpl->sitemgr)
+			// preselect the first nation/federation the user has register-rights for
+			else
 			{
-				list($nation) = @each($this->federation->get_user_grants());
+				foreach($this->federation->get_user_grants() as $n => $r)
+				{
+					if ($r & EGW_ACL_REGISTER)
+					{
+						$nation = $n;
+						break;
+					}
+				}
 			}
 		}
 		$allow_register_everyone = $this->is_admin || $this->is_judge($comp) ||		// limit non-judge to feds user has registration rights
