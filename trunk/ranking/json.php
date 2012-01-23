@@ -51,7 +51,7 @@ try
 	if (isset($_GET['nation']))
 	{
 		$export = new ranking_export();
-		$result = $export->export_calendar($_GET['nation'], $_GET['year']);
+		$result = $export->export_calendar($_GET['nation'], $_GET['year'], $_GET['filter']);
 	}
 	else
 	{

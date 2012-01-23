@@ -396,10 +396,11 @@ class ranking_export extends boresult
 	 *
 	 * @param array|string $nations
 	 * @param int $year=null default current year
+	 * @param array $filter=null eg. array('fed_id' => 123)
 	 * @return array or competitions
 	 * @todo turn rename_key call in explicit column-list with from AS to
 	 */
-	public function export_calendar($nations,$year=null)
+	public function export_calendar($nations,$year=null,array $filter=null)
 	{
 		$where = array();
 
@@ -418,7 +419,6 @@ class ranking_export extends boresult
 		}
 		$where[] = $sql;
 
-		$competitions = $this->comp->search(null,false,'datum ASC','','','','AND',false,$where);
 		static $rename_comp = array(
 			'gruppen' => 'cats',
 			'dru_bez' => 'short',
@@ -441,6 +441,27 @@ class ranking_export extends boresult
 			'quota_extra' => false, //'extra_quotas',
 			'prequal_extra' => false, //'extra_prequals',
 		);
+		if ($filter)
+		{
+			foreach($filter as $name => $val)
+			{
+				if (($n = array_search($name,$rename_comp))) $name = $n;
+
+				if (isset($this->comp->db_cols[$name]))
+				{
+					if ((string)$val === '' && $this->comp->table_def['fd'][$name]['nullable'] !== false)
+					{
+						$where[] = $name.' IS NULL';
+					}
+					else
+					{
+						$where[$name] = $val;
+					}
+				}
+			}
+		}
+		//error_log(__METHOD__."('$nation', $year, ".array2string($filter).') --> where='.array2string($where));
+		$competitions = $this->comp->search(null,false,'datum ASC','','','','AND',false,$where);
 		$cats = $cups = $ids = $rkey2cat = $id2cup = array();
 		foreach($competitions as &$comp)
 		{
