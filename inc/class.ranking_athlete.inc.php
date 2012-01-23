@@ -124,7 +124,7 @@ class ranking_athlete extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = translation::charset();
 
 		foreach(array(
 				'cats'  => 'category',
@@ -169,13 +169,13 @@ class ranking_athlete extends so_sql
 	 */
 	function db2data($data=null)
 	{
-		if (!is_array($data))
+		if (($intern = !is_array($data)))
 		{
 			$data =& $this->data;
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
+			$data = translation::convert($data,$this->source_charset);
 		}
 		if ($data['practice'] && $data['practice'] > 100)
 		{
@@ -212,7 +212,7 @@ class ranking_athlete extends so_sql
 		{
 			$data['license'] = 'n';
 		}
-		return $data;
+		return parent::db2data($intern ? null : $data);	// important to use null, if $intern!
 	}
 
 	/**
@@ -223,7 +223,7 @@ class ranking_athlete extends so_sql
 	 */
 	function data2db($data=null)
 	{
-		if (!is_array($data))
+		if (($intern = !is_array($data)))
 		{
 			$data =& $this->data;
 		}
@@ -248,9 +248,9 @@ class ranking_athlete extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = translation::convert($data,$this->charset,$this->source_charset);
 		}
-		return $data;
+		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
 	}
 
 	function init($arr=array())
@@ -469,7 +469,7 @@ class ranking_athlete extends so_sql
 			'ć' => 'c', 'Ć' => 'C', 'ĉ' => 'c', 'Ĉ' => 'C',
 		);
 		$data['rkey'] = mb_convert_encoding(strtoupper(str_replace(array_keys($to_ascii),array_values($to_ascii),$data['rkey'])),
-			'7bit',$GLOBALS['egw']->translation->charset());
+			'7bit',translation::charset());
 
 		$rkey = $data['rkey'];
 		$n = 0;
