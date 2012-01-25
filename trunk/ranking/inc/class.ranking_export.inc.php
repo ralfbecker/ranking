@@ -92,7 +92,7 @@ class ranking_export extends boresult
 		// for all other purposes caching is ok and should be enabled
 		if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)) !== false)
 		{
-			if (!isset($instance)) new ranking_export();
+			if (!isset($instance)) $instance = new ranking_export();
 
 			$data = $instance->_export_route($comp, $cat, $heat);
 			egw_cache::setInstance('ranking', $location, $data, self::EXPORT_ROUTE_TTL);
