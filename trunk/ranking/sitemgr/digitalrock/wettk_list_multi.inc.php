@@ -367,8 +367,7 @@ if ($mode != 2)
 						$minis .= ($minis?"\n| ":'').'<a class="mini_link" href="'.$prefix.$infos.'" target="_blank" title="'.$t_show_infos.'">'.$t_infos.'</a>';
 					}
 //_debug_array($wettk);
-					echo '<tr bgcolor="'.$cat['bgcolor'].'">'."\n\t".'<td class="comp_date">'.wettk_datum($wettk).
-						'<br/>'.$wettk->cat_id."</td>\n";
+					echo '<tr bgcolor="'.$cat['bgcolor'].'">'."\n\t".'<td class="comp_date">'.wettk_datum($wettk)."</td>\n";
 					$wettk_class = $wettk->serie && ($wettk->faktor > 0.0 || $wettk->nation != 'GER') ? 'comp_cup' : 'comp';
 					$wettk_label = str_replace('#','<font color="red">###</font> ',wettk_link_str($wettk,$wettk->name,'comp_link',!file_exists($result)));
 					echo "\t".'<td><span class="'.$wettk_class.'">'.$wettk_label.'</span><br />'.$minis."</td>\n";
