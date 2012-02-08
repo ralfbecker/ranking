@@ -158,8 +158,8 @@ class ranking_admin_prefs_sidebox_hooks
 	static function search_link($location)
 	{
 		return array(
-			'query' => 'ranking.athlete.link_query',
-			'title' => 'ranking.athlete.link_title',
+			'query' => 'ranking.ranking_athlete.link_query',
+			'title' => 'ranking.ranking_athlete.link_title',
 //			'titles' => 'ranking.athlete.link_titles',
 			'view' => array(
 				'menuaction' => 'ranking.ranking_athlete_ui.edit'
