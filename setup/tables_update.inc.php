@@ -259,7 +259,7 @@ function ranking_upgrade1_0_0_005()
 {
 	$GLOBALS['phpgw_setup']->oProc->AlterColumn('Wettkaempfe','gruppen',array(
 		'type' => 'varchar',
-		'precision' => '80'
+		'precision' => '128'
 	));
 
 	$GLOBALS['setup_info']['ranking']['currentver'] = '1.0.0.006';
@@ -330,7 +330,7 @@ function ranking_upgrade1_0_0_008()
 			'pflicht' => array('type' => 'varchar','precision' => '3','default' => 'no'),
 			'ex_pkte' => array('type' => 'varchar','precision' => '3','default' => 'no'),
 			'nation' => array('type' => 'char','precision' => '5'),
-			'gruppen' => array('type' => 'varchar','precision' => '80'),
+			'gruppen' => array('type' => 'varchar','precision' => '128'),
 			'homepage' => array('type' => 'varchar','precision' => '60'),
 			'quota' => array('type' => 'int','precision' => '2'),
 			'host_nation' => array('type' => 'varchar','precision' => '3'),
