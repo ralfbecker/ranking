@@ -176,6 +176,7 @@ class ranking_accounting extends boresult
 						'geb_date'     => array('label' => lang('Birthdate'),   'type' => 'date'),
 						'verband'      => array('label' => lang('Sektion'),     'type' => 'text'),
 						'acl_fed_id'   => array('label' => lang('Regionalzentrum'),'type' => 'select'),
+						'fed_parent'   => array('label' => lang('Landesverband'),'type' => 'select'),
 						'license'      => array('label' => lang('License'),     'type' => 'select'),
 						'total'        => array('label' => lang('Total'),       'type' => 'float', 'size' => '2'),
 						'fed'          => array('label' => lang('Federation'),  'type' => 'float', 'size' => '2'),
