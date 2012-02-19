@@ -38,7 +38,7 @@ all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 allow athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
 allowed without extra confirmation	ranking	de	Erlaubt ohne extra Bestätigung
-an email with instructions how to (re-)set your password has been sent to you.	ranking	de	Eine EMail mit Anleitung wie das Passwort (zurück) gesetzt wird wurde an Dich versandt.
+an email with instructions how to (re-)set the password has been sent.	ranking	de	Eine EMail mit Anleitung, wie das Passwort (zurück) gesetzt wird, wurde versandt.
 an error happend, while storing your password!	ranking	de	Ein Fehler passierte, beim Speichern Deines Passwortes!
 applied	ranking	de	beantragt
 applied for a %1 license	ranking	de	%1 Lizenz beantragt
@@ -349,6 +349,7 @@ pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Ath
 pairing speed final	ranking	de	Paarungen Speed Finale
 parent federation	ranking	de	übergeordneter Verband
 participant deleted	ranking	de	Teilnehmer gelöscht
+password email	ranking	de	Passwort EMail
 password you entered is not correct!	ranking	de	Das eingegebene Passwort ist NICHT korrekt!
 pc city	ranking	de	PLZ Ort
 pc city (nation)	ranking	de	PLZ Ort (Nation)
@@ -439,6 +440,7 @@ select order for qualification startlist or use default	ranking	de	Sortierung f�
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 selfregister	ranking	de	Selbstregistrierung
+send email to set password to athlete	ranking	de	Sendet Athleten EMail um Passwort zu setzen
 serid	ranking	de	SerId
 set by category	ranking	de	nach der Kategorie
 set license to	ranking	de	Setze Lizenz als
@@ -553,6 +555,7 @@ xml file uses unknown schema (format)!	ranking	de	XML Datei benutzt unbekanntes 
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
 you are not allowed to register for %1!	ranking	de	Sie sind nicht berechtigt für %1 zu registrieren!
 you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizenz beantragen!
+you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	de	Sie können jetzt %1ihr Profil bearbeiten%2 oder sich im Kalender für einen Wettkampf registrieren.
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you have not yet a password set!	ranking	de	Du hast noch kein Passwort gesetzt!

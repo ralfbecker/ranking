@@ -38,7 +38,7 @@ all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 allow athletes to register themself for this competition	ranking	en	Allow athletes to register themself for this competition
 allowed without extra confirmation	ranking	en	Allowed without extra confirmation
-an email with instructions how to (re-)set your password has been sent to you.	ranking	en	An EMail with instructions how to (re-)set your password has been sent to you.
+an email with instructions how to (re-)set the password has been sent.	ranking	en	An EMail with instructions how to (re-)set the password has been sent.
 an error happend, while storing your password!	ranking	en	An error happend, while storing your password!
 applied	ranking	en	applied
 applied for a %1 license	ranking	en	Applied for a %1 license
@@ -349,6 +349,7 @@ pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete 
 pairing speed final	ranking	en	Pairing speed final
 parent federation	ranking	en	Parent federation
 participant deleted	ranking	en	Participant deleted
+password email	ranking	en	Password EMail
 password you entered is not correct!	ranking	en	Password you entered is NOT correct!
 pc city	ranking	en	PC City
 pc city (nation)	ranking	en	PC City (Nation)
@@ -439,6 +440,7 @@ select order for qualification startlist or use default	ranking	en	Select order 
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
 selfregister	ranking	en	Selfregister
+send email to set password to athlete	ranking	en	Send EMail to set password to athlete
 serid	ranking	en	SerId
 set by category	ranking	en	set by category
 set license to	ranking	en	Set license to
@@ -553,6 +555,7 @@ xml file uses unknown schema (format)!	ranking	en	XML file uses unknown schema (
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you are not allowed to register for %1!	ranking	en	You are not allowed to register for %1!
 you are not permitted to apply for a license!	ranking	en	You are not permitted to apply for a license!
+you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	en	You can now %1edit your profile%2 or register for a competition in the calendar.
 you can only create a new heat, if the previous one '%1' has a result!	ranking	en	You can only create a new round, if the previous one '%1' has a result!
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last round, not one in between!
 you have not yet a password set!	ranking	en	You have not yet a password set!

@@ -174,7 +174,7 @@
 						<menulist>
 							<menupopup id="license"/>
 						</menulist>
-						<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license" onclick="return confirm('$cont[license_msg]');"/>
+						<button statustext="|Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license" onclick="return confirm('$cont[license_msg]');"/>
 					</hbox>
 				</row>
 				<row class="row">
@@ -226,8 +226,9 @@
 						<button statustext="exists without saving the changes" label="Cancel" id="cancel" onclick="window.close();"/>
 					</hbox>
 					<hbox align="right" span="all">
+						<button statustext="|Send EMail to set password to athlete" label="Password EMail" id="pw_mail"/>
 						<link-entry id="merge_to" options="ranking"/>
-						<button statustext="Merges this entry into the selected one." label="Merge" id="merge" onclick="return confirm('ATTENTION: merging can NOT be undone! Really want to merge?');"/>
+						<button statustext="|Merges this entry into the selected one." label="Merge" id="merge" onclick="return confirm('ATTENTION: merging can NOT be undone! Really want to merge?');"/>
 						<button statustext="Delete this athlete" label="Delete" id="delete" onclick="return confirm('Delete this athlete');"/>
 					</hbox>
 				</row>
