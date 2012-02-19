@@ -75,6 +75,7 @@ class ranking_selfservice extends boranking
 		switch($action)
 		{
 			case 'profile':
+			case '':
 				egw::redirect_link('/index.php',array(
 					'menuaction' => 'ranking.ranking_athlete_ui.edit',
 					'PerId' => $PerId,
@@ -234,28 +235,11 @@ class ranking_selfservice extends boranking
 			}
 			elseif ($action == 'recovery')
 			{
-				// create and store recovery hash and time
-				$this->athlete->update(array(
-					'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
-					'recover_pw_time' => $this->athlete->now,
-				));
-				$link = egw::link('/ranking/athlete.php', array(
-					'PerId' => $athlete['PerId'],
-					'action'  => 'password',
-					'hash' => $this->athlete->data['recover_pw_hash'],
-				));
-				if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
 				// mail hash to athlete
 				//echo "<p>*** TEST *** <a href='$link'>Click here</a> to set a password *** TEST ***</p>\n";
 				try {
-					$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
-					self::mail("$athlete[vorname] $athlete[$nachname] <$athlete[email]>",
-						$athlete+array(
-							'LINK' => preg_match('/\.txt$/',$template) ? $link : '<a href="'.$link.'">'.$link.'<a>',
-							'SERVER_NAME' => $_SERVER['SERVER_NAME'],
-							'RECOVERY_TIMEOUT' => self::RECOVERY_TIMEOUT/3600,	// in hours (not sec)
-						), $template);
-					echo "<p>".lang('An EMail with instructions how to (re-)set your password has been sent to you.')."</p>\n".
+					$this->password_reset_mail($athlete);
+					echo "<p>".lang('An EMail with instructions how to (re-)set the password has been sent.')."</p>\n".
 						"<p>".lang('You have to act on the instructions in the next %1 hours, or %2request a new mail%3.',
 							self::RECOVERY_TIMEOUT/3600,"<a href='$recovery_link'>","</a>")."</p>\n";
 				}
@@ -296,7 +280,17 @@ class ranking_selfservice extends boranking
 								'password' => auth::encrypt_ldap($_POST['password'],'sha512_crypt'),
 							)))
 							{
-								echo "<h1>".lang('Your new password is now active.')."</h1>\n";
+								// store successful selfservice login
+								$this->is_selfservice($athlete['PerId']);
+
+								setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
+
+								echo "<p><b>".lang('Your new password is now active.')."</b></p>\n";
+								$link = egw::link('/index.php',array(
+									'menuaction' => 'ranking.ranking_athlete_ui.edit',
+									'PerId' => $athlete['PerId'],
+								));
+								echo "<p>".lang('You can now %1edit your profile%2 or register for a competition in the calendar.','<a href="'.$link.'">','</a>')."</p>\n";
 								common::egw_exit();
 							}
 							else
@@ -385,6 +379,35 @@ class ranking_selfservice extends boranking
 			echo "<td><input type='submit' value='".lang('Login')."' /></td></tr>\n";
 			echo "</table>\n</form>\n";
 		}
+	}
+
+	/**
+	 * Send password-reset-mail to athlete
+	 *
+	 * @param array $athlete
+	 * @throws Exception on error
+	 */
+	public function password_reset_mail(array $athlete)
+	{
+		// create and store recovery hash and time
+		$this->athlete->update(array(
+			'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
+			'recover_pw_time' => $this->athlete->now,
+		));
+		$link = egw::link('/ranking/athlete.php', array(
+			'PerId' => $athlete['PerId'],
+			'action'  => 'password',
+			'hash' => $this->athlete->data['recover_pw_hash'],
+		));
+		if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
+
+		$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
+		self::mail("$athlete[vorname] $athlete[$nachname] <$athlete[email]>",
+			$athlete+array(
+				'LINK' => preg_match('/\.txt$/',$template) ? $link : '<a href="'.$link.'">'.$link.'<a>',
+				'SERVER_NAME' => $_SERVER['SERVER_NAME'],
+				'RECOVERY_TIMEOUT' => self::RECOVERY_TIMEOUT/3600,	// in hours (not sec)
+			), $template);
 	}
 
 	/**

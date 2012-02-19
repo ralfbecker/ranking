@@ -179,7 +179,7 @@ class ranking_athlete_ui extends boranking
 			$this->athlete->data['acl_fed_id'] = (int)$content['acl_fed_id']['fed_id'];
 			//echo "<br>ranking_athlete_ui::edit: athlete->data ="; _debug_array($this->athlete->data);
 
-			if (($content['save'] || $content['apply']) || $content['apply_license'])
+			if (($content['save'] || $content['apply']) || $content['apply_license'] || $content['pw_mail'])
 			{
 				if ($this->acl_check_athlete($this->athlete->data))
 				{
@@ -297,6 +297,18 @@ class ranking_athlete_ui extends boranking
 						{
 							$this->athlete->set_license($content['license_year'],$content['license'],null,$content['license_nation']);
 						}
+						if ($content['pw_mail'])
+						{
+							try {
+								$selfservice = new ranking_selfservice();
+								$selfservice->password_reset_mail($content);
+								$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
+							}
+							catch (Exception $e) {
+								$msg .= "\n".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
+									$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
+							}
+						}
 					}
 				}
 				else
@@ -388,6 +400,7 @@ class ranking_athlete_ui extends boranking
 			'delete' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->data['comp'],
 			'nation' => !!$this->only_nation_athlete,
 			'edit'   => $view || !$edit_rights,
+			'pw_mail'=> $view || !$edit_rights,
 			// show apply license only if status is 'n' or 'a' AND user has right to apply for license
 			'apply_license' => in_array($content['license'],array('s','c')) ||
 				!$this->acl_check_athlete($this->athlete->data,EGW_ACL_ATHLETE,null,$content['license_nation']),
