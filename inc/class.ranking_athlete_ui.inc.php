@@ -301,7 +301,7 @@ class ranking_athlete_ui extends boranking
 						{
 							try {
 								$selfservice = new ranking_selfservice();
-								$selfservice->password_reset_mail($content);
+								$selfservice->password_reset_mail($this->athlete->data);
 								$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
 							}
 							catch (Exception $e) {
