@@ -151,6 +151,11 @@ class route_result extends so_sql
 			unset($filter['route_type']);
 			$extra_cols[] = $route_type.' AS route_type';
 		}
+		if (is_array($filter) && array_key_exists('quali_preselected', $filter))
+		{
+			$quali_preselected = $filter['quali_preselected'];
+			unset($filter['quali_preselected']);
+		}
 		if (is_array($filter) && array_key_exists('discipline',$filter))	// pseudo-filter to transport the discipline
 		{
 			$discipline = $filter['discipline'];
@@ -251,7 +256,9 @@ class route_result extends so_sql
 				}
 				else
 				{
-					$filter[] = $this->table_name.'.result_rank IS NOT NULL';
+					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL'.
+						// if exist need to check first final route too, as prequalifed are not ranking in quali
+						(isset($route_names[2]) ? ' OR r2.result_rank IS NOT NULL' : '').')';
 				}
 				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 
@@ -260,19 +267,25 @@ class route_result extends so_sql
 				// the general result is always sorted by the overal rank (to get it)
 				// now we need to store that rank in result_rank
 				$old = null;
+				//echo "<p>quali_preselected=$quali_preselected</p>\n";
 				foreach($rows as $n => &$row)
 				{
 					if ($row['route_order'] == 0) $row['result_rank0'] = $row['result_rank'];
 					$row['org_rank'] = $row['result_rank'.$row['route_order']];
+					//echo "<p>$n: $row[nachname], org_rank=$row[org_rank], result_rank=$row[result_rank] ";
 
 					// check for ties
 					$row['result_rank'] = $old['result_rank'];
 					foreach(array_reverse(array_keys($route_names)) as $route_order)
 					{
+						// for quali_preselected: do NOT use qualification, if we have a first final result (route_order=2)
+						if ($quali_preselected && $route_order < 2 && $row['result_rank2']) continue;
+
 						if ($route_type == TWOxTWO_QUALI && $route_order == 3 ||
 							$route_type == TWO_QUALI_HALF && $route_order == 1)
 						{
 							if (!$old || $old['org_rank'] < $row['org_rank']) $row['result_rank'] = $n+1;
+							//echo "route_order=$route_order, result_rank=$row[result_rank] --> no further countback ";
 							break;		// no further countback
 						}
 						if (boresult::is_two_quali_all($route_type) && $route_order == 1)
@@ -300,8 +313,10 @@ class route_result extends so_sql
 							break;	// --> not use countback
 						}
 					}
+					//echo " --> rank=$row[result_rank]</p>\n";
 					$old = $row;
 				}
+
 				// now we need to check if user wants to sort by something else
 				$order = array_shift($order_by_parts);
 				$sort  = array_pop($order_by_parts);
@@ -1067,7 +1082,7 @@ class route_result extends so_sql
 			{
 				// use the previous heat to break the tie
 				$data['new_rank'] = $old_prev_rank < $data['rank_prev_heat'] ? $i+1 : $old_rank;
-				//echo "<p>$i. $data[$this->id_col]: prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
+				//echo "<p>$i. ".$data[$this->id_col].": prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			}
 			$to_update = array();
 			if ($places)	// calculate the quali-points of the single heat
