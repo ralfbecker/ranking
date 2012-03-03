@@ -60,6 +60,9 @@ class route extends so_sql
 	{
 		if (is_null($keys)) $keys = array_intersect_key($this->data,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));
 
+		// when deleting 1. quali, delete everything (specially general result!)
+		if (!$keys['route_order']) unset($keys['route_order']);
+
 		if (($ret = parent::delete($keys)))
 		{
 			/* dont know why this dont work: delete is in the query log, but it get's not executed, rows_effected=0
