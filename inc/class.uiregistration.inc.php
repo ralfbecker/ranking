@@ -469,7 +469,10 @@ class uiregistration extends boranking
 							'delete_button' => $delete_button,
 							'register_button' => $register_button,
 						);
-						$readonlys[$registered ? $delete_button : $register_button] = false;	// re-enable the button
+						if (!$tmpl->sitemgr)
+						{
+							$readonlys[$registered ? $delete_button : $register_button] = false;	// re-enable the button
+						}
 						if ($athlete['license'] == 'n') $readonlys[$register_button] = true;	// no register without license
 					}
 					if (count($athletes) > $prequal_lines)
@@ -548,7 +551,7 @@ class uiregistration extends boranking
 					'class' => $nation && $i >= $quota ? 'complimentary' : 'registered',
 					'delete_button' => $delete_button,
 				);
-				$readonlys[$delete_button] = !$this->acl_check_athlete($starter,EGW_ACL_REGISTER,$comp);
+				if (!$tmpl->sitemgr) $readonlys[$delete_button] = !$this->acl_check_athlete($starter,EGW_ACL_REGISTER,$comp);
 			}
 			$cats = array();
 			foreach((array)$cat2col as $cat => $col)
