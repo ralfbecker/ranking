@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.comp.edit.general" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="200" overflow="auto">
+		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -42,7 +42,7 @@
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="200" overflow="auto">
+		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -74,11 +74,20 @@
 						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 					</menulist>
 				</row>
+				<row class="th">
+					<description value="Prequalified competitiors" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Qualification" for="quali_preselected"/>
+					<textbox type="integer" statustext="|Participants, at least on that place in the used ranking or cup, don't need to climb qualification" id="quali_preselected" min="0"/>
+					<description/>
+					<description/>
+				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="1.7.001">
-		<grid width="100%" height="200" overflow="auto">
+		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="1%"/>
@@ -123,7 +132,7 @@
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="200" overflow="auto">
+		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="15%"/>
@@ -200,13 +209,13 @@
 					<menulist>
 						<menupopup type="select-number" id="prequal_comp" options="None,1,10"/>
 					</menulist>
-					<listbox id="prequal_comps" no_lang="1" rows="3"/>
+					<listbox id="prequal_comps" no_lang="1" rows="3" options="max-width:100%"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit.judges" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%" height="200">
+	<template id="ranking.comp.edit.judges" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="210">
 			<columns>
 				<column width="15%"/>
 				<column/>

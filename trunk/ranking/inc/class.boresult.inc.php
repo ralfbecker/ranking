@@ -373,6 +373,7 @@ class boresult extends boranking
 				'route_order' => $route_order,
 				'PerId' => $starter['PerId'],
 				'start_order' => $start_order,
+				'ranking' => $starter['ranking'],	// place in cup or ranking responsible for start-order
 			)+(isset($starter['start_number']) ? array(
 				'start_number' => $starter['start_number'],
 			) : array())+(isset($starter['start_order2n']) ? array(
@@ -462,6 +463,13 @@ class boresult extends boranking
 		// which column get propagated to next heat
 		$cols = $this->route_result->startlist_cols();
 
+		// we need ranking from result_detail for 2. qualification for preselected participants
+		if (!$prev_route['route_order'])
+		{
+			$cols[] = 'result_detail AS ranking';
+
+			$comp = $this->comp->read($keys['WetId']);
+		}
 		if ($prev_route['route_quota'] == 1 || 				// superfinal
 			$start_order == 'previous' && !$ko_system || 	// 2. Quali uses same startorder
 			$ko_system && $keys['route_order'] > 2)			// speed-final
@@ -526,6 +534,11 @@ class boresult extends boranking
 		$half_starters = count($starters)/2;
 		foreach($starters as $n => $data)
 		{
+			// get ranking value of prequalified
+			if (!empty($data['ranking']) && ($data['ranking'] = unserialize($data['ranking'])))
+			{
+				$data['ranking'] = $data['ranking']['ranking'];
+			}
 			// applying a quota for TWO_QUALI_ALL, taking ties into account!
 			if (isset($data['quali_points']) && count($starters)-$n > $prev_route['route_quota'] &&
 				$data['quali_points'] > $starters[count($starters)-$prev_route['route_quota']]['quali_points'])
@@ -566,6 +579,34 @@ class boresult extends boranking
 			$this->route_result->init($keys);
 			unset($data['result_rank']);
 			$this->route_result->save($data);
+		}
+		// add prequalified
+		if ($comp && $comp['quali_preselected'])
+		{
+			array_pop($prev_keys);	// remove: result_rank IS NULL
+			// we need ranking from result_detail for 2. qualification for preselected participants
+			$cols[] = $this->route_result->table_name.'.result_detail AS ranking';
+			$cols[] = $this->route_result->table_name.'.result_rank AS result_rank';
+			$order_by = $this->route_result->table_name.'.start_order ASC';	// are already in cup order
+			$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
+			//_debug_array($starters);
+			foreach($starters as $n => $data)
+			{
+				// get ranking value of prequalified
+				if (!empty($data['ranking']) && ($data['ranking'] = unserialize($data['ranking'])))
+				{
+					$data['ranking'] = $data['ranking']['ranking'];
+				}
+				if (!(isset($data['ranking']) && $data['ranking'] <= $comp['quali_preselected']))	// not prequalified
+				{
+					//echo "<p>not prequalified</p>";
+					continue;
+				}
+				$data['start_order'] = $start_order++;
+				$this->route_result->init($keys);
+				unset($data['result_rank']);
+				$this->route_result->save($data);
+			}
 		}
 		if ($max_rank)	// fill up with wildcards
 		{
@@ -613,7 +654,8 @@ class boresult extends boranking
 			}
 		}
 		// which column get propagated to next heat
-		$cols = $this->route_result->startlist_cols().',start_order';
+		$cols = $this->route_result->startlist_cols();
+		$cols[] = 'start_order';
 		$starters =& $this->route_result->search('',$cols,
 			$order_by='start_order','','',false,'AND',false,$prev_keys);
 		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
@@ -713,9 +755,10 @@ class boresult extends boranking
 	 * 		default is null, which causes save_result to read the results now.
 	 * 		If multiple people are updating, you should provide the result of the time of display,
 	 * 		to not accidently overwrite results entered by someone else!
-	 * @return boolean/int number of changed results or false on error
+	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
+	 * @return boolean|int number of changed results or false on error
 	 */
-	function save_result($keys,$results,$route_type,$discipline,$old_values=null)
+	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0)
 	{
 		$this->error = null;
 
@@ -822,7 +865,7 @@ class boresult extends boranking
 				$route = $this->route->read($keys);
 				$route_type = $route['route_type'];
 			}
-			$n = $this->route_result->update_ranking($keys,$route_type,$discipline);
+			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		// delete the export_route cache
