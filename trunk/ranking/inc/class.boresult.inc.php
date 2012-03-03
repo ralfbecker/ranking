@@ -580,8 +580,8 @@ class boresult extends boranking
 			unset($data['result_rank']);
 			$this->route_result->save($data);
 		}
-		// add prequalified
-		if ($comp && $comp['quali_preselected'])
+		// add prequalified to quali(s) and first final round
+		if ($comp && $comp['quali_preselected'] && $keys['route_order'] <= 2)
 		{
 			array_pop($prev_keys);	// remove: result_rank IS NULL
 			// we need ranking from result_detail for 2. qualification for preselected participants
