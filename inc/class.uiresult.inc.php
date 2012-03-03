@@ -452,6 +452,7 @@ class uiresult extends boresult
 		// this is to transport the route_type to route_result::search's filter param
 		$query['col_filter']['route_type'] = $query['route_type'];
 		$query['col_filter']['discipline'] = $query['discipline'];
+		$query['col_filter']['quali_preselected'] = $query['quali_preselected'];
 		// check if route_result object is instancated for relay or not
 		if ($this->route_result->isRelay != ($query['discipline'] == 'speedrelay'))
 		{
@@ -1023,20 +1024,6 @@ class uiresult extends boresult
 		}
 		//_debug_array($sel_options);
 
-		// no startlist, no rights at all or result offical -->disable all update possebilities
-		if (($readonlys['button[apply]'] =
-			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) && !$this->is_judge($comp,false,$route) ||
-			$route['route_status'] == STATUS_RESULT_OFFICIAL ||
-			$content['nm']['route_order'] < 0 || $content['nm']['show_result'] > 1 && $content['nm']['show_result'] != 4))
-		{
-			$sel_options['result_plus'] = $this->plus;
-			$content['nm']['readonly'] = true;
-		}
-		else
-		{
-			unset($content['nm']['readonly']);
-		}
 		// enabling download for general result too (if we have at least a quali startlist)
 		$readonlys['button[download]'] = !($this->has_startlist($keys) || $keys['route_order'] == -1 && $this->has_startlist(array('route_order'=>0)+$keys));
 		$content['no_route_selection'] = !$cat; 	// no cat selected
@@ -1095,6 +1082,22 @@ class uiresult extends boresult
 		{
 			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -1 ? 2 : 3) : 1;
 		}
+		// no startlist, no rights at all or result offical -->disable all update possebilities
+		if (($readonlys['button[apply]'] =
+			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) && !$this->is_judge($comp,false,$route) ||
+			$route['route_status'] == STATUS_RESULT_OFFICIAL ||
+			$content['nm']['route'] < 0 || $content['nm']['show_result'] > 1 && $content['nm']['show_result'] != 4))
+		{
+			$sel_options['result_plus'] = $this->plus;
+			$content['nm']['readonly'] = true;
+		}
+		else
+		{
+			unset($content['nm']['readonly']);
+		}
+		//echo "<p>route_order={$content['nm']['route']}, show_result={$content['nm']['show_result']}: readonly=".array2string($content['nm']['readonly'])."</p>\n";
+
 		if ($content['nm']['route'] < 0)	// general result --> hide show_route selection
 		{
 			$sel_options['show_result'] = array(2 => ' ');
