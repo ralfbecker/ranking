@@ -556,7 +556,7 @@ class route_result extends so_sql
 								$plus2string[$data['result_plus'.$suffix]];
 							$data['result_plus'.$to_suffix] = $data['result_plus'.$suffix];
 						}
-						elseif(($suffix === '' || $suffix == 1 ) && $data['result_height2'])
+						elseif(($suffix === '' || $suffix == 1 ) && $data['result_height2'] && $data['route_type'] != TWO_QUALI_HALF)
 						{
 							$data['result'.$to_suffix] = lang('Prequalified');
 						}
