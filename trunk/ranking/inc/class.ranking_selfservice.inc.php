@@ -86,6 +86,12 @@ class ranking_selfservice extends boranking
 				$this->selfservice_register($athlete, $action_id);
 				break;
 
+			case 'recovery':
+			case 'password':
+			case 'set':
+				$this->selfservice_auth($athlete, $action);
+				break;
+
 			default:
 				throw new egw_exception_wrong_parameter("Unknown action '$action'!");
 		}
