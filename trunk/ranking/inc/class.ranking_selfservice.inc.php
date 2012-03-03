@@ -317,7 +317,7 @@ class ranking_selfservice extends boranking
 			}
 			else
 			{
-				echo "<p><a href='$recovery_link'>".lang('Click here to have a mail send to your stored EMail address with instructions how to set your password.')."</a></p>\n";
+				echo "<p><a href='$recovery_link'>".lang('Click here to have a mail send to your stored EMail address with instructions how to set your password, register for competitions and edit your profile.')."</a></p>\n";
 			}
 		}
 		else
