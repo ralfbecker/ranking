@@ -349,6 +349,7 @@ pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Ath
 pairing speed final	ranking	de	Paarungen Speed Finale
 parent federation	ranking	de	übergeordneter Verband
 participant deleted	ranking	de	Teilnehmer gelöscht
+participants, at least on that place in the used ranking or cup, don't need to climb qualification	ranking	de	Teilnehmer die mindestens auf diesem Platz im verwendeten Ranking oder Cup platziert sind, müssen die Qualifikation nicht klettern
 password email	ranking	de	Passwort EMail
 password you entered is not correct!	ranking	de	Das eingegebene Passwort ist NICHT korrekt!
 pc city	ranking	de	PLZ Ort

@@ -1168,6 +1168,7 @@ class boranking extends ranking_so
 			{
 				if (isset($starters[$athlete['PerId']]))
 				{
+					$starters[$athlete['PerId']]['ranking'] = $athlete['platz'];
 					$this->move_to_startlist($starters,$athlete['PerId'],$startlist,$num_routes,$reset_data,__LINE__);
 					$reset_data = false;
 					$ranked[$athlete['PerId']] = true;

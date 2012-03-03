@@ -57,6 +57,7 @@ class route_result extends so_sql
 	const MAX_BOULDERS = 8;
 
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
+		'ranking',
 	);
 	var $charset,$source_charset;
 
@@ -241,9 +242,12 @@ class route_result extends so_sql
 				{
 					// not yet a 2. route --> show everyone from 1. route (used for xml/json export)
 				}
-				elseif (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_SUM)) && $discipline != 'speed')		// speed stores both results in the first quali
+				// speed stores both results in the first quali
+				elseif (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_SUM)) && $discipline != 'speed')
 				{
-					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL OR r1.result_rank IS NOT NULL)';
+					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL OR r1.result_rank IS NOT NULL'.
+						// if exist need to check first final route too, as prequalifed are not ranking in quali
+						(isset($route_names[2]) ? ' OR r2.result_rank IS NOT NULL' : '').')';
 				}
 				else
 				{
@@ -419,6 +423,7 @@ class route_result extends so_sql
 		//echo "route_names="; _debug_array($route_names);
 		$order_by = array("$this->table_name.result_rank");	// Quali
 
+		$join = "\n";
 		foreach($route_names as $route_order => $label)
 		{
 			if ($route_order < 0) continue;	// general result
@@ -431,7 +436,7 @@ class route_result extends so_sql
 				continue;	// no need to join the qualification
 			}
 
-			$join .= " LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.$this->id_col=r$route_order.$this->id_col";
+			$join .= "LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.$this->id_col=r$route_order.$this->id_col\n";
 			foreach($result_cols as $col)
 			{
 				$extra_cols[] = "r$route_order.$col AS $col$route_order";
@@ -523,7 +528,7 @@ class route_result extends so_sql
 		{
 			default:
 			case 'lead':
-				if ($data['result_height'] || $data['result_height1'])	// lead result
+				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'])	// lead result
 				{
 					if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
 					foreach($data['general_result'] ? array(1,2,3,'',0,4,5,6) : array('') as $suffix)
@@ -541,15 +546,19 @@ class route_result extends so_sql
 						{
 							$data['result_height'.$to_suffix] = '';
 							$data['result_plus'.$to_suffix]   = TOP_PLUS;
-							$data['result'.$to_suffix]   = lang('Top');
+							$data['result'.$to_suffix] = lang('Top');
 						}
 						elseif ($data['result_height'.$suffix])
 						{
 							$data['result_height'.$to_suffix] = 0.001 * $data['result_height'.$suffix];
-		//					$data['result'.$to_suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
+							//$data['result'.$to_suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).
 							$data['result'.$to_suffix] = $data['result_height'.$to_suffix].
 								$plus2string[$data['result_plus'.$suffix]];
 							$data['result_plus'.$to_suffix] = $data['result_plus'.$suffix];
+						}
+						elseif(($suffix === '' || $suffix == 1 ) && $data['result_height2'])
+						{
+							$data['result'.$to_suffix] = lang('Prequalified');
 						}
 						if ($suffix !== $to_suffix)
 						{
@@ -564,7 +573,7 @@ class route_result extends so_sql
 						// quali on two routes for all --> add rank to result
 						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
 						{
-							if ($data['result'.$suffix]) $data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
+							if ($data['result'.$suffix] && $data['result_rank'.$suffix]) $data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
 						}
 					}
 				}
@@ -890,6 +899,8 @@ class route_result extends so_sql
 			if ($data['result_height']) $data['result_height'] *= 100.0/$data['ability_percent'];
 			$data['result_detail']['ability_percent'] = $data['ability_percent'];
 		}
+		if (isset($data['ranking'])) $data['result_detail']['ranking'] = $data['ranking'];
+
 		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
 
 		return $data;
@@ -924,11 +935,12 @@ class route_result extends so_sql
 	 * @param boolean $do_countback=true should we do a countback on further heats
 	 * @param int $route_type=ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
 	 * @param string $discipline='lead' 'lead', 'speed', 'boulder', 'speedrelay'
-	 * @return int/boolean updated rows or false on error (no route specified in $keys)
+	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
+	 * @return int|boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($keys,$route_type=ONE_QUALI,$discipline='lead')
+	function update_ranking($keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0)
 	{
-		//echo "<p>update_ranking(".print_r($keys,true),",$route_type,'$discipline')</p>\n";
+		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected)");
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
 
 		$keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
@@ -965,7 +977,11 @@ class route_result extends so_sql
 		$extra_cols[] = $mode.' AS new_rank';
 
 		// do we have a countback
-		if ($route_type == TWOxTWO_QUALI && $keys['route_order'] <= 4)	// 2x2 til 1/2-Final incl.
+		if ($quali_preselected && $keys['route_order'] == 2)
+		{
+			// no countback to quali, if we use preselected athletes
+		}
+		elseif ($route_type == TWOxTWO_QUALI && $keys['route_order'] <= 4)	// 2x2 til 1/2-Final incl.
 		{
 			if (in_array($keys['route_order'],array(2,3)))
 			{
@@ -981,7 +997,6 @@ class route_result extends so_sql
 		elseif ($discipline == 'lead')
 		{
 			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
-			$route_order = $keys['route_order'];
 			if ($keys['route_order'] == 2 && $route_type == TWO_QUALI_ALL)
 			{
 				$extra_cols[] = 'ROUND(('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).'),2) AS rank_prev_heat';
@@ -993,7 +1008,8 @@ class route_result extends so_sql
 				$order_by .= ',rank_prev_heat ASC';
 			}
 		}
-		$result = $this->search($keys,$this->id_col.',result_rank',$order_by,$extra_cols);
+		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected) extra_cols=".array2string($extra_cols).", order_by=$order_by");
+		$result = $this->search($keys,$this->id_col.',result_rank,result_detail AS detail',$order_by,$extra_cols);
 
 		if ($route_type == TWO_QUALI_ALL && $keys['route_order'] < 2 ||		// calculate the points
 			$route_type == TWOxTWO_QUALI && $keys['route_order'] < 4)
@@ -1058,8 +1074,12 @@ class route_result extends so_sql
 			{
 				if ($data['new_qoints'] != $data['qoints'] || $data['new_quali_points'] != $data['quali_points'])
 				{
+					// keep existing details, like ranking for prequalified
+					$to_update['result_detail'] = $data['detail'] ? unserialize($data['detail']) : array();
+					$to_update['result_detail']['qoints'] = $data['new_qoints'];
+					$to_update['result_detail']['quali_points'] = $data['new_quali_points'];
 					//echo "<p>qoints: $data[qoints] --> $qoints</p>\n";
-					$to_update['result_detail'] = serialize(array('qoints' => $data['new_qoints'],'quali_points' =>  $data['new_quali_points']));
+					$to_update['result_detail'] = serialize($to_update['result_detail']);
 				}
 			}
 			if ($data['new_rank'] != $data['result_rank']) $to_update['result_rank'] = $data['new_rank'];
@@ -1192,17 +1212,17 @@ class route_result extends so_sql
 	/**
 	 * which column should get propagated to next heat, depends on isRelay or not
 	 *
-	 * @return string comma separated columns
+	 * @return array with columns
 	 */
 	function startlist_cols()
 	{
 		if ($this->isRelay)
 		{
-			$cols = 'team_id,result_rank,team_nation,team_name,start_number_1,PerId_1,start_number_2,PerId_2,start_number_3,PerId_3';
+			$cols = array('team_id','result_rank','team_nation','team_name','start_number_1','PerId_1','start_number_2','PerId_2','start_number_3','PerId_3');
 		}
 		else
 		{
-			$cols = 'PerId,result_rank,start_number';
+			$cols = array('PerId','result_rank','start_number');
 		}
 		return $cols;
 	}

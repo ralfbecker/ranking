@@ -49,7 +49,8 @@ $phpgw_baseline = array(
 			'fed_id' => array('type' => 'int','precision' => '4'),
 			'display_athlete' => array('type' => 'varchar','precision' => '20','comment' => 'nation, pc_city, federation, pc_city_nation, NULL=default'),
 			'selfregister' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=no, 1=fed.to confirm, 2=register'),
-			'open_comp' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=No, 1=national, 2=DACH, 3=int.')
+			'open_comp' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=No, 1=national, 2=DACH, 3=int.'),
+			'quali_preselected' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => 'number of preselected athletes, not climbing qualification')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),

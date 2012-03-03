@@ -476,10 +476,10 @@ class uiresult extends boresult
 			$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
 			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
 		}
-		$comp = $this->comp->read($query['comp']);
 		if (($query['ranking'] & 3) && strstr($query['template'],'startlist') &&
 			($cat = $this->cats->read($query['cat'])))
 		{
+			$comp = $this->comp->read($query['comp']);
 			$stand = $comp['datum'];
 			if (!$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$query['ranking']==2?$comp['serie']:'') && $query['ranking'] == 2 &&
 				// if there no cup ranking yet (first competition) --> use the one from last year
@@ -595,6 +595,12 @@ class uiresult extends boresult
 					}
 				}
 			}
+			// mark prequalified participants for qualification with "Prequalified" instead of start-order
+			if ($query['quali_preselected'] && $query['route'] < 2 &&
+				$row['ranking'] && $row['ranking'] <= $query['quali_preselected'])
+			{
+				$rows[$k]['start_order'] = lang('Prequalified');
+			}
 		}
 		// disable print-only start-number
 		$rows['no_printnumber'] = !$need_start_number;
@@ -605,7 +611,8 @@ class uiresult extends boresult
 
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
-			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4;
+			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4 ||
+			$query['quali_preselected'] && $query['route'] == 2;	// no countback to quali for quali_preselected
 
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
@@ -632,7 +639,7 @@ class uiresult extends boresult
 			$rows[$name] =& $query[$name];
 		}
 		// what columns to show for an athlete: can be set per comp. or has a national default
-		switch($comp['display_athlete'] ? $comp['display_athlete'] : (string)$comp['nation'])
+		switch($query['display_athlete'] ? $query['display_athlete'] : (string)$query['calendar'])
 		{
 			case '':	// international
 			case ranking_competition::NATION:
@@ -761,7 +768,7 @@ class uiresult extends boresult
 					'no_cat'     => true,
 					'no_filter'  => true,
 					'no_filter2' => true,
-					'num_rows'   => 1000,
+					'num_rows'   => 999,
 					'order'      => 'start_order',
 					'sort'       => 'ASC',
 					'show_result'=> 1,
@@ -873,7 +880,8 @@ class uiresult extends boresult
 			{
 				case 'apply':
 					$old = $GLOBALS['egw']->session->appsession('set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route'],'ranking');
-					if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old))
+					if (is_array($content['nm']['rows']['set']) &&
+						$this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old,$comp['quali_preselected']))
 					{
 						$msg = lang('Heat updated');
 					}
@@ -965,6 +973,8 @@ class uiresult extends boresult
 		$content['cat']  = $cat;
 		$content['nm']['comp_name'] = $comp['name'];
 		$content['nm']['comp_date'] = $comp['date_span'];
+		$content['nm']['quali_preselected'] = $comp['quali_preselected'];
+		$content['nm']['display_athlete'] = $comp['display_athlete'];
 
 		unset($content['nm']['comp_logo']);
 		unset($content['nm']['comp_sponsors']);
@@ -1225,7 +1235,7 @@ class uiresult extends boresult
 				$old_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
 
 				if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],
-					$request->preserv['nm']['route_type'],$request->preserv['nm']['discipline']))
+					$request->preserv['nm']['route_type'],$request->preserv['nm']['discipline'],null,$request->preserv['nm']['quali_preselected']))
 				{
 					$new_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
 					$msg = lang('Heat updated');

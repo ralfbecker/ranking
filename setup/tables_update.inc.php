@@ -1506,3 +1506,22 @@ function ranking_upgrade1_9_008()
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.009';
 }
+
+/**
+ * Add column to store number of preselected athletes, not climbing qualification
+ *
+ * ALTER TABLE `Wettkaempfe` ADD `quali_preselected` TINYINT NOT NULL DEFAULT 0
+ */
+function ranking_upgrade1_9_009()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','quali_preselected',array(
+		'type' => 'int',
+		'precision' => '1',
+		'nullable' => False,
+		'default' => '0',
+		'comment' => 'number of preselected athletes, not climbing qualification'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.010';
+}
+
