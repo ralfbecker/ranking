@@ -160,8 +160,8 @@ class ranking_competition_ui extends boranking
 							}
 							else
 							{
-								$error_msg = ($extension=competition::is_image($file['name'],$file['type'])) ? false :
-									lang('File is not an image (%1)',str_replace(array('\\','$'),'',implode(', ',competition::$image_types)));
+								$error_msg = ($extension=ranking_competition::is_image($file['name'],$file['type'])) ? false :
+									lang('File is not an image (%1)',str_replace(array('\\','$'),'',implode(', ',ranking_competition::$image_types)));
 							}
 							if (!$error_msg && $this->comp->attach_files(array($type => $file['tmp_name']),$error_msg,null,$extension))
 							{
