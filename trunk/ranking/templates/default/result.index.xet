@@ -114,7 +114,7 @@
 					<description align="center" value="$row_cont[start_order]" id="{$row}[start_number]" no_lang="1"/>
 					<hbox align="center" options="0,0">
 						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
-						<textbox type="float" id="set[$row_cont[PerId]][result_height]" onchange="handle_plus(this,form::name('set[$row_cont[PerId]][result_plus]'));" size="5" precision="%4.2lf" class="$cont[rw_result]"/>
+						<textbox id="set[$row_cont[PerId]][result_height]" onchange="handle_plus(this,form::name('set[$row_cont[PerId]][result_plus]'));" size="5" validator="&quot;/^-?[0-9]*[,.]?[0-9]*$/&quot;" class="$cont[rw_result]"/>
 						<menulist class="$cont[rw_result] leftPad5">
 							<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1"/>
 						</menulist>
