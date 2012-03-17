@@ -332,7 +332,7 @@ class uiresult extends boresult
 		}
 		// cant delete general result or not yet saved routes
 		$readonlys['button[startlist]'] = $readonlys['button[delete]'] =
-			$content['route_order'] == -1 || $content['new_route'];
+			$content['route_order'] == -1 || $content['new_route'] || $content['route_status'] == STATUS_RESULT_OFFICIAL;
 		// disable max. complimentary selection if no quali.
 		if ($content['route_order'] > (int)($content['route_type']==TWO_QUALI_HALF) || $content['route_order'] < 0)
 		{
