@@ -121,6 +121,34 @@ class boresult extends boranking
 	}
 
 	/**
+	 * Fix allowed plus labels depending on year of competition and nation
+	 *
+	 * Also takes into account if we run on ifsc-climbing.org or digitalrock.de
+	 *
+	 * @param int $year year of competition
+	 * @param string $nation nation of comp.
+	 * @return array
+	 */
+	function plus_labels($year, $nation)
+	{
+		$labels = $this->plus_labels;
+
+		$minus_allowed = $year < 2012;	// nothing to do
+
+		// digitalrock.de
+		if (isset($this->license_nations['GER']) || isset($this->license_nations['SUI']))
+		{
+			// SUI and international/Regio Cup still has minus in 2012
+			if ($nation != 'GER' && $year == 2012) $minus_allowed = true;
+		}
+		if (!$minus_allowed)
+		{
+			unset($labels['-1']);
+		}
+		return $labels;
+	}
+
+	/**
 	 * Convert athlete array to a string
 	 *
 	 * @param array $athlete array with values for 'vorname', 'nachname', 'nation' and optional 'start_order', 'start_number', 'result_rank', 'result'
