@@ -321,7 +321,7 @@ function fed_join($per_table='Personen',$year=null,$f='')
 {
 	return " JOIN Athlete2Fed ON $per_table.PerId=Athlete2Fed.PerId AND ".
 		(is_null($year) ? 'a2f_end=9999' : "a2f_end >= $year AND $year >= a2f_start").
-		" JOIN Federations $f USING(fed_id)";
+		" JOIN Federations $f ON Athlete2Fed.fed_id=".($f?$f:'Federations').".fed_id";
 }
 
 function read_pers(&$pers,$do_fail=True)
