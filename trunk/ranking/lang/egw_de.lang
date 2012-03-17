@@ -94,7 +94,7 @@ changes applied to %1 federations.	ranking	de	Änderungen auf %1 Verbände angew
 check all	ranking	de	Alle auswählen
 children	ranking	de	Kinder
 city	ranking	de	Stadt
-click here to have a mail send to your stored email address with instructions how to set your password, register for competitions and edit your profile.	ranking	de	Hier klicken, damit eine Mail an Deine gespeicherte EMail Adresse versendet wird. Diese enthält Anweisungen zum Setzen Deines Passworts. Damit kannst Du Dich für Wettkämpfe anmelden und Dein Profile bearbeiten.
+click here to have a mail send to your stored email address with instructions how to set your password, register for competitions and edit your profile.	ranking	de	Hier klicken, damit eine Mail an Deine gespeicherte EMail Adresse versendet wird. Diese enthält Anweisungen zum Setzen Deines Passworts. Damit kannst Du Dich für Wettkämpfe anmelden und Dein Profil bearbeiten.
 click to view	ranking	de	anklicken zum Anzeigen
 climbing professional	ranking	de	Profi
 climbing since (years)	ranking	de	klettert seit (Jahren)
@@ -556,7 +556,7 @@ xml file uses unknown schema (format)!	ranking	de	XML Datei benutzt unbekanntes 
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
 you are not allowed to register for %1!	ranking	de	Sie sind nicht berechtigt für %1 zu registrieren!
 you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizenz beantragen!
-you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	de	Sie können jetzt %1ihr Profil bearbeiten%2 oder sich im Kalender für einen Wettkampf registrieren.
+you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	de	Sie können jetzt %1Ihr Profil bearbeiten%2 oder sich im Kalender für einen Wettkampf registrieren.
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you have not yet a password set!	ranking	de	Du hast noch kein Passwort gesetzt!
