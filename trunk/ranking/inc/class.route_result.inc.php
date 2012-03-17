@@ -591,6 +591,11 @@ class route_result extends so_sql
 							if ($data['result'.$suffix] && $data['result_rank'.$suffix]) $data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
 						}
 					}
+					// lead time
+					if ($data['result_time'])
+					{
+						$data['result_time'] /= 1000;
+					}
 				}
 				if ($data['qoints'] && $data['result_rank'] && !$data['general_result'])
 				{
@@ -650,7 +655,6 @@ class route_result extends so_sql
 					++$suffix;
 				}
 				break;
-
 
 			case 'speedrelay':
 				for($i = 1; $i <= 3; ++$i)
@@ -788,6 +792,8 @@ class route_result extends so_sql
 		{
 			unset($data['result_plus']);	// no plus without height
 		}
+		// time for lead is handled by speed, further down
+
 		// speed
 		if ($data['result_time_r'] || isset($data['eliminated_r']) || $data['ability_percent'])	// result on 2. speed route
 		{
@@ -1061,6 +1067,7 @@ class route_result extends so_sql
 		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
+		$first_places = array();
 		foreach($result as $i => &$data)
 		{
 			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
@@ -1097,8 +1104,16 @@ class route_result extends so_sql
 					$to_update['result_detail'] = serialize($to_update['result_detail']);
 				}
 			}
-			if ($data['new_rank'] != $data['result_rank']) $to_update['result_rank'] = $data['new_rank'];
-
+//_debug_array($data); _debug_array($to_update);
+			// for lead finals, do not yet store first places, they might have to use the time
+			if ($discipline == 'lead' && $keys['route_order'] >= 2 && !$to_update && $data['new_rank'] == 1 && $data['result_time_l'])
+			{
+				$first_places[] = $data;
+			}
+			elseif ($data['new_rank'] != $data['result_rank'])
+			{
+				$to_update['result_rank'] = $data['new_rank'];
+			}
 			if ($to_update && $this->db->update($this->table_name,$to_update,$keys+array($this->id_col=>$data[$this->id_col]),__LINE__,__FILE__))
 			{
 				//_debug_array($to_update+array($this->id_col=>$data[$this->id_col]));
@@ -1106,6 +1121,38 @@ class route_result extends so_sql
 			}
 			$old_prev_rank = $data['rank_prev_heat'];
 			$old_rank = $data['new_rank'];
+		}
+		// now handle first places in lead finals, where the time breaks ties since 2012 rules
+		if ($first_places)
+		{
+			// for more then one first place, check if we are in the finale and have a time
+			if (count($first_places) > 1 && ($comp = boresult::$instance->route->read($keys)) && !$comp['route_quota'])
+			{
+				// sort by result_time
+				usort($first_places,create_function('$a,$b', 'return $a["result_time_l"]-$b["result_time_l"];'));
+				// update new-rank accordingly
+				foreach($first_places as $i => &$data)
+				{
+					if (!$i || $first_places[$i-1]['result_time_l'] < $data['result_time_l'])
+					{
+						$data['new_rank'] = 1+$i;
+					}
+					else
+					{
+						$data['new_rank'] = $first_places[$i-1]['new_rank'];
+					}
+				}
+			}
+			// store first places, if necessary
+			foreach($first_places as &$data)
+			{
+				if ($data['new_rank'] != $data['result_rank'] && $this->db->update($this->table_name,array(
+					'result_rank' => $data['new_rank'],
+				),$keys+array($this->id_col=>$data[$this->id_col]),__LINE__,__FILE__))
+				{
+					++$modified;
+				}
+			}
 		}
 		if ($modified) boresult::delete_export_route_cache($keys);
 

@@ -502,9 +502,12 @@ class uiresult extends boresult
 			++$total;
 		}
 		$need_start_number = false;
+		$need_lead_time_column = false;
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
+
+			if ($row['result_time'] && $query['discipline'] == 'lead') $need_lead_time_column = true;
 
 			// results for setting on regular routes (no general result)
 			if($query['route'] >= 0)
@@ -603,6 +606,9 @@ class uiresult extends boresult
 				$rows[$k]['start_order'] = lang('Prequalified');
 			}
 		}
+		// disable lead time-column in print, if not used
+		if (!$need_lead_time_column) $rows['lead_time_class'] = 'noPrint';
+
 		// disable print-only start-number
 		$rows['no_printnumber'] = !$need_start_number;
 		$rows['no_start_number'] = !$need_start_number && $query['route_status'] == STATUS_RESULT_OFFICIAL;
