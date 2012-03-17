@@ -937,7 +937,7 @@ class uiresult extends boresult
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC') : array(),
-			'result_plus' => $this->plus_labels,
+			'result_plus' => $this->plus_labels($comp['year'], $comp['nation']),
 			'show_result' => array(
 				0 => lang('Startlist'),
 				1 => lang('Resultlist'),
