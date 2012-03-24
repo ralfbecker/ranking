@@ -144,6 +144,7 @@ class ranking_cup_ui extends boranking
 				'nation'=>$this->cup->data['nation'])),
 			'nation'    => $this->ranking_nations,
 			'gruppen'   => $this->cats->names(array('nation' => $this->cup->data['nation'])),
+			'cat'       => $this->cats->names(array('nation' => $this->cup->data['nation']), -1),
 			'split_by_places' => $this->split_by_places,
 			'fed_id'       => $this->federation->federations($this->cup->data['nation'], true),
 			'selfregister' => $this->comp->selfregister_types,
@@ -159,6 +160,8 @@ class ranking_cup_ui extends boranking
 		{
 			$sel_options['per_cat'][$rkey] = $sel_options['gruppen'][$rkey];
 		}
+		$content['presets']['quali_preselected'][] = array('cat' => '');
+
 		if ($view)
 		{
 			$readonlys = array(

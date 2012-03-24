@@ -888,7 +888,8 @@ class uiresult extends boresult
 				case 'apply':
 					$old = $GLOBALS['egw']->session->appsession('set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route'],'ranking');
 					if (is_array($content['nm']['rows']['set']) &&
-						$this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old,$comp['quali_preselected']))
+						$this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old,
+							$this->comp->quali_preselected($content['nm']['cat'], $comp['quali_preselected'])))
 					{
 						$msg = lang('Heat updated');
 					}
@@ -980,7 +981,7 @@ class uiresult extends boresult
 		$content['cat']  = $cat;
 		$content['nm']['comp_name'] = $comp['name'];
 		$content['nm']['comp_date'] = $comp['date_span'];
-		$content['nm']['quali_preselected'] = $comp['quali_preselected'];
+		$content['nm']['quali_preselected'] = $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']);
 		$content['nm']['display_athlete'] = $comp['display_athlete'];
 
 		unset($content['nm']['comp_logo']);

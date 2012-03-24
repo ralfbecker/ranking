@@ -72,7 +72,7 @@
 		</styles>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="200" overflow="auto">
+		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -107,9 +107,24 @@
 				<row class="th">
 					<description value="Prequalified competitiors" span="all"/>
 				</row>
-				<row class="row">
+				<row class="row" valign="top">
 					<description value="Qualification" for="quali_preselected"/>
-					<textbox type="integer" statustext="|Participants, at least on that place in the used ranking or cup, don't need to climb qualification" id="quali_preselected" min="0"/>
+					<grid id="quali_preselected">
+						<columns>
+							<column/>
+							<column/>
+							<column/>
+						</columns>
+						<rows>
+							<row>
+								<menulist>
+									<menupopup id="${row}[cat]" options="Category"/>
+								</menulist>
+								<textbox type="integer" statustext="|Participants, at least on that place in the used ranking or cup, don't need to climb qualification" id="${row}[num]" min="0"/>
+								<description/>
+							</row>
+						</rows>
+					</grid>
 					<description/>
 					<description/>
 				</row>
@@ -117,7 +132,7 @@
 		</grid>
 	</template>
 	<template id="ranking.cup.edit.presets" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="200" overflow="hidden">
+		<grid width="100%" height="200" overflow="scroll">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -178,11 +193,11 @@
 					<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" id="rkey" size="10" maxlength="8"/>
 				</row>
 				<row>
-					<tabbox id="ranking.cup.edit.general|ranking.cup.edit.ranking|ranking.cup.edit.presets" span="all">
+					<tabbox id="tabs" span="all">
 						<tabs>
-							<tab id="ranking.cup.edit.general" label="Categories"/>
-							<tab id="ranking.cup.edit.ranking" label="Ranking"/>
-							<tab id="ranking.cup.edit.presets" label="Presets"/>
+							<tab id="general" label="Categories"/>
+							<tab id="ranking" label="Ranking"/>
+							<tab id="presets" label="Presets"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.cup.edit.general"/>

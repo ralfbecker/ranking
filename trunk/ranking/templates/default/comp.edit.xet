@@ -77,9 +77,24 @@
 				<row class="th">
 					<description value="Prequalified competitiors" span="all"/>
 				</row>
-				<row class="row">
+				<row class="row" valign="top">
 					<description value="Qualification" for="quali_preselected"/>
-					<textbox type="integer" statustext="|Participants, at least on that place in the used ranking or cup, don't need to climb qualification" id="quali_preselected" min="0"/>
+					<grid id="quali_preselected">
+						<columns>
+							<column/>
+							<column/>
+							<column/>
+						</columns>
+						<rows>
+							<row>
+								<menulist>
+									<menupopup id="${row}[cat]" options="Category"/>
+								</menulist>
+								<textbox type="integer" statustext="|Participants, at least on that place in the used ranking or cup, don't need to climb qualification" id="${row}[num]" min="0"/>
+								<description/>
+							</row>
+						</rows>
+					</grid>
 					<description/>
 					<description/>
 				</row>

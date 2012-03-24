@@ -609,7 +609,7 @@ class boresult extends boranking
 			$this->route_result->save($data);
 		}
 		// add prequalified to quali(s) and first final round
-		if ($comp && $comp['quali_preselected'] && $keys['route_order'] <= 2)
+		if ($comp && ($preselected = $this->comp->quali_preselected($keys['GrpId'], $comp['quali_preselected'])) && $keys['route_order'] <= 2)
 		{
 			array_pop($prev_keys);	// remove: result_rank IS NULL
 			// we need ranking from result_detail for 2. qualification for preselected participants
@@ -625,7 +625,7 @@ class boresult extends boranking
 				{
 					$data['ranking'] = $data['ranking']['ranking'];
 				}
-				if (!(isset($data['ranking']) && $data['ranking'] <= $comp['quali_preselected']))	// not prequalified
+				if (!(isset($data['ranking']) && $data['ranking'] <= $preselected))	// not prequalified
 				{
 					//echo "<p>not prequalified</p>";
 					continue;
