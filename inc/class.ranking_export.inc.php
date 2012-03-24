@@ -170,7 +170,7 @@ class ranking_export extends boresult
 			'route_order' => $heat,
 			'discipline'  => $discipline,
 			'route_type'  => $route['route_type'],
-			'quali_preselected' => $comp['quali_preselected'],
+			'quali_preselected' => $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']),
 		)))) $result = array();
 		//_debug_array($filter); _debug_array($result);
 

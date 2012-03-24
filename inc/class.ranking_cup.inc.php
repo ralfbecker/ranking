@@ -94,6 +94,22 @@ class ranking_cup extends so_sql
 		}
 		if ($data['presets']) $data['presets'] = (array) @unserialize($data['presets']);
 
+		if (isset($data['presets']) && isset($data['presets']['quali_preselected']))
+		{
+			foreach(explode(',', $data['presets']['quali_preselected']) as $n => $pre)
+			{
+				if ($n === 0) $data['presets']['quali_preselected'] = array();
+				unset($num);
+				list($grp, $num) = explode(':', $pre);
+				if (!isset($num))
+				{
+					$num = $grp;
+					$grp = 0;
+				}
+				$data['presets']['quali_preselected'][] = array('cat' => $grp, 'num' => $num);
+			}
+		}
+
 		return parent::db2data($intern ? null : $data);	// important to use null, if $intern!
 	}
 
@@ -130,6 +146,20 @@ class ranking_cup extends so_sql
 			unset($data['max_per_cat']);
 
 			$data['gruppen'] = implode(',',$data['gruppen']);
+		}
+		if (isset($data['presets']) && isset($data['presets']['quali_preselected']))
+		{
+			$to_store = array();
+			foreach($data['presets']['quali_preselected'] as $n => $pre)
+			{
+				$to_store[$pre['cat']] = $pre['cat'].':'.(int)$pre['num'];
+				// remove last 0 selected for all cats line
+				if ($to_store[$pre['cat']] == ':0' && $n)
+				{
+					unset($to_store[$pre['cat']]);
+				}
+			}
+			$data['presets']['quali_preselected'] = implode(',', $to_store);
 		}
 		if (is_array($data['presets'])) $data['presets'] = serialize($data['presets']);
 

@@ -230,6 +230,7 @@ class ranking_competition_ui extends boranking
 		}
 		$content['quota_extra'][] = array('fed' => '');		// one extra line to add a new fed or cat value
 		$content['prequal_extra'][] = array('cat' => '');
+		$content['quali_preselected'][] = array('cat' => '');
 
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,

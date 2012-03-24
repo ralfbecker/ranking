@@ -1525,3 +1525,21 @@ function ranking_upgrade1_9_009()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.010';
 }
 
+/**
+ * Alter column to store number of preselected athletes to use: GrpId: number, ...
+ *
+ * ALTER TABLE `Wettkaempfe` MODIFY COLUMN `quali_preselected` VARCHAR(64) NOT NULL DEFAULT '0'
+ */
+function ranking_upgrade1_9_010()
+{
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Wettkaempfe','quali_preselected',array(
+		'type' => 'varchar',
+		'precision' => '64',
+		'nullable' => False,
+		'default' => '0',
+		'comment' => 'GrpId: number of preselected athletes, not climbing qualification'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.011';
+}
+

@@ -163,6 +163,22 @@ class ranking_competition extends so_sql
 				$data[$name] = $extra;
 			}
 		}
+
+		if (isset($data['quali_preselected']))
+		{
+			foreach(explode(',', $data['quali_preselected']) as $n => $pre)
+			{
+				if ($n === 0) $data['quali_preselected'] = array();
+				unset($num);
+				list($grp, $num) = explode(':', $pre);
+				if (!isset($num))
+				{
+					$num = $grp;
+					$grp = 0;
+				}
+				$data['quali_preselected'][] = array('cat' => $grp, 'num' => $num);
+			}
+		}
 		return parent::db2data($intern ? null : $data);	// important to use null, if $intern!
 	}
 
@@ -212,6 +228,21 @@ class ranking_competition extends so_sql
 		if (count($data) && $this->source_charset)
 		{
 			$data = translation::convert($data,$this->charset,$this->source_charset);
+		}
+
+		if (isset($data['quali_preselected']))
+		{
+			$to_store = array();
+			foreach($data['quali_preselected'] as $n => $pre)
+			{
+				$to_store[$pre['cat']] = $pre['cat'].':'.(int)$pre['num'];
+				// remove last 0 selected for all cats line
+				if ($to_store[$pre['cat']] == ':0' && $n)
+				{
+					unset($to_store[$pre['cat']]);
+				}
+			}
+			$data['quali_preselected'] = implode(',', $to_store);
 		}
 		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
 	}
@@ -829,5 +860,23 @@ class ranking_competition extends so_sql
 		}
 		//error_log(__METHOD__."({'$athlete[nachname] $athlete[vorname] ($athlete[nation])', fed_id=$athlete[fed_id], lv=$athlete[fed_parent], rz=$athlete[acl_fed_id]}, {'$comp[name]', nation='$comp[nation]', fed_id=$comp[fed_id], open_comp=$comp[open_comp]}) returning ".array2string($ret));
 		return $ret;
+	}
+
+	/**
+	 * Return number of preselected for a given category
+	 *
+	 * @param int $cat
+	 * @param array $quali_preselected
+	 * @return int
+	 */
+	function quali_preselected($cat, array $quali_preselected=null)
+	{
+		if (is_null($quali_preselected)) $quali_preselected = $this->data['quali_preselected'];
+
+		foreach($quali_preselected as $pre)
+		{
+			if ($pre['cat'] == $cat || !$pre['cat']) return $pre['num'];
+		}
+		return 0;
 	}
 }
