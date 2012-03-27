@@ -18,6 +18,7 @@
 				<column/>
 				<column/>
 				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="th" part="header">
@@ -33,11 +34,13 @@
 					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id"/>
 					<nextmatch-sortheader label="Landesverband" id="fed_parent"/>
 					<nextmatch-sortheader label="License" id="license"/>
+					<nextmatch-header label="EMail" id="email"/>
 					<nextmatch-header align="right" label="Total"/>
 					<nextmatch-header align="right" label="Federation"/>
 				</row>
 				<row class="th" disabled="!@total" part="footer">
 					<description value="Sum"/>
+					<description/>
 					<description/>
 					<description/>
 					<description/>
@@ -73,6 +76,7 @@
 					<menulist>
 						<menupopup id="${row}[license]" readonly="true"/>
 					</menulist>
+					<url-email id="${row}[email]" readonly="true"/>
 					<textbox type="float" align="right" id="${row}[total]" readonly="true" precision="2"/>
 					<textbox type="float" align="right" id="${row}[fed]" readonly="true" precision="2"/>
 				</row>
