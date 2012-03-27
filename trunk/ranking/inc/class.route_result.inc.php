@@ -1129,7 +1129,7 @@ class route_result extends so_sql
 			if (count($first_places) > 1 && ($comp = boresult::$instance->route->read($keys)) && !$comp['route_quota'])
 			{
 				// sort by result_time
-				usort($first_places,create_function('$a,$b', 'return $a["result_time_l"]-$b["result_time_l"];'));
+				usort($first_places,create_function('$a,$b', 'return $a["result_time_l"]==$b["result_time_l"]?0:($a["result_time_l"]<$b["result_time_l"]?-1:1);'));
 				// update new-rank accordingly
 				foreach($first_places as $i => &$data)
 				{
