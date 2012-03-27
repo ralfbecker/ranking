@@ -178,6 +178,7 @@ class ranking_accounting extends boresult
 						'acl_fed_id'   => array('label' => lang('Regionalzentrum'),'type' => 'select'),
 						'fed_parent'   => array('label' => lang('Landesverband'),'type' => 'select'),
 						'license'      => array('label' => lang('License'),     'type' => 'select'),
+						'email'        => array('label' => lang('EMail'),       'type' => 'text'),
 						'total'        => array('label' => lang('Total'),       'type' => 'float', 'size' => '2'),
 						'fed'          => array('label' => lang('Federation'),  'type' => 'float', 'size' => '2'),
 					)
