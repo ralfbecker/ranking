@@ -649,6 +649,7 @@ class uiresult extends boresult
 		switch($query['display_athlete'] ? $query['display_athlete'] : (string)$query['calendar'])
 		{
 			case '':	// international
+			case 'NULL':	// international
 			case ranking_competition::NATION:
 				$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 				break;
