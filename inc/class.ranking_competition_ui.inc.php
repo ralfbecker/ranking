@@ -70,7 +70,7 @@ class ranking_competition_ui extends boranking
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
 		{
-			if (!$_GET['WetId'] && !$_GET['rkey'] && $this->only_nation_edit)
+			if (!$_GET['WetId'] && !$_GET['rkey'])
 			{
 				$this->check_set_nation_fed_id($this->comp->data);
 			}

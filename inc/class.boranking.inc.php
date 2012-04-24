@@ -434,22 +434,25 @@ class boranking extends ranking_so
 	}
 
 	/**
-	 * Check and set nation&fed_id depending on only_nation_edit
+	 * Check and set nation&fed_id depending on $this->edit_rights
+	 *
+	 * Only works for a single edit-right or one national right plus federation rights of same nation
 	 *
 	 * @parm array $comp=null default $this->comp->data
 	 */
 	function check_set_nation_fed_id(array &$comp)
 	{
-		if ($this->only_nation_edit)
+		foreach($this->edit_rights as $nat_fed_id)
 		{
-			if (is_numeric($this->only_nation_edit) && ($fed = $this->federation->read($this->only_nation_edit)))
+			if (is_numeric($nat_fed_id) && ($fed = $this->federation->read($nat_fed_id)))
 			{
-				$comp['fed_id'] = $this->only_nation_edit;
+				$comp['fed_id'] = $nat_fed_id;
 				$comp['nation'] = $fed['nation'];
 			}
-			else
+			elseif ($comp['nation'] !== $nat_fed_id)
 			{
-				$comp['nation'] = $this->only_nation_edit;
+				$comp['nation'] = $nat_fed_id;
+				unset($comp['fed_id']);
 			}
 		}
 	}
