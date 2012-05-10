@@ -266,6 +266,7 @@ how many athletes from the complimentary list of each nation should be used	rank
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
+if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	en	If you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.
 ignore	ranking	en	Ignore
 import	ranking	en	Import
 import as	ranking	en	Import as
@@ -365,6 +366,7 @@ place	ranking	en	Place
 place of birth	ranking	en	Place of birth
 please check the categories you want to register for:	ranking	en	Please check the categories you want to register for:
 please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	en	Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.
+please enter your email address and password to register for competitions or edit your profile:	ranking	en	Please enter your EMail address and password to register for competitions or edit your profile:
 please enter your new password:	ranking	en	Please enter your new password:
 please enter your password to log in or %1click here%2, if you forgot it.	ranking	en	Please enter your password to log in or %1click here%2, if you forgot it.
 please try again ...	ranking	en	Please try again ...
