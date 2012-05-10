@@ -459,7 +459,7 @@ class ranking_athlete_ui extends boranking
 			if ($this->athlete->data['PerId'] && $this->is_selfservice() == $this->athlete->data['PerId'])
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = $readonlys['geb_date'] = true;
-				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
+				$readonlys['fed_id'] = $readonlys['a2f_start'] = $readonlys['acl'] = true;
 				// 'til we have some kind of review mechanism
 				$readonlys['tabs']['pictures'] = true;
 			}
