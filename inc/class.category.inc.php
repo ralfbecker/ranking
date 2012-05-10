@@ -395,7 +395,7 @@ class category extends so_sql
 			$y = $from_year; $from_year = $to_year; $to_year = $y;
 		}
 		//echo "category::age_group(,'$stand',from=$from_year, to=$to_year)"; _debug_array($cat);
-		return $cat['from_year'] && $cat['to_year'];
+		return $cat['from_year'] || $cat['to_year'];
 	}
 
 	/**
@@ -427,7 +427,7 @@ class category extends so_sql
 		}
 		else
 		{
-			$ret = $from_year <= (int)$birthdate && (int)$birthdate <= $to_year;
+			$ret = (!$from_year || $from_year <= (int)$birthdate) && (!$to_year || (int)$birthdate <= $to_year);
 		}
 		//echo "<p>".__METHOD__."($birthdate,".array2string($cat).",$year) from_year=$from_year, to_year=$to_year --> returning ".array2string($ret)."$reason</p>\n";
 		return $ret;
