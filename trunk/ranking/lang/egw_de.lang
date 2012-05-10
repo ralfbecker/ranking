@@ -266,6 +266,7 @@ how many athletes from the complimentary list of each nation should be used	rank
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athleten des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
+if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	de	Falls Sie noch kein Passwort haben oder es vergessen haben, geben sie einfach nur Ihre E-Mail Adresse an. Dann erhalten Sie eine E-Mail mit Anweisungen zum Setzen des Passworts.
 ignore	ranking	de	Ignorieren
 import	ranking	de	Importieren
 import as	ranking	de	Importieren als
@@ -365,6 +366,7 @@ place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
 please check the categories you want to register for:	ranking	de	Bitte Kategorien abhaken für die Du registrieren willst:
 please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	de	Bitte kontakte Deinen Verband%1 um Deine EMail Adresse einzutragen, damit wir Dir ein Passwort zusenden können.
+please enter your email address and password to register for competitions or edit your profile:	ranking	de	Bitte E-Mail Adresse und Password eingeben, zur Anmeldung an Wettkämpfe oder um das eigene Profil zu bearbeiten:
 please enter your new password:	ranking	de	Bitte neues Passwort eingeben:
 please enter your password to log in or %1click here%2, if you forgot it.	ranking	de	Zur Anmeldung bitte Passwort eingeben oder %1hier klicken%2, falls Du es vergessen hast.
 please try again ...	ranking	de	Bitte nochmal versuchen ...

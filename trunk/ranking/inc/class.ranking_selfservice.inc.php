@@ -373,7 +373,7 @@ class ranking_selfservice extends boranking
 			echo "<form action='$link' method='POST'>\n";
 			if (!$athlete)
 			{
-				echo "<p>".lang("Please enter your EMail and password to log in.")."</p>\n";
+				echo "<p>".lang("Please enter your EMail address and password to register for competitions or edit your profile:")."</p>\n";
 				$pw = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : $_COOKIE[self::EMAIL_COOKIE]);
 				echo "<table>\n<tr><td>".lang('EMail')."</td><td><input type='text' name='email' value='$pw' /></td></tr>\n";
 			}
@@ -384,6 +384,11 @@ class ranking_selfservice extends boranking
 			echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' /></td>\n";
 			echo "<td><input type='submit' value='".lang('Login')."' /></td></tr>\n";
 			echo "</table>\n</form>\n";
+
+			if (!$athlete)
+			{
+				echo "<p>".lang("If you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.")."</p>\n";
+			}
 		}
 	}
 
