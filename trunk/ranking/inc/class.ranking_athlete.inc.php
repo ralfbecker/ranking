@@ -356,7 +356,8 @@ class ranking_athlete extends so_sql
 				// if cat uses an age-group only show athlets in that age-group
 				if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
 				{
-					$join .= " AND $from_year <= YEAR(geb_date) AND YEAR(geb_date) <= $to_year";
+					if ($from_year) $join .= " AND ".(int)$from_year." <= YEAR(geb_date)";
+					if ($to_year) $join .= " AND YEAR(geb_date) <= ".(int)$to_year;
 				}
 				$extra_cols[] = "MAX($this->result_table.datum) AS last_comp";
 				$order_by = "GROUP BY $this->table_name.PerId ORDER BY $order_by";
