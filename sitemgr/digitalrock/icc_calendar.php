@@ -57,7 +57,7 @@ $cats = array(
 	),
 );
 
-do_header ($t_calendar,'','',0,'',2);
+do_header ($t_calendar,'','',0,'',2, $mode != 2);	// load jQuery for mode != 2
 
 echo '<style type="text/css">
 <!--

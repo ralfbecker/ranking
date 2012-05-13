@@ -6,11 +6,12 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2002-9 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
+	!in_array($_SERVER['HTTP_HOST'], array('localhost','ralfsmacbook.local','boulder.outdoor-training.de')))
 {
 	include_once('cache.php');
 	do_cache();
