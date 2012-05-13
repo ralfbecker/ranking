@@ -1,5 +1,4 @@
 <!-- $Id$ -->
-<br /><hr width="100%">
 <p>Resultservice and rankings provided by <a href="http://www.digitalROCK.de" target=_blank>
 digital ROCK</A>, (c) 1990-<?php echo date('Y'); ?> by <?php echo mailto('RalfBecker@digitalROCK.de',
 'Ralf Becker'); ?>. </p>

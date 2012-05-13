@@ -1,6 +1,14 @@
 <?php
-
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - ranglist display
+ *
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
 
 if (!strlen($date_format)) $date_format = '%d.%m.%y';
 $anz_year = strlen($anz_year) ? intval($anz_year) : 1;	// number of years before/after are shown
@@ -225,18 +233,12 @@ if ($serien)
 	//echo "<pre>"; print_r($cats); echo "</pre>\n";
 }
 
-echo '<table width="100%"><tr>'."\n";
-echo "\t".'<td align="left">';
-if (!strstr($extra_header[$year],'provisional') && !$mode && !defined('DR_PATH'))
-{
-	echo "\t\t".'<p><a class="rank_link" href="#ranking">>>> '.$t_ranking."</a></p>\n";
-}
 $hidden_vars = '';
 foreach ($_GET as $name => $value)
 {
 	if ($value && $name != 'year') $hidden_vars .= "\t\t\t".'<input type="hidden" name="'.$name.'" value="'.htmlspecialchars($value).'">'."\n";
 }
-echo "\t\t".'<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'."\n".$hidden_vars.
+echo "\t\t".'<form id="yearSelection" action="'.$_SERVER['PHP_SELF'].'" method="GET" style="float:left; padding-top: 35px; margin-bottom: 5px;">'."\n".$hidden_vars.
      "\t\t\t".'<span class="cal_head">'.$extra_header[$year].' '.($mode != 2 ? $t_calendar : $t_ranking)."</span>\n".
      "\t\t\t".'<select class="cal_head" name="year" onchange="this.form.submit();">'."\n";
 
@@ -246,12 +248,27 @@ foreach($years as $y)	// the availible years are queried now from the db
 }
 echo "\t\t\t</select>\n";
 echo "\t\t</form>\n";
-echo "\t".'</td><td width="20%" align="right">'.$header_logos."</td>\n";
-echo "</tr></table>\n";
+echo '<div style="float: right">'.$header_logos."</div>\n";
 
 if ($mode != 2)
 {
 	$last_s_year = $year;
+
+	if (!defined(DR_PATH))	// not running in SiteMgr
+	{
+		echo "<script>
+	jQuery(document).ready(function(){
+		var scrollIntoView = document.getElementById('scrollIntoView');
+		if (typeof scrollIntoView != 'undefined')
+		{
+			scrollIntoView.scrollIntoView(true);
+			document.getElementById('yearSelection').scrollIntoView(true);
+		}
+	});
+</script>\n";
+		$div_style='height: 300px; overflow: auto;';
+	}
+	echo '<div style="'.$div_style.'clear: both;">'."\n";
 	echo '<table width="100%">'."\n";
 	while ($next_serie || $wettk) {			// solange noch eine Zeile da
 		$s_year = 0;
@@ -367,7 +384,14 @@ if ($mode != 2)
 						$minis .= ($minis?"\n| ":'').'<a class="mini_link" href="'.$prefix.$infos.'" target="_blank" title="'.$t_show_infos.'">'.$t_infos.'</a>';
 					}
 //_debug_array($wettk);
-					echo '<tr bgcolor="'.$cat['bgcolor'].'">'."\n\t".'<td class="comp_date">'.wettk_datum($wettk)."</td>\n";
+					list($y,$m,$d) = explode('-',$wettk->datum);
+					list($show_y,$show_m,$show_d) = explode('-',date('Y-m-d',time()-5*86400));	// 5 days back
+					if (!isset($show_comp) && $y == $show_y && ($m > $show_m || $m == $show_m && $d >= $show_d))
+					{
+						$show_comp = ' id="scrollIntoView"';
+					}
+					echo '<tr bgcolor="'.$cat['bgcolor'].'"'.$show_comp.'>'."\n\t".'<td class="comp_date">'.wettk_datum($wettk)."</td>\n";
+					if (isset($show_comp)) $show_comp = '';
 					$wettk_class = $wettk->serie && ($wettk->faktor > 0.0 || $wettk->nation != 'GER') ? 'comp_cup' : 'comp';
 					$wettk_label = str_replace('#','<font color="red">###</font> ',wettk_link_str($wettk,$wettk->name,'comp_link',!file_exists($result)));
 					echo "\t".'<td><span class="'.$wettk_class.'">'.$wettk_label.'</span><br />'.$minis."</td>\n";
@@ -379,6 +403,7 @@ if ($mode != 2)
 		}
 	}
 	echo "</table>\n";
+	echo "</div>\n";
 
 	if ($extra_footer[$year]) echo $extra_footer[$year]."\n";
 }
@@ -390,7 +415,7 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 	{
 		echo '<a name="ranking">'."\n";
 
-		echo '<table width="100%"><tr>'."\n";
+		echo '<table width="100%" style="clear: both;"><tr>'."\n";
 		echo "\t".'<td align="left" valign="bottom"><span class="cal_head">'.$t_ranking."</span></td>\n";
 		echo "\t".'<td width="20%" align="right">'.$dav_header."</td>\n";
 		echo "</tr></table>\n";
@@ -460,8 +485,8 @@ if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
 				else
 				{
 					echo "\t".'<tr bgcolor="'.$cat['bgcolor'].'">'."\n";
-					echo "\t\t".'<td nowrap>'."\n";
-					echo "\t\t\t".'<span class="comp">'.$serie->name.":</SPAN>\n";
+					echo "\t\t".'<td>'."\n";
+					echo "\t\t\t".'<span class="comp">'.$serie->name.":</span>\n";
 					echo "\t\t</td><td>\n";
 				}
 				foreach(isset($cat['serie_grps']) ? $cat['serie_grps'] : $cat['grps'] as $grp => $gname)

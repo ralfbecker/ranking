@@ -1,6 +1,14 @@
 <?php
-
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - ranglist display
+ *
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
 
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set('mbstring.internal_encoding','utf-8');
@@ -43,7 +51,7 @@ else
 	);
 }
 
-function do_header($head_title,$title,$align="center",$raise=0,$target='profil',$do_body=1)
+function do_header($head_title,$title,$align="center",$raise=0,$target='profil',$do_body=1,$load_jquery=false)
 {
 	global $t_header_logo,$t_dig_rock_alt,$url_drock,$url_icc_info;
 
@@ -70,6 +78,7 @@ function do_header($head_title,$title,$align="center",$raise=0,$target='profil',
    </script>
 <?php
 		}
+		if ($load_jquery) echo '<script src="'.($_SERVER['HTTPS']?'https://':'http://').'ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>'."\n";
 ?>
 </head>
 <body text="#000000" bgcolor="#FFFFFF">
@@ -176,6 +185,11 @@ function do_footer($do_body=True)
 	if ($see_also_done)
 	{
 		echo "</ul></div>\n";
+		echo "<hr width='100%'/>\n";
+	}
+	else
+	{
+		echo "<p>\n";
 	}
 	if (!defined('DR_PATH'))	// not running in sitemgr
 	{

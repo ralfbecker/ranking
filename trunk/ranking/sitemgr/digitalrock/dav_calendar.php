@@ -1,7 +1,8 @@
 <?php
 /* $Id$ */
 
-if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
+	!in_array($_SERVER['HTTP_HOST'],array('localhost','ralfsmacbook.local','boulder.outdoor-training.de')))
 {
 	include_once('cache.php');
 	do_cache();
@@ -163,7 +164,7 @@ if (!$no_dav)
 }
 else
 {
-	do_header ($t_calendar,'','',0,'',2);
+	do_header ($t_calendar,'','',0,'',2, $mode != 2);	// load jQuery for mode != 2
 }
 
 echo '<style type="text/css">
