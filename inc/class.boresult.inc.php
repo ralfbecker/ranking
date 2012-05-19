@@ -636,7 +636,7 @@ class boresult extends boranking
 				$this->route_result->save($data);
 			}
 		}
-		if ($max_rank)	// fill up with wildcards
+		if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem --> fill up with wildcards
 		{
 			while($start_order <= $prev_route['route_quota'])
 			{
