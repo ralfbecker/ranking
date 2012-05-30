@@ -90,7 +90,7 @@ class ranking_export extends boresult
 		// switch caching off for speed-cli.php, as it can not (un)set the cache,
 		// because of permissions of /tmp/egw_cache only writable by webserver-user
 		// for all other purposes caching is ok and should be enabled
-		if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)) !== false)
+		if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)))
 		{
 			if (!isset($instance)) $instance = new ranking_export();
 
