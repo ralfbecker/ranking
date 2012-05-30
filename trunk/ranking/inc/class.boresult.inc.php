@@ -252,7 +252,7 @@ class boresult extends boranking
 			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
 			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM)),		// true = stagger, false = no stagger
-			$old_startlist);
+			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']));
 
 		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF)	// set 2. lane for record format
 		{
@@ -359,7 +359,7 @@ class boresult extends boranking
 		switch($nation)
 		{
 			case 'SUI':
-				$order = 2|4;	// reverse cup
+				$order = 10;	// random, distribution by Cup(!), since 2012
 				break;
 
 			default:

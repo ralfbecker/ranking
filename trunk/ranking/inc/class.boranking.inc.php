@@ -1069,15 +1069,16 @@ class boranking extends ranking_so
 	 * 	new random order but distribution on multiple routes by 3: ranking or 4: cup
 	 * @param boolean $stagger=false insert starters of other route behind
 	 * @param array $old_startlist=null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
+	 * @param int $quali_preselected=null number of preselected from cup or ranking, returned last, rest is randomized
 	 * @return boolean/array true or array with starters (if is_array($old_startlist)) if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$order=0,$stagger=false,$old_startlist=null)
+	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$order=0,$stagger=false,$old_startlist=null,$quali_preselected=null)
 	{
 		// order bitfields to booleans
 		$use_ranking = (boolean)($order & 3);	// cup OR ranking
 		$use_cup = (boolean)($order & 2);
-		$reverse_ranking = (boolean)($order & 4);
-		$distribution_only = (boolean)($order & 8);
+		$reverse_ranking = ($order & 4) || $quali_preselected;	// preselected are displayed last
+		$distribution_only = ($order & 8) && !$quali_preselected;
 		//echo "<p>".__METHOD__."($comp,$cat,num_routes=$num_routes,max_compl=$max_compl,order=$order,stagger=$stagger,) use_ranking=$use_ranking,use_cup=$use_cup, reverse_ranking=$reverse_ranking, distribution_only=$distribution_only</p>\n";
 
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
@@ -1170,7 +1171,7 @@ class boranking extends ranking_so
 			// we generate the startlist starting from the end = first of the ranking
 			foreach((array) $ranking as $athlete)
 			{
-				if (isset($starters[$athlete['PerId']]))
+				if (isset($starters[$athlete['PerId']]) && (!$quali_preselected || $athlete['platz'] <= $quali_preselected))
 				{
 					$starters[$athlete['PerId']]['ranking'] = $athlete['platz'];
 					$this->move_to_startlist($starters,$athlete['PerId'],$startlist,$num_routes,$reset_data,__LINE__);
