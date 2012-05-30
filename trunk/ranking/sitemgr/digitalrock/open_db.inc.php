@@ -560,7 +560,7 @@ function prepare_var($name,$hows,$from,$default='')
 				$var = (int) $var;
 				break;
 			case 'slashes': case 'addslashes':
-				$var = addslashes($var);
+				$var = mysql_real_escape_string($var);
 				break;
 			case 'upper': case 'strtoupper':
 				$var = strtoupper($var);
