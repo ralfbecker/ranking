@@ -1,7 +1,17 @@
 <?php
-/* $Id$ */
+/**
+ * eGroupWare digital ROCK Rankings - Sektionenwertung
+ *
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
 
-if (basename($_SERVER['PHP_SELF']) == basename(__FILE__))
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
+	!in_array($_SERVER['HTTP_HOST'],array('localhost','ralfsmacbook.local','boulder.outdoor-training.de')))
 {
 	include_once('cache.php');
 	do_cache();
@@ -14,91 +24,143 @@ $from = $stand = prepare_var('from','addslashes,strtoupper',array('GET',0),'.');
 $gruppe=prepare_var('cat','strtoupper',array('GET',1));
 $serie =prepare_var('cup','strtoupper',array('GET',2));		// Serie statt Rangliste berechnen
 $show_calc = prepare_var('show_calc','int',array('GET'),0);
-$results_per_wettk = prepare_var('max','int',array('GET'),2);
-
-if ($debug) echo "<p>$_SERVER[PHP_SELF]: stand='$stand', gruppe='$gruppe', serie='$serie'</p>\n";
-
-setup_grp ($gruppe);			// defaults fuer Gruppe einrichten
-require $grp_inc;
-
-if ($debug) echo "<pre>".print_r($gruppe,true)."</pre>\n";
+$results_per_wettk = /*prepare_var('max','int',array('GET'),*/$gruppe ? 2 : 1;//);
 
 $window_anz = 12;	// letzten 12 monate zaehlen
 
-if ($serie)
-{
-	read_serie ($serie);
-	get_pkte($serie->pkte,$serien_pkte);
-}
+if ($debug) echo "<p>$_SERVER[PHP_SELF]: stand='$stand', gruppe='$gruppe', serie='$serie'</p>\n";
 
-if ($stand == '.')			// . == letzter Wettk vor akt. Datum
+if (!$gruppe)	// Sektionenrangliste: bestes Ergebnis jeder Kategorie (Erwachsene und Jugend)
 {
-	$stand = date ("Y-m-d",time());
-	$res = my_query($sql="SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
-		" WHERE w.WetId=r.WetId AND r.GrpId IN ($gruppe->GrpIds) AND ".
-		($gruppe->nation ? "w.nation='$gruppe->nation'" : "ISNULL(w.nation)")." AND ".
-		($serie ? "w.serie=$serie->SerId" : "w.faktor>0.0").
-		" AND w.datum<='$stand'".
-		" ORDER BY w.datum DESC LIMIT 1");
-}
-else
-{
-	$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE rkey='$stand'");
-}
-if ($res > 0 && mysql_num_rows($res))
-{
-	$wettk = mysql_fetch_object ($res);
-	$stand = $wettk->datum;
+	setup_grp ($g='GER_M');			// defaults fuer GER einrichten
+	require $grp_inc;
 
-	$sql = '';
-	$gruppen = $gruppe->mgroups ? $gruppe->mgroups : array($gruppe->rkey,$grp2old[$gruppe->rkey]);
-	foreach($gruppen as $grp)
+	if ($stand == '.' || preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}$/', $stand))
 	{
-		if (strlen($grp))
-		{
-			$sql .= ($sql ? ' OR ':'').
-				"find_in_set('$grp',if(instr(gruppen,'@'),left(gruppen,instr(gruppen,'@')-1),gruppen))".
-				" OR '$grp' regexp if(instr(gruppen,'@'),left(gruppen,instr(gruppen,'@')-1),gruppen)";
-		}
-	}
-	// auf weiteren wettk im akt. Jahr testen
-	$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE ".
-		($gruppe->nation ? "nation='$gruppe->nation'" : "ISNULL(nation)")." AND ".
-		($serie ? "serie=$serie->SerId" : "faktor>0.0").
-		" AND datum>'$wettk->datum' AND datum<='".(0+$wettk->datum)."-12-31'".
-		" AND ($sql) ORDER BY datum ASC LIMIT 1");
-
-	if ($res > 0 && ($next_wettk = mysql_fetch_object($res)))
-	{
-		if ($debug) echo "<p>next wettk: $next_wettk->name, $next_wettk->datum, '$next_wettk->gruppen'</p>\n";
+		if ($stand == '.') $stand = date('Y-m-d');
+		$stand = "w.datum <= '$stand'";
 	}
 	else
 	{
-		$stand = (0+$wettk->datum) . '-12-31';	// kein weiterer wettk -> Stand 31.12.
+		$stand = "w.rkey='$stand'";
 	}
-}
-if ($debug) echo "<p>stand='$stand'</p>\n";
+	if (($res = my_query($sql="SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
+		" WHERE w.WetId=r.WetId AND w.nation='GER' AND w.serie IS NOT NULL AND w.fed_id IS NULL AND $stand".
+		" ORDER BY w.datum DESC LIMIT 1")) && mysql_num_rows($res))
+	{
+		$wettk = mysql_fetch_object ($res);
+		$stand = $wettk->datum;
 
-if ($serie)
-{
-	$valid = "wettk.serie = $serie->SerId";
-}
-else
-{
-	ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$stand,$date);
-	$anfang = date("Y-m-d",mktime(0,0,0,$date[2]-$window_anz,$date[3],$date[1]));
+		// check if $wettk is last comp in the year
+		if (($res = my_query($sql="SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
+			" WHERE w.WetId=r.WetId AND w.nation='GER' AND w.serie IS NOT NULL AND w.fed_id IS NULL AND w.datum>'$stand'".
+			" ORDER BY w.datum ASC LIMIT 1")) && mysql_num_rows($res) &&
+			($next_wettk = mysql_fetch_object($res)) && (int)$wettk->datum !== (int)$next_wettk->datum)
+		{
+			$stand = (int)$wettk->datum.'-12-31';
+		}
+	}
+	else
+	{
+		die("No compeition found!\n");
+	}
+	$date = explode('-', $stand);
+	$anfang = date("Y-m-d",mktime(0,0,0,$date[1]-$window_anz,$date[2],$date[0]));
 
-	$valid = "'$anfang' < wettk.datum AND wettk.faktor > 0.0";
+	if ($debug) echo "<p>stand='$stand', anfang='$anfang'</p>\n";
+
+	$res = my_query($sql = "SELECT verband,fed_url,wettk.WetId,wettk.rkey,wettk.name,wettk.dru_bez,wettk.datum,".
+		"grp.GrpId,grp.rkey AS grkey,grp.GrpId,grp.name AS gname,per.PerId,per.nachname,per.vorname,res.platz,res.pkt".
+		" FROM Wettkaempfe wettk".
+		" JOIN Results res USING(WetId)".
+		" JOIN Gruppen grp USING(GrpId)".
+		" JOIN Personen per USING(PerId)".fed_join('per','YEAR(wettk.datum)').
+		" WHERE wettk.nation='GER' AND wettk.serie IS NOT NULL AND wettk.fed_id IS NULL AND".
+		" '$anfang' < wettk.datum AND wettk.datum <= '$stand'".
+		" ORDER BY verband,wettk.datum,grp.name,res.platz");
 }
-$year = (int)$stand;
-$res = my_query($sql = "SELECT verband,fed_url,wettk.WetId,wettk.rkey,wettk.name,wettk.dru_bez,wettk.datum,".
-	"grp.GrpId,grp.rkey AS grkey,grp.GrpId,grp.name AS gname,per.PerId,per.nachname,per.vorname,res.platz,res.pkt".
-	" FROM Wettkaempfe wettk".
-	" JOIN Results res USING(WetId)".
-	" JOIN Gruppen grp USING(GrpId)".
-	" JOIN Personen per USING(PerId)".fed_join('per','YEAR(wettk.datum)').
-	" WHERE grp.GrpId IN ($gruppe->GrpIds) AND $valid AND wettk.datum <= '$stand'".
-	" ORDER BY verband,wettk.datum,grp.name,res.platz");
+else	// Sektionenwertung pro Kategorie
+{
+	setup_grp ($gruppe);			// defaults fuer Gruppe einrichten
+	require $grp_inc;
+
+	if ($debug) echo "<pre>".print_r($gruppe,true)."</pre>\n";
+
+	if ($serie)
+	{
+		read_serie ($serie);
+		get_pkte($serie->pkte,$serien_pkte);
+	}
+
+	if ($stand == '.')			// . == letzter Wettk vor akt. Datum
+	{
+		$stand = date ("Y-m-d",time());
+		$res = my_query($sql="SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
+			" WHERE w.WetId=r.WetId AND r.GrpId IN ($gruppe->GrpIds) AND ".
+			($gruppe->nation ? "w.nation='$gruppe->nation'" : "ISNULL(w.nation)")." AND ".
+			($serie ? "w.serie=$serie->SerId" : "w.faktor>0.0").
+			" AND w.datum<='$stand'".
+			" ORDER BY w.datum DESC LIMIT 2");
+	}
+	else
+	{
+		$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE rkey='$stand'");
+	}
+	if ($res > 0 && mysql_num_rows($res))
+	{
+		$wettk = mysql_fetch_object ($res);
+		$stand = $wettk->datum;
+
+		$sql = '';
+		$gruppen = $gruppe->mgroups ? $gruppe->mgroups : array($gruppe->rkey,$grp2old[$gruppe->rkey]);
+		foreach($gruppen as $grp)
+		{
+			if (strlen($grp))
+			{
+				$sql .= ($sql ? ' OR ':'').
+					"find_in_set('$grp',if(instr(gruppen,'@'),left(gruppen,instr(gruppen,'@')-1),gruppen))".
+					" OR '$grp' regexp if(instr(gruppen,'@'),left(gruppen,instr(gruppen,'@')-1),gruppen)";
+			}
+		}
+		// auf weiteren wettk im akt. Jahr testen
+		$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE ".
+			($gruppe->nation ? "nation='$gruppe->nation'" : "ISNULL(nation)")." AND ".
+			($serie ? "serie=$serie->SerId" : "faktor>0.0").
+			" AND datum>'$wettk->datum' AND datum<='".(0+$wettk->datum)."-12-31'".
+			" AND ($sql) ORDER BY datum ASC LIMIT 1");
+
+		if ($res > 0 && ($next_wettk = mysql_fetch_object($res)))
+		{
+			if ($debug) echo "<p>next wettk: $next_wettk->name, $next_wettk->datum, '$next_wettk->gruppen'</p>\n";
+		}
+		else
+		{
+			$stand = (0+$wettk->datum) . '-12-31';	// kein weiterer wettk -> Stand 31.12.
+		}
+	}
+	if ($debug) echo "<p>stand='$stand'</p>\n";
+
+	if ($serie)
+	{
+		$valid = "wettk.serie = $serie->SerId";
+	}
+	else
+	{
+		$date = explode('-', $stand);
+		$anfang = date("Y-m-d",mktime(0,0,0,$date[1]-$window_anz,$date[2],$date[0]));
+
+		$valid = "'$anfang' < wettk.datum AND wettk.faktor > 0.0";
+	}
+	$year = (int)$stand;
+	$res = my_query($sql = "SELECT verband,fed_url,wettk.WetId,wettk.rkey,wettk.name,wettk.dru_bez,wettk.datum,".
+		"grp.GrpId,grp.rkey AS grkey,grp.GrpId,grp.name AS gname,per.PerId,per.nachname,per.vorname,res.platz,res.pkt".
+		" FROM Wettkaempfe wettk".
+		" JOIN Results res USING(WetId)".
+		" JOIN Gruppen grp USING(GrpId)".
+		" JOIN Personen per USING(PerId)".fed_join('per','YEAR(wettk.datum)').
+		" WHERE grp.GrpId IN ($gruppe->GrpIds) AND $valid AND wettk.datum <= '$stand'".
+		" ORDER BY verband,wettk.datum,grp.name,res.platz");
+}
 if ($debug) echo "<p>sql='$sql'</p>\n";
 
 $rang = array();
@@ -165,7 +227,7 @@ if ($debug) echo "<pre>".print_r($rang,true)."</pre>";
 
 do_header($t_sektionranking.($serie ? ' '.$serie->name : '')." $t_after ".
 	(is_object($wettk)?$wettk->name:datum($stand)),
-	$t_sektionranking.'<br>'.($serie?"<b>$serie->name</b>":'')."<p><b>$gruppe->name</b><br>".
+	($gruppe ? $t_sektionranking_cat.'<br>'.($serie?"<b>$serie->name</b>":'')."<p><b>$gruppe->name</b><br>" : $t_sektionranking."<br>").
 	(is_object($wettk) ? "<i><font size=\"+0\">$t_after</font></i><br>$wettk->name<br>".datum($wettk->datum):"").
 	(!is_object($wettk)||$wettk->datum != $stand ? "<br><i><font size=\"+0\">$t_stand</font></i><br><b>".datum($stand).'</b>' : ''));
 

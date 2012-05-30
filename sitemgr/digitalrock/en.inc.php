@@ -41,10 +41,9 @@ $t_show_result = 'show result';
 $t_no_result = 'no result yet';
 $t_calendar = 'Competitioncalendar';
 $t_ranking = 'Rankings';
+$t_sektionranking_cat = 'Ranking by club and category';
 $t_sektionranking = 'Ranking by club';
 $t_result_per_wettk = '(per competition and category)';
 $t_nat_team_ranking = 'National Team Ranking';
 $t_combined_ranking = 'Combined Ranking';
 $t_per_cat = 'per category';
-
-?>
