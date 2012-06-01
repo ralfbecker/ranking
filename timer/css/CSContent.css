@@ -1,0 +1,61 @@
+/* General styles */
+body { 
+	margin: 0; 
+	padding: 0; 
+	width: 100%; 
+	height: 100%; 
+	background-color: #333;
+/*	cursor: none; */
+}
+#bg_image { 
+	/* z location of layer */
+	z-index: 1; 
+	/* Positioning */
+	display: block;
+	position: relative;
+	top: 0;
+	/* Sizing */
+	height: 100%;
+	margin: 0 auto;
+}
+#outer {
+	/* Positioning */
+	position: absolute;
+	top: 50%;
+	left: 0px;
+	/* Sizing */
+	width: 100%;
+	height: 1px;
+	/* Overflow */
+	overflow: visible;
+}
+#inner {
+	/* z location of layer */
+	z-index:  2;
+	/* Positioning */
+	position: absolute;
+	width: 100%;
+	margin-left: -50%;	/* width/2 */
+	left: 50%;
+	/* Sizing */
+	height: 200pt;
+	top: -100pt;		/* height/2 */		
+	/* Overflow */
+	overflow: hidden;
+	/* Text Description*/
+	text-align: center;
+	color: #bbb;
+	font: 200pt Arial, Monaco, Calibri, sans-serif;
+}
+#intervalForm {
+	cursor: default;
+}
+
+#restart {
+	position: absolute;
+	x-display: none;
+	top: 10px;
+	left: 10px;
+}
+	
+

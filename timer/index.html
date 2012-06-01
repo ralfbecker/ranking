@@ -1,0 +1,110 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<!-- Counts down for n minutes based on system clock -->
+	<head>		
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Boulder Timer</title>
+		<!-- CSS -->
+		<link rel="stylesheet" href="./css/CSContent.css" type="text/css" media="screen"> 
+		<link rel="stylesheet" href="./css/CSModal.css" type="text/css" media="screen"> 
+		<!-- Javascript -->	
+		<script type="text/javascript" src="./js/jquery-1.4.2.min.js"></script>	<!-- Use .min for production -->
+		<script type='text/javascript' src='./js/jquery.simplemodal.js'></script>
+		<!-- Inline functions -->
+		<script type="text/javascript">
+			// Global variables
+			var beep1 = new Audio("./css/beep-1.mp3");
+			var beep4 = new Audio("./css/countdown.mp3");
+			var theRotationInterval;
+			var finalTimer;
+			var theStartTime;
+			
+			/* countdownTimer() */
+			function countdownTimer() {
+				/* Calculate the time remaining */
+				var now = new Date();
+				if (finalTimer) {
+					var secs = Math.floor((now.getTime() - theStartTime)/1000);
+					var minutes = Math.floor((theRotationInterval*60 - secs) / 60);
+					var seconds = Math.abs((theRotationInterval*60 - secs) % 60);
+				}
+				else {
+					var minutes = theRotationInterval - (Math.floor(now.getTime()/60000) % theRotationInterval) - 1;
+					var seconds = 59 - now.getSeconds();
+				}
+				//console.log('start='+theStartTime+', now='+now.toLocaleString()+', secs='+secs+', min='+minutes+', sec='+seconds);
+				/* Display the time and any warnings */
+				displayTime(minutes,seconds);
+			};
+			/* displayTime(minutes, seconds) */
+			function displayTime(minutesRemaining, secondsRemaining){
+				/* Play Audio Signal */
+				switch (minutesRemaining) {
+					case 1:
+						if(secondsRemaining<1) beep1.play();
+						break;
+					case 0:
+						if(secondsRemaining==5) beep4.play();
+						break;
+				};
+				// we dont want negative minutes in final timer
+				if (minutesRemaining < 0) minutesRemaining = Math.abs(minutesRemaining)-1;
+				/* Format and display */	
+				if (secondsRemaining<10) secondsRemaining = "0" + secondsRemaining;
+				$('#inner').text(minutesRemaining+':'+secondsRemaining);
+			};
+
+			$(document).ready(function(){
+				$('#basic-modal-content').modal();
+				$('#restart').hide();
+				
+				$('#start').click(function() {
+					theRotationInterval = $('#time').val();	// minutes
+					finalTimer = $('#final').attr('checked');
+					
+					if (finalTimer) {	
+						beep1.play();
+						$('#restart').show();
+					}
+					theStartTime = new Date().getTime();
+
+					/* Size the display font based on the viewport height */	
+					var theHeight = 0.7 * screen.height;
+					$('#inner').css('height', theHeight).css('top', -theHeight/2).css('font-size', theHeight );
+
+					countdownTimer();
+					
+					setInterval(function(){countdownTimer();}, 300);
+					$.modal.close();
+				});
+				
+				$('#restart').click(function() {
+					theStartTime = new Date().getTime();
+					beep1.play();
+					countdownTimer();
+				});
+			});
+		</script>		
+	</head>
+	<body id="main_body">
+		<!-- Semantic Markup (empty) -->
+		<div id="outer">
+			<div id="inner"></div>
+		</div>
+
+		<!-- Modal Dialog -->
+		<div id="basic-modal-content">
+			<h3>Boulder Timer</h3>
+			<label for="time">Interval:</label>
+			<input id="time" name="time" type="number" min="1" max="10" step="1" value="4" />
+			<label for="time"> min </label>
+			<input id="start" type="button" value="Start" />
+			<p><input id="final" type="checkbox" />
+			<label for="final">use final timer (starts again at press of restart)</label></p>
+		</div>
+		
+		<!-- restart button for final timer -->
+		<input id="restart" type="button" value="Restart" />
+	</body>
+</html>
+

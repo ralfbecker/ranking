@@ -1,0 +1,55 @@
+/*
+ * SimpleModal Basic Modal Dialog
+ * http://www.ericmmartin.com/projects/simplemodal/
+ * http://code.google.com/p/simplemodal/
+ *
+ * Copyright (c) 2010 Eric Martin - http://ericmmartin.com
+ *
+ * Licensed under the MIT license:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *
+ * Revision: $Id$
+ */
+
+#basic-modal-content {
+/*	padding: 0 40px; */
+
+	display:none;
+	margin-left: 10%;
+}
+
+/* Overlay */
+#simplemodal-overlay {background-color:#000;}
+
+/* Container */
+#simplemodal-container {
+	margin-left: auto;
+	margin-right: auto;
+
+
+	width:400px;
+	height:  140px; 
+	color:#bbb; 
+	background-color:#333; 
+	border:4px solid #444; 
+	padding:12px;
+
+	
+	font: 16px "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+}
+#simplemodal-container h3 {color:#84b8d9;}
+#simplemodal-container label {
+	margin: 0 10px 0 0;
+}
+#simplemodal-container input[type=number] {
+	margin:  0;
+	padding: 0;
+	text-align: center;
+	font-size: 16px;	
+	width: 4em;
+}
+#simplemodal-container input[type=button] {
+	display:  inline-block;
+	font-size: 16px;	
+	width: 80px;
+}
