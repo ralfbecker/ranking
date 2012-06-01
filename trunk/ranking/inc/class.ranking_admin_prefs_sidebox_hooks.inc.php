@@ -49,6 +49,12 @@ class ranking_admin_prefs_sidebox_hooks
 				),false)."','beamer',1024,768,'yes')",
 				'no_lang' => true,
 			);
+			$file[] = array(
+				'text'   => 'Boulder timer',
+				'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/timer/index.html',
+				'target' => 'timer',
+			);
+
 			if (is_object($GLOBALS['uiresult']))	// we show the displays menu only if we are in the result-service
 			{
 				if (($displays = $GLOBALS['uiresult']->display->displays()) || $GLOBALS['egw_info']['user']['apps']['admin'])
