@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @package ranking
  * @author Ralf Becker <RalfBecker-AT-outdoor-training.de>
- * @copyright (c) 2008 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
+ * @copyright (c) 2008-12 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @version $Id$
  */
@@ -150,7 +150,8 @@ $debug = 0;
 $only_download = false;
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route_result.inc.php');
 $set_status = STATUS_RESULT_OFFICIAL;
-$route_type = ONE_QUALI;
+$route_type = null;
+$detect_route_type = true;
 $import_ranking = false;
 
 while(($arg = array_shift($arguments)) && substr($arg,0,2) == '--')
@@ -189,6 +190,7 @@ while(($arg = array_shift($arguments)) && substr($arg,0,2) == '--')
 			break;
 		case '--quali-type':
 			$route_type = (int)array_shift($arguments);
+			$detect_route_type = false;
 			if (!isset($boresult->quali_types[$route_type]) && !isset($boresult->quali_types_speed[$route_type]))
 			{
 				echo "Error: not existing quali-type!\n";
@@ -275,6 +277,7 @@ foreach($cats as $n => $cat_name)
 	$exec_id = get_exec_id($download=curl_exec($ch));	// switch to route=0 and get new exec-id
 	if ($debug > 4) echo $download."\n\n";
 
+	$downloads = array();
 	for($route=0; $route <= 6; ++$route)
 	{
 		// download each heat
@@ -307,14 +310,48 @@ foreach($cats as $n => $cat_name)
 		}
 		$fname = str_replace('/','-',$matches[1]);
 		// convert from the given charset to eGW's
-		$download = translation::convert($download,$charset);
-		if ($debug > 1) echo "$fname:\n".implode("\n",array_slice(explode("\n",$download),0,4))."\n\n";
+		$downloads[$route] = translation::convert($download,$charset);
+		if ($debug > 1) echo "$fname:\n".implode("\n",array_slice(explode("\n",$downloads[$route]),0,4))."\n\n";
 
 		if ($only_download)
 		{
-			file_put_contents($fname,$download);
+			file_put_contents($fname,$downloads[$route]);
 		}
-		else // import
+	}
+	if (!$only_download) // import
+	{
+		// autodetect route_type
+		if ($detect_route_type)
+		{
+			if (!isset($downloads[1]))
+			{
+				$route_type = ONE_QUALI;
+			}
+			else
+			{
+				$content = array(
+					'WetId' => $comp['WetId'],
+					'GrpId' => $cat['GrpId'],
+					'route_order' => 0,
+				);
+				$download = $downloads[0];
+				$quali1 = $boresult->upload($content,fopen('global://download','r'),$add_athletes,false,true);
+				$content['route_order'] = 1;
+				$download = $downloads[1];
+				$quali2 = $boresult->upload($content,fopen('global://download','r'),$add_athletes,false,true);
+				foreach($quali1 as $n => $athlete)
+				{
+					foreach($quali2 as $a)
+					{
+						if ($athlete['PerId'] == $a['PerId']) break 2;
+					}
+					if ($n > 10) break;
+				}
+				$route_type = $athlete['PerId'] == $a['PerId'] ? TWO_QUALI_ALL : TWO_QUALI_HALF;
+			}
+			echo "detected route_type=$route_type=$boresult[$route_type]\n";
+		}
+		foreach($downloads as $route => $download)
 		{
 			$content = array(
 				'WetId' => $comp['WetId'],
@@ -340,7 +377,7 @@ foreach($cats as $n => $cat_name)
 				if ($content['route_num_problems'])
 				{
 					list($line1) = explode("\n",$download);
-					for($n = 3; $n <= 6; $n++)
+					for($n = 3; $n <= 8; $n++)
 					{
 						if (strpos($line1,'boulder'.$n)) $num_problems = $n;
 					}
