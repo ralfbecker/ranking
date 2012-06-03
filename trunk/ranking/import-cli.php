@@ -323,7 +323,12 @@ foreach($cats as $n => $cat_name)
 		// autodetect route_type
 		if ($detect_route_type)
 		{
-			if (!isset($downloads[1]))
+			if ($cat['discipline'] == 'speed')
+			{
+				// no real detection, but currently only bestof is used
+				$route_type = TWO_QUALI_BESTOF;
+			}
+			elseif (!isset($downloads[1]))
 			{
 				$route_type = ONE_QUALI;
 			}
