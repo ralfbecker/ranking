@@ -320,6 +320,7 @@ foreach($cats as $n => $cat_name)
 	}
 	if (!$only_download) // import
 	{
+		require_once(EGW_API_INC.'/class.global_stream_wrapper.inc.php');
 		// autodetect route_type
 		if ($detect_route_type)
 		{
@@ -354,7 +355,7 @@ foreach($cats as $n => $cat_name)
 				}
 				$route_type = $athlete['PerId'] == $a['PerId'] ? TWO_QUALI_ALL : TWO_QUALI_HALF;
 			}
-			echo "detected route_type=$route_type=".(isset($boresult->quali_types[$route_type]) ?
+			echo "detected quali-type: $route_type: ".(isset($boresult->quali_types[$route_type]) ?
 				$boresult->quali_types[$route_type] : $boresult->quali_types_speed[$route_type])."\n";
 		}
 		foreach($downloads as $route => $download)
@@ -368,7 +369,6 @@ foreach($cats as $n => $cat_name)
 			{
 				throw new Exception(lang('Permission denied !!!'),9);
 			}
-			require_once(EGW_API_INC.'/class.global_stream_wrapper.inc.php');
 			$num_imported = $boresult->upload($content,fopen('global://download','r'),$add_athletes);
 
 			if (is_numeric($num_imported))
