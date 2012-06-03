@@ -277,7 +277,7 @@ foreach($cats as $n => $cat_name)
 	$exec_id = get_exec_id($download=curl_exec($ch));	// switch to route=0 and get new exec-id
 	if ($debug > 4) echo $download."\n\n";
 
-	$downloads = array();
+	$downloads = $fnames = array();
 	for($route=0; $route <= 6; ++$route)
 	{
 		// download each heat
@@ -308,7 +308,7 @@ foreach($cats as $n => $cat_name)
 			if ($route == 1) continue;	// me might not have a 2. quali
 			break;	// no further heat
 		}
-		$fname[$route] = $fname = str_replace('/','-',$matches[1]);
+		$fnames[$route] = $fname = str_replace('/','-',$matches[1]);
 		// convert from the given charset to eGW's
 		$downloads[$route] = translation::convert($download,$charset);
 		if ($debug > 1) echo "$fname:\n".implode("\n",array_slice(explode("\n",$downloads[$route]),0,4))."\n\n";
@@ -394,7 +394,7 @@ foreach($cats as $n => $cat_name)
 					}
 				}
 				// set the name from the csv file
-				$fname = $fname[$route];
+				$fname = $fnames[$route];
 				if (substr($fname,0,strlen($cat['name'])+3) == $cat['name'].' - ' &&
 					($name_from_file = str_replace('.csv','',substr($fname,strlen($cat['name'])+3))) != $content['route_name'])
 				{
