@@ -1105,9 +1105,10 @@ class boresult extends boranking
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
 	 * @param boolean $ignore_comp_heat=false ignore WetId and route_order, default do NOT
-	 * @return int/string integer number of imported results or string with error message
+	 * @param boolean $return_data=false true return array with data and do NOT store it
+	 * @return int|string|array integer number of imported results or string with error message
 	 */
-	function upload($keys,$file,$add_athletes=false,$ignore_comp_heat=false)
+	function upload($keys,$file,$add_athletes=false,$ignore_comp_heat=false,$return_data=false)
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) // permission denied
 		{
@@ -1151,7 +1152,7 @@ class boresult extends boranking
 		{
 			$data = $this->parse_csv($keys,$file,false,$add_athletes,$ignore_comp_heat);
 		}
-		if (!is_array($data)) return $data;
+		if (!is_array($data) || $return_data) return $data;
 
 		$this->route_result->route_type = $route_type;
 		$this->route_result->discipline = $discipline;
