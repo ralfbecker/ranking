@@ -1723,7 +1723,7 @@ class boranking extends ranking_so
 					list($bonus,$bonus_tries) = explode('b',trim(substr($str,$bonus_pos-1)));
 					$result['result_top'] = $top ? 100 * $top - $top_tries : null;
 					$result['result_zone'] = 100 * $bonus - $bonus_tries;
-					for($i = 1; $i <= 6 && array_key_exists('boulder'.$i,$arr); ++$i)
+					for($i = 1; $i <= 8 && array_key_exists('boulder'.$i,$arr); ++$i)
 					{
 						$result['top'.$i] = '';
 						$result['zone'.$i] = strpos($str,'0b') !== false ? '0' : '';	// we need to differ between 0b and not climbed!
