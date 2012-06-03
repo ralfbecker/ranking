@@ -354,7 +354,8 @@ foreach($cats as $n => $cat_name)
 				}
 				$route_type = $athlete['PerId'] == $a['PerId'] ? TWO_QUALI_ALL : TWO_QUALI_HALF;
 			}
-			echo "detected route_type=$route_type=".$boresult->quali_types[$route_type]."\n";
+			echo "detected route_type=$route_type=".(isset($boresult->quali_types[$route_type]) ?
+				$boresult->quali_types[$route_type] : $boresult->quali_types_speed[$route_type])."\n";
 		}
 		foreach($downloads as $route => $download)
 		{
