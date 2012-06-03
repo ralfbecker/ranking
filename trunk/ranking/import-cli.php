@@ -341,10 +341,12 @@ foreach($cats as $n => $cat_name)
 					'route_order' => 0,
 				);
 				$download = $downloads[0];
-				$quali1 = $boresult->upload($content,fopen('global://download','r'),$add_athletes,false,true);
+				$quali1 = $boresult->parse_csv($content,fopen('global://download','r'),false,$add_athletes);
+				if (!is_array($quali1)) die($quali1."\n");
 				$content['route_order'] = 1;
 				$download = $downloads[1];
-				$quali2 = $boresult->upload($content,fopen('global://download','r'),$add_athletes,false,true);
+				$quali2 = $boresult->parse_csv($content,fopen('global://download','r'),false,$add_athletes);
+				if (!is_array($quali2)) die($quali2."\n");
 				foreach($quali1 as $n => $athlete)
 				{
 					foreach($quali2 as $a)
