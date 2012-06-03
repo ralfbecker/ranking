@@ -20,7 +20,7 @@ $arguments = $_SERVER['argv'];
 array_shift($arguments);	// remove cmd
 // this is kind of a hack, as the autocreate_session_callback can not change the type of the loaded account-class
 // so we need to make sure the right one is loaded by setting the domain before the header gets included.
-@list(,$_GET['domain']) = explode('@',array_shift($arguments));	// remove user from args
+@list(,$_REQUEST['domain']) = explode('@',array_shift($arguments));	// remove user from args
 array_shift($arguments);	// remove pw from args
 
 if (ini_get('session.save_handler') == 'files' && !is_writable(ini_get('session.save_path')) && is_dir('/tmp') && is_writable('/tmp'))
@@ -145,7 +145,7 @@ $add_athletes = false;
 $charset = 'iso-8859-1';
 $cats = null;	// all
 //$baseurl = 'http://localhost/sitemgr-site/index.php?page_name=resultservice&';
-$baseurl = 'http://www.ifsc-climbing.org/index.php?page_name=resultservice&';
+$baseurl = 'https://www.ifsc-climbing.org/index.php?page_name=resultservice&';
 $debug = 0;
 $only_download = false;
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route_result.inc.php');
@@ -250,6 +250,7 @@ foreach($cats as $n => $cat_name)
 					'cat' => $cat['GrpId'],
 					'show_result' => 1,
 					'route' => 0,
+					'num_rows' => '999',
 				),
 			)
 		)));
@@ -266,6 +267,7 @@ foreach($cats as $n => $cat_name)
 				'cat' => $cat['GrpId'],
 				'show_result' => 1,
 				'route' => 0,
+				'num_rows' => '999',
 			),
 		)
 	)));
@@ -285,17 +287,19 @@ foreach($cats as $n => $cat_name)
 					'cat' => $cat['GrpId'],
 					'show_result' => 1,
 					'route' => $route,
+					'num_rows' => '999',
 				),
 			)
 		)));
 		if ($debug > 2) echo "\nPOSTing $url with $post\n";
 		$download = curl_exec($ch);
+
 		$headers = '';
 		while (empty($headers) || $headers == 'HTTP/1.1 100 Continue')
 		{
 			list($headers,$download) = explode("\r\n\r\n",$download,2);
+			if ($debug > 3) echo "Headers ".__LINE__.":\n".$headers."\n";
 		}
-		if ($debug > 3) echo $headers."\n";
 		if (!preg_match('/attachment; filename="([^"]+)"/m',$headers,$matches))
 		{
 			if ($route == 1) continue;	// me might not have a 2. quali
@@ -303,7 +307,7 @@ foreach($cats as $n => $cat_name)
 		}
 		$fname = str_replace('/','-',$matches[1]);
 		// convert from the given charset to eGW's
-		$download = $GLOBALS['egw']->translation->convert($download,$charset);
+		$download = translation::convert($download,$charset);
 		if ($debug > 1) echo "$fname:\n".implode("\n",array_slice(explode("\n",$download),0,4))."\n\n";
 
 		if ($only_download)
