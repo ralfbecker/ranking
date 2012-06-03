@@ -148,6 +148,11 @@ if (substr($name,0,5) == 'youth')
 {
 	$quota = 1;
 }
+// hardcoding quota of 3 for everything else, as national quota is 4 since 2012, while rules still want 3 for nat-team-ranking
+else
+{
+	$quota = 3;
+}
 //echo "<p>$name: quota=$quota</p>\n"; exit;
 
 if ($cup)
