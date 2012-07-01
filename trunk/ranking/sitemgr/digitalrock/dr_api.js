@@ -217,7 +217,7 @@ Startlist.prototype.update = function()
 		dataType: 'json',
 		type: 'GET', 
 		success: this.handleResponse,
-		error: function(_xmlhttp,_err) { alert('Ajax request to '+this.json_url+' failed: '+_err); }
+		error: function(_xmlhttp,_err) { if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err); }
 	});
 };
 
