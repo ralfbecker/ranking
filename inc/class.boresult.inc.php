@@ -43,7 +43,7 @@ class boresult extends boranking
 		TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
 		TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
 		TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
-		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, on sight',				// lead on 2 routes for all on sight
+		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder',	// lead on 2 routes for all on sight
 		TWO_QUALI_ALL_SUM => 'two Qualification with height sum',							// lead on 2 routes with height sum counting
 		TWO_QUALI_ALL_NO_COUNTBACK => 'two Qualification for all, no countback',			// lead 2012 EYC
 		TWOxTWO_QUALI  => 'two * two Qualification',		// multiply the rank of 2 quali rounds on two routes each
