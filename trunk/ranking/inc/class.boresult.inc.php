@@ -45,6 +45,7 @@ class boresult extends boranking
 		TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
 		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, on sight',				// lead on 2 routes for all on sight
 		TWO_QUALI_ALL_SUM => 'two Qualification with height sum',							// lead on 2 routes with height sum counting
+		TWO_QUALI_ALL_NO_COUNTBACK => 'two Qualification for all, no countback',			// lead 2012 EYC
 		TWOxTWO_QUALI  => 'two * two Qualification',		// multiply the rank of 2 quali rounds on two routes each
 	);
 	var $quali_types_speed = array(
@@ -205,7 +206,7 @@ class boresult extends boranking
 			return false;
 		}
 		if ($route_order >= 2 || 	// further heat --> startlist from reverse result of previous heat
-			$route_order == 1 && in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER)))	// 2. Quali uses same start-order
+			$route_order == 1 && in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_NO_COUNTBACK)))	// 2. Quali uses same start-order
 		{
 			// delete existing starters
 			$this->route_result->delete($keys);
@@ -249,7 +250,7 @@ class boresult extends boranking
 		}
 		// generate a startlist, without storing it in the result store
 		$starters =& parent::generate_startlist($comp,$cat,
-			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
+			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
 			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM)),		// true = stagger, false = no stagger
 			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']));
@@ -271,7 +272,7 @@ class boresult extends boranking
 
 		$num = $this->_store_startlist($starters[1],$route_type == TWO_QUALI_HALF ? 0 : $route_order);
 
-		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL)) && $discipline != 'speed')	// automatically generate 2. quali
+		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) && $discipline != 'speed')	// automatically generate 2. quali
 		{
 			$keys['route_order'] = 1;
 			if (!$this->route->read($keys))
@@ -746,7 +747,7 @@ class boresult extends boranking
 	 */
 	static function is_two_quali_all($route_type)
 	{
-		return in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM));
+		return in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM,TWO_QUALI_ALL_NO_COUNTBACK));
 	}
 
 	/**
@@ -893,7 +894,13 @@ class boresult extends boranking
 				$route = $this->route->read($keys);
 				$route_type = $route['route_type'];
 			}
-			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected);
+			$is_final = false;
+			if ($discipline == 'lead' && $keys['route_order'] >= 2)
+			{
+				if (is_null($route)) $route = $this->route->read($keys);
+				$is_final = !$route['route_quota'];
+			}
+			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		// delete the export_route cache

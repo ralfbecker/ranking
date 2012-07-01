@@ -10,6 +10,7 @@
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 %1. heat	ranking	en	%1. Round
 %1. topo	ranking	en	%1. topo
+%s quota has to be 0 for lead final, otherwise time is not used!	ranking	en	%s Quota has to be 0 for lead final, otherwise time is NOT used!
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 (%1 athletes not from %2 skipped)	ranking	en	(%1 athletes not from %2 skipped)
 1. display	ranking	en	1. Display
@@ -510,7 +511,9 @@ two * two qualification	ranking	en	two * two Qualification
 two qualification	ranking	en	two Qualification
 two qualification for all, flash one after the other	ranking	en	two Qualification for all, flash one after the other
 two qualification for all, flash simultaniously	ranking	en	two Qualification for all, flash simultaniously
+two qualification for all, no countback	ranking	en	two Qualification for all, no countback
 two qualification for all, on sight	ranking	en	two Qualification for all, on sight
+two qualification with height sum	ranking	en	two Qualification with height sum
 two qualification, half quota	ranking	en	two Qualification, half quota
 type of display	ranking	en	Type of display
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
