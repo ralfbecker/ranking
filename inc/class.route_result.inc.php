@@ -29,6 +29,7 @@ define('TWO_QUALI_ALL_SEED_STAGGER',5);	// lead on 2 routes for all on flash
 define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
 define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
 define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
+define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012+ EYC, no countback, otherwise like TWO_QUALI_ALL
 
 define('LEAD',4);
 define('BOULDER',8);
@@ -186,7 +187,7 @@ class route_result extends so_sql
 				}
 			}
 			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
-			if ($route_order == 2 && $route_type == TWO_QUALI_ALL)
+			if ($route_order == 2 && in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)))
 			{
 				$extra_cols[] = 'ROUND(('.$this->_sql_rank_prev_heat($route_order,$route_type).'),2) AS rank_prev_heat';
 			}
@@ -248,7 +249,7 @@ class route_result extends so_sql
 					// not yet a 2. route --> show everyone from 1. route (used for xml/json export)
 				}
 				// speed stores both results in the first quali
-				elseif (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_SUM)) && $discipline != 'speed')
+				elseif (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_SUM,TWO_QUALI_ALL_NO_COUNTBACK)) && $discipline != 'speed')
 				{
 					$filter[] = '('.$this->table_name.'.result_rank IS NOT NULL OR r1.result_rank IS NOT NULL'.
 						// if exist need to check first final route too, as prequalifed are not ranking in quali
@@ -471,7 +472,7 @@ class route_result extends so_sql
 				$order_by[] = "r$route_order.result_rank";
 			}
 			// not participating in one qualification (order 0 or 1) of TWO_QUALI_ALL is ok
-			if ($route_type != TWO_QUALI_ALL || $route_order >= 2)
+			if (!in_array($route_type, array(TWO_QUALI_ALL, TWO_QUALI_ALL_NO_COUNTBACK)) || $route_order >= 2)
 			{
 				$order_by[] = "r$route_order.result_rank IS NULL";
 			}
@@ -583,7 +584,7 @@ class route_result extends so_sql
 							unset($data['result_plus'.$suffix]);
 						}
 					}
-					if (in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI)))
+					if (in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK)))
 					{
 						// quali on two routes for all --> add rank to result
 						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
@@ -957,9 +958,10 @@ class route_result extends so_sql
 	 * @param int $route_type=ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
 	 * @param string $discipline='lead' 'lead', 'speed', 'boulder', 'speedrelay'
 	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
+	 * @param boolean $is_final=false important for lead where we use time now in final, if tied after countback
 	 * @return int|boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0)
+	function update_ranking($keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$is_final=null)
 	{
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected)");
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
@@ -998,9 +1000,9 @@ class route_result extends so_sql
 		$extra_cols[] = $mode.' AS new_rank';
 
 		// do we have a countback
-		if ($quali_preselected && $keys['route_order'] == 2)
+		if ($quali_preselected && $keys['route_order'] == 2 || $route_type == TWO_QUALI_ALL_NO_COUNTBACK)
 		{
-			// no countback to quali, if we use preselected athletes
+			// no countback to quali, if we use preselected athletes or TWO_QUALI_ALL_NO_COUNTBACK
 		}
 		elseif ($route_type == TWOxTWO_QUALI && $keys['route_order'] <= 4)	// 2x2 til 1/2-Final incl.
 		{
@@ -1018,7 +1020,7 @@ class route_result extends so_sql
 		elseif ($discipline == 'lead')
 		{
 			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
-			if ($keys['route_order'] == 2 && $route_type == TWO_QUALI_ALL)
+			if ($keys['route_order'] == 2 && in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)))
 			{
 				$extra_cols[] = 'ROUND(('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).'),2) AS rank_prev_heat';
 				$order_by .= ',rank_prev_heat ASC';
@@ -1029,10 +1031,15 @@ class route_result extends so_sql
 				$order_by .= ',rank_prev_heat ASC';
 			}
 		}
+		// lead final use time, after regular countback
+		if ($discipline == 'lead' && $is_final)
+		{
+			$order_by .= ',result_time ASC';
+		}
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected) extra_cols=".array2string($extra_cols).", order_by=$order_by");
 		$result = $this->search($keys,$this->id_col.',result_rank,result_detail AS detail',$order_by,$extra_cols);
 
-		if ($route_type == TWO_QUALI_ALL && $keys['route_order'] < 2 ||		// calculate the points
+		if (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) && $keys['route_order'] < 2 ||		// calculate the points
 			$route_type == TWOxTWO_QUALI && $keys['route_order'] < 4)
 		{
 			$places = array();
@@ -1091,6 +1098,12 @@ class route_result extends so_sql
 				$data['new_rank'] = $old_prev_rank < $data['rank_prev_heat'] ? $i+1 : $old_rank;
 				//echo "<p>$i. ".$data[$this->id_col].": prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			}
+			// break ties in lead finals (already ordered by time)
+			if ($data['new_rank'] && $data['new_rank'] != $i+1 && $discipline == 'lead' && $is_final)
+			{
+				$data['new_rank'] = $old_time < $data['result_time_l'] ? $i+1 : $old_rank;
+				//echo "<p>".($i+1).'. '.$data[$this->id_col].": old_time=$old_time, time=$data[result_time_l] --> $data[new_rank]</p>\n";
+			}
 			$to_update = array();
 			if ($places)	// calculate the quali-points of the single heat
 			{
@@ -1106,11 +1119,7 @@ class route_result extends so_sql
 			}
 //_debug_array($data); _debug_array($to_update);
 			// for lead finals, do not yet store first places, they might have to use the time
-			if ($discipline == 'lead' && $keys['route_order'] >= 2 && !$to_update && $data['new_rank'] == 1 && $data['result_time_l'])
-			{
-				$first_places[] = $data;
-			}
-			elseif ($data['new_rank'] != $data['result_rank'])
+			if ($data['new_rank'] != $data['result_rank'])
 			{
 				$to_update['result_rank'] = $data['new_rank'];
 			}
@@ -1120,39 +1129,8 @@ class route_result extends so_sql
 				++$modified;
 			}
 			$old_prev_rank = $data['rank_prev_heat'];
+			$old_time = $data['result_time_l'];
 			$old_rank = $data['new_rank'];
-		}
-		// now handle first places in lead finals, where the time breaks ties since 2012 rules
-		if ($first_places)
-		{
-			// for more then one first place, check if we are in the finale and have a time
-			if (count($first_places) > 1 && ($comp = boresult::$instance->route->read($keys)) && !$comp['route_quota'])
-			{
-				// sort by result_time
-				usort($first_places,create_function('$a,$b', 'return $a["result_time_l"]==$b["result_time_l"]?0:($a["result_time_l"]<$b["result_time_l"]?-1:1);'));
-				// update new-rank accordingly
-				foreach($first_places as $i => &$data)
-				{
-					if (!$i || $first_places[$i-1]['result_time_l'] < $data['result_time_l'])
-					{
-						$data['new_rank'] = 1+$i;
-					}
-					else
-					{
-						$data['new_rank'] = $first_places[$i-1]['new_rank'];
-					}
-				}
-			}
-			// store first places, if necessary
-			foreach($first_places as &$data)
-			{
-				if ($data['new_rank'] != $data['result_rank'] && $this->db->update($this->table_name,array(
-					'result_rank' => $data['new_rank'],
-				),$keys+array($this->id_col=>$data[$this->id_col]),__LINE__,__FILE__))
-				{
-					++$modified;
-				}
-			}
 		}
 		if ($modified) boresult::delete_export_route_cache($keys);
 

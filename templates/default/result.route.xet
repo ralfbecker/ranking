@@ -31,28 +31,27 @@
 					</hbox>
 				</row>
 				<row class="row" disabled="@route_order=-1">
-					<description value="Isolation" options="route_iso_open"/>
+					<description value="Isolation" font_style="route_iso_open"/>
 					<hbox options="0,0" span="all">
 						<textbox blur="opens" id="route_iso_open" size="20" maxlength="40"/>
 						<textbox blur="closes" label="-" id="route_iso_close" size="20" maxlength="40"/>
 					</hbox>
 				</row>
 				<row class="row" disabled="@route_order=-1">
-					<description value="Start heat" options=",,,route_start"/>
+					<description value="Start heat" for="route_start"/>
 					<textbox blur="time" id="route_start" size="64" maxlength="64" span="all" class="inputFullWidth"/>
 					<description/>
 				</row>
 				<row class="row" disabled="@route_order=-1">
-					<description value="Observation time" options=",,,route_observation_time"/>
+					<description value="Observation time" for="route_observation_time"/>
 					<hbox options="0,0" span="all">
 						<textbox id="route_observation_time" size="20" maxlength="40"/>
 						<textbox label="Climbing time" id="route_climbing_time" size="20" maxlength="40" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row class="row">
-					<description value="Quota" options=",,,route_quota"/>
-					<int id="route_quota"/>
-					<description/>
+					<description value="Quota" for="route_quota"/>
+					<textbox type="integer" label="%s Quota has to be 0 for lead final, otherwise time is NOT used!" id="route_quota" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Result official"/>
@@ -60,7 +59,7 @@
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Judge" options=",,,route_judge"/>
+					<description value="Judge" for="route_judge"/>
 					<textbox blur="name(s)" id="route_judge" size="64" maxlength="80" span="all" class="inputFullWidth"/>
 					<description/>
 				</row>
@@ -118,16 +117,16 @@
 					<description value="Time measurement"/>
 					<hbox options="0,0" span="all">
 						<textbox blur="Host" statustext="Hostname or IP the Timy control program is running, eg. localhost" id="route_time_host"/>
-						<int blur="Port" id="route_time_port" class="leftPad5"/>
+						<textbox type="integer" blur="Port" id="route_time_port" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row class="row" valign="top">
-					<description value="Routejudges" options=",,,route_judges"/>
+					<description value="Routejudges" for="route_judges"/>
 					<listbox type="select-account" id="route_judges" rows="5"/>
 					<description/>
 				</row>
 				<row class="row" disabled="@no_upload">
-					<description value="Upload topo" options=",,,topo_upload"/>
+					<description value="Upload topo" for="topo_upload"/>
 					<hbox options="0,0">
 						<file id="topo_upload"/>
 						<button label="Upload" id="button[topo_upload]" class="leftPad5"/>
@@ -205,9 +204,9 @@
 				<row>
 					<tabbox id="tabs" span="all">
 						<tabs>
-							<tab label="General" statustext=""/>
-							<tab label="Comment" statustext=""/>
-							<tab label="Measurement" statustext=""/>
+							<tab id="general" label="General"/>
+							<tab id="comment" label="Comment"/>
+							<tab id="measure" label="Measurement"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.result.route.general"/>
