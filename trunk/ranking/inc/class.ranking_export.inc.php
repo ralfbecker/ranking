@@ -288,6 +288,7 @@ class ranking_export extends boresult
 				if(isset($row['result']))
 				{
 					list($row['result']) = explode('&nbsp;',$row['result']);
+					$row['time'] = $row['result_time_l'];
 				}
 				for($i = 0; $i <= 5; ++$i)
 				{
