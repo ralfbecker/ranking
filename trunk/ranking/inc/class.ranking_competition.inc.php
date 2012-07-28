@@ -866,14 +866,14 @@ class ranking_competition extends so_sql
 	 * Return number of preselected for a given category
 	 *
 	 * @param int $cat
-	 * @param array $quali_preselected
+	 * @param array $quali_preselected=null
 	 * @return int
 	 */
 	function quali_preselected($cat, array $quali_preselected=null)
 	{
 		if (is_null($quali_preselected)) $quali_preselected = $this->data['quali_preselected'];
 
-		foreach($quali_preselected as $pre)
+		foreach((array)$quali_preselected as $pre)
 		{
 			if ($pre['cat'] == $cat || !$pre['cat']) return $pre['num'];
 		}
