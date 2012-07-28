@@ -138,49 +138,60 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 
 	if ($debug) echo "<p>calc_rangliste(gruppe='$gruppe->rkey',stand='$stand',serie='$serie->rkey') combined=$combined</p>\n";
 
-	if ($stand == "." && (!$combined || $serie))	// . == letzter Wettk vor akt. Datum
+	$use_last = $stand == '.';
+	if (!$use_last && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $stand))
 	{
-		$stand = date ("Y-m-d",time());
+		$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE rkey='$stand' OR WetId='$stand'");
+		if ($res > 0 && mysql_num_rows($res))
+		{
+			$wk = mysql_fetch_object($res);
+			$stand = $wk->datum;
+		}
+		elseif ($combined && !$serie)
+		{
+			read_wettk($stand);	// --> fail comp not found
+		}
+	}
+	// fetch competition with latest result to display as "after $wettk->name"
+	if (!$combined || $serie)
+	{
+		if ($use_last) $stand = date ("Y-m-d",time());
 		$res = my_query($sql="SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
 		      " WHERE w.WetId=r.WetId AND r.GrpId IN ($gruppe->GrpIds) AND ".
 		      ($gruppe->nation ? "w.nation='$gruppe->nation'" : "ISNULL(w.nation)")." AND ".
 		      ($serie ? "w.serie=$serie->SerId" : "w.faktor>0.0").
 		      " AND w.datum<='$stand'".
+		      " AND (r.platz=1 OR r.cup_platz=1)".
 		      " ORDER BY w.datum DESC LIMIT 1");
-	}
-	else
-	{
-		$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE rkey='$stand' OR WetId='$stand'");
 
-		if ($combined && !$cup) read_wettk($stand);	// --> fail comp not found
-	}
-	if ($res > 0 && mysql_num_rows($res))
-	{
-		$wettk = mysql_fetch_object ($res);
-		$stand = $wettk->datum;
-
-		if (!$combined || $serie)
+		if ($res > 0 && mysql_num_rows($res))
 		{
-			// auf weiteren wettk im akt. Jahr testen
-			$sql = check_group_sql($gruppe);
-			$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE ".
-				($gruppe->nation ? "nation='$gruppe->nation'" : "ISNULL(nation)")." AND ".
-				($serie ? "serie=$serie->SerId" : "faktor>0.0").
-				" AND datum>'$wettk->datum' AND datum<='".(0+$wettk->datum)."-12-31'".
-				" AND ($sql) ORDER BY datum ASC LIMIT 1");
+			$wettk = mysql_fetch_object ($res);
+			if ($use_last) $stand = $wettk->datum;
 
-			if ($res > 0 && ($next_wettk = mysql_fetch_object($res)))
+			if (!$combined || $serie)
 			{
-				if ($debug) echo "<p>next wettk: $next_wettk->name, $next_wettk->datum, '$next_wettk->gruppen'</p>\n";
+				// auf weiteren wettk im akt. Jahr testen
+				$sql = check_group_sql($gruppe);
+				$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE ".
+					($gruppe->nation ? "nation='$gruppe->nation'" : "ISNULL(nation)")." AND ".
+					($serie ? "serie=$serie->SerId" : "faktor>0.0").
+					" AND datum>'$wettk->datum' AND datum<='".(0+$wettk->datum)."-12-31'".
+					" AND ($sql) ORDER BY datum ASC LIMIT 1");
+
+				if ($res > 0 && ($next_wettk = mysql_fetch_object($res)))
+				{
+					if ($debug) echo "<p>next wettk: $next_wettk->name, $next_wettk->datum, '$next_wettk->gruppen'</p>\n";
+				}
+				else
+				{
+					$stand = (0+$wettk->datum) . '-12-31';	// kein weiterer wettk -> Stand 31.12.
+				}
 			}
 			else
 			{
-				$stand = (0+$wettk->datum) . '-12-31';	// kein weiterer wettk -> Stand 31.12.
+				$anfang = $stand;
 			}
-		}
-		else
-		{
-			$anfang = $stand;
 		}
 	}
 	if ($debug) echo "<p>stand='$stand'</p>\n";

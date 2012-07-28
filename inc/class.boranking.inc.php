@@ -1485,6 +1485,9 @@ class boranking extends ranking_so
 				}
 			}
 		}
+		// reverse array to store 1. place last, as it is used to determine in calc_rang if competition has a result
+		$result = array_reverse($result, true);
+
 		foreach($result as $PerId => $place)
 		{
 			$nation = $cup_place = $cup_pkt = null;
