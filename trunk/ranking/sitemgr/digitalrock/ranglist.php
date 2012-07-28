@@ -125,7 +125,8 @@ if ($rang && $show_calc)		// Liste enthaltene Wettk. erzeugen
 	}
 	$res = my_query($query = "SELECT * $cup_platz $cup_pkte FROM Results r WHERE GrpId IN ($gruppe->GrpIds)".
 		($wettks ? ' AND r.WetId IN ('.implode(',',$WetIds).')' : '').
-		" AND '$anfang'<=datum AND datum<='$stand' ORDER BY r.WetId,r.platz");
+		($serie ? '' : " AND '$anfang'<=datum").	// MySQL 5.5 gives an error for '' <= datum
+		" AND datum<='$stand' ORDER BY r.WetId,r.platz");
 
 	while ($row = mysql_fetch_object($res))
 	{
