@@ -634,10 +634,18 @@ function my_query ($query,$file='',$line='')
 {
 	global $mysql;
 
-	$res = mysql_query($query,$mysql) or
+	$res = mysql_query($query,$mysql);
+	if (!$res)
+	{
+		if (!$file)
+		{
+			$trace = debug_backtrace();
+			$file = $trace[0]['file'];
+			$line = $trace[0]['line'];
+		}
 		fail ('Error querying the Database !!!',mysql_error()."<p><table><tr><td><b>Query</b>:</td><td>$query</td></tr>\n".
 			($file || $line ? "<tr><td><b>File</b>:</td><td>$file</td></tr>\n<tr><td><b>Line</b>:</td><td>$line</td></tr>":'')."</table>\n");
-
+	}
 	return $res;
 }
 
