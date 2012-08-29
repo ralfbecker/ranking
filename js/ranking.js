@@ -264,8 +264,9 @@ function topo_clicked(e)
 	
 	if (!PerId)
 	{
-		var x = e.offsetX ? e.offsetX : e.layerX - $j(e.target).position().left;	// FF has not offsetX/Y
-		var y = e.offsetY ? e.offsetY : e.layerY - $j(e.target).position().top;
+		// FF 15 has offsetX/Y values in e.orginalEvent.layerX/Y (Chrome&IE use offsetX/Y)
+		var x = e.offsetX ? e.offsetX : e.originalEvent.layerX;
+		var y = e.offsetY ? e.offsetY : e.originalEvent.layerY;
 		//$j('#msg').text('topo_clicked() x='+x+'/'+topo.width+', y='+y+'/'+topo.height);
 		//add_handhold({'xpercent':100.0*x/topo.width, 'ypercent': 100.0*y/topo.height, 'height': 'Test'});
 		xajax_doXMLHTTP('ranking_measurement::ajax_save_hold',{'xpercent':100.0*x/topo.width, 'ypercent': 100.0*y/topo.height});
@@ -392,14 +393,20 @@ function remove_handholds()
  * Recalculate handhold position, eg. when window get's resized or topo image is loaded
  * 
  * Required because topo image is scaled to width:100% AND displayed in a container div with fixed height and overflow:auto
+ * 
+ * @param boolean resizeContainer=true
  */
-function recalc_handhold_positions()
+function recalc_handhold_positions(resizeContainer)
 {
+	var y_ratio = 1.0;
 	// resize topoContainer to full page height
-	var topo_pos = $j('div.topoContainer').offset();
-	$j('div.topoContainer').height($j(window).height()-topo_pos.top-$j('#divGenTime').height()-$j('#divPoweredBy').height()-20);
-
-	var y_ratio = $j('#topo').height() / $j('div.topoContainer').height();	
+	if (typeof resizeContainer == 'undefined' || resizeContainer)
+	{
+		var topo_pos = $j('div.topoContainer').offset();
+		$j('div.topoContainer').height($j(window).height()-topo_pos.top-$j('#divGenTime').height()-$j('#divPoweredBy').height()-20);
+		y_ratio = $j('#topo').height() / $j('div.topoContainer').height();
+		//console.log('recalc_handhold_positions() $(#topo).height()='+$j('#topo').height()+', $(div.topoContainer).height()='+$j('div.topoContainer').height()+' --> y_ratio='+y_ratio);
+	}
 	$j('div.topoHandhold').each(function(index,container){
 		container.style.top = (y_ratio*$j(container).data('hold').ypercent)+'%';
 	});
@@ -412,9 +419,10 @@ function print_topo()
 {
 	$j('div.topoContainer').width('18cm');	// % placed handholds do NOT work with % with on print!
 	$j('div.topoContainer').css('height','auto');
+	
 	$j('div.topoContainer').css('visible');
 	
-	recalc_handhold_positions();
+	recalc_handhold_positions(false);
 	
 	window.focus();
 	window.print();
