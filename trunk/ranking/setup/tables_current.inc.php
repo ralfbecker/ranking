@@ -39,7 +39,7 @@ $phpgw_baseline = array(
 			'prequal_comp' => array('type' => 'int','precision' => '2'),
 			'prequal_comps' => array('type' => 'varchar','precision' => '64'),
 			'judges' => array('type' => 'varchar','precision' => '64'),
-			'discipline' => array('type' => 'varchar','precision' => '8'),
+			'discipline' => array('type' => 'varchar','precision' => '16'),
 			'prequal_extra' => array('type' => 'varchar','precision' => '255'),
 			'quota_extra' => array('type' => 'varchar','precision' => '255'),
 			'no_complimentary' => array('type' => 'bool'),
@@ -93,7 +93,7 @@ $phpgw_baseline = array(
 			'vor_rls' => array('type' => 'int','precision' => '2'),
 			'vor' => array('type' => 'int','precision' => '2'),
 			'extra' => array('type' => 'varchar','precision' => '40'),
-			'discipline' => array('type' => 'varchar','precision' => '10','default' => 'lead')
+			'discipline' => array('type' => 'varchar','precision' => '16','default' => 'lead')
 		),
 		'pk' => array('GrpId'),
 		'fk' => array(),
@@ -267,7 +267,8 @@ $phpgw_baseline = array(
 			'next_8' => array('type' => 'int','precision' => '4','comment' => 'next for boulder #8'),
 			'boulder_time' => array('type' => 'int','precision' => '4','comment' => 'boulder rotation time in sec'),
 			'boulder_startet' => array('type' => 'int','precision' => '8','comment' => 'last boulder rotation started timestamp'),
-			'route_judges' => array('type' => 'varchar','precision' => '255','comment' => 'judges for just that route')
+			'route_judges' => array('type' => 'varchar','precision' => '255','comment' => 'judges for just that route'),
+			'discipline' => array('type' => 'varchar','precision' => '16','comment' => 'lead, speed, boulder or NULL to use from category or competition')
 		),
 		'pk' => array('WetId','GrpId','route_order'),
 		'fk' => array(),

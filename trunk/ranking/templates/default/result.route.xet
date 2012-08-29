@@ -180,7 +180,7 @@
 					</menulist>
 					<hbox align="right" onchange="1" options="0,0">
 						<menulist>
-							<menupopup id="discipline" readonly="true"/>
+							<menupopup id="discipline"/>
 						</menulist>
 						<menulist class="leftPad5">
 							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,8,1"/>

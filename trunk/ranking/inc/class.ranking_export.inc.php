@@ -143,6 +143,8 @@ class ranking_export extends boresult
 		{
 			throw new Exception(lang('Route NOT found !!!'));
 		}
+		if (!empty($route['discipline'])) $discipline = $route['discipline'];
+
 		//printf("<p>reading route+result took %4.2lf s</p>\n",microtime(true)-$start);
 
 		//echo "<pre>".print_r($route,true)."</pre>\n";
@@ -183,6 +185,7 @@ class ranking_export extends boresult
 
 		switch($discipline)
 		{
+			default:
 			case 'lead':
 				$num_current = 1;
 				break;
@@ -271,6 +274,12 @@ class ranking_export extends boresult
 			$row['lastname']  = $row['nachname'];
 			$row['federation']= $row['verband'];
 			if ($row['PerId']) $row['url'] = self::profile_url($row,$cat['GrpId']);
+
+			// remove &nbsp; in boulderheight results
+			if ($discipline == 'boulderheight')
+			{
+				$row = str_replace('&nbsp;', ' ', $row);
+			}
 
 			// remove &nbsp; in lead results
 			if ($discipline == 'lead')

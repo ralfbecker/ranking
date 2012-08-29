@@ -38,6 +38,7 @@ class boranking extends ranking_so
 		'boulder' => 'boulder',
 		'speed' => 'speed',
 		'speedrelay' => 'speedrelay',
+		'boulderheight' => 'boulder: height, tries',	// height and tries, as used in Arco
 	);
 	var $pkt_names;
 	var $cat_names;

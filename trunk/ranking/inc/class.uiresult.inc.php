@@ -298,6 +298,8 @@ class uiresult extends boresult
 		{
 			$tmpl->disable_cells('route_num_problems');
 		}
+		$readonlys['discipline'] = !!$content['route_order'];	// for no only allow to set discipline in 1. quali
+
 		foreach(array('new_route','route_type','route_order','dsp_id','frm_id','dsp_id2','frm_id2') as $name)
 		{
 			$preserv[$name] = $content[$name];
@@ -340,7 +342,7 @@ class uiresult extends boresult
 			$tmpl->disable_cells('slist_order');
 			if ($readonlys['button[startlist]']) $content['no_startlist'] = true;	// disable empty startlist row
 		}
-		// hack for speedrelay to use startlist button for redomizing
+		// hack for speedrelay to use startlist button for randomizing
 		if ($discipline == 'speedrelay' && !$content['route_order'])
 		{
 			$tmpl->set_cell_attribute('button[startlist]','label','Randomize startlist');
@@ -835,13 +837,6 @@ class uiresult extends boresult
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['nm']['route'] < 0 ? -1 : $content['nm']['route'],
 		);
-		// get discipline and check if relay
-		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
-		if ($this->route_result->isRelay != ($content['nm']['discipline'] == 'speedrelay'))
-		{
-			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
-				$content['nm']['discipline'] == 'speedrelay');
-		}
 		if ($comp && ($content['nm']['old_comp'] != $comp['WetId'] ||		// comp changed or
 			$cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
 			!($route = $this->route->read($keys)))))	// route not found and no general result
@@ -870,6 +865,14 @@ class uiresult extends boresult
 		{
 			$msg = lang('No startlist or result yet!');
 			$content['nm']['show_result'] = '0';
+		}
+		// get discipline and check if relay
+		$content['nm']['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		if (!empty($route['discipline'])) $content['nm']['discipline'] = $route['discipline'];
+		if ($this->route_result->isRelay != ($content['nm']['discipline'] == 'speedrelay'))
+		{
+			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+				$content['nm']['discipline'] == 'speedrelay');
 		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
 
@@ -945,7 +948,7 @@ class uiresult extends boresult
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC') : array(),
-			'result_plus' => $this->plus_labels($comp['year'], $comp['nation']),
+			'result_plus' => $this->plus_labels($comp['year'], $comp['nation'], $content['nm']['discipline']),
 			'show_result' => array(
 				0 => lang('Startlist'),
 				1 => lang('Resultlist'),
