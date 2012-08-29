@@ -128,10 +128,20 @@ class boresult extends boranking
 	 *
 	 * @param int $year year of competition
 	 * @param string $nation nation of comp.
+	 * @param string $discipline='lead' can be 'boulderheight' to return labels for tries
 	 * @return array
 	 */
-	function plus_labels($year, $nation)
+	function plus_labels($year, $nation, $discipline='lead')
 	{
+		if ($discipline == 'boulderheight')
+		{
+			$labels = array();
+			for($n = 1; $n < 10; ++$n)
+			{
+				$labels[100-$n] = lang('%1. try', $n);
+			}
+			return $labels;
+		}
 		$labels = $this->plus_labels;
 
 		$minus_allowed = $year < 2012;	// nothing to do
@@ -211,7 +221,8 @@ class boresult extends boranking
 			// delete existing starters
 			$this->route_result->delete($keys);
 			return $this->_startlist_from_previous_heat($keys,
-				($route_order >= 2 ? 'reverse' : 'previous'),	// after quali reversed result, otherwise as previous heat
+				// after quali reversed result, otherwise as previous heat (always previous for boulderheight!)
+				($route_order >= 2 && $discipline != 'boulderheight' ? 'reverse' : 'previous'),
 				$discipline);
 		}
 		// hack for speedrelay, which currently does NOT use registration --> randomize teams
@@ -1750,7 +1761,8 @@ class boresult extends boranking
 		{
 			return false;	// permission denied
 		}
-		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		$discipline = !empty($content['discipline']) ? $content['discipline'] :
+			($comp['discipline'] ? $comp['discipline'] : $cat['discipline']);
 		// switch route_result class to relay mode, if necessary
 		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
 		{
@@ -1782,6 +1794,7 @@ class boresult extends boranking
 				{
 					$keys[$name] = $previous[$name];
 				}
+				if (!empty($previous['discipline'])) $keys['discipline'] = $previous['discipline'];
 			}
 			else
 			{
@@ -1841,6 +1854,14 @@ class boresult extends boranking
 
 			// default to 5 boulders
 			$content['route_num_problems'] = 5;
+		}
+		if (empty($content['discipline']))
+		{
+			$content['discipline'] = $discipline;
+		}
+		else
+		{
+			$discipline = $content['discipline'];
 		}
 		return $msg ? $msg : true;
 	}

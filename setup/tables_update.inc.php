@@ -1543,3 +1543,15 @@ function ranking_upgrade1_9_010()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.011';
 }
 
+
+function ranking_upgrade1_9_011()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','discipline',array(
+		'type' => 'varchar',
+		'precision' => '16',
+		'comment' => 'lead, speed, boulder or NULL to use from category or competition'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.012';
+}
+

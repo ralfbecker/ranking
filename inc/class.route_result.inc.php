@@ -558,7 +558,15 @@ class route_result extends so_sql
 						{
 							$to_suffix = '';
 						}
-						if ($data['result_height'.$suffix] == TOP_HEIGHT)
+						// labels for modus "boulder: height, tries"
+						if ($data['result_plus'.$suffix] > 1)
+						{
+							$data['result_height'.$to_suffix] = 0.001 * $data['result_height'.$suffix];
+							$data['result'.$suffix] = $data['result_height'.$suffix] >= 999 ?
+								lang('Top') : $data['result_height'.$suffix];
+							$data['result'.$suffix] .= '&nbsp;'.(100-$data['result_plus'.$suffix]).'.';
+						}
+						elseif ($data['result_height'.$suffix] == TOP_HEIGHT)
 						{
 							$data['result_height'.$to_suffix] = '';
 							$data['result_plus'.$to_suffix]   = TOP_PLUS;

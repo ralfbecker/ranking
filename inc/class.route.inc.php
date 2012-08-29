@@ -110,6 +110,7 @@ class route extends so_sql
 					'route_type'  => $ret['route_type'],
 					'route_name'  => lang('General result'),
 					'route_status'=> STATUS_STARTLIST,
+					'discipline'  => $ret['discipline'],
 				));
 			}
 		}
@@ -165,7 +166,7 @@ class route extends so_sql
 	 */
 	function update($fields,$merge=true)
 	{
-		boresult::delete_export_route_cache($merge ? array_merge($this->data,fields) : $fields);
+		boresult::delete_export_route_cache($merge ? array_merge($this->data, $fields) : $fields);
 
 		return parent::update($fields,$merge);
 	}

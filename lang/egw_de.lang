@@ -75,6 +75,7 @@ bonus	ranking	de	Bonus
 bonus: number of tries or no	ranking	de	Bonus: Anzahl Versuche oder Nein
 both password do not match!	ranking	de	Beide Passwörter stimmen NICHT überein!
 boulder	ranking	de	Bouldern
+boulder: height, tries	ranking	de	Bouldern: Höhe, Versuche
 can not be higher than top!	ranking	de	Darf nicht höher als Top sein!
 can not be higher than tries!	ranking	de	Darf nicht höher als Versuche sein!
 can not be lower than tops!	ranking	de	Darf nicht niedriger als Top sein!
@@ -461,6 +462,7 @@ small final	ranking	de	Kleines Finale
 someone already applied for a %1 license!	ranking	de	Jemand hat bereits die %1 Lizenz beantragt!
 sorry, an error happend sending your email (%1), please try again later or %2contact us%3.	ranking	de	Entschuldigung, es gab eine Fehler beim Sender Deiner EMail (%1), bitter versuch es später nochmal oder %2benachrichtige uns%3.
 speed	ranking	de	Geschwindigkeit
+speedrelay	ranking	de	Speedrelay
 sponsor logos	ranking	de	Sponsorenlogo(s)
 squad	ranking	de	Kader
 start	ranking	de	Start

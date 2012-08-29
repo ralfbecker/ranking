@@ -75,6 +75,7 @@ bonus	ranking	en	Bonus
 bonus: number of tries or no	ranking	en	Bonus: Number of tries or no
 both password do not match!	ranking	en	Both password do NOT match!
 boulder	ranking	en	boulder
+boulder: height, tries	ranking	en	boulder: height, tries
 can not be higher than top!	ranking	en	Can NOT be higher than top!
 can not be higher than tries!	ranking	en	Can NOT be higher than tries!
 can not be lower than tops!	ranking	en	Can NOT be lower than tops!
@@ -461,6 +462,7 @@ small final	ranking	en	Small final
 someone already applied for a %1 license!	ranking	en	Someone already applied for a %1 license!
 sorry, an error happend sending your email (%1), please try again later or %2contact us%3.	ranking	en	Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.
 speed	ranking	en	speed
+speedrelay	ranking	en	speedrelay
 sponsor logos	ranking	en	Sponsor logos
 squad	ranking	en	Squad
 start	ranking	en	Start
