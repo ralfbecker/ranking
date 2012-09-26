@@ -150,7 +150,7 @@ if (!$wettk->nation && $wettk->quota && (
 		echo "\t<tr bgcolor=\"#c0c0c0\">\n\t\t<td colspan=\"4\"><b>$t_nat_team_ranking</b>:\n";
 		echo implode(",\n",$links)."</td>\t</tr>\n";
 	}
-	if ((int)$wettk->datum >= 2008 && $wettk->WetId != 991)	// temporary disabling 2009 Word Championship
+	if ((int)$wettk->datum >= 2008 && !in_array($wettk->WetId, array(991,1439)))	// disabling display of combined ranking for 2009+2012 Word Championship
 	{
 		// combined ranking
 		$valid_cats = array(
