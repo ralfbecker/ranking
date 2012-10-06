@@ -53,7 +53,7 @@
 			.extra_result { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.import" template="" lang="" group="0" version="1.5.001">
+	<template id="ranking.import" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -81,6 +81,16 @@
 					<menulist>
 						<menupopup label="Import" id="keys[route]"/>
 					</menulist>
+				</row>
+				<row disabled="!@import_url">
+					<hbox>
+						<menulist>
+							<menupopup id="quali_type" options="Type of qualification: automatic"/>
+						</menulist>
+						<description value="WetId" for="comp2import"/>
+						<textbox type="integer" id="comp2import"/>
+						<button label="Import from URL" id="button[url]"/>
+					</hbox>
 				</row>
 				<row disabled="!@import">
 					<grid id="import">

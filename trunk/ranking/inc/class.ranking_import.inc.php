@@ -61,6 +61,9 @@ class ranking_import extends boresult
 		}
 		$tmpl = new etemplate('ranking.import');
 
+		$config = config::read('ranking');
+		$import_url = $config['import_url'];
+
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
 			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
@@ -153,6 +156,15 @@ class ranking_import extends boresult
 					case 'detect':
 						self::detect_athletes($content['import'],$content['import']['as'],$calendar,$cat['sex'],$content['license'],$this->license_year);
 						break;
+					case 'url':
+						try {
+							$msg = $this->from_url($comp, $content['keys']['cat'] ? $cat['rkey'] : null, $content['quali_type'],
+								$content['comp2import'], $import_url);
+						}
+						catch (Exception $e) {
+							$msg = $e->getMessage();
+						}
+						break;
 				}
 			}
 			catch (Exception $e) {
@@ -193,6 +205,11 @@ class ranking_import extends boresult
 		}
 		//echo "<p>calendar='$calendar', comp={$content['keys']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['keys']['route']}</p>\n";
 		// create new view
+		$speed_types = $this->quali_types_speed;
+		foreach($speed_types as &$quali_type)
+		{
+			$quali_type = lang('Speed').': '.lang($quali_type);
+		}
 		$sel_options = array(
 			'delimiter' => array(',' => ',',';' => ';','\t' => 'Tab'),
 			'charset' => array('utf-8' => 'UTF-8','iso-8859-1' => 'ISO-8859-1'),
@@ -204,7 +221,10 @@ class ranking_import extends boresult
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
-			'route'    => array(
+			'route'    => ($import_url ? array(
+				'url' => 'Import URL',
+			) : array()
+			)+array(
 				'athletes' => 'Athletes',
 			)+($comp && $cat ? array(
 				'ranking'  => 'General result into ranking',
@@ -212,6 +232,7 @@ class ranking_import extends boresult
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC')) ? $routes : array()): array()),
+			'quali_type' => $this->quali_types + $speed_types,
 			'license' => $this->license_labels,
 		);
 		foreach(self::$import_columns as $col => $lables)
@@ -221,6 +242,10 @@ class ranking_import extends boresult
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
 
 		if (is_array($route)) $content += $route;
+		if ($comp && (!isset($content['keys']['old_comp']) || $content['keys']['old_comp'] != $comp['WetId']))
+		{
+			$content['comp2import'] = $comp['WetId'];
+		}
 		$content['keys']['calendar'] = $calendar;
 		$content['keys']['comp']     = $content['keys']['old_comp']= $comp ? $comp['WetId'] : null;
 		$content['keys']['cat']      = $content['keys']['old_cat'] = $cat ? $cat['GrpId'] : null;
@@ -229,6 +254,8 @@ class ranking_import extends boresult
 		// make competition and category data availible for print
 		$content['comp'] = $comp;
 		$content['cat']  = $cat;
+
+		$content['import_url'] = $import_url;
 
 		$content['msg'] = $msg;
 
@@ -576,5 +603,294 @@ class ranking_import extends boresult
 		self::detect_athletes($import,$col2name,$keys['calendar'],null,$license,$license_year);
 
 		return $imported;
+	}
+
+	/**
+	 * Import results from an other ranking instance via their SiteMgr module
+	 *
+	 * @param int|string|array $comp WetId, rkey or array of competition to import into
+	 * @param array|string $cats=null default all categories
+	 * @param int $route_type=null
+	 * @param int $comp2import=null default $WetId
+	 * @param string $baseurl=null from ranking config "import_url"
+	 * @param boolean $add_athletes true=import missing athletes
+	 * @param int $set_status=STATUS_RESULT_OFFICAL or STATUS_STARTLIST or STATUS_UNPUBLISHED
+	 * @param boolean $import_ranking=true true=import into ranking
+	 * @param string $download_dir=null stop after downloading files into given directory
+	 * @param int $debug=0 debug level: 0: echo some messages while import is running, 2, 3, 4 ... more verbose messages
+	 * @param string $charset=null
+	 * @return string messages, if run by webserver
+	 * @throws Exception on error
+	 */
+	public function from_url($comp, $cats=null, $route_type=null, $comp2import=null, $baseurl=null,
+		$add_athletes=true, $set_status=STATUS_RESULT_OFFICIAL, $import_ranking=true, $download_dir=null, $debug=0, $charset='iso-8859-1')
+	{
+		if (isset($_SERVER['HTTP_HOST']))
+		{
+			//echo "<pre>\n";
+			ob_start();
+		}
+		$arg = $comp;
+		if (!is_array($comp) && !($comp = $this->comp->read(is_numeric($comp) ? array('WetId'=>$comp) : array('rkey'=>$comp))))
+		{
+			throw new Exception("Competition '$arg' not found!",4);
+		}
+		if (!$cats)
+		{
+			$cats = $comp['gruppen'];
+		}
+		elseif(!is_array($cats))
+		{
+			$cats = array($cats);
+		}
+		if (!is_null($debug)) echo $comp['rkey'].': '.$comp['name']."\n";
+
+		if (!$comp2import) $comp2import = $comp['WetId'];
+
+		//echo "comp=".array2string($comp).", cats=".array2string($cats).", route_type=$route_type, comp2import=$comp2import, baseurl=$baseurl\n";
+		$detect_route_type = !is_numeric($route_type);
+
+		$cat = $cats[0];
+
+		if (!($ch = curl_init($url=$baseurl.'comp='.$comp2import.'&cat='.$cat.'&route=0')))
+		{
+			throw new Exception("Error: opening URL '$url'!",5);
+		}
+		$cookiefile = tempnam('/tmp','importcookies');
+		curl_setopt($ch, CURLOPT_COOKIEFILE,$cookiefile);
+		curl_setopt($ch, CURLOPT_COOKIEJAR,$cookiefile); # SAME cookiefile
+		curl_setopt($ch,CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($ch,CURLOPT_HEADER,true);
+
+		// getting the page of the competition and category --> get's us to the general result
+		if ($debug > 2) echo "\nGETting $url\n";
+		$get = curl_exec($ch);
+		//echo substr($get,0,500)."\n\n";
+		$exec_id = self::get_exec_id($get, $debug);
+
+		curl_setopt($ch,CURLOPT_POST,true);		// from now on only posts
+		foreach($cats as $n => $cat_name)
+		{
+			if (!($cat = $this->cats->read($cat_name)))
+			{
+				throw new Exception("Error: Cat '$cat_name' not found!",7);
+			}
+			echo $cat['rkey'].': '.$cat['name']."\n";
+
+			if ($n)	// changing the cat via a post --> get's us to the general result
+			{
+				// setting route=0 qualification with a post
+				curl_setopt($ch,CURLOPT_URL,$url=$baseurl.'comp='.$comp2import.'&cat='.$cat['GrpId']);
+				curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
+					'etemplate_exec_id' => $exec_id,
+					'exec' => array(
+						'nm' => array(
+							'cat' => $cat['GrpId'],
+							'show_result' => 1,
+							'route' => 0,
+							'num_rows' => '999',
+						),
+					)
+				)));
+				if ($debug > 2) echo "POSTing $url with $post\n";
+				$exec_id = self::get_exec_id($download=curl_exec($ch), $debug);	// switch to route=0 and get new exec-id
+				//if ($n) echo $download."\n\n";
+			}
+			// setting route=0 qualification with a post
+			curl_setopt($ch,CURLOPT_URL,$url=$baseurl.'comp='.$comp2import.'&cat='.$cat['GrpId']);
+			curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
+				'etemplate_exec_id' => $exec_id,
+				'exec' => array(
+					'nm' => array(
+						'cat' => $cat['GrpId'],
+						'show_result' => 1,
+						'route' => 0,
+						'num_rows' => '999',
+					),
+				)
+			)));
+			if ($debug > 2) echo "POSTing $url with $post\n";
+			$exec_id = self::get_exec_id($download=curl_exec($ch), $debug);	// switch to route=0 and get new exec-id
+			if ($debug > 4) echo $download."\n\n";
+
+			$downloads = $fnames = array();
+			for($route=0; $route <= 6; ++$route)
+			{
+				// download each heat
+				curl_setopt($ch,CURLOPT_URL,$url=$baseurl.'comp='.$comp2import.'&cat='.$cat['GrpId']);
+				curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
+					'etemplate_exec_id' => $exec_id,
+					'submit_button' => 'exec[button][download]',
+					'exec' => array(
+						'nm' => array(
+							'cat' => $cat['GrpId'],
+							'show_result' => 1,
+							'route' => $route,
+							'num_rows' => '999',
+						),
+					)
+				)));
+				if ($debug > 2) echo "\nPOSTing $url with $post\n";
+				$download = curl_exec($ch);
+
+				$headers = '';
+				while (empty($headers) || $headers == 'HTTP/1.1 100 Continue')
+				{
+					list($headers,$download) = explode("\r\n\r\n",$download,2);
+					if ($debug > 3) echo "Headers ".__LINE__.":\n".$headers."\n";
+				}
+				if (!preg_match('/attachment; filename="([^"]+)"/m',$headers,$matches))
+				{
+					if ($route == 1) continue;	// me might not have a 2. quali
+					break;	// no further heat
+				}
+				$fnames[$route] = $fname = str_replace('/','-',$matches[1]);
+				// convert from the given charset to eGW's
+				$downloads[$route] = translation::convert($download,$charset);
+				if ($debug > 1) echo "$fname:\n".implode("\n",array_slice(explode("\n",$downloads[$route]),0,4))."\n\n";
+
+				if ($only_download)
+				{
+					file_put_contents($fname,$downloads[$route]);
+				}
+			}
+			global $download;	// as we use global stream-wrapper
+			if (!$only_download) // import
+			{
+				require_once(EGW_API_INC.'/class.global_stream_wrapper.inc.php');
+				// autodetect route_type
+				if ($detect_route_type)
+				{
+					if ($cat['discipline'] == 'speed')
+					{
+						// no real detection, but currently only bestof is used
+						$route_type = TWO_QUALI_BESTOF;
+					}
+					elseif (!isset($downloads[1]))
+					{
+						$route_type = ONE_QUALI;
+					}
+					else
+					{
+						$content = array(
+							'WetId' => $comp['WetId'],
+							'GrpId' => $cat['GrpId'],
+							'route_order' => 0,
+						);
+						$download = $downloads[0];
+						$quali1 = $this->parse_csv($content,fopen('global://download','r'),false,$add_athletes,(int)$comp2import);
+						if (!is_array($quali1)) die($quali1."\n");
+						$content['route_order'] = 1;
+						$download = $downloads[1];
+						$quali2 = $this->parse_csv($content,fopen('global://download','r'),false,$add_athletes,(int)$comp2import);
+						if (!is_array($quali2)) die($quali2."\n");
+						foreach($quali1 as $n => $athlete)
+						{
+							foreach($quali2 as $a)
+							{
+								if ($athlete['PerId'] == $a['PerId']) break 2;
+							}
+							if ($n > 10) break;
+						}
+						$route_type = $athlete['PerId'] == $a['PerId'] ? TWO_QUALI_ALL : TWO_QUALI_HALF;
+					}
+					echo "detected quali-type: $route_type: ".(isset($this->quali_types[$route_type]) ?
+						$this->quali_types[$route_type] : $this->quali_types_speed[$route_type])."\n";
+				}
+				foreach($downloads as $route => $download)
+				{
+					$content = array(
+						'WetId' => $comp['WetId'],
+						'GrpId' => $cat['GrpId'],
+						'route_order' => $route,
+					);
+					if (!$this->init_route($content,$comp,$cat,$discipline))
+					{
+						throw new Exception(lang('Permission denied !!!'),9);
+					}
+					$num_imported = $this->upload($content,fopen('global://download','r'),$add_athletes,(int)$comp2import);
+
+					if (is_numeric($num_imported))
+					{
+						$need_save = $content['new_route'];
+						if (!$route && $route_type)
+						{
+							$content['route_type'] = $route_type;
+							$need_save = true;
+						}
+						// set number of problems from csv file
+						if ($content['route_num_problems'])
+						{
+							list($line1) = explode("\n",$download);
+							for($n = 3; $n <= 8; $n++)
+							{
+								if (strpos($line1,'boulder'.$n)) $num_problems = $n;
+							}
+							if ($num_problems && $num_problems != $content['route_num_problems'])
+							{
+								$content['route_num_problems'] = $num_problems;
+								$need_save = true;
+							}
+						}
+						// set the name from the csv file
+						$fname = $fnames[$route];
+						if (substr($fname,0,strlen($cat['name'])+3) == $cat['name'].' - ' &&
+							($name_from_file = str_replace('.csv','',substr($fname,strlen($cat['name'])+3))) != $content['route_name'])
+						{
+							$content['route_name'] = $name_from_file;
+							$need_save = true;
+						}
+						if ($set_status != $content['route_status'])
+						{
+							$content['route_status'] = $set_status;
+							$need_save = true;
+						}
+						// save the route, if we set something above
+						if ($need_save && $this->route->save($content) != 0)
+						{
+							throw new Exception(lang('Error: saving the heat!!!'),8);
+						}
+						echo $fname.': '.lang('%1 participants imported',$num_imported)."\n";
+					}
+					else
+					{
+						throw new Exception($num_imported,9);
+					}
+				}
+			}
+			if ($import_ranking && $route >= 2)
+			{
+				$content = array(
+					'WetId' => $comp['WetId'],
+					'GrpId' => $cat['GrpId'],
+					'route_order' => -1,
+				);
+				if (!$this->init_route($content,$comp,$cat,$discipline))
+				{
+					throw new Exception(lang('Permission denied !!!'),9);
+				}
+				$content['route_status'] = STATUS_RESULT_OFFICIAL;
+				if ($this->route->save($content) != 0)
+				{
+					throw new Exception(lang('Error: saving the heat!!!'),8);
+				}
+				echo $this->import_ranking($content)."\n";
+			}
+		}
+		if (isset($_SERVER['HTTP_HOST']))
+		{
+			return ob_get_clean();
+		}
+	}
+
+	private static function get_exec_id($html, $debug=null)
+	{
+		if (!preg_match('/name="etemplate_exec_id" value="([^"]+)"/m',$html,$matches))
+		{
+			throw new Exception("Error: etemplate_exec_id not found!",6);
+		}
+		if ($debug > 2) echo "etemplate_exec_id='$matches[1]'\n";
+		return $matches[1];
 	}
 }
