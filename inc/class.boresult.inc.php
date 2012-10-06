@@ -1122,7 +1122,7 @@ class boresult extends boranking
 	 * @param array $keys WetId, GrpId, route_order and optional 'route_type and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
-	 * @param boolean $ignore_comp_heat=false ignore WetId and route_order, default do NOT
+	 * @param boolean|int $ignore_comp_heat=false ignore WetId and route_order, default do NOT, or integer WetId to check agains
 	 * @param boolean $return_data=false true return array with data and do NOT store it
 	 * @return int|string|array integer number of imported results or string with error message
 	 */

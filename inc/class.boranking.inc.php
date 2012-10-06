@@ -1550,7 +1550,7 @@ class boranking extends ranking_so
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $result_only true = only results allowed, false = startlists too
 	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
-	 * @param boolean $ignore_comp_heat=false ignore WetId and route_order, default do NOT
+	 * @param boolean|int $ignore_comp_heat=false ignore WetId and route_order, default do NOT, or integer WetId to check against
 	 * @return string/array error message or result lines
 	 */
 	function parse_csv($keys,$file,$result_only=false,$add_athletes=false,$ignore_comp_heat=false)
@@ -1586,7 +1586,8 @@ class boranking extends ranking_so
 			}
 			$line = array_combine($labels,$line);
 
-			if (!$ignore_comp_heat && in_array('comp',$labels) && $keys['WetId'] != $line['comp'])
+			if ((!$ignore_comp_heat || !is_bool($ignore_comp_heat)) && in_array('comp',$labels) &&
+				$line['comp'] != (!$ignore_comp_heat ? $keys['WetId'] : $ignore_comp_heat))
 			{
 				return lang('Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!',
 					$n,lang('competition'),$line['comp'],$keys['WetId']);
@@ -1601,7 +1602,7 @@ class boranking extends ranking_so
 				}
 				continue;
 			}
-			if (!$ignore_comp_heat && in_array('heat',$labels) && isset($keys['route_order']) && $keys['route_order'] != $line['heat'])
+			if ($ignore_comp_heat !== true && in_array('heat',$labels) && isset($keys['route_order']) && $keys['route_order'] != $line['heat'])
 			{
 				return lang('Error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!',
 				$n,lang('heat'),$line['heat'],$keys['route_order']);

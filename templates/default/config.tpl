@@ -23,7 +23,7 @@
     <td colspan="2"><b>{lang_Ranking_database}</b> ({lang_only_fill_values_different_from_eGW}):</td>
    </tr>
    <tr class="row_on">
-    <td>{lang_Charset}:</td>
+    <td>{lang_Encoding}:</td>
     <td><input size="8" name="newsettings[ranking_db_charset]" value="{value_ranking_db_charset}"></td>
    </tr>
    <tr class="row_off">
@@ -45,6 +45,16 @@
    <tr class="row_off">
     <td>{lang_Password}:</td>
     <td><input type="password" name="newsettings[ranking_db_pass]" value="{value_ranking_db_pass}"></td>
+   </tr>
+
+   <tr class="th">
+    <td colspan="2"><b>Import from other ranking instances</b>:</td>
+   </tr>
+   <tr class="row_on">
+    <td>Import URL:</td>
+    <td>
+     <input size="80" name="newsettings[import_url]" value="{value_import_url}">
+    </td>
    </tr>
 
    <tr class="th">
