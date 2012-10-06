@@ -699,7 +699,9 @@ class uiresult extends boresult
 	 */
 	static function needAbilityPercent($cat)
 	{
-		return in_array($cat, array(95, 96));
+		// enable for all categories, since 2012
+		return 85 <= $cat && $cat <= 101;
+		//return in_array($cat, array(95, 96));
 	}
 
 	/**
