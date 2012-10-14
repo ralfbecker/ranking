@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -140,7 +140,7 @@ class uiresult extends boresult
 					}
 					elseif (is_numeric($content['route_order']) &&
 						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'],
-							$content['max_compl']!=='' ? $content['max_compl'] : 999,$content['slist_order'])))
+							$content['max_compl']!=='' ? $content['max_compl'] : 999,$content['slist_order'],$content['add_cat'])))
 					{
 						$param['msg'] = ($msg .= lang('Startlist generated'));
 
@@ -262,7 +262,7 @@ class uiresult extends boresult
 					break;
 
 				case 'ranking':
-					$param['msg'] = $msg = $this->import_ranking($content,$comp['nation'] != 'NULL' ? $comp['nation'] : null);
+					$param['msg'] = $msg = $this->import_ranking($content, $comp['nation'] != 'NULL' ? $comp['nation'] : null, $content['import_cat']);
 					break;
 			}
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent
@@ -354,17 +354,48 @@ class uiresult extends boresult
 		{
 			foreach($this->route->db_cols as $col)
 			{
-				$readonlys[$col] = $readonlys['button[upload]'] = true;
+				$readonlys[$col] = true;
 			}
-			$readonlys['button[upload]'] = $readonlys['button[ranking]'] = $readonlys['button[startlist]'] = $readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] = true;
+			$readonlys['button[upload]'] = $readonlys['button[ranking]'] = $readonlys['button[startlist]'] =
+				$readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] =
+				$readonlys['import_cat'] = $readonlys['add_cat'] = true;
 			$content['no_upload'] = true;
 		}
 		else
 		{
+			if ($content['route_order'])
+			{
+				$readonlys['add_cat'] = true;
+			}
+			else
+			{
+				$sel_options['add_cat'] = array('' => lang('Additional category'));
+				$sel_options['add_cat'] += $this->cats->names(array('rkey' => $comp['gruppen'],'sex' => $cat['sex'],'GrpId!='.(int)$cat['GrpId']),0);
+			}
 			if ($content['route_status'] != STATUS_RESULT_OFFICIAL || $content['new_route'] ||
 				$content['route_order'] != -1 || $discipline == 'speedrelay')
 			{
-				$readonlys['button[ranking]'] = true;	// only offical results can be commited into the ranking
+				$readonlys['button[ranking]'] = $readonlys['import_cat'] = true;	// only offical results can be commited into the ranking
+			}
+			else
+			{
+				$sel_options['import_cat'] = array('' => lang('Into current category'));
+				$sel_options['import_cat'] += $this->cats->names(array('rkey' => $comp['gruppen'],'sex' => $cat['sex'],'GrpId!='.(int)$cat['GrpId']),0);
+				// add cats from other competitions with identical date
+				if (($comps = $this->comp->names(array('datum' => $comp['datum'],'WetId!='.(int)$comp['WetId']), 0)))
+				{
+					foreach($comps as $id => $label)
+					{
+						if (($c = $this->comp->read($id)) && $c['gruppen'] &&
+							($c_cats = $this->cats->names(array('rkey' => $c['gruppen'],'sex' => $cat['sex']),0)))
+						{
+							foreach($c_cats as $c_cat_id => $c_cat_name)
+							{
+								$sel_options['import_cat'][$c_cat_id.':'.$c['WetId']] = $c_cat_name.': '.$label;
+							}
+						}
+					}
+				}
 			}
 			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
 			{

@@ -1071,9 +1071,10 @@ class boranking extends ranking_so
 	 * @param boolean $stagger=false insert starters of other route behind
 	 * @param array $old_startlist=null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
 	 * @param int $quali_preselected=null number of preselected from cup or ranking, returned last, rest is randomized
+	 * @param int $add_cat=null additional category to add registered atheletes from
 	 * @return boolean/array true or array with starters (if is_array($old_startlist)) if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$order=0,$stagger=false,$old_startlist=null,$quali_preselected=null)
+	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$order=0,$stagger=false,$old_startlist=null,$quali_preselected=null,$add_cat=null)
 	{
 		// order bitfields to booleans
 		$use_ranking = (boolean)($order & 3);	// cup OR ranking
@@ -1090,9 +1091,9 @@ class boranking extends ranking_so
 
 		$filter = array(
 			'WetId'  => $comp['WetId'],
-			'GrpId'  => $cat['GrpId'],
+			'GrpId'  => $add_cat ? array($add_cat, $cat['GrpId']) : $cat['GrpId'],
 		);
-		if (!is_array($old_startlist)) $filter[] = 'platz = 0';		// savegard against an already exsiting result
+		if (!is_array($old_startlist)) $filter[] = 'platz = 0';		// savegard against an already existing result
 
 		$starters = $this->result->read($filter,'',true,'nation,reg_nr');
 
@@ -1127,7 +1128,7 @@ class boranking extends ranking_so
 						$this->result->save(array(
 							'PerId' => $athlete['PerId'],
 							'WetId' => $athlete['WetId'],
-							'GrpId' => $athlete['GrpId'],
+							'GrpId' => $cat['GrpId'],
 							'platz' => 0,
 							'pkt'   => $athlete['pkt'] & 63,	// leave only the registration number
 							'datum' => $athlete['datum'] ? $athlete['datum'] : date('Y-m-d'),
@@ -1141,6 +1142,7 @@ class boranking extends ranking_so
 		$starters2 = array();
 		foreach($starters as $k => $athlete)
 		{
+			$starters[$k]['GrpId'] = $cat['GrpId'];	// could be $add_cat
 			$starters2[$athlete['PerId']] =& $starters[$k];
 		}
 		$starters =& $starters2; unset($starters2);

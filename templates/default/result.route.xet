@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.route.general" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.result.route.general" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="280">
 			<columns>
 				<column width="116"/>
@@ -15,6 +15,9 @@
 						<menulist>
 							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
 						</menulist>
+						<menulist class="selectboxFullWidth">
+							<menupopup statustext="|Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat"/>
+						</menulist>
 						<button statustext="Import the result into the ranking" label="Import into ranking" id="button[ranking]" class="leftPad5"/>
 					</hbox>
 				</row>
@@ -22,10 +25,13 @@
 					<description value="Startlist"/>
 					<hbox options="0,0" span="all">
 						<button label="Generate Startlist" id="button[startlist]"/>
-						<menulist class="leftPad5">
+						<menulist class="leftPad5 selectboxFullWidth">
 							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10"/>
 						</menulist>
-						<menulist class="leftPad5">
+						<menulist class="leftPad5 selectboxFullWidth">
+							<menupopup statustext="|Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat"/>
+						</menulist>
+						<menulist class="leftPad5 selectboxFullWidth">
 							<menupopup statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order"/>
 						</menulist>
 					</hbox>

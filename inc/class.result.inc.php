@@ -82,9 +82,9 @@ class result extends so_sql
 		}
 		foreach(array('WetId','GrpId','PerId') as $key)
 		{
-			if ((int) $keys[$key])
+			if ($keys[$key])
 			{
-				$this->$key = (int) $keys[$key];
+				$this->$key = $keys[$key];
 			}
 			else
 			{
