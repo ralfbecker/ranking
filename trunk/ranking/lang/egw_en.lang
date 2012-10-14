@@ -10,20 +10,25 @@
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 %1. heat	ranking	en	%1. Round
 %1. topo	ranking	en	%1. topo
+%1. try	ranking	en	%1. try
 %s quota has to be 0 for lead final, otherwise time is not used!	ranking	en	%s Quota has to be 0 for lead final, otherwise time is NOT used!
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 (%1 athletes not from %2 skipped)	ranking	en	(%1 athletes not from %2 skipped)
 1. display	ranking	en	1. Display
 1. place	ranking	en	1. place
 2. display	ranking	en	2. Display
+2. lane	ranking	en	2. Lane
 2. qualification	ranking	en	2. Qualification
 2. time	ranking	en	2. Time
 3. place	ranking	en	3. place
+ability	ranking	en	Ability
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
 accounting	ranking	en	Accounting
 actions	ranking	en	Actions
+add a cup	ranking	en	Add a cup
 add a new athlete	ranking	en	add a new athlete
+add a new category	ranking	en	Add a new category
 add a new competition	ranking	en	add a new competition
 add a new cup	ranking	en	add a new cup
 add a new heat	ranking	en	Add a new round
@@ -32,6 +37,7 @@ add heat	ranking	en	Add round
 add new athlete with the given data	ranking	en	Add new athlete with the given data
 add not existing athletes to the database, use with caution!	ranking	en	add not existing athletes to the database, use with caution!
 add to parent federation opened for editing	ranking	en	Add to parent federation opened for editing
+additional category	ranking	en	Additional category
 admin rights required!	ranking	en	Admin rights required!
 administrated by: parent federation	ranking	en	Administrated by: parent federation
 all above	ranking	en	all above
@@ -39,6 +45,7 @@ all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 allow athletes to register themself for this competition	ranking	en	Allow athletes to register themself for this competition
 allowed without extra confirmation	ranking	en	Allowed without extra confirmation
+allows athletes to register themself for this competition	ranking	en	Allows athletes to register themself for this competition
 an email with instructions how to (re-)set the password has been sent.	ranking	en	An EMail with instructions how to (re-)set the password has been sent.
 an error happend, while storing your password!	ranking	en	An error happend, while storing your password!
 applied	ranking	en	applied
@@ -52,6 +59,9 @@ are you sure you want to make an exception?	ranking	en	Are you sure you want to 
 as of	ranking	en	As of
 athlete	ranking	en	Athlete
 athlete %1 not found!	ranking	en	Athlete %1 not found!
+athlete 1	ranking	en	Athlete 1
+athlete 2	ranking	en	Athlete 2
+athlete 3	ranking	en	Athlete 3
 athlete has no license! use regular registration to apply for a license first.	ranking	en	Athlete has no license! Use regular registration to apply for a license first.
 athlete including %1 results merged.	ranking	en	Athlete including %1 results merged.
 athlete is not in the age-group of that category	ranking	en	Athlete is NOT in the age-group of that category
@@ -59,6 +69,7 @@ athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athletes	ranking	en	Athletes
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	en	Athlets need to be at least %1 years old! Maybe wrong date format.
 attention: merging can not be undone! really want to merge?	ranking	en	ATTENTION: merging can NOT be undone! Really want to merge?
+beamer	ranking	en	Beamer
 beamer / videowalls	ranking	en	Beamer / videowalls
 before	ranking	en	before
 before which year the old system was used (first year of new system)	ranking	en	before which year the old system was used (first year of new system)
@@ -72,7 +83,9 @@ birthyear	ranking	en	Birthyear
 birthyears from	ranking	en	Birthyears from
 body height in centimeter	ranking	en	body height in centimeter
 bonus	ranking	en	Bonus
+bonus: number of tries	ranking	en	Bonus: number of tries
 bonus: number of tries or no	ranking	en	Bonus: Number of tries or no
+bonus: total number or no	ranking	en	Bonus: total number or no
 both password do not match!	ranking	en	Both password do NOT match!
 boulder	ranking	en	boulder
 boulder: height, tries	ranking	en	boulder: height, tries
@@ -134,6 +147,7 @@ cups	ranking	en	cups
 database	admin	en	Database
 dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	en	Dataline %1 has a different number of columns (%2) then labels (%3)!
 deadline	ranking	en	Deadline
+default details	ranking	en	Default details
 default ranking view	ranking	en	Default ranking view
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
@@ -141,6 +155,7 @@ delete all rights for this nation	ranking	en	Delete all rights for this nation
 delete an eventually existing result withour further confirmation	ranking	en	Delete an eventually existing result withour further confirmation
 delete result	ranking	en	delete result
 delete this athlete	ranking	en	Delete this athlete
+delete this category	ranking	en	Delete this category
 delete this competition	ranking	en	Delete this competition
 delete this cup	ranking	en	Delete this cup
 delete this federation	ranking	en	Delete this federation
@@ -176,7 +191,9 @@ edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
 edit this heat	ranking	en	Edit this round
+edit topo	ranking	en	Edit topo
 eliminated	ranking	en	eliminated
+email address not found!	ranking	en	EMail address NOT found!
 encoding	ranking	en	Encoding
 end	ranking	en	End
 entry copied - edit and save the copy now.	ranking	en	Entry copied - edit and save the copy now.
@@ -267,6 +284,7 @@ how is the key for the default cup of this cathegory, eg. '??_wc' for the worldc
 how many athletes from the complimentary list of each nation should be used	ranking	en	How many athletes from the complimentary list of each nation should be used
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
+id	ranking	en	ID
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
 if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	en	If you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.
 ignore	ranking	en	Ignore
@@ -274,12 +292,14 @@ import	ranking	en	Import
 import as	ranking	en	Import as
 import charset	ranking	en	Import Charset
 import file	ranking	en	Import file
+import from url	ranking	en	Import from URL
 import into ranking	ranking	en	Import into ranking
 import the result into the ranking	ranking	en	Import the result into the ranking
 in kilogram	ranking	en	in kilogram
 incl. nation-code	ranking	en	incl. nation-code
 information pdf	ranking	en	Information PDF
 internal key, leave it empty to have it automaticaly generated	ranking	en	internal key, leave it empty to have it automaticaly generated
+into current category	ranking	en	Into current category
 isolation	ranking	en	Isolation
 isolation zone	ranking	en	Isolation zone
 isolation zone and starting time	ranking	en	Isolation zone and starting time
@@ -299,6 +319,7 @@ login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too ma
 male	ranking	en	male
 max	ranking	en	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
+maybe you have a different one registered. try looking it up by using "edit profile" on your profile page.	ranking	en	Maybe you have a different one registered. Try looking it up by using "Edit profile" on your profile page.
 measurement	ranking	en	Measurement
 measurement aborted!	ranking	en	Measurement aborted!
 merge	ranking	en	Merge
@@ -334,6 +355,7 @@ not used at the moment	ranking	en	not used at the moment
 nothing to apply!	ranking	en	Nothing to apply!
 nothing to update	ranking	en	Nothing to update
 notice	ranking	en	Notice
+number of competitions counting for the cup	ranking	en	number of competitions counting for the cup
 number of competitions counting for the cup (empty for all)	ranking	en	number of competitions counting for the cup (empty for all)
 number of problems	ranking	en	Number of problems
 observation time	ranking	en	Observation time
@@ -411,12 +433,14 @@ register this athlete for the selected category	ranking	en	Register this athlete
 registration	ranking	en	Registration
 registration deadline	ranking	en	Registration deadline
 registration for this competition is over!	ranking	en	Registration for this competition is over!
+remark	ranking	en	Remark
 remove the attached pdf	ranking	en	Remove the attached PDF
 remove the grafic	ranking	en	Remove the grafic
 removed the %1	ranking	en	Removed the %1
 repeat	ranking	en	Repeat
 replace: %1	ranking	en	replace: %1
 required information missing, application rejected!	ranking	en	Required information missing, application rejected!
+result	ranking	en	Result
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)
 result form is timed out, please reload the form by clicking on the application icon.	ranking	en	Result form is timed out, please reload the form by clicking on the application icon.
 result official	ranking	en	result official
@@ -430,9 +454,11 @@ reverse ranking (unranked first)	ranking	en	reverse ranking (unranked first)
 route	ranking	en	Route
 route not found !!!	ranking	en	Route NOT found !!!
 route not found!	ranking	en	Route NOT found!
+routejudges	ranking	en	Routejudges
 routes	ranking	en	Routes
 rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
+select a category to additionally add to startlist (eg. juniors to men)	ranking	en	Select a category to additionally add to startlist (eg. juniors to men)
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
 select an action	ranking	en	Select an action
@@ -440,6 +466,7 @@ select calendar	ranking	en	Select calendar
 select competition	ranking	en	Select competition
 select heat	ranking	en	Select round
 select how the ranking should be calculated	ranking	en	select how the ranking should be calculated
+select if you want to import into a different category (eg. import juniors from men result)	ranking	en	Select if you want to import into a different category (eg. import juniors from men result)
 select multiple federations for a further action	ranking	en	Select multiple federations for a further action
 select order for qualification startlist or use default	ranking	en	Select order for qualification startlist or use default
 select participant for time measurment	ranking	en	select participant for time measurment
@@ -488,6 +515,7 @@ target for athlete profile (default: profil)	ranking	en	Target for athlete profi
 target for national team rankings (default: nat_team_ranking)	ranking	en	Target for national team rankings (default: nat_team_ranking)
 target for result service (default: resultservice)	ranking	en	Target for result service (default: resultservice)
 target for start lists (default: startlist)	ranking	en	Target for start lists (default: startlist)
+teamname	ranking	en	Teamname
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
 the link is expired, please have a %1new mail send to you%2.	ranking	en	The link is expired, please have a %1new mail send to you%2.
@@ -503,10 +531,14 @@ time measured	ranking	en	Time measured
 time measurement	ranking	en	Time measurement
 to year	ranking	en	to year
 top	ranking	en	Top
+top: number of tries	ranking	en	Top: number of tries
 top: number of tries or no	ranking	en	Top: number of tries or no
+top: total number or no	ranking	en	Top: total number or no
 topo deleted.	ranking	en	Topo deleted.
 topo uploaded as %1.	ranking	en	Topo uploaded as %1.
 total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
+tries	ranking	en	Tries
+try	ranking	en	Try
 try again after %1 minutes.	ranking	en	Try again after %1 minutes.
 try again or have a %1new mail send to you%2.	ranking	en	Try again or have a %1new mail send to you%2.
 two * two qualification	ranking	en	two * two Qualification
@@ -519,6 +551,7 @@ two qualification for all, on sight	ranking	en	two Qualification for all, on sig
 two qualification with height sum	ranking	en	two Qualification with height sum
 two qualification, half quota	ranking	en	two Qualification, half quota
 type of display	ranking	en	Type of display
+type of qualification: automatic	ranking	en	Type of qualification: automatic
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
@@ -526,7 +559,9 @@ unknown mode="%1"!	ranking	en	Unknown Mode="%1"!
 unpublished	ranking	en	unpublished
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
 up	ranking	en	Up
+update time	ranking	en	update time
 upload a portrait picture for the profile	ranking	en	Upload a portrait picture for the profile
+upload topo	ranking	en	Upload topo
 uploaded picture is no jpeg !!!	ranking	en	Uploaded picture is no JPEG !!!
 url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. http://domain.com
 use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"

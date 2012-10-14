@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-12 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -198,9 +198,10 @@ class boresult extends boranking
 	 *  &2  use cup for order, unranked are random behind last ranked
 	 *  &4  reverse ranking or cup (--> unranked first)
 	 *  &8  use ranking/cup for distribution only, order is random
+	 * @param int $add_cat=null additional category to add registered atheletes from
 	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null)
+	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null,$add_cat=null)
 	{
 		$keys = array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
@@ -264,7 +265,7 @@ class boresult extends boranking
 			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
 			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM)),		// true = stagger, false = no stagger
-			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']));
+			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']), $add_cat);
 
 		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF)	// set 2. lane for record format
 		{
@@ -1433,15 +1434,26 @@ class boresult extends boranking
 	 *
 	 * @param array $keys WetId, GrpId, discipline, route_type, route_order=-1
 	 * @param string $filter_nation=null only import athletes of the given nation
+	 * @param string $import_cat=null only import athletes of the given category
 	 * @return string message
 	 */
-	function import_ranking($keys,$filter_nation=null)
+	function import_ranking($keys, $filter_nation=null, $import_cat=null)
 	{
 		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']))
 		{
 			return false;
 		}
-		$skiped = 0;
+		if ($import_cat)
+		{
+			list($import_cat, $import_comp) = explode(':', $import_cat);
+			$import_cat = $this->cats->read($import_cat);
+			if ($import_comp && ($import_comp = $this->comp->read($import_comp)) && $import_comp['nation'])
+			{
+				$filter_nation = $import_comp['nation'];
+			}
+		}
+		$skipped = $last_rank = $ex_aquo = 0;
+		$rank = 1;
 		foreach($this->route_result->search('',false,'result_rank','','',false,'AMD',false,array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
@@ -1455,14 +1467,43 @@ class boresult extends boranking
 			{
 				if ($filter_nation && $row['nation'] != $filter_nation)
 				{
-					$skiped++;
+					$skipped++;
 					continue;
 				}
-				$row['result_rank'] -= $skiped;
+				if ($import_cat && !$this->cats->in_agegroup($row['geb_date'], $import_cat))
+				{
+					$skipped++;
+					continue;
+				}
+				if ($last_rank === (int)$row['result_rank'])
+				{
+					++$ex_aquo;
+				}
+				else
+				{
+					$ex_aquo = 0;
+				}
+				$last_rank = (int)$row['result_rank'];
+
+				//echo "<p>$row[nachname], $row[vorname] $row[geb_date]: result_rank=$row[result_rank], rank=$rank, ex_aquo=$ex_aquo --> ".($rank - $ex_aquo)."</p>\n";
+				$row['result_rank'] = $rank++ - $ex_aquo;
 				$result[$row['PerId']] = $row;
 			}
 		}
-		return parent::import_ranking($keys,$result).($skiped ? "\n".lang('(%1 athletes not from %2 skipped)',$skiped,$filter_nation) : '');
+		if ($import_cat)
+		{
+			$keys['GrpId'] = $import_cat['GrpId'];
+		}
+		if ($import_comp)
+		{
+			$keys['WetId'] = $import_comp['WetId'];
+		}
+		if ($skipped)
+		{
+			if ($import_cat) $reason = $import_cat['name'];
+			if ($filter_nation) $reason .= ($reason ? ' '.lang('or').' ' : '').$filter_nation;
+		}
+		return parent::import_ranking($keys, $result).($skipped ? "\n".lang('(%1 athletes not from %2 skipped)', $skipped, $reason) : '');
 	}
 
 	/**

@@ -10,12 +10,14 @@
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
 %1. heat	ranking	de	%1. Runde
 %1. topo	ranking	de	%1. Topo
+%1. try	ranking	de	%1. Versuch
 %s quota has to be 0 for lead final, otherwise time is not used!	ranking	de	%s Quota muss 0 sein für Lead Finale, sonst wird Zeit NICHT gewertet!
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
 (%1 athletes not from %2 skipped)	ranking	de	(%1 Athleten nicht aus %2 überlesen)
 1. display	ranking	de	1. Display
 1. place	ranking	de	1. Platz
 2. display	ranking	de	2. Display
+2. lane	ranking	de	2. Bahn
 2. qualification	ranking	de	2. Qualifikation
 2. time	ranking	de	2. Zeit
 3. place	ranking	de	3. Platz
@@ -23,7 +25,9 @@ aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
 accounting	ranking	de	Abrechnung
 actions	ranking	de	Befehle
+add a cup	ranking	de	Cup hinzufügen
 add a new athlete	ranking	de	einen neuen Athleten anlegen
+add a new category	ranking	de	Neue Kategorie hinzufügen
 add a new competition	ranking	de	einen neuen Wettkampf anlegen
 add a new cup	ranking	de	Neue Serie anlegen
 add a new heat	ranking	de	Neue Runde anlegen
@@ -32,6 +36,7 @@ add heat	ranking	de	Runde anlegen
 add new athlete with the given data	ranking	de	Neuen Athleten mit den gegebenen Daten anlegen
 add not existing athletes to the database, use with caution!	ranking	de	Nicht existierende Athleten zur Datenbank hinzufügen, mit Vorsicht benutzen!
 add to parent federation opened for editing	ranking	de	Hinzufügen zu zum Bearbeiten geöffneten übergeordneten Verband
+additional category	ranking	de	Zusätzliche Kategorie
 admin rights required!	ranking	de	Administrator Rechte erforderlich!
 administrated by: parent federation	ranking	de	Verwaltet von: übergeordnetem Verband
 all above	ranking	de	Alle darüber
@@ -39,6 +44,7 @@ all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 allow athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
 allowed without extra confirmation	ranking	de	Erlaubt ohne extra Bestätigung
+allows athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
 an email with instructions how to (re-)set the password has been sent.	ranking	de	Eine EMail mit Anleitung, wie das Passwort (zurück) gesetzt wird, wurde versandt.
 an error happend, while storing your password!	ranking	de	Ein Fehler passierte, beim Speichern Deines Passwortes!
 applied	ranking	de	beantragt
@@ -59,6 +65,7 @@ athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athletes	ranking	de	Athleten
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	de	Athleten müssen mindestens %1 Jahre alt sein! Eventuell falsches Datumsformat.
 attention: merging can not be undone! really want to merge?	ranking	de	ACHTUNG: Vereinigen kann NICHT rückgänig gemacht werden! Wollen Sie die beiden Athleten wirklich vereinigen?
+beamer	ranking	de	Beamer
 beamer / videowalls	ranking	de	Beamer / Videowand
 before	ranking	de	vor
 before which year the old system was used (first year of new system)	ranking	de	bis vor welchem Jahr wurde das alte System benützt (erstes Jahr des neuen Systems)
@@ -72,7 +79,9 @@ birthyear	ranking	de	Jahrgang
 birthyears from	ranking	de	Geburtsjahr von
 body height in centimeter	ranking	de	Körpergröße in Zentimeter
 bonus	ranking	de	Bonus
+bonus: number of tries	ranking	de	Bonus: Anzahl Versuche
 bonus: number of tries or no	ranking	de	Bonus: Anzahl Versuche oder Nein
+bonus: total number or no	ranking	de	Bonus: Gesamtanzahl oder Nein
 both password do not match!	ranking	de	Beide Passwörter stimmen NICHT überein!
 boulder	ranking	de	Bouldern
 boulder: height, tries	ranking	de	Bouldern: Höhe, Versuche
@@ -134,6 +143,7 @@ cups	ranking	de	Cups
 database	admin	de	Datenbank
 dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	de	Datenzeile %1 hat eine andere Anzahl Spalten (%2) als die Kopfzeile (%3)!
 deadline	ranking	de	Anmeldeschluss
+default details	ranking	de	Vorgabe für Details
 default ranking view	ranking	de	Standardansicht Ranglisten
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
@@ -141,6 +151,7 @@ delete all rights for this nation	ranking	de	Alle Rechte für diese Nation lösc
 delete an eventually existing result withour further confirmation	ranking	de	Löscht das eventuel existierende Ergebnis ohne weitere Rückfrage
 delete result	ranking	de	Ergebnis löschen
 delete this athlete	ranking	de	Diesen Athleten löschen
+delete this category	ranking	de	Diese Kategorie löschen
 delete this competition	ranking	de	Diesen Wettkampf löschen
 delete this cup	ranking	de	Diesen Cup löschen
 delete this federation	ranking	de	Diesen Verband löschen
@@ -176,7 +187,9 @@ edit this athlete	ranking	de	Diesen Athleten bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
 edit this heat	ranking	de	Diese Runde bearbeiten
+edit topo	ranking	de	Topo bearbeiten
 eliminated	ranking	de	eliminiert
+email address not found!	ranking	de	EMail Adresse NICHT gefunden!
 encoding	ranking	de	Zeichensatz
 end	ranking	de	Ende
 entry copied - edit and save the copy now.	ranking	de	Eintrag kopiert - Sie können die Kopie nun bearbeiten und speichern.
@@ -267,6 +280,7 @@ how is the key for the default cup of this cathegory, eg. '??_wc' for the worldc
 how many athletes from the complimentary list of each nation should be used	ranking	de	Wie viele Athleten der Komplimentärliste sollen von jeder Nation zugelassen werden
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athleten des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
+id	ranking	de	ID
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
 if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	de	Falls Sie noch kein Passwort haben oder es vergessen haben, geben sie einfach nur Ihre E-Mail Adresse an. Dann erhalten Sie eine E-Mail mit Anweisungen zum Setzen des Passworts.
 ignore	ranking	de	Ignorieren
@@ -274,12 +288,14 @@ import	ranking	de	Importieren
 import as	ranking	de	Importieren als
 import charset	ranking	de	Zeichensatz
 import file	ranking	de	Datei importieren
+import from url	ranking	de	Import aus URL
 import into ranking	ranking	de	Ranglistenimport
 import the result into the ranking	ranking	de	Importiert die Ergebnisse in die Rangliste
 in kilogram	ranking	de	in Kilogram
 incl. nation-code	ranking	de	einschl. Länderkennung
 information pdf	ranking	de	Informations PDF
 internal key, leave it empty to have it automaticaly generated	ranking	de	interner Schlüssel, leer lassen um ihn automatisch zu generieren
+into current category	ranking	de	In aktuelle Kategorie
 isolation	ranking	de	Isolation
 isolation zone	ranking	de	Isolation
 isolation zone and starting time	ranking	de	Isolation und Startzeit
@@ -299,6 +315,7 @@ login suspended, too many unsuccessful tries!	ranking	de	Login ausgesetzt, zu vi
 male	ranking	de	männlich
 max	ranking	de	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
+maybe you have a different one registered. try looking it up by using "edit profile" on your profile page.	ranking	de	Eventuell hast Du eine andere registriert. Versuch es über "Profil bearbeiten" in Deinem Profil.
 measurement	ranking	de	Messung
 measurement aborted!	ranking	de	Messung abgebrochen!
 merge	ranking	de	Vereinigen
@@ -334,6 +351,7 @@ not used at the moment	ranking	de	im Moment nicht benutzt
 nothing to apply!	ranking	de	Nichts anzuwenden!
 nothing to update	ranking	de	Nichts zu aktualisieren
 notice	ranking	de	Notiz
+number of competitions counting for the cup	ranking	de	Anzahl Wettkämpfe die für den Cup zählen
 number of competitions counting for the cup (empty for all)	ranking	de	Anzahl Wettkämpfe die für den Cup zählen (leer für alle)
 number of problems	ranking	de	Anzahl Probleme
 observation time	ranking	de	Besichtigungszeit
@@ -411,12 +429,14 @@ register this athlete for the selected category	ranking	de	Diesen Athleten für 
 registration	ranking	de	Registrierung
 registration deadline	ranking	de	Anmeldeschuss für die Registrierung
 registration for this competition is over!	ranking	de	Die Registrierung für diesen Wettkampf ist vorüber!
+remark	ranking	de	Bemerkung
 remove the attached pdf	ranking	de	Das angehangene PDF löschen
 remove the grafic	ranking	de	Bild entfernen
 removed the %1	ranking	de	Das %1 wurde gelöscht
 repeat	ranking	de	Wiederholen
 replace: %1	ranking	de	Ersetze: %1
 required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
+result	ranking	de	Ergebnis
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
 result form is timed out, please reload the form by clicking on the application icon.	ranking	de	Das Ergebnis Formular ist nicht mehr gültig (zu lange nicht aktualisiert), bitte aktualisieren Sie es durch Anklicken des Anwendungsicons.
 result official	ranking	de	Ergebnis offiziell
@@ -430,9 +450,11 @@ reverse ranking (unranked first)	ranking	de	Umgekehrte Rangliste (nicht gelistet
 route	ranking	de	Route
 route not found !!!	ranking	de	Route NICHT gefunden !!!
 route not found!	ranking	de	Route NICHT gefunden!
+routejudges	ranking	de	Routenschiedsrichter
 routes	ranking	de	Routen
 rows	ranking	de	Zeilen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
+select a category to additionally add to startlist (eg. juniors to men)	ranking	de	Zusätzliche Kategorie auswählen zum Generieren der Startliste (z.B. Junioren zu Herren)
 select a cup for a cup-ranking	ranking	de	Einen Cup auswählen für eine Cup-Ranliste
 select a nation first	ranking	de	Zuerst Nation auswählen
 select an action	ranking	de	Einen Befehl auswählen
@@ -440,6 +462,7 @@ select calendar	ranking	de	Kalender auswählen
 select competition	ranking	de	Wettkampf auswählen
 select heat	ranking	de	Runde auswählen
 select how the ranking should be calculated	ranking	de	wählen Sie wie die Rangliste berechnet werden soll
+select if you want to import into a different category (eg. import juniors from men result)	ranking	de	Auswählen, falls in eine andere Kategorie importiert werden soll (z.B. Junioren aus Herren Ergebnis importieren)
 select multiple federations for a further action	ranking	de	Mehrere Verbände für einen Befehl auswählen
 select order for qualification startlist or use default	ranking	de	Sortierung für Startliste der Qualifikation wählen oder Vorgabe verwenden
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
@@ -488,6 +511,7 @@ target for athlete profile (default: profil)	ranking	de	Ziel (target) für Athle
 target for national team rankings (default: nat_team_ranking)	ranking	de	Ziel (target) für nationale Team Rankings (Vorgabe: nat_team_ranking)
 target for result service (default: resultservice)	ranking	de	Ziel (target) für Ergebnisservice (Vorgabe: resultservice)
 target for start lists (default: startlist)	ranking	de	Ziel (target) für Startlisten (Vorgabe: startlist)
+teamname	ranking	de	Teamname
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
 the link is expired, please have a %1new mail send to you%2.	ranking	de	Der Link ist abgelaufen, bitte eine %1neue Mail anfordern%2.
@@ -503,10 +527,14 @@ time measured	ranking	de	Zeit gemessen
 time measurement	ranking	de	Zeitmessung
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
+top: number of tries	ranking	de	Top: Anzahl Versuche
 top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein
+top: total number or no	ranking	de	Top: Gesamtanzahl oder Nein
 topo deleted.	ranking	de	Topo gelöscht.
 topo uploaded as %1.	ranking	de	Topo hochgeladen als %1.
 total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
+tries	ranking	de	Versuche
+try	ranking	de	Versuch
 try again after %1 minutes.	ranking	de	Bitte nach %1 Minuten nochmal versuchen.
 try again or have a %1new mail send to you%2.	ranking	de	Nochmal versuchen oder %1neue Mail anfordern%2.
 two * two qualification	ranking	de	zwei * zwei Qualifikationen für alle
@@ -519,6 +547,7 @@ two qualification for all, on sight	ranking	de	zwei Qualifikationen für alle, o
 two qualification with height sum	ranking	de	zwei Qualifikationen für alle mit Höhensumme
 two qualification, half quota	ranking	de	zwei Qualifikationen, halbe Quote
 type of display	ranking	de	Typ der Anzeige
+type of qualification: automatic	ranking	de	Art der Qualifikation: automatisch
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
 unknown category or not a category of this competition	ranking	de	Unbekannte Kategorie oder nicht eine Kategorie dieses Wettkampfes
@@ -526,7 +555,9 @@ unknown mode="%1"!	ranking	de	Unbekannter Modus="%1"!
 unpublished	ranking	de	unveröffentlicht
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt
 up	ranking	de	Nach oben
+update time	ranking	de	Zeit aktualisieren
 upload a portrait picture for the profile	ranking	de	Ein Protrait Bild für das Profil hochladen
+upload topo	ranking	de	Topo hochladen
 uploaded picture is no jpeg !!!	ranking	de	Hochgeladenes Bild ist kein JPEG !!!
 url to own homepage, eg. http://domain.com	ranking	de	URL zu eigener Homepage, zB. http://climbing.de
 use "yes" or "no, prefession"	ranking	de	benützen Sie "yes" oder "no, Beruf"
