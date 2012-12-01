@@ -280,7 +280,8 @@ class route_result extends so_sql
 					foreach(array_reverse(array_keys($route_names)) as $route_order)
 					{
 						// for quali_preselected: do NOT use qualification, if we have a first final result (route_order=2)
-						if ($quali_preselected && $route_order < 2 && $row['result_rank2']) continue;
+						// same is true for 2012+ EYC: no countback to quali
+						if (($route_type==TWO_QUALI_ALL_NO_COUNTBACK || $quali_preselected) && $route_order < 2 && $row['result_rank2']) continue;
 
 						if ($route_type == TWOxTWO_QUALI && $route_order == 3 ||
 							$route_type == TWO_QUALI_HALF && $route_order == 1)
