@@ -214,7 +214,7 @@ Startlist.prototype.update = function()
 		async: true,
 		context: this,
 		data: '',
-		dataType: 'json',
+		dataType: this.json_url[0] == '/' ? 'json' : 'jsonp',
 		type: 'GET', 
 		success: this.handleResponse,
 		error: function(_xmlhttp,_err) { if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err); }
