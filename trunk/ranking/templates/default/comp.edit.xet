@@ -146,7 +146,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -198,7 +198,9 @@
 					<description value="Prequalified competitiors" span="all"/>
 				</row>
 				<row class="row">
-					<description value="from the ranking" for="prequal_ranking"/>
+					<menulist>
+						<menupopup label="ranking" id="prequal_type"/>
+					</menulist>
 					<menulist>
 						<menupopup type="select-number" id="prequal_ranking" options="None,1,15,1"/>
 					</menulist>

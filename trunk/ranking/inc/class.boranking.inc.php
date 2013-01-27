@@ -863,7 +863,16 @@ class boranking extends ranking_so
 				// get athlets prequalified by ranking
 				if (($prequal_ranking = $this->comp->prequal_ranking($cat_id,$comp)))
 				{
-					$stand = $comp['datum'];
+					switch ($comp['prequal_type'])
+					{
+						case 1:		// prequalified are from ranking 1. Jan of current year
+							$stand = ($comp['datum']-1).'-12-31';
+							break;
+
+						default:	// prequalified are from ranking of competition date
+							$stand = $comp['datum'];
+							break;
+					}
 					// german youth does NOT use ranking, but cup result since 2008!
 					if (in_array($cat_id,array(48,49,50,11,12,13)))
 					{

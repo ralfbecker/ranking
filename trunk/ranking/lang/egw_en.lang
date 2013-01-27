@@ -15,6 +15,7 @@
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 (%1 athletes not from %2 skipped)	ranking	en	(%1 athletes not from %2 skipped)
 1. display	ranking	en	1. Display
+1. january	ranking	en	1. January
 1. place	ranking	en	1. place
 2. display	ranking	en	2. Display
 2. lane	ranking	en	2. Lane
@@ -119,6 +120,7 @@ clone of	ranking	en	Clone of
 closes	ranking	en	closes
 columns	ranking	en	Columns
 comments	ranking	en	Comments
+comp. date	ranking	en	comp. date
 competition	ranking	en	Competition
 competition already has a result for this category!	ranking	en	Competition already has a result for this category!
 competition calendar	ranking	en	Competition calendar

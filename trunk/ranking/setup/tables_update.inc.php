@@ -1555,3 +1555,17 @@ function ranking_upgrade1_9_011()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.012';
 }
 
+
+function ranking_upgrade1_9_012()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','prequal_type',array(
+		'type' => 'int',
+		'precision' => '1',
+		'nullable' => False,
+		'default' => '0',
+		'comment' => '0=comp. date, 1=1.1.'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.013';
+}
+
