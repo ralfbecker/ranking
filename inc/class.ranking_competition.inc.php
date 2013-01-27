@@ -519,7 +519,7 @@ class ranking_competition extends so_sql
 	 */
 	function has_results($keys,$GrpId=null)
 	{
-		if (is_array($keys) || !$keys['WetId'])
+		if (is_array($keys))
 		{
 			$data_backup = $this->data;
 			$keys = $this->read($keys);
