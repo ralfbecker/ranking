@@ -86,6 +86,9 @@ class ranking_selfservice extends boranking
 				$this->selfservice_register($athlete, $action_id);
 				break;
 
+			case 'logout':
+				$this->is_selfservice(0);
+				// fall through
 			case 'recovery':
 			case 'password':
 			case 'set':
@@ -129,17 +132,7 @@ class ranking_selfservice extends boranking
 			die("<p class='error'>".lang('Athlete is suspended !!!')."</p>\n");
 		}
 		// check available categories (matching sex and evtl. agegroup) and if athlete is already registered
-		$cats = array();
-		foreach($comp['gruppen'] as $rkey)
-		{
-			if (!($cat = $this->cats->read($rkey))) continue;
-			if ($cat['sex'] && $cat['sex'] != $athlete['sex']) continue;
-			if (!$this->cats->in_agegroup($athlete['geb_date'], $cat, (int)$comp['datum'])) continue;
-			if ($this->comp->has_results($comp['WetId'],$cat['GrpId'])) continue;
-
-			$cats[$cat['GrpId']] = $cat['name'];
-		}
-		if (!$cats)
+		if (!($cats = $this->matching_cats($comp, $athlete)))
 		{
 			die("<p class='error'>".lang('Competition has no categories you are allowed to register for!')."</p>\n");
 		}
@@ -183,6 +176,57 @@ class ranking_selfservice extends boranking
 		echo '<td>'.html::input('',lang('Register'),'submit')."</td>\n";
 		echo "</tr></table>\n</form>\n";
 
+		// list other competitons with selfservice registration
+		foreach($this->comp->search('', false, 'datum', '', '*', false, 'AND', false, array(
+			'datum > '.$this->db->quote(time(), 'date'),
+			'datum <= '.$this->db->quote(strtotime('+6 month'), 'date'),
+			'selfregister>0',
+			'(deadline IS NULL OR deadline>='.$this->db->quote(time(), 'date').')',
+			'WetId != '.(int)$WetId,
+		)) as $comp)
+		{
+			if (!$this->comp->open_comp_match($athlete, $comp)) continue;	// comp not open to athletes federation
+			if (!$this->matching_cats($comp, $athlete)) continue;	// no category for athlete
+
+			if (!$found++) echo "<p>".lang('Further competitions you can register for:')."</p>\n<ul>\n";
+			echo "<li>".$this->comp->datespan($comp).': '.
+				html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'register-'.$comp['WetId'])).
+				"</li>\n";
+		}
+		if ($found) echo "</ul>\n";
+
+		// Edit profile and logout buttons
+		echo "<p>".html::input('profile', lang('Edit Profile'), 'button', 'onClick="location.href=\''.
+			egw::link('/index.php',array(
+					'menuaction' => 'ranking.ranking_athlete_ui.edit',
+					'PerId' => $athlete['PerId'],
+				)).'\'"')."\n".
+			html::input('logout', lang('Logout'), 'submit', 'onClick="location.href=\''.
+				egw::link('/ranking/athlete.php',array('action' => 'logout')).'\'"')."</p>\n";
+
+	}
+
+	/**
+	 * Return cats of a competition an athlete is allowed to register for
+	 *
+	 * @param array $comp
+	 * @param array $athlete
+	 * @param boolean $check_has_result=false true: check if category already has a result
+	 * @return array GrpId => name pairs
+	 */
+	private function matching_cats(array $comp, array $athlete, $check_has_result=true)
+	{
+		$cats = array();
+		foreach($comp['gruppen'] as $rkey)
+		{
+			if (!($cat = $this->cats->read($rkey))) continue;
+			if ($cat['sex'] && $cat['sex'] != $athlete['sex']) continue;
+			if (!$this->cats->in_agegroup($athlete['geb_date'], $cat, (int)$comp['datum'])) continue;
+			if ($this->comp->has_results($comp['WetId'],$cat['GrpId'])) continue;
+
+			$cats[$cat['GrpId']] = $cat['name'];
+		}
+		return $cats;
 	}
 
 	/**

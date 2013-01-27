@@ -187,6 +187,7 @@ edit %1	ranking	en	edit %1
 edit athlete	ranking	en	Edit athlete
 edit competition	ranking	en	Edit competition
 edit heat	ranking	en	Edit round
+edit profile	ranking	en	Edit profile
 edit this athlete	ranking	en	Edit this athlete
 edit this competition	ranking	en	Edit this competition
 edit this cup	ranking	en	Edit this cup
@@ -259,6 +260,7 @@ from the ranking	ranking	en	from the ranking
 full cathegory name (must not be empty)	ranking	en	full cathegory name (must not be empty)
 full competition name (must not be empty)	ranking	en	full competition name (must not be empty)
 full cup name (must not be empty)	ranking	en	full cup name (must not be empty)
+further competitions you can register for:	ranking	en	Further competitions you can register for:
 gender	ranking	en	Gender
 gender of the athlete	ranking	en	gender of the athlete
 gender...	ranking	en	Gender...
