@@ -15,6 +15,7 @@
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
 (%1 athletes not from %2 skipped)	ranking	de	(%1 Athleten nicht aus %2 überlesen)
 1. display	ranking	de	1. Display
+1. january	ranking	de	1. Januar
 1. place	ranking	de	1. Platz
 2. display	ranking	de	2. Display
 2. lane	ranking	de	2. Bahn
@@ -115,6 +116,7 @@ clone of	ranking	de	Klone von
 closes	ranking	de	schließt
 columns	ranking	de	Spalten
 comments	ranking	de	Kommentare
+comp. date	ranking	de	Wettk. Datum
 competition	ranking	de	Wettkampf
 competition already has a result for this category!	ranking	de	Der Wettkampf hat bereits ein Ergebnis für diese Kategorie!
 competition calendar	ranking	de	Wettkampfkalender

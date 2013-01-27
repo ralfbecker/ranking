@@ -253,6 +253,7 @@ class ranking_competition_ui extends boranking
 			'fed_id'       => $this->federation->federations($this->comp->data['nation'], true),
 			'selfregister' => $this->comp->selfregister_types,
 			'open_comp'    => $this->comp->open_comp_types,
+			'prequal_type' => $this->comp->prequal_types,
 		);
 		// select a category parent fitting to the nation
 		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');

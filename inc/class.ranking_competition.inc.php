@@ -57,6 +57,10 @@ class ranking_competition extends so_sql
 		2 => 'D,A,CH',
 		3 => 'International',
 	);
+	var $prequal_types = array(
+		0 => 'comp. date',
+		1 => '1. January',
+	);
 
 	/**
 	 * Timestaps that need to be adjusted to user-time on reading or saving
