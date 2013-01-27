@@ -183,6 +183,7 @@ edit %1	ranking	de	%1 bearbeiten
 edit athlete	ranking	de	Athlet bearbeiten
 edit competition	ranking	de	Wettkampf bearbeiten
 edit heat	ranking	de	Runde bearbeiten
+edit profile	ranking	de	Profil bearbeiten
 edit this athlete	ranking	de	Diesen Athleten bearbeiten
 edit this competition	ranking	de	Diesen Wettkampf bearbeiten
 edit this cup	ranking	de	Diesen Cup bearbeiten
@@ -255,6 +256,7 @@ from the ranking	ranking	de	von der Rangliste
 full cathegory name (must not be empty)	ranking	de	vollständiger Name der Kategorie (darf nicht leer sein)
 full competition name (must not be empty)	ranking	de	vollständiger Name des Wettkampfs (darf nicht leer sein)
 full cup name (must not be empty)	ranking	de	vollständiger Name des Cups (darf nicht leer sein)
+further competitions you can register for:	ranking	de	Weitere Wettkämpfe für die Du Dich anmelden kannst:
 gender	ranking	de	Geschlecht
 gender of the athlete	ranking	de	Geschlecht des Athleten
 gender...	ranking	de	Geschlecht...

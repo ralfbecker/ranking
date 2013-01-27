@@ -416,7 +416,7 @@ class boranking extends ranking_so
 	 */
 	function is_selfservice($set=null)
 	{
-		$ret = $set ? egw_cache::setSession('ranking', 'selfservice', $set) :
+		$ret = !is_null($set) ? egw_cache::setSession('ranking', 'selfservice', $set) :
 			($GLOBALS['egw']->session->session_flags == 'A' ? egw_cache::getSession('ranking', 'selfservice') : null);
 		//error_log(__METHOD__.'('.array2string($set).') returning '.array2string($ret)." (egw_cache::getSession('ranking', 'selfservice')=".array2string(egw_cache::getSession('ranking', 'selfservice')).')');
 		return $ret;
