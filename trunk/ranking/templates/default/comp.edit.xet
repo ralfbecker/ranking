@@ -164,7 +164,7 @@
 					<menulist>
 						<menupopup type="select-number" id="quota" options="Select one,1,12,1"/>
 					</menulist>
-					<grid spacing="0" padding="1">
+					<grid spacing="0" padding="1" id="quota_extra">
 						<columns>
 							<column/>
 							<column/>
@@ -202,7 +202,7 @@
 					<menulist>
 						<menupopup type="select-number" id="prequal_ranking" options="None,1,15,1"/>
 					</menulist>
-					<grid spacing="0" padding="1">
+					<grid spacing="0" padding="1" id="prequal_extra">
 						<columns>
 							<column/>
 							<column/>
