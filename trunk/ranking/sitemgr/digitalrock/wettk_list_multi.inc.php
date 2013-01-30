@@ -293,7 +293,7 @@ if ($mode != 2)
 			switch((string)$wettk->nation)
 			{
 				case '':
-					$prefix = 'http://www.ifsc-climbing.org/';
+					$prefix = '/';
 					if ((int)$wettk->datum >= 2007) $file_prefix = '/var/www/ifsc-climbing.org/';
 					break;
 				case 'GER':
