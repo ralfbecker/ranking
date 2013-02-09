@@ -65,6 +65,7 @@ athlete 2	ranking	en	Athlete 2
 athlete 3	ranking	en	Athlete 3
 athlete has no license! use regular registration to apply for a license first.	ranking	en	Athlete has no license! Use regular registration to apply for a license first.
 athlete including %1 results merged.	ranking	en	Athlete including %1 results merged.
+athlete is not in agegroup of selected license category!	ranking	en	Athlete is NOT in agegroup of selected license category!
 athlete is not in the age-group of that category	ranking	en	Athlete is NOT in the age-group of that category
 athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athletes	ranking	en	Athletes
@@ -103,6 +104,7 @@ can't open connection to displays at %1 !!!	ranking	en	Can't open connection to 
 can't open connection to timy at %1 !!!	ranking	en	Can't open connection to Timy at %1 !!!
 can't open control port (%1) %2 !!!	ranking	en	Can't open control port (%1) %2 !!!
 cannel without saving	ranking	en	Cannel without saving
+category license is applied for, does not limit athletes to compete in that category only	ranking	en	category license is applied for, does NOT limit athletes to compete in that category only
 category not found !!!	ranking	en	Category NOT found !!!
 cathegories	ranking	en	Cathegories
 cellphone	ranking	en	Cellphone

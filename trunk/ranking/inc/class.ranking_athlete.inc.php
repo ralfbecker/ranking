@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -55,6 +55,11 @@ class ranking_athlete extends so_sql
 
 	var $result_table = self::RESULT_TABLE;
 
+	/**
+	 * Instance of category object
+	 *
+	 * @var category
+	 */
 	var $cats;
 
 	var $picture_url = '/jpgs';
@@ -351,7 +356,7 @@ class ranking_athlete extends so_sql
 			if (is_numeric($cat))	// add join to filter for a category
 			{
 				$cat = (int) $cat;
-				$join .= " JOIN $this->result_table ON GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId AND platz > 0";
+				$join .= " JOIN $this->result_table ON $this->result_table.GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId";
 
 				// if cat uses an age-group only show athlets in that age-group
 				if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
@@ -384,6 +389,7 @@ class ranking_athlete extends so_sql
 			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' l ON l.PerId='.self::ATHLETE_TABLE.'.PerId AND lic_year='.(int)$license_year.' AND l.nation='.
 				$this->db->quote(!$license_nation || $license_nation == 'NULL' ? '' : $license_nation);
 			$extra_cols[] = 'lic_status AS license';
+			$extra_cols[] = 'l.GrpId AS license_cat';
 			if ($filter['license'])
 			{
 				$filter[] = !$filter['license'] ? 'lic_status IS NULL' :
@@ -617,6 +623,7 @@ class ranking_athlete extends so_sql
 			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' ON '.self::LICENSE_TABLE.".PerId=$this->table_name.PerId AND lic_year=".
 				(int)$year.' AND '.self::LICENSE_TABLE.'.nation='.$this->db->quote(!$nation || $nation == 'NULL' ? '' : $nation);
 			$extra_cols[] = 'lic_status AS license';
+			$extra_cols[] = self::LICENSE_TABLE.'.GrpId as license_cat';
 		}
 		$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
 
@@ -627,7 +634,7 @@ class ranking_athlete extends so_sql
 	}
 
 	/**
-	 * Set the license for a given year
+	 * Get the license of a given year
 	 *
 	 * @param int $year
 	 * @param string $nation nation for a national license, or null for an international one
@@ -659,15 +666,27 @@ class ranking_athlete extends so_sql
 	 * @param string $status 'n' = none, 'a' = applied, 'c' = confirmed, 's' = suspended
 	 * @param int $PerId=null else use $this->data[PerId]
 	 * @param string $nation=null nation for a national license, or null for an international one
-	 * @return boolean/int false on wrong parameter or number of affected rows
+	 * @param int $GrpId=null category to apply for
+	 * @return boolean|int false on wrong parameter or athlete not matching cat age-group, or number of affected rows
 	 */
-	function set_license($year,$status='c',$PerId=null,$nation=null)
+	function set_license($year,$status='c',$PerId=null,$nation=null,$GrpId=null)
 	{
 		//echo "<p>set_license($year,'$status',$PerId,'$nation')</p>\n";
 		if (is_null($PerId)) $PerId = $this->data['PerId'];
 
 		if (!(int)$PerId || $year <= 0) return false;
 
+		if ($GrpId)	// if category given, check if athlete meets categories age-group
+		{
+			if ($PerId != $this->data['PerId'])
+			{
+				$backup = $this->data;
+				$this->read($PerId);
+			}
+			$wrong_agegroup = !$this->cats->in_agegroup($this->data['geb_date'], $GrpId);
+			if ($backup) $this->data = $backup;
+			if ($wrong_agegroup) return false;
+		}
 		$where = array(
 			'PerId' => $PerId,
 			'nation' => !$nation || $nation == 'NULL' ? '' : $nation,
@@ -679,6 +698,16 @@ class ranking_athlete extends so_sql
 		}
 		else
 		{
+			// add fake result to find athlete in category
+			$this->db->insert('Results', array(
+				'platz' => 0,
+				'pkt' => 0,
+			),array(
+				'PerId' => $PerId,
+				'GrpId' => $GrpId,
+				'WetId' => 0,
+			), __LINE__, __FILE__, 'ranking');
+
 			switch($status)
 			{
 				case 'a': $what = 'applied'; break;
@@ -689,12 +718,13 @@ class ranking_athlete extends so_sql
 				'lic_status' => $status,
 				'lic_'.$what => date('Y-m-d'),
 				'lic_'.$what.'_by' => $GLOBALS['egw_info']['user']['account_id'],
+				'GrpId' => (int)$GrpId ? $GrpId : null,
 			);
-			if($this->db->select(self::LICENSE_TABLE,'PerId',$where,__LINE__,__FILE__,false,'','ranking')->fetch())
+			/*if($this->db->select(self::LICENSE_TABLE,'PerId',$where,__LINE__,__FILE__,false,'','ranking')->fetch())
 			{
 				$this->db->update(self::LICENSE_TABLE,$data,$where,__LINE__,__FILE__,'ranking');
 			}
-			else
+			else*/
 			{
 				$this->db->insert(self::LICENSE_TABLE,$data,$where,__LINE__,__FILE__,'ranking');
 			}
@@ -702,6 +732,7 @@ class ranking_athlete extends so_sql
 		if ($PerId == $this->data['PerId'])
 		{
 			$this->data['license'] = $status;
+			$this->data['license_cat'] = $GrpId;
 		}
 		//echo "ranking_athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
 		return $this->db->affected_rows();

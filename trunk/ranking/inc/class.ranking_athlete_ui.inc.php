@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -78,6 +78,10 @@ class ranking_athlete_ui extends boranking
 				// read the athletes results
 				$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
 				if ($this->athlete->data['comp']) array_unshift($this->athlete->data['comp'],false);	// reindex with 1
+				if (!$this->athlete->data['license_cat'] && (int)$_GET['license_cat'])
+				{
+					$this->athlete->data['license_cat'] = (int)$_GET['license_cat'];
+				}
 			}
 			else
 			{
@@ -169,7 +173,7 @@ class ranking_athlete_ui extends boranking
 				$content['athlete_data']['license'] = $content['license'] = $this->athlete->get_license($content['license_year'],$content['license_nation']);
 			}
 			// restore some fields set by ranking_athlete::read, which are no real athlete fields
-			foreach(array('comp','last_comp','license') as $name)
+			foreach(array('comp','last_comp','license','license_cat') as $name)
 			{
 				$this->athlete->data[$name] = $content['athlete_data'][$name];
 			}
@@ -267,10 +271,17 @@ class ranking_athlete_ui extends boranking
 								}
 								if (!$required_missing)
 								{
-									$this->athlete->set_license($content['license_year'],'a',null,$content['license_nation']);
-									$msg .= ', '.lang('Applied for a %1 license',$content['license_year'].' '.
-										(!$content['license_nation'] || $content['license_nation'] == 'NULL' ?
-										lang('international') : $content['license_nation']));
+									if ($this->athlete->set_license($content['license_year'],'a',null,$content['license_nation'],$content['license_cat']))
+									{
+										$msg .= ', '.lang('Applied for a %1 license',$content['license_year'].' '.
+											(!$content['license_nation'] || $content['license_nation'] == 'NULL' ?
+											lang('international') : $content['license_nation']));
+									}
+									else
+									{
+										$msg .= ', '.lang('Athlete is NOT in agegroup of selected license category!');
+										$required_missing = true;	// to not download the form
+									}
 								}
 							}
 							else
@@ -287,15 +298,20 @@ class ranking_athlete_ui extends boranking
 									'PerId' => $this->athlete->data['PerId'],
 									'license_year' => $content['license_year'],
 									'license_nation' => $content['license_nation'],
+									'license_cat' => $content['license_cat'],
 								));
 								$js .= "window.location='$link';";
 							}
 						}
 						// change of license status, requires athlete rights for the license-nation
-						elseif ($content['athlete_data']['license'] != $content['license'] &&
+						elseif (($content['athlete_data']['license'] != $content['license'] ||
+							$content['athlete_data']['license_cat'] != $content['license_cat']) &&
 							$this->acl_check($content['license_nation'],EGW_ACL_ATHLETE))	// you need int. athlete rights
 						{
-							$this->athlete->set_license($content['license_year'],$content['license'],null,$content['license_nation']);
+							if (!$this->athlete->set_license($content['license_year'],$content['license'],null,$content['license_nation'],$content['license_cat']))
+							{
+								$msg .= ', '.lang('Athlete is NOT in agegroup of selected license category!');
+							}
 						}
 						if ($content['pw_mail'])
 						{
@@ -372,6 +388,7 @@ class ranking_athlete_ui extends boranking
 			'foto' => $this->athlete->picture_url().'?'.time(),
 			'license_year' => $content['license_year'],
 			'license_nation' => $content['license_nation'],
+			'license_cat' => $content['license_cat'],
 			'referer' => $content['referer'],
 			'merge_to' => $content['merge_to'],
 		);
@@ -394,6 +411,10 @@ class ranking_athlete_ui extends boranking
 			'fed_id' => !$content['nation'] ? array(lang('Select a nation first')) :
 				$this->athlete->federations($content['nation'],false,$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
 			'license_nation' => ($license_nations = $this->license_nations),
+			'license_cat' => $this->cats->names(array(
+				'sex' => $content['sex'],
+				'nation' => $content['nation'],
+			),0),
 		);
 		$edit_rights = $this->acl_check_athlete($this->athlete->data);
 		$readonlys = array(
@@ -410,6 +431,9 @@ class ranking_athlete_ui extends boranking
 			'merge' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 		);
+		// only allow to set license-category when applying or having rights to change license
+		$readonlys['license_cat'] = $readonlys['apply_license'] && $readonlys['license'];
+
 		if (!$readonlys['merge_to'] && !$content['merge_to'])
 		{
 			$content['merge_to']['query'] = $content['sex'][0].':'.$content['nation'].':!'.$content['PerId'].': '.$content['nachname'];
@@ -478,6 +502,7 @@ class ranking_athlete_ui extends boranking
 				'row' => (int)$_GET['row'] ? (int)$_GET['row'] : $content['row'],
 				'license_year' => $content['license_year'],
 				'license_nation' => $content['license_nation'],
+				'license_cat' => $content['license_cat'],
 				'old_license_nation' => $content['license_nation'],
 				'acl_fed_id' => $content['acl_fed_id'],
 			),2);
@@ -585,6 +610,7 @@ class ranking_athlete_ui extends boranking
 		$rows['sel_options'] =& $sel_options;
 		$rows['license_nation'] = !$license_nation ? 'NULL' : $license_nation;
 		$rows['license_year'] = $this->license_year;
+		$rows['license_cat'] = $query['filter'];
 		// dont show license column for nation without licenses or if a license-filter is selected
 		$rows['no_license'] = $query['filter2'] != '' || !isset($sel_options['license_nation'][$rows['license_nation']]);
 		// dont show license filter for a nation without license
@@ -697,6 +723,7 @@ class ranking_athlete_ui extends boranking
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'filter2'=> array('' => 'All')+$this->license_labels,
 			'license'=> $this->license_labels,
+			'license_cat' => $this->cats->names(array(), 0),
 		),$readonlys);
 	}
 
@@ -705,14 +732,20 @@ class ranking_athlete_ui extends boranking
 	 *
 	 * @param string $nation=null
 	 * @param int $year=null defaults to $this->license_year
+	 * @param int $GrpId=null category to apply for
 	 * @return string path on server
 	 */
-	function license_form_name($nation=null,$year=null)
+	function license_form_name($nation=null, $year=null, $GrpId=null)
 	{
 		if (is_null($year)) $year = $this->license_year;
 		if ($nation == 'NULL') $nation = null;
 
-		return $_SERVER['DOCUMENT_ROOT'].'/'.$year.'/license_'.$year.$nation.'.rtf';
+		if (!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
+			!file_exists($file = $_SERVER['DOCUMENT_ROOT'].'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'].'.rtf'))
+		{
+			$file = $_SERVER['DOCUMENT_ROOT'].'/'.$year.'/license_'.$year.$nation.'.rtf';
+		}
+		return $file;
 	}
 
 	/**
@@ -720,18 +753,20 @@ class ranking_athlete_ui extends boranking
 	 *
 	 * @param string $nation=null
 	 * @param int $year=null defaults to $this->license_year
+	 * @param int $GrpId=null category to apply for
 	 */
-	function licenseform($nation=null,$year=null)
+	function licenseform($nation=null,$year=null,$GrpId=null)
 	{
 		if (is_null($year)) $year = $_GET['license_year'] ? $_GET['license_year'] : $this->license_year;
 		if (is_null($nation) && $_GET['license_nation']) $nation = $_GET['license_nation'];
+		if (is_null($GrpId) && $_GET['license_cat']) $GrpId = $_GET['license_cat'];
 
 		if (!$this->athlete->read($_GET) ||
-			!($form = file_get_contents($this->license_form_name($nation,$year))))
+			!($form = file_get_contents($this->license_form_name($nation,$year,$GrpId))))
 		{
 			common::egw_exit();
 		}
-		$egw_charset = $GLOBALS['egw']->translation->charset();
+		$egw_charset = translation::charset();
 		$replace = array();
 		foreach($this->athlete->data as $name => $value)
 		{

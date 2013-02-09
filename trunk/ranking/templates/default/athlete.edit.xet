@@ -80,7 +80,7 @@
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.9.001">
-		<htmlarea cols="1" statustext="This text will be shown in the profil on the website." id="freetext" rows="1" mode="extended" height="120px" width="100%" toolbar="true"/>
+		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="120px" width="100%" toolbar="true"/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -148,7 +148,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -174,7 +174,6 @@
 						<menulist>
 							<menupopup id="license"/>
 						</menulist>
-						<button statustext="|Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license" onclick="return confirm('$cont[license_msg]');"/>
 					</hbox>
 				</row>
 				<row class="row">
@@ -183,9 +182,15 @@
 						<menupopup statustext="gender of the athlete" id="sex" needed="1" options="Select one"/>
 					</menulist>
 					<description value="Nation" for="nation"/>
-					<menulist span="all">
+					<menulist>
 						<menupopup statustext="nation the athlete is competing for" id="nation" needed="1" no_lang="1" onchange="1" options="Select one"/>
 					</menulist>
+					<hbox align="right">
+						<menulist>
+							<menupopup statustext="|category license is applied for, does NOT limit athletes to compete in that category only" id="license_cat" options="Athlete license"/>
+						</menulist>
+						<button statustext="|Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license" onclick="return confirm('$cont[license_msg]');"/>
+					</hbox>
 				</row>
 				<row class="row">
 					<description value="Birthdate" for="geb_date"/>

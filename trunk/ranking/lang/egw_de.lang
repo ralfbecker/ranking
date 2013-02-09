@@ -61,6 +61,7 @@ athlete	ranking	de	Athlet
 athlete %1 not found!	ranking	de	Athlet %1 nicht gefunden!
 athlete has no license! use regular registration to apply for a license first.	ranking	de	Athlet hat keine Lizenz! Benutzen Sie die reguläre Registrierung um eine zu beantragen.
 athlete including %1 results merged.	ranking	de	Athlet einschließlich %1 Ergebnisse vereinigt.
+athlete is not in agegroup of selected license category!	ranking	de	Athlet is NICHT in der Altersklasse der ausgewählten Lizenzkategorie!
 athlete is not in the age-group of that category	ranking	de	Athlet hat NICHT den erforderlichen Jahrgang für diese Kategorie
 athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athletes	ranking	de	Athleten
@@ -99,6 +100,7 @@ can't open connection to displays at %1 !!!	ranking	de	Kann keine Verbindung zu 
 can't open connection to timy at %1 !!!	ranking	de	Kann keine Verbindung zu Timy unter %1 aufbauen!!!
 can't open control port (%1) %2 !!!	ranking	de	Kann Kontroll Port (%1) %2 nicht öffnen !!!
 cannel without saving	ranking	de	Abbrechen ohne zu Speichern
+category license is applied for, does not limit athletes to compete in that category only	ranking	de	Kategorie, für die die Lizenz beantragt wird, schränkt Athleten NICHT auf diese Kategorie ein
 category not found !!!	ranking	de	Kategorie NICHT gefunden !!!
 cathegories	ranking	de	Kategorien
 cellphone	ranking	de	Mobiltelefon
