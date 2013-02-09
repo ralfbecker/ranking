@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -1567,5 +1567,21 @@ function ranking_upgrade1_9_012()
 	));
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.013';
+}
+
+/**
+ * Add (optional) category to license
+ *
+ * ALTER TABLE `Licenses` ADD `GrpId` INTEGER
+ */
+function ranking_upgrade1_9_013()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','GrpId',array(
+		'type' => 'int',
+		'precision' => '4',
+		'comment' => 'optional category for which license was applied'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.014';
 }
 

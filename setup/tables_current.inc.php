@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -413,7 +413,8 @@ $phpgw_baseline = array(
 			'lic_confirmed' => array('type' => 'date'),
 			'lic_confirmed_by' => array('type' => 'int','precision' => '4'),
 			'lic_suspended' => array('type' => 'date'),
-			'lic_suspended_by' => array('type' => 'int','precision' => '4')
+			'lic_suspended_by' => array('type' => 'int','precision' => '4'),
+			'GrpId' => array('type' => 'int','precision' => '4','comment' => 'optional category for which license was applied')
 		),
 		'pk' => array('PerId','nation','lic_year'),
 		'fk' => array(),

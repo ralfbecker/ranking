@@ -58,12 +58,17 @@
 					<description id="${row}[ort]" no_lang="1"/>
 					<description id="${row}[verband]" no_lang="1"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
-					<hbox options="0,0">
+					<vbox options="0,0">
+						<hbox options="0,0">
+							<menulist>
+								<menupopup id="${row}[license]" readonly="true"/>
+							</menulist>
+							<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]&amp;license_cat=$cont[license_cat]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" class="small"/>
+						</hbox>
 						<menulist>
-							<menupopup id="${row}[license]" readonly="true"/>
+							<menupopup id="${row}[license_cat]" readonly="true"/>
 						</menulist>
-						<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" class="small"/>
-					</hbox>
+					</vbox>
 					<vbox options="0,0">
 						<date-time id="${row}[modified]" readonly="true"/>
 						<menulist>
