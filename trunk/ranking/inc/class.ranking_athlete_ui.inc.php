@@ -413,7 +413,7 @@ class ranking_athlete_ui extends boranking
 			'license_nation' => ($license_nations = $this->license_nations),
 			'license_cat' => $this->cats->names(array(
 				'sex' => $content['sex'],
-				'nation' => $content['nation'],
+				'nation' => $content['license_nation'] != 'NULL' ? $content['license_nation'] : null,
 			),0),
 		);
 		$edit_rights = $this->acl_check_athlete($this->athlete->data);
