@@ -317,6 +317,12 @@ class category extends so_sql
 		{
 			$keys['sex'] = null;
 		}
+		// implement "!(fe)male" to include non-gender cats
+		elseif($keys['sex'][0] == '!')
+		{
+			$keys[] = "COALESCE(sex,'both') != ".$this->db->quote(substr($keys['sex'], 1));
+			unset($keys['sex']);
+		}
 		$names = array();
 		foreach((array)$this->search(array(),False,$sort,'','',false,'AND',false,$keys) as $data)
 		{
