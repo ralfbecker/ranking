@@ -257,7 +257,7 @@ class category extends so_sql
 	 *
 	 * all not explicitly named cats are sorted by their GrpId
 	 */
-	static function sui_cat_sort()
+	static function sui_cat_sort($col='GrpId')
 	{
 		$fix_startorder = array(
 			38 => 1,	// SUI_F_M 	U14 Damen
@@ -271,12 +271,12 @@ class category extends so_sql
 			30 => 12,	// SUI_F 	Elite Damen
 			33 => 13,	// SUI_M 	Elite Herren
 		);
-		$sql_sort = 'CASE GrpId';
+		$sql_sort = "CASE $col";
 		foreach($fix_startorder as $grp_id => $sort)
 		{
 			$sql_sort .= ' WHEN '.$grp_id.' THEN '.$sort;
 		}
-		$sql_sort .= ' ELSE GrpId END';
+		$sql_sort .= " ELSE $col END";
 
 		return $sql_sort;
 	}

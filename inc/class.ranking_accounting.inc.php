@@ -48,7 +48,7 @@ class ranking_accounting extends boresult
 		switch (($order = $query['order']))
 		{
 			case 'start_order':
-				$query['order'] = category::sui_cat_sort().',start_order';
+				$query['order'] = category::sui_cat_sort(route_result::RESULT_TABLE.'.GrpId').',start_order';
 				break;
 		}
 		$comp = $this->comp->read($query['comp']);
@@ -69,7 +69,7 @@ class ranking_accounting extends boresult
 			'license_year'   => (int)$comp['datum'],
 		);
 
-		$total = $this->athlete->get_rows($query,$rows,$readonlys,$join,false,false,'start_number,start_order,GrpId');
+		$total = $this->athlete->get_rows($query,$rows,$readonlys,$join,false,false,'start_number,start_order,'.route_result::RESULT_TABLE.'.GrpId AS GrpId');
 		//echo $total; _debug_array($rows); //die('Stop');
 
 		$rows['total'] = $rows['fed'] = 0.0;
