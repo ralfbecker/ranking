@@ -488,7 +488,14 @@ function wettk_link_str($wettk,$text='',$class='')
 		{
 			$year = $args[1] + ($args[1] < 90 ? 2000 : 1900);
 		}
-		$homepage = $url_drock.($year ? '/'.$year : '').'/'.$wettk->homepage;
+		if((int)$wettk->homepage || $wettk->homepage[0] == '/')
+		{
+			$homepage = $url_drock.($year ? '/'.$year : '').'/'.$wettk->homepage;
+		}
+		else
+		{
+			$homepage = 'http://'.$wettk->homepage;
+		}
 	}
 	else
 	{
