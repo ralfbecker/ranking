@@ -412,7 +412,7 @@ class ranking_athlete_ui extends boranking
 				$this->athlete->federations($content['nation'],false,$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
 			'license_nation' => ($license_nations = $this->license_nations),
 			'license_cat' => $this->cats->names(array(
-				'sex' => $content['sex'],
+				'sex' => $content['sex'] ? ($content['sex']=='male'?'!female':'!male') : null,
 				'nation' => $content['license_nation'] != 'NULL' ? $content['license_nation'] : null,
 			),0),
 		);
