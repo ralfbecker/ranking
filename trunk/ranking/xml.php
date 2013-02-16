@@ -48,7 +48,13 @@ function check_anon_access(&$anon_account)
 
 try
 {
-	if (isset($_GET['nation']))
+	if(isset($_GET['cat']) && !isset($_GET['comp']))
+	{
+		$export = new ranking_export();
+		$result = $export->export_ranking($_GET['cat'], $_GET['date'], $_GET['cup']);
+		$root_tag = 'ranking';
+	}
+	elseif (isset($_GET['nation']) || !isset($_GET['comp']))
 	{
 		$export = new ranking_export();
 		$result = $export->export_calendar($_GET['nation'], $_GET['year'], $_GET['filter']);
@@ -99,16 +105,16 @@ foreach($result as $name => &$value)
 	elseif($value)
 	{
 		if (substr($name,-1) == 's') $name = substr($name,0,-1);
-		$xml->startElement($name.'s');
+		$xml->startElement($name.(in_array($name, array('cat','cup','comp')) ? '' : 's'));
 		foreach($value as $id => &$val)
 		{
 			if (!is_array($val))
 			{
 				if (!is_string($val)) $val = (string)$val;
-				if ($name == 'route_names' || $name == 'route_name')
+				if ($name == 'route_name' || $name == 'cat' || $name == 'comp' || $name == 'cup')
 				{
-					$xml->startElement('route_name');
-					$xml->writeAttribute('route',$id);
+					$xml->startElement($name == 'route_name' ? $name : $id);
+					if ($name == 'route_name') $xml->writeAttribute('route',$id);
 					$xml->text($val);
 					$xml->endElement();
 				}

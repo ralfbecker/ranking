@@ -1,3 +1,5 @@
+Result data via XML or JSON
+===========================
 So here's a small documentation. I will use XML as example because it's
 easier to view (eg. in Firefox) compared with the JSON, thought content
 is identical and you only have to replace xml.php with json.php in the
@@ -134,6 +136,92 @@ described webservice via JSON). The API can be used to embed results
 into other webpages eg. the webcast page. They have an update method
 which can be called on non offical results to self-update on a certain
 frequency (NOT less then 10s!).
+
+Calendar data via XML or JSON
+=============================
+calendar data feed is triggered by setting "nation" GET parameter, or NOT setting "comp" parameter.
+Optional parameters:
+- year: to switch to a calendar of a different year then the current one
+- filter: allows to filter competitions by a given column and value(s), 
+	eg. "filter[cat_id]=!71,72" returns only competitions not having cat_id=71 or 72
+	you can use most fields below to filter by
+
+Meaning of competition values:
+- WetId: numerical id, used eg. as "comp" parameter for result calls
+- rkey: unique short name of competition
+- name: long competition name
+- short: short competition name
+- nation: calendar nation, empty for international competition
+- homepage: url of competition homepage
+- host_nation: 3-letter code of host-nation, eg. "GER"
+- deadline: registration deadline in YYYY-MM-DD format
+- discipline: discipline (if specified on competition, usually not for international competition) "lead", "speed" or "boulder"
+- cat_id: numerical competition (not athlete!) category
+- fed_id: only return competitions from given federation (eg. state within Germany)
+- display_athlete: how athlet is to be displayed: "nation" (default), "federation", "nation_pc_city", "pc_city"
+- selfregister: 0 = no selfregistration, 1 = selfregistration, 2 = selfregistration with confirmation by federation
+- open_comp: comp-id of competition this one is an open for
+- duration: of competition in days
+- date: start-date of competition in YYYY-MM-DD format
+- date_end: end-date of competition
+- date_span: eg. 13. - 14. April 2012
+- cats: categories of competition with values:
+  * GrpId: numerical id, used eg. as "cat" parameter
+  * name: name of category eg. "W O M E N  boulder"
+  * status: data available
+    - 0: result imported into ranking
+    - 1: result-service result available
+    - 2: result-service startlist available
+    - 3: old non result-server startlist (no longer used)
+    - 4: starters / registration data
+  * url: to display data
+- info: url to info pdf
+- result: url to result as pdf, if one got uploaded
+- startlist: url to startlist as pdf, if one got uploaded
+
+Ranking data via XML or JSON
+============================
+ranking data is triggered by setting "cat" GET parameter and NOT setting "comp" parameter.
+Optional parameters:
+- date: YYYY-MM-DD value or WetId of a competition, to get eg. ranking used for distribution of participants on 2 routes
+- cup: numerical id of cup or string rkey, for a cup ranking
+
+Ranking data is (on purpose) very similar to competition results:
+- cat: GrpId & name: numerical id and name of category
+- cup: SerId & name: numerical id and name of cup
+- comp: WetId, name & date: of last competition in ranking
+- max_comp: max. number of competitions counting
+- start: start of ranking window (not for cup ranking!)
+- end: date of ranking (might be different from passed in date, as ranking are only published for competition dates!)
+- participants: with following values:
+  * PerId: numerical id of athlete
+  * firstname, lastname, birthyear, nation, city of athlete
+  * federation: name of federation
+  * url: profile url
+  * result_rank: rank in ranking
+  * points: sum of counting competitions
+  * result{WetId}: "{rank}.\n{points}" (eg. "1.\n100.00") rank and points (in brackets if not counting) for competition {WetId}
+- route_name: name of competition
+- route_names: multiple numerical id {WetId}: "{short name}\n{date}" of competition in ranking, can be used as column-headers
+- route_result: date of ranking, same as end
+- comp_name: cup name or "Ranking": category name
+- route_order: always -1
+- discipline: always "ranking"
+
+You can use similar code / widgets to display rankings as you use for results. 
+
+Examples:
+--------
+1. Current worldranking MEN lead:
+- XML: www.ifsc-climbing.org/egw/ranking/xml.php?cat=1
+- JSON: www.ifsc-climbing.org/egw/ranking/json.php?cat=1
+- HTML: www.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=1 append "&detail=1" to show results
+2. 2012 WorldCup WOMEN lead:
+- XML: www.ifsc-climbing.org/egw/ranking/xml.php?cat=2&cup=12_wc
+- JSON: www.ifsc-climbing.org/egw/ranking/json.php?cat=2&cup=12_wc
+- HTML: www.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=2&cup=12_wc append "&detail=1" to show results
+
+Please note: www.digitalrock.de uses "/egroupware", while www.ifsc-climbing.org uses "/egw"!
 
 If you have questions please ask.
 

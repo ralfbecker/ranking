@@ -16,6 +16,15 @@ require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
 class ranking_export extends boresult
 {
 	/**
+	 * Disable caching for following development systems
+	 *
+	 * @var array
+	 */
+	public static $ignore_caching_hosts = array(
+		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost'
+	);
+
+	/**
 	 * Get URL for athlete profile
 	 *
 	 * Currently /pstambl.php is used for every HTTP_HOST not www.ifsc-climbing.org,
@@ -30,7 +39,7 @@ class ranking_export extends boresult
 		static $base;
 		if (is_null($base))
 		{
-			$base = 'http://'.$_SERVER['HTTP_HOST'];
+			//$base = 'http://'.$_SERVER['HTTP_HOST'];	// disabled base to have domain independent links
 			if ($_SERVER['HTTP_HOST'] == 'www.ifsc-climbing.org')
 			{
 				$base .= '/index.php?page_name=pstambl&person=';
@@ -90,7 +99,8 @@ class ranking_export extends boresult
 		// switch caching off for speed-cli.php, as it can not (un)set the cache,
 		// because of permissions of /tmp/egw_cache only writable by webserver-user
 		// for all other purposes caching is ok and should be enabled
-		if ($update_cache || !($data = egw_cache::getInstance('ranking', $location)))
+		if (in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) ||
+			$update_cache || !($data = egw_cache::getInstance('ranking', $location)))
 		{
 			if (!isset($instance)) $instance = new ranking_export();
 
@@ -152,6 +162,7 @@ class ranking_export extends boresult
 		// append category name to route name
 		$route['route_name'] .= ' '.$cat['name'];
 		$route['comp_name'] = $comp['name'];
+		$route['nation'] = $comp['nation'];
 
 		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
 		{
@@ -181,6 +192,13 @@ class ranking_export extends boresult
 		{
 			$route['route_names'] = $result['route_names'];
 			unset($result['route_names']);
+		}
+		else
+		{
+			$route['route_names'] = $this->route->query_list('route_name','route_order',array(
+				'WetId' => $comp['WetId'],
+				'GrpId' => $cat['GrpId'],
+			),'route_order');
 		}
 
 		switch($discipline)
@@ -243,14 +261,7 @@ class ranking_export extends boresult
 			}
 			foreach($this->athlete->search(array('PerId' => $ids),false) as $athlete)
 			{
-				$athletes[$athlete['PerId']] = array(
-					'PerId'     => $athlete['PerId'],
-					'federation'=> $athlete['verband'],
-					'firstname' => $athlete['vorname'],
-					'lastname'  => $athlete['nachname'],
-					'nation'    => $athlete['nation'],
-					'url'       => self::profile_url($athlete,$cat['GrpId']),
-				);
+				$athletes[$athlete['PerId']] = self::athlete_attributes($athlete, $comp['nation'], $cat['GrpId']);
 			}
 			//echo "<pre>".print_r($athletes,true)."</pre>\n";die('Stop');
 		}
@@ -270,10 +281,7 @@ class ranking_export extends boresult
 				unset($row['result']);
 			}
 			// use english names
-			$row['firstname'] = $row['vorname'];
-			$row['lastname']  = $row['nachname'];
-			$row['federation']= $row['verband'];
-			if ($row['PerId']) $row['url'] = self::profile_url($row,$cat['GrpId']);
+			$row += self::athlete_attributes($row, $comp['nation'], $cat['GrpId']);
 
 			// remove &nbsp; in boulderheight results
 			if ($discipline == 'boulderheight')
@@ -401,9 +409,18 @@ class ranking_export extends boresult
 		return $ret;
 	}
 
+	/**
+	 * Livetime of cache entries of calendar data
+	 *
+	 * We use a fairly low time, as we cant invalidate the cache,
+	 * because of filter value
+	 *
+	 * @var int
+	 */
+	const EXPORT_CALENDAR_TTL = 300;
 
 	/**
-	 * Export an competition calendar for the given year and nation(s)
+	 * Export a competition calendar for the given year and nation(s)
 	 *
 	 * @param array|string $nations
 	 * @param int $year=null default current year
@@ -413,9 +430,19 @@ class ranking_export extends boresult
 	 */
 	public function export_calendar($nations,$year=null,array $filter=null)
 	{
-		$where = array();
-
 		if (!(int)$year) $year = (int)date('Y');
+		$location = 'calendar:'.json_encode(array(
+			'nation' => $nations,
+			'year' => $year,
+			'filter' => $filter,
+		));
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
+			($data = egw_cache::getInstance('ranking', $location)))
+		{
+			return $data;
+		}
+
+		$where = array();
 		$where[] = 'datum LIKE '.$this->db->quote((int)$year.'%');
 
 		if (!is_array($nations)) $nations = explode(',',$nations);
@@ -464,6 +491,22 @@ class ranking_export extends boresult
 					{
 						$where[] = $name.' IS NULL';
 					}
+					elseif ($val[0] == '!' || strpos($val, ',') !== false)
+					{
+						$not = '';
+						if ($val[0] == '!')
+						{
+							$not = 'NOT ';
+							$val = substr($val, 1);
+						}
+						$val = explode(',', $val);
+						if ($this->comp->table_def['fd'][$name]['type'] !== 'varchar')
+						{
+							$val = array_diff($val, array(''));	// remove empty vales as they would give SQL error
+						}
+						if (!$val) $val = $this->comp->table_def['fd'][$name]['nullable'] !== false ? null : '';
+						$where[] = $this->db->expression($this->comp->table_name, $not, array($name => $val));
+					}
 					else
 					{
 						$where[$name] = $val;
@@ -483,39 +526,41 @@ class ranking_export extends boresult
 		}
 		//_debug_array($competitions); die('STOP');
 
-		$cats = $this->cats->search(null,false,'rkey','','','','AND',false,array('rkey' => $cats));
-		static $rename_cat = array(
-			'serien_pat' => false,	// not interesting
-			'vor_rls' => false,
-			'vor' => false,
-			'rls' => false,
-			'GrpIds' => false,	// only intersting for combined, so not for calendar
-			'extra' => false,	// what's that anyway?
-		);
-		foreach($cats as &$cat)
+		if ($cats && ($cats = $this->cats->search(null,false,'rkey','','','','AND',false,array('rkey' => $cats))))
 		{
-			$cat = self::rename_key($cat, $rename_cat);
-			$rkey2cat[$cat['rkey']] =& $cat;
+			static $rename_cat = array(
+				'serien_pat' => false,	// not interesting
+				'vor_rls' => false,
+				'vor' => false,
+				'rls' => false,
+				'GrpIds' => false,	// only intersting for combined, so not for calendar
+				'extra' => false,	// what's that anyway?
+			);
+			foreach($cats as &$cat)
+			{
+				$cat = self::rename_key($cat, $rename_cat);
+				$rkey2cat[$cat['rkey']] =& $cat;
+			}
+			//_debug_array($cats); die('STOP');
 		}
-		//_debug_array($cats); die('STOP');
-
-		$cups = $this->cup->search(null,false,'rkey','','','','AND',false,array('SerId' => $cups));
-		static $rename_cup = array(
-			'gruppen' => 'cats',
-			'faktor' => false,	// currently not used
-			'split_by_places' => false,	// not interesting for calendar
-			'pkte' => false,
-			'max_rang' => false,
-			'max_serie' => false,
-			'presets' => false,
-		);
-		foreach($cups as &$cup)
+		if ($cups && ($cups = $this->cup->search(null,false,'rkey','','','','AND',false,array('SerId' => $cups))))
 		{
-			$cup = self::rename_key($cup, $rename_cup);
-			$id2cup[$cup['SerId']] =& $cup;
+			static $rename_cup = array(
+				'gruppen' => 'cats',
+				'faktor' => false,	// currently not used
+				'split_by_places' => false,	// not interesting for calendar
+				'pkte' => false,
+				'max_rang' => false,
+				'max_serie' => false,
+				'presets' => false,
+			);
+			foreach($cups as &$cup)
+			{
+				$cup = self::rename_key($cup, $rename_cup);
+				$id2cup[$cup['SerId']] =& $cup;
+			}
+			//_debug_array($cups); die('STOP');
 		}
-		//_debug_array($cups); die('STOP');
-
 		// query status (existence for start list or result)
 		$status = $this->result->result_status($ids);
 		$status = $this->route_result->result_status($ids,$status);
@@ -557,13 +602,130 @@ class ranking_export extends boresult
 					'name'  => $id2cup[$comp['cup']]['name'],
 				);
 			}
+			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true)))
+			{
+				$comp += $attachments;
+			}
 		}
 
-		return array(
+		$data = array(
 			'competitions' => $competitions,
 			'cats' => $cats,
 			'cups' => $cups,
 		);
+		egw_cache::setInstance('ranking', $location, $data, self::EXPORT_CALENDAR_TTL);
+
+		return $data;
+	}
+
+	/**
+	 * Livetime of cache entries of calendar data
+	 *
+	 * We use a fairly low time, as we cant invalidate the cache easyly.
+	 *
+	 * @var int
+	 */
+	const EXPORT_RANKING_TTL = 300;
+
+	/**
+	 * Export a (cup) ranking
+	 *
+	 * @param int|string $cat id or rkey of category
+	 * @param string $date=null date of ranking, default today
+	 * @param int|string $cup id or rkey of cup to generate a cup-ranking
+	 * @return array or athletes
+	 */
+	public function export_ranking($cat,$date=null,$cup=null)
+	{
+		if (empty($date)) $date = '.';
+		$location = 'calendar:'.json_encode(array(
+			'cat' => $cat,
+			'date' => $date,
+			'cup' => $cup,
+		));
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
+			($data = egw_cache::getInstance('ranking', $location)))
+		{
+			return $data;
+		}
+		if ($cup && !($cup = $this->cup->read($cup)))
+		{
+			throw new Exception(lang('Cup not found!!!'));
+		}
+		if (!($cat = $this->cats->read($cat)))
+		{
+			throw new Exception(lang('Category not found!!!'));
+		}
+		$comps = array();
+		if (!($ranking = $this->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
+		{
+			throw new Exception(lang('No ranking defined or no results yet for category %1 !!!',$cat['name']));
+		}
+		$rows = array();
+		foreach($ranking as $athlete)
+		{
+			$data = self::athlete_attributes($athlete, $cat['nation'], $cat['GrpId']) + array(
+				'result_rank' => $athlete['platz'],
+				'points' => $athlete['pkt'],
+			);
+			foreach($athlete['results'] as $WetId => $result)
+			{
+				$data['result'.$WetId] = $result;
+			}
+			$rows[] = $data;
+		}
+		// sort competitions by date
+		uasort($comps, function($a,$b){return strcmp($a['datum'],$b['datum']);});
+		unset($data);
+		$route_names = array();
+		foreach($comps as $WetId => &$data)
+		{
+			if (empty($data['dru_bez']))
+			{
+				$parts = preg_split('/ ?- ?/', $data['name']);
+				list($data['dru_bez']) = explode('/', array_pop($parts));
+			}
+			$route_names[$WetId] = $data['dru_bez']."\n".implode('.', array_reverse(explode('-', $data['datum'])));
+		}
+		unset($data);
+		$data = array(
+			'cat' => array(
+				'GrpId' => $cat['GrpId'],
+				'name' => $cat['name'],
+			),
+			'cup' => $cup ? array(
+				'SerId' => $cup['SerId'],
+				'name' => $cup['name'],
+			) : null,
+			'start' => $start,
+			'end' => $date,
+			'max_comp' => $max_comp,
+			'comp' => array(
+				'WetId' => $comp['WetId'],
+				'name' => $comp['name'],
+				'date' => $comp['datum'],
+			),
+			'nation' => $cat['nation'],
+			'participants' => $rows,
+			'route_name' => $comp['name'].' ('.implode('.', array_reverse(explode('-', $comp['datum']))).')',
+			'route_names' => $route_names,
+			'route_result' => implode('.', array_reverse(explode('-', $date))),
+			'route_order' => -1,
+			'discipline' => 'ranking',
+		);
+		if ($cup)
+		{
+			$data['comp_name'] = $cup['name'];
+		}
+		else
+		{
+			$data['comp_name'] = 'Ranglist';
+		}
+		$data['comp_name'] .= ': '.$cat['name'];
+
+		egw_cache::setInstance('ranking', $location, $data, self::EXPORT_RANKING_TTL);
+
+		return $data;
 	}
 
 	/**
@@ -581,5 +743,37 @@ class ranking_export extends boresult
 			unset($arr[$from]);
 		}
 		return $arr;
+	}
+
+	/**
+	 * Set athlete specific attributes taking into account calendar nation
+	 *
+	 * @param array $athlete
+	 * @param string $nation
+	 * @param int $cat GrpId for profile url
+	 * @return array
+	 */
+	protected static function athlete_attributes($athlete, $nation, $cat)
+	{
+		$data = array(
+			'PerId' => $athlete['PerId'],
+			'firstname' => $athlete['vorname'],
+			'lastname' => $athlete['nachname'],
+			'birthyear' => $athlete['geb_year'],
+			'nation' => $athlete['nation'],
+			'federation' => $athlete['verband'],
+			'fed_url' => $athlete['fed_url'],
+			'url' => self::profile_url($athlete, $cat),
+		);
+		switch ($nation)
+		{
+			case 'GER':
+				$data['federation'] = preg_replace("/^(DAV|Sektion|Deutscher|Dt|Alpenverein|[:., ])*/i", '', $athlete['verband']);
+				break;
+			case 'SUI':
+				$data['city'] = $athlete['ort'];
+				break;
+		}
+		return $data;
 	}
 }

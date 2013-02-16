@@ -306,7 +306,7 @@ class result extends so_sql
 	{
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,".
-			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId".
+			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId".
 			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.platz > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
@@ -334,7 +334,7 @@ class result extends so_sql
 	{
 		$results = array();
 		foreach($this->db->query($sql="SELECT $this->athlete_table.*,".
-			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
+			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
 			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
 			' AND r.GrpId '.(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').
