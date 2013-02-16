@@ -1940,44 +1940,44 @@ class boresult extends boranking
 		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':-1');
 	}
 
-        /**
-         * Fix ordering of result (so it is identical in xml/json and UI)
-         *
-         * @param array $query
-         * @param boolean $isRelay=false
-         */
-        function process_sort(array &$query,$isRelay=false)
-        {
-                $alpha_sort = $isRelay ? ',team_nation '.$query['sort'].',team_name' :
-                        ',nachname '.$query['sort'].',vorname';
-                // in speed(relay) sort by time first and then alphabetic
-                if (substr($query['discipline'],0,5) == 'speed')
-                {
-                        $alpha_sort = ',result_time '.$query['sort'].$alpha_sort;
-                }
-                switch (($order = $query['order']))
-                {
-                        case 'result_rank':
-                                if ($query['route'] == -1)      // in general result we sort unranked at the end and then as the rest by name
-                                {
-                                        $query['order'] = 'result_rank IS NULL '.$query['sort'];
-                                }
-                                else    // in route-results we want unranked sorted by start_order for easier result-entering
-                                {
-                                        $query['order'] = 'CASE WHEN result_rank IS NULL THEN start_order ELSE 0 END '.$query['sort'];
-                                }
-                                $query['order'] .= ',result_rank '.$query['sort'].$alpha_sort;
-                                break;
-                        case 'result_height':
-                                $query['order'] = 'CASE WHEN result_height IS NULL THEN -start_order ELSE 0 END '.$query['sort'].
-                                        ',result_height '.$query['sort'].',result_plus '.$query['sort'].$alpha_sort;
-                                break;
-                        case 'result_top,result_zone':
-                                $query['order'] = 'result_top IS NULL,result_top '.$query['sort'].',result_zone IS NULL,result_zone';
-                                break;
-                        case 'nation':
-                                $query['order'] = 'Federations.nation '.$query['sort'].$alpha_sort;
-                                break;
-                }
-        }
+	/**
+	 * Fix ordering of result (so it is identical in xml/json and UI)
+	 *
+	 * @param array $query
+	 * @param boolean $isRelay=false
+	 */
+	function process_sort(array &$query,$isRelay=false)
+	{
+		$alpha_sort = $isRelay ? ',team_nation '.$query['sort'].',team_name' :
+			',nachname '.$query['sort'].',vorname';
+		// in speed(relay) sort by time first and then alphabetic
+		if (substr($query['discipline'],0,5) == 'speed')
+		{
+			$alpha_sort = ',result_time '.$query['sort'].$alpha_sort;
+		}
+		switch (($order = $query['order']))
+		{
+			case 'result_rank':
+				if ($query['route'] == -1)      // in general result we sort unranked at the end and then as the rest by name
+				{
+					$query['order'] = 'result_rank IS NULL '.$query['sort'];
+				}
+				else    // in route-results we want unranked sorted by start_order for easier result-entering
+				{
+					$query['order'] = 'CASE WHEN result_rank IS NULL THEN start_order ELSE 0 END '.$query['sort'];
+				}
+				$query['order'] .= ',result_rank '.$query['sort'].$alpha_sort;
+				break;
+			case 'result_height':
+				$query['order'] = 'CASE WHEN result_height IS NULL THEN -start_order ELSE 0 END '.$query['sort'].
+					',result_height '.$query['sort'].',result_plus '.$query['sort'].$alpha_sort;
+				break;
+			case 'result_top,result_zone':
+				$query['order'] = 'result_top IS NULL,result_top '.$query['sort'].',result_zone IS NULL,result_zone';
+				break;
+			case 'nation':
+				$query['order'] = 'Federations.nation '.$query['sort'].$alpha_sort;
+				break;
+		}
+	}
 }

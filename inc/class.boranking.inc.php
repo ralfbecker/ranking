@@ -605,6 +605,8 @@ class boranking extends ranking_so
 	 * @param array &$ex_aquo on return: array with place => number of ex_aqous per place pairs
 	 * @param array &$not_counting on return: array PerId => string off all not valued WetId's pairs
 	 * @param mixed $cup='' rkey,SerId or array of cup or '' for a ranking
+	 * @param array &$comps=null if array on return WetId => comp array
+	 * @param &$max_comp=null on return max. number of competitions counting
 	 * @return array sorted by ranking place
 	 *
 	 * Achtung:   Nicht berücksichtigt sind die folgenden Parameter:
@@ -623,7 +625,8 @@ class boranking extends ranking_so
 	 * 10.06.2006: EYC nicht-europ. Teiln. zaehlen nicht fuer Punkte
 	 * 01.01.2009: Int. competition use "averaged" points for ex aquo
 	 */
-	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup='')
+	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup='',
+		array &$comps=null, &$max_comp=null)
 	{
 		if ($cup && !is_array($cup))
 		{
@@ -732,6 +735,7 @@ class boranking extends ranking_so
 		foreach($results as $result)
 		{
 			$id = $result['PerId'];
+			$nc = false;
 			if (!isset($pers[$id]))		// Person neu --> anlegen
 			{
 				$pers[$id] = $result;
@@ -748,10 +752,18 @@ class boranking extends ranking_so
 			else
 			{
 				$not_counting[$id][$result['WetId']][$result['GrpId']] = $result['pkt'];
+				$nc = true;
 				if ($cup['split_by_places'] != 'only_counting')
 				{
 					++$platz[$result['platz']][$id];
 				}
+			}
+			$pers[$id]['results'][$result['WetId']] = $result['platz'].".\n".
+				($nc ? '(' : '').sprintf('%04.2f',$result['pkt']).($nc ? ')' : '');
+
+			if (is_array($comps) && !isset($comps[$result['WetId']]))
+			{
+				$comps[$result['WetId']] = $this->comp->read($result['WetId']);
 			}
 		}
 		if (!$pers)

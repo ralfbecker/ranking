@@ -5,7 +5,7 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2010 by RalfBecker@digitalROCK.de
+ * @copyright 2010-13 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
  
@@ -82,6 +82,18 @@ Resultlist.prototype.handleResponse = function(_data)
 				'team_nation': 'Nation',
 				'result': 'Sum'				
 			});
+			break;
+			
+		case 'ranking':
+			this.result_cols = {
+				'result_rank': 'Rank',
+				'lastname' : {'label': 'Name', 'colspan': 2},
+				'firstname' : '',
+				'nation' : 'Nation',
+				'points': 'Points',
+				'result' : 'Result'
+			};
+			if (!detail || detail[1] == '0') delete this.result_cols.result;
 			break;
 
 		default:
@@ -285,6 +297,17 @@ Startlist.prototype.handleResponse = function(_data)
 		this.columns = this.result_cols;
 		sort = 'result_rank';
 	}
+	
+	// for SUI and GER competitions replace nation
+	switch (_data.nation)
+	{
+		case 'GER':
+			replace_attribute(this.columns, 'nation', 'federation', 'DAV Sektion');
+			break;
+		case 'SUI':
+			replace_attribute(this.columns, 'nation', 'city', 'City');
+			break;			
+	}
 
 	// keep route_names to detect additional routes on updates
 	if (typeof this.route_names == 'undefined')
@@ -321,12 +344,20 @@ Startlist.prototype.handleResponse = function(_data)
 	if (typeof this.table == 'undefined')
 	{
 		// for general result use one column per heat
-		if (this.columns.result && _data.route_names)
+		if (this.columns.result && _data.route_names && _data.route_order == -1)
 		{
 			delete this.columns.result;
-			// show final first and 2. quali behind 1. quali: eg. 3, 2, 0, 1
-			for(var route=10; route >= -1; --route)
+			var routes = [];
+			for(var id in _data.route_names)
 			{
+				routes.push(id);
+			}
+			routes.reverse();
+			// show final first and 2. quali behind 1. quali: eg. 3, 2, 0, 1
+			//for(var route=10; route >= -1; --route)
+			for(var i = 0; i < routes.length; ++i)
+			{
+				var route = routes[i];
 				if (route != 1 && typeof _data.route_names[Math.abs(route)] != 'undefined')
 					this.columns['result'+Math.abs(route)] = _data.route_names[Math.abs(route)];
 			}
@@ -387,8 +418,8 @@ Startlist.prototype.setHeader = function(_data)
 		(_data.route_result ? 'Result' : 'provisional Result'))+': ';
 
 	var header = _data.route_name;
-	// if NOT detail=0, add prefix before route name
-	if (!this.json_url.match(/detail=0/))
+	// if NOT detail=0 and not for general result, add prefix before route name
+	if (!this.json_url.match(/detail=0/) && _data.route_order != -1)
 		header = title_prefix+header;
 	
 	document.title = header;
@@ -587,6 +618,14 @@ Table.prototype.createRow = function(_data,_tag)
 			var a = document.createElement('a');
 			a.href = url;
 			a.target = 'pstambl';
+			jQuery(tag).append(a);
+			tag = a;
+		}
+		if (typeof _data.fed_url != 'undefined' && (col == 'nation' || col == 'federation'))
+		{
+			var a = document.createElement('a');
+			a.href = _data.fed_url;
+			a.target = '_blank';
 			jQuery(tag).append(a);
 			tag = a;
 		}
@@ -845,4 +884,35 @@ function load_css(href)
 	cssnode.rel = "stylesheet";
 	cssnode.href = href;
 	headID.appendChild(cssnode);
+}
+
+/**
+ * Replace attribute named from with one name to and value keeping the order of the attributes
+ * 
+ * @param object obj
+ * @param string from
+ * @param string to
+ * @param mixed value
+ */
+function replace_attribute(obj, from, to, value)
+{
+	var found = false;
+	for(var attr in obj)
+	{
+		if (!found)
+		{
+			if (attr == from)
+			{
+				found = true;
+				delete obj[attr];
+				obj[to] = value;
+			}
+		}
+		else
+		{
+			var val = obj[attr];
+			delete obj[attr];
+			obj[attr] = val;
+		}
+	}
 }

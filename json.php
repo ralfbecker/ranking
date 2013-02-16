@@ -48,7 +48,12 @@ function check_anon_access(&$anon_account)
 
 try
 {
-	if (isset($_GET['nation']))
+	if(isset($_GET['cat']) && !isset($_GET['comp']))
+	{
+		$export = new ranking_export();
+		$result = $export->export_ranking($_GET['cat'], $_GET['date'], $_GET['cup']);
+	}
+	elseif (isset($_GET['nation']) || !isset($_GET['comp']))
 	{
 		$export = new ranking_export();
 		$result = $export->export_calendar($_GET['nation'], $_GET['year'], $_GET['filter']);
