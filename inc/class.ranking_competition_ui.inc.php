@@ -87,6 +87,8 @@ class ranking_competition_ui extends boranking
 			$old_rkey = $content['comp_data']['rkey'];
 			unset($content['comp_data']);
 
+			if (substr($content['homepage'], 0, 4) === 'www.') $content['homepage'] = 'http://'.$content['homepage'];
+
 			$view = $content['view'] && !($content['edit'] && $this->acl_check_comp($this->comp->data));
 
 			if (!$view && $this->only_nation_edit)
