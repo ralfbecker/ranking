@@ -222,7 +222,8 @@ function Startlist(_container,_json_url)
 Startlist.prototype.update = function()
 {
 	jQuery.ajax({
-		url: this.json_url,
+		// remove our own parameter from json url to improve caching
+		url: this.json_url.replace(/(detail|beamer|rotate)=[^&]*(&|$)/, '').replace(/&$/, ''),
 		async: true,
 		context: this,
 		data: '',
