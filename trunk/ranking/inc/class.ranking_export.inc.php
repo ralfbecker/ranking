@@ -40,7 +40,7 @@ class ranking_export extends boresult
 		if (is_null($base))
 		{
 			//$base = 'http://'.$_SERVER['HTTP_HOST'];	// disabled base to have domain independent links
-			if ($_SERVER['HTTP_HOST'] == 'www.ifsc-climbing.org')
+			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
 			{
 				$base .= '/index.php?page_name=pstambl&person=';
 			}
