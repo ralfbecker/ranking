@@ -61,6 +61,32 @@ class ranking_export extends boresult
 	 * @var int
 	 */
 	const EXPORT_ROUTE_TTL = 86400;
+	/**
+	 * Expires header time for proxys/cdn on a running (not offical result) heat
+	 *
+	 * We cant invalidate proxys
+	 *
+	 * @var int
+	 */
+	const EXPORT_ROUTE_RUNNING_EXPIRES = 10;
+	/**
+	 * Expires header time for proxys/cdn on a recently offical result
+	 *
+	 * @var int
+	 */
+	const EXPORT_ROUTE_RECENT_OFFICAL_EXPIRES = 3600;
+	/**
+	 * Timeout for recently official
+	 *
+	 * @var int
+	 */
+	const EXPORT_ROUTE_RECENT_TIMEOUT = 14440;	// 4h
+	/**
+	 * Expires header time for proxys/cdn on an older offical result
+	 *
+	 * @var int
+	 */
+	const EXPORT_ROUTE_OFFICAL_EXPIRES = 86400;
 
 	/**
 	 * Export route for xml or json access, cached access
@@ -105,6 +131,11 @@ class ranking_export extends boresult
 			if (!isset($instance)) $instance = new ranking_export();
 
 			$data = $instance->_export_route($comp, $cat, $heat);
+			// setting expires depending on result offical and how long it is offical
+			$data['expires'] = !isset($data['route_result']) ? self::EXPORT_ROUTE_RUNNING_EXPIRES :
+				(time()-$data['last_modified'] > self::EXPORT_ROUTE_RECENT_TIMEOUT ?
+					self::EXPORT_ROUTE_OFFICAL_EXPIRES : self::EXPORT_ROUTE_RECENT_OFFICAL_EXPIRES);
+
 			egw_cache::setInstance('ranking', $location, $data, self::EXPORT_ROUTE_TTL);
 
 			// update general result too?
@@ -418,6 +449,12 @@ class ranking_export extends boresult
 	 * @var int
 	 */
 	const EXPORT_CALENDAR_TTL = 300;
+	/**
+	 * Livetime of cache entries of calendar data of previous years
+	 *
+	 * @var int
+	 */
+	const EXPORT_CALENDAR_OLD_TTL = 86400;
 
 	/**
 	 * Export a competition calendar for the given year and nation(s)
@@ -613,19 +650,28 @@ class ranking_export extends boresult
 			'cats' => $cats,
 			'cups' => $cups,
 		);
-		egw_cache::setInstance('ranking', $location, $data, self::EXPORT_CALENDAR_TTL);
+		$data['expires'] = $year < date('Y') ? self::EXPORT_CALENDAR_OLD_TTL : self::EXPORT_CALENDAR_TTL;
+		$data['etag'] = md5(serialize($data));
+
+		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
 
 		return $data;
 	}
 
 	/**
-	 * Livetime of cache entries of calendar data
+	 * Livetime of cache entries of recent ranking data
 	 *
 	 * We use a fairly low time, as we cant invalidate the cache easyly.
 	 *
 	 * @var int
 	 */
 	const EXPORT_RANKING_TTL = 300;
+	/**
+	 * Livetime of cache entries of ranking data longer then duration of last-competition in the past
+	 *
+	 * @var int
+	 */
+	const EXPORT_RANKING_OLD_TTL = 86400;
 
 	/**
 	 * Export a (cup) ranking
@@ -723,7 +769,20 @@ class ranking_export extends boresult
 		}
 		$data['comp_name'] .= ': '.$cat['name'];
 
-		egw_cache::setInstance('ranking', $location, $data, self::EXPORT_RANKING_TTL);
+		// calculate expiration date based on date of ranking and duration of last competition
+		list($y,$m,$d) = explode('-', $date);
+		$date = mktime(0,0,0,$m,$d,$y);
+		if (substr($data['end'], -6) == '-12-31' || (time()-$date)/86400 > $comp['duration'])
+		{
+			$data['expires'] = self::EXPORT_RANKING_OLD_TTL;
+		}
+		else
+		{
+			$data['expires'] = self::EXPORT_RANKING_TTL;
+		}
+		$data['etag'] = md5(serialize($data));
+
+		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
 
 		return $data;
 	}

@@ -27,6 +27,7 @@ $GLOBALS['egw_info'] = array(
 		'nonavbar'		=> True,
 		'noheader'      => True,
 		'autocreate_session_callback' => 'check_anon_access',
+		'nocachecontrol'=> 'public',
 ));
 include('../header.inc.php');
 
@@ -82,9 +83,19 @@ $encoding = translation::charset();
 $xml = new XMLWriter();
 if (!isset($_GET['debug']) || !$_GET['debug'])
 {
-	$xml->openURI('php://output');
 	header('Content-Type: application/xml; charset='.$encoding);
-	if ($result['etag']) header('Etag: "'.$result['etag'].'"');
+	if (isset($result['expires'])) egw_session::cache_control($result['expires']);
+	if (isset($result['etag']))
+	{
+		if ($result['etag'][0] != '"') $result['etag'] = '"'.$result['etag'].'"';
+		header('Etag: '.$result['etag']);
+	}
+	if (isset($_SERVER['HTTP_IF_MATCH']) && $_SERVER['HTTP_IF_MATCH'] === $result['etag'])
+	{
+		header('HTTP/1.1 304 Not Modified');
+		common::egw_exit();
+	}
+	$xml->openURI('php://output');
 }
 else
 {
