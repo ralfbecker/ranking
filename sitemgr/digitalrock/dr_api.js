@@ -223,7 +223,7 @@ Startlist.prototype.update = function()
 {
 	jQuery.ajax({
 		// remove our own parameter from json url to improve caching
-		url: this.json_url.replace(/(detail|beamer|rotate)=[^&]*(&|$)/, '').replace(/&$/, ''),
+		url: this.json_url.replace(/(detail|beamer|rotate|toc)=[^&]*(&|$)/, '').replace(/&$/, ''),
 		async: true,
 		context: this,
 		data: '',
@@ -334,13 +334,15 @@ Startlist.prototype.handleResponse = function(_data)
 
 	// remove whole table, if discipline or startlist/resultlist (detemined by sort) changed
 	if (this.discipline && this.discipline != _data.discipline ||
-		this.sort && this.sort != sort)
+		this.sort && this.sort != sort ||
+		(_data.route_order == -1) != (this.route_order == -1))	// switching to or from a general result
 	{
 		jQuery(this.container).empty();
 		delete this.table;		
 	}
 	this.discipline = _data.discipline;
 	this.sort = sort;
+	this.route_order = _data.route_order;
 
 	if (typeof this.table == 'undefined')
 	{
@@ -386,6 +388,34 @@ Startlist.prototype.handleResponse = function(_data)
 		jQuery(this.container).append(this.header);
 		this.header.addClass('listHeader');
 		
+		if (!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/))
+		{
+			var toc = jQuery(document.createElement('ul'));
+			jQuery(this.container).append(toc);
+			toc.addClass('listToc');
+			for (var r in _data.route_names)
+			{
+				var li = jQuery(document.createElement('li'));
+				if (r != this.route_order)
+				{
+					var a = jQuery(document.createElement('a'));
+					a.text(_data.route_names[r]);
+					a.attr('href', location.href.replace(/route=[^&]+/, 'route='+r));
+					var that = this;
+					a.click(function(e){
+						that.json_url = that.json_url.replace(/\?.*/, this.href.match(/\?.*/)[0]);
+						that.update();
+						e.preventDefault();
+					});
+					li.append(a);
+				}
+				else
+				{
+					li.text(_data.route_names[r]);
+				}
+				toc.prepend(li);
+			}
+		}
 		// create new table
 		this.table = new Table(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
 	

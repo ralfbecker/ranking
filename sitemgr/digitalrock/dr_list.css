@@ -68,6 +68,15 @@
 }
 
 /**
+ * Toc row
+ */
+ul.listToc li {
+	display: inline-block;
+	margin-right: 15px !important;
+	text-transform: uppercase;
+}
+
+/**
  * New boulder result display
  */
 div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {
