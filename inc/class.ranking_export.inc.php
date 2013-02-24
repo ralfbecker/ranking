@@ -25,6 +25,55 @@ class ranking_export extends boresult
 	);
 
 	/**
+	 * Get result for export specified via URL
+	 *
+	 * Used for JSON and XML alike, as it returns raw data.
+	 *
+	 * @param string &$root_tag=null on return root tag for xml export
+	 * @return array
+	 */
+	public static function export(&$root_tag=null)
+	{
+		try
+		{
+			if(isset($_GET['cat']) && !isset($_GET['comp']))
+			{
+				$export = new ranking_export();
+				$result = $export->export_ranking($_GET['cat'], $_GET['date'], $_GET['cup']);
+				$root_tag = 'ranking';
+			}
+			elseif (isset($_GET['nation']) || !isset($_GET['comp']))
+			{
+				$export = new ranking_export();
+				$result = $export->export_calendar($_GET['nation'], $_GET['year'], $_GET['filter']);
+				$root_tag = 'calendar';
+			}
+			elseif (isset($_GET['comp']) && !isset($_GET['cat']) || isset($_GET['filter']))
+			{
+				$export = new ranking_export();
+				$result = $export->export_results($_GET['comp'], $_GET['num'], $_GET['all'], $_GET['filter']);
+				$root_tag = 'results';
+			}
+			else
+			{
+				$result = self::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
+				$root_tag = 'route';
+			}
+		}
+		catch(Exception $e)
+		{
+			header("HTTP/1.1 404 Not Found");
+			echo "<html>\n<head>\n\t<title>Error ".$e->getMessage()."</title>\n</head>\n";
+			echo "<body>\n\t<h1>".$e->getMessage()."</h1>\n";
+			echo "<p>The requested ressource was not found on this server.<br>\n<br>\n";
+			echo 'URI: ' . $_SERVER['REQUEST_URI'] . "</p>\n";
+			echo "</body></html>\n";
+			exit;
+		}
+		return $result;
+	}
+
+	/**
 	 * Get URL for athlete profile
 	 *
 	 * Currently /pstambl.php is used for every HTTP_HOST not www.ifsc-climbing.org,
@@ -50,6 +99,34 @@ class ranking_export extends boresult
 			}
 		}
 		return $base.$athlete['PerId'].($cat ? '&cat='.$cat : '');
+	}
+
+	/**
+	 * Get URL for a result
+	 *
+	 * Currently /result.php is used for every HTTP_HOST not www.ifsc-climbing.org,
+	 * for which /index.php?page_name=result is used.
+	 *
+	 * @param int $comp
+	 * @param int $cat
+	 * @return string
+	 */
+	static function result_url($comp, $cat)
+	{
+		static $base;
+		if (is_null($base))
+		{
+			//$base = 'http://'.$_SERVER['HTTP_HOST'];	// disabled base to have domain independent links
+			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
+			{
+				$base .= '/index.php?page_name=result&comp=';
+			}
+			else
+			{
+				$base .= '/result.php?comp=';
+			}
+		}
+		return $base.$comp.'&cat='.$cat;
 	}
 
 	/**
@@ -457,6 +534,34 @@ class ranking_export extends boresult
 	const EXPORT_CALENDAR_OLD_TTL = 86400;
 
 	/**
+	 * colum --> export name conversation (or false to suppress in export)
+	 *
+	 * @var array
+	 */
+	public static $rename_comp = array(
+		'gruppen' => 'cats',
+		'dru_bez' => 'short',
+		'datum'   => 'date',
+		'serie' => 'cup',
+		'pflicht' => false, 'ex_pkte' => false,	'open' => false,	// currently not used
+		'pkte' => false,	// not interesting for calendar
+		'pkt_bis' => false,
+		'feld_pkte' => false,
+		'feld_bis' => false,
+		'faktor' => false, // 'factor'
+		'quota' => false,
+		'host_quota' => false,
+		'prequal_ranking' => false,
+		'prequal_comp' => false,
+		'prequal_comps' => false,
+		'judges' => false,
+		'no_complimentary' => false,
+		'modifier' => false,
+		'quota_extra' => false, //'extra_quotas',
+		'prequal_extra' => false, //'extra_prequals',
+	);
+
+	/**
 	 * Export a competition calendar for the given year and nation(s)
 	 *
 	 * @param array|string $nations
@@ -479,7 +584,7 @@ class ranking_export extends boresult
 			return $data;
 		}
 
-		$where = array();
+		$where = self::process_filter($filter);
 		$where[] = 'datum LIKE '.$this->db->quote((int)$year.'%');
 
 		if (!is_array($nations)) $nations = explode(',',$nations);
@@ -494,69 +599,12 @@ class ranking_export extends boresult
 		}
 		$where[] = $sql;
 
-		static $rename_comp = array(
-			'gruppen' => 'cats',
-			'dru_bez' => 'short',
-			'datum'   => 'date',
-			'serie' => 'cup',
-			'pflicht' => false, 'ex_pkte' => false,	'open' => false,	// currently not used
-			'pkte' => false,	// not intersting for calendar
-			'pkt_bis' => false,
-			'feld_pkte' => false,
-			'feld_bis' => false,
-			'faktor' => false, // 'factor'
-			'quota' => false,
-			'host_quota' => false,
-			'prequal_ranking' => false,
-			'prequal_comp' => false,
-			'prequal_comps' => false,
-			'judges' => false,
-			'no_complimentary' => false,
-			'modifier' => false,
-			'quota_extra' => false, //'extra_quotas',
-			'prequal_extra' => false, //'extra_prequals',
-		);
-		if ($filter)
-		{
-			foreach($filter as $name => $val)
-			{
-				if (($n = array_search($name,$rename_comp))) $name = $n;
-
-				if (isset($this->comp->db_cols[$name]))
-				{
-					if ((string)$val === '' && $this->comp->table_def['fd'][$name]['nullable'] !== false)
-					{
-						$where[] = $name.' IS NULL';
-					}
-					elseif ($val[0] == '!' || strpos($val, ',') !== false)
-					{
-						$not = '';
-						if ($val[0] == '!')
-						{
-							$not = 'NOT ';
-							$val = substr($val, 1);
-						}
-						$val = explode(',', $val);
-						if ($this->comp->table_def['fd'][$name]['type'] !== 'varchar')
-						{
-							$val = array_diff($val, array(''));	// remove empty vales as they would give SQL error
-						}
-						if (!$val) $val = $this->comp->table_def['fd'][$name]['nullable'] !== false ? null : '';
-						$where[] = $this->db->expression($this->comp->table_name, $not, array($name => $val));
-					}
-					else
-					{
-						$where[$name] = $val;
-					}
-				}
-			}
-		}
 		//error_log(__METHOD__."('$nation', $year, ".array2string($filter).') --> where='.array2string($where));
 		$competitions = $this->comp->search(null,false,'datum ASC','','','','AND',false,$where);
 		$cats = $cups = $ids = $rkey2cat = $id2cup = array();
 		foreach($competitions as &$comp)
 		{
-			$comp = self::rename_key($comp, $rename_comp);
+			$comp = self::rename_key($comp, self::$rename_comp);
 			if ($comp['cats'] && ($d = array_diff($comp['cats'], $cats))) $cats = array_merge($cats, $d);
 			if ($comp['cup'] && !in_array($comp['cup'],$cups)) $cups[] = $comp['cup'];
 			$ids[] = $comp['WetId'];
@@ -656,6 +704,56 @@ class ranking_export extends boresult
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
 
 		return $data;
+	}
+
+	/**
+	 * Process a competition filter into an array to pass into select query
+	 *
+	 * - multiple values are comma-separated
+	 * - leading exclemation mark negates expression
+	 *
+	 * @param array $filter allowed keys are all column-names and alias from self::$rename_comp
+	 * @return array
+	 */
+	private function process_filter(array $filter=null)
+	{
+		$where = array();
+		if ($filter)
+		{
+			foreach($filter as $name => $val)
+			{
+				if (($n = array_search($name, self::$rename_comp))) $name = $n;
+
+				if (isset($this->comp->db_cols[$name]))
+				{
+					if ((string)$val === '' && $this->comp->table_def['fd'][$name]['nullable'] !== false)
+					{
+						$where[] = $name.' IS NULL';
+					}
+					elseif ($val[0] == '!' || strpos($val, ',') !== false)
+					{
+						$not = '';
+						if ($val[0] == '!')
+						{
+							$not = 'NOT ';
+							$val = substr($val, 1);
+						}
+						$val = explode(',', $val);
+						if ($this->comp->table_def['fd'][$name]['type'] !== 'varchar')
+						{
+							$val = array_diff($val, array(''));	// remove empty vales as they would give SQL error
+						}
+						if (!$val) $val = $this->comp->table_def['fd'][$name]['nullable'] !== false ? null : '';
+						$where[] = $this->db->expression($this->comp->table_name, $not, array($name => $val));
+					}
+					else
+					{
+						$where[$name] = $val;
+					}
+				}
+			}
+		}
+		return $where;
 	}
 
 	/**
@@ -788,6 +886,102 @@ class ranking_export extends boresult
 	}
 
 	/**
+	 * Export results from all categories of a competition
+	 *
+	 * @param string|int $comp WetId or rkey of competition or '.' or 3-char calendar nation for latest result
+	 * @param int $num=null how many results to return, default 8 for 2 categories (or less), otherwise 3
+	 * @param string $nation=null if set, return all results of that nation
+	 * @param array $filter=null eg. array('fed_id' => 123)
+	 * @return array
+	 */
+	public function export_results($comp, $num=null, $nation=null, array $filter=null)
+	{
+		if ($comp == '.' || !(int)$comp && strlen($comp) == 3)
+		{
+			$calendar = $comp == '.' ? null : $comp;
+			unset($comp);
+		}
+		else
+		{
+			if (!($comp = $this->comp->read($comp)))
+			{
+				throw new Exception(lang('Competition NOT found !!!'));
+			}
+			$calendar = $comp['nation'];
+		}
+		$filter = self::process_filter($filter);
+		$filter['nation'] = $calendar;
+		$filter[] = $this->comp->table_name.'.datum <= '.$this->db->quote(time(), 'date');
+		$filter[] = 'platz > 0';
+		$join = 'JOIN '.$this->result->result_table.' USING(WetId)';
+
+		$comps = array();
+		foreach($this->comp->search(null, 'DISTINCT WetId,name,'.$this->comp->table_name.'.datum AS datum,gruppen,nation', 'datum DESC', '', '', '', 'AND', array(0, 20), $filter, $join) as $c)
+		{
+			if (!isset($comp) || $comp['WetId'] == $c['WetId'])
+			{
+				$comp = $c;
+			}
+			else
+			{
+				unset($c['gruppen']);	// not needed/wanted
+				unset($c['duration']);
+				unset($c['date_end']);
+				$comps[] = self::rename_key($c, self::$rename_comp);
+			}
+		}
+		//_debug_array($comps);
+		if (!($cats = $this->result->read(array(
+			'WetId' => $comp['WetId'],
+			'platz > 0',
+		))))
+		{
+			throw new Exception(lang('No result yet !!!'));
+		}
+		$cats_by_id = array();
+		foreach($cats as $cat)
+		{
+			$cat['url'] = self::result_url($comp['WetId'], $cat['GrpId']);
+			$cats_by_id[$cat['GrpId']] = $cat;
+		}
+		//_debug_array($comp);
+		if (!isset($num) || !($num > 0))
+		{
+			$num = count($cats_by_id) <= 2 ? 8 : 3;
+		}
+		$result_filter = 'platz <= '.(int)$num;
+		if ($nation)
+		{
+			$result_filter = '('.$result_filter.' OR nation='.$this->db->quote($nation).')';
+		}
+		$results = array();
+		foreach($this->result->read(array(
+			'WetId' => $comp['WetId'],
+			'GrpId' => array_keys($cats_by_id),
+			$result_filter,
+		)) as $result)
+		{
+			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
+			if (($ts = $modified->format('ts')) > $last_modified) $last_modified = $ts;
+			$cats_by_id[$result['GrpId']]['results'][] = array(
+				'result_rank' => $result['platz'],
+			)+self::athlete_attributes($result, $comp['nation'], $result['GrpId']);
+		}
+		unset($comp['gruppen']);
+
+		$ret = self::rename_key($comp, self::$rename_comp)+array(
+			'nation' => $comp['nation'],
+			'categorys' => array_values($cats_by_id),
+			'competitions' => $comps,
+			'last_modified' => $last_modified,
+		);
+		$ret['etag'] = md5(serialize($ret));
+
+		//_debug_array($ret); exit;
+		return $ret;
+	}
+
+	/**
 	 * Rename array keys or remove value if no new key given
 	 *
 	 * @param array $arr
@@ -818,7 +1012,7 @@ class ranking_export extends boresult
 			'PerId' => $athlete['PerId'],
 			'firstname' => $athlete['vorname'],
 			'lastname' => $athlete['nachname'],
-			'birthyear' => $athlete['geb_year'],
+			'birthyear' => substr($athlete['geb_date'], 0, 4),
 			'nation' => $athlete['nation'],
 			'federation' => $athlete['verband'],
 			'fed_url' => $athlete['fed_url'],
