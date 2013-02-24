@@ -266,7 +266,14 @@ if ($mode != 2)
 		}
 	});
 </script>\n";
-		$div_style='height: 300px; overflow: auto;';
+		if ($mode != 1 && !strstr($extra_header[$year],'provisional'))	// provisional calendar does NOT include ranking!
+		{
+			$div_style='height: 300px; overflow: auto;';	// display including ranking
+		}
+		else
+		{
+			$div_style = 'height: 75%; overflow: auto;';	// display without ranking
+		}
 	}
 	echo '<div style="'.$div_style.'clear: both;">'."\n";
 	echo '<table width="100%">'."\n";
@@ -407,7 +414,7 @@ if ($mode != 2)
 
 	if ($extra_footer[$year]) echo $extra_footer[$year]."\n";
 }
-if ($mode != 1 && !strstr($extra_header[$year],'provisional'))
+if ($mode != 1 && !strstr($extra_header[$year],'provisional'))	// provisional calendar does NOT include ranking!
 {
 	$do_list = /*defined('DR_PATH') &&*/ $mode == 2;	// sitemgr and produce just a list of rankings
 
