@@ -37,8 +37,9 @@ function Resultlist(_container,_json_url)
 	Resultlist.prototype.upDown = Startlist.prototype.upDown;
 	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
-
 	Startlist.apply(this, [_container,_json_url]);
+	this.container.removeClass('Startlist');
+	this.container.addClass('Resultlist');
 }
 
 /**
@@ -185,7 +186,8 @@ function Startlist(_container,_json_url)
 {
 	this.json_url = _json_url;
 	if (typeof _container == "string") _container = document.getElementById(_container);
-	this.container = _container;
+	this.container = jQuery(_container);
+	this.container.addClass('Startlist');
 	
 	// Variables needed for scrolling in upDown
 	// scroll speed
@@ -335,7 +337,7 @@ Startlist.prototype.handleResponse = function(_data)
 	// remove whole table, if discipline or startlist/resultlist (detemined by sort) changed
 	if (this.discipline && this.discipline != _data.discipline ||
 		this.sort && this.sort != sort ||
-		(_data.route_order == -1) != (this.route_order == -1))	// switching to or from a general result
+		_data.route_order != this.route_order)	// switching heats (they can have different columns)
 	{
 		jQuery(this.container).empty();
 		delete this.table;		
@@ -370,7 +372,7 @@ Startlist.prototype.handleResponse = function(_data)
 			
 			title_prefix = '';
 		}
-		if (this.columns.result && _data.participants[0].rank_prev_heat && ! this.json_url.match(/detail=0/) )
+		if (this.columns.result && _data.participants[0].rank_prev_heat && !this.json_url.match(/detail=0/))
 		{
 			this.columns['rank_prev_heat'] = 'previous heat';
 		}
@@ -400,7 +402,9 @@ Startlist.prototype.handleResponse = function(_data)
 				{
 					var a = jQuery(document.createElement('a'));
 					a.text(_data.route_names[r]);
-					a.attr('href', location.href.replace(/route=[^&]+/, 'route='+r));
+					var url = this.json_url.replace(/route=[^&]+/, 'route='+r);
+					if (url.indexOf('route=') == -1) url += '&route='+r;
+					a.attr('href', url);
 					var that = this;
 					a.click(function(e){
 						that.json_url = that.json_url.replace(/\?.*/, this.href.match(/\?.*/)[0]);
@@ -464,6 +468,95 @@ Startlist.prototype.setHeader = function(_data)
 };
 
 /**
+ * Constructor for results from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ */
+function Results(_container,_json_url)
+{
+	this.json_url = _json_url;
+	if (typeof _container == "string") _container = document.getElementById(_container);
+	this.container = jQuery(_container);
+	this.container.addClass('Results');
+	
+	this.update();
+}
+Results.prototype.update = Startlist.prototype.update;
+/**
+ * Callback for loading data via ajax
+ * 
+ * @param _data route data object
+ */            
+Results.prototype.handleResponse = function(_data)
+{
+	this.columns = {
+		'result_rank': 'Rank',
+		'lastname' : {'label': 'Name', 'colspan': 2},
+		'firstname' : '',
+		'nation' : 'Nation'
+	};
+	// for SUI and GER competitions replace nation
+	switch (_data.nation)
+	{
+		case 'GER':
+			replace_attribute(this.columns, 'nation', 'federation', 'DAV Sektion');
+			break;
+		case 'SUI':
+			replace_attribute(this.columns, 'nation', 'city', 'City');
+			break;			
+	}
+
+	if (typeof this.table == 'undefined')
+	{
+		// competition
+		this.comp_header = jQuery(document.createElement('h1'));
+		this.comp_header.addClass('compHeader');
+		this.container.append(this.comp_header);
+		// result date
+		this.comp_date = jQuery(document.createElement('h3'));
+		this.comp_date.addClass('resultDate');
+		this.container.append(this.comp_date);
+	}
+	else
+	{
+		delete this.table.dom;
+		this.comp_header.empty();
+		this.comp_date.empty();
+	}
+	this.comp_header.text(_data.name);
+	this.comp_date.text(_data.date_span);
+	
+	for(var i=0; i < _data.categorys.length; ++i)
+	{
+		var cat = _data.categorys[i];
+		var that = this;
+		cat.click = function(e) {
+			that.showCompleteResult(e);
+		};
+	}
+	
+	// create new table
+	this.table = new Table(_data.categorys,this.columns,'result_rank');
+
+	this.container.append(this.table.dom);
+};
+/**
+ * Switch from Results (of all categories) to Resultlist (of a single category)
+ * 
+ * @param e
+ */
+Results.prototype.showCompleteResult = function(e)
+{
+	this.container.empty();
+	this.container.removeClass('Results');
+	new Resultlist(this.container, this.json_url.replace(/\?.*$/, e.target.href.match(/\?.*$/)[0]));
+	e.preventDefault();
+};
+
+/**
  * Constructor for table with given data and columns
  * 
  * Table get appended to specified _container
@@ -496,17 +589,51 @@ function Table(_data,_columns,_sort,_ascending,_quota)
 	jQuery(thead).append(row);
 	
 	// athlets
-	var tbody = document.createElement('tbody');
+	var tbody = jQuery(document.createElement('tbody'));
 	jQuery(this.dom).append(tbody);
-	for(i in this.data)
+	
+	for (var i=0; i < this.data.length; ++i)
 	{
-		if (this.sort == 'result_rank' && 
-			(typeof this.data[i].result_rank == 'undefined' || this.data[i].result_rank < 1))
+		var data = this.data[i];
+
+		if (Array.isArray(data.results))	// category with result
 		{
-			break;	// no more ranked competitiors
+			if (typeof this.column_count == 'undefined')
+			{
+				this.column_count = 0;
+				for(var c in this.columns) ++this.column_count;
+			}
+			if (typeof data.name != 'undefined')
+			{
+				row = document.createElement('tr');
+				var th = jQuery(document.createElement('th'));
+				th.attr('colspan', this.column_count);
+				th.text(data.name);
+				if (typeof data.url != 'undefined')
+				{
+					var a = jQuery(document.createElement('a'));
+					a.attr('href', data.url);
+					a.text('complete result');
+					if (typeof data.click != 'undefined') a.click(data.click);
+					th.append(a);
+				}
+				jQuery(row).append(th);
+				tbody.append(row);
+			}
+			for (var j=0; j < data.results.length; ++j)
+			{
+				tbody.append(this.createRow(data.results[j]));
+			}
 		}
-		var row = this.createRow(this.data[i]);
-		jQuery(tbody).append(row);
+		else	// single result row
+		{
+			if (this.sort == 'result_rank' && 
+				(typeof data.result_rank == 'undefined' || data.result_rank < 1))
+			{
+				break;	// no more ranked competitiors
+			}
+			tbody.append(this.createRow(data));
+		}
 	}
 	//console.log(this.athletes);
 }
@@ -946,4 +1073,11 @@ function replace_attribute(obj, from, to, value)
 			obj[attr] = val;
 		}
 	}
+}
+
+if(!Array.isArray)
+{
+	Array.isArray = function (vArg) {
+		return Object.prototype.toString.call(vArg) === "[object Array]";
+	};
 }

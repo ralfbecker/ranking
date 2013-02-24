@@ -600,7 +600,7 @@ function init_boulder()
 		resultlist = new Resultlist('table',egw_webserverUrl+'/ranking/json.php'+
 			'?comp='+document.getElementById('exec[comp][WetId]').value+
 			'&cat='+document.getElementById('exec[nm][cat]').value+
-			'&route='+document.getElementById('exec[nm][route]').value+'&detail=2');
+			'&route='+document.getElementById('exec[nm][route]').value+'&detail=2&toc=0');
 	}
 }
 

@@ -47,37 +47,7 @@ function check_anon_access(&$anon_account)
 	return true;
 }
 
-try
-{
-	if(isset($_GET['cat']) && !isset($_GET['comp']))
-	{
-		$export = new ranking_export();
-		$result = $export->export_ranking($_GET['cat'], $_GET['date'], $_GET['cup']);
-		$root_tag = 'ranking';
-	}
-	elseif (isset($_GET['nation']) || !isset($_GET['comp']))
-	{
-		$export = new ranking_export();
-		$result = $export->export_calendar($_GET['nation'], $_GET['year'], $_GET['filter']);
-		$root_tag = 'calendar';
-	}
-	else
-	{
-		$result = ranking_export::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
-		$root_tag = 'route';
-	}
-}
-catch(Exception $e)
-{
-	header("HTTP/1.1 404 Not Found");
-	echo "<html>\n<head>\n\t<title>Error ".$e->getMessage()."</title>\n</head>\n";
-	echo "<body>\n\t<h1>".$e->getMessage()."</h1>\n";
-	echo "<p>The requested ressource was not found on this server.<br>\n<br>\n";
-	echo 'URI: ' . $_SERVER['REQUEST_URI'] . "</p>\n";
-	echo "</body></html>\n";
-	exit;
-}
-
+$result = ranking_export::export($root_tag);
 $encoding = translation::charset();
 
 $xml = new XMLWriter();

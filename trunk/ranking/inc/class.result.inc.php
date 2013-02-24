@@ -101,7 +101,7 @@ class result extends so_sql
 
 				if (!$extra_cols)
 				{
-					$extra_cols = "nachname,vorname,nation,".ranking_athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
+					$extra_cols = "nachname,vorname,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
 				}
 				else
 				{
@@ -111,7 +111,7 @@ class result extends so_sql
 			}
 			if ($this->GrpId < 0) unset($keys['GrpId']);	// return all cats
 
-			return $this->search($keys,$cols,$order ? $order : 'platz,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
+			return $this->search($keys,$cols,$order ? $order : $this->result_table.'.GrpId,platz,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
 		}
 		elseif (!$this->WetId && !$this->GrpId && $this->PerId)	// read list comps of one athlet
 		{
