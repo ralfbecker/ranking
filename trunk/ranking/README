@@ -1,23 +1,21 @@
+Please note: 
+===========
+- www.digitalrock.de uses "/egroupware", while http://egw.ifsc-climbing.org uses "/egw"!
+- Only use CDN domain http://egw.ifsc-climbing.org and NOT https://ifsc.egroupware.net/ for any public access!
+
 Result data via XML or JSON
 ===========================
 So here's a small documentation. I will use XML as example because it's
-easier to view (eg. in Firefox) compared with the JSON, thought content
+easier to view (eg. in Firefox or Chrome) compared with the JSON, thought content
 is identical and you only have to replace xml.php with json.php in the
 URL's to get JSON. There's no difference in content or update frequency.
-
-Current only www.digitalrock.de is updated with the new software, so
-base URL for XML is
-
-	http://www.digigitalrock.de/egroupware/ranking/xml.php
-
-(On the competition we probably use www.ifsc-climbing.org)
 
 You can use a few GET parameters to influence what information you get:
 
 a) comp: This is the Id of the competition (1287 in case of Arco
 Rockmaster 2010). Older competitions id's can be found the the url's of
-eg. the competition calendar (www.ifsc-climbing.org/?page_name=calendar)
-or the latest result page (www.ifsc-climbing.org/?page_name=result)
+eg. the competition calendar (http://egw.ifsc-climbing.org/?page_name=calendar)
+or the latest result page (http://egw.ifsc-climbing.org/?page_name=result)
 
 b) cat: This is id of the category and discipline:
 1 = MEN lead
@@ -197,6 +195,7 @@ Ranking data is (on purpose) very similar to competition results:
   * PerId: numerical id of athlete
   * firstname, lastname, birthyear, nation, city of athlete
   * federation: name of federation
+  * fed_url: url of federation
   * url: profile url
   * result_rank: rank in ranking
   * points: sum of counting competitions
@@ -213,15 +212,50 @@ You can use similar code / widgets to display rankings as you use for results.
 Examples:
 --------
 1. Current worldranking MEN lead:
-- XML: www.ifsc-climbing.org/egw/ranking/xml.php?cat=1
-- JSON: www.ifsc-climbing.org/egw/ranking/json.php?cat=1
-- HTML: www.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=1 append "&detail=1" to show results
+- XML: http://egw.ifsc-climbing.org/egw/ranking/xml.php?cat=1
+- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?cat=1
+- HTML: http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=1 append "&detail=1" to show results
 2. 2012 WorldCup WOMEN lead:
-- XML: www.ifsc-climbing.org/egw/ranking/xml.php?cat=2&cup=12_wc
-- JSON: www.ifsc-climbing.org/egw/ranking/json.php?cat=2&cup=12_wc
-- HTML: www.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=2&cup=12_wc append "&detail=1" to show results
+- XML: http://egw.ifsc-climbing.org/egw/ranking/xml.php?cat=2&cup=12_wc
+- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?cat=2&cup=12_wc
+- HTML: http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=2&cup=12_wc append "&detail=1" to show results
 
-Please note: www.digitalrock.de uses "/egroupware", while www.ifsc-climbing.org uses "/egw"!
+(Latest) competition results from all categories via XML or JSON
+================================================================
+This data is NOT from result-service, but from data (eg. from result-service) imported into the ranking.
+It contains first N climbers (plus additionally all from a given nation) of ALL categories of a competition.
+
+Examples:
+--------
+- HTML: http://egw.ifsc-climbing.org/ifsc-results.html?comp=1316
+- XML:  http://egw.ifsc-climbing.org/egw/ranking/xml.php?comp=1316
+- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?comp=1316
+
+Feed supports the following parameters:
+- comp: numeric competition id, or "." for latest international comp. or 3-char calendar nation eg. "GER" for latest German comp.
+- num: number of results to return, default 8 for 2 or less categories, 3 for more then 2 categories
+- all: 3-char nation code, to include all athletes from given nation
+- filter[...] as for calendar, eg. filter[cat_id]=69 to include only latest WorldCup and Championshipts (but no youth or int. events)
+
+Data include usual competition data as eg. in calendar, plus categorys array containing following data for each category
+of the competition with values for:
+- GrpId numeric category id, eg. 5
+- name of category, eg. "M E N  boulder"
+- rkey unique string key of category, eg. ICC_FB
+- url to full result page
+- results array with following values of first N athletes:
+  * result_rank rank
+  * PerId: numerical id of athlete
+  * firstname, lastname, birthyear, nation, city of athlete
+  * federation: name of federation
+  * fed_url: url of federation
+  * url: profile url
+Plus competitions array with following values for last 20 competitions (eg. to implement a competition chooser):
+- WetId numeric competition id
+- name of competition
+- nation calendar nation (empty for internation competitions)
+- date and date_span, eg. "2012-11-02" and "2. - 4. November 2012"
+
 
 If you have questions please ask.
 
