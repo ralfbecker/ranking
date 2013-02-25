@@ -421,7 +421,7 @@ Startlist.prototype.handleResponse = function(_data)
 			}
 		}
 		// create new table
-		this.table = new Table(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
+		this.table = new DrTable(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
 	
 		jQuery(this.container).append(this.table.dom);
 	}
@@ -539,7 +539,7 @@ Results.prototype.handleResponse = function(_data)
 	}
 	
 	// create new table
-	this.table = new Table(_data.categorys,this.columns,'result_rank');
+	this.table = new DrTable(_data.categorys,this.columns,'result_rank');
 
 	this.container.append(this.table.dom);
 };
@@ -567,7 +567,7 @@ Results.prototype.showCompleteResult = function(e)
  * @param _ascending
  * @param _quota quota if quota line should be drawn in result
  */
-function Table(_data,_columns,_sort,_ascending,_quota)
+function DrTable(_data,_columns,_sort,_ascending,_quota)
 {
 	this.data      = _data;
 	this.columns   = _columns;
@@ -644,7 +644,7 @@ function Table(_data,_columns,_sort,_ascending,_quota)
  * @param _data array with data for each participant
  * @param _quota quota if quota line should be drawn in result
  */
-Table.prototype.update = function(_data,_quota)
+DrTable.prototype.update = function(_data,_quota)
 {
 	this.data = _data;
 	if (typeof _quota != 'undefined') this.quota = _quota;
@@ -710,7 +710,7 @@ Table.prototype.update = function(_data,_quota)
  * Update given data-row with changed content
  * @todo
  */
-Table.prototype.updateRow = function(_row,_data)
+DrTable.prototype.updateRow = function(_row,_data)
 {
 	
 };
@@ -718,7 +718,7 @@ Table.prototype.updateRow = function(_row,_data)
 /**
  * Create new data-row with all columns from this.columns
  */
-Table.prototype.createRow = function(_data,_tag)
+DrTable.prototype.createRow = function(_data,_tag)
 {
 	//console.log(_data);
 	if (typeof _tag == 'undefined') _tag = 'td';
@@ -820,7 +820,7 @@ Table.prototype.createRow = function(_data,_tag)
  * 
  * @todo get using this.sortNummeric callback working
  */
-Table.prototype.sortData = function()
+DrTable.prototype.sortData = function()
 {
 	switch(this.sort)
 	{
@@ -834,7 +834,7 @@ Table.prototype.sortData = function()
 			break;
 
 		default:
-			throw("Table.sortData: Not yet implemented sort by '"+this.sort+"'!");
+			throw("DrTable.sortData: Not yet implemented sort by '"+this.sort+"'!");
 			break;
 	}
 	if (!this.ascending) this.data.reverse();
@@ -885,7 +885,7 @@ function sortResultRank(_a, _b)
  * @todo get this working
  * @return int
  */
-Table.prototype.sortNummeric = function(_a,_b)
+DrTable.prototype.sortNummeric = function(_a,_b)
 {
 	//console.log('_a[PerId]='+_a['PerId']+': _a['+this.sort+']='+_a[this.sort]+', _b[PerId]='+_b['PerId']+': _b['+this.sort+']='+_b[this.sort]+' returning '+((_b[this.sort] - _a[this.sort]) * (this.ascending ? 1 : -1)));
 	return (_a[this.sort] - _b[this.sort]) * (this.ascending ? 1 : -1);
