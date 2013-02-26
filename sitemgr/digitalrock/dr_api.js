@@ -600,7 +600,7 @@ Starters.prototype.handleResponse = function(_data)
 		this.comp_date.empty();
 	}
 	this.comp_header.text(_data.name+' : '+_data.date_span);
-	this.comp_date.text('Deadline: '+_data.deadline);
+	if (_data.deadline) this.comp_date.text('Deadline: '+_data.deadline);
 	
 	this.table = jQuery(document.createElement('table')).addClass('DrTable');
 	this.container.append(this.table);
