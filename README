@@ -256,6 +256,32 @@ Plus competitions array with following values for last 20 competitions (eg. to i
 - nation calendar nation (empty for internation competitions)
 - date and date_span, eg. "2012-11-02" and "2. - 4. November 2012"
 
+Registration aka Starters from a competiton via XML or JSON
+===========================================================
+
+Examples:
+- HTML: http://egw.ifsc-climbing.org/ifsc-starters.html?comp=1494
+- XML:  http://egw.ifsc-climbing.org/ranking/xml.php?comp=1494&type=starters
+- JSON: http://egw.ifsc-climbing.org/ranking/json.php?comp=1494&type=starters
+
+Only supported parameter is comp=<numeric competition id>. 
+You always need to add &type=starters, as otherwise you request a (not yet existing) result and get an error!
+
+Data include usual competition data as eg. in calendar, plus categorys array containing following data for each category
+of the competition with values for:
+- GrpId numeric category id, eg. 5
+- name of category, eg. "M E N  boulder"
+- rkey unique string key of category, eg. ICC_FB
+- url to full result page
+An array with registered athletes containing beside usual athlete data:
+- cat: numeric category id athlete is registered for
+- reg_fed_id: numeric id of registering federation or nation for intl. competitions
+- order: non-consecutive number representing the order of registration
+An array with registering federations, if not an intl. competition, with following data:
+- fed_id: numeric federation id
+- name: name of federation
+- shortcut: shortcut of federation
+
 
 If you have questions please ask.
 
