@@ -1077,15 +1077,13 @@ class ranking_export extends boresult
 		);
 		if ($comp['nation'])
 		{
-			foreach($this->federation->query_list('verband', 'fed_id', array(
+			$data['federations'] = array_values($this->federation->query_list(array(
+				'fed_id' => 'fed_id',
+				'shortcut' => 'fed_shortcut',
+				'name' => 'verband',
+			), 'fed_id', array(
 				'fed_id' => array_values($federations)
-			), 'verband') as $fed_id => $name)
-			{
-				$data['federations'][] = array(
-					'fed_id' => $fed_id,
-					'name' => $name,
-				);
-			}
+			), 'verband'));
 		}
 		$data['expires'] = self::EXPORT_STARTERS_EXPIRES;
 

@@ -569,7 +569,7 @@ function Starters(_container,_json_url)
 	this.json_url = _json_url;
 	if (typeof _container == "string") _container = document.getElementById(_container);
 	this.container = jQuery(_container);
-	this.container.addClass('Results');
+	this.container.addClass('Starters');
 	
 	this.update();
 }
@@ -602,7 +602,7 @@ Starters.prototype.handleResponse = function(_data)
 	this.comp_header.text(_data.name+' : '+_data.date_span);
 	this.comp_date.text('Deadline: '+_data.deadline);
 	
-	this.table = jQuery(document.createElement('table'));
+	this.table = jQuery(document.createElement('table')).addClass('DrTable');
 	this.container.append(this.table);
 	var thead = jQuery(document.createElement('thead'));
 	this.table.append(thead);
@@ -616,6 +616,7 @@ Starters.prototype.handleResponse = function(_data)
 	for(var i=0; i < _data.categorys.length; ++i)
 	{
 		var th = jQuery(document.createElement('th'));
+		th.addClass('category');
 		th.text(_data.categorys[i].name);
 		row.append(th);
 		cats[_data.categorys[i].GrpId] = i;
@@ -657,12 +658,16 @@ Starters.prototype.handleResponse = function(_data)
 			{
 				fed = athlete.reg_fed_id;
 				th.text(this.federation(athlete.reg_fed_id));
+				th.addClass('federation');
 			}
 		}
 		this.fillUpFedRow(r, cat_col);
 		// create athlete cell
 		var td = jQuery(document.createElement('td'));
-		td.text(athlete.lastname+', '+athlete.firstname);
+		td.addClass('athlete');
+		var lastname = jQuery(document.createElement('span')).addClass('lastname').text(athlete.lastname);
+		var firstname = jQuery(document.createElement('span')).addClass('firstname').text(athlete.firstname);
+		td.append(lastname).append(firstname);
 		this.fed_rows[r].append(td);
 		this.fed_rows_pos[r]++;
 	}
@@ -709,7 +714,7 @@ Starters.prototype.federation = function(_fed_id)
 	for(var i=0; i < this.data.federations.length; ++i)
 	{
 		var fed = this.data.federations[i];
-		if (fed.fed_id == _fed_id) return fed.name;
+		if (fed.fed_id == _fed_id) return fed.shortcut || fed.name;
 	}
 };
 
@@ -740,6 +745,7 @@ function DrTable(_data,_columns,_sort,_ascending,_quota)
 	
 	// header
 	this.dom = document.createElement('table');
+	jQuery(this.dom).addClass('DrTable');
 	var thead = document.createElement('thead');
 	jQuery(this.dom).append(thead);
 	var row = this.createRow(this.columns,'th');

@@ -7,57 +7,61 @@
  * @version $Id$
  */
 
-#table table {
+table.DrTable {
 	width: 100%;
 }
 
 /**
  * Background etc. for header rows
  */
-#table thead, #table tbody th {
+table.DrTable thead, table.DrTable tbody th {
 	background-color: #c0c0c0;
 }
 /**
  * Background etc. for body rows
  */
-#table tbody {
+table.DrTable tbody {
 	background-color: #f0f0f0;
 }
 /**
  * Center all columns by default
  */
-#table th, #table td {
+table.DrTable th, table.DrTable td {
 	text-align: center;
 }
 /**
  * Left justify text columns like name
  */
-#table th.lastname, #table td.lastname, #table td.firstname, #table td.team_name, #table tbody th {
+table.DrTable th.lastname, table.DrTable td.lastname, table.DrTable td.firstname, 
+table.DrTable td.team_name, table.DrTable tbody th, .Starters table.DrTable th, .Starters table.DrTable td {
 	padding-left: 5px;
 	text-align: left;
 }
-#table tbody th a {
+table.DrTable tbody th a {
 	padding-left: 10px;
 	font-weight: normal;
 }
 /**
  * Capitalize names
  */
-#table td.lastname {
+.lastname {
 	text-transform: uppercase;
+}
+.Starters .lastname:after {
+	content: ", ";	
 }
 
 /**
  * Format the header
  */
-#table h1 {
+.Results h1, .Startlist h1, .Resultlist h1, .Starters h1 {
 	padding: 0;
 	margin: 0;
 	font-size: 20pt;
 	font-weight: bold;
 }
 
-#table.Results h3 {
+.Results h3 {
 	padding: 0;
 	margin: 0;
 	font-weight: normal;
