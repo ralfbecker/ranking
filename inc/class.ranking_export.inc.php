@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-13 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -886,6 +886,15 @@ class ranking_export extends boresult
 	}
 
 	/**
+	 * Cache and expires time for results from a running competition
+	 */
+	const EXPORT_RESULTS_RUNNING = 900;
+	/**
+	 * Cache and expires time for results from a finished/historic competition
+	 */
+	const EXPORT_RESULTS_HISTORIC = 86400;
+
+	/**
 	 * Export results from all categories of a competition
 	 *
 	 * @param string|int $comp WetId or rkey of competition or '.' or 3-char calendar nation for latest result
@@ -896,6 +905,12 @@ class ranking_export extends boresult
 	 */
 	public function export_results($comp, $num=null, $nation=null, array $filter=null)
 	{
+		$location = 'results:'.json_encode(func_get_args());
+		if (($data = egw_cache::getInstance('ranking', $location)))
+		{
+			return $data;
+		}
+
 		if ($comp == '.' || !(int)$comp && strlen($comp) == 3)
 		{
 			$calendar = $comp == '.' ? null : $comp;
@@ -969,16 +984,23 @@ class ranking_export extends boresult
 		}
 		unset($comp['gruppen']);
 
-		$ret = self::rename_key($comp, self::$rename_comp)+array(
+		$data = self::rename_key($comp, self::$rename_comp)+array(
 			'nation' => $comp['nation'],
 			'categorys' => array_values($cats_by_id),
 			'competitions' => $comps,
 			'last_modified' => $last_modified,
 		);
-		$ret['etag'] = md5(serialize($ret));
+		list($y,$m,$d) = explode('-', $comp['datum']);
+		$comp_ts = mktime(0, 0, 0, $m, $d, $y);
+		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration'] ?
+			self::EXPORT_RESULTS_HISTORIC : self::EXPORT_RESULTS_RUNNING;
+
+		$data['etag'] = md5(serialize($data));
+
+		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
 
 		//_debug_array($ret); exit;
-		return $ret;
+		return $data;
 	}
 
 	/**
