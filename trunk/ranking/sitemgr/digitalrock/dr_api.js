@@ -557,6 +557,158 @@ Results.prototype.showCompleteResult = function(e)
 };
 
 /**
+ * Constructor for starters / registration from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ */
+function Starters(_container,_json_url)
+{
+	this.json_url = _json_url;
+	if (typeof _container == "string") _container = document.getElementById(_container);
+	this.container = jQuery(_container);
+	this.container.addClass('Results');
+	
+	this.update();
+}
+Starters.prototype.update = Startlist.prototype.update;
+/**
+ * Callback for loading data via ajax
+ * 
+ * @param _data route data object
+ */            
+Starters.prototype.handleResponse = function(_data)
+{
+	this.data = _data;
+	if (typeof this.table == 'undefined')
+	{
+		// competition
+		this.comp_header = jQuery(document.createElement('h1'));
+		this.comp_header.addClass('compHeader');
+		this.container.append(this.comp_header);
+		// result date
+		this.comp_date = jQuery(document.createElement('h3'));
+		this.comp_date.addClass('resultDate');
+		this.container.append(this.comp_date);
+	}
+	else
+	{
+		delete this.table;
+		this.comp_header.empty();
+		this.comp_date.empty();
+	}
+	this.comp_header.text(_data.name+' : '+_data.date_span);
+	this.comp_date.text('Deadline: '+_data.deadline);
+	
+	this.table = jQuery(document.createElement('table'));
+	this.container.append(this.table);
+	var thead = jQuery(document.createElement('thead'));
+	this.table.append(thead);
+	
+	// create header row
+	var row = jQuery(document.createElement('tr'));
+	var th = jQuery(document.createElement('th'));
+	th.text(typeof _data.federations != 'undefined' ? 'Federation' : 'Nation');
+	row.append(th);
+	var cats = {};
+	for(var i=0; i < _data.categorys.length; ++i)
+	{
+		var th = jQuery(document.createElement('th'));
+		th.text(_data.categorys[i].name);
+		row.append(th);
+		cats[_data.categorys[i].GrpId] = i;
+	}
+	thead.append(row);
+	
+	var tbody = jQuery(document.createElement('tbody'));
+	this.table.append(tbody);
+
+	var fed;
+	this.fed_rows = [];
+	this.fed_rows_pos = [];
+	for(var i=0; i < _data.athletes.length; ++i)
+	{
+		var athlete = _data.athletes[i];
+		// evtl. create new row for federation/nation
+		if (typeof fed == 'undefined' || fed != athlete.reg_fed_id)
+		{
+			this.fillUpFedRows();
+			// reset fed rows to empty
+			this.fed_rows = [];
+			this.fed_rows_pos = [];
+		}
+		// find rows with space in column of category
+		var cat_col = cats[athlete.cat];
+		for(var r=0; r < this.fed_rows.length; ++r)
+		{
+			if (this.fed_rows_pos[r] <= cat_col) break;
+		}
+		if (r == this.fed_rows.length)	// create a new fed-row
+		{
+			row = jQuery(document.createElement('tr'));
+			tbody.append(row);
+			th = jQuery(document.createElement('th'));
+			row.append(th);
+			this.fed_rows.push(row);
+			this.fed_rows_pos.push(0);
+			if (typeof fed == 'undefined' || fed != athlete.reg_fed_id)
+			{
+				fed = athlete.reg_fed_id;
+				th.text(this.federation(athlete.reg_fed_id));
+			}
+		}
+		this.fillUpFedRow(r, cat_col);
+		// create athlete cell
+		var td = jQuery(document.createElement('td'));
+		td.text(athlete.lastname+', '+athlete.firstname);
+		this.fed_rows[r].append(td);
+		this.fed_rows_pos[r]++;
+	}
+	this.fillUpFedRows();
+};
+/**
+ * Fill a single fed-row up to a given position with empty td's
+ * 
+ * @param int _r row-number
+ * @param int _to column-number, default whole row
+ */
+Starters.prototype.fillUpFedRow = function(_r, _to) 
+{
+	if (typeof _to == 'undefined') _to = this.data.categorys.length;
+	while (this.fed_rows_pos[_r] < _to)
+	{
+		var td = jQuery(document.createElement('td'));
+		this.fed_rows[_r].append(td);
+		this.fed_rows_pos[_r]++;
+	}
+}
+/**
+ * Fill up all fed rows with empty td's
+ */
+Starters.prototype.fillUpFedRows = function() 
+{
+	for(var r=0; r < this.fed_rows.length; ++r)
+	{
+		this.fillUpFedRow(r);
+	}
+}
+/**
+ * Get name of federation specified by given id
+ * @param _fed_id
+ * @returns string with name
+ */
+Starters.prototype.federation = function(_fed_id)
+{
+	for(var i=0; i < this.data.federations.length; ++i)
+	{
+		var fed = this.data.federations[i];
+		if (fed.fed_id == _fed_id) return fed.name;
+	}
+}
+
+/**
  * Constructor for table with given data and columns
  * 
  * Table get appended to specified _container

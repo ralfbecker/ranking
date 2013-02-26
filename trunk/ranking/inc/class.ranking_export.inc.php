@@ -48,6 +48,12 @@ class ranking_export extends boresult
 				$result = $export->export_calendar($_GET['nation'], $_GET['year'], $_GET['filter']);
 				$root_tag = 'calendar';
 			}
+			elseif (isset($_GET['comp']) && $_GET['type'] == 'starters')
+			{
+				$export = new ranking_export();
+				$result = $export->export_starters($_GET['comp']);
+				$root_tag = 'starters';
+			}
 			elseif (isset($_GET['comp']) && !isset($_GET['cat']) || isset($_GET['filter']))
 			{
 				$export = new ranking_export();
@@ -559,6 +565,7 @@ class ranking_export extends boresult
 		'modifier' => false,
 		'quota_extra' => false, //'extra_quotas',
 		'prequal_extra' => false, //'extra_prequals',
+		'user_timezone_read' => false,
 	);
 
 	/**
@@ -888,11 +895,11 @@ class ranking_export extends boresult
 	/**
 	 * Cache and expires time for results from a running competition
 	 */
-	const EXPORT_RESULTS_RUNNING = 900;
+	const EXPORT_RESULTS_RUNNING_EXPIRES = 900;
 	/**
 	 * Cache and expires time for results from a finished/historic competition
 	 */
-	const EXPORT_RESULTS_HISTORIC = 86400;
+	const EXPORT_RESULTS_HISTORIC_EXPIRES = 86400;
 
 	/**
 	 * Export results from all categories of a competition
@@ -906,7 +913,8 @@ class ranking_export extends boresult
 	public function export_results($comp, $num=null, $nation=null, array $filter=null)
 	{
 		$location = 'results:'.json_encode(func_get_args());
-		if (($data = egw_cache::getInstance('ranking', $location)))
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
+			($data = egw_cache::getInstance('ranking', $location)))
 		{
 			return $data;
 		}
@@ -993,7 +1001,92 @@ class ranking_export extends boresult
 		list($y,$m,$d) = explode('-', $comp['datum']);
 		$comp_ts = mktime(0, 0, 0, $m, $d, $y);
 		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration'] ?
-			self::EXPORT_RESULTS_HISTORIC : self::EXPORT_RESULTS_RUNNING;
+			self::EXPORT_RESULTS_HISTORIC_EXPIRES : self::EXPORT_RESULTS_RUNNING_EXPIRES;
+
+		$data['etag'] = md5(serialize($data));
+
+		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+
+		//_debug_array($ret); exit;
+		return $data;
+	}
+
+	/**
+	 * Cache and expires time for starters / registration
+	 */
+	const EXPORT_STARTERS_EXPIRES = 900;
+
+	/**
+	 * Export starters / registration from all categories of a competition
+	 *
+	 * @param string|int $comp WetId or rkey of competition
+	 * @return array
+	 */
+	public function export_starters($comp)
+	{
+		$location = 'starters:'.$comp;
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) && is_numeric($comp) &&
+			($data = egw_cache::getInstance('ranking', $location)))
+		{
+			return $data;
+		}
+
+		if (!($comp = $this->comp->read($comp)))
+		{
+			throw new Exception(lang('Competition NOT found !!!'));
+		}
+		// try again with numeric id
+		$location = 'starters:'.$comp['WetId'];
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
+			($data = egw_cache::getInstance('ranking', $location)))
+		{
+			return $data;
+		}
+		//_debug_array($comps);
+		if (!($cats = $this->result->read(array('WetId' => $comp['WetId']), '', true, $this->result->table_name.'.GrpId')))
+		{
+			throw new Exception(lang('No starters yet !!!'));
+		}
+		$athletes = $federations = array();
+		foreach($this->result->read(array(
+			'WetId' => $comp['WetId'],
+			'GrpId' => -1,
+		), '', true, $results ? '' : ($comp['nation'] ? 'acl_fed_id,fed_parent' : 'nation').',GrpId,pkt') as $result)
+		{
+			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
+			if (($ts = $modified->format('ts')) > $last_modified) $last_modified = $ts;
+
+			$fed_id = $comp['nation'] && $result['acl_fed_id'] ? $result['acl_fed_id'] :
+				($result['fed_parent'] ? $result['fed_parent'] : $result['fed_id']);
+			$federations[$fed_id] = $fed_id;
+
+			$athletes[] = self::athlete_attributes($result, $comp['nation'], $result['GrpId'])+array(
+				'cat' => $result['GrpId'],
+				'reg_fed_id' => $fed_id,
+				'order' => $result['pkt'],
+			);
+		}
+		unset($comp['gruppen']);
+
+		$data = self::rename_key($comp, self::$rename_comp)+array(
+			'nation' => $comp['nation'],
+			'categorys' => $cats,
+			'athletes' => $athletes,
+			'last_modified' => $last_modified,
+		);
+		if ($comp['nation'])
+		{
+			foreach($this->federation->query_list('verband', 'fed_id', array(
+				'fed_id' => array_values($federations)
+			), 'verband') as $fed_id => $name)
+			{
+				$data['federations'][] = array(
+					'fed_id' => $fed_id,
+					'name' => $name,
+				);
+			}
+		}
+		$data['expires'] = self::EXPORT_STARTERS_EXPIRES;
 
 		$data['etag'] = md5(serialize($data));
 
