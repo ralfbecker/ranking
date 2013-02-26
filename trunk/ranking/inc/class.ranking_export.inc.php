@@ -1056,8 +1056,9 @@ class ranking_export extends boresult
 			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
 			if (($ts = $modified->format('ts')) > $last_modified) $last_modified = $ts;
 
-			$fed_id = $comp['nation'] && $result['acl_fed_id'] ? $result['acl_fed_id'] :
-				($result['fed_parent'] ? $result['fed_parent'] : $result['fed_id']);
+			$fed_id = !$comp['nation'] ? $result['nation'] :
+				($result['acl_fed_id'] ? $result['acl_fed_id'] :
+				($result['fed_parent'] ? $result['fed_parent'] : $result['fed_id']));
 			$federations[$fed_id] = $fed_id;
 
 			$athletes[] = self::athlete_attributes($result, $comp['nation'], $result['GrpId'])+array(

@@ -683,7 +683,7 @@ Starters.prototype.fillUpFedRow = function(_r, _to)
 		this.fed_rows[_r].append(td);
 		this.fed_rows_pos[_r]++;
 	}
-}
+};
 /**
  * Fill up all fed rows with empty td's
  */
@@ -693,20 +693,25 @@ Starters.prototype.fillUpFedRows = function()
 	{
 		this.fillUpFedRow(r);
 	}
-}
+};
 /**
  * Get name of federation specified by given id
+ * 
  * @param _fed_id
  * @returns string with name
  */
 Starters.prototype.federation = function(_fed_id)
 {
+	if (typeof this.data.federations == 'undefined')
+	{
+		return _fed_id;	// nation of int. competition
+	}
 	for(var i=0; i < this.data.federations.length; ++i)
 	{
 		var fed = this.data.federations[i];
 		if (fed.fed_id == _fed_id) return fed.name;
 	}
-}
+};
 
 /**
  * Constructor for table with given data and columns
