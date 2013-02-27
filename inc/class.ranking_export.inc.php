@@ -567,6 +567,31 @@ class ranking_export extends boresult
 		'prequal_extra' => false, //'extra_prequals',
 		'user_timezone_read' => false,
 	);
+	public static $rename_cat = array(
+		'serien_pat' => false,	// not interesting
+		'vor_rls' => false,
+		'vor' => false,
+		'rls' => false,
+		'GrpIds' => false,	// only intersting for combined, so not for calendar
+		'extra' => false,	// what's that anyway?
+	);
+	public static $rename_cup = array(
+		'gruppen' => 'cats',
+		'faktor' => false,	// currently not used
+		'split_by_places' => false,	// not interesting for calendar
+		'pkte' => false,
+		'max_rang' => false,
+		'max_serie' => false,
+		'presets' => false,
+	);
+	/**
+	 * Categories to permanently exclude from calendar
+	 *
+	 * @var array
+	 */
+	public static $calendar_exclude = array(
+		120,	// ICC-TOF: Team Officals
+	);
 
 	/**
 	 * Export a competition calendar for the given year and nation(s)
@@ -620,35 +645,18 @@ class ranking_export extends boresult
 
 		if ($cats && ($cats = $this->cats->search(null,false,'rkey','','','','AND',false,array('rkey' => $cats))))
 		{
-			static $rename_cat = array(
-				'serien_pat' => false,	// not interesting
-				'vor_rls' => false,
-				'vor' => false,
-				'rls' => false,
-				'GrpIds' => false,	// only intersting for combined, so not for calendar
-				'extra' => false,	// what's that anyway?
-			);
 			foreach($cats as &$cat)
 			{
-				$cat = self::rename_key($cat, $rename_cat);
+				$cat = self::rename_key($cat, self::$rename_cat);
 				$rkey2cat[$cat['rkey']] =& $cat;
 			}
 			//_debug_array($cats); die('STOP');
 		}
 		if ($cups && ($cups = $this->cup->search(null,false,'rkey','','','','AND',false,array('SerId' => $cups))))
 		{
-			static $rename_cup = array(
-				'gruppen' => 'cats',
-				'faktor' => false,	// currently not used
-				'split_by_places' => false,	// not interesting for calendar
-				'pkte' => false,
-				'max_rang' => false,
-				'max_serie' => false,
-				'presets' => false,
-			);
 			foreach($cups as &$cup)
 			{
-				$cup = self::rename_key($cup, $rename_cup);
+				$cup = self::rename_key($cup, self::$rename_cup);
 				$id2cup[$cup['SerId']] =& $cup;
 			}
 			//_debug_array($cups); die('STOP');
@@ -662,9 +670,14 @@ class ranking_export extends boresult
 			// add cat id, name, status and url
 			if (isset($comp['cats']) && is_array($comp['cats']))
 			{
-				foreach($comp['cats'] as &$cat)
+				foreach($comp['cats'] as $key => &$cat)
 				{
 					$c = $rkey2cat[$cat];
+					if (in_array($c['GrpId'], self::$calendar_exclude))
+					{
+						unset($comp['cats'][$key]);
+						continue;
+					}
 					$cat = array(
 						'GrpId' => $c['GrpId'],
 						'name' => $c['name'],
@@ -685,6 +698,7 @@ class ranking_export extends boresult
 						}
 					}
 				}
+				$comp['cats'] = array_values($comp['cats']);	// reindex, in case excluded cat was deleted
 			}
 			// add cup name
 			if ($comp['cup'])
@@ -694,7 +708,7 @@ class ranking_export extends boresult
 					'name'  => $id2cup[$comp['cup']]['name'],
 				);
 			}
-			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true)))
+			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true,$add_host=true)))
 			{
 				$comp += $attachments;
 			}
