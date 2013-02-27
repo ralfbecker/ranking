@@ -633,9 +633,10 @@ class ranking_competition extends so_sql
 	 * @param array $data a given competition, default use the already read one
 	 * @param boolean $return_link=false return links or arrays with vars for the link-function, default false=array
 	 * @param boolean $only_pdf=true return only pdfs (default) or the logos too
+	 * @param boolean $add_host=false return attachment links including a host, not just a path, default not
 	 * @return boolean/array links for the keys: info, startlist, result or false on error
 	 */
-	function attachments($data=null,$return_link=false,$only_pdf=true)
+	function attachments($data=null,$return_link=false,$only_pdf=true,$add_host=false)
 	{
 		if (!$data) $data =& $this->data;
 
@@ -648,6 +649,11 @@ class ranking_competition extends so_sql
 			if (egw_vfs::stat($vfs_path))
 			{
 				$attachments[$type] = egw_vfs::download_url($vfs_path);
+				if ($add_host && $attachments[$type][0] == '/')
+				{
+					$attachments[$type] = ($_SERVER['HTTPS'] ? 'https://' : 'http://').
+						$_SERVER['HTTP_HOST'].$attachments[$type];
+				}
 			}
 		}
 		return $attachments;
