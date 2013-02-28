@@ -94,7 +94,8 @@ class ranking_export extends boresult
 		static $base;
 		if (is_null($base))
 		{
-			//$base = 'http://'.$_SERVER['HTTP_HOST'];	// disabled base to have domain independent links
+			$base = self::base_url();
+
 			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
 			{
 				$base .= '/index.php?page_name=pstambl&person=';
@@ -105,6 +106,26 @@ class ranking_export extends boresult
 			}
 		}
 		return $base.$athlete['PerId'].($cat ? '&cat='.$cat : '');
+	}
+
+	/**
+	 * Return base url for
+	 * Enter description here ...
+	 */
+	static function base_url()
+	{
+		switch($_SERVER['HTTP_HOST'])
+		{
+			case 'www.ifsc-climbing.org':
+			case 'ifsc.egroupware.org':
+				$host = 'egw.ifsc-climbing.org';	// use CDN url
+				break;
+
+			default:
+				$host = $_SERVER['HTTP_HOST'];
+				break;
+		}
+		return 'http://'.$host;
 	}
 
 	/**
@@ -708,7 +729,7 @@ class ranking_export extends boresult
 					'name'  => $id2cup[$comp['cup']]['name'],
 				);
 			}
-			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true,$add_host=true)))
+			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true,self::base_url())))
 			{
 				$comp += $attachments;
 			}
