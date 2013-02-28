@@ -117,7 +117,7 @@ class ranking_export extends boresult
 		switch($_SERVER['HTTP_HOST'])
 		{
 			case 'www.ifsc-climbing.org':
-			case 'ifsc.egroupware.org':
+			case 'ifsc.egroupware.net':
 				$host = 'egw.ifsc-climbing.org';	// use CDN url
 				break;
 

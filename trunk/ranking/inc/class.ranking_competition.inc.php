@@ -650,10 +650,17 @@ class ranking_competition extends so_sql
 			if (egw_vfs::stat($vfs_path))
 			{
 				$attachments[$type] = egw_vfs::download_url($vfs_path);
-				if ($add_host && $attachments[$type][0] == '/')
+				if ($add_host && $attachments[$type][0] == '/' ||
+					// might need to replace domain with CDN domain
+					is_string($add_host) && parse_url($attachments[$type], PHP_URL_HOST) == $_SERVER['HTTP_HOST'])
 				{
 					if ($add_host === true) $add_host = ($_SERVER['HTTPS'] ? 'https://' : 'http://').$_SERVER['HTTP_HOST'];
 
+					if ($attachments[$type][0] != '/')
+					{
+						$parsed = parse_url($attachments[$type]);
+						$attachments[$type] = $parsed['path'].($parsed['query'] ? '?'.$parsed['query'] : '');
+					}
 					$attachments[$type] = $add_host.$attachments[$type];
 				}
 			}
