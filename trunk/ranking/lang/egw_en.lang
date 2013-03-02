@@ -134,8 +134,8 @@ competition logo	ranking	en	Competition logo
 competition name	ranking	en	Competition name
 competition not found !!!	ranking	en	Competition NOT found !!!
 competition results	ranking	en	Competition results
-competitions	ranking	en	competitions
-competitions counting	ranking	en	competitions counting
+competitions	ranking	en	Competitions
+competitions counting	ranking	en	Competitions counting
 complete profile	ranking	en	complete profile
 complimentary	ranking	en	Complimentary
 confirmed	ranking	en	confirmed
@@ -147,7 +147,7 @@ create new federation: %1 (%2)	ranking	en	Create new federation: %1 (%2)
 cup	ranking	en	Cup
 cup (unranked last)	ranking	en	cup (unranked last)
 cuppattern	ranking	en	Cuppattern
-cups	ranking	en	cups
+cups	ranking	en	Cups
 database	admin	en	Database
 dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	en	Dataline %1 has a different number of columns (%2) then labels (%3)!
 deadline	ranking	en	Deadline
