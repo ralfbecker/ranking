@@ -36,7 +36,13 @@ class ranking_export extends boresult
 	{
 		try
 		{
-			if(isset($_GET['cat']) && !isset($_GET['comp']))
+			if (isset($_GET['person']))
+			{
+				$export = new ranking_export();
+				$result = $export->export_profile($_GET['person'], $_GET['cat']);
+				$root_tag = 'profile';
+			}
+			elseif (isset($_GET['cat']) && !isset($_GET['comp']))
 			{
 				$export = new ranking_export();
 				$result = $export->export_ranking($_GET['cat'], $_GET['date'], $_GET['cup']);
@@ -143,7 +149,7 @@ class ranking_export extends boresult
 		static $base;
 		if (is_null($base))
 		{
-			//$base = 'http://'.$_SERVER['HTTP_HOST'];	// disabled base to have domain independent links
+			$base = self::base_url();
 			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
 			{
 				$base .= '/index.php?page_name=result&comp=';
@@ -154,6 +160,34 @@ class ranking_export extends boresult
 			}
 		}
 		return $base.$comp.'&cat='.$cat;
+	}
+
+	/**
+	 * Get URL for a result
+	 *
+	 * Currently /result.php is used for every HTTP_HOST not www.ifsc-climbing.org,
+	 * for which /index.php?page_name=result is used.
+	 *
+	 * @param int $cat
+	 * @param int $cup=null
+	 * @return string
+	 */
+	static function ranking_url($cat, $cup=null)
+	{
+		static $base;
+		if (is_null($base))
+		{
+			$base = self::base_url();
+			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
+			{
+				$base .= '/index.php?page_name=ranking&cat=';
+			}
+			else
+			{
+				$base .= '/ranking.php?cat=';
+			}
+		}
+		return $base.$cat.($cup ? '&cup='.$cup : '');
 	}
 
 	/**
@@ -819,9 +853,10 @@ class ranking_export extends boresult
 	 * @param int|string $cat id or rkey of category
 	 * @param string $date=null date of ranking, default today
 	 * @param int|string $cup id or rkey of cup to generate a cup-ranking
+	 * @param boolean $force_cache=false true use cache even for $ignore_caching_hosts
 	 * @return array or athletes
 	 */
-	public function export_ranking($cat,$date=null,$cup=null)
+	public function export_ranking($cat,$date=null,$cup=null,$force_cache=false)
 	{
 		if (empty($date)) $date = '.';
 		$location = 'calendar:'.json_encode(array(
@@ -829,7 +864,7 @@ class ranking_export extends boresult
 			'date' => $date,
 			'cup' => $cup,
 		));
-		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
+		if (($force_cache || !in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts)) &&
 			($data = egw_cache::getInstance('ranking', $location)))
 		{
 			return $data;
@@ -1126,7 +1161,200 @@ class ranking_export extends boresult
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
 
-		//_debug_array($ret); exit;
+		//_debug_array($data); exit;
+		return $data;
+	}
+
+	/**
+	 * Rename athlete columns for export
+	 *
+	 * @var array
+	 */
+	public static $rename_athlete = array(
+		'PerId' => 'PerId',
+		'rkey' => 'rkey',
+		'nachname' => 'lastname',
+		'vorname' => 'firstname',
+		'sex' => 'gender',
+		'nation' => 'nation',
+		'verband' => 'federation',
+		'fed_url' => 'fed_url',
+		'geb_ort' => 'birthplace',
+		'geb_date' => 'birthdate',	// set automatic to just year
+		'age' => 'age',
+		//'geb_year' => 'birthyear',
+		'practice' => 'practice',
+		'groesse' => 'height',
+		'gewicht' => 'weight',
+		'lizenz' => 'license',
+		'kader' => 'squad',
+		'anrede' => 'title',
+		'hobby' => 'hobbies',
+		'sport' => 'other_sports',
+		'profi' => 'professional',
+		'freetext' => 'freetext',
+		// commented usually disabled fields, to never export them
+		//'email' => 'email',
+		'homepage' => 'homepage',
+		//'strasse' => 'street',
+		//'plz' => 'postcode',
+		'ort' => 'city',
+		//'tel' => 'phone',
+		//'fax' => 'fax',
+		//'mobile' => 'mobile',
+		//'bemerkung' => 'remark',
+		'last_comp' => 'last_comp',
+		'fed_id' => false,
+		'fed_parent' => false,
+		'acl_fed_id' => 'acl_fed_id',
+		'modified' => 'last_modified',
+	);
+
+	/**
+	 * Cache and expires time for athlete profiles
+	 */
+	const EXPORT_PROFILE_EXPIRES = 900;
+	/**
+	 * Cache and expires time for historic (not in ranking and not last_comp more then one year ago) athlete profiles
+	 */
+	const EXPORT_PROFILE_HISTORIC_EXPIRES = 86400;
+
+	/**
+	 * Home many weights to provide to limit results to this number of competitions
+	 */
+	const WEIGHT_LIMITS = 20;
+
+	/**
+	 * Export starters / registration from all categories of a competition
+	 *
+	 * @param string|int $athlete numeric id or rkey of athlete
+	 * @param string|int $cat=null numeric id or rkey of category, to calculate ranking and cup rankings
+	 * @return array
+	 */
+	public function export_profile($athlete, $cat=null)
+	{
+		$location = '$profile:'.$athlete.':'.$cat;
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) && is_numeric($comp) &&
+			($data = egw_cache::getInstance('ranking', $location)))
+		{
+			return $data;
+		}
+		if (!($athlete = $this->athlete->read($athlete)))
+		{
+			throw new Exception(lang('Athlete NOT found !!!'));
+		}
+
+		$data = self::rename_key($athlete, self::$rename_athlete, true);
+		// athlete requested not to show his profile
+		// --> no results, no ranking, regular profile data already got removed by athlete->db2data called by read
+		if ($athlete['acl'] & 128)
+		{
+			$data['freetext'] = $data['error'] = lang('Sorry, the climber requested not to show his profile!');
+			$data['last_modified'] = egw_time::to($athlete['modified'], 'ts');
+		}
+		else
+		{
+			$data['photo'] = $this->athlete->picture_url();
+			if ($data['photo'][0] == '/' || parse_url($data['photo'], PHP_URL_HOST) == $_SERVER['HTTP_HOST'])
+			{
+				$data['photo'] = self::base_url().($data['photo'][0] == '/' ? $data['photo'] : parse_url($data['photo'], PHP_URL_PATH));
+			}
+
+			// if category given fetch ranking
+			if ($cat && ($cat = $this->cats->read($cat)))
+			{
+				$data['GrpId'] = $cat['GrpId'];
+				$data['cat_name'] = $cat['name'];
+				list($year, $month) = explode('-', date('Y-m'));
+				if ($month <= 3) $year--;
+
+				foreach(array(
+					'ranking' => '.',
+					'cup' => $month <= 3 ? $year.'-12-31' : '.',
+					'cup-1' => ($year-1).'-12-31',
+					'cup-2' => ($year-2).'-12-31',
+				) as $name => $date)
+				{
+					if ($name != 'ranking')
+					{
+						if (empty($cat['serien_pat'])) break;	// no cup defined
+						$cup = str_replace('??', sprintf("%02d", (int)$date % 100), $cat['serien_pat']);
+					}
+					if (!$cup || ($cup = $this->cup->read($cup)))
+					{
+						$ranking = $this->export_ranking($cat, $date, $cup['SerId'], true);
+						foreach($ranking['participants'] as $participant)
+						{
+							if ($participant['PerId'] == $athlete['PerId'])
+							{
+								$data['rankings'][] = array(
+									'rank' => $participant['result_rank'],
+									'name' => $cup ? $cup['name'] : ($cat['nation'] ? lang('Ranking') : 'Worldranking'),
+									'SerId' => $cup['SerId'],
+									'url' => self::ranking_url($cat['GrpId'], $cup ? $cup['SerId'] : null),
+									'date' => $ranking['end'],
+								);
+								break;
+							}
+						}
+					}
+
+				}
+			}
+
+			$last_modified = egw_time::to($athlete['modified'], 'ts');
+			// fetch results and calculate their weight, to allow clients to easyly show N best competitions
+			if (($results = $this->result->read(array('PerId' => $athlete['PerId']))))
+			{
+				$year = (int)date('Y');
+				$limits = array();
+				foreach($results as $result)
+				{
+					if ($last_modified < ($ts = egw_time::to($result['modified'], 'ts')))
+					{
+						$last_modified = $ts;
+					}
+					/* can be done easyly on clientside
+					$weight = $result['platz']/2 + ($year-$result['datum']) + 4*!empty($result['nation']);
+					// maintain array of N best competitions (least weight)
+					if (count($limits) < self::WEIGHT_LIMITS || $weight < $limits[count($limits)-1])
+					{
+						foreach($limits as $n => $limit)
+						{
+							if ($limit > $weight) break;
+						}
+						if ($limit < $weight && $n == count($limits)-1) $n = count($limits);
+						$limits = array_merge(array_slice($limits, 0, (int)$n), array($weight),
+							array_slice($limits, (int)$n, self::WEIGHT_LIMITS-1-$n));
+					}
+					*/
+					$data['results'][] = array(
+						'rank' => $result['platz'],
+						'date' => $result['datum'],
+						'name' => $result['name'],
+						'url' => self::result_url($result['WetId'], $result['GrpId']),
+						'nation' => $result['nation'],
+						'WetId' => $result['WetId'],
+						'cat_name' => $result['cat_name'],
+						'GrpId' => $result['GrpId'],
+						'weight' => $weight,
+					);
+				}
+				//$data['weight_limits'] = $limits;
+			}
+
+			unset($data['last_modified']);
+			$data['last_modified'] = $last_modified;
+		}
+		// historic profiles: athlete not in ranking and last modification more then 1 year ago
+		$data['expires'] = !$data['rankings'][0]['rank'] && time()-$data['last_modified'] > 365*86400 ?
+			self::EXPORT_PROFILE_HISTORIC_EXPIRES : self::EXPORT_PROFILE_EXPIRES;
+
+		$data['etag'] = md5(serialize($data));
+
+		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+
+		//_debug_array($data); exit;
 		return $data;
 	}
 
@@ -1135,16 +1363,18 @@ class ranking_export extends boresult
 	 *
 	 * @param array $arr
 	 * @param array $rename array with from => to or from => false pairs
+	 * @param boolean $filter=false true return only fields given in $rename, false return whole $arr
 	 * @return array
 	 */
-	public static function rename_key(array $arr, array $rename)
+	public static function rename_key(array $arr, array $rename, $filter=false)
 	{
+		$ret = $filter ? array() : $arr;
 		foreach($rename as $from => $to)
 		{
-			if ($to && isset($arr[$from])) $arr[$to] =& $arr[$from];
-			unset($arr[$from]);
+			if ($to && isset($arr[$from])) $ret[$to] =& $arr[$from];
+			if ($from !== $to) unset($ret[$from]);
 		}
-		return $arr;
+		return $ret;
 	}
 
 	/**

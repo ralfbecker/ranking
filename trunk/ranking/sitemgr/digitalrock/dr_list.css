@@ -54,7 +54,7 @@ table.DrTable tbody th a {
 /**
  * Format the header
  */
-.Results h1, .Startlist h1, .Resultlist h1, .Starters h1 {
+.Results h1, .Startlist h1, .Resultlist h1, .Starters h1, .Profile h1 {
 	padding: 0;
 	margin: 0;
 	font-size: 20pt;
@@ -132,4 +132,17 @@ div.bonusTries {
 div.topTries {
 	left: 3px;
 	top: 1px;	
+}
+
+/**
+ * Profile page
+ */
+.profileHeader {
+	width: 100%;
+}
+.profileRank:after, .profileResultRank:after {
+	content: ".";
+}
+.profileAge, .profileBirthdate, .profileBirthplace, .profileCity, .profileStreet, .profileRank {
+	font-weight: bold;
 }
