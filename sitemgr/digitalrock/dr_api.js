@@ -719,6 +719,81 @@ Starters.prototype.federation = function(_fed_id)
 };
 
 /**
+ * Constructor for profile from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ */
+function Profile(_container,_json_url)
+{
+	this.json_url = _json_url;
+	if (typeof _container == "string") _container = document.getElementById(_container);
+	this.container = jQuery(_container);
+	this.container.addClass('Profile');
+	this.template = this.container.html();
+	this.container.empty();
+	
+	this.update();
+}
+Profile.prototype.update = Startlist.prototype.update;
+/**
+ * Callback for loading data via ajax
+ * 
+ * @param _data route data object
+ */            
+Profile.prototype.handleResponse = function(_data)
+{
+	var pattern = /\$\$([^$]+)\$\$/g;
+	var n = 0;
+	var html = this.template.replace(pattern, function(match, placeholder)
+	{
+		var parts = placeholder.split('/');
+		var data = _data;
+		for(var i=0; i < parts.length; ++i)
+		{
+			if (typeof data[parts[i]] == 'undefined' || !data[parts[i]])
+			{
+				return parts[i] === 'N' ? match : '';
+			}
+			data = data[parts[i]];
+		}
+		return data;
+	});
+	pattern = /\$\$results\/N\/([^$]+)\$\$/g;
+	html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
+	{
+		if (match.indexOf('$$results/N/') == -1) return match;
+
+		var rows = '';
+		for(var i=0; i < _data.results.length; ++i)
+		{
+			rows += match.replace(pattern, function(match, placeholder)
+			{
+				switch (placeholder)
+				{
+					case 'cat_name+name':
+						return (_data.results[i].GrpId != _data.GrpId ? _data.results[i].cat_name+': ' : '')+_data.results[i].name;
+					case 'date':
+						return _data.results[i].date.split('-').reverse().join('.');
+					default:
+						return _data.results[i][placeholder];
+				}
+			});
+		}
+		return rows;
+	});
+	this.container.html(html);
+	// remove links with empty href
+	this.container.find('a[href=""]').replaceWith(function(){
+		return jQuery(this).contents();
+	});
+	// remove images with empty src
+	this.container.find('img[src=""]').remove();
+};
+
+/**
  * Constructor for table with given data and columns
  * 
  * Table get appended to specified _container

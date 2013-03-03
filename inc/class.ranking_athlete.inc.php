@@ -186,8 +186,13 @@ class ranking_athlete extends so_sql
 		{
 			$data['practice'] = date('Y') - $data['practice'];
 		}
-		if ($data['geb_date']) $data['geb_year'] = (int) $data['geb_date'];
-
+		if ($data['geb_date'])
+		{
+			$data['geb_year'] = (int) $data['geb_date'];
+			list($y, $m, $d) = explode('-', $data['geb_date']);
+			list($ny, $nm, $nd) = explode('-', date('Y-m-d'));
+			$data['age'] = $ny - $y - ($m > $nm || $m == $nm && $d > $nd);
+		}
 		if ($data['acl'])
 		{
 			$acl = $data['acl'];

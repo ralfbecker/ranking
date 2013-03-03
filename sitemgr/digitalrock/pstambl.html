@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"> 
+	<head> 
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 
+		<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="dr_api.js"></script>
+		<link type="text/css" rel="StyleSheet" href="dr_list.css" />
+	</head>
+<body>
+<div id="profile">
+<table class="profileHeader">
+ <tr>
+  <td class="profilePhoto"><img src="$$photo$$" border="0"></td>  
+  <td>
+  	<h1><a href="$$homepage$$" target="_blank">
+	  <span class="firstname">$$firstname$$</span>
+	  <span class="lastname">$$lastname$$</span>
+  	</a></h1>
+    <h3 class="nation">$$nation$$</h1>
+    <h3 class="federation"><a href="$$fed_url$$" target="_blank">$$federation$$</a></h1>
+  </td>
+  <td class="profileLogo"><a href="http://www.digitalROCK.de" target=_blank><img src="http://www.digitalrock.de/dig_rock.klein.jpg" title="digital ROCK's Homepage" /></a></td>
+ </tr>
+</table>
+<table cols="6" class="profileData">
+	<tr>
+		<td>age:</td>
+		<td class="profileAge">$$age$$</td>
+		<td>date of birth:</td>
+		<td class="profileBirthdate">$$birthdate$$</td>
+	</tr>
+	<tr>
+		<td>place of birth:</td>
+		<td class="profileBirthplace">$$birthplace$$</td>
+	</tr>
+	<tr>
+		<td>address:</td>
+		<td colspan="2" class="profileCity">$$postcode$$ $$city$$</td>
+		<td colspan="2" class="profileStreet">$$street$$</td>
+	</tr>
+	<tr style="height: 5px;">
+		<td width="5%"></td>
+		<td width="15%"></td>
+		<td width="20%"></td>
+		<td width="10%"></td>
+		<td width="20%"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/0/url$$">$$rankings/0/name$$</a>:</td>
+		<td class="profileRank">$$rankings/0/rank$$</td>
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/1/url$$">$$rankings/1/name$$</a>:</td>
+		<td class="profileRank">$$rankings/1/rank$$</td>
+	</tr>
+	<tr>
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/2/url$$">$$rankings/2/name$$</a>:</td>
+		<td class="profileRank">$$rankings/2/rank$$</td>
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/3/url$$">$$rankings/3/name$$</a>:</td>
+		<td class="profileRank">$$rankings/3/rank$$</td>
+	</tr>
+	<tr>
+		<td colspan="6"><a name="results">best results:</a></td>
+	</tr>
+	<tr class="profileResult">
+		<td class="profileResultRank">$$results/N/rank$$</td>
+		<td colspan="4" class="profileResultName"><a href="$$results/N/url$$">$$results/N/cat_name+name$$</a></td>
+		<td class="profileResultDate">$$results/N/date$$</td>
+	</tr>
+</table>
+</div>
+<script type="text/javascript">
+	var profile;
+	$(document).ready(function() {
+		results = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+location.search);
+		
+		setTimeout(function(){window.scrollTo(0, 1);}, 100);
+	});
+
+	if (document.location.href.match(/beamer=1/)) load_css('beamer.css');
+</script>
+</body>
+</html>
