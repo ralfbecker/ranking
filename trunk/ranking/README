@@ -282,6 +282,47 @@ An array with registering federations, if not an intl. competition, with followi
 - name: name of federation
 - shortcut: shortcut of federation
 
+Athlete profile via XML JSON
+============================
+
+- HTML: view-source:http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
+- Template: view-source:http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
+- XML:  http://egw.ifsc-climbing.org/ranking/xml.php?person=6933&cat=6
+- JSON: http://egw.ifsc-climbing.org/ranking/json.php?person=6933&cat=6
+
+Required parameter is person (numeric athlete id) and optional cat (nummeric category id).
+Optional category is required to display rank of athlete in current and older rankings of that category.
+
+Data includes usual athlete data:
+- firstname, lastname, nation, birthdate, age, birthplace, gender
+- federation, fed_url: name and url of federation
+- PerId, rkey: numerical and string id of climbing
+- practice: practices climbing since "N years, since YYYY"
+- other_sports: other sports practiced
+- professional: professional climber or if not profession
+- city, postcode, street: address data, usually on city is available
+- last_comp: date in YYYY-mm-dd format of last competition
+If category given:
+- GrpId: nummerical id of category
+- cat_name: name of category
+- rankings: athletes rank in following rankings
+  * 0: current (world) ranking
+  * 1: current year (world) cup
+  * 2: last year (world) cup
+  * 3: two years ago (world) cup
+  with following data:
+  * rank: in ranking
+  * date, name, url: of ranking
+  * SerId: nummerical id of cup
+Recorded results of athlete as array with following data per result:
+- rank, date, name: of competition
+- nation: for national results
+- cat_name, GrpId: name and numeric id of category
+- WetId: numeric id of competition
+- url: of complete ranking
+
+Javascript Profile widget supports HTML template to render the profile, see above example.
+It also displays by default only N best results, with the option to show all results.
 
 If you have questions please ask.
 

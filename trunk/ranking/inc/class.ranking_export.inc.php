@@ -1339,7 +1339,7 @@ class ranking_export extends boresult
 						'WetId' => $result['WetId'],
 						'cat_name' => $result['cat_name'],
 						'GrpId' => $result['GrpId'],
-						'weight' => $weight,
+						//'weight' => $weight,
 					);
 				}
 				//$data['weight_limits'] = $limits;
