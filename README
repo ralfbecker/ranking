@@ -285,7 +285,7 @@ An array with registering federations, if not an intl. competition, with followi
 Athlete profile via XML JSON
 ============================
 
-- HTML: view-source:http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
+- HTML: http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
 - Template: view-source:http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
 - XML:  http://egw.ifsc-climbing.org/ranking/xml.php?person=6933&cat=6
 - JSON: http://egw.ifsc-climbing.org/ranking/json.php?person=6933&cat=6
