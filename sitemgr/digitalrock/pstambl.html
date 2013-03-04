@@ -17,8 +17,8 @@
 	  <span class="firstname">$$firstname$$</span>
 	  <span class="lastname">$$lastname$$</span>
   	</a></h1>
-    <h3 class="nation">$$nation$$</h1>
-    <h3 class="federation"><a href="$$fed_url$$" target="_blank">$$federation$$</a></h1>
+    <h2 class="profileNation">$$nation$$</h1>
+    <h3 class="profileFederation"><a href="$$fed_url$$" target="_blank">$$federation$$</a></h1>
   </td>
   <td class="profileLogo"><a href="http://www.digitalROCK.de" target=_blank><img src="http://www.digitalrock.de/dig_rock.klein.jpg" title="digital ROCK's Homepage" /></a></td>
  </tr>
@@ -30,24 +30,37 @@
 		<td>date of birth:</td>
 		<td class="profileBirthdate">$$birthdate$$</td>
 	</tr>
-	<tr>
+	<tr class="profileHideRowIfEmpty">
 		<td>place of birth:</td>
-		<td class="profileBirthplace">$$birthplace$$</td>
+		<td class="profileBirthplace profileHideRowIfEmpty">$$birthplace$$</td>
 	</tr>
-	<tr>
+	<tr class="profileHideRowIfEmpty">
+		<td>height:</td>
+		<td class="profileHeight profileHideRowIfEmpty">$$height$$</td>
+		<td>weight:</td>
+		<td class="profileWeight profileHideRowIfEmpty">$$weight$$</td>
+	</tr>
+	<tr class="profileMarginTop profileHideRowIfEmpty">
 		<td>address:</td>
-		<td colspan="2" class="profileCity">$$postcode$$ $$city$$</td>
-		<td colspan="2" class="profileStreet">$$street$$</td>
+		<td colspan="2" class="profileCity profileHideRowIfEmpty">$$postcode$$ $$city$$</td>
+		<td colspan="2" class="profileStreet profileHideRowIfEmpty">$$street$$</td>
 	</tr>
-	<tr style="height: 5px;">
-		<td width="5%"></td>
-		<td width="15%"></td>
-		<td width="20%"></td>
-		<td width="10%"></td>
-		<td width="20%"></td>
-		<td></td>
+	<tr class="profileMarginTop profileHideRowIfEmpty">
+		<td colspan="3">practicing climbing for:</td>
+		<td colspan="3" class="profilePractice profileHideRowIfEmpty">$$practice$$</td>
 	</tr>
-	<tr>
+	<tr class="profileHideRowIfEmpty">
+		<td colspan="3">professional climber (if not, profession):</td>
+		<td colspan="3" class="profileProfessional profileHideRowIfEmpty">$$professional$$</td>
+	</tr>
+	<tr class="profileHideRowIfEmpty">
+		<td colspan="3">other sports practiced:</td>
+		<td colspan="3" class="profileOtherSports profileHideRowIfEmpty">$$other_sports$$</td>
+	</tr>
+	<tr class="profileMarginTop profileHideRowIfEmpty">
+		<td colspan="6" class="profileFreetext profileHideRowIfEmpty">$$freetext$$</td>
+	</tr>
+	<tr class="profileMarginTop">
 		<td colspan="2" class="profileRanglist"><a href="$$rankings/0/url$$">$$rankings/0/name$$</a>:</td>
 		<td class="profileRank">$$rankings/0/rank$$</td>
 		<td colspan="2" class="profileRanglist"><a href="$$rankings/1/url$$">$$rankings/1/name$$</a>:</td>
@@ -59,10 +72,10 @@
 		<td colspan="2" class="profileRanglist"><a href="$$rankings/3/url$$">$$rankings/3/name$$</a>:</td>
 		<td class="profileRank">$$rankings/3/rank$$</td>
 	</tr>
-	<tr>
-		<td colspan="6"><a name="results">best results:</a></td>
+	<tr class="profileResultHeader profileMarginTop">
+		<td colspan="6"><a href="javascript:profile.toggleResults()" title="show all results">best results:</a></td>
 	</tr>
-	<tr class="profileResult">
+	<tr class="profileResult $$results/N/weightClass$$">
 		<td class="profileResultRank">$$results/N/rank$$</td>
 		<td colspan="4" class="profileResultName"><a href="$$results/N/url$$">$$results/N/cat_name+name$$</a></td>
 		<td class="profileResultDate">$$results/N/date$$</td>
@@ -72,7 +85,7 @@
 <script type="text/javascript">
 	var profile;
 	$(document).ready(function() {
-		results = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+location.search);
+		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+location.search);
 		
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);
 	});
