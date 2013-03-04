@@ -61,7 +61,7 @@ table.DrTable tbody th a {
 	font-weight: bold;
 }
 
-.Results h3 {
+.Results h3, .Profile h3, .Profile h2 {
 	padding: 0;
 	margin: 0;
 	font-weight: normal;
@@ -137,12 +137,40 @@ div.topTries {
 /**
  * Profile page
  */
-.profileHeader {
+div.Profile {
+	display: inline-block;
+}
+.profileHeader, .profileData {
 	width: 100%;
+}
+.profileHeader .profileNation {
+	margin: 5px 0 5px 0;	
+}
+.profileLogo {
+	text-align: right;
 }
 .profileRank:after, .profileResultRank:after {
 	content: ".";
 }
-.profileAge, .profileBirthdate, .profileBirthplace, .profileCity, .profileStreet, .profileRank {
+.profileData td {
+	font-style: italic;
+}
+td.profileAge, td.profileBirthdate, td.profileBirthplace, td.profileCity, td.profileStreet, td.profileRank, 
+td.profilePractice, td.profileOtherSports, td.profileProfessional, td.profileHeight, td.profileWeight {
 	font-weight: bold;
+	font-style: normal;
+}
+.profileResult td, h1, h3, td.profileRanglist {
+	font-style: normal;
+}
+.profileResultHidden {
+	display: none;
+}
+tr.profileMarginTop > td {
+	padding-top: 10px;
+}
+.profileResultHeader td {
+	font-weight: bold;
+	font-style: normal;
+	font-size: 120%;
 }

@@ -735,6 +735,8 @@ function Profile(_container,_json_url)
 	this.template = this.container.html();
 	this.container.empty();
 	
+	this.bestResults = 12;
+	
 	this.update();
 }
 Profile.prototype.update = Startlist.prototype.update;
@@ -745,8 +747,8 @@ Profile.prototype.update = Startlist.prototype.update;
  */            
 Profile.prototype.handleResponse = function(_data)
 {
+	// replace non-result data
 	var pattern = /\$\$([^$]+)\$\$/g;
-	var n = 0;
 	var html = this.template.replace(pattern, function(match, placeholder)
 	{
 		var parts = placeholder.split('/');
@@ -759,26 +761,70 @@ Profile.prototype.handleResponse = function(_data)
 			}
 			data = data[parts[i]];
 		}
+		switch(placeholder)
+		{
+			case 'practice':
+				data += ' years, since '+((new Date).getFullYear()-data);
+				break;
+			case 'height':
+				data += ' cm';
+				break;
+			case 'weight':
+				data += ' kg';
+				break;
+		}
 		return data;
 	});
+	// replace result data
+	var n = 0;
+	var bestResults = this.bestResults;
 	pattern = /\$\$results\/N\/([^$]+)\$\$/g;
 	html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
 	{
 		if (match.indexOf('$$results/N/') == -1) return match;
 
-		var rows = '';
+		// find and mark N best results
+		var year = (new Date).getFullYear();
+		var limits = [];
 		for(var i=0; i < _data.results.length; ++i)
 		{
+			var result = _data.results[i];
+			result.weight = result.rank/2 + (year-parseInt(result.date)) + 4*!result.nation;
+			// maintain array of N best competitions (least weight)
+			if (limits.length < bestResults || result.weight < limits[limits.length-1])
+			{
+				var limit=0;
+				for(var l=0; l < limits.length; ++l)
+				{
+					limit = limits[l];
+					if (limit > result.weight) break;
+				}
+				if (limit < result.weight && l == limits.length-1) l = limits.length;
+				limits = limits.slice(0, l).concat([result.weight]).concat(limits.slice(l, bestResults-1-l));
+			}
+		}
+		var weight_limit = limits.pop();
+		
+		var rows = '';
+		var l = 0;
+		for(var i=0; i < _data.results.length; ++i)
+		{
+			var result = _data.results[i];
+			if (match.indexOf('$$results/N/weightClass$$') >= 0 &&
+				(result.weight > weight_limit || ++l > bestResults))
+			{
+				result.weightClass = 'profileResultHidden';
+			}
 			rows += match.replace(pattern, function(match, placeholder)
 			{
 				switch (placeholder)
 				{
 					case 'cat_name+name':
-						return (_data.results[i].GrpId != _data.GrpId ? _data.results[i].cat_name+': ' : '')+_data.results[i].name;
+						return (result.GrpId != _data.GrpId ? result.cat_name+': ' : '')+result.name;
 					case 'date':
-						return _data.results[i].date.split('-').reverse().join('.');
+						return result.date.split('-').reverse().join('.');
 					default:
-						return _data.results[i][placeholder];
+						return typeof result[placeholder] != 'undefined' ? result[placeholder] : '';
 				}
 			});
 		}
@@ -791,6 +837,23 @@ Profile.prototype.handleResponse = function(_data)
 	});
 	// remove images with empty src
 	this.container.find('img[src=""]').remove();
+	// hide rows with profileHideRowIfEmpty, if ALL td.profileHideRowIfEmpty are empty
+	this.container.find('tr.profileHideRowIfEmpty').each(function(index, row){
+		var tds = jQuery(row).children('td.profileHideRowIfEmpty');
+		if (tds.length == tds.filter(':empty').length)
+		{
+			jQuery(row).hide();
+		}
+	});
+};
+/**
+ * toggle between best results and all results
+ */
+Profile.prototype.toggleResults = function()
+{
+	var hidden_rows = this.container.find('tr.profileResultHidden');
+	var display = hidden_rows.length ? jQuery(hidden_rows[0]).css('display') : 'none';
+	hidden_rows.css('display', display == 'none' ? 'table-row' : 'none');
 };
 
 /**

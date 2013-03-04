@@ -1218,6 +1218,10 @@ class ranking_export extends boresult
 	 * Cache and expires time for historic (not in ranking and not last_comp more then one year ago) athlete profiles
 	 */
 	const EXPORT_PROFILE_HISTORIC_EXPIRES = 86400;
+	/**
+	 * Time without any profile change or result to consider profile historic
+	 */
+	const EXPORT_PROFILE_HISTORIC_TIME = 31536000;	// 31536000s=1y
 
 	/**
 	 * Home many weights to provide to limit results to this number of competitions
@@ -1239,10 +1243,11 @@ class ranking_export extends boresult
 		{
 			return $data;
 		}
-		if (!($athlete = $this->athlete->read($athlete)))
+		if (!($athlete = $this->athlete->read($athlete, array('fed_url'))))
 		{
 			throw new Exception(lang('Athlete NOT found !!!'));
 		}
+		//_debug_array($athlete); exit;
 
 		$data = self::rename_key($athlete, self::$rename_athlete, true);
 		// athlete requested not to show his profile
@@ -1285,18 +1290,15 @@ class ranking_export extends boresult
 						$ranking = $this->export_ranking($cat, $date, $cup['SerId'], true);
 						foreach($ranking['participants'] as $participant)
 						{
-							if ($participant['PerId'] == $athlete['PerId'])
-							{
-								$data['rankings'][] = array(
-									'rank' => $participant['result_rank'],
-									'name' => $cup ? $cup['name'] : ($cat['nation'] ? lang('Ranking') : 'Worldranking'),
-									'SerId' => $cup['SerId'],
-									'url' => self::ranking_url($cat['GrpId'], $cup ? $cup['SerId'] : null),
-									'date' => $ranking['end'],
-								);
-								break;
-							}
+							if ($participant['PerId'] == $athlete['PerId']) break;
 						}
+						$data['rankings'][] = array(
+							'rank' => $participant['PerId'] == $athlete['PerId'] ? $participant['result_rank'] : '',
+							'name' => $cup ? $cup['name'] : ($cat['nation'] ? lang('Ranking') : 'Worldranking'),
+							'SerId' => $cup['SerId'],
+							'url' => self::ranking_url($cat['GrpId'], $cup ? $cup['SerId'] : null),
+							'date' => $ranking['end'],
+						);
 					}
 
 				}
@@ -1314,7 +1316,7 @@ class ranking_export extends boresult
 					{
 						$last_modified = $ts;
 					}
-					/* can be done easyly on clientside
+					/* done on clientside
 					$weight = $result['platz']/2 + ($year-$result['datum']) + 4*!empty($result['nation']);
 					// maintain array of N best competitions (least weight)
 					if (count($limits) < self::WEIGHT_LIMITS || $weight < $limits[count($limits)-1])
