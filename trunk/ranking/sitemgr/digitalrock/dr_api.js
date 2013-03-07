@@ -940,7 +940,7 @@ Competitions.prototype.handleResponse = function(_data)
 		comp_div.append(jQuery(document.createElement('div')).addClass('date').text(competition.date_span));
 		var cats_ul = jQuery(document.createElement('ul')).addClass('cats');
 		var have_cats = false;
-		var links = { 'info': 'Information', 'startlist': 'Startlist', 'result': 'Result' };
+		var links = { 'homepage': 'Event Website', 'info': 'Information', 'startlist': 'Startlist', 'result': 'Result' };
 		for(var c=0; c < competition.cats.length; ++c)
 		{
 			var cat = competition.cats[c];
@@ -985,6 +985,7 @@ Competitions.prototype.handleResponse = function(_data)
 			if (typeof competition[l] == 'undefined') continue;
 			var a = jQuery(document.createElement('a'));
 			a.attr('href', competition[l]);
+			if (l != 'starters') a.attr('target', '_blank');
 			a.text(links[l]);
 			links_ul.append(jQuery(document.createElement('li')).append(a));
 			have_links = true;
