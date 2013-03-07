@@ -672,7 +672,6 @@ class ranking_export extends boresult
 		}
 
 		$where = self::process_filter($filter);
-		$where[] = 'datum LIKE '.$this->db->quote((int)$year.'%');
 
 		if (!is_array($nations)) $nations = explode(',',$nations);
 		if (($key = array_search('',$nations)) !== false)
@@ -685,6 +684,14 @@ class ranking_export extends boresult
 			$sql = '('.($sql ? $sql.' OR ' : '').$this->db->expression($this->comp->table_name,array('nation'=>$nations)).')';
 		}
 		$where[] = $sql;
+
+		// get available years using given calendar filter
+		$years = array();
+		foreach($this->comp->search(null,"DISTINCT DATE_FORMAT(datum,'%Y') AS year",'datum DESC','','','','AND',false,$where) as $data)
+		{
+			$years[] = $data['year'];
+		}
+		$where[] = 'datum LIKE '.$this->db->quote((int)$year.'%');
 
 		//error_log(__METHOD__."('$nation', $year, ".array2string($filter).') --> where='.array2string($where));
 		$competitions = $this->comp->search(null,false,'datum ASC','','','','AND',false,$where);
@@ -773,6 +780,7 @@ class ranking_export extends boresult
 			'competitions' => $competitions,
 			'cats' => $cats,
 			'cups' => $cups,
+			'years' => $years,
 		);
 		$data['expires'] = $year < date('Y') ? self::EXPORT_CALENDAR_OLD_TTL : self::EXPORT_CALENDAR_TTL;
 		$data['etag'] = md5(serialize($data));
