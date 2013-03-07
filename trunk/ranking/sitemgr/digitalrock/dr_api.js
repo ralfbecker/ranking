@@ -223,16 +223,24 @@ function Startlist(_container,_json_url)
  */
 Startlist.prototype.update = function()
 {
+	// remove our own parameters and current year from json url to improve caching
+	var url = this.json_url.replace(/(detail|beamer|rotate|toc)=[^&]*(&|$)/, '')
+		.replace(new RegExp('year='+(new Date).getFullYear()+'(&|$)'), '').replace(/&$/, '');
+	
+	// update location hash, to reflect current page-content
+	document.location.hash = url.indexOf('?') == -1 ? '!' : '!'+url.replace(/^.*\?/, '');
+	
 	jQuery.ajax({
-		// remove our own parameter from json url to improve caching
-		url: this.json_url.replace(/(detail|beamer|rotate|toc)=[^&]*(&|$)/, '').replace(/&$/, ''),
+		url: url,
 		async: true,
 		context: this,
 		data: '',
-		dataType: this.json_url[0] == '/' ? 'json' : 'jsonp',
+		dataType: this.json_url.indexOf('//') == -1 ? 'json' : 'jsonp',
 		type: 'GET', 
 		success: this.handleResponse,
-		error: function(_xmlhttp,_err) { if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err); }
+		error: function(_xmlhttp,_err) { 
+			if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err); 
+		}
 	});
 };
 
@@ -854,6 +862,163 @@ Profile.prototype.toggleResults = function()
 	var hidden_rows = this.container.find('tr.profileResultHidden');
 	var display = hidden_rows.length ? jQuery(hidden_rows[0]).css('display') : 'none';
 	hidden_rows.css('display', display == 'none' ? 'table-row' : 'none');
+};
+
+/**
+ * Constructor calendar from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ * @param _filters object 
+ */
+function Competitions(_container,_json_url,_filters)
+{
+	this.json_url = _json_url;
+	if (typeof _container == "string") _container = document.getElementById(_container);
+	this.container = jQuery(_container);
+	this.container.addClass('Calendar');
+	if (typeof _filters != 'undefined') this.filters = _filters;
+	this.year_regexp = /([&?])year=(\d+)/;
+	
+	this.update();
+}
+Competitions.prototype.update = Startlist.prototype.update;
+/**
+ * Callback for loading data via ajax
+ * 
+ * @param _data route data object
+ */            
+Competitions.prototype.handleResponse = function(_data)
+{
+	this.container.empty();
+
+	var year = this.json_url.match(this.year_regexp);
+	year = year ? parseInt(year[2]) : (new Date).getFullYear();
+	var h1 = jQuery(document.createElement('h1')).text('Calendar '+year);
+	this.container.append(h1);
+	
+	var filter = jQuery(document.createElement('div')).addClass('filter');
+	var select = jQuery(document.createElement('select')).attr('name', 'year');
+	var years = _data.years || [year+1, year, year-1];
+	for(var i=0; i < years.length; ++i)
+	{
+		var y = years[i];
+		var option = jQuery(document.createElement('option')).attr('value', y);
+		option.text(y);
+		if (year == y) option.attr('selected', 'selected');
+		select.append(option);
+	}
+	var that=this;
+	select.change(function(e) {
+		that.changeYear(this.value);
+	});
+	select.attr('style', 'margin-right: 5px');
+	filter.append(select);
+
+	select = jQuery(document.createElement('select')).attr('name', 'filter');
+	for(var f in this.filters)
+	{
+		var option = jQuery(document.createElement('option')).attr('value', this.filters[f]);
+		option.text(f);
+		if (this.json_url.indexOf(this.filters[f]) != -1) option.attr('selected', 'selected');
+		select.append(option);
+	}
+	select.change(function(e) {
+		that.changeFilter(this.value);
+	});
+	filter.append(select);
+	this.container.append(filter);
+	
+	for(var i=0; i < _data.competitions.length; ++i)
+	{
+		var competition = _data.competitions[i];
+		
+		var comp_div = jQuery(document.createElement('div')).addClass('competition');
+		comp_div.append(jQuery(document.createElement('div')).addClass('title').text(competition.name));
+		comp_div.append(jQuery(document.createElement('div')).addClass('date').text(competition.date_span));
+		var cats_ul = jQuery(document.createElement('ul')).addClass('cats');
+		var have_cats = false;
+		var links = { 'info': 'Information', 'startlist': 'Startlist', 'result': 'Result' };
+		for(var c=0; c < competition.cats.length; ++c)
+		{
+			var cat = competition.cats[c];
+			var url = '';
+			if (typeof cat.status != 'undefined')
+			{
+				switch(cat.status)
+				{
+					case 4:	// registration
+						links.starters = 'Starters';
+						competition.starters = '#starters';
+						break;
+					case 2:	// startlist in result-service
+						url = '#startlist';
+						break;
+					case 1:
+						url = '#resultlist';
+						break;
+					case 0:
+						url = '#ranking';
+						break;
+				}
+			}
+			var cat_li = jQuery(document.createElement('li'));
+			if (url != '')
+			{
+				var a = jQuery(document.createElement('a')).attr('href', url);
+				a.text(cat.name);
+				cat_li.append(a);
+			}
+			else
+			{
+				cat_li.text(cat.name);
+			}
+			cats_ul.append(cat_li);
+			have_cats = true;
+		}
+		var links_ul = jQuery(document.createElement('ul')).addClass('links');
+		var have_links = false;
+		for(var l in links)
+		{
+			if (typeof competition[l] == 'undefined') continue;
+			var a = jQuery(document.createElement('a'));
+			a.attr('href', competition[l]);
+			a.text(links[l]);
+			links_ul.append(jQuery(document.createElement('li')).append(a));
+			have_links = true;
+		}
+		if (have_links) comp_div.append(links_ul);
+		if (have_cats) comp_div.append(cats_ul);
+		this.container.append(comp_div);
+	}
+};
+Competitions.prototype.changeYear = function(year)
+{
+	if (this.json_url.match(this.year_regexp))
+	{
+		this.json_url = this.json_url.replace(this.year_regexp, '$1year='+year);
+	}
+	else
+	{
+		this.json_url += this.json_url.indexOf('?') == -1 ? '?' : '&';
+		this.json_url += 'year='+year;
+	}
+	this.update();
+};
+Competitions.prototype.changeFilter = function(filter)
+{
+	if (this.json_url.indexOf('?') == -1)
+	{
+		this.json_url += '?'+filter;
+	}
+	else
+	{
+		var year = this.json_url.match(this.year_regexp);
+		this.json_url = this.json_url.replace(/\?.*$/, '?'+(year && year[2] ? 'year='+year[2]+'&' : '')+filter);
+	}
+	this.update();
 };
 
 /**
