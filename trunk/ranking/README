@@ -176,6 +176,7 @@ Meaning of competition values:
 - info: url to info pdf
 - result: url to result as pdf, if one got uploaded
 - startlist: url to startlist as pdf, if one got uploaded
+- years: array of year's for which a calendar is available
 
 Ranking data via XML or JSON
 ============================
