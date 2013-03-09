@@ -19,6 +19,8 @@
  * Example https://rb66.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?comp=1395&beamer=1&cat=1&route=0&rotate=w=1395,c=1,r=0:w=1396,c=1,r=0
  * 
  * The interesting part here is rotate=w=1395,c=1,r=0:w=1396,c=1,r=0
+ * 
+ * @link https://developers.google.com/webmasters/ajax-crawling/
  */
  
 /**
@@ -38,8 +40,7 @@ function Resultlist(_container,_json_url)
 	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
 
 	Startlist.apply(this, [_container,_json_url]);
-	this.container.removeClass('Startlist');
-	this.container.addClass('Resultlist');
+	this.container.attr('class', 'Resultlist');
 }
 
 /**
@@ -94,7 +95,15 @@ Resultlist.prototype.handleResponse = function(_data)
 				'points': 'Points',
 				'result' : 'Result'
 			};
-			if (!detail || detail[1] == '0') delete this.result_cols.result;
+			if (!detail || detail[1] == '0') 
+			{
+				delete this.result_cols.result;
+				// allow to click on points to show single results
+				this.result_cols.points = {
+					label: this.result_cols.points,
+					url: location.href+'&detail=1'
+				};
+			}
 			break;
 
 		default:
@@ -124,7 +133,7 @@ Resultlist.prototype.handleResponse = function(_data)
 			}
 			break;
 	}
-	Startlist.prototype.handleResponse.apply(this, [_data]);
+	Startlist.prototype.handleResponse.call(this, _data);
 };
 
 /**
@@ -185,9 +194,8 @@ Resultlist.prototype.getBoulderResult = function(_data,_tag)
 function Startlist(_container,_json_url)
 {
 	this.json_url = _json_url;
-	if (typeof _container == "string") _container = document.getElementById(_container);
-	this.container = jQuery(_container);
-	this.container.addClass('Startlist');
+	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
+	this.container.attr('class', 'Startlist');
 	
 	// Variables needed for scrolling in upDown
 	// scroll speed
@@ -227,15 +235,14 @@ Startlist.prototype.update = function()
 	var url = this.json_url.replace(/(detail|beamer|rotate|toc)=[^&]*(&|$)/, '')
 		.replace(new RegExp('year='+(new Date).getFullYear()+'(&|$)'), '').replace(/&$/, '');
 	
-	// update location hash, to reflect current page-content
-	document.location.hash = url.indexOf('?') == -1 ? '!' : '!'+url.replace(/^.*\?/, '');
-	
 	jQuery.ajax({
 		url: url,
 		async: true,
 		context: this,
 		data: '',
 		dataType: this.json_url.indexOf('//') == -1 ? 'json' : 'jsonp',
+		jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not chachable by CDN
+		cache: true,
 		type: 'GET', 
 		success: this.handleResponse,
 		error: function(_xmlhttp,_err) { 
@@ -340,7 +347,6 @@ Startlist.prototype.handleResponse = function(_data)
 			}
 		}
 	}
-	//console.log(this);
 
 	// remove whole table, if discipline or startlist/resultlist (detemined by sort) changed
 	if (this.discipline && this.discipline != _data.discipline ||
@@ -398,7 +404,7 @@ Startlist.prototype.handleResponse = function(_data)
 		jQuery(this.container).append(this.header);
 		this.header.addClass('listHeader');
 		
-		if (!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/))
+		if (!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/) && this.discipline != 'ranking')
 		{
 			var toc = jQuery(document.createElement('ul'));
 			jQuery(this.container).append(toc);
@@ -410,15 +416,24 @@ Startlist.prototype.handleResponse = function(_data)
 				{
 					var a = jQuery(document.createElement('a'));
 					a.text(_data.route_names[r]);
-					var url = this.json_url.replace(/route=[^&]+/, 'route='+r);
+					var reg_exp = /route=[^&]+/;
+					var url = location.href.replace(reg_exp, 'route='+r);
 					if (url.indexOf('route=') == -1) url += '&route='+r;
 					a.attr('href', url);
-					var that = this;
-					a.click(function(e){
-						that.json_url = that.json_url.replace(/\?.*/, this.href.match(/\?.*/)[0]);
-						that.update();
-						e.preventDefault();
-					});
+					if (this.navigateTo)
+					{
+						a.click(this.navigateTo);
+					}
+					else
+					{
+						var that = this;
+						a.click(function(e){
+							that.json_url = that.json_url.replace(reg_exp, this.href.match(reg_exp)[0]);
+							if (that.json_url.indexOf('route=') == -1) that.json_url += '&route='+r;
+							that.update();
+							e.preventDefault();
+						});
+					}
 					li.append(a);
 				}
 				else
@@ -429,7 +444,7 @@ Startlist.prototype.handleResponse = function(_data)
 			}
 		}
 		// create new table
-		this.table = new DrTable(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null);
+		this.table = new DrTable(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null,this.navigateTo);
 	
 		jQuery(this.container).append(this.table.dom);
 	}
@@ -486,9 +501,8 @@ Startlist.prototype.setHeader = function(_data)
 function Results(_container,_json_url)
 {
 	this.json_url = _json_url;
-	if (typeof _container == "string") _container = document.getElementById(_container);
-	this.container = jQuery(_container);
-	this.container.addClass('Results');
+	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
+	this.container.attr('class', 'Results');
 	
 	this.update();
 }
@@ -547,7 +561,7 @@ Results.prototype.handleResponse = function(_data)
 	}
 	
 	// create new table
-	this.table = new DrTable(_data.categorys,this.columns,'result_rank');
+	this.table = new DrTable(_data.categorys,this.columns,'result_rank',true,null,this.navigateTo);
 
 	this.container.append(this.table.dom);
 };
@@ -575,9 +589,8 @@ Results.prototype.showCompleteResult = function(e)
 function Starters(_container,_json_url)
 {
 	this.json_url = _json_url;
-	if (typeof _container == "string") _container = document.getElementById(_container);
-	this.container = jQuery(_container);
-	this.container.addClass('Starters');
+	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
+	this.container.attr('class', 'Starters');
 	
 	this.update();
 }
@@ -731,16 +744,16 @@ Starters.prototype.federation = function(_fed_id)
  * 
  * Table get appended to specified _container
  * 
- * @param _container
+ * @param _container id or dom node
  * @param _json_url url for data to load
+ * @param _template optional id or dome node, default _container
  */
-function Profile(_container,_json_url)
+function Profile(_container,_json_url,_template)
 {
 	this.json_url = _json_url;
-	if (typeof _container == "string") _container = document.getElementById(_container);
-	this.container = jQuery(_container);
-	this.container.addClass('Profile');
-	this.template = this.container.html();
+	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
+	this.container.attr('class', 'Profile');
+	this.template = jQuery(_template || this.container).html();
 	this.container.empty();
 	
 	this.bestResults = 12;
@@ -853,6 +866,8 @@ Profile.prototype.handleResponse = function(_data)
 			jQuery(row).hide();
 		}
 	});
+	// install click handler from DrWidget
+	if (this.navigateTo) this.container.find('.profileData a').click(this.navigateTo);
 };
 /**
  * toggle between best results and all results
@@ -878,7 +893,7 @@ function Competitions(_container,_json_url,_filters)
 	this.json_url = _json_url;
 	if (typeof _container == "string") _container = document.getElementById(_container);
 	this.container = jQuery(_container);
-	this.container.addClass('Calendar');
+	this.container.attr('class', 'Calendar');
 	if (typeof _filters != 'undefined') this.filters = _filters;
 	this.year_regexp = /([&?])year=(\d+)/;
 	
@@ -917,18 +932,21 @@ Competitions.prototype.handleResponse = function(_data)
 	select.attr('style', 'margin-right: 5px');
 	filter.append(select);
 
-	select = jQuery(document.createElement('select')).attr('name', 'filter');
-	for(var f in this.filters)
+	if (typeof this.filters != 'undefied')
 	{
-		var option = jQuery(document.createElement('option')).attr('value', this.filters[f]);
-		option.text(f);
-		if (this.json_url.indexOf(this.filters[f]) != -1) option.attr('selected', 'selected');
-		select.append(option);
+		select = jQuery(document.createElement('select')).attr('name', 'filter');
+		for(var f in this.filters)
+		{
+			var option = jQuery(document.createElement('option')).attr('value', this.filters[f]);
+			option.text(f);
+			if (this.json_url.indexOf(this.filters[f]) != -1) option.attr('selected', 'selected');
+			select.append(option);
+		}
+		select.change(function(e) {
+			that.changeFilter(this.value);
+		});
+		filter.append(select);
 	}
-	select.change(function(e) {
-		that.changeFilter(this.value);
-	});
-	filter.append(select);
 	this.container.append(filter);
 	
 	for(var i=0; i < _data.competitions.length; ++i)
@@ -941,6 +959,7 @@ Competitions.prototype.handleResponse = function(_data)
 		var cats_ul = jQuery(document.createElement('ul')).addClass('cats');
 		var have_cats = false;
 		var links = { 'homepage': 'Event Website', 'info': 'Information', 'startlist': 'Startlist', 'result': 'Result' };
+		if (typeof competition.cats == 'undefined') competition.cats = [];
 		for(var c=0; c < competition.cats.length; ++c)
 		{
 			var cat = competition.cats[c];
@@ -951,16 +970,12 @@ Competitions.prototype.handleResponse = function(_data)
 				{
 					case 4:	// registration
 						links.starters = 'Starters';
-						competition.starters = '#starters';
+						competition.starters = '#!type=starters&comp='+competition.WetId;
 						break;
 					case 2:	// startlist in result-service
-						url = '#startlist';
-						break;
-					case 1:
-						url = '#resultlist';
-						break;
-					case 0:
-						url = '#ranking';
+					case 1:	// result in result-service
+					case 0:	// result in ranking (ToDo: need extra export, as it might not be in result-service)
+						url = '#!comp='+competition.WetId+'&cat='+cat.GrpId;
 						break;
 				}
 			}
@@ -969,6 +984,7 @@ Competitions.prototype.handleResponse = function(_data)
 			{
 				var a = jQuery(document.createElement('a')).attr('href', url);
 				a.text(cat.name);
+				if (this.navigateTo) a.click(this.navigateTo);
 				cat_li.append(a);
 			}
 			else
@@ -982,10 +998,13 @@ Competitions.prototype.handleResponse = function(_data)
 		var have_links = false;
 		for(var l in links)
 		{
-			if (typeof competition[l] == 'undefined') continue;
+			if (typeof competition[l] == 'undefined' || competition[l] === null) continue;
 			var a = jQuery(document.createElement('a'));
 			a.attr('href', competition[l]);
-			if (l != 'starters') a.attr('target', '_blank');
+			if (l != 'starters') 
+				a.attr('target', '_blank');
+			else if (this.navigateTo)
+				a.click(this.navigateTo);
 			a.text(links[l]);
 			links_ul.append(jQuery(document.createElement('li')).append(a));
 			have_links = true;
@@ -1003,10 +1022,18 @@ Competitions.prototype.changeYear = function(year)
 	}
 	else
 	{
-		this.json_url += this.json_url.indexOf('?') == -1 ? '?' : '&';
+		if (this.json_url.substr(-1) != '?')
+			this.json_url += this.json_url.indexOf('?') == -1 ? '?' : '&';
 		this.json_url += 'year='+year;
 	}
-	this.update();
+	if (this.navigateTo)
+	{
+		this.navigateTo(this.json_url);
+	}
+	else
+	{
+		this.update();
+	}
 };
 Competitions.prototype.changeFilter = function(filter)
 {
@@ -1019,7 +1046,124 @@ Competitions.prototype.changeFilter = function(filter)
 		var year = this.json_url.match(this.year_regexp);
 		this.json_url = this.json_url.replace(/\?.*$/, '?'+(year && year[2] ? 'year='+year[2]+'&' : '')+filter);
 	}
-	this.update();
+	if (this.navigateTo)
+	{
+		this.navigateTo(this.json_url);
+	}
+	else
+	{
+		this.update();
+	}
+};
+
+/**
+ * call appropriate widget to display data specified by _json_url or location
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ * @param _arg3 object with widget specific 3. argument, eg. { Competitions: {filters}, Profile: 'template-id' }
+ */
+function DrWidget(_container,_json_url,_arg3)
+{
+	if (typeof _container == "string") _container = document.getElementById(_container);
+	this.container = jQuery(_container);
+	this.json_url = _json_url;
+	this.arg3 = _arg3 || {};
+	
+	var matches = this.json_url.match(/\?.*$/);
+	this.update(matches ? matches[0] : null);
+
+	// add popstate or hashchange (IE8,9) event listener, to use browser back button for navigation
+	// some browsers, eg. Chrome, generate a pop on inital page-load
+	// to prevent loading page initially twice, we store initial location
+	this.prevent_initial_pop = location.href;
+	var that = this;
+	jQuery(window).bind(window.history.pushState ? "popstate" : "hashchange", function(e) {
+		if (!that.prevent_initial_pop || that.prevent_initial_pop != location.href)
+		{
+			that.update(location.hash || location.search);
+		}
+		delete that.prevent_initial_pop;
+	});
+	}
+/**
+ * Navigate to a certain result-page
+ * 
+ * @param _params default if not specified first location.hash then location.search
+ */
+DrWidget.prototype.navigateTo = function(_params)
+{
+	delete this.prevent_initial_pop;
+	var params = '!'+_params.replace(/^.*(#!|#|\?)/, '');
+	
+	// update location hash, to reflect current page-content
+	if (document.location.hash != '#'+params) document.location.hash = params;
+};
+DrWidget.prototype.update = function(_params)
+{
+	var params = _params || location.hash || location.search;
+	params = params.replace(/^.*(#!|#|\?)/, '');
+
+	this.json_url = this.json_url.replace(/\?.*$/, '')+'?'+params;
+	
+	// check which widget is needed to render requested content
+	function hasParam(_param, _value)
+	{
+		if (typeof _value == 'undefined') _value = '';
+		return params.indexOf(_param+'='+_value) != -1;
+	}
+	var widget;
+	if (hasParam('person'))
+	{
+		widget = 'Profile';
+	}
+	else if (hasParam('cat') && !hasParam('comp'))
+	{
+		widget = 'Resultlist';	// ranking uses Resultlist!
+	}
+	else if (hasParam('nation') || !hasParam('comp'))
+	{
+		widget = 'Competitions';
+	}
+	else if (hasParam('comp') && hasParam('type', 'starters'))
+	{
+		widget = 'Starters';
+	}
+	else if (hasParam('comp') && !hasParam('cat') || hasParam('filter'))
+	{
+		widget = 'Results';
+	}
+	else
+	{
+		widget = 'Resultlist';
+	}
+	// check if widget is currently instancated and only need to update or need to be instancated
+	if (typeof this.widget == 'undefined' || this.widget.constructor != window[widget])
+	{
+		this.container.html('');	// following .empty() does NOT work in IE8 Grrrr
+		this.container.empty();
+		// do a new of objects whos name is stored in widget
+		this.widget = Object.create(window[widget].prototype);
+		// Object.create, does NOT call constructor, so do it now manually
+		window[widget].call(this.widget, this.container, this.json_url, this.arg3[widget]);
+		var that = this;
+		this.widget.navigateTo = function(e) {
+			if (typeof e == 'string')
+			{
+				that.navigateTo(e);
+			}
+			else
+			{
+				that.navigateTo(this.href);
+				e.preventDefault();
+			}
+		};
+	}
+	else
+	{
+		this.widget.json_url = this.json_url;
+		this.widget.update();
+	}
 };
 
 /**
@@ -1032,8 +1176,9 @@ Competitions.prototype.changeFilter = function(filter)
  * @param _sort column name to sort by
  * @param _ascending
  * @param _quota quota if quota line should be drawn in result
+ * @param _navigateTo click method for profiles
  */
-function DrTable(_data,_columns,_sort,_ascending,_quota)
+function DrTable(_data,_columns,_sort,_ascending,_quota,_navigateTo)
 {
 	this.data      = _data;
 	this.columns   = _columns;
@@ -1042,6 +1187,7 @@ function DrTable(_data,_columns,_sort,_ascending,_quota)
 	if (typeof _ascending == 'undefined') _ascending = true;
 	this.ascending = _ascending;
 	this.quota = _quota;
+	this.navigateTo = _navigateTo;
 	// hash with PerId => tr containing athlete
 	this.athletes = {};
 	
@@ -1081,7 +1227,7 @@ function DrTable(_data,_columns,_sort,_ascending,_quota)
 					var a = jQuery(document.createElement('a'));
 					a.attr('href', data.url);
 					a.text('complete result');
-					if (typeof data.click != 'undefined') a.click(data.click);
+					if (this.navigateTo || typeof data.click != 'undefined') a.click(this.navigateTo || data.click);
 					th.append(a);
 				}
 				jQuery(row).append(th);
@@ -1243,6 +1389,7 @@ DrTable.prototype.createRow = function(_data,_tag)
 			var a = document.createElement('a');
 			a.href = url;
 			a.target = 'pstambl';
+			if (this.navigateTo) jQuery(a).click(this.navigateTo);
 			jQuery(tag).append(a);
 			tag = a;
 		}
@@ -1262,8 +1409,16 @@ DrTable.prototype.createRow = function(_data,_tag)
 			}
 			else
 			{
-				if (col_data['colspan'] > 1) tag.colSpan = span = col_data['colspan'];
-				jQuery(tag).text(col_data['label']);
+				if (col_data.colspan > 1) tag.colSpan = span = col_data.colspan;
+				if (col_data.url)
+				{
+					var a = document.createElement('a');
+					a.href = col_data.url;
+					if (this.navigateTo) jQuery(a).click(this.navigateTo);
+					jQuery(tag).append(a);
+					tag = a;
+				}
+				jQuery(tag).text(col_data.label);
 			}
 		}
 		else
@@ -1322,9 +1477,7 @@ function sortStartOrder(_a, _b)
 /**
  * Callback for sort by 'platz' attribute and then 'name' and 'vorname'
  * 
- * Currently not used, as server returns data already sorted this way
- * AND our implementation does NOT work in webkit browsers, because
- * wie return boolean for sort by alphabet
+ * Currently not used, as server returns data already sorted this way.
  *
  * @param _a first object to compare
  * @param _b second object to compare
@@ -1338,8 +1491,8 @@ function sortResultRank(_a, _b)
 	if (typeof rank_b == 'undefined' || rank_b < 1) rank_b = 9999;
 	var ret = rank_a - rank_b;
 	
-	if (!ret) ret = _a['lastname'] > _b['lastname'];
-	if (!ret) ret = _a['firstname'] > _b['firstname'];
+	if (!ret) ret = _a['lastname'] > _b['lastname'] ? 1 : -1;
+	if (!ret) ret = _a['firstname'] > _b['firstname'] ? 1 : -1;
 	
 	return ret;
 }
@@ -1542,9 +1695,21 @@ function replace_attribute(obj, from, to, value)
 	}
 }
 
+/**
+ * Some compatibilty functions to cope with older javascript implementations
+ */
 if(!Array.isArray)
 {
 	Array.isArray = function (vArg) {
 		return Object.prototype.toString.call(vArg) === "[object Array]";
 	};
+}
+
+if(!Object.create)
+{
+    Object.create = function(o) {
+        function F(){}
+        F.prototype=o;
+        return new F();
+    };
 }
