@@ -70,7 +70,28 @@ else
 	header('Content-Type: text/html; charset='.$encoding);
 }
 
-$json = json_encode($result);
+/**
+ * Remove all empty (null or "") values from an array
+ *
+ * @param array $arr
+ * @return array
+ */
+function remove_empty(array $arr)
+{
+	foreach($arr as $key => &$val)
+	{
+		if (is_array($val))
+		{
+			$val = remove_empty($val);
+		}
+		elseif ((string)$val === '')
+		{
+			unset($arr[$key]);
+		}
+	}
+	return $arr;
+}
+$json = json_encode(remove_empty($result));
 
 if (isset($_GET['debug']) && $_GET['debug'])
 {
