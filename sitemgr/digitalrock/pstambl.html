@@ -10,52 +10,56 @@
 <body>
 <div id="profile">
 <table class="profileHeader">
- <tr>
-  <td class="profilePhoto"><img src="$$photo$$" border="0"></td>  
-  <td>
+ <thead>
+  <tr>
+   <td class="profilePhoto"><img src="$$photo$$" border="0"></td>  
+   <td>
   	<h1><a href="$$homepage$$" target="_blank">
 	  <span class="firstname">$$firstname$$</span>
 	  <span class="lastname">$$lastname$$</span>
   	</a></h1>
     <h2 class="profileNation">$$nation$$</h1>
     <h3 class="profileFederation"><a href="$$fed_url$$" target="_blank">$$federation$$</a></h1>
-  </td>
-  <td class="profileLogo"><a href="http://www.digitalROCK.de" target=_blank><img src="http://www.digitalrock.de/dig_rock.klein.jpg" title="digital ROCK's Homepage" /></a></td>
- </tr>
+   </td>
+   <td class="profileLogo"><a href="http://www.digitalROCK.de" target=_blank><img src="http://www.digitalrock.de/dig_rock-155x100.png" title="digital ROCK's Homepage" /></a></td>
+  </tr>
+ </thead>
 </table>
 <table cols="6" class="profileData">
+  <thead>
 	<tr>
 		<td>age:</td>
 		<td class="profileAge">$$age$$</td>
 		<td>date of birth:</td>
-		<td class="profileBirthdate">$$birthdate$$</td>
+		<td colspan="3" class="profileBirthdate">$$birthdate$$</td>
 	</tr>
 	<tr class="profileHideRowIfEmpty">
+		<td colspan="2"></td>
 		<td>place of birth:</td>
-		<td class="profileBirthplace profileHideRowIfEmpty">$$birthplace$$</td>
+		<td colspan="3" class="profileBirthplace profileHideRowIfEmpty">$$birthplace$$</td>
 	</tr>
 	<tr class="profileHideRowIfEmpty">
 		<td>height:</td>
 		<td class="profileHeight profileHideRowIfEmpty">$$height$$</td>
 		<td>weight:</td>
-		<td class="profileWeight profileHideRowIfEmpty">$$weight$$</td>
+		<td colspan="3" class="profileWeight profileHideRowIfEmpty">$$weight$$</td>
 	</tr>
 	<tr class="profileMarginTop profileHideRowIfEmpty">
 		<td>address:</td>
 		<td colspan="2" class="profileCity profileHideRowIfEmpty">$$postcode$$ $$city$$</td>
-		<td colspan="2" class="profileStreet profileHideRowIfEmpty">$$street$$</td>
+		<td colspan="3" class="profileStreet profileHideRowIfEmpty">$$street$$</td>
 	</tr>
 	<tr class="profileMarginTop profileHideRowIfEmpty">
-		<td colspan="3">practicing climbing for:</td>
-		<td colspan="3" class="profilePractice profileHideRowIfEmpty">$$practice$$</td>
+		<td colspan="2">practicing climbing for:</td>
+		<td colspan="4" class="profilePractice profileHideRowIfEmpty">$$practice$$</td>
 	</tr>
 	<tr class="profileHideRowIfEmpty">
-		<td colspan="3">professional climber (if not, profession):</td>
-		<td colspan="3" class="profileProfessional profileHideRowIfEmpty">$$professional$$</td>
+		<td colspan="2">professional climber (if not, profession):</td>
+		<td colspan="4" class="profileProfessional profileHideRowIfEmpty">$$professional$$</td>
 	</tr>
 	<tr class="profileHideRowIfEmpty">
-		<td colspan="3">other sports practiced:</td>
-		<td colspan="3" class="profileOtherSports profileHideRowIfEmpty">$$other_sports$$</td>
+		<td colspan="2">other sports practiced:</td>
+		<td colspan="4" class="profileOtherSports profileHideRowIfEmpty">$$other_sports$$</td>
 	</tr>
 	<tr class="profileMarginTop profileHideRowIfEmpty">
 		<td colspan="6" class="profileFreetext profileHideRowIfEmpty">$$freetext$$</td>
@@ -75,11 +79,14 @@
 	<tr class="profileResultHeader profileMarginTop">
 		<td colspan="6"><a href="javascript:profile.toggleResults()" title="show all results">best results:</a></td>
 	</tr>
+   </thead>
+   <tbody>
 	<tr class="profileResult $$results/N/weightClass$$">
 		<td class="profileResultRank">$$results/N/rank$$</td>
 		<td colspan="4" class="profileResultName"><a href="$$results/N/url$$">$$results/N/cat_name+name$$</a></td>
 		<td class="profileResultDate">$$results/N/date$$</td>
 	</tr>
+  </tbody>
 </table>
 </div>
 <script type="text/javascript">
