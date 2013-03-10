@@ -1314,7 +1314,10 @@ class ranking_export extends boresult
 
 			$last_modified = egw_time::to($athlete['modified'], 'ts');
 			// fetch results and calculate their weight, to allow clients to easyly show N best competitions
-			if (($results = $this->result->read(array('PerId' => $athlete['PerId']))))
+			if (($results = $this->result->read(array(
+				'PerId' => $athlete['PerId'],
+				'platz > 0',
+			))))
 			{
 				$year = (int)date('Y');
 				$limits = array();
