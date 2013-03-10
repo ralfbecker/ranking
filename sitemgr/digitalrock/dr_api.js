@@ -867,7 +867,7 @@ Profile.prototype.handleResponse = function(_data)
 		}
 	});
 	// install click handler from DrWidget
-	if (this.navigateTo) this.container.find('.profileData a:not([href]^="javascript:")').click(this.navigateTo);
+	if (this.navigateTo) this.container.find('.profileData a:not(a[href^="javascript:"])').click(this.navigateTo);
 };
 /**
  * toggle between best results and all results
