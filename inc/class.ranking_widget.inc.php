@@ -319,7 +319,11 @@ function change_filter(form, value)
 			{
 				if (!empty($competition[$link]))
 				{
-					$links .= $this->tag('li', $this->tag('a', $label, array('href' => $competition[$link])), array(), false);
+					$links .= $this->tag('li', $this->tag('a', $label, array(
+						'href' => $competition[$link],
+					)+($link != 'starters' ? array(
+						'target' => '_blank',
+					):array())), array(), false);
 				}
 			}
 			if ($links) $comp .= $this->tag('ul', $links, array('class' => 'links'), false);
