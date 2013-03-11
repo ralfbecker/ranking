@@ -217,7 +217,24 @@ class ranking_widget
 
 		$title = $this->lang('Calendar').' '.$year;
 		$content = $this->tag('h1', $title);
-
+$content .= '<script>
+function change_filter(form, value)
+{
+	// unfortunately modifying form.action does NOT work :-(
+	//form.action=form.action.replace(/(#|\\?).*$/, "?"+value);
+	var parts = value.split("&");
+	for(var i=0; i < parts.length; ++i)
+	{
+		var name_val = parts[i].split("=", 2);
+		var hidden = document.createElement("input");
+		hidden.name = name_val[0];
+		hidden.type = "hidden";
+		hidden.value = name_val[1];
+		jQuery(form).append(hidden);
+	}
+	form.submit();
+}
+</script>';
 		if (!isset($data['years']) || !is_array($data['years']))
 		{
 			$data['years'] = array($year+1, $year, $year-1);
@@ -245,10 +262,14 @@ class ranking_widget
 			}
 			$filters .= $this->tag('select', $options, array(
 				//'name' => 'filter',
-				'onchange' => 'this.form.action+=(this.form.action.indexOf("?")==-1?"?":"&")+this.value; this.form.submit()',
+//				'onchange' => 'this.form.action=this.form.action.replace(/(#|\\?).*$/, "?"+this.value); this.form.submit()',
+				'onchange' => 'change_filter(this.form, this.value)',
 			), false);
 		}
-		$filters = $this->tag('form', $filters, array('method' => 'GET'), false);
+		$filters = $this->tag('form', $filters, array(
+			'method' => 'GET',
+			'action' => $_SERVER['REQUEST_URI'],
+		), false);
 		$content .= $this->tag('div', $filters, array('class' => 'filter'), false);
 
 		foreach($data['competitions'] as $competition)

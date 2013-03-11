@@ -939,7 +939,7 @@ Competitions.prototype.handleResponse = function(_data)
 		{
 			var option = jQuery(document.createElement('option')).attr('value', this.filters[f]);
 			option.text(f);
-			if (this.json_url.indexOf(this.filters[f]) != -1) option.attr('selected', 'selected');
+			if (decodeURI(this.json_url).indexOf(this.filters[f]) != -1) option.attr('selected', 'selected');
 			select.append(option);
 		}
 		select.change(function(e) {
