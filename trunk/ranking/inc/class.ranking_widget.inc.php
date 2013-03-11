@@ -266,9 +266,10 @@ function change_filter(form, value)
 				'onchange' => 'change_filter(this.form, this.value)',
 			), false);
 		}
+		$page_url = preg_replace('/(year|filter\[[^]]+\]|'.self::FRAGMENT.')=[^&]*(&|$)/', '', $_SERVER['REQUEST_URI']);
 		$filters = $this->tag('form', $filters, array(
 			'method' => 'GET',
-			'action' => $_SERVER['REQUEST_URI'],
+			'action' => $page_url,
 		), false);
 		$content .= $this->tag('div', $filters, array('class' => 'filter'), false);
 
@@ -295,12 +296,12 @@ function change_filter(form, value)
 						{
 							case 4:	// registration
 								$links2labels['starters'] = 'Starters';
-								$competition['starters'] = '#!type=starters&comp='.$competition['WetId'];
+								$competition['starters'] = $page_url.'#!type=starters&comp='.$competition['WetId'];
 								break;
 							case 2:	// startlist in result-service
 							case 1:	// result in result-service
 							case 0:	// result in ranking (ToDo: need extra export, as it might not be in result-service)
-								$url = '#!comp='.$competition['WetId'].'&cat='.$cat['GrpId'];
+								$url = $page_url.'#!comp='.$competition['WetId'].'&cat='.$cat['GrpId'];
 								break;
 						}
 					}
