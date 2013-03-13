@@ -693,6 +693,13 @@ Starters.prototype.handleResponse = function(_data)
 		this.fed_rows_pos[r]++;
 	}
 	this.fillUpFedRows();
+
+	var tfoot = jQuery(document.createElement('tfoot'));
+	this.table.append(tfoot);
+	var th = jQuery(document.createElement('th'));
+	tfoot.append(jQuery(document.createElement('tr')).append(th));
+	th.attr('colspan', 1+_data.categorys.length);
+	th.text('Total of '+_data.athletes.length+' athlets registered in all categories.');
 };
 /**
  * Fill a single fed-row up to a given position with empty td's
