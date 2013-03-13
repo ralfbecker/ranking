@@ -218,7 +218,7 @@ class ranking_accounting extends boresult
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $content['nm']['calendar'],
-				'datum < '.$this->db->quote(date('Y-m-d',time()+14*24*3600)),	// starting 14 days from now
+				'datum < '.$this->db->quote(date('Y-m-d',time()+23*24*3600)),	// starting 23 days from now
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
