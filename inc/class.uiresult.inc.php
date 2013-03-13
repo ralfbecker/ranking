@@ -501,7 +501,8 @@ class uiresult extends boresult
 			$query['sort']  = 'ASC';
 		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
-		$total = $this->route_result->get_rows($query,$rows,$readonlys);
+		$extra_cols = $query['csv_export'] ? array('strasse','email') : array();
+		$total = $this->route_result->get_rows($query,$rows,$readonlys,$join='',$need_full_no_count=false,$only_keys=false,$extra_cols);
 		//echo $total; _debug_array($rows);
 
 		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
@@ -591,7 +592,7 @@ class uiresult extends boresult
 			if ($query['pstambl'])
 			{
 				list($page_name,$target) = explode(',',$query['pstambl']);
-				$rows[$k]['link'] = ',index.php?page_name='.$page_name.'&person='.$row['PerId'].'&cat='.$query['cat']['GrpId'].',,,'.$target;
+				$rows[$k]['link'] = ',index.php?page_name='.$page_name.'&person='.$row['PerId'].'&cat='.$query['cat'].',,,'.$target;
 			}
 			if ($query['readonly']) $readonlys['set['.$row['PerId'].']'] = true;	// disable all result input
 
@@ -815,6 +816,21 @@ class uiresult extends boresult
 					'order'      => 'start_order',
 					'sort'       => 'ASC',
 					'show_result'=> 1,
+					'csv_fields' => array(
+						'start_order'  => array('label' => lang('Startorder'),  'type' => 'int'),
+						'start_number' => array('label' => lang('Startnumber'), 'type' => 'int'),
+						'GrpId'        => array('label' => lang('Category'),    'type' => 'select'),
+						'nachname'     => array('label' => lang('Lastname'),    'type' => 'text'),
+						'vorname'      => array('label' => lang('Firstname'),   'type' => 'text'),
+						'strasse'      => array('label' => lang('Street'),      'type' => 'text'),
+						'plz'          => array('label' => lang('Postalcode'),  'type' => 'text'),
+						'ort'          => array('label' => lang('City'),        'type' => 'text'),
+						'geb_date'     => array('label' => lang('Birthdate'),   'type' => 'date'),
+						'verband'      => array('label' => lang('Sektion'),     'type' => 'text'),
+						'acl_fed'      => array('label' => lang('Regionalzentrum'),'type' => 'select'),
+						'fed_parent'   => array('label' => lang('Landesverband'),'type' => 'select'),
+						'email'        => array('label' => lang('EMail'),       'type' => 'text'),
+					)
 				);
 			}
 			if ($_GET['calendar']) $content['nm']['calendar'] = $_GET['calendar'];
@@ -972,7 +988,7 @@ class uiresult extends boresult
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum < '.$this->db->quote(date('Y-m-d',time()+10*24*3600)),	// starting 10 days from now
+				'datum < '.$this->db->quote(date('Y-m-d',time()+23*24*3600)),	// starting 23 days from now
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
