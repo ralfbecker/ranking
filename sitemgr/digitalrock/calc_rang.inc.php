@@ -288,7 +288,7 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 	}
 	$abs_pl = 1;
 
-	do
+	if ($pkte) do
 	{
 		$id = key($pkte);
 		$pers[$id]->platz = $abs_pl > 1 && current($pkte) == $last_pkte ?

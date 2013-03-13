@@ -134,10 +134,7 @@ class ranking_competition extends so_sql
 			$data['name'] = strip_tags($data['name']);	// some use tags for calendar formatting
 		}
 		list($data['gruppen'],$data['duration']) = explode('@',$data['gruppen']);
-		if ($data['gruppen'])
-		{
-			$data['gruppen'] = $this->cats->cat_rexp2rkeys($data['gruppen']);
-		}
+		$data['gruppen'] = $data['gruppen'] ? $this->cats->cat_rexp2rkeys($data['gruppen']) : array();
 		$data['pkt_bis'] = $data['pkt_bis']!='' ? intval(100 * $data['pkt_bis']) : 100;
 		$data['feld_bis'] = $data['feld_bis']!='' ? intval(100 * $data['feld_bis']) : 100;
 
