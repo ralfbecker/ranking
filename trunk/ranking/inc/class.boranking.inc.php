@@ -723,7 +723,7 @@ class boranking extends ranking_so
 		}
 		else
 		{
-			if (!($rls['window_type'] != 'wettk_athlet' && $rls['end_pflicht_tol'] &&
+			if (!$rls || !($rls['window_type'] != 'wettk_athlet' && $rls['end_pflicht_tol'] &&
 				$this->cats->age_group($cat,$stand,$from_year,$to_year)))
 			{
 				$from_year = $to_year = 0;
@@ -753,7 +753,7 @@ class boranking extends ranking_so
 			{
 				$not_counting[$id][$result['WetId']][$result['GrpId']] = $result['pkt'];
 				$nc = true;
-				if ($cup['split_by_places'] != 'only_counting')
+				if ($cup && $cup['split_by_places'] != 'only_counting')
 				{
 					++$platz[$result['platz']][$id];
 				}
@@ -772,7 +772,7 @@ class boranking extends ranking_so
 		}
 		arsort ($pkte);
 
-		if ($cup['SerId'] == 60)	// EYC 2003. not sure what this is for, why only 2003?
+		if ($cup && $cup['SerId'] == 60)	// EYC 2003. not sure what this is for, why only 2003?
 		{
 			switch($cup['split_by_places'])
 			{
