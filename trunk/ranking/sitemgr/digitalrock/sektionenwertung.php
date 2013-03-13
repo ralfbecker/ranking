@@ -32,7 +32,8 @@ if ($debug) echo "<p>$_SERVER[PHP_SELF]: stand='$stand', gruppe='$gruppe', serie
 
 if (!$gruppe)	// Sektionenrangliste: bestes Ergebnis jeder Kategorie (Erwachsene und Jugend)
 {
-	setup_grp ($g='GER_M');			// defaults fuer GER einrichten
+	$g='GER_M';
+	setup_grp ($g);			// defaults fuer GER einrichten
 	require $grp_inc;
 
 	if ($stand == '.' || preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}$/', $stand))
