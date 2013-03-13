@@ -166,6 +166,13 @@ class ranking_widget
 	}
 
 	/**
+	 * Data returned from JSON feed
+	 *
+	 * @var array
+	 */
+	protected $data;
+
+	/**
 	 * Render widget server-side depending on given parameters
 	 *
 	 * @param array $params
@@ -187,31 +194,176 @@ class ranking_widget
 				}
 			}
 		}
+		//echo "<pre>".print_r($params, true)."</pre>\n"; echo $query;
 		if (!($json = file_get_contents($this->json_url.$query)))
 		{
 			throw new Exception("Requesting data from $url failed!");
 		}
-		if (!($data = json_decode($json, true)))
+		if (!($this->data = json_decode($json, true)))
 		{
 			throw new Exception("Data from $url is NO valid JSON!");
 		}
-		if (isset($data['competitions']))
+		//echo "<pre>".print_r($this->data, true)."</pre>\n";
+
+		if (isset($this->data['competitions']))
 		{
-			return $this->Competitions($data, $id, $title);
+			return $this->Competitions($id, $title);
+		}
+		if (isset($this->data['athletes']))
+		{
+			return $this->Starters($id, $title);
 		}
 		return "Not yet implemented!";
+	}
+
+	protected $fed_rows = array();
+	protected $fed_rows_pos = array();
+
+	/**
+	 * Server-side rendering of calendar
+	 *
+	 * @param string $id='widget_content'
+	 * @param string &$title on return of server-side rendering title of widget, to eg. put in page-title
+	 * @return html
+	 */
+	protected function Starters($id, &$title=null)
+	{
+		$data = &$this->data;
+		//return '<pre>'.print_r($data, true)."</pre>\n";
+		$title = $data['name'].' : '.$data['date_span'];
+		$content = $this->tag('h1', $title, array('class' => 'compHeader'));
+		if (!empty($data['deadline']))
+		{
+			$content .= $this->tag('h3', $this->lang('Deadline').': '.$data['deadline'], array('class' => 'resultDate'));
+		}
+
+		// create header row
+		$thead = $this->tag('th', $this->lang(isset($data['federations']) ? 'Federation' : 'Nation'));
+		$cats = array();
+		foreach($data['categorys'] as $i => $cat)
+		{
+			$thead .= $this->tag('th', $cat['name'], array('class' => 'category'));
+			$cats[$cat['GrpId']] = $i;
+		}
+		$thead = $this->tag('tr', $thead, array(), false);
+
+		$tbody = '';
+		foreach($data['athletes'] as $athlete)
+		{
+			// evtl. create new row for federation/nation
+			if (!isset($fed) || $fed != $athlete['reg_fed_id'])
+			{
+				$tbody .= $this->fillUpFedRows();
+			}
+			// find rows with space in column of category
+			$cat_col = $cats[$athlete['cat']];
+			$r = 0;
+			foreach($this->fed_rows_pos as $r => $pos)
+			{
+				if ($pos <= $cat_col) break;
+			}
+			if (!$this->fed_rows_pos || $pos > $cat_col)	// create a new fed-row
+			{
+				if (!isset($fed) || $fed != $athlete['reg_fed_id'])
+				{
+					$fed = $athlete['reg_fed_id'];
+					$this->fed_rows[++$r] = $this->tag('th', $this->federation($fed), array('class' => 'federation'));
+				}
+				else
+				{
+					$this->fed_rows[++$r] = $this->tag('th');
+				}
+				$this->fed_rows_pos[$r] = 0;
+			}
+			$this->fillUpFedRow($r, $cat_col);
+			// create athlete cell
+			$this->fed_rows[$r] .= $this->tag('td',
+				$this->tag('span', $athlete['lastname'], array('class' => 'lastname')).
+				$this->tag('span', $athlete['firstname'], array('class' => 'firstname')),
+				array('class' => 'athlete'), false
+			);
+			$this->fed_rows_pos[$r]++;
+		}
+		$tbody .= $this->fillUpFedRows();
+
+		$tfoot = $this->tag('tr',$this->tag('th',
+			$this->lang('Total of %1 athlets registered in all categories.', count($data['athletes'])),
+			array('colspan' => 1+count($data['categorys']))), array(), false);
+
+		$content .= $this->tag('table',
+			$this->tag('thead', $thead, array(), false).
+			$this->tag('tbody', $tbody, array(), false).
+			$this->tag('tfoot', $tfoot, array(), false),
+			array('class' => 'DrTable'), false);
+
+		return $this->tag('div', $content, array('class' => 'Starters'), false);
+	}
+
+	/**
+	 * Fill a single fed-row up to a given position with empty td's
+	 *
+	 * @param int $r row-number
+	 * @param int $to column-number, default whole row
+	 */
+	private function fillUpFedRow ($r, $to=null)
+	{
+		if (!isset($to)) $to = count($this->data['categorys']);
+
+		for (; $this->fed_rows_pos[$r] < $to; ++$this->fed_rows_pos[$r])
+		{
+			$this->fed_rows[$r] .= $this->tag('td');
+		}
+	}
+
+	/**
+	 * Fill up all fed rows with empty td's
+	 *
+	 * @return string with filled up rows
+	 */
+	private function fillUpFedRows()
+	{
+		$rows = '';
+		foreach($this->fed_rows as $r => &$row)
+		{
+			$this->fillUpFedRow($r);
+			$rows .= $this->tag('tr', $row, array(), false);
+		}
+		$this->fed_rows = $this->fed_rows_pos = array();
+
+		return $rows;
+	}
+
+	/**
+	 * Get name of federation specified by given id
+	 *
+	 * @param _fed_id
+	 * @returns string with name
+	 */
+	private function federation($fed_id)
+	{
+		if (isset($this->data['federations']))
+		{
+			foreach($this->data['federations'] as $fed)
+			{
+				if ($fed['fed_id'] == $fed_id)
+				{
+					return !empty($fed['shortcut']) ? $fed['shortcut'] : $fed['name'];
+				}
+			}
+		}
+		return $fed_id;	// nation of int. competition
 	}
 
 	/**
 	 * Server-side rendering of calendar
 	 *
-	 * @param array $data
 	 * @param string $id='widget_content'
 	 * @param string &$title on return of server-side rendering title of widget, to eg. put in page-title
 	 * @return html
 	 */
-	protected function Competitions(array $data, $id, &$title=null)
+	protected function Competitions($id, &$title=null)
 	{
+		$data = &$this->data;
 		//return '<pre>'.print_r($data, true)."</pre>\n";
 		if (!($year = (int)$data['competitions'][0]['date'])) $year = (int)date('Y');
 
@@ -261,8 +413,6 @@ function change_filter(form, value)
 				)/*+((string)$y === (string)$year ? array('selected' => '') : array())*/);
 			}
 			$filters .= $this->tag('select', $options, array(
-				//'name' => 'filter',
-//				'onchange' => 'this.form.action=this.form.action.replace(/(#|\\?).*$/, "?"+this.value); this.form.submit()',
 				'onchange' => 'change_filter(this.form, this.value)',
 			), false);
 		}
@@ -342,6 +492,7 @@ function change_filter(form, value)
 	 * Translate a string
 	 *
 	 * @param string $str
+	 * @param mixed variable number of arguments to replace placeholder %1, %2, ...
 	 * @return string
 	 */
 	protected function lang($str)
@@ -350,6 +501,17 @@ function change_filter(form, value)
 		{
 			$args = func_get_args();
 			$str = call_user_func_array($this->translate, $args);
+		}
+		if (func_num_args() > 1)
+		{
+			$args = func_get_args();
+			array_shift($args);
+			foreach($args as $n => $arg)
+			{
+				$args['%'.(1+$n)] = $arg;
+				unset($args[$n]);
+			}
+			$str = strtr($str, $args);
 		}
 		return $str;
 	}
