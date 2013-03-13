@@ -571,7 +571,7 @@ class uiregistration extends boranking
 		}
 		$content = $preserv = array(
 			'calendar' => $calendar,
-			'comp'     => $comp['WetId'],
+			'comp'     => $comp ? $comp['WetId'] : null,
 			'nation'   => $nation,
 		);
 		$content += array(
@@ -722,8 +722,7 @@ class uiregistration extends boranking
 
 			if ($content['download'] && $starters && count($starters))
 			{
-				$browser =& CreateObject('phpgwapi.browser');
-				$browser->content_header($comp['rkey'].'.csv','text/comma-separated-values');
+				html::content_header($comp['rkey'].'.csv','text/comma-separated-values');
 				$name2csv = array(
 					'WetId'    => 'comp',
 					'GrpId'    => 'cat',
@@ -733,13 +732,14 @@ class uiregistration extends boranking
 					$show == 'startlist' ? 'startnumber' : 'points',
 					'nachname' => 'lastname',
 					'vorname'  => 'firstname',
+					'email'    => 'email',
 					'nation'   => 'nation',
 					'geb_date' => 'birthdate',
 					'ranking',
 					'ranking-points',
 				);
 				echo implode(';',$name2csv)."\n";
-				$charset = $GLOBALS['egw']->translation->charset();
+				$charset = translation::charset();
 				$c['GrpId'] = 0;
 				foreach($starters as $athlete)
 				{
@@ -784,7 +784,7 @@ class uiregistration extends boranking
 						$values[$csv] = $val;
 					}
 					// convert by default to iso-8859-1, as this seems to be the default of excel
-					echo $GLOBALS['egw']->translation->convert(implode(';',$values),$charset,
+					echo translation::convert(implode(';',$values),$charset,
 						$_GET['charset'] ? $_GET['charset'] : 'iso-8859-1')."\n";
 				}
 				$GLOBALS['egw']->common->egw_exit();
