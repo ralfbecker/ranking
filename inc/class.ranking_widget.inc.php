@@ -43,7 +43,7 @@ class ranking_widget
 	 *
 	 * @var string
 	 */
-	public $url_mode = self::URL_TEST;//HASH;
+	public $url_mode = self::URL_HASH;
 
 	/**
 	 * URL to query json data
