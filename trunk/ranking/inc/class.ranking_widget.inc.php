@@ -43,7 +43,7 @@ class ranking_widget
 	 *
 	 * @var string
 	 */
-	public $url_mode = self::URL_HASH;
+	public $url_mode = self::URL_TEST;//HASH;
 
 	/**
 	 * URL to query json data
@@ -261,7 +261,7 @@ class ranking_widget
 				$url = $this->page_url.(strpos($this->page_url, '?') === false ? '?' : '&').$query;
 				break;
 		}
-		error_log(__METHOD__."() url_mode='$this->url_mode', page_url='$this->page_url', query='$query' --> url='$url'");
+		//error_log(__METHOD__."() url_mode='$this->url_mode', page_url='$this->page_url', query='$query' --> url='$url'");
 		return $url;
 	}
 
@@ -322,11 +322,14 @@ class ranking_widget
 	 *
 	 * @param string $id='widget_content'
 	 * @param string &$title on return of server-side rendering title of widget, to eg. put in page-title
-	 * @param string $result=true false: startlist
+	 * @param string $startlist=null true: display startlist, false: display result, null check for type=startlist
 	 * @return html
 	 */
-	protected function Resultlist($id, &$title=null, $result=true)
+	protected function Resultlist($id, &$title=null, $startlist=null)
 	{
+		if (is_null($startlist)) $startlist = isset($this->params['type']) && $this->params['type'] == 'startlist';
+		if (empty($this->data['participants'][0]['result_rank'])) $startlist = true;
+
 		$title = $this->data['comp_name'];
 		$content = $this->tag('h1', $title, array('class' => 'compHeader'));
 		if (!empty($this->data['route_result']))
@@ -365,8 +368,16 @@ class ranking_widget
 			$content .= $this->tag('ul', $gen.$toc, array('class' => 'listToc'), false);
 		}
 
-		$this->result_cols = $this->result_cols($result);
+		$this->result_cols = $this->result_cols(!$startlist);
 		//echo "<pre>".print_r($this->result_cols, true)."</pre>\n";
+
+		if ($startlist)
+		{
+			usort($this->data['participants'], function($a,$b)
+			{
+				return $a['start_order']-$b['start_order'];
+			});
+		}
 
 		// header
 		$thead = $this->createRow($this->result_cols, 'th');
@@ -398,7 +409,7 @@ class ranking_widget
 			}
 			else	// single result row
 			{
-				if ($result && (empty($data['result_rank']) || $data['result_rank'] < 1))
+				if (!$startlist && (empty($data['result_rank']) || $data['result_rank'] < 1))
 				{
 					break;	// no more ranked competitiors
 				}
@@ -456,7 +467,8 @@ class ranking_widget
 					if (!empty($url))
 					{
 						$col_data = $this->tag('a', $col_data, array(
-							'href' => $this->url('person='.$data['PerId'].'&cat='.$this->data['GrpId']),
+							'href' => $this->url('person='.$data['PerId'].'&cat='.
+								(isset($this->data['GrpId']) ? $this->data['GrpId'] : $this->data['cat']['GrpId'])),
 						));
 						$quote = false;
 					}
@@ -514,74 +526,145 @@ class ranking_widget
 	{
 		$detail = isset($this->params['detail']) ? $this->params['detail'] : null;
 
-		switch($this->data['discipline'])
+		if ($result)
 		{
-			case 'speedrelay':
-				$cols = empty($detail) ? array(	// default detail
-					'result_rank' => 'Rank',
-					'team_name' => 'Teamname',
-					'athletes/0/lastname' => 'Athlete #1',
-					'athletes/1/lastname' => 'Athlete #2',
-					'athletes/2/lastname' => 'Athlete #3',
-					'result' => 'Sum'
-				) : ($detail == '1' ? array(	// detail=1
-					'result_rank' => 'Rank',
-					'team_name' => 'Teamname',
-					//'team_nation' => 'Nation',
-					'athletes/0/lastname' => array('label' => 'Athlete #1', 'colspan' => 3),
-					'athletes/0/firstname' => '',
-					'athletes/0/result_time' => '',
-					'athletes/1/lastname' => array('label' => 'Athlete #2', 'colspan' => 3),
-					'athletes/1/firstname' => '',
-					'athletes/1/result_time' => '',
-					'athletes/2/lastname' => array('label' => 'Athlete #3', 'colspan' => 3),
-					'athletes/2/firstname' => '',
-					'athletes/2/result_time' => '',
-					'result' => 'Sum'
-				) : array(	// detail=0
-					'result_rank' => 'Rank',
-					'team_name' => 'Teamname',
-					'team_nation' => 'Nation',
-					'result' => 'Sum'
-				));
-				break;
+			switch($this->data['discipline'])
+			{
+				case 'speedrelay':
+					$cols = empty($detail) ? array(	// default detail
+						'result_rank' => 'Rank',
+						'team_name' => 'Teamname',
+						'athletes/0/lastname' => 'Athlete #1',
+						'athletes/1/lastname' => 'Athlete #2',
+						'athletes/2/lastname' => 'Athlete #3',
+						'result' => 'Sum'
+					) : ($detail == '1' ? array(	// detail=1
+						'result_rank' => 'Rank',
+						'team_name' => 'Teamname',
+						//'team_nation' => 'Nation',
+						'athletes/0/lastname' => array('label' => 'Athlete #1', 'colspan' => 3),
+						'athletes/0/firstname' => '',
+						'athletes/0/result_time' => '',
+						'athletes/1/lastname' => array('label' => 'Athlete #2', 'colspan' => 3),
+						'athletes/1/firstname' => '',
+						'athletes/1/result_time' => '',
+						'athletes/2/lastname' => array('label' => 'Athlete #3', 'colspan' => 3),
+						'athletes/2/firstname' => '',
+						'athletes/2/result_time' => '',
+						'result' => 'Sum'
+					) : array(	// detail=0
+						'result_rank' => 'Rank',
+						'team_name' => 'Teamname',
+						'team_nation' => 'Nation',
+						'result' => 'Sum'
+					));
+					break;
 
-			case 'ranking':
-				$cols = array(
-					'result_rank' => 'Rank',
-					'lastname' => array('label' => 'Name', 'colspan' => 2),
-					'firstname' => '',
-					'nation' => 'Nation',
-					'points' => 'Points',
-					'result' => 'Result'
-				);
-				if (empty($detail))
-				{
-					unset($cols['result']);
-					// allow to click on points to show single results
-					$cols['points'] = array(
-						'label' => $cols['points'],
-						'url' => location.href+'&detail=1'
+				case 'ranking':
+					$cols = array(
+						'result_rank' => 'Rank',
+						'lastname' => array('label' => 'Name', 'colspan' => 2),
+						'firstname' => '',
+						'nation' => 'Nation',
+						'points' => 'Points',
+						'result' => 'Result'
 					);
-				}
-				break;
+					if (empty($detail))
+					{
+						unset($cols['result']);
+						// allow to click on points to show single results
+						$cols['points'] = array(
+							'label' => $cols['points'],
+							'url' => $_SERVER['REQUEST_URI'].'&detail=1'
+						);
+					}
+					break;
 
-			default:
-				$cols = isset($detail) && $detail == '0' ? array(
-					'result_rank' => 'Rank',
-					'lastname' => array('label' => 'Name', 'colspan' => 2),
-					'firstname' => '',
-					'nation' => 'Nation',
-					'result' => 'Result'
-				) : array(
-					'result_rank' => 'Rank',
-					'lastname' => array('label' => 'Name', 'colspan' => 2),
-					'firstname' => '',
-					'nation' => 'Nation',
-					'start_number' => 'StartNr',
-					'result' => 'Result'
-				);
-				break;
+				default:
+					$cols = isset($detail) && $detail == '0' ? array(
+						'result_rank' => 'Rank',
+						'lastname' => array('label' => 'Name', 'colspan' => 2),
+						'firstname' => '',
+						'nation' => 'Nation',
+						'result' => 'Result'
+					) : array(
+						'result_rank' => 'Rank',
+						'lastname' => array('label' => 'Name', 'colspan' => 2),
+						'firstname' => '',
+						'nation' => 'Nation',
+						'start_number' => 'StartNr',
+						'result' => 'Result'
+					);
+					break;
+			}
+			// for general result use one column per heat
+			if (isset($cols['result']) && $this->data['route_names'] && $this->data['route_order'] == -1)
+			{
+				unset($cols['result']);
+				// show final first and 2. quali behind 1. quali: eg. 3, 2, 0, 1
+				foreach(array_reverse($this->data['route_names'], true) as $route => $name)
+				{
+					if ($route != 1 && isset($this->data['route_names'][abs($route)]))
+					{
+						$cols['result'.abs($route)] = $this->data['route_names'][abs($route)];
+					}
+				}
+				// evtl. add points column
+				if (!empty($this->data['participants'][0]['quali_points']))
+				{
+					$cols['quali_points'] = 'Points';
+				}
+				$title_prefix = '';
+			}
+			if (!empty($cols['result']) && !empty($this->data['participants'][0]['rank_prev_heat']) &&
+				(!isset($detail) || $detail != 0))
+			{
+				$cols['rank_prev_heat'] = 'previous heat';
+			}
+		}
+		else
+		{
+			switch($this->data['discipline'])
+			{
+				case 'speedrelay':
+					$cols = !isset($detail) ? array(	// default detail
+						'start_order' => 'StartNr',
+						'team_name' => 'Teamname',
+						'athletes/0/lastname' => 'Athlete #1',
+						'athletes/1/lastname' => 'Athlete #2',
+						'athletes/2/lastname' => 'Athlete #3'
+					) : ($detail ? array(	// detail=1
+						'start_order' => 'StartNr',
+						'team_name' => 'Teamname',
+						//'team_nation' => 'Nation',
+						'athletes/0/lastname' => array('label' => 'Athlete #1', 'colspan' => 3),
+						'athletes/0/firstname' => '',
+						'athletes/0/result_time' => '',
+						'athletes/1/lastname' => array('label' => 'Athlete #2', 'colspan' => 3),
+						'athletes/1/firstname' => '',
+						'athletes/1/result_time' => '',
+						'athletes/2/lastname' => array('label' => 'Athlete #3', 'colspan' => 3),
+						'athletes/2/firstname' => '',
+						'athletes/2/result_time' => ''
+					) : array(	// detail=0
+						'start_order' => 'StartNr',
+						'team_name' => 'Teamname',
+						'team_nation' => 'Nation'
+					));
+					break;
+
+				default:
+					$cols = array(
+						'start_order' => array('label' => 'StartNr', 'colspan' => 2),
+						'start_number' => '',
+						'lastname' => array('label' => 'Name', 'colspan' => 2),
+						'firstname' => '',
+						'birthyear' => 'Birthyear',
+						'nation' => 'Nation'
+					);
+					break;
+			}
+
 		}
 		// for SUI and GER competitions replace nation
 		if (!empty($this->data['nation']))
@@ -595,30 +678,6 @@ class ranking_widget
 					$this->replace_attribute($cols, 'nation', 'city', 'City');
 					break;
 			}
-		}
-		// for general result use one column per heat
-		if (isset($cols['result']) && $this->data['route_names'] && $this->data['route_order'] == -1)
-		{
-			unset($cols['result']);
-			// show final first and 2. quali behind 1. quali: eg. 3, 2, 0, 1
-			foreach(array_reverse($this->data['route_names'], true) as $route => $name)
-			{
-				if ($route != 1 && isset($this->data['route_names'][abs($route)]))
-				{
-					$cols['result'.abs($route)] = $this->data['route_names'][abs($route)];
-				}
-			}
-			// evtl. add points column
-			if (!empty($this->data['participants'][0]['quali_points']))
-			{
-				$cols['quali_points'] = 'Points';
-			}
-			$title_prefix = '';
-		}
-		if (!empty($cols['result']) && !empty($this->data['participants'][0]['rank_prev_heat']) &&
-			(!isset($detail) || $detail != 0))
-		{
-			$cols['rank_prev_heat'] = 'previous heat';
 		}
 		return $cols;
 	}
