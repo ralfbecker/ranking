@@ -12,8 +12,12 @@
  */
 
 /**
+ * Renders calendar, registration, results, rankings and profiles with data from JSON feed
  *
+ * By default widget only returns html/javascript to render on client-side / browser.
  *
+ * If search-engine encounters URL with #!, it requests page-content with _escaped_fragment_ query param
+ * and widget renders on server-side to support crawler not understanding javascript.
  */
 class ranking_widget
 {
@@ -21,6 +25,25 @@ class ranking_widget
 	 * Name of get parameter to trigger serverside rendering
 	 */
 	const FRAGMENT = '_escaped_fragment_';
+	/**
+	 * Render all links as hash (default), uses server-side rendering only if _escaped_fragment_ query param given
+	 */
+	const URL_HASH = '#!';
+	/**
+	 * Render all links as query, this forces server-side rendering
+	 */
+	const URL_QUERY = '?';
+	/**
+	 * Render all links as _escaped_fragment_ query param AND force server-side rendering
+	 */
+	const URL_TEST = 'test';
+
+	/**
+	 * What type of URLs to render, see URL_* constants
+	 *
+	 * @var string
+	 */
+	public $url_mode = self::HASH;
 
 	/**
 	 * URL to query json data
@@ -123,9 +146,18 @@ class ranking_widget
 	 */
 	public function render($id='widget_content', &$title=null)
 	{
-		if (isset($_GET[self::FRAGMENT]))
+		// do we want server-side rendering
+		if (isset($_GET[self::FRAGMENT]) || in_array($this->url_mode, array(self::URL_QUERY, self::URL_TEST)))
 		{
-			parse_str($_GET[self::FRAGMENT], $this->params);
+			if (isset($_GET[self::FRAGMENT]))
+			{
+				parse_str($_GET[self::FRAGMENT], $this->params);
+			}
+			else
+			{
+				$this->params = $_GET;
+			}
+			error_log(__METHOD__."('$id') params=".print_r($this->params, true));
 
 			try {
 				return $this->render_widgets($id, $title);
@@ -194,6 +226,46 @@ class ranking_widget
 	protected $page_url;
 
 	/**
+	 * Get URL for given query
+	 *
+	 * @param string|array $query query parameter as query string, url or array
+	 * @return string url
+	 */
+	public function url($query)
+	{
+		if (is_array($query))
+		{
+			$params = array();
+			foreach($query as $name => $value)
+			{
+				$params[] = $name.'='.urlencode($value);
+			}
+			$query = implode('&', $params);
+		}
+		elseif($query[0] == '/' || strpos($query, '://'))
+		{
+			if (($q = parse_url($query, PHP_URL_FRAGMENT)) || ($q = parse_url($query, PHP_URL_QUERY)))
+			{
+				$query = $q[0] == '!' ? substr($q, 1) : $q;
+			}
+		}
+		switch($this->url_mode)
+		{
+			case self::URL_HASH:
+				$url = $this->page_url.self::URL_HASH.$query;
+				break;
+			case self::URL_TEST:
+				$query = self::FRAGMENT.'='.urlencode($query);
+				// fall through
+			case self::URL_QUERY:
+				$url = $this->page_url.(strpos($this->page_url, '?') === false ? '?' : '&').$query;
+				break;
+		}
+		error_log(__METHOD__."() url_mode='$this->url_mode', page_url='$this->page_url', query='$query' --> url='$url'");
+		return $url;
+	}
+
+	/**
 	 * Render widget server-side depending on given parameters
 	 *
 	 * @param string $id='widget_content'
@@ -215,6 +287,7 @@ class ranking_widget
 			}
 		}
 		$this->page_url = preg_replace('/('.implode('|', self::$supported_params).'|'.self::FRAGMENT.')=[^&]*(&|$)/', '', $_SERVER['REQUEST_URI']);
+		if (substr($this->page_url, -1) == '?') $this->page_url = substr($this->page_url, 0, -1);
 
 		//echo "<pre>".print_r($params, true)."</pre>\n"; echo $query;
 		if (!($json = file_get_contents($this->json_url.$query)))
@@ -267,14 +340,13 @@ class ranking_widget
 			$this->data['discipline'] != 'ranking')
 		{
 			$toc = $gen = '';
-			$page_url = preg_replace('/(comp|cat|route|'.self::FRAGMENT.')=[^&]*(&|$)/', '', $_SERVER['REQUEST_URI']).
-				'#!comp='.$this->data['WetId'].'&cat='.$this->data['GrpId'].'&route=';
+			$url = $this->url('comp='.$this->data['WetId'].'&cat='.$this->data['GrpId'].'&route=');
 			foreach($this->data['route_names'] as $r => $name)
 			{
 				if ($r != $this->data['route_order'])
 				{
 					$li = $this->tag('li', $this->tag('a', $name, array(
-						'href' => $page_url.$r,
+						'href' => $url.$r,
 					)), array(), false);
 				}
 				else
@@ -311,7 +383,7 @@ class ranking_widget
 					if (!empty($data['url']))
 					{
 						$th .= $this->tag('a', $this->lang('complete result'), array(
-							'href' => $data['url'],
+							'href' => $this->url($data['url']),
 						));
 						$quote = false;
 					}
@@ -384,7 +456,7 @@ class ranking_widget
 					if (!empty($url))
 					{
 						$col_data = $this->tag('a', $col_data, array(
-							'href' => $this->page_url.'#!person='.$data['PerId'].'&cat='.$this->data['GrpId'],
+							'href' => $this->url('person='.$data['PerId'].'&cat='.$this->data['GrpId']),
 						));
 						$quote = false;
 					}
@@ -407,7 +479,7 @@ class ranking_widget
 				if (!empty($col_data['url']))
 				{
 					$col_data = $this->tag('a', $col_data['label'], array(
-						'href' => $col_data['url'],
+						'href' => $this->url($col_data['url']),
 					));
 					$quote = false;
 				}
@@ -784,10 +856,9 @@ function change_filter(form, value)
 				'onchange' => 'change_filter(this.form, this.value)',
 			), false);
 		}
-		$page_url = preg_replace('/(year|filter\[[^]]+\]|'.self::FRAGMENT.')=[^&]*(&|$)/', '', $_SERVER['REQUEST_URI']);
 		$filters = $this->tag('form', $filters, array(
 			'method' => 'GET',
-			'action' => $page_url,
+			'action' => $this->page_url,
 		), false);
 		$content .= $this->tag('div', $filters, array('class' => 'filter'), false);
 
@@ -814,12 +885,12 @@ function change_filter(form, value)
 						{
 							case 4:	// registration
 								$links2labels['starters'] = 'Starters';
-								$competition['starters'] = $page_url.'#!type=starters&comp='.$competition['WetId'];
+								$competition['starters'] = $this->url('type=starters&comp='.$competition['WetId']);
 								break;
 							case 2:	// startlist in result-service
 							case 1:	// result in result-service
 							case 0:	// result in ranking (ToDo: need extra export, as it might not be in result-service)
-								$url = $page_url.'#!comp='.$competition['WetId'].'&cat='.$cat['GrpId'];
+								$url = $this->url('comp='.$competition['WetId'].'&cat='.$cat['GrpId']);
 								break;
 						}
 					}
