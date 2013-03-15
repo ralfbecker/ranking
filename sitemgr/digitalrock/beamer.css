@@ -69,3 +69,10 @@ div.bonusTries, div.topTries {
 .compHeader, .resultDate {
 	display: none;
 }
+
+/**
+ * Do not display federation or city column, it is to big
+ */
+td.federation, th.federation, td.city, th.city {
+	display: none;
+}

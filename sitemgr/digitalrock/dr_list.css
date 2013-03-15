@@ -32,8 +32,9 @@ table.DrTable th, table.DrTable td {
 /**
  * Left justify text columns like name
  */
-table.DrTable th.lastname, table.DrTable td.lastname, table.DrTable td.firstname, 
-table.DrTable td.team_name, table.DrTable tbody th, .Starters table.DrTable th, .Starters table.DrTable td {
+table.DrTable th.lastname, table.DrTable td.lastname, table.DrTable td.firstname, table.DrTable td.boulder,
+table.DrTable td.team_name, table.DrTable tbody th, .Starters table.DrTable th, .Starters table.DrTable td,
+table.DrTable th.federation, table.DrTable td.federation {
 	padding-left: 5px;
 	text-align: left;
 }

@@ -128,7 +128,12 @@ Resultlist.prototype.handleResponse = function(_data)
 			if (_data.discipline == 'boulder' && (!detail || detail[1] == 2) && route != -1)
 			{
 				delete this.result_cols.result;
-				this.result_cols.boulder = Resultlist.prototype.getBoulderResult;
+				var that = this;
+				var num_problems = parseInt(_data.route_num_problems);
+				this.result_cols.boulder = function(_data,_tag){
+					return that.getBoulderResult.call(that, _data, _tag, num_problems);
+				};
+				//Resultlist.prototype.getBoulderResult;
 				if (detail && detail[1] == 2) this.result_cols.result = 'Sum';
 			}
 			break;
@@ -141,15 +146,16 @@ Resultlist.prototype.handleResponse = function(_data)
  * 
  * @param _data
  * @param _tag 'th' for header, 'td' for data rows
+ * @param _num_problems
  * @return DOM node
  */
-Resultlist.prototype.getBoulderResult = function(_data,_tag)
+Resultlist.prototype.getBoulderResult = function(_data,_tag,_num_problems)
 {
 	if (_tag == 'th') return 'Result';
 
 	var tag = document.createElement('div');
 	
-	for(var i=1; typeof _data['boulder'+i] != 'undefined'; ++i)
+	for(var i=1; i <= _num_problems; ++i)
 	{
 		var boulder = document.createElement('div');
 		var result = _data['boulder'+i];
@@ -1451,77 +1457,40 @@ DrTable.prototype.createRow = function(_data,_tag)
  */
 DrTable.prototype.sortData = function()
 {
+	function sortResultRank(_a, _b)
+	{
+		var rank_a = _a['result_rank'];
+		if (typeof rank_a == 'undefined' || rank_a < 1) rank_a = 9999;
+		var rank_b = _b['result_rank'];
+		if (typeof rank_b == 'undefined' || rank_b < 1) rank_b = 9999;
+		var ret = rank_a - rank_b;
+		
+		if (!ret) ret = _a['lastname'] > _b['lastname'] ? 1 : -1;
+		if (!ret) ret = _a['firstname'] > _b['firstname'] ? 1 : -1;
+		
+		return ret;
+	}
+
 	switch(this.sort)
 	{
-		case 'start_order':
-			this.data.sort(sortStartOrder);
-			break;
-
 		case 'result_rank':
 			// not necessary as server returns them sorted this way
 			//this.data.sort(sortResultRank);
 			break;
 
 		default:
-			throw("DrTable.sortData: Not yet implemented sort by '"+this.sort+"'!");
+			var sort = this.sort;
+			this.data.sort(function(_a,_b){
+				return _a[sort] == _b[sort] ? 0 : (_a[sort] < _b[sort] ? -1 : 1);
+			});
 			break;
 	}
 	if (!this.ascending) this.data.reverse();
 };
 
 /**
- * Callback for sort by 'startfolgenr' attribute
- * 
- * @param _a first object to compare
- * @param _b second object to compare
- * @return int
- */
-function sortStartOrder(_a, _b)
-{
-	return _a['start_order'] - _b['start_order'];
-}
-
-/**
- * Callback for sort by 'platz' attribute and then 'name' and 'vorname'
- * 
- * Currently not used, as server returns data already sorted this way.
- *
- * @param _a first object to compare
- * @param _b second object to compare
- * @return int
- */
-function sortResultRank(_a, _b)
-{
-	var rank_a = _a['result_rank'];
-	if (typeof rank_a == 'undefined' || rank_a < 1) rank_a = 9999;
-	var rank_b = _b['result_rank'];
-	if (typeof rank_b == 'undefined' || rank_b < 1) rank_b = 9999;
-	var ret = rank_a - rank_b;
-	
-	if (!ret) ret = _a['lastname'] > _b['lastname'] ? 1 : -1;
-	if (!ret) ret = _a['firstname'] > _b['firstname'] ? 1 : -1;
-	
-	return ret;
-}
-
-/**
- * Callback for numerical sort
- * 
- * @param _a first object to compare
- * @param _b second object to compare
- * @todo get this working
- * @return int
- */
-DrTable.prototype.sortNummeric = function(_a,_b)
-{
-	//console.log('_a[PerId]='+_a['PerId']+': _a['+this.sort+']='+_a[this.sort]+', _b[PerId]='+_b['PerId']+': _b['+this.sort+']='+_b[this.sort]+' returning '+((_b[this.sort] - _a[this.sort]) * (this.ascending ? 1 : -1)));
-	return (_a[this.sort] - _b[this.sort]) * (this.ascending ? 1 : -1);
-};
-
-/**
  * Return the current scrolling position, which is the top of the current view.
  */
-
 Startlist.prototype.currentTopPosition = function()
 {
 	var y = 0;
