@@ -487,8 +487,9 @@ function try_clicked(button)
 	{
 		bonus.value = '0';
 		// store on server
-		update_boulder();
+		//update_boulder();
 	}
+	update_boulder('try');
 }
 
 /**
@@ -530,8 +531,9 @@ function bonus_clicked(button)
 		bonus.value = try_num(1);
 		check_bonus(bonus);
 	
-		if (!bonus.isNaN) update_boulder();
+		//if (!bonus.isNaN) update_boulder();
 	}
+	update_boulder('bonus');
 }
 
 /**
@@ -551,14 +553,15 @@ function top_clicked(button)
 		top.value = num;
 		check_top(top);
 		
-		update_boulder();
+		//update_boulder();
 	}
+	update_boulder('top');
 }
 
 /**
  * Sending bonus and top for PerId to server
  */
-function update_boulder()
+function update_boulder(clicked)
 {
 	var WetId = document.getElementById('exec[comp][WetId]').value;
 	var n = document.getElementById('exec[nm][boulder_n]').value;
@@ -568,10 +571,27 @@ function update_boulder()
 
 	if (PerId && n)
 	{
-		var update = {};
+		var bonus = document.getElementById('exec[zone]').value;
 		var top = document.getElementById('exec[top]').value;
+		
+		if (typeof protocol != 'undefined')
+		{
+			protocol.record({
+				'WetId': WetId,
+				'GrpId': GrpId,
+				'route': route_order,
+				'PerId': PerId,
+				'boulder': n,
+				'bonus': bonus,
+				'top': top,
+				'clicked': clicked,
+				'try': clicked ? try_num() : null
+			});
+		}
+		
+		var update = {};
+		update['zone'+n] = bonus;
 		update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
-		update['zone'+n] = document.getElementById('exec[zone]').value;
 
 		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});				
 	}

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.boulder_measurement" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.result.boulder_measurement" template="" lang="" group="0" version="1.9.002">
 		<grid width="x">
 			<columns>
 				<column/>
@@ -10,7 +10,7 @@
 			</columns>
 			<rows>
 				<row height="60">
-					<description value="Boulder" options=",,,PerId"/>
+					<description value="Boulder" for="PerId"/>
 					<hbox options="0,0">
 						<menulist>
 							<menupopup type="select-number" id="nm[boulder_n]" onchange="boulder_changed(this);" options=",1,{$cont[nm][num_problems]}"/>
@@ -21,15 +21,16 @@
 					</menulist>
 				</row>
 				<row height="60">
-					<description value="Top" options=",,,top"/>
 					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" id="top" onchange="check_top(this)" options="No,1,20"/>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="check_try(this)" options=",1,20"/>
+					</menulist>
+					<menulist>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,20"/>
 					</menulist>
 					<hbox options="0,0">
 						<menulist>
-							<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,20"/>
+							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="check_top(this)" options="No,1,20"/>
 						</menulist>
-						<description/>
 						<buttononly align="right" label="Update" id="button[update]" onclick="update_boulder();" class="leftPad5"/>
 					</hbox>
 				</row>
@@ -39,6 +40,7 @@
 						<buttononly label="Bonus" id="button[bonus]" onclick="bonus_clicked(this);" class="bigButton"/>
 						<buttononly label="Top" id="button[top]" onclick="top_clicked(this);" class="bigButton"/>
 						<buttononly label="&gt;&gt;" id="button[next]" onclick="boulder_next();" class="bigButton"/>
+						<buttononly align="right" label="Protocol" onclick="protocol.display();"/>
 					</hbox>
 					<description/>
 					<description/>

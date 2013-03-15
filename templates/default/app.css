@@ -41,3 +41,35 @@
 .inputFullWidth input { width:100%; }
 .checkAllArrow input { right-pad: 10px; }
 .previewImage img { max-width: 200px; max-height: 100px; border: 1px solid black; }
+
+/**
+ * Boulder protocol
+ */
+div#protocolDiv {
+	position: absolute;
+	overflow: auto;
+	z-index: 1000;
+	top: 2px;
+	left: 2px;
+	width: 90%;
+	height: 90%;
+	background-color: white;
+	border: 2px solid black;
+	border-radius: 10px;
+	padding: 5px;
+	margin: 0;
+}
+table#protocolTable {
+	width: 100%;
+}
+table#protocolTable th, table#protocolTable td {
+	text-align: left;
+}
+input#deleteButton {
+	float: right;
+}
+/* disable federation or city column in boulder measurement */
+div#table table.DrTable td.federation, div#table table.DrTable th.federation,
+div#table table.DrTable td.city, div#table table.DrTable th.city {
+	display: none;
+}

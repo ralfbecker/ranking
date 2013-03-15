@@ -61,6 +61,8 @@ class ranking_boulder_measurement
 				$sel_options['PerId'][$row['PerId']] = boresult::athlete2string($row, false);
 			}
 		}
+		// init protocol
+		egw_framework::validate_file('/ranking/js/boulder.js');
 	}
 
 	/**
