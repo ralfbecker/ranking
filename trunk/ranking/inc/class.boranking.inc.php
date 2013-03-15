@@ -177,6 +177,7 @@ class boranking extends ranking_so
 			}
 			else
 			{
+				translation::add_app('etemplate');
 				translation::$lang_arr['top'] = 'Top';
 				translation::$lang_arr['Time'] = 'Zeit';
 			}
