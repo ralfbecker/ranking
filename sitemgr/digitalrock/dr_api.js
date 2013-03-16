@@ -1481,7 +1481,10 @@ DrTable.prototype.sortData = function()
 		default:
 			var sort = this.sort;
 			this.data.sort(function(_a,_b){
-				return _a[sort] == _b[sort] ? 0 : (_a[sort] < _b[sort] ? -1 : 1);
+				var a = sort == 'start_order' ? parseInt(_a[sort]) : _a[sort];
+				var b = sort == 'start_order' ? parseInt(_b[sort]) : _b[sort];
+				return a == b ? 0 : (a < b ? -1 : 1);
+				//return _a[sort] == _b[sort] ? 0 : (_a[sort] < _b[sort] ? -1 : 1);
 			});
 			break;
 	}
