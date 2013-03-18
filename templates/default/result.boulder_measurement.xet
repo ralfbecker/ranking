@@ -22,7 +22,7 @@
 				</row>
 				<row height="60">
 					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="check_try(this)" options=",1,20"/>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="set_try(this.value)" options=",1,20"/>
 					</menulist>
 					<menulist>
 						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,20"/>
