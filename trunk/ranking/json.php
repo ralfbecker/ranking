@@ -52,7 +52,14 @@ $encoding = translation::charset();
 
 if (!isset($_GET['debug']) || !$_GET['debug'])
 {
-	header('Content-Type: application/json; charset='.$encoding);
+	if ($_GET['callback'])	// JSONP uses application/javascript as content-type
+	{
+		header('Content-Type: application/javascript; charset='.$encoding);
+	}
+	else
+	{
+		header('Content-Type: application/json; charset='.$encoding);
+	}
 	if (isset($result['expires'])) egw_session::cache_control($result['expires']);
 	if (isset($result['etag']))
 	{
