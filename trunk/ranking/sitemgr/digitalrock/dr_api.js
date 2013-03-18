@@ -1198,7 +1198,7 @@ function DrTable(_data,_columns,_sort,_ascending,_quota,_navigateTo)
 	this.sort      = _sort;
 	if (typeof _ascending == 'undefined') _ascending = true;
 	this.ascending = _ascending;
-	this.quota = _quota;
+	this.quota = parseInt(_quota);
 	this.navigateTo = _navigateTo;
 	// hash with PerId => tr containing athlete
 	this.athletes = {};
@@ -1272,7 +1272,7 @@ function DrTable(_data,_columns,_sort,_ascending,_quota,_navigateTo)
 DrTable.prototype.update = function(_data,_quota)
 {
 	this.data = _data;
-	if (typeof _quota != 'undefined') this.quota = _quota;
+	if (typeof _quota != 'undefined') this.quota = parseInt(_quota);
 	//console.log(this.data);
 	this.sortData();
 	
@@ -1441,7 +1441,7 @@ DrTable.prototype.createRow = function(_data,_tag)
 	}
 	// add or remove quota line
 	if (this.sort == 'result_rank' && this.quota && _data.result_rank && 
-		_data.result_rank >= 1 && _data.result_rank > this.quota)
+		parseInt(_data.result_rank) >= 1 && parseInt(_data.result_rank) > this.quota)
 	{
 		row.className = 'quota_line';
 		delete this.quota;	// to set quota line only once
