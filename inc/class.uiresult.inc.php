@@ -890,21 +890,29 @@ class uiresult extends boresult
 			$cat && ($content['nm']['old_cat'] != $cat['GrpId'] || 			// cat changed or
 			!($route = $this->route->read($keys)))))	// route not found and no general result
 		{
-			$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
-			if (!is_numeric($keys['route_order']) || !$this->has_startlist($keys))
+			if ($content['nm']['show_result'] == 4 && is_numeric($keys['route_order']) &&
+				($route = $this->route->read($keys)))
 			{
-				if ($cat) $msg = lang('No startlist or result yet!');
-				$content['nm']['show_result'] = '0';
+				// cat changed in measurement and same route exists for new cat --> stay in measurement
 			}
-			elseif ($keys['route_order'] > 0)	// more then the quali --> show the general result
+			else
 			{
-				$content['nm']['route'] = $keys['route_order'] = -1;
+				$content['nm']['route'] = $keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId']);
+				if (!is_numeric($keys['route_order']) || !$this->has_startlist($keys))
+				{
+					if ($cat) $msg = lang('No startlist or result yet!');
+					$content['nm']['show_result'] = '0';
+				}
+				elseif ($keys['route_order'] > 0)	// more then the quali --> show the general result
+				{
+					$content['nm']['route'] = $keys['route_order'] = -1;
+				}
+				else	// only quali --> show result if availible, else startlist
+				{
+					$content['nm']['show_result'] = $this->has_results($keys) ? '1' : '0';
+				}
+				if (is_numeric($keys['route_order'])) $route = $this->route->read($keys);
 			}
-			else	// only quali --> show result if availible, else startlist
-			{
-				$content['nm']['show_result'] = $this->has_results($keys) ? '1' : '0';
-			}
-			if (is_numeric($keys['route_order'])) $route = $this->route->read($keys);
 		}
 		elseif ($content['nm']['show_result'] == 4 && is_numeric($keys['route_order']))
 		{
