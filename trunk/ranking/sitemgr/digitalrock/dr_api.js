@@ -247,13 +247,12 @@ Startlist.prototype.update = function()
 		context: this,
 		data: '',
 		dataType: this.json_url.indexOf('//') == -1 ? 'json' : 'jsonp',
-		jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not chachable by CDN
+		jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not cachable by CDN
 		cache: true,
 		type: 'GET', 
 		success: this.handleResponse,
 		error: function(_xmlhttp,_err) { 
-			if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err); 
-		}
+			if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
 	});
 };
 
@@ -766,7 +765,7 @@ function Profile(_container,_json_url,_template)
 	this.json_url = _json_url;
 	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
 	this.container.attr('class', 'Profile');
-	this.template = jQuery(_template || this.container).html();
+	if (_template) this.template = jQuery(_template).html();
 	this.container.empty();
 	
 	this.bestResults = 12;
@@ -1692,3 +1691,89 @@ if(!Object.create)
         return new F();
     };
 }
+
+/**
+ * Default tempalte for Profile widget
+ */
+Profile.prototype.template =
+'<div>\n'+
+'<table class="profileHeader">\n'+
+' <thead>\n'+
+'  <tr>\n'+
+'   <td class="profilePhoto"><img src="$$photo$$" border="0"></td>\n'+
+'   <td>\n'+
+'  	<h1><a href="$$homepage$$" target="_blank">\n'+
+'	  <span class="firstname">$$firstname$$</span>\n'+
+'	  <span class="lastname">$$lastname$$</span>\n'+
+'  	</a></h1>\n'+
+'    <h2 class="profileNation">$$nation$$</h1>\n'+
+'    <h3 class="profileFederation"><a href="$$fed_url$$" target="_blank">$$federation$$</a></h1>\n'+
+'   </td>\n'+
+'   <td class="profileLogo"><a href="http://www.digitalROCK.de" target=_blank><img src="http://www.digitalrock.de/dig_rock-155x100.png" title="digital ROCK\'s Homepage" /></a></td>\n'+
+'  </tr>\n'+
+' </thead>\n'+
+'</table>\n'+
+'<table cols="6" class="profileData">\n'+
+'  <thead>\n'+
+'	<tr>\n'+
+'		<td>age:</td>\n'+
+'		<td class="profileAge">$$age$$</td>\n'+
+'		<td>date of birth:</td>\n'+
+'		<td colspan="3" class="profileBirthdate">$$birthdate$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileHideRowIfEmpty">\n'+
+'		<td colspan="2"></td>\n'+
+'		<td>place of birth:</td>\n'+
+'		<td colspan="3" class="profileBirthplace profileHideRowIfEmpty">$$birthplace$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileHideRowIfEmpty">\n'+
+'		<td>height:</td>\n'+
+'		<td class="profileHeight profileHideRowIfEmpty">$$height$$</td>\n'+
+'		<td>weight:</td>\n'+
+'		<td colspan="3" class="profileWeight profileHideRowIfEmpty">$$weight$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileMarginTop profileHideRowIfEmpty">\n'+
+'		<td>address:</td>\n'+
+'		<td colspan="2" class="profileCity profileHideRowIfEmpty">$$postcode$$ $$city$$</td>\n'+
+'		<td colspan="3" class="profileStreet profileHideRowIfEmpty">$$street$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileMarginTop profileHideRowIfEmpty">\n'+
+'		<td colspan="2">practicing climbing for:</td>\n'+
+'		<td colspan="4" class="profilePractice profileHideRowIfEmpty">$$practice$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileHideRowIfEmpty">\n'+
+'		<td colspan="2">professional climber (if not, profession):</td>\n'+
+'		<td colspan="4" class="profileProfessional profileHideRowIfEmpty">$$professional$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileHideRowIfEmpty">\n'+
+'		<td colspan="2">other sports practiced:</td>\n'+
+'		<td colspan="4" class="profileOtherSports profileHideRowIfEmpty">$$other_sports$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileMarginTop profileHideRowIfEmpty">\n'+
+'		<td colspan="6" class="profileFreetext profileHideRowIfEmpty">$$freetext$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileMarginTop">\n'+
+'		<td colspan="2" class="profileRanglist"><a href="$$rankings/0/url$$">$$rankings/0/name$$</a>:</td>\n'+
+'		<td class="profileRank">$$rankings/0/rank$$</td>\n'+
+'		<td colspan="2" class="profileRanglist"><a href="$$rankings/1/url$$">$$rankings/1/name$$</a>:</td>\n'+
+'		<td class="profileRank">$$rankings/1/rank$$</td>\n'+
+'	</tr>\n'+
+'	<tr>\n'+
+'		<td colspan="2" class="profileRanglist"><a href="$$rankings/2/url$$">$$rankings/2/name$$</a>:</td>\n'+
+'		<td class="profileRank">$$rankings/2/rank$$</td>\n'+
+'		<td colspan="2" class="profileRanglist"><a href="$$rankings/3/url$$">$$rankings/3/name$$</a>:</td>\n'+
+'		<td class="profileRank">$$rankings/3/rank$$</td>\n'+
+'	</tr>\n'+
+'	<tr class="profileResultHeader profileMarginTop">\n'+
+'		<td colspan="6"><a href="javascript:widget.widget.toggleResults()" title="show all results">best results:</a></td>\n'+
+'	</tr>\n'+
+'   </thead>\n'+
+'   <tbody>\n'+
+'	<tr class="profileResult $$results/N/weightClass$$">\n'+
+'		<td class="profileResultRank">$$results/N/rank$$</td>\n'+
+'		<td colspan="4" class="profileResultName"><a href="$$results/N/url$$">$$results/N/cat_name+name$$</a></td>\n'+
+'		<td class="profileResultDate">$$results/N/date$$</td>\n'+
+'	</tr>\n'+
+'  </tbody>\n'+
+'</table>\n'+
+'</div>\n';
