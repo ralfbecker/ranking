@@ -175,3 +175,9 @@ tr.profileMarginTop > td {
 	font-style: normal;
 	font-size: 120%;
 }
+/**
+ * Fix some CSS on www.ifsc-climbing.org
+ */
+section#gkMainbody table.profileHeader thead tr:hover td, table.profileData thead tr:hover td {
+	background-color: black;
+}
