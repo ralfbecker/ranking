@@ -493,12 +493,25 @@ function try_clicked(button)
 }
 
 /**
+ * Set tries to given number
+ * 
+ * @param n
+ */
+function set_try(n)
+{
+	try_num(n-1, true);
+	
+	try_clicked(document.getElementById('exec[button][try]'));
+}
+
+/**
  * Get number of try from label of try button
  * 
  * @param int set_value 0: reset, 1: set to 1, if not already higher
+ * @param boolean set_anyway set, even if number is smaller
  * @returns int number of try
  */
-function try_num(set_value)
+function try_num(set_value, set_anyway)
 {
 	var try_button = document.getElementById('exec[button][try]');
 
@@ -510,8 +523,10 @@ function try_num(set_value)
 		var label = try_button.value;
 		label = label.replace(/^[0-9]+. /,'');
 		
-		if (set_value == 0 || num < set_value) num = set_value;
-		
+		if (set_value == 0 || num < set_value || set_anyway)
+		{
+			document.getElementById('exec[try]').value = num = set_value;
+		}
 		try_button.value = (num ? ''+num+'. ' : '')+label;
 	}
 	return num;
