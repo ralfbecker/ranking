@@ -590,7 +590,7 @@ function update_boulder(clicked)
 		}
 		
 		var update = {};
-		update['zone'+n] = bonus;
+		update['zone'+n] = bonus === '' ? 'empty' : bonus;	// egw_json_encode sends '' as null, which get not stored!
 		update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
 
 		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});				
