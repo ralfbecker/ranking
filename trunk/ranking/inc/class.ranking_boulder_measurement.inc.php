@@ -82,6 +82,9 @@ class ranking_boulder_measurement
 		$keys = self::query2keys($query);
 		//$response->alert(__METHOD__."($PerId, ".array2string($update).", $set_current) ".array2string($keys));
 
+		// change zone$n === 'empty' --> ''
+		if ($update['zone'.$set_current] === 'empty') $update['zone'.$set_current] = '';
+
 		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
 		if (boresult::$instance->save_result($keys,array($PerId => $update),$query['route_type'],$query['discipline']))
 		{
