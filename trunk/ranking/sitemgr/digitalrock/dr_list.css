@@ -181,3 +181,6 @@ tr.profileMarginTop > td {
 section#gkMainbody table.profileHeader thead tr:hover td, table.profileData thead tr:hover td {
 	background-color: black;
 }
+section#gkMainbody table.DrTable thead, section#gkMainbody table.DrTable tbody{
+	background-color: inherit;
+}
