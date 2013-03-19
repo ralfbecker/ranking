@@ -46,6 +46,17 @@ class ranking_widget
 	public $url_mode = self::URL_HASH;
 
 	/**
+	 * Default number of best results to show (should match default of dr_api.js!)
+	 */
+	const DEFAULT_BEST_RESULTS = 12;
+	/**
+	 * Best results to show in profile
+	 *
+	 * @var int
+	 */
+	public $best_results = self::DEFAULT_BEST_RESULTS;
+
+	/**
 	 * URL to query json data
 	 *
 	 * @var string
@@ -157,7 +168,7 @@ class ranking_widget
 			{
 				$this->params = $_GET;
 			}
-			error_log(__METHOD__."('$id') params=".print_r($this->params, true));
+			//error_log(__METHOD__."('$id') params=".print_r($this->params, true));
 
 			try {
 				return $this->render_widgets($id, $title);
@@ -187,10 +198,6 @@ class ranking_widget
 		$dr_api_url .= 'sitemgr/digitalrock/dr_api.js';
 
 		$params = json_encode($this->widget_params);
-		if (isset($this->widget_params['Profile']))	// remove quoting as string
-		{
-			$params = preg_replace('/"Profile":".*"(,"|})/', '"Profile":'.$this->widget_params['Profile'].'$1', $params);
-		}
 
 		return "<div id='$id' />
 
@@ -312,7 +319,229 @@ class ranking_widget
 		{
 			return $this->Resultlist($id, $title);
 		}
+		if (isset($this->data['results']))
+		{
+			return $this->Profile($id, $title);
+		}
 		return "Not yet implemented!";
+	}
+
+	/**
+	 * Default Profile template, if none is specified via widget_params['Profile']
+	 *
+	 * @var string
+	 */
+	private static $default_template = '
+<table class="profileHeader">
+ <thead>
+  <tr>
+   <td class="profilePhoto"><img src="$$photo$$" border="0"></td>
+   <td>
+  	<h1><a href="$$homepage$$" target="_blank">
+	  <span class="firstname">$$firstname$$</span>
+	  <span class="lastname">$$lastname$$</span>
+  	</a></h1>
+    <h2 class="profileNation">$$nation$$</h1>
+    <h3 class="profileFederation"><a href="$$fed_url$$" target="_blank">$$federation$$</a></h1>
+   </td>
+   <td class="profileLogo"><a href="http://www.digitalROCK.de" target=_blank><img src="http://www.digitalrock.de/dig_rock-155x100.png" title="digital ROCK\'s Homepage" /></a></td>
+  </tr>
+ </thead>
+</table>
+<table cols="6" class="profileData">
+  <thead>
+	<tr>
+		<td>age:</td>
+		<td class="profileAge">$$age$$</td>
+		<td>date of birth:</td>
+		<td colspan="3" class="profileBirthdate">$$birthdate$$</td>
+	</tr>
+	<tr class="profileHideRowIfEmpty">
+		<td colspan="2"></td>
+		<td>place of birth:</td>
+		<td colspan="3" class="profileBirthplace profileHideRowIfEmpty">$$birthplace$$</td>
+	</tr>
+	<tr class="profileHideRowIfEmpty">
+		<td>height:</td>
+		<td class="profileHeight profileHideRowIfEmpty">$$height$$</td>
+		<td>weight:</td>
+		<td colspan="3" class="profileWeight profileHideRowIfEmpty">$$weight$$</td>
+	</tr>
+	<tr class="profileMarginTop profileHideRowIfEmpty">
+		<td>address:</td>
+		<td colspan="2" class="profileCity profileHideRowIfEmpty">$$postcode$$ $$city$$</td>
+		<td colspan="3" class="profileStreet profileHideRowIfEmpty">$$street$$</td>
+	</tr>
+	<tr class="profileMarginTop profileHideRowIfEmpty">
+		<td colspan="2">practicing climbing for:</td>
+		<td colspan="4" class="profilePractice profileHideRowIfEmpty">$$practice$$</td>
+	</tr>
+	<tr class="profileHideRowIfEmpty">
+		<td colspan="2">professional climber (if not, profession):</td>
+		<td colspan="4" class="profileProfessional profileHideRowIfEmpty">$$professional$$</td>
+	</tr>
+	<tr class="profileHideRowIfEmpty">
+		<td colspan="2">other sports practiced:</td>
+		<td colspan="4" class="profileOtherSports profileHideRowIfEmpty">$$other_sports$$</td>
+	</tr>
+	<tr class="profileMarginTop profileHideRowIfEmpty">
+		<td colspan="6" class="profileFreetext profileHideRowIfEmpty">$$freetext$$</td>
+	</tr>
+	<tr class="profileMarginTop">
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/0/url$$">$$rankings/0/name$$</a>:</td>
+		<td class="profileRank">$$rankings/0/rank$$</td>
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/1/url$$">$$rankings/1/name$$</a>:</td>
+		<td class="profileRank">$$rankings/1/rank$$</td>
+	</tr>
+	<tr>
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/2/url$$">$$rankings/2/name$$</a>:</td>
+		<td class="profileRank">$$rankings/2/rank$$</td>
+		<td colspan="2" class="profileRanglist"><a href="$$rankings/3/url$$">$$rankings/3/name$$</a>:</td>
+		<td class="profileRank">$$rankings/3/rank$$</td>
+	</tr>
+	<tr class="profileResultHeader profileMarginTop">
+		<td colspan="6"><a href="javascript:widget.widget.toggleResults()" title="show all results">best results:</a></td>
+	</tr>
+   </thead>
+   <tbody>
+	<tr class="profileResult $$results/N/weightClass$$">
+		<td class="profileResultRank">$$results/N/rank$$</td>
+		<td colspan="4" class="profileResultName"><a href="$$results/N/url$$">$$results/N/cat_name+name$$</a></td>
+		<td class="profileResultDate">$$results/N/date$$</td>
+	</tr>
+  </tbody>
+</table>
+';
+
+	/**
+	 * Server-side rendering of athlete profile
+	 *
+	 * @param string $id='widget_content'
+	 * @param string &$title on return of server-side rendering title of widget, to eg. put in page-title
+	 * @return string with html
+	 */
+	protected function Profile($id, &$title=null)
+	{
+		$template = empty($this->widget_params['Profile']) ? self::$default_template : $this->widget_params['Profile'];
+		//echo "<pre>".htmlspecialchars($template)."</pre>\n";
+
+		// replace non-result data
+		$data = $this->data;	// can NOT use $this in closure with PHP 5.3, requires 5.4!
+		$content = preg_replace_callback('/\$\$([^$]+)\$\$/', function($matches) use($data)
+		{
+			foreach(explode('/', $matches[1]) as $part)
+			{
+				if (empty($data[$part]))
+				{
+					return $part === 'N' ? $matches[0] : '';
+				}
+				$data = $data[$part];
+			}
+			switch($part)
+			{
+				case 'practice':
+					$data = lang('%1 years, since %2', $data, date('Y')-$data);
+					break;
+				case 'height':
+					$data .= ' cm';
+					break;
+				case 'weight':
+					$data .= ' kg';
+					break;
+				case 'url':
+					return $this->url($data);
+			}
+			return htmlspecialchars($data, ENT_COMPAT, $this->charset);
+		},
+		$template);
+
+		// replace result data
+		$data = $this->data;
+		if (preg_match_all('|\s*<tr.*</tr>\n?|siU', $content, $matches))
+		{
+			foreach($matches[0] as $row)
+			{
+				if (strpos($row, '$$results/N/') === false) continue;
+
+				$year = (int)date('Y');
+				$limits = array();
+				foreach($data['results'] as &$result)
+				{
+					$result['weight'] = $weight = $result['rank']/2 + ($year-$result['date']) + 4*!empty($result['nation']);
+					// maintain array of N best competitions (least weight)
+					if (count($limits) < $this->best_results || $weight < $limits[count($limits)-1])
+					{
+						foreach($limits as $n => $limit)
+						{
+							if ($limit > $weight) break;
+						}
+						if (!isset($limit) || $limit < $weight && $n == count($limits)-1) $n = count($limits);
+						$limits = array_merge(array_slice($limits, 0, (int)$n), array($weight),
+							array_slice($limits, (int)$n, $this->best_results-1-$n));
+					}
+				}
+				unset($resutl);
+				$weight_limit = array_pop($limits);
+
+				$rows = '';
+				$l = 0;
+				foreach($data['results'] as $i => $result)
+				{
+					if ($result['weight'] > $weight_limit || ++$l > $this->best_results)
+					{
+						$result['weightClass'] = 'profileResultHidden';
+					}
+					$rows .= preg_replace_callback('/\$\$results\/N\/([^$]+)\$\$/', function($matches) use($data, $result)
+					{
+						switch ($placeholder=$matches[1])
+						{
+							case 'cat_name+name':
+								$ret = ($result['GrpId'] != $data['GrpId'] ? $result['cat_name'].': ' : '').$result['name'];
+								break;
+							case 'date':
+								$ret = implode('.', explode('-', $result['date']));
+								break;
+							case 'url':
+								return $this->url($result['url']);
+							default:
+								$ret = empty($result[$placeholder]) ? '' : $result[$placeholder];
+								break;
+						}
+						return htmlspecialchars($ret, ENT_COMPAT, $this->charset);
+					},
+					$row);
+				}
+				$content = str_replace($row, $rows, $content);
+			}
+		}
+
+		// add our id and class
+		$content = $this->tag('div', $content, array('id' => $id, 'class' => 'Profile'), false);
+
+		// remove links with empty href
+		// remove images with empty src
+		// hide rows with profileHideRowIfEmpty, if ALL td.profileHideRowIfEmpty are empty
+		$content .= "<script>
+	jQuery('#$id').find('a[href=\"\"]').replaceWith(function(){
+		return jQuery(this).contents();
+	});
+	jQuery('#$id').find('img[src=\"\"]').remove();
+	jQuery('#$id').find('tr.profileHideRowIfEmpty').each(function(index, row){
+		var tds = jQuery(row).children('td.profileHideRowIfEmpty');
+		if (tds.length == tds.filter(':empty').length)
+		{
+			jQuery(row).hide();
+		}
+	});
+	var widget = { widget: { toggleResults: function()
+	{
+		var hidden_rows = jQuery('#$id').find('tr.profileResultHidden');
+		var display = hidden_rows.length ? jQuery(hidden_rows[0]).css('display') : 'none';
+		hidden_rows.css('display', display == 'none' ? 'table-row' : 'none');
+	}}};
+</script>\n";
+
+		return $content;
 	}
 
 	private $result_cols = array();
