@@ -251,7 +251,7 @@ Startlist.prototype.update = function()
 		cache: true,
 		type: 'GET', 
 		success: this.handleResponse,
-		error: function(_xmlhttp,_err) { 
+		error: function(_xmlhttp,_err,_status) { 
 			if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
 	});
 };
@@ -758,14 +758,14 @@ Starters.prototype.federation = function(_fed_id)
  * 
  * @param _container id or dom node
  * @param _json_url url for data to load
- * @param _template optional id or dome node, default _container
+ * @param _template optional string with html-template
  */
 function Profile(_container,_json_url,_template)
 {
 	this.json_url = _json_url;
 	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
 	this.container.attr('class', 'Profile');
-	if (_template) this.template = jQuery(_template).html();
+	if (_template) this.template = _template;
 	this.container.empty();
 	
 	this.bestResults = 12;
