@@ -37,6 +37,11 @@ c) route: The heat of a category result, or if ommited general result:
 2  = further heats 'til the final depending on discipline
 N  = final (N-1 in speed is eg. small final)
 
+d) type=result instead of route, to fetch result from ranking, not result-service
+This is done automatic if there is no result in result-service.
+If result has been filtered on import (eg. EYC result or international or national open competitions),
+this contains the filtered result, with result-service contains the full result.
+
 Examples:
 --------
 1) lead competition general result:

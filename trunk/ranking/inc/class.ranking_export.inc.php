@@ -68,7 +68,7 @@ class ranking_export extends boresult
 			}
 			else
 			{
-				$result = self::export_route($_GET['comp'],$_GET['cat'],$_GET['route']);
+				$result = self::export_route($_GET['comp'],$_GET['cat'],isset($_GET['route']) ? $_GET['route'] : $_GET['type']);
 				$root_tag = 'route';
 			}
 		}
@@ -233,7 +233,7 @@ class ranking_export extends boresult
 	 *
 	 * @param int $comp
 	 * @param int|string $cat
-	 * @param int $heat=-1
+	 * @param int|string $heat=-1 string 'result' to use result from ranking
 	 * @param boolean $update_cache=false false: read result from cache, false: update cache, before using it
 	 * @return array
 	 */
@@ -268,7 +268,20 @@ class ranking_export extends boresult
 		{
 			if (!isset($instance)) $instance = new ranking_export();
 
-			$data = $instance->_export_route($comp, $cat, $heat);
+			if ($heat === 'result')
+			{
+				$data = $instance->_export_result($comp, $cat);
+			}
+			else
+			{
+				try {
+					$data = $instance->_export_route($comp, $cat, $heat);
+				}
+				catch(Exception $e) {
+					// try if we have a result in ranking
+					$data = $instance->_export_result($comp, $cat);
+				}
+			}
 			// setting expires depending on result offical and how long it is offical
 			$data['expires'] = !isset($data['route_result']) ? self::EXPORT_ROUTE_RUNNING_EXPIRES :
 				(time()-$data['last_modified'] > self::EXPORT_ROUTE_RECENT_TIMEOUT ?
@@ -1063,7 +1076,7 @@ class ranking_export extends boresult
 		)) as $result)
 		{
 			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
-			if (($ts = $modified->format('ts')) > $last_modified) $last_modified = $ts;
+			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
 			$cats_by_id[$result['GrpId']]['results'][] = array(
 				'result_rank' => $result['platz'],
 			)+self::athlete_attributes($result, $comp['nation'], $result['GrpId']);
@@ -1087,6 +1100,61 @@ class ranking_export extends boresult
 
 		//_debug_array($ret); exit;
 		return $data;
+	}
+
+	/**
+	 * Export result from ranking (NOT result service) using identical format as _export_route
+	 *
+	 * @param int $comp
+	 * @param int $cat
+	 * @return array
+	 */
+	protected function _export_result($comp, $cat)
+	{
+		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
+		{
+			throw new Exception(lang('Category NOT found !!!'));
+		}
+
+		if (!($comp = $this->comp->read($comp)))
+		{
+			throw new Exception(lang('Competition NOT found !!!'));
+		}
+		if (!($discipline = $comp['discipline']))
+		{
+			$discipline = $cat['discipline'];
+		}
+		$modified = egw_time::createFromFormat(egw_time::DATABASE, $comp['modified'], egw_time::$server_timezone);
+		$last_modified = $modified->format('U');
+
+		$results = array();
+		foreach($this->result->read(array(
+			'WetId' => $comp['WetId'],
+			'GrpId' => $cat['GrpId'],
+			'platz > 0',
+		)) as $result)
+		{
+			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
+			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
+			$results[] = array(
+				'result_rank' => $result['platz'],
+				'result' => $result['pkt'],
+			)+self::athlete_attributes($result, $comp['nation'], $result['GrpId']);
+		}
+		$ret = array(
+			'WetId'         => $comp['WetId'],
+			'GrpId'         => $cat['GrpId'],
+			'route_name'    => $cat['name'],
+			'route_result'  => implode('.', array_reverse(explode('-',$comp['datum']))),
+			'comp_name'     => $comp['name'],
+			'nation'        => $comp['nation'],
+			'discipline'    => $discipline,
+			'participants'  => $results,
+			'last_modified' => $last_modified,
+		);
+		$ret['etag'] = md5(serialize($ret));
+
+		return $ret;
 	}
 
 	/**
@@ -1132,7 +1200,7 @@ class ranking_export extends boresult
 		), '', true, $results ? '' : ($comp['nation'] ? 'acl_fed_id,fed_parent' : 'nation').',GrpId,pkt') as $result)
 		{
 			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
-			if (($ts = $modified->format('ts')) > $last_modified) $last_modified = $ts;
+			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
 
 			$fed_id = !$comp['nation'] ? $result['nation'] :
 				($result['acl_fed_id'] ? $result['acl_fed_id'] :
@@ -1295,18 +1363,23 @@ class ranking_export extends boresult
 					}
 					if (!$cup || ($cup = $this->cup->read($cup)))
 					{
-						$ranking = $this->export_ranking($cat, $date, $cup['SerId'], true);
-						foreach($ranking['participants'] as $participant)
-						{
-							if ($participant['PerId'] == $athlete['PerId']) break;
+						try {
+							$ranking = $this->export_ranking($cat, $date, $cup['SerId'], true);
+							foreach($ranking['participants'] as $participant)
+							{
+								if ($participant['PerId'] == $athlete['PerId']) break;
+							}
+							$data['rankings'][] = array(
+								'rank' => $participant['PerId'] == $athlete['PerId'] ? $participant['result_rank'] : '',
+								'name' => $cup ? $cup['name'] : ($cat['nation'] ? lang('Ranking') : 'Worldranking'),
+								'SerId' => $cup['SerId'],
+								'url' => self::ranking_url($cat['GrpId'], $cup ? $cup['SerId'] : null),
+								'date' => $ranking['end'],
+							);
 						}
-						$data['rankings'][] = array(
-							'rank' => $participant['PerId'] == $athlete['PerId'] ? $participant['result_rank'] : '',
-							'name' => $cup ? $cup['name'] : ($cat['nation'] ? lang('Ranking') : 'Worldranking'),
-							'SerId' => $cup['SerId'],
-							'url' => self::ranking_url($cat['GrpId'], $cup ? $cup['SerId'] : null),
-							'date' => $ranking['end'],
-						);
+						catch(Exception $e) {
+							// ignore not existing rankings
+						}
 					}
 
 				}
