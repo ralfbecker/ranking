@@ -107,6 +107,9 @@ div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {
 	background-size: 100%;
 	position: relative;
 }
+td.boulder > div {
+	white-space: nowrap;	
+}
 
 div.boulderNone {
 	background-image: url(../../templates/default/images/boulderNone.png);
@@ -183,4 +186,8 @@ section#gkMainbody table.profileHeader thead tr:hover td, table.profileData thea
 }
 section#gkMainbody table.DrTable thead, section#gkMainbody table.DrTable tbody{
 	background-color: inherit;
+}
+/* do NOT show start-numbers on ifsc-website */
+section#gkMainbody table.DrTable .start_number {
+	display: none;
 }
