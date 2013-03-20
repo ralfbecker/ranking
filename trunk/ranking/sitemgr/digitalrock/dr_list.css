@@ -3,7 +3,7 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2010/11 by RalfBecker@digitalROCK.de
+ * @copyright 2010-13 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
 
@@ -80,6 +80,9 @@ table.DrTable tbody th a {
  */
 ul.seeAlso:before {
 	content: "See also:";
+}
+ul.seeAlso li {
+	display: block ! important;
 }
 
 /**
