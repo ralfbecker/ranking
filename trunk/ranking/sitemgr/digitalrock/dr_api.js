@@ -139,6 +139,17 @@ Resultlist.prototype.handleResponse = function(_data)
 			break;
 	}
 	Startlist.prototype.handleResponse.call(this, _data);
+	
+	if (_data.discipline == 'ranking' && detail && detail[1] == '1' && _data.max_comp)
+	{
+		var tfoot = jQuery(document.createElement('tfoot'));
+		jQuery(this.table.dom).append(tfoot);
+		var th = jQuery(document.createElement('th'));
+		tfoot.append(jQuery(document.createElement('tr')).append(th));
+		var cols=0; for(var c in this.result_cols) cols++;
+		th.attr('colspan', cols);
+		th.text(_data.max_comp+' best competition results are counting for the ranking, not counting points are in brackets.');
+	}
 };
 
 /**
