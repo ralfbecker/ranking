@@ -76,6 +76,13 @@ table.DrTable tbody th a {
 }
 
 /**
+ * See also links
+ */
+ul.seeAlso:before {
+	content: "See also:";
+}
+
+/**
  * Result column
  */
 .result {

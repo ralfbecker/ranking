@@ -452,6 +452,29 @@ Startlist.prototype.handleResponse = function(_data)
 		this.table = new DrTable(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null,this.navigateTo);
 	
 		jQuery(this.container).append(this.table.dom);
+		
+		if (!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/) && this.discipline != 'ranking' &&
+			typeof _data.see_also != 'undefined')
+		{
+			var ul = jQuery(document.createElement('ul')).attr('class', 'seeAlso');
+			for(var i=0; i < _data.see_also.length; ++i)
+			{
+				var tag = jQuery(document.createElement('li'));
+				ul.append(tag);
+				if (_data.see_also[i].url)
+				{
+					var a = jQuery(document.createElement('a')).attr('href', _data.see_also[i].url);
+					tag.append(a);
+					if (this.navigateTo)
+					{
+						a.click(this.navigateTo);
+					}
+					tag = a;
+				}
+				tag.text(_data.see_also[i].name);
+			}
+			this.container.append(ul);
+		}
 	}
 	else
 	{

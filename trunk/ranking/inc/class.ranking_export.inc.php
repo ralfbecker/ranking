@@ -42,10 +42,10 @@ class ranking_export extends boresult
 				$result = $export->export_profile($_GET['person'], $_GET['cat']);
 				$root_tag = 'profile';
 			}
-			elseif (isset($_GET['cat']) && !isset($_GET['comp']))
+			elseif (isset($_GET['cat']) && (!isset($_GET['comp']) || $_GET['type'] === 'ranking'))
 			{
 				$export = new ranking_export();
-				$result = $export->export_ranking($_GET['cat'], $_GET['date'], $_GET['cup']);
+				$result = $export->export_ranking($_GET['cat'], isset($_GET['date']) ? $_GET['date'] : $_GET['comp'], $_GET['cup']);
 				$root_tag = 'ranking';
 			}
 			elseif (isset($_GET['nation']) || !isset($_GET['comp']))
@@ -586,6 +586,14 @@ class ranking_export extends boresult
 			'participants'  => $tn,
 			'last_modified' => $last_modified,
 		);
+		// for official results add ranking and cup links
+		if ($this->result->has_results(array(
+			'WetId' => $comp['WetId'],
+			'GrpId' => $cat['GrpId'],
+		)))
+		{
+			$ret += $this->see_also_result($comp, $cat);
+		}
 		$ret['etag'] = md5(serialize($ret));
 
 		return $ret;
@@ -1145,16 +1153,49 @@ class ranking_export extends boresult
 			'WetId'         => $comp['WetId'],
 			'GrpId'         => $cat['GrpId'],
 			'route_name'    => $cat['name'],
-			'route_result'  => implode('.', array_reverse(explode('-',$comp['datum']))),
+			'route_result'  => $comp['date_span'],
 			'comp_name'     => $comp['name'],
 			'nation'        => $comp['nation'],
 			'discipline'    => $discipline,
 			'participants'  => $results,
 			'last_modified' => $last_modified,
 		);
+		$ret += $this->see_also_result($comp, $cat);
+
 		$ret['etag'] = md5(serialize($ret));
 
 		return $ret;
+	}
+
+	/**
+	 * Add see also links to results
+	 * - ranking, if faktor > 0
+	 * - cup ranking, if cup set
+	 *
+	 * @param array $comp
+	 * @param int $cat
+	 * @return array with array of links ("name", "url") for key "see_also", empty array otherwise
+	 */
+	public function see_also_result(array $comp, $cat)
+	{
+		$see_also = array();
+		if ((double)$comp['faktor'] > 0)
+		{
+			$see_also[] = array(
+				'name' => 'Ranking'.' '.'after'.' '.$comp['name'],
+				'url' => '/ranglist.php?comp='.$comp['WetId'].'&cat='.(is_array($cat) ? $cat['GrpId'] : $cat).
+					'&type=ranking',
+			);
+		}
+		if ($comp['serie'] && ($cup = $this->cup->read($comp['serie'])))
+		{
+			$see_also[] = array(
+				'name' => $cup['name'].' '.'after'.' '.$comp['name'],
+				'url' => '/ranglist.php?comp='.$comp['WetId'].'&cat='.(is_array($cat) ? $cat['GrpId'] : $cat).
+					'&cup='.$cup['SerId'].'&type=ranking',
+			);
+		}
+		return $see_also ? array('see_also' => $see_also) : array();
 	}
 
 	/**
