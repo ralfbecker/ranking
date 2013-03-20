@@ -384,19 +384,29 @@ Startlist.prototype.handleResponse = function(_data)
 		if (this.columns.result && _data.route_names && _data.route_order == -1)
 		{
 			delete this.columns.result;
+			// show final first and 2. quali behind 1. quali: eg. 3, 2, 0, 1
 			var routes = [];
+			if (_data.route_names['1']) routes.push('1');
 			for(var id in _data.route_names)
 			{
-				routes.push(id);
+				if (id != '-1' && id != '1') routes.push(id);
 			}
 			routes.reverse();
-			// show final first and 2. quali behind 1. quali: eg. 3, 2, 0, 1
-			//for(var route=10; route >= -1; --route)
 			for(var i = 0; i < routes.length; ++i)
 			{
 				var route = routes[i];
-				if (route != 1 && typeof _data.route_names[Math.abs(route)] != 'undefined')
-					this.columns['result'+Math.abs(route)] = _data.route_names[Math.abs(route)];
+				// for ranking, we add link to results
+				if (_data.discipline == 'ranking')
+				{
+					this.columns['result'+parseInt(route)] = {	// parseInt(route) to remove space append to force js to keep the order
+						'label': _data.route_names[route],
+						'url': '#!comp='+parseInt(route)+'&cat='+_data.cat.GrpId
+					};
+				}
+				else
+				{
+					this.columns['result'+route] = _data.route_names[route];					
+				}
 			}
 			// evtl. add points column
 			if (_data.participants[0].quali_points)

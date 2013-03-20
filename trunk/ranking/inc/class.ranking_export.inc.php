@@ -935,7 +935,8 @@ class ranking_export extends boresult
 				$parts = preg_split('/ ?- ?/', $data['name']);
 				list($data['dru_bez']) = explode('/', array_pop($parts));
 			}
-			$route_names[$WetId] = $data['dru_bez']."\n".implode('.', array_reverse(explode('-', $data['datum'])));
+			// HACK: appending a space, to force JSON to keep order given here
+			$route_names[$WetId.' '] = $data['dru_bez']."\n".implode('.', array_reverse(explode('-', $data['datum'])));
 		}
 		unset($data);
 		$data = array(
