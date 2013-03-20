@@ -356,7 +356,8 @@ Startlist.prototype.handleResponse = function(_data)
 	// remove whole table, if discipline or startlist/resultlist (detemined by sort) changed
 	if (this.discipline && this.discipline != _data.discipline ||
 		this.sort && this.sort != sort ||
-		_data.route_order != this.route_order)	// switching heats (they can have different columns)
+		_data.route_order != this.route_order ||	// switching heats (they can have different columns)
+		detail != this.detail)		// switching detail on/off
 	{
 		jQuery(this.container).empty();
 		delete this.table;		
@@ -364,6 +365,7 @@ Startlist.prototype.handleResponse = function(_data)
 	this.discipline = _data.discipline;
 	this.sort = sort;
 	this.route_order = _data.route_order;
+	this.detail = detail;
 
 	if (typeof this.table == 'undefined')
 	{
