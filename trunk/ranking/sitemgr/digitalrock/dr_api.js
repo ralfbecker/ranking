@@ -915,6 +915,97 @@ Profile.prototype.toggleResults = function()
 };
 
 /**
+ * Constructor for ResultTempalte from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container id or dom node
+ * @param _json_url url for data to load
+ * @param _template optional string with html-template, if not html-content of _container will be used
+ */
+function ResultTemplate(_container,_json_url,_template)
+{
+	this.json_url = _json_url;
+	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
+	if (_template) 
+		this.template = _template;
+	else
+		this.template = this.container.html();
+	this.container.empty();
+	
+	this.update();
+}
+ResultTemplate.prototype.update = Startlist.prototype.update;
+/**
+ * Callback for loading data via ajax
+ * 
+ * @param _data route data object
+ */            
+ResultTemplate.prototype.handleResponse = function(_data)
+{
+	// if route is NOT offical, update list every 10 sec
+	if (!_data.route_result && typeof this.update_handle == 'undefined') 
+	{
+		var list = this;
+		this.update_handle = window.setInterval(function(){
+			list.update();
+		},10000);
+	}
+	// if route is offical stop reload
+	else if (_data.route_result && this.update_handle)
+	{
+		window.clearInterval(this.update_handle);
+		delete this.update_handle;
+	}
+
+	// replace non-result data
+	var pattern = /\$\$([^$]+)\$\$/g;
+	var html = this.template.replace(pattern, function(match, placeholder)
+	{
+		var parts = placeholder.split('/');
+		var data = _data;
+		for(var i=0; i < parts.length; ++i)
+		{
+			if (typeof data[parts[i]] == 'undefined' || !data[parts[i]])
+			{
+				return parts[i] === 'N' ? match : '';
+			}
+			data = data[parts[i]];
+		}
+		switch(placeholder)
+		{
+		}
+		return data;
+	});
+	// replace result data
+	var n = 0;
+	var bestResults = this.bestResults;
+	pattern = /\$\$participants\/N\/([^$]+)\$\$/g;
+	html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
+	{
+		if (match.indexOf('$$participants/N/') == -1) return match;
+
+		var rows = '';
+		for(var i=0; i < _data.participants.length; ++i)
+		{
+			var result = _data.participants[i];
+			rows += match.replace(pattern, function(match, placeholder)
+			{
+				switch (placeholder)
+				{
+					default:
+						return typeof result[placeholder] != 'undefined' ? result[placeholder] : '';
+				}
+			});
+		}
+		return rows;
+	});
+	
+	// replace container
+	this.container.html(html);
+};
+
+/**
  * Constructor calendar from given json url
  * 
  * Table get appended to specified _container
