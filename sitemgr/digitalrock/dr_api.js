@@ -561,6 +561,19 @@ Results.prototype.handleResponse = function(_data)
 
 	if (typeof this.table == 'undefined')
 	{
+		// competition chooser
+		this.comp_chooser = jQuery(document.createElement('select'));
+		this.comp_chooser.addClass('compChooser');
+		this.container.append(this.comp_chooser);
+		var that = this;
+		this.comp_chooser.change(function(e){
+			that.json_url = that.json_url.replace(/comp=[^&]+/, 'comp='+this.value);
+			if (that.navigateTo)
+				that.navigateTo(that.json_url);
+			else
+				that.update();
+		});
+		
 		// competition
 		this.comp_header = jQuery(document.createElement('h1'));
 		this.comp_header.addClass('compHeader');
@@ -572,9 +585,22 @@ Results.prototype.handleResponse = function(_data)
 	}
 	else
 	{
-		delete this.table.dom;
+		jQuery(this.table.dom).remove();
+		this.comp_chooser.empty();
 		this.comp_header.empty();
 		this.comp_date.empty();
+	}
+	// fill competition chooser
+	var option = jQuery(document.createElement('option'));
+	option.text('Select an other competition ...');
+	this.comp_chooser.append(option);
+	for(var i=0; i < _data.competitions.length; ++i)
+	{
+		var competition = _data.competitions[i];
+		option = jQuery(document.createElement('option'));
+		option.attr({'value':  competition.WetId, 'title': competition.date_span});
+		option.text(competition.name);
+		this.comp_chooser.append(option);
 	}
 	this.comp_header.text(_data.name);
 	this.comp_date.text(_data.date_span);

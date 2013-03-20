@@ -68,6 +68,10 @@ table.DrTable tbody th a {
 	font-weight: normal;
 }
 
+.Results select.compChooser {
+	width: 100%;
+}
+
 /**
  * Quota line
  */
