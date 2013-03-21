@@ -91,10 +91,12 @@ class ranking_export extends boresult
 	const IFSC_BASE_PAGE = '/index.php/world-competition';
 
 	/**
-	 * Return base url for
-	 * Enter description here ...
+	 * Return base url
+	 *
+	 * @param boolean $use_egw=false do we need egroupware or website
+	 * @return string with schema and host (no path or trailing slash)
 	 */
-	static function base_url()
+	static function base_url($use_egw=false)
 	{
 		switch($_SERVER['HTTP_HOST'])
 		{
@@ -102,7 +104,7 @@ class ranking_export extends boresult
 			case 'www.ifsc-climbing.org':
 			case 'ifsc.egroupware.net':
 			case 'egw.ifsc-climbing.org':
-				$host = 'www.ifsc-climbing.org';	// use CDN url
+				$host = $use_egw ? 'egw.ifsc-climbing.org' : 'www.ifsc-climbing.org';	// use CDN urls
 				break;
 
 			default:
@@ -282,6 +284,10 @@ class ranking_export extends boresult
 			{
 				try {
 					$data = $instance->_export_route($comp, $cat, $heat);
+					if (count($data['route_names']) == 1 && (!isset($heat) || !is_numeric($heat)) && $data['route_order'] != 0)
+					{
+						$data = $instance->_export_route($comp, $cat, 0);
+					}
 				}
 				catch(Exception $e) {
 					// try if we have a result in ranking
@@ -345,7 +351,7 @@ class ranking_export extends boresult
 
 		//printf("<p>reading route+result took %4.2lf s</p>\n",microtime(true)-$start);
 
-		//echo "<pre>".print_r($route,true)."</pre>\n";
+		//echo "<pre>".print_r($route,true)."</pre>\n";exit;
 
 		// append category name to route name
 		$route['route_name'] .= ' '.$cat['name'];
@@ -774,17 +780,7 @@ class ranking_export extends boresult
 					);
 					if (isset($cat['status']))
 					{
-						if ($cat['status'])
-						{
-							$cat['url'] = egw::link('/ranking/result.php',array(
-								'comp' => $comp['WetId'],
-								'cat' => $c['GrpId'],
-							));
-						}
-						else
-						{
-							$cat['url'] = '/result.php?comp='.$comp['WetId'].'&cat='.$c['GrpId'];
-						}
+						$cat['url'] = $this->result_url($comp['WetId'], $c['GrpId']);
 					}
 				}
 				$comp['cats'] = array_values($comp['cats']);	// reindex, in case excluded cat was deleted
@@ -797,7 +793,7 @@ class ranking_export extends boresult
 					'name'  => $id2cup[$comp['cup']]['name'],
 				);
 			}
-			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true,self::base_url())))
+			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true,self::base_url(true))))
 			{
 				$comp += $attachments;
 			}
