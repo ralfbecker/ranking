@@ -86,33 +86,9 @@ class ranking_export extends boresult
 	}
 
 	/**
-	 * Get URL for athlete profile
-	 *
-	 * Currently /pstambl.php is used for every HTTP_HOST not www.ifsc-climbing.org,
-	 * for which /index.php?page_name=pstambl is used.
-	 *
-	 * @param array $athlete
-	 * @param int $cat=null
-	 * @return string
+	 * Page used for all IFSC urls
 	 */
-	static function profile_url($athlete,$cat=null)
-	{
-		static $base;
-		if (is_null($base))
-		{
-			$base = self::base_url();
-
-			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
-			{
-				$base .= '/index.php?page_name=pstambl&person=';
-			}
-			else
-			{
-				$base .= '/pstambl.php?person=';
-			}
-		}
-		return $base.$athlete['PerId'].($cat ? '&cat='.$cat : '');
-	}
+	const IFSC_BASE_PAGE = '/index.php/world-competition';
 
 	/**
 	 * Return base url for
@@ -122,9 +98,11 @@ class ranking_export extends boresult
 	{
 		switch($_SERVER['HTTP_HOST'])
 		{
+			case 'ralfsmacbook.local':
 			case 'www.ifsc-climbing.org':
 			case 'ifsc.egroupware.net':
-				$host = 'egw.ifsc-climbing.org';	// use CDN url
+			case 'egw.ifsc-climbing.org':
+				$host = 'www.ifsc-climbing.org';	// use CDN url
 				break;
 
 			default:
@@ -150,9 +128,9 @@ class ranking_export extends boresult
 		if (is_null($base))
 		{
 			$base = self::base_url();
-			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
+			if ($base == 'http://www.ifsc-climbing.org')
 			{
-				$base .= '/index.php?page_name=result&comp=';
+				$base .= self::IFSC_BASE_PAGE.'#!comp=';
 			}
 			else
 			{
@@ -160,6 +138,34 @@ class ranking_export extends boresult
 			}
 		}
 		return $base.$comp.'&cat='.$cat;
+	}
+
+	/**
+	 * Get URL for athlete profile
+	 *
+	 * Currently /pstambl.php is used for every HTTP_HOST not www.ifsc-climbing.org,
+	 * for which /index.php?page_name=pstambl is used.
+	 *
+	 * @param array $athlete
+	 * @param int $cat=null
+	 * @return string
+	 */
+	static function profile_url($athlete,$cat=null)
+	{
+		static $base;
+		if (is_null($base))
+		{
+			$base = self::base_url();
+			if ($base == 'http://www.ifsc-climbing.org')
+			{
+				$base .= self::IFSC_BASE_PAGE.'#!person=';
+			}
+			else
+			{
+				$base .= '/pstambl.php?person=';
+			}
+		}
+		return $base.$athlete['PerId'].($cat ? '&cat='.$cat : '');
 	}
 
 	/**
@@ -178,9 +184,9 @@ class ranking_export extends boresult
 		if (is_null($base))
 		{
 			$base = self::base_url();
-			if (in_array($_SERVER['HTTP_HOST'], array('www.ifsc-climbing.org', 'ifsc.egroupware.net')))
+			if ($base == 'http://www.ifsc-climbing.org')
 			{
-				$base .= '/index.php?page_name=ranking&cat=';
+				$base .= self::IFSC_BASE_PAGE.'#!type=ranking&cat=';
 			}
 			else
 			{
