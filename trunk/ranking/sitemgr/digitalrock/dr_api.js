@@ -245,26 +245,78 @@ function Startlist(_container,_json_url)
 
 /**
  * Update Startlist from json_url
+ * 
+ * To be able to cache jsonp requests in CDN, we have to use the same callback.
+ * Using same callback leads to problems with concurrent requests: failed: parsererror (jsonp was not called)
+ * To work around that we queue jsonp request, if there's already one running.
+ * 
+ * Queue is maintained globally in Startlist.jsonp_queue, as requests come from different objects!
+ * 
+ * @param boolean ignore_queue used internally to start next object in queue without requeing it
  */
-Startlist.prototype.update = function()
+Startlist.prototype.update = function(ignore_queue)
 {
 	// remove our own parameters and current year from json url to improve caching
 	var url = this.json_url.replace(/(detail|beamer|rotate|toc)=[^&]*(&|$)/, '')
 		.replace(new RegExp('year='+(new Date).getFullYear()+'(&|$)'), '').replace(/&$/, '');
 	
-	jQuery.ajax({
-		url: url,
-		async: true,
-		context: this,
-		data: '',
-		dataType: this.json_url.indexOf('//') == -1 ? 'json' : 'jsonp',
-		jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not cachable by CDN
-		cache: true,
-		type: 'GET', 
-		success: this.handleResponse,
-		error: function(_xmlhttp,_err,_status) { 
-			if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
-	});
+	// do we need a jsonp request
+	var jsonp = this.json_url.indexOf('//') != -1 && this.json_url.split('/', 3) != location.href.split('/', 3);
+	if (typeof Startlist.jsonp_queue == 'undefined') Startlist.jsonp_queue = [];
+	if (!ignore_queue && jsonp)
+	{
+		// add us to the queue
+		Startlist.jsonp_queue.push(this);
+	}
+	// if there's only one in the queue (or no queueing necessary: no jsonp) --> send ajax request
+	if (ignore_queue || !jsonp || Startlist.jsonp_queue.length == 1)
+	{
+		jQuery.ajax({
+			url: url,
+			async: true,
+			context: this,
+			data: '',
+			dataType: jsonp ? 'jsonp' : 'json',
+			jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not cachable by CDN
+			cache: true,
+			type: 'GET', 
+			success: function(_data) {
+				// if we are first object in queue, remove us
+				if (Startlist.jsonp_queue[0] === this) Startlist.jsonp_queue.shift();
+				// if someone left in queue, run it's update ignore the queue
+				if (Startlist.jsonp_queue.length) Startlist.jsonp_queue[0].update(true);
+				this.handleResponse(_data);
+			},
+			error: function(_xmlhttp,_err,_status) {
+				// need same handling as success
+				if (Startlist.jsonp_queue[0] === this) Startlist.jsonp_queue.shift();
+				if (Startlist.jsonp_queue.length) Startlist.jsonp_queue[0].update(true);
+				if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
+		});
+	}
+	
+	function do_ajax(url, jsonp)
+	{
+		jQuery.ajax({
+			url: url,
+			async: true,
+			context: this,
+			data: '',
+			dataType: jsonp ? 'jsonp' : 'json',
+			//jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not cachable by CDN
+			cache: true,
+			type: 'GET', 
+			success: function(_data) {
+				Startlist.jsonp_queue.shift();
+				this.handleResponse(_data);
+				var next = Startlist.jsonp_queue.shift();
+			},
+			error: function(_xmlhttp,_err,_status) {
+				Startlist.jsonp_queue.shift();
+				if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
+		});
+		
+	}
 };
 
 /**
