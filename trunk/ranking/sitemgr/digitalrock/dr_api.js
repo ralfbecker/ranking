@@ -294,29 +294,6 @@ Startlist.prototype.update = function(ignore_queue)
 				if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
 		});
 	}
-	
-	function do_ajax(url, jsonp)
-	{
-		jQuery.ajax({
-			url: url,
-			async: true,
-			context: this,
-			data: '',
-			dataType: jsonp ? 'jsonp' : 'json',
-			//jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not cachable by CDN
-			cache: true,
-			type: 'GET', 
-			success: function(_data) {
-				Startlist.jsonp_queue.shift();
-				this.handleResponse(_data);
-				var next = Startlist.jsonp_queue.shift();
-			},
-			error: function(_xmlhttp,_err,_status) {
-				Startlist.jsonp_queue.shift();
-				if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
-		});
-		
-	}
 };
 
 /**
@@ -375,6 +352,7 @@ Startlist.prototype.handleResponse = function(_data)
 	{
 		this.columns = this.startlist_cols;
 		sort = 'start_order';
+		this.container.attr('class', 'Startlist');
 	}
 	// if we are a result showing a startlist AND have now a ranked participant
 	// --> switch back to result
@@ -394,6 +372,9 @@ Startlist.prototype.handleResponse = function(_data)
 			replace_attribute(this.columns, 'nation', 'city', 'City');
 			break;			
 	}
+
+	// fix route_names containing only one qualification are send as array because index 0
+	if (Array.isArray(_data.route_names)) _data.route_names = { '0': _data.route_names[0] };
 
 	// keep route_names to detect additional routes on updates
 	if (typeof this.route_names == 'undefined')
@@ -415,12 +396,12 @@ Startlist.prototype.handleResponse = function(_data)
 			}
 		}
 	}
-
 	// remove whole table, if discipline or startlist/resultlist (detemined by sort) changed
 	if (this.discipline && this.discipline != _data.discipline ||
 		this.sort && this.sort != sort ||
 		_data.route_order != this.route_order ||	// switching heats (they can have different columns)
-		detail != this.detail)		// switching detail on/off
+		detail != this.detail ||		// switching detail on/off
+		this.json_url != this.last_json_url)
 	{
 		jQuery(this.container).empty();
 		delete this.table;		
@@ -429,6 +410,7 @@ Startlist.prototype.handleResponse = function(_data)
 	this.sort = sort;
 	this.route_order = _data.route_order;
 	this.detail = detail;
+	this.last_json_url = this.json_url;
 
 	if (typeof this.table == 'undefined')
 	{

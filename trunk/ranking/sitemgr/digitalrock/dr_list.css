@@ -202,7 +202,7 @@ section#gkMainbody table.DrTable thead, section#gkMainbody table.DrTable tbody{
 	background-color: inherit;
 }
 /* do NOT show start-numbers on ifsc-website */
-section#gkMainbody table.DrTable .start_number {
+section#gkMainbody .Resultlist table.DrTable .start_number {
 	display: none;
 }
 /* display wide lists over right _WORLDCOMP. menu, not under it */
