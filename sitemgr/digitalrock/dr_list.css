@@ -205,3 +205,12 @@ section#gkMainbody table.DrTable thead, section#gkMainbody table.DrTable tbody{
 section#gkMainbody table.DrTable .start_number {
 	display: none;
 }
+/* display wide lists over right _WORLDCOMP. menu, not under it */
+section#gkMainbody table.DrTable {
+	position: relative;
+	z-index: 1;	
+}
+/* hide digitalROCK logo */
+section#gkMainbody td.profileLogo {
+        display: none;
+}
