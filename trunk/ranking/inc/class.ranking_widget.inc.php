@@ -195,7 +195,6 @@ class ranking_widget
 	public function render_js_widget($id='widget_content')
 	{
 		list($dr_api_url) = explode('json.php', $this->json_url);
-$dr_api_url = 'http://ralfsmacbook.local/egroupware/ranking/';
 		$dr_api_url .= 'sitemgr/digitalrock/dr_api.js';
 
 		$params = json_encode($this->widget_params);
