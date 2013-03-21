@@ -507,7 +507,7 @@ class boranking extends ranking_so
 		if (!$is_judge && $route && (is_array($route) && isset($route['route_judges']) ||
 			($route = $this->route->read($route))) && $route['route_judges'] &&
 			$route['route_status'] != STATUS_RESULT_OFFICIAL &&			// only 'til result is offical
-			$distance < 0 && abs($distance) <= $this->judge_right_days)	// and only after competitions started
+			$distance < 1 && abs($distance) <= $this->judge_right_days)	// and one day before competition started
 		{
 			$is_judge = in_array($this->user, explode(',',$route['route_judges']));
 		}
