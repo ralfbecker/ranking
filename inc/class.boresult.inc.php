@@ -1938,6 +1938,7 @@ class boresult extends boranking
 		}
 		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':'.$route_order);
 		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':-1');
+		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':');	// used if no route is specified!
 	}
 
 	/**
