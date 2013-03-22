@@ -146,10 +146,12 @@ div.bonusTries, div.topTries {
 div.bonusTries {
 	right: 3px;
 	bottom: 1px;
+	line-height: 1;
 }
 div.topTries {
 	left: 3px;
-	top: 1px;	
+	top: 1px;
+	line-height: 1;
 }
 
 /**
