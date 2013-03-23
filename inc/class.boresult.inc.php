@@ -1927,8 +1927,9 @@ class boresult extends boranking
 	 * @param int|array $comp WetId or array with values for WetId, GrpId and route_order
 	 * @param int $cat=null GrpId
 	 * @param int $route_order=null
+	 * @param boolean $previous_heats=false also invalidate previous heats, eg. if new heats got created to include them in route_names
 	 */
-	public static function delete_export_route_cache($comp, $cat=null, $route_order=null)
+	public static function delete_export_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false)
 	{
 		if (is_array($comp))
 		{
@@ -1939,6 +1940,14 @@ class boresult extends boranking
 		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':'.$route_order);
 		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':-1');
 		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':');	// used if no route is specified!
+
+		if ($previous_heats)
+		{
+			while($route_order-- > 0)
+			{
+				egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':'.$route_order);
+			}
+		}
 	}
 
 	/**

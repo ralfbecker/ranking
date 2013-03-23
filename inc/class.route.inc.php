@@ -150,7 +150,7 @@ class route extends so_sql
 		$this->data['route_modified'] = time();
 		$this->data['route_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 
-		boresult::delete_export_route_cache($this->data);
+		boresult::delete_export_route_cache($this->data, null, null, true);	// true = invalidate prev. heats
 
 		return parent::save(null,$extra_where);
 	}
