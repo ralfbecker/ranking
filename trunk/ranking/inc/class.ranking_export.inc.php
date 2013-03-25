@@ -284,14 +284,21 @@ class ranking_export extends boresult
 			{
 				try {
 					$data = $instance->_export_route($comp, $cat, $heat);
-					if (count($data['route_names']) == 1 && (!isset($heat) || !is_numeric($heat)) && $data['route_order'] != 0)
+					if (count($data['route_names']) == 1 && (!isset($heat) || (string)$heat === '') && $data['route_order'] != 0)
 					{
 						$data = $instance->_export_route($comp, $cat, 0);
 					}
 				}
 				catch(Exception $e) {
 					// try if we have a result in ranking
-					$data = $instance->_export_result($comp, $cat);
+					if (!isset($heat) || (string)$heat === '')
+					{
+						$data = $instance->_export_result($comp, $cat);
+					}
+					else
+					{
+						throw $e;
+					}
 				}
 			}
 			// setting expires depending on result offical and how long it is offical
@@ -337,7 +344,7 @@ class ranking_export extends boresult
 		{
 			$discipline = $cat['discipline'];
 		}
-		if (!isset($heat) || !is_numeric($heat)) $heat = -1;	// General result
+		if (!isset($heat) || (string)$heat === '') $heat = -1;	// General result
 
 		if (!($route = $this->route->read(array(
 			'WetId' => $comp['WetId'],
