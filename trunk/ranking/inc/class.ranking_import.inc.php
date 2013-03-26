@@ -619,7 +619,10 @@ class ranking_import extends boresult
 			}
 			if ($do_result_import)
 			{
-				$result[$athletes[$n]] = $row[$rank_col];
+				$result[$athletes[$n]] = array(
+					'result_rank' => $row[$rank_col],
+					'nation' => $athlete['nation'],
+				);
 			}
 
 		}
