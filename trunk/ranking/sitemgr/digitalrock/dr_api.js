@@ -1342,6 +1342,10 @@ DrWidget.prototype.update = function(_params)
 	{
 		widget = 'Results';
 	}
+	else if (hasParam('type', 'startlist'))
+	{
+		widget = 'Startlist';
+	}
 	else
 	{
 		widget = 'Resultlist';
@@ -1482,7 +1486,7 @@ DrTable.prototype.update = function(_data,_quota)
 	athletes = this.athletes;
 	this.athletes = {};
 
-	for(i in this.data)
+	for(var i=0; i < this.data.length; ++i)
 	{
 		var data = this.data[i];
 		var row;
