@@ -77,7 +77,7 @@ if (!$gruppe)	// Sektionenrangliste: bestes Ergebnis jeder Kategorie (Erwachsene
 		" JOIN Gruppen grp USING(GrpId)".
 		" JOIN Personen per USING(PerId)".fed_join('per','YEAR(wettk.datum)').
 		" WHERE wettk.nation='GER' AND wettk.serie IS NOT NULL AND wettk.fed_id IS NULL AND".
-		" '$anfang' < wettk.datum AND wettk.datum <= '$stand'".
+		" res.platz > 0 AND '$anfang' < wettk.datum AND wettk.datum <= '$stand'".
 		" ORDER BY verband,wettk.datum,grp.name,res.platz");
 }
 else	// Sektionenwertung pro Kategorie
@@ -159,7 +159,7 @@ else	// Sektionenwertung pro Kategorie
 		" JOIN Results res USING(WetId)".
 		" JOIN Gruppen grp USING(GrpId)".
 		" JOIN Personen per USING(PerId)".fed_join('per','YEAR(wettk.datum)').
-		" WHERE grp.GrpId IN ($gruppe->GrpIds) AND $valid AND wettk.datum <= '$stand'".
+		" WHERE grp.GrpId IN ($gruppe->GrpIds) AND res.platz > 0 AND $valid AND wettk.datum <= '$stand'".
 		" ORDER BY verband,wettk.datum,grp.name,res.platz");
 }
 if ($debug) echo "<p>sql='$sql'</p>\n";
