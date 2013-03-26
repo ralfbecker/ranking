@@ -190,7 +190,8 @@ class ranking_import extends boresult
 				$row['presets'] = '';
 				foreach($content['import']['as'] as $c => $name)
 				{
-					if ($name && $row[$c]) $row['presets'] .= '&preset['.$name.']='.$row[$c];
+					if ($name && $row[$c]) $row['presets'] .= '&preset['.$name.']='.$row[$c].
+						($name == 'geb_date' && is_numeric($row[$c]) ? '-01-01' : '');
 				}
 				if ($calendar && $calendar != 'NULL' && !in_array('nation',$content['import']['as']))
 				{
@@ -506,6 +507,10 @@ class ranking_import extends boresult
 						$detection[$n]['help-'.$c] = ($athlete[$name] ? lang('Replace: %1',$athlete[$name]).', ' : '').
 							(lang('Create new federation: %1 (%2)',$data[$c],$nation_col&&$data[$nation_col]?$data[$nation_col]:$nation));
 					}
+					elseif ($name == 'rank')
+					{
+						// exclude rang, it's not stored in athlete
+					}
 					elseif ($data[$c] && (!$athlete[$name] || // no data stored for athlete
 						$name == 'geb_date' && $athlete[$name] == (int)$data[$c].'-01-01' ||	// birthday replaces birthyear
 						$name == 'verband' && substr($data[$c],0,strlen($athlete[$name])) == $athlete[$name]))	// fed name starts identical
@@ -559,10 +564,19 @@ class ranking_import extends boresult
 		$athletes =& $import['athlete'];
 		$detection =& $import['detection'];
 		$update =& $import['update'];
+		$rank_col = array_search('rank', $col2name);
+		$do_result_import = $rank_col &&	// do result import, if we rank column selected
+			!empty($keys['comp']) && !empty($keys['cat']);
+		$result = array();
 		foreach($import as $n => &$row)
 		{
-			if ($n < 2 || !$athletes[$n] || !($athlete = $this->athlete->read($athletes[$n])))
+			if ($n < 2 || !$athletes[$n] || is_array($athletes[$n]) || !($athlete = $this->athlete->read($athletes[$n])))
 			{
+				if ($n >= 2 && $do_result_import)
+				{
+					$do_result_import = false;
+					$error = lang('No result imported, need to select ALL athletes first!');
+				}
 				continue;	// no athlete line or no (valid) athlete selected
 			}
 			$need_update = false;
@@ -597,12 +611,30 @@ class ranking_import extends boresult
 				unset($detection[$n]);	// unmark as now updated
 				unset($update[$n]);
 				$imported++;
+				// new created athletes need to set PerId
+				if (!$athlete['PerId'])
+				{
+					$athletes[$n] = $this->athelte->data['PerId'];
+				}
 			}
+			if ($do_result_import)
+			{
+				$result[$athletes[$n]] = $row[$rank_col];
+			}
+
+		}
+		// import result into ranking (not result-service!)
+		if ($do_result_import)
+		{
+			$error = boranking::import_ranking(array(	// $this->import_ranking is from boresult!
+				'WetId' => $keys['comp'],
+				'GrpId' => $keys['cat'],
+			), $result);
 		}
 		// run a new detection as that's easier and more consistent
 		self::detect_athletes($import,$col2name,$keys['calendar'],null,$license,$license_year);
 
-		return $imported;
+		return (isset($error) ? $error.' ' : '').$imported;
 	}
 
 	/**
