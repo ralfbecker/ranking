@@ -349,6 +349,33 @@ class result extends so_sql
 	}
 
 	/**
+	 * Return results for an aggregated ranking
+	 *
+	 * @param array $filter
+	 * @param string $extra_cols
+	 * @param string $join
+	 * @param string $order
+	 * @return array
+	 */
+	function &aggregated_results(array $filter, $extra_cols, $join, $order)
+	{
+		$results = array();
+		foreach($this->db->select($this->result_table, $this->result_table.'.*,'.$extra_cols, $filter, __LINE__, __FILE__,
+			false, 'ORDER BY '.$order, 'ranking', 0, $join) as $row)
+		{
+			$result = $this->athlete->db2data($row);
+			foreach(explode(',', $extra_cols) as $col)
+			{
+				$name = $col;
+				list($col,$name) = explode(' AS ', $col);
+				if (!isset($result[$name]) && isset($row[$name])) $result[$name] = $row[$name];
+			}
+			$results[] = $result;
+		}
+		return $results;
+	}
+
+	/**
 	 * Save a calculated fieldfactor
 	 *
 	 * @param int/array $comp

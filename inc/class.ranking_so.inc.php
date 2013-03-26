@@ -78,6 +78,10 @@ class ranking_so
 	 * @var ranking_display
 	 */
 	private $display;
+	/**
+	 * @var ranking_calculation
+	 */
+	private $calc;
 
 	/**
 	 * sub-objects, which get automatic instanciated by __get()
@@ -96,6 +100,7 @@ class ranking_so
 		'route_result'  => 'route_result',
 		'federation' => 'ranking_federation',
 		'display' => 'ranking_display',
+		'calc'    => 'ranking_calculation',
 	);
 
 
@@ -230,7 +235,16 @@ class ranking_so
 
 			if (!isset($GLOBALS['egw']->$name))
 			{
-				$GLOBALS['egw']->$name = CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
+				switch($class)
+				{
+					case 'ranking_calculation':
+						$GLOBALS['egw']->$name = new ranking_calculation($this);
+						break;
+
+					default:
+						$GLOBALS['egw']->$name = CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
+						break;
+				}
 			}
 			$this->$name = $GLOBALS['egw']->$name;
 		}

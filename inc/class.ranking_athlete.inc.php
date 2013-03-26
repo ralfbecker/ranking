@@ -279,6 +279,26 @@ class ranking_athlete extends so_sql
 	}
 
 	/**
+	 * Federation join with variable table names and columns
+	 *
+	 * @param string $per_table='Personen' table for athletes
+	 * @param int $year=null year or sql expression for year to use
+	 * @param string $f='Federations' table for federations
+	 * @return string sql with join
+	 */
+	function fed_join($per_table='Personen',$year=null,$f='Federations')
+	{
+		$join = self::FEDERATIONS_JOIN;
+		$join = strtr($join, array(
+			'Personen' => $per_table,
+			'a2f.a2f_end=9999' => is_null($year) ? 'a2f.a2f_end=9999' : "a2f.a2f_end >= $year AND $year >= a2f.a2f_start",
+			'Federations' => $f ? $f : 'Federations',
+		));
+		//error_log(__METHOD__."('$per_table', '$year', '$f') returning '$join'");
+		return $join;
+	}
+
+	/**
 	 * Search for athletes, joins by default with the Result table to show the last competition and to filter by a category
 	 *
 	 * '*' and '?' are replaced with sql-wildcards '%' and '_'
