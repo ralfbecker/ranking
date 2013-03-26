@@ -116,17 +116,6 @@ class boranking extends ranking_so
 
 	var $maxmatches = 12;
 	/**
-	 * @var array $european_nations 3-digit nation codes of nation in europe
-	 */
-	var $european_nations = array(
-		'ALB','AND','ARM','AUT','AZE','BLR','BEL','BIH','BUL',
-		'CRO','CYP','CZE','DEN','EST','ESP','FIN','FRA','GBR',
-		'GEO','GER','GRE','HUN','IRL','ISL','ISR','ITA','LAT',
-		'LIE','LTU','LUX','MDA','MKD','MLT','MON','NED','NOR',
-		'POL','POR','ROU','RUS','SRB','SLO','SMR','SUI','SVK',
-		'SWE','TUR','UKR'
-	);
-	/**
 	 * year we check the license for
 	 *
 	 * @var int
@@ -629,6 +618,9 @@ class boranking extends ranking_so
 	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup='',
 		array &$comps=null, &$max_comp=null)
 	{
+		return $this->calc->ranking($cat, $stand, $start, $comp, $ret_pers, $rls, $ret_ex_aquo,
+			$not_counting, $cup, $comps, $max_comp);
+/*
 		if ($cup && !is_array($cup))
 		{
 			$cup = $this->cup->read($cup);
@@ -825,6 +817,7 @@ class boranking extends ranking_so
 		$not_counting =& $not_counting;
 
 		return $rang;
+*/
 	}
 
 	/**

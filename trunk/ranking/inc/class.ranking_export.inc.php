@@ -42,11 +42,17 @@ class ranking_export extends boresult
 				$result = $export->export_profile($_GET['person'], $_GET['cat']);
 				$root_tag = 'profile';
 			}
-			elseif (isset($_GET['cat']) && (!isset($_GET['comp']) || $_GET['type'] === 'ranking'))
+			elseif (isset($_GET['cat']) && (!isset($_GET['comp']) && !isset($_GET['type']) || $_GET['type'] === 'ranking'))
 			{
 				$export = new ranking_export();
 				$result = $export->export_ranking($_GET['cat'], isset($_GET['date']) ? $_GET['date'] : $_GET['comp'], $_GET['cup']);
 				$root_tag = 'ranking';
+			}
+			elseif (in_array($_GET['type'], array('nat_team_ranking','sektionenwertung','regionalzentren')))
+			{
+				$export = new ranking_export();
+				$result = $export->export_aggregated($_GET['type'], $_GET['date'], $_GET['cat']);
+				$root_tag = 'aggregated';
 			}
 			elseif (isset($_GET['nation']) || !isset($_GET['comp']))
 			{
@@ -1493,6 +1499,53 @@ class ranking_export extends boresult
 
 		//_debug_array($data); exit;
 		return $data;
+	}
+
+	/**
+	 * Export an aggregated ranking: national team ranking, sektionen wertung, ...
+	 *
+	 * @param string $type 'nat_team_ranking', 'sektionenwertung', 'regionalzentren'
+	 * @param string $date='.'
+	 * @param int $cat=null
+	 * @throws Exception
+	 * @return array
+	 */
+	public function export_aggregated($type, $date='.', $cat=null)
+	{
+		if (empty($date)) $date = '.';
+
+		$filter = array();
+		if ($cat) $filter['GrpId'] = $cat;
+
+		switch($type)
+		{
+			case 'nat_team_ranking':
+				$filter['nation'] = null;
+				$by = 'nation';
+				$best_results = 3;
+				break;
+			case 'sektionenwertung':
+				$filter['nation'] = 'GER';
+				$by = 'fed_id';
+				$best_results = isset($filter['GrpId']) ? 2 : 1;
+				break;
+			case 'regionalzentren':
+				$filter['nation'] = 'SUI';
+				$by = 'acl_fed_id';
+				$best_results = 1;
+				break;
+			default:
+				throw new Exception("Unknown type '$type'!");
+		}
+		$result = $this->calc->aggregated($date, $filter, $best_results, $by);
+		$result = array(
+			'nation' => $filter['nation'],
+			'aggregated_by' => $by,
+			'best_results' => $best_results,
+			'federations' => $result,
+		);
+		//_debug_array($result); exit;
+		return $result;
 	}
 
 	/**
