@@ -498,4 +498,27 @@ class ranking_federation extends so_sql
 		}
 		return implode(", ", $contacts);
 	}
+
+	/**
+	 * Get name of nation from 3 char shortcut
+	 *
+	 * @param string $nation
+	 * @return string
+	 */
+	function get_nationname($nation)
+	{
+		static $nations;
+		if (is_null($nations))
+		{
+			foreach($this->db->select($this->table_name, 'DISTINCT nation,fed_nationname', 'fed_parent IS NULL', __LINE__, __FILE__, false, '', 'ranking') as $row)
+			{
+				if (!isset($nations[$row['nation']]) || strlen($nations[$row['nation']]) < strlen($row['fed_nationname']))
+				{
+					$nations[$row['nation']] = $row['fed_nationname'];
+				}
+			}
+		}
+		//_debug_array($nations); exit;
+		return $nations[$nation];
+	}
 }

@@ -54,16 +54,197 @@ class ranking_calculation
 	}
 
 	/**
+	 * Calculate nation team ranking for a given comp. or cup and given cats
+	 *
+	 * @param int $_comp
+	 * @param int|string|array $_cats
+	 * @param int $_cup
+	 * @param array &$date_comp=null on return latest competition
+	 * @return array see ranking_calculation::aggregate
+	 */
+	public function nat_team_ranking($_comp, $_cats, $_cup, array &$date_comp=null)
+	{
+		$valid_cats = array();
+
+		if ($_cup)	// do a cup ranking
+		{
+			if (!($cup = $this->bo->cup->read($_cup)))
+			{
+				throw new egw_exception_wrong_parameter("Cup '$_cup' NOT found!");
+			}
+
+			// get all comps of a serie
+			$comps = $this->bo->comp->search(array('serie' => $cup['SerId']), true, 'datum');
+			foreach($comps as &$c)
+			{
+				$c = $c['WetId'];
+			}
+			$_comp = $comps[0];
+		}
+		if (!($comp = $this->bo->comp->read($_comp)))
+		{
+			throw new egw_exception_wrong_parameter("Competition '$_comp' NOT found!");
+		}
+		if (!$comp['quota'])
+		{
+			throw new egw_exception_wrong_parameter("No quota set for competition $comp[name]!");
+		}
+
+		if (!$cup)
+		{
+			$comps = array($comp['WetId']);
+			// no overall/combined for a cup ranking
+			if ((int)$comp['datum'] >= 2008)
+			{
+				$valid_cats['overall'] = array(1,2,5,6,23,24);
+			}
+			else
+			{
+				$valid_cats['combined (lead &amp; boulder)'] = array(1,2,5,6);
+			}
+		}
+		// all valid Combinations
+		$valid_cats += array(
+			'lead' => array(1,2),
+			'boulder' => array(5,6),
+			'speed'    => array(23,24),
+			'youth lead' => array(15,16,17,18,19,20),
+			'youth boulder' => array(79,80,81,82,83,84),
+			'youth speed' => array(56,57,58,59,60,61),
+		);
+
+		// get all cats from existing results of a comp or cup
+		$cats_found = array();
+		foreach($this->bo->db->select($this->bo->result->table_name, 'DISTINCT GrpId', array(
+			'WetId' => $comps,
+			'platz > 0',
+		), __LINE__, __FILE__, false, 'ORDER BY GrpId', 'ranking') as $row)
+		{
+			$cats_found[] = $row['GrpId'];
+		}
+		if (!$cats_found)
+		{
+			throw new egw_exception_wrong_parameter("No results yet!");
+		}
+
+		foreach($valid_cats as $name => $vcats)
+		{
+			if (count(array_intersect($cats_found,$vcats)) != count($vcats) &&
+				($name != 'overall' || count($cats_found) <= 2 ||	// show overall if we have more then 2 cats
+				// no overall for youth
+				$name == 'overall' && array_intersect($cats_found, array(15,16,17,18,19,20,56,57,58,59,60,61,79,80,81,82,83,84))))
+			{
+				unset($valid_cats[$name]);
+			}
+		}
+		//echo "valid_cats=<pre>".print_r($valid_cats,true)."</pre>\n";
+
+		// get the data of all cats
+		$cat_data = $this->bo->cats->names(array('GrpId' => $cats_found), 0, 'GrpId');
+		$given_cats = explode(',', $_cats);
+		$cats = array();
+		foreach($cats_found as $cat)
+		{
+			if (in_array($cat, $given_cats))
+			{
+				$cats[] = $cat;
+			}
+		}
+
+		// check if we have a valid combination
+		$valid = '';
+		foreach($valid_cats as $name => $vcats)
+		{
+			if (count(array_intersect($cats,$vcats)) == count($vcats) ||
+				($name == 'overall' && count($cats) > 2))	// show overall if we have more then 2 cats
+			{
+				$valid = $vcats;
+				break;
+			}
+		}
+		if (!$valid)
+		{
+			//otherwise choose one which includes the given cat (reverse order ensures the combined has lowest significants)
+			foreach(array_reverse($valid_cats) as $name => $vcats)
+			{
+				if (count(array_intersect($cats, $vcats)))	// given cat(s) are at least included in this valid cat combination
+				{
+					$valid = $vcats;
+					break;
+				}
+			}
+			if (!$valid)	// no cats ==> use first valid
+			{
+				reset($valid_cats);
+				list($name, $valid) = each($valid_cats);
+			}
+		}
+		foreach($valid as $key => $c)
+		{
+			if (isset($cat_data[$c]))
+			{
+				$cat_names[] = $cat_data[$c];
+			}
+			else
+			{
+				unset($valid[$key]);
+			}
+		}
+		$cats = implode(',', $valid);
+		$cat_names = implode(', ', $cat_names);
+
+		$quota = $wettk['quota'];
+		// force quota for youth to 1, to allow to use a higher quota for registration, it still need to be set!
+		if (substr($name,0,5) == 'youth')
+		{
+			$quota = 1;
+		}
+		// hardcoding quota of 3 for everything else, as national quota is 4 since 2012, while rules still want 3 for nat-team-ranking
+		else
+		{
+			$quota = 3;
+		}
+		//echo "<p>$name: quota=$quota</p>\n"; exit;
+
+		if ($cup)
+		{
+			$cat = $this->bo->cats->read($valid[0]);
+			$max_comps = $this->bo->cup->get_max_comps($cat['rkey'], $cup);
+		}
+		elseif($name == 'overall' && count($valid) > 2)
+		{
+			$min_cats = 2;	// overall ranking requires participation in 2 or more categories!
+		}
+		$filter = array(
+			'GrpId' => $valid,
+		);
+		if ($cup)
+		{
+			$filter['SerId'] = $cup['SerId'];
+		}
+		else
+		{
+			$filter['WetId'] = $comp['WetId'];
+		}
+		return $this->aggregated('.', $filter, $quota, 'nation', true, $min_cats, $max_comps, $date_comp);
+	}
+
+	/**
 	 * Calculate an aggregated ranking eg. national team ranking or sektionen wertung
 	 *
 	 * @param string|int $date date of ranking, "." for current date or WetId or rkey of competition
 	 * @param array $filter=array() to filter results by GrpId or WetId
 	 * @param int $best_results=null use N best results per category and competition
 	 * @param string $by='nation' 'nation', 'fed_id', 'fed_parent' or 3-letter nation code
+	 * @param boolean $use_cup_points=true
+	 * @param int $min_cats=null required minimum number of cats, eg. 2 for overall
+	 * @param int $max_comps=null used max. number of comps for national team ranking of a cup
+	 * @param array &$date_comp=null on return data of last competition in ranking
 	 * @param int $window=12 number of month in ranking
 	 * @return array of array with values 'rank', 'name', 'points', 'results' (array)
 	 */
-	public function aggregated($date='.', array $filter=array(), $best_results=3, $by='nation', $window=12)
+	public function aggregated($date='.', array $filter=array(), $best_results=3, $by='nation', $use_cup_points=true,
+		$min_cats=null, $max_comps=null, &$date_comp=null, $window=12)
 	{
 		// set $by from $filter['nation'] or visa versa
 		switch($by ? $by : $filter['nation'])
@@ -84,23 +265,30 @@ class ranking_calculation
 				break;
 		}
 		// get date-range for results
-		if ($date == '.' || preg_match('/^\d{4}-\d{2}-\d{2}$/', $date))
+		if (!empty($filter['WetId']))
+		{
+			if (!($date_comp = $this->bo->comp->read($filter['WetId'])))
+			{
+				throw new egw_exception_wrong_parameter ("Competition '$filter[WetId]' NOT found!");
+			}
+		}
+		elseif ($date == '.' || preg_match('/^\d{4}-\d{2}-\d{2}$/', $date))
 		{
 			if ($date == '.') $date = date('Y-m-d');
 
-			$date_comp = $this->bo->comp->last_comp($date, $filter['GrpId'], $filter['nation']);
+			$date_comp = $this->bo->comp->last_comp($date, $filter['GrpId'], $filter['nation'], $filter['SerId']);
 		}
 		else
 		{
 			if (!($date_comp = $this->bo->comp->read($date)))
 			{
-				throw new Exception ("Competition '$date' NOT found!");
+				throw new egw_exception_wrong_parameter ("Competition '$date' NOT found!");
 			}
 		}
 		$date = $date_comp['datum'];
 
 		// if no single competition, use date filter for window
-		if (!isset($filter['comp']))
+		if (empty($filter['WetId']))
 		{
 			$filter[] = $this->bo->comp->table_name.'.datum <= '.$this->bo->db->quote($date);
 			list($y,$m,$d) = explode('-', $date);
@@ -115,22 +303,57 @@ class ranking_calculation
 		}
 		if (array_key_exists('nation', $filter))
 		{
-			$filter[] = $this->bo->comp->table_name.'.nation='.$this->bo->db->quote($filter['nation']);
+			$filter[] = $this->bo->comp->table_name.'.nation'.
+				(isset($filter['nation']) ? '='.$this->bo->db->quote($filter['nation']) : ' IS NULL');
 			unset($filter['nation']);
 		}
-		$filter[] = 'platz > 0';
+		if (!empty($filter['SerId']))
+		{
+			$filter[] = $this->bo->comp->table_name.'.serie='.(int)$filter['SerId'];
+			unset($filter['SerId']);
+		}
+		$filter[] = $this->bo->result->table_name.'.platz > 0';
 		$filter[] = $this->bo->comp->table_name.'.faktor > 0';
 
-		$ranking = array();
-		$last_aggr = $last_comp = $last_cat = null;
-		$used = 0;
 		//_debug_array($filter);
 		$join = ' JOIN '.$this->bo->comp->table_name.' USING(WetId)';
 		$join .= ' JOIN '.$this->bo->cats->table_name.' USING(GrpId)';
 		$join .= ' JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)';
-		$join .= str_replace('USING(fed_id)','ON a2f.fed_id='.ranking_athlete::FEDERATIONS_TABLE.'.fed_id', $this->bo->athlete->fed_join('Personen','YEAR(Wettkaempfe.datum)'));
-		$extra_cols = $this->bo->comp->table_name.'.name AS comp_name,'.$this->bo->cats->table_name.'.name AS cat_name,nachname,vorname,'.ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,'.ranking_athlete::FEDERATIONS_TABLE.'.fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,'.ranking_athlete::ATHLETE_TABLE.'.PerId AS PerId';
-		foreach($this->bo->result->aggregated_results($filter, $extra_cols, $join, $by.','.$this->bo->comp->table_name.'.datum,WetId,GrpId,platz') as $result)
+		$join .= str_replace('USING(fed_id)','ON a2f.fed_id='.ranking_athlete::FEDERATIONS_TABLE.
+			'.fed_id', $this->bo->athlete->fed_join('Personen','YEAR(Wettkaempfe.datum)'));
+		$extra_cols = $this->bo->comp->table_name.'.name AS comp_name,'.
+			$this->bo->comp->table_name.'.dru_bez AS comp_short,'.
+			$this->bo->cats->table_name.'.name AS cat_name,nachname,vorname,'.
+			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,'.
+			ranking_athlete::FEDERATIONS_TABLE.'.fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,'.
+			ranking_athlete::ATHLETE_TABLE.'.PerId AS PerId';
+		$append = 'ORDER BY '.$by.','.$this->bo->comp->table_name.'.datum,WetId,GrpId,Results.platz';
+		if ($use_cup_points)
+		{
+			$PktId = $use_cup_points !== true ? $use_cup_points : 2;	// uiaa
+			$pkte = 's.pkt';
+			$platz = 'Results.platz';
+			// since 2009 int. cups use "averaged" points for ex aquo competitors (rounded down!)
+			if ((int)$date_comp['datum'] >= 2009)
+			{
+				$ex_aquos = '(SELECT COUNT(*) FROM Results ex WHERE ex.GrpId=Results.GrpId AND ex.WetId=Results.WetId AND ex.platz=Results.platz)';
+				$pkte = "(CASE WHEN Results.datum<'2009-01-01' OR $ex_aquos=1 THEN $pkte ELSE FLOOR((SELECT SUM(pkte.pkt) FROM PktSystemPkte pkte WHERE PktId=$PktId AND $platz <= pkte.platz AND pkte.platz < $platz+$ex_aquos)/$ex_aquos) END)";
+			}
+			$join .= ' LEFT JOIN PktSystemPkte s ON Results.platz=s.platz AND s.PktId='.(int)$PktId;
+
+			if ($min_cats > 1)
+			{
+				$extra_cols .= ',(SELECT COUNT(*) FROM Results v WHERE Results.WetId=v.WetId AND Results.PerId=v.PerId AND v.platz > 0 AND '.
+					$this->bo->db->expression('Results', 'v.', array('GrpId' => $filter['GrpId'])).') AS num_cats';
+
+				$append = 'HAVING num_cats >= '.(int)$min_cats.' '.$append;
+			}
+			$extra_cols .= ','.$pkte.'*100 AS pkt';
+		}
+		$ranking = array();
+		$last_aggr = $last_comp = $last_cat = null;
+		$used = 0;
+		foreach($this->bo->result->aggregated_results($filter, $extra_cols, $join, $append) as $result)
 		{
 			if (!isset($last_aggr) || $last_aggr != $result[$by])
 			{
@@ -140,6 +363,10 @@ class ranking_calculation
 						$name = $result['verband'];
 						$url = $result['fed_url'];
 						break;
+					case 'nation':
+						$name = $this->bo->federation->get_nationname($result['nation']);
+						$url = '';
+						break;
 					default:
 						$name = $result[$by];
 						$url = '';
@@ -147,13 +374,16 @@ class ranking_calculation
 				}
 				$ranking[$result[$by]] = array(
 					$by => $result[$by],
-					'url' => $url,
  					'name' => $name,
+					'url' => $url,
+					'rank' => '',
 					'points' => 0,
 					'results' => array(),
+					'comps' => array(),
 				);
 				$results =& $ranking[$result[$by]]['results'];
 				$points =& $ranking[$result[$by]]['points'];
+				$comps =& $ranking[$result[$by]]['comps'];
 				$last_aggr = $result[$by];
 				$last_cat = $last_comp = null;
 			}
@@ -164,12 +394,48 @@ class ranking_calculation
 				$last_cat = $result['GrpId'];
 			}
 			if ($used >= $best_results) continue;	// no more results counting
+
+			$result['pkt'] = round($result['pkt']/100.0, 2);
 			$results[] = array_intersect_key($result, array_flip(array('platz','comp_name','PerId','vorname','nachname','pkt','WetId','GrpId','cat_name')));
+
 			$points += $result['pkt'];
+			if (!isset($comps[$result['WetId']]))
+			{
+				$comps[$result['WetId']] = array(
+					'WetId' => $result['WetId'],
+					'name' => $result['comp_name'],
+					'short' => $result['comp_short'],
+					'points' => 0,
+				);
+			}
+			$comps[$result['WetId']]['points'] += $result['pkt'];
+
 			$used++;
 		}
-		usort($ranking, function($a, $b) {
-			return $b['points'] - $a['points'];
+		if ($max_comps)	// mark and remove points from not counting competitions
+		{
+			foreach($ranking as &$federation)
+			{
+				uasort($federation['comps'], function($a, $b)
+				{
+					return $b['points']-$a['points'];
+				});
+				$n = 1;
+				foreach($federation['comps'] as &$c)
+				{
+					if ($n++ > $max_comps)
+					{
+						$federation['points'] -= $c['points'];
+						$c['points'] = '('.$c['points'].')';
+					}
+				}
+			}
+		}
+		usort($ranking, function($a, $b)
+		{
+			$ret = $b['points'] - $a['points'];
+			if (!$ret) $ret = strcasecmp($a['name'], $b['name']);
+			return $ret;
 		});
 		$abs_rank = $rank = $last_points = 0;
 		foreach($ranking as &$federation)
@@ -182,6 +448,13 @@ class ranking_calculation
 			$federation['rank'] = $rank;
 			$last_points = $federation['points'];
 		}
+		$names = array(
+			'date', 'filter', 'best_results', 'aggregate_by',
+			'use_cup_points', 'min_cats', 'max_comps'
+		);
+		$params = func_get_args();
+		$ranking['params'] = array_combine($names, array_slice($params, 0, count($names)));
+
 		//_debug_array($ranking);exit;
 		return $ranking;
 	}

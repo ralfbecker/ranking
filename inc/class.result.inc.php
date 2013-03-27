@@ -354,14 +354,14 @@ class result extends so_sql
 	 * @param array $filter
 	 * @param string $extra_cols
 	 * @param string $join
-	 * @param string $order
+	 * @param string $append='' eg. ORDER BY ...
 	 * @return array
 	 */
-	function &aggregated_results(array $filter, $extra_cols, $join, $order)
+	function &aggregated_results(array $filter, $extra_cols, $join, $append)
 	{
 		$results = array();
 		foreach($this->db->select($this->result_table, $this->result_table.'.*,'.$extra_cols, $filter, __LINE__, __FILE__,
-			false, 'ORDER BY '.$order, 'ranking', 0, $join) as $row)
+			false, $append, 'ranking', 0, $join) as $row)
 		{
 			$result = $this->athlete->db2data($row);
 			foreach(explode(',', $extra_cols) as $col)
