@@ -51,7 +51,7 @@ class ranking_export extends boresult
 			elseif (in_array($_GET['type'], array('nat_team_ranking','sektionenwertung','regionalzentren')))
 			{
 				$export = new ranking_export();
-				$result = $export->export_aggregated($_GET['type'], $_GET['date'], $_GET['cat']);
+				$result = $export->export_aggregated($_GET['type'], $_GET['date'], $_GET['comp'], $_GET['cup'], $_GET['cat']);
 				$root_tag = 'aggregated';
 			}
 			elseif (isset($_GET['nation']) || !isset($_GET['comp']))
@@ -1506,43 +1506,77 @@ class ranking_export extends boresult
 	 *
 	 * @param string $type 'nat_team_ranking', 'sektionenwertung', 'regionalzentren'
 	 * @param string $date='.'
+	 * @param int $comp=null
+	 * @param int $cup=null
 	 * @param int $cat=null
 	 * @throws Exception
 	 * @return array
 	 */
-	public function export_aggregated($type, $date='.', $cat=null)
+	public function export_aggregated($type, $date='.', $comp=null, $cup=null, $cat=null)
 	{
 		if (empty($date)) $date = '.';
 
 		$filter = array();
-		if ($cat) $filter['GrpId'] = $cat;
+		if ($comp) $filter['WetId'] = (int)$comp;
+		if ($cup) $filter['SerId'] = (int)$cup;
+		if ($cat) $filter['GrpId'] = array_map('intval', explode(',', $cat));
 
 		switch($type)
 		{
 			case 'nat_team_ranking':
-				$filter['nation'] = null;
-				$by = 'nation';
-				$best_results = 3;
+				// only defined for a given comp or cup!
+				if (!$filter['WetId'] && !$filter['SerId'])
+				{
+					throw new Exception ("National team ranking only defined for competitions or cups!");
+				}
+				$feds = $this->calc->nat_team_ranking($comp, $cat, $cup, $date_comp);
 				break;
 			case 'sektionenwertung':
 				$filter['nation'] = 'GER';
 				$by = 'fed_id';
 				$best_results = isset($filter['GrpId']) ? 2 : 1;
+				$use_cup_points = false;
 				break;
 			case 'regionalzentren':
 				$filter['nation'] = 'SUI';
 				$by = 'acl_fed_id';
 				$best_results = 1;
+				$use_cup_points = true;
 				break;
 			default:
 				throw new Exception("Unknown type '$type'!");
 		}
-		$result = $this->calc->aggregated($date, $filter, $best_results, $by);
-		$result = array(
+		if (!isset($feds))
+		{
+			$feds = $this->calc->aggregated($date, $filter, $best_results, $by, $use_cup_points, $date_comp);
+		}
+		// extract params
+		$params = $feds['params'];
+		unset($feds['params']);
+		$filter_used = $params['filter'];
+		unset($params['filter']);
+
+		foreach($feds as &$fed)
+		{
+			foreach($fed['results'] as &$res)
+			{
+				$res = self::rename_key($res, array(
+					'platz'    => 'rank',
+					'pkt'      => 'points',
+					'vorname'  => 'firstname',
+					'nachname' => 'lastname',
+				));
+			}
+		}
+		$result = $params+array(
 			'nation' => $filter['nation'],
-			'aggregated_by' => $by,
-			'best_results' => $best_results,
-			'federations' => $result,
+			'comp_filter' => $comp,
+			'comp_name' => $date_comp['name'],
+			'comp_date' => $date_comp['datum'],
+			'comp_date_span' => $date_comp['date_span'],
+			'cat_filter' => implode(',', (array)$filter_used['GrpId']),
+			'cup_filter' => $cup,
+			'federations' => $feds,
 		);
 		//_debug_array($result); exit;
 		return $result;
