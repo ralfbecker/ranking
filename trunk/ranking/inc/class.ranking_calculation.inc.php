@@ -226,7 +226,14 @@ class ranking_calculation
 		{
 			$filter['WetId'] = $comp['WetId'];
 		}
-		return $this->aggregated('.', $filter, $quota, 'nation', true, $min_cats, $max_comps, $date_comp);
+		$ret = $this->aggregated('.', $filter, $quota, 'nation', true, $min_cats, $max_comps, $date_comp);
+
+		if ($cup)
+		{
+			$ret['params']['cup_name'] = $cup['name'];
+			$ret['params']['SerId'] = $cup['SerId'];
+		}
+		return $ret;
 	}
 
 	/**
@@ -462,6 +469,10 @@ class ranking_calculation
 		);
 		$params = func_get_args();
 		$ranking['params'] = array_combine($names, array_slice($params, 0, count($names)));
+		if ($cup)
+		{
+
+		}
 		$ranking['competitions'] = $competitions;
 		asort($categorys);
 		$ranking['categorys'] = $categorys;
