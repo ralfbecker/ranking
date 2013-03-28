@@ -1550,11 +1550,15 @@ class ranking_export extends boresult
 		{
 			$feds = $this->calc->aggregated($date, $filter, $best_results, $by, $use_cup_points, $date_comp);
 		}
-		// extract params
+		// extract params, competititons and categorys
 		$params = $feds['params'];
 		unset($feds['params']);
 		$filter_used = $params['filter'];
 		unset($params['filter']);
+		$competitions = $feds['competitions'];
+		unset($feds['competitions']);
+		$categorys = $feds['categorys'];
+		unset($feds['categorys']);
 
 		foreach($feds as &$fed)
 		{
@@ -1577,6 +1581,8 @@ class ranking_export extends boresult
 			'cat_filter' => implode(',', (array)$filter_used['GrpId']),
 			'cup_filter' => $cup,
 			'federations' => $feds,
+			'competitions' => $competitions,
+			'categorys' => $categorys,
 		);
 		//_debug_array($result); exit;
 		return $result;
