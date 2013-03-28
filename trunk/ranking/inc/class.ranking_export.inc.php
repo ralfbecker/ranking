@@ -1530,18 +1530,24 @@ class ranking_export extends boresult
 					throw new Exception ("National team ranking only defined for competitions or cups!");
 				}
 				$feds = $this->calc->nat_team_ranking($comp, $cat, $cup, $date_comp);
+				$name = 'National Team Ranking';
+				$aggregated_name = 'Nation';
 				break;
 			case 'sektionenwertung':
 				$filter['nation'] = 'GER';
 				$by = 'fed_id';
 				$best_results = isset($filter['GrpId']) ? 2 : 1;
 				$use_cup_points = false;
+				$name = isset($filter['GrpId']) ? 'Sektionenwertung' : 'Sektionenrangliste';
+				$aggregated_name = 'DAV Sektion';
 				break;
 			case 'regionalzentren':
 				$filter['nation'] = 'SUI';
 				$by = 'acl_fed_id';
 				$best_results = 1;
 				$use_cup_points = true;
+				$name = 'Regionalzentrumswertung';
+				$aggregated_name = 'Regionalzentrum';
 				break;
 			default:
 				throw new Exception("Unknown type '$type'!");
@@ -1580,6 +1586,8 @@ class ranking_export extends boresult
 			'comp_date_span' => $date_comp['date_span'],
 			'cat_filter' => implode(',', (array)$filter_used['GrpId']),
 			'cup_filter' => $cup,
+			'name' => $name,
+			'aggregated_name' => $aggregated_name,
 			'federations' => $feds,
 			'competitions' => $competitions,
 			'categorys' => $categorys,

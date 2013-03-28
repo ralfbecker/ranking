@@ -195,6 +195,40 @@ tr.profileMarginTop > td {
 	font-size: 120%;
 }
 /**
+ * Aggregated rankings
+ */
+.Aggregated th.nation, .Aggregated td.nation, .Aggregated td.name, 
+.Aggregated th.result, .Aggregated td.result, .Aggregated th.name {
+	text-align: left;
+	padding-left: 3px;
+}
+.Aggregated td.name, .Aggregated th.result, .Aggregated td.result {
+	line-height: 1.3;
+}
+.Aggregated td.result, .Aggregated th.result {
+	display: none;
+}
+.Aggregated div.resultRows, .Aggregated div.resultRow {
+	width: 100%;
+}
+.Aggregated td.result span
+{
+	padding-right: 1ex;
+}
+.Aggregated td.result span.rank {
+	display: inline-block;
+	width: 2em;	
+}
+.Aggregated td.result span.rank:after, .Aggregated td.rank:after {
+	content: ".";	
+}
+.Aggregated td.result span.points {
+	float: right;	
+}
+.Aggregated th.result {
+	white-space: pre;	
+}
+/**
  * Fix some CSS on www.ifsc-climbing.org
  */
 section#gkMainbody table.profileHeader thead tr:hover td, table.profileData thead tr:hover td {

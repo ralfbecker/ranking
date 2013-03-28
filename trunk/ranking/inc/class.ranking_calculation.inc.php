@@ -468,6 +468,7 @@ class ranking_calculation
 			'use_cup_points', 'min_cats', 'max_comps'
 		);
 		$params = func_get_args();
+		if (count($params) < count($names)) $params = array_pad($params, count($names), null);
 		$ranking['params'] = array_combine($names, array_slice($params, 0, count($names)));
 		if ($cup)
 		{

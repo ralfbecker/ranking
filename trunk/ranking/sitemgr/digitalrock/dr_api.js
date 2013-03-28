@@ -1266,6 +1266,207 @@ Competitions.prototype.changeFilter = function(filter)
 };
 
 /**
+ * Constructor for aggregated rankings (nat. team ranking, sektionenwertung, ...) from given json url
+ * 
+ * Table get appended to specified _container
+ * 
+ * @param _container
+ * @param _json_url url for data to load
+ */
+function Aggregated(_container,_json_url)
+{
+	this.json_url = _json_url;
+	this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
+	this.container.attr('class', 'Aggregated');
+	
+	this.update();
+}
+Aggregated.prototype.update = Startlist.prototype.update;
+/**
+ * Callback for loading data via ajax
+ * 
+ * @param _data route data object
+ */            
+Aggregated.prototype.handleResponse = function(_data)
+{
+	var that = this;
+	this.columns = {
+		'rank': 'Rank',
+		'nation': { 'label': _data.aggregated_name, 'colspan': 2},
+		'name': _data.aggregated_name,
+		'points': {'label': 'Points','click': function(e) {
+			var hidden_cols = that.container.find('.result');
+			var display = hidden_cols.length ? jQuery(hidden_cols[0]).css('display') : 'none';
+			hidden_cols.css('display', display == 'none' ? 'table-cell' : 'none');
+			e.preventDefault();
+		}}
+	};
+	if (_data.aggregate_by != 'nation') delete this.columns.nation;
+
+	var ranking_name = jQuery(document.createElement('h3')).addClass('rankingName');
+	ranking_name.text(_data.name);
+	this.container.append(ranking_name);
+
+	// cup or competition
+	this.header = jQuery(document.createElement('h1')).addClass('compHeader');
+	this.container.append(this.header);
+	this.header.text(_data.cup_name || _data.comp_name);
+	
+	// category names
+	this.cat_names = jQuery(document.createElement('h3')).addClass('catNames');
+	this.container.append(this.cat_names);
+	var names = '';
+	for(var i in _data.categorys)
+	{
+		names += (names ? ', ' : '')+_data.categorys[i].name;
+	}
+	this.cat_names.text(names);
+	
+	// check if we have more then 1 competition --> use competition columns
+	var num_comps = 0;
+	this.data = _data;
+	if (!_data.comp_filter && !_data.cat_filter)	// sektionenwertung
+	{
+		num_comps = 1;	// force category columns
+	}
+	else
+	{
+		for(var c in _data.competitions)
+		{
+			++num_comps;
+			this.columns['result'+c] = function(_data, _tag, _name) {
+				return that.comp_header.call(that, _data, _tag, _name);
+			};
+		}
+	}
+	if (num_comps == 1)	// single comp --> use category columns
+	{
+		delete this.columns['result'+c];
+		for(var c in _data.categorys)
+		{
+			this.columns['result'+c] = function(_data, _tag, _name) {
+				return that.cat_header.call(that, _data, _tag, _name);
+			};			
+		}
+	}
+	for(var f=0; f < _data.federations.length; ++f)
+	{
+		var fed = _data.federations[f];
+		fed.cat_results = fed.results;	// can't use .results with DrTable!
+		delete fed.results;
+	}
+	
+	// create new table
+	this.table = new DrTable(_data.federations, this.columns, false, true, null, this.navigateTo);
+
+	this.container.append(this.table.dom);
+};
+/**
+ * Display a competition column
+ * @param _data
+ * @param _tag tag 'th' for header or 'td' for data row
+ * @param _name column-name
+ */
+Aggregated.prototype.comp_header = function(_data, _tag, _name)
+{
+	var id = _name.substr(6);
+	var ret = {'className': 'result'};
+	if (_tag == 'th')
+	{
+		ret.label = this.data.competitions[id].short+"\n"+
+			this.data.competitions[id].date.split('-').reverse().join('.');
+		ret.url = location.href.replace(/(cup)=[^&]+/, 'comp='+id);
+	}
+	else if (this.data.cat_filter && this.data.cat_filter.indexOf(',') == -1)
+	{
+		// display results of that competition
+		for(var r=0; r < _data.cat_results.length; ++r)
+		{
+			var result = _data.cat_results[r];
+			if (result.WetId == id)
+			{
+				if (typeof ret.nodes == 'undefined')
+				{
+					ret.nodes = jQuery(document.createElement('div')).addClass('resultRows');
+				}
+				var div = jQuery(document.createElement('div')).addClass('resultRow');
+				var cols = ['rank','lastname','firstname','points'];
+				for(var c=0; c < cols.length; ++c)
+				{
+					var span = jQuery(document.createElement('span')).addClass(cols[c]);
+					span.text(result[cols[c]]);
+					div.append(span);
+				}
+				ret.nodes.append(div);
+			}
+		}
+	}
+	else
+	{
+		ret.label = _data.comps[id];
+	}
+	return ret;
+};
+/**
+ * Display a category column
+ * @param _data
+ * @param _tag tag 'th' for header or 'td' for data row
+ * @param _name column-name
+ */
+Aggregated.prototype.cat_header = function(_data, _tag, _name)
+{
+	var id = _name.substr(6);
+	var ret = {'className': 'result'};
+	if (_tag == 'th')
+	{
+		ret.label = this.data.categorys[id].name;
+		ret.label = ret.label.replace(/(lead|speed|boulder)/, "\n$1").replace(/(männlich|weiblich|male|female)/, "$1\n");
+		if (!this.data.comp_filter && !this.data.cat_filter)
+		{
+			ret.url = location.href+'&cat='+id;
+		}
+	}
+	else if (!this.data.comp_filter && !this.data.cat_filter)	// sektionenwertung
+	{
+		var points = 0.0;
+		for(var r=0; r < _data.cat_results.length; ++r)
+		{
+			var result = _data.cat_results[r];
+			if (result.GrpId == id)
+			{
+				points += result.points;
+			}
+		}
+		ret.label = points.toFixed(2);
+	}
+	else
+	{
+		ret.label = '';
+		for(var r=0; r < _data.cat_results.length; ++r)
+		{
+			var result = _data.cat_results[r];
+			if (result.GrpId == id)
+			{
+				if (typeof ret.nodes == 'undefined')
+				{
+					ret.nodes = jQuery(document.createElement('div')).addClass('resultRows');
+				}
+				var div = jQuery(document.createElement('div')).addClass('resultRow');
+				var cols = ['rank','lastname','firstname','points'];
+				for(var c=0; c < cols.length; ++c)
+				{
+					var span = jQuery(document.createElement('span')).addClass(cols[c]);
+					span.text(result[cols[c]]);
+					div.append(span);
+				}
+				ret.nodes.append(div);
+			}
+		}
+	}
+	return ret;
+};
+
+/**
  * call appropriate widget to display data specified by _json_url or location
  * 
  * @param _container
@@ -1294,7 +1495,7 @@ function DrWidget(_container,_json_url,_arg3)
 		}
 		delete that.prevent_initial_pop;
 	});
-	}
+}
 /**
  * Navigate to a certain result-page
  * 
@@ -1322,7 +1523,11 @@ DrWidget.prototype.update = function(_params)
 		return params.indexOf(_param+'='+_value) != -1;
 	}
 	var widget;
-	if (hasParam('person'))
+	if (hasParam('type', 'nat_team_ranking') || hasParam('type', 'sektionenwertung') || hasParam('type', 'regionalzentren'))
+	{
+		widget = 'Aggregated';
+	}
+	else if (hasParam('person'))
 	{
 		widget = 'Profile';
 	}
@@ -1569,7 +1774,7 @@ DrTable.prototype.createRow = function(_data,_tag)
 		// if object has a special getter func, call it
 		if (typeof this.columns[col] == 'function')
 		{
-			var col_data = this.columns[col].call(this,_data,_tag);
+			var col_data = this.columns[col].call(this,_data,_tag,col);
 		}
 		else
 		{
@@ -1623,20 +1828,31 @@ DrTable.prototype.createRow = function(_data,_tag)
 			else
 			{
 				if (col_data.colspan > 1) tag.colSpan = span = col_data.colspan;
-				if (col_data.url)
+				if (col_data.className) tag.className = col_data.className;
+				if (col_data.url || col_data.click)
 				{
 					var a = document.createElement('a');
-					a.href = col_data.url;
-					if (this.navigateTo) jQuery(a).click(this.navigateTo);
+					a.href = col_data.url || '#';
+					if (col_data.click || this.navigateTo)
+					{
+						jQuery(a).click(col_data.click || this.navigateTo);
+					}
 					jQuery(tag).append(a);
 					tag = a;
 				}
-				jQuery(tag).text(col_data.label);
+				if (col_data.nodes)
+				{
+					jQuery(tag).append(col_data.nodes);
+				}
+				else
+				{
+					jQuery(tag).text(col_data.label);
+				}
 			}
 		}
 		else
 		{
-			jQuery(tag).text(col_data ? col_data : '');
+			jQuery(tag).text(typeof col_data != 'undefined' ? col_data : '');
 			span = 1;
 		}
 	}
@@ -1670,9 +1886,12 @@ DrTable.prototype.sortData = function()
 		
 		return ret;
 	}
-
+	
 	switch(this.sort)
 	{
+		case false:	// dont sort
+			break;
+
 		case 'result_rank':
 			// not necessary as server returns them sorted this way
 			//this.data.sort(sortResultRank);
