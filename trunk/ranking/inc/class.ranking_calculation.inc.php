@@ -323,6 +323,7 @@ class ranking_calculation
 			'.fed_id', $this->bo->athlete->fed_join('Personen','YEAR(Wettkaempfe.datum)'));
 		$extra_cols = $this->bo->comp->table_name.'.name AS comp_name,'.
 			$this->bo->comp->table_name.'.dru_bez AS comp_short,'.
+			$this->bo->comp->table_name.'.datum AS comp_date,'.
 			$this->bo->cats->table_name.'.name AS cat_name,nachname,vorname,'.
 			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,'.
 			ranking_athlete::FEDERATIONS_TABLE.'.fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,'.
@@ -350,7 +351,7 @@ class ranking_calculation
 			}
 			$extra_cols .= ','.$pkte.'*100 AS pkt';
 		}
-		$ranking = array();
+		$ranking = $competions = $categorys = array();
 		$last_aggr = $last_comp = $last_cat = null;
 		$used = 0;
 		foreach($this->bo->result->aggregated_results($filter, $extra_cols, $join, $append) as $result)
@@ -393,40 +394,47 @@ class ranking_calculation
 				$last_comp = $result['WetId'];
 				$last_cat = $result['GrpId'];
 			}
+			// build competitions array
+			if (!isset($competitions[$result['WetId']]))
+			{
+				$competitions[$result['WetId']] = array(
+					'WetId' => $result['WetId'],
+					'name'  => $result['comp_name'],
+					'short' => $result['comp_short'],
+					'date'  => $result['comp_date'],
+				);
+			}
+			// build categories array
+			if (!isset($categorys[$result['GrpId']]))
+			{
+				$categorys[$result['GrpId']] = array(
+					'GrpId' => $result['GrpId'],
+					'name'  => $result['cat_name'],
+				);
+			}
 			if ($used >= $best_results) continue;	// no more results counting
 
+			// change or fixed point format to float
 			$result['pkt'] = round($result['pkt']/100.0, 2);
+
 			$results[] = array_intersect_key($result, array_flip(array('platz','comp_name','PerId','vorname','nachname','pkt','WetId','GrpId','cat_name')));
 
 			$points += $result['pkt'];
-			if (!isset($comps[$result['WetId']]))
-			{
-				$comps[$result['WetId']] = array(
-					'WetId' => $result['WetId'],
-					'name' => $result['comp_name'],
-					'short' => $result['comp_short'],
-					'points' => 0,
-				);
-			}
-			$comps[$result['WetId']]['points'] += $result['pkt'];
-
+			$comps[$result['WetId']] += $result['pkt'];
 			$used++;
 		}
 		if ($max_comps)	// mark and remove points from not counting competitions
 		{
 			foreach($ranking as &$federation)
 			{
-				uasort($federation['comps'], function($a, $b)
-				{
-					return $b['points']-$a['points'];
-				});
+				arsort($federation['comps'], SORT_NUMERIC);
 				$n = 1;
-				foreach($federation['comps'] as &$c)
+				foreach($federation['comps'] as &$pts)
 				{
 					if ($n++ > $max_comps)
 					{
-						$federation['points'] -= $c['points'];
-						$c['points'] = '('.$c['points'].')';
+						$federation['points'] -= $pts;
+						$pts = '('.$pts.')';
 					}
 				}
 			}
@@ -454,6 +462,9 @@ class ranking_calculation
 		);
 		$params = func_get_args();
 		$ranking['params'] = array_combine($names, array_slice($params, 0, count($names)));
+		$ranking['competitions'] = $competitions;
+		asort($categorys);
+		$ranking['categorys'] = $categorys;
 
 		//_debug_array($ranking);exit;
 		return $ranking;
