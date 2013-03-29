@@ -1303,59 +1303,84 @@ Aggregated.prototype.handleResponse = function(_data)
 	};
 	if (_data.aggregate_by != 'nation') delete this.columns.nation;
 
-	var ranking_name = jQuery(document.createElement('h3')).addClass('rankingName');
-	ranking_name.text(_data.name);
-	this.container.append(ranking_name);
-
-	// cup or competition
-	this.header = jQuery(document.createElement('h1')).addClass('compHeader');
-	this.container.append(this.header);
-	this.header.text(_data.cup_name || _data.comp_name);
-	
-	// category names
-	this.cat_names = jQuery(document.createElement('h3')).addClass('catNames');
-	this.container.append(this.cat_names);
-	var names = '';
-	for(var i in _data.categorys)
+	if (typeof this.table == 'undefined')
 	{
-		names += (names ? ', ' : '')+_data.categorys[i].name;
-	}
-	this.cat_names.text(names);
+		this.ranking_name = jQuery(document.createElement('h1')).addClass('rankingName');
+		this.container.append(this.ranking_name);
 	
-	// check if we have more then 1 competition --> use competition columns
-	var num_comps = 0;
-	this.data = _data;
-	if (!_data.comp_filter && !_data.cat_filter)	// sektionenwertung
-	{
-		num_comps = 1;	// force category columns
+		// cup or competition
+		this.header = jQuery(document.createElement('h2')).addClass('rankingHeader');
+		this.container.append(this.header);
+		
+		// category names
+		this.header2 = jQuery(document.createElement('h3')).addClass('rankingHeader2');
+		this.container.append(this.header2);
 	}
 	else
 	{
-		for(var c in _data.competitions)
+		jQuery(this.table.dom).remove();
+		this.header.empty();
+		this.header2.empty();
+	}
+	this.ranking_name.text(_data.name);
+	this.header.text(_data.cup_name || _data.comp_name);
+	// if we filter by cat display categories as 2. header
+	if (_data.cat_filter)
+	{
+		if (_data.cat_name)	// category name given, use it but upcase and space it
 		{
-			++num_comps;
-			this.columns['result'+c] = function(_data, _tag, _name) {
-				return that.comp_header.call(that, _data, _tag, _name);
+			this.header2.text(_data.cat_name.toUpperCase().split('').join(' '));
+		}
+		else
+		{
+			var names = '';
+			for(var i in _data.categorys)
+			{
+				names += (names ? ', ' : '')+_data.categorys[i].name;
+			}
+			this.header2.text(names);
+		}
+	}
+	
+	// make _data available to other methods
+	this.data = _data;
+
+	var comps = [];
+	for(var c in _data.competitions) comps.push(_data.competitions[c]);
+	// use competition columns for more then one comp. and not sektionenwertung
+	if (comps.length > 1 && (_data.comp_filter || _data.cat_filter))
+	{
+		comps.sort(function(a,b){
+			return a.date < b.date ? 1 : -1;
+		});
+		for(var c=0; c < comps.length; ++c)
+		{
+			this.columns['result'+comps[c].WetId] = function(_data, _tag, _name) {
+				return that.comp_column.call(that, _data, _tag, _name);
 			};
 		}
 	}
-	if (num_comps == 1)	// single comp --> use category columns
+	else	// otherwise use category header
 	{
-		delete this.columns['result'+c];
-		for(var c in _data.categorys)
+		var cats = [];
+		for(var c in _data.categorys) cats.push(_data.categorys[c]);
+		cats.sort(function(a,b){
+			return a.name < b.name ? -1 : 1;
+		});
+		for(var c=0; c < cats.length; ++c)
 		{
-			this.columns['result'+c] = function(_data, _tag, _name) {
-				return that.cat_header.call(that, _data, _tag, _name);
+			this.columns['result'+cats[c].GrpId] = function(_data, _tag, _name) {
+				return that.cat_column.call(that, _data, _tag, _name);
 			};			
 		}
 	}
-	for(var f=0; f < _data.federations.length; ++f)
+	if (_data.use_cup_points)	// display all ranking points with 2 digits
 	{
-		var fed = _data.federations[f];
-		fed.cat_results = fed.results;	// can't use .results with DrTable!
-		delete fed.results;
+		for(var f=0; f < _data.federations.length; ++f)
+		{
+			_data.federations[f].points = _data.federations[f].points.toFixed(2);
+		}
 	}
-	
 	// create new table
 	this.table = new DrTable(_data.federations, this.columns, false, true, null, this.navigateTo);
 
@@ -1363,43 +1388,34 @@ Aggregated.prototype.handleResponse = function(_data)
 };
 /**
  * Display a competition column
+ * 
  * @param _data
  * @param _tag tag 'th' for header or 'td' for data row
  * @param _name column-name
  */
-Aggregated.prototype.comp_header = function(_data, _tag, _name)
+Aggregated.prototype.comp_column = function(_data, _tag, _name)
 {
 	var id = _name.substr(6);
 	var ret = {'className': 'result'};
+	if (this.json_url.indexOf('detail=1') == -1) ret.className += ' resultHidden';
 	if (_tag == 'th')
 	{
+		// use comp. shortcut plus date as column header
 		ret.label = this.data.competitions[id].short+"\n"+
 			this.data.competitions[id].date.split('-').reverse().join('.');
-		ret.url = location.href.replace(/(cup)=[^&]+/, 'comp='+id);
+		// add comp to url evtl. replacing cup
+		ret.url = location.href.indexOf('cup=') == -1 ? location.href+'&comp='+id :
+			location.href.replace(/(cup)=[^&]+/, 'comp='+id);
+		// nat. team ranking selects a cat, if none given, need to add it to not get a different selected
+		if (this.data.cat_filter && ret.url.indexOf('cat=') == -1) ret.url += '&cat='+this.data.cat_filter;
+		// keep in detailed view
+		if (ret.url.indexOf('detail=1') == -1) ret.url += '&detail=1';
+		ret.title = this.data.competitions[id].name;
 	}
 	else if (this.data.cat_filter && this.data.cat_filter.indexOf(',') == -1)
 	{
-		// display results of that competition
-		for(var r=0; r < _data.cat_results.length; ++r)
-		{
-			var result = _data.cat_results[r];
-			if (result.WetId == id)
-			{
-				if (typeof ret.nodes == 'undefined')
-				{
-					ret.nodes = jQuery(document.createElement('div')).addClass('resultRows');
-				}
-				var div = jQuery(document.createElement('div')).addClass('resultRow');
-				var cols = ['rank','lastname','firstname','points'];
-				for(var c=0; c < cols.length; ++c)
-				{
-					var span = jQuery(document.createElement('span')).addClass(cols[c]);
-					span.text(result[cols[c]]);
-					div.append(span);
-				}
-				ret.nodes.append(div);
-			}
-		}
+		ret.label = '';
+		ret.nodes = this.results(id, 'WetId', _data.counting);
 	}
 	else
 	{
@@ -1409,29 +1425,35 @@ Aggregated.prototype.comp_header = function(_data, _tag, _name)
 };
 /**
  * Display a category column
+ * 
  * @param _data
  * @param _tag tag 'th' for header or 'td' for data row
  * @param _name column-name
  */
-Aggregated.prototype.cat_header = function(_data, _tag, _name)
+Aggregated.prototype.cat_column = function(_data, _tag, _name)
 {
 	var id = _name.substr(6);
 	var ret = {'className': 'result'};
+	if (this.json_url.indexOf('detail=1') == -1) ret.className += ' resultHidden';
 	if (_tag == 'th')
 	{
 		ret.label = this.data.categorys[id].name;
-		ret.label = ret.label.replace(/(lead|speed|boulder)/, "\n$1").replace(/(männlich|weiblich|male|female)/, "$1\n");
+		// get less wide headers by inserting a newline
+		ret.label = ret.label.replace(/(lead|speed|boulder)/, "\n$1")
+			.replace(/(männliche|weibliche|male|female) */, "$1\n");
 		if (!this.data.comp_filter && !this.data.cat_filter)
 		{
 			ret.url = location.href+'&cat='+id;
+			// keep in detailed view
+			if (ret.url.indexOf('detail=1') == -1) ret.url += '&detail=1';
 		}
 	}
 	else if (!this.data.comp_filter && !this.data.cat_filter)	// sektionenwertung
 	{
 		var points = 0.0;
-		for(var r=0; r < _data.cat_results.length; ++r)
+		for(var r=0; r < _data.counting.length; ++r)
 		{
-			var result = _data.cat_results[r];
+			var result = _data.counting[r];
 			if (result.GrpId == id)
 			{
 				points += result.points;
@@ -1442,29 +1464,36 @@ Aggregated.prototype.cat_header = function(_data, _tag, _name)
 	else
 	{
 		ret.label = '';
-		for(var r=0; r < _data.cat_results.length; ++r)
-		{
-			var result = _data.cat_results[r];
-			if (result.GrpId == id)
-			{
-				if (typeof ret.nodes == 'undefined')
-				{
-					ret.nodes = jQuery(document.createElement('div')).addClass('resultRows');
-				}
-				var div = jQuery(document.createElement('div')).addClass('resultRow');
-				var cols = ['rank','lastname','firstname','points'];
-				for(var c=0; c < cols.length; ++c)
-				{
-					var span = jQuery(document.createElement('span')).addClass(cols[c]);
-					span.text(result[cols[c]]);
-					div.append(span);
-				}
-				ret.nodes.append(div);
-			}
-		}
+		ret.nodes = this.results(id, 'GrpId', _data.counting);
 	}
 	return ret;
 };
+Aggregated.prototype.results = function(_id, _attr, _results)
+{
+	var cols = ['rank','lastname','firstname','points'];
+	var nodes;
+	for(var r=0; r < _results.length; ++r)
+	{
+		var result = _results[r];
+		if (result[_attr] == _id)
+		{
+			if (typeof nodes == 'undefined')
+			{
+				nodes = jQuery(document.createElement('div')).addClass('resultRows');
+			}
+			var div = jQuery(document.createElement('div')).addClass('resultRow');
+			for(var c=0; c < cols.length; ++c)
+			{
+				var col = cols[c];
+				var span = jQuery(document.createElement('span')).addClass(col);
+				span.text(col != 'points' || this.data.use_cup_points ? result[col] : result[col].toFixed(2));
+				div.append(span);
+			}
+			nodes.append(div);
+		}
+	}
+	return nodes;
+}
 
 /**
  * call appropriate widget to display data specified by _json_url or location
@@ -1829,6 +1858,7 @@ DrTable.prototype.createRow = function(_data,_tag)
 			{
 				if (col_data.colspan > 1) tag.colSpan = span = col_data.colspan;
 				if (col_data.className) tag.className = col_data.className;
+				if (col_data.title) tag.title = col_data.title;
 				if (col_data.url || col_data.click)
 				{
 					var a = document.createElement('a');

@@ -1538,7 +1538,7 @@ class ranking_export extends boresult
 				$by = 'fed_id';
 				$best_results = isset($filter['GrpId']) ? 2 : 1;
 				$use_cup_points = false;
-				$name = isset($filter['GrpId']) ? 'Sektionenwertung' : 'Sektionenrangliste';
+				$name = isset($filter['GrpId']) || isset($filter['WetId']) ? 'Sektionenwertung' : 'Sektionenrangliste';
 				$aggregated_name = 'DAV Sektion';
 				break;
 			case 'regionalzentren':
@@ -1554,7 +1554,7 @@ class ranking_export extends boresult
 		}
 		if (!isset($feds))
 		{
-			$feds = $this->calc->aggregated($date, $filter, $best_results, $by, $use_cup_points, $date_comp);
+			$feds = $this->calc->aggregated($date, $filter, $best_results, $by, $use_cup_points, null, null, $date_comp);
 		}
 		// extract params, competititons and categorys
 		$params = $feds['params'];
@@ -1568,7 +1568,7 @@ class ranking_export extends boresult
 
 		foreach($feds as &$fed)
 		{
-			foreach($fed['results'] as &$res)
+			foreach($fed['counting'] as &$res)
 			{
 				$res = self::rename_key($res, array(
 					'platz'    => 'rank',
