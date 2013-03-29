@@ -1374,7 +1374,7 @@ Aggregated.prototype.handleResponse = function(_data)
 			};			
 		}
 	}
-	if (_data.use_cup_points)	// display all ranking points with 2 digits
+	if (!_data.use_cup_points)	// display all ranking points with 2 digits
 	{
 		for(var f=0; f < _data.federations.length; ++f)
 		{
