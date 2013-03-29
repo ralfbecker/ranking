@@ -233,6 +233,8 @@ class ranking_calculation
 			$ret['params']['cup_name'] = $cup['name'];
 			$ret['params']['SerId'] = $cup['SerId'];
 		}
+		$ret['params']['cat_name'] = $name;
+
 		return $ret;
 	}
 
@@ -248,11 +250,13 @@ class ranking_calculation
 	 * @param int $max_comps=null used max. number of comps for national team ranking of a cup
 	 * @param array &$date_comp=null on return data of last competition in ranking
 	 * @param int $window=12 number of month in ranking
-	 * @return array of array with values 'rank', 'name', 'points', 'results' (array)
+	 * @return array of array with values 'rank', 'name', 'points', 'counting', 'comps' (array)
+	 * 	plus categorys and competitions arrays
 	 */
 	public function aggregated($date='.', array $filter=array(), $best_results=3, $by='nation', $use_cup_points=true,
 		$min_cats=null, $max_comps=null, &$date_comp=null, $window=12)
 	{
+		//error_log(__METHOD__."(date='$date', filter=".array2string($filter).", best_results=$best_results, by='$by', use_cup_points=".array2string($use_cup_points).", min_cats=$min_cats, max_comps=$max_comps)");
 		// set $by from $filter['nation'] or visa versa
 		switch($by ? $by : $filter['nation'])
 		{
@@ -279,9 +283,9 @@ class ranking_calculation
 				throw new egw_exception_wrong_parameter ("Competition '$filter[WetId]' NOT found!");
 			}
 		}
-		elseif ($date == '.' || preg_match('/^\d{4}-\d{2}-\d{2}$/', $date))
+		elseif ($date == '.' || !isset($date) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $date))
 		{
-			if ($date == '.') $date = date('Y-m-d');
+			if ($date == '.' || !isset($date)) $date = date('Y-m-d');
 
 			$date_comp = $this->bo->comp->last_comp($date, $filter['GrpId'], $filter['nation'], $filter['SerId']);
 		}
@@ -335,7 +339,7 @@ class ranking_calculation
 			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,'.
 			ranking_athlete::FEDERATIONS_TABLE.'.fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,'.
 			ranking_athlete::ATHLETE_TABLE.'.PerId AS PerId';
-		$append = 'ORDER BY '.$by.','.$this->bo->comp->table_name.'.datum,WetId,GrpId,Results.platz';
+		$append = 'ORDER BY '.$by.','.$this->bo->comp->table_name.'.datum DESC,WetId,GrpId,Results.platz';
 		if ($use_cup_points)
 		{
 			$PktId = $use_cup_points !== true ? $use_cup_points : 2;	// uiaa
@@ -386,10 +390,10 @@ class ranking_calculation
 					'url' => $url,
 					'rank' => '',
 					'points' => 0,
-					'results' => array(),
+					'counting' => array(),
 					'comps' => array(),
 				);
-				$results =& $ranking[$result[$by]]['results'];
+				$results =& $ranking[$result[$by]]['counting'];
 				$points =& $ranking[$result[$by]]['points'];
 				$comps =& $ranking[$result[$by]]['comps'];
 				$last_aggr = $result[$by];
@@ -470,12 +474,7 @@ class ranking_calculation
 		$params = func_get_args();
 		if (count($params) < count($names)) $params = array_pad($params, count($names), null);
 		$ranking['params'] = array_combine($names, array_slice($params, 0, count($names)));
-		if ($cup)
-		{
-
-		}
 		$ranking['competitions'] = $competitions;
-		asort($categorys);
 		$ranking['categorys'] = $categorys;
 
 		//_debug_array($ranking);exit;
@@ -651,7 +650,7 @@ class ranking_calculation
 					++$platz[$result['platz']][$id];
 				}
 			}
-			$pers[$id]['results'][$result['WetId']] = $result['platz'].".\n".
+			$pers[$id]['counting'][$result['WetId']] = $result['platz'].".\n".
 				($nc ? '(' : '').sprintf('%04.2f',$result['pkt']).($nc ? ')' : '');
 
 			if (is_array($comps) && !isset($comps[$result['WetId']]))

@@ -197,19 +197,20 @@ tr.profileMarginTop > td {
 /**
  * Aggregated rankings
  */
-.Aggregated th.nation, .Aggregated td.nation, .Aggregated td.name, 
-.Aggregated th.result, .Aggregated td.result, .Aggregated th.name {
+.Aggregated th.nation, .Aggregated td.nation, .Aggregated td.name, .Aggregated th.name {
 	text-align: left;
 	padding-left: 3px;
 }
 .Aggregated td.name, .Aggregated th.result, .Aggregated td.result {
 	line-height: 1.3;
+	white-space: pre;
 }
-.Aggregated td.result, .Aggregated th.result {
+.Aggregated td.resultHidden, .Aggregated th.resultHidden {
 	display: none;
 }
 .Aggregated div.resultRows, .Aggregated div.resultRow {
 	width: 100%;
+	text-align: left;
 }
 .Aggregated td.result span
 {
@@ -217,16 +218,13 @@ tr.profileMarginTop > td {
 }
 .Aggregated td.result span.rank {
 	display: inline-block;
-	width: 2em;	
+	width: 1.5em;	
 }
 .Aggregated td.result span.rank:after, .Aggregated td.rank:after {
 	content: ".";	
 }
 .Aggregated td.result span.points {
 	float: right;	
-}
-.Aggregated th.result {
-	white-space: pre;	
 }
 /**
  * Fix some CSS on www.ifsc-climbing.org
@@ -236,6 +234,7 @@ section#gkMainbody table.profileHeader thead tr:hover td, table.profileData thea
 }
 section#gkMainbody table.DrTable thead, section#gkMainbody table.DrTable tbody{
 	background-color: inherit;
+	background-color: rgba(0,0,0,0.75);
 }
 /* do NOT show start-numbers on ifsc-website */
 section#gkMainbody .Resultlist table.DrTable .start_number {
