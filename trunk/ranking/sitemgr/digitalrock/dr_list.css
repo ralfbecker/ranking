@@ -226,6 +226,9 @@ tr.profileMarginTop > td {
 .Aggregated td.result span.points {
 	float: right;	
 }
+.Aggregated .rankingHeader2 {
+	white-space: pre;
+}
 /**
  * Fix some CSS on www.ifsc-climbing.org
  */
