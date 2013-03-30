@@ -38,6 +38,7 @@ function Resultlist(_container,_json_url)
 	Resultlist.prototype.currentTopPosition = Startlist.prototype.currentTopPosition;
 	Resultlist.prototype.upDown = Startlist.prototype.upDown;
 	Resultlist.prototype.rotateURL = Startlist.prototype.rotateURL;
+	Resultlist.prototype.seeAlso = Startlist.prototype.seeAlso;
 
 	Startlist.apply(this, [_container,_json_url]);
 	this.container.attr('class', 'Resultlist');
@@ -509,29 +510,8 @@ Startlist.prototype.handleResponse = function(_data)
 		this.table = new DrTable(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null,this.navigateTo);
 	
 		jQuery(this.container).append(this.table.dom);
-		
-		if (!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/) && this.discipline != 'ranking' &&
-			typeof _data.see_also != 'undefined')
-		{
-			var ul = jQuery(document.createElement('ul')).attr('class', 'seeAlso');
-			for(var i=0; i < _data.see_also.length; ++i)
-			{
-				var tag = jQuery(document.createElement('li'));
-				ul.append(tag);
-				if (_data.see_also[i].url)
-				{
-					var a = jQuery(document.createElement('a')).attr('href', _data.see_also[i].url);
-					tag.append(a);
-					if (this.navigateTo)
-					{
-						a.click(this.navigateTo);
-					}
-					tag = a;
-				}
-				tag.text(_data.see_also[i].name);
-			}
-			this.container.append(ul);
-		}
+
+		this.see_also(_data.see_also);
 	}
 	else
 	{
@@ -548,7 +528,38 @@ Startlist.prototype.handleResponse = function(_data)
 		this.update_handle = window.setTimeout(function(){list.update();},10000);
 	}
 };
+/**
+ * Add list with see also links, if not beamer or toc disabled
+ * 
+ * @param _see_also
+ */
+Startlist.prototype.seeAlso = function(_see_also)
+{
+	this.container.find('ul.seeAlso').remove();
 
+	if (typeof _see_also != 'undefined' && _see_also.length > 0 && 
+		!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/))
+	{
+		var ul = jQuery(document.createElement('ul')).attr('class', 'seeAlso');
+		for(var i=0; i < _see_also.length; ++i)
+		{
+			var tag = jQuery(document.createElement('li'));
+			ul.append(tag);
+			if (_see_also[i].url)
+			{
+				var a = jQuery(document.createElement('a')).attr('href', _see_also[i].url);
+				tag.append(a);
+				if (this.navigateTo)
+				{
+					a.click(this.navigateTo);
+				}
+				tag = a;
+			}
+			tag.text(_see_also[i].name);
+		}
+		this.container.append(ul);
+	}
+}
 /**
  * Set header with a (provisional) Result or Startlist prefix
  * 
@@ -592,6 +603,7 @@ function Results(_container,_json_url)
 	this.update();
 }
 Results.prototype.update = Startlist.prototype.update;
+Results.prototype.seeAlso = Startlist.prototype.seeAlso;
 /**
  * Callback for loading data via ajax
  * 
@@ -675,6 +687,8 @@ Results.prototype.handleResponse = function(_data)
 	this.table = new DrTable(_data.categorys,this.columns,'result_rank',true,null,this.navigateTo);
 
 	this.container.append(this.table.dom);
+	
+	this.seeAlso(_data.see_also);
 };
 /**
  * Switch from Results (of all categories) to Resultlist (of a single category)
@@ -1282,6 +1296,7 @@ function Aggregated(_container,_json_url)
 	this.update();
 }
 Aggregated.prototype.update = Startlist.prototype.update;
+Aggregated.prototype.seeAlso = Startlist.prototype.seeAlso;
 /**
  * Callback for loading data via ajax
  * 
@@ -1295,7 +1310,7 @@ Aggregated.prototype.handleResponse = function(_data)
 		'nation': { 'label': _data.aggregated_name, 'colspan': 2},
 		'name': _data.aggregated_name,
 		'points': {'label': 'Points','click': function(e) {
-			var hidden_cols = that.container.find('.result');
+			var hidden_cols = that.container.find('.calculationHidden');
 			var display = hidden_cols.length ? jQuery(hidden_cols[0]).css('display') : 'none';
 			hidden_cols.css('display', display == 'none' ? 'table-cell' : 'none');
 			e.preventDefault();
@@ -1347,7 +1362,7 @@ Aggregated.prototype.handleResponse = function(_data)
 
 	var comps = [];
 	for(var c in _data.competitions) comps.push(_data.competitions[c]);
-	// use competition columns for more then one comp. and not sektionenwertung
+	// use competition columns for more then one comp. and international or SUI
 	if (comps.length > 1 && (!_data.nation || _data.nation == 'SUI'))
 	{
 		comps.sort(function(a,b){
@@ -1384,7 +1399,20 @@ Aggregated.prototype.handleResponse = function(_data)
 	// create new table
 	this.table = new DrTable(_data.federations, this.columns, false, true, null, this.navigateTo);
 
+	// add table footer with note about how many results are counting
+	var tfoot = jQuery(document.createElement('tfoot'));
+	jQuery(this.table.dom).append(tfoot);
+	var th = jQuery(document.createElement('th'));
+	if (this.json_url.indexOf('detail=1') == -1) th.addClass('calculationHidden');
+	tfoot.append(jQuery(document.createElement('tr')).append(th));
+	var cols=0; for(var c in this.columns) cols++;
+	th.attr('colspan', cols);
+	th.text('For '+_data.name+' '+_data.best_results+' best results per competition and category are counting. '+
+			'Not counting results are in brackets.');
+	
 	this.container.append(this.table.dom);
+	
+	this.seeAlso(_data.see_also);
 };
 /**
  * Display a competition column
@@ -1397,7 +1425,7 @@ Aggregated.prototype.comp_column = function(_data, _tag, _name)
 {
 	var id = _name.substr(6);
 	var ret = {'className': 'result'};
-	if (this.json_url.indexOf('detail=1') == -1) ret.className += ' resultHidden';
+	if (this.json_url.indexOf('detail=1') == -1) ret.className += ' calculationHidden';
 	if (_tag == 'th')
 	{
 		// use comp. shortcut plus date as column header
@@ -1434,7 +1462,7 @@ Aggregated.prototype.cat_column = function(_data, _tag, _name)
 {
 	var id = _name.substr(6);
 	var ret = {'className': 'result'};
-	if (this.json_url.indexOf('detail=1') == -1) ret.className += ' resultHidden';
+	if (this.json_url.indexOf('detail=1') == -1) ret.className += ' calculationHidden';
 	if (_tag == 'th')
 	{
 		ret.label = this.data.categorys[id].name;
