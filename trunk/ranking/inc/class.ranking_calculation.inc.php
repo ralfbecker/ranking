@@ -235,6 +235,19 @@ class ranking_calculation
 		}
 		$ret['params']['cat_name'] = $name;
 
+		// add see also links for other available national team rankings
+		foreach($valid_cats as $name => $vcats)
+		{
+			$vcats_str = implode(',',$vcats);
+			if ($cats != $vcats_str && ($name != 'overall' || count(explode(',',$cats)) <= 2))
+			{
+				$ret['params']['see_also'][] = array(
+					'name' => $ret['params']['name'].' '.($cup ? $cup['name'] : $comp['name']).': '.$name,
+					'url'  => '#!type=nat_team_ranking&'.($cup ? 'cup='.$cup['SerId'] : 'comp='.$comp['WetId']).'&cat='.$vcats_str,
+				);
+			}
+		}
+
 		return $ret;
 	}
 

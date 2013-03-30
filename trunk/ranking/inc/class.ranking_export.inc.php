@@ -1054,7 +1054,7 @@ class ranking_export extends boresult
 		$join = 'JOIN '.$this->result->result_table.' USING(WetId)';
 
 		$comps = array();
-		foreach($this->comp->search(null, 'DISTINCT WetId,name,'.$this->comp->table_name.'.datum AS datum,gruppen,nation', 'datum DESC', '', '', '', 'AND', array(0, 20), $filter, $join) as $c)
+		foreach($this->comp->search(null, 'DISTINCT WetId,name,'.$this->comp->table_name.'.datum AS datum,gruppen,nation,quota,rkey', 'datum DESC', '', '', '', 'AND', array(0, 20), $filter, $join) as $c)
 		{
 			if (!isset($comp) || $comp['WetId'] == $c['WetId'])
 			{
@@ -1113,6 +1113,69 @@ class ranking_export extends boresult
 			'competitions' => $comps,
 			'last_modified' => $last_modified,
 		);
+		// add see also links to national team ranking and combined ranking
+		if (!$comp['nation'] && $comp['quota'] && (
+			(int)$comp['datum'] >= 2005 && preg_match('/^[0-9]{2}_[^I]+/',$comp['rkey']) ||	// world cup from 2005 on
+			(int)$comp['datum'] >= 2010 && preg_match('/^[0-9]{2}EY[SC]/',$comp['rkey'])))	// european youth from 2010 on
+		{
+			// all valid Combinations
+			$valid_cats = array(
+				'combined (lead &amp; boulder)' => array(1,2,5,6),
+				'lead' => array(1,2),
+				'boulder' => array(5,6),
+				'speed'    => array(23,24),
+				'youth lead' => array(15,16,17,18,19,20),
+				'youth boulder' => array(79,80,81,82,83,84),
+				'youth speed' => array(56,57,58,59,60,61),
+			);
+			if ((int)$comp['datum'] >= 2008)
+			{
+				$valid_cats['overall'] = array(1,2,5,6,23,24);
+			}
+			if ((int)$comp['datum'] >= 2009)	// no more combined ranking from 2009 on, only overall
+			{
+				unset($valid_cats['combined (lead &amp; boulder)']);
+			}
+
+			$cats = array_keys($cats_by_id);
+			foreach($valid_cats as $name => $vcats)
+			{
+				if ((count($icats=array_intersect($cats, $vcats)) == count($vcats) ||
+					($name == 'overall' && count($icats) > 2))	// show overall if we have more then 2 cats
+					&& ($name != 'overall' || $comp['WetId'] != 991))	// temporary disabling 2009 Word Championship
+				{
+					$data['see_also'][] = array(
+						'url' => '#!type=nat_team_ranking&comp='.$comp['WetId'].'&cat='.implode(',',$vcats),
+						'name' => 'National Team Ranking '.strtoupper($name),
+					);
+				}
+			}
+			if ((int)$comp['datum'] >= 2008 && !in_array($comp['WetId'], array(991,1439)))	// disabling display of combined ranking for 2009+2012 Word Championship
+			{
+				/* combined ranking
+				$valid_cats = array(
+					'MEN' => array(
+						'GrpId' => 45,
+						'GrpIds' => array(1,6,23),
+					),
+					'WOMEN' => array(
+						'GrpId' => 42,
+						'GrpIds' => array(2,5,24),
+					),
+				);
+				foreach($valid_cats as $name => $cat_data)
+				{
+					if (count(array_intersect($cats, $cat_data['GrpIds'])) > 1)
+					{
+						$data['see_also'][] = array(
+							'url' => $this->ranking_url($cat_data['GrpId']).'&comp='.$comp['WetId'],
+							'name' => 'Combined Ranking '.$name,
+						);
+					}
+				}*/
+			}
+		}
+
 		list($y,$m,$d) = explode('-', $comp['datum']);
 		$comp_ts = mktime(0, 0, 0, $m, $d, $y);
 		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration'] ?
