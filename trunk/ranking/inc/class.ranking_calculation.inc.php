@@ -379,6 +379,15 @@ class ranking_calculation
 						$name = $this->bo->federation->get_nationname($result['nation']);
 						$url = '';
 						break;
+					case 'acl_fed_id':
+						if (!isset($rzs))
+						{
+							$rzs = $this->bo->federation->federations('SUI');
+						}
+						$name = isset($rzs[$result['acl_fed_id']]) ? $rzs[$result['acl_fed_id']] :
+							(empty($result['acl_fed_id']) ? 'None' : $result['acl_fed_id']);
+						$url = '';
+						break;
 					default:
 						$name = $result[$by];
 						$url = '';

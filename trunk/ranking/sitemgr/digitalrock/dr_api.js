@@ -1348,7 +1348,7 @@ Aggregated.prototype.handleResponse = function(_data)
 	var comps = [];
 	for(var c in _data.competitions) comps.push(_data.competitions[c]);
 	// use competition columns for more then one comp. and not sektionenwertung
-	if (comps.length > 1 && (_data.comp_filter || _data.cat_filter))
+	if (comps.length > 1 && (!_data.nation || _data.nation == 'SUI'))
 	{
 		comps.sort(function(a,b){
 			return a.date < b.date ? 1 : -1;
@@ -1401,7 +1401,7 @@ Aggregated.prototype.comp_column = function(_data, _tag, _name)
 	if (_tag == 'th')
 	{
 		// use comp. shortcut plus date as column header
-		ret.label = this.data.competitions[id].short+"\n"+
+		ret.label = (this.data.competitions[id].short || this.data.competitions[id].name.replace(/^.* - /, ''))+"\n"+
 			this.data.competitions[id].date.split('-').reverse().join('.');
 		// add comp to url evtl. replacing cup
 		ret.url = location.href.indexOf('cup=') == -1 ? location.href+'&comp='+id :
