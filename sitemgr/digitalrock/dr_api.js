@@ -511,7 +511,7 @@ Startlist.prototype.handleResponse = function(_data)
 	
 		jQuery(this.container).append(this.table.dom);
 
-		this.see_also(_data.see_also);
+		this.seeAlso(_data.see_also);
 	}
 	else
 	{
@@ -559,7 +559,7 @@ Startlist.prototype.seeAlso = function(_see_also)
 		}
 		this.container.append(ul);
 	}
-}
+};
 /**
  * Set header with a (provisional) Result or Startlist prefix
  * 
@@ -929,7 +929,6 @@ Profile.prototype.handleResponse = function(_data)
 		return data;
 	});
 	// replace result data
-	var n = 0;
 	var bestResults = this.bestResults;
 	pattern = /\$\$results\/N\/([^$]+)\$\$/g;
 	html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
@@ -1075,8 +1074,6 @@ ResultTemplate.prototype.handleResponse = function(_data)
 		return data;
 	});
 	// replace result data
-	var n = 0;
-	var bestResults = this.bestResults;
 	pattern = /\$\$participants\/N\/([^$]+)\$\$/g;
 	html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
 	{
@@ -1521,7 +1518,7 @@ Aggregated.prototype.results = function(_id, _attr, _results)
 		}
 	}
 	return nodes;
-}
+};
 
 /**
  * call appropriate widget to display data specified by _json_url or location
@@ -1829,13 +1826,14 @@ DrTable.prototype.createRow = function(_data,_tag)
 		var url = _data.url;
 		
 		// if object has a special getter func, call it
+		var col_data;
 		if (typeof this.columns[col] == 'function')
 		{
-			var col_data = this.columns[col].call(this,_data,_tag,col);
+			col_data = this.columns[col].call(this,_data,_tag,col);
 		}
 		else
 		{
-			var col_data = _data[col];
+			col_data = _data[col];
 		}
 		// allow /-delemited expressions to index into arrays and objects
 		if (typeof col_data == 'undefined' && col.indexOf('/') != -1)
