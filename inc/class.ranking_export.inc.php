@@ -922,7 +922,7 @@ class ranking_export extends boresult
 			throw new Exception(lang('Category not found!!!'));
 		}
 		$comps = array();
-		if (!($ranking = $this->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
+		if (!($ranking = $this->calc->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
 		{
 			throw new Exception(lang('No ranking defined or no results yet for category %1 !!!',$cat['name']));
 		}
