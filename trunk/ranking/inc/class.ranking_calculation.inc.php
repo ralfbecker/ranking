@@ -672,7 +672,7 @@ class ranking_calculation
 					++$platz[$result['platz']][$id];
 				}
 			}
-			$pers[$id]['counting'][$result['WetId']] = $result['platz'].".\n".
+			$pers[$id]['results'][$result['WetId']] = $result['platz'].".\n".
 				($nc ? '(' : '').sprintf('%04.2f',$result['pkt']).($nc ? ')' : '');
 
 			if (is_array($comps) && !isset($comps[$result['WetId']]))
