@@ -19,7 +19,7 @@
  * - Profile: display profile of an athlete based on a html template
  * - ResultTemplate: displays result based on a html template
  * - Aggregated: displays an aggregated ranking: national team ranking, GER sektionenwertung or SUI regionalzentren
- * - DrBaseWidget: virtual base of all widgets (but DrWidget) implements json(p) loading of data
+ * - DrBaseWidget: virtual base of all widgets implements json(p) loading of data
  * - DrTable: creates and updates a table from data and a column definition, used by most widgets
  * 
  * In almost all cases you only need to use DrWidget as shown in following example:
@@ -72,9 +72,25 @@ var DrBaseWidget = (function() {
 		this.json_url = _json_url;
 		this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
 		this.container.attr('class', this.constructor.name);
-		// allow DrWidget to set it's own link-handler
-		this.navigateTo = null;
 	}
+	/**
+	 * Install update method as popstate or hashchange handler
+	 */
+	DrBaseWidget.prototype.installPopState = function()
+	{
+		// add popstate or hashchange (IE8,9) event listener, to use browser back button for navigation
+		// some browsers, eg. Chrome, generate a pop on inital page-load
+		// to prevent loading page initially twice, we store initial location
+		this.prevent_initial_pop = location.href;
+		var that = this;
+		jQuery(window).bind(window.history.pushState ? "popstate" : "hashchange", function(e) {
+			if (!that.prevent_initial_pop || that.prevent_initial_pop != location.href)
+			{
+				that.update();
+			}
+			delete that.prevent_initial_pop;
+		});
+	};
 	/**
 	 * Update Widget from json_url
 	 * 
@@ -1979,9 +1995,8 @@ var Aggregated = (function() {
 	 * 
 	 * @param _container
 	 * @param _json_url url for data to load
-	 * @param _template optional string with html-template
 	 */
-	function Aggregated(_container,_json_url,_template)
+	function Aggregated(_container,_json_url)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
 		
@@ -1998,12 +2013,29 @@ var Aggregated = (function() {
 	Aggregated.prototype.handleResponse = function(_data)
 	{
 		var that = this;
+		
+		// if we are not controlled by DrWidget, install our own navigation
+		if (!this.navigateTo)
+		{
+			this.navigateTo = function(e)
+			{
+				document.location.hash = this.href.replace(/^.*#!/, '');
+				e.preventDefault();
+			};
+			this.update = function()
+			{
+				that.json_url = that.json_url.replace(/&(cup|comp|cat)=[^&]+/, '')+'&'+
+					document.location.hash.substr(1);
+				DrBaseWidget.prototype.update.call(that);
+			};
+			this.installPopState();
+		}
 		this.columns = {
 			'rank': 'Rank',
 			'nation': { 'label': _data.aggregated_name, 'colspan': 2},
 			'name': _data.aggregated_name,
 			'points': {'label': 'Points','click': function(e) {
-				var hidden_cols = that.container.find('.calculationHidden');
+				var hidden_cols = that.container.find('.result,.calculationHidden');
 				var display = hidden_cols.length ? jQuery(hidden_cols[0]).css('display') : 'none';
 				hidden_cols.css('display', display == 'none' ? 'table-cell' : 'none');
 				e.preventDefault();
@@ -2095,7 +2127,7 @@ var Aggregated = (function() {
 		// add table footer with note about how many results are counting
 		var tfoot = jQuery(document.createElement('tfoot'));
 		jQuery(this.table.dom).append(tfoot);
-		var th = jQuery(document.createElement('th'));
+		var th = jQuery(document.createElement('th')).addClass('result');
 		if (this.json_url.indexOf('detail=1') == -1) th.addClass('calculationHidden');
 		tfoot.append(jQuery(document.createElement('tr')).append(th));
 		var cols=0; for(var c in this.columns) cols++;
@@ -2125,7 +2157,8 @@ var Aggregated = (function() {
 			ret.label = (this.data.competitions[id].short || this.data.competitions[id].name.replace(/^.* - /, ''))+"\n"+
 				this.data.competitions[id].date.split('-').reverse().join('.');
 			// add comp to url evtl. replacing cup
-			ret.url = location.href.indexOf('cup=') == -1 ? location.href+'&comp='+id :
+			ret.url = location.href.indexOf('cup=') == -1 ? location.href+
+				(location.href.indexOf('#!') == -1 ? '#!' : '&')+'comp='+id :
 				location.href.replace(/(cup)=[^&]+/, 'comp='+id);
 			// nat. team ranking selects a cat, if none given, need to add it to not get a different selected
 			if (this.data.cat_filter && ret.url.indexOf('cat=') == -1) ret.url += '&cat='+this.data.cat_filter;
@@ -2231,27 +2264,19 @@ var DrWidget = (function() {
 	 */
 	function DrWidget(_container,_json_url,_arg3)
 	{
-		if (typeof _container == "string") _container = document.getElementById(_container);
-		this.container = jQuery(_container);
-		this.json_url = _json_url;
+		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
+
 		this.arg3 = _arg3 || {};
 		
 		var matches = this.json_url.match(/\?.*$/);
 		this.update(matches ? matches[0] : null);
-	
-		// add popstate or hashchange (IE8,9) event listener, to use browser back button for navigation
-		// some browsers, eg. Chrome, generate a pop on inital page-load
-		// to prevent loading page initially twice, we store initial location
-		this.prevent_initial_pop = location.href;
-		var that = this;
-		jQuery(window).bind(window.history.pushState ? "popstate" : "hashchange", function(e) {
-			if (!that.prevent_initial_pop || that.prevent_initial_pop != location.href)
-			{
-				that.update(location.hash || location.search);
-			}
-			delete that.prevent_initial_pop;
-		});
+		
+		// install this.update as PopState handler
+		this.installPopState();
 	}
+	// inherit from DrBaseWidget
+	DrWidget.prototype = new DrBaseWidget();
+	DrWidget.prototype.constructor = DrWidget;
 	/**
 	 * Navigate to a certain result-page
 	 * 

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]">
+	<meta name="GENERATOR" content="www.digitalROCK.de (c) 2000-2013 by Ralf Becker">
+	<meta name="KeyWords" content="digital ROCK, Klettern, Wettkampfklettern, Sportklettern, climbing, climbing competitions, UIAA, DAV, ICC, EYC, worldcup, worldranking, CUWR">
+	<title>Regionalzentrenwertung</title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="/egroupware/ranking/sitemgr/digitalrock/dr_api.js"></script>
+	<link type="text/css" rel="StyleSheet" href="/egroupware/ranking/sitemgr/digitalrock/dr_list.css" />
+	<style type="text/css">
+		.federationLogo {
+			float: left;
+			padding: 0px 20px 10px 10px;
+		}
+		.digitalRockLogo {
+			float: right;
+		}
+		table.DrTable tfoot th {
+			text-align: left;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div class="federationLogo">
+			<a href="http://www.sac-cas.ch/" target=_blank><img src="sac110.gif" title="Schweizer Alpen-Club - Club Alpin Suisse" BORDER="0" /></a>
+		</div>
+		<div class="digitalRockLogo">
+			<a href="/" target=_blank><img src="/dig_rock.klein.jpg" title="digital ROCK's Homepage" border="0" /></a>
+		</div>
+	</div>
+	<script>
+		var widget;
+		$(document).ready(function() {
+			widget = new Aggregated('container', '/egroupware/ranking/json.php?type=regionalzentren');
+		});
+	</script>
+
+	<p>Die Ergebnisse und Ranglisten wurden von <A HREF="/" target=_blank>digital ROCK</A>,
+	(c) 1990-2013 by <a href="#" onclick="location.href='mai'+'lto:'+'RalfBecker'+unescape('%40')+'digitalROCK'+unescape('%2E')+'de'; return false;" title="RalfBecker AT digitalROCK DOT de">Ralf Becker</a>,
+	zur Verf&uuml;gung gestellt. Digital ROCK ist vom SAC beauftragt die Schweizer Rangliste und die 
+	Wertung des Swisscups zu f&uuml;hren.<br>
+	Wenn Sie sich f&uuml;r unseren Leistungen interessieren, bitte nehmen Sie
+	<a href="/kontakt.php">mit uns Kontakt auf</a>.</p>
+</body>
+</html>
