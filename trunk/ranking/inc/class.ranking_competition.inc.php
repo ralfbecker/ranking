@@ -433,20 +433,18 @@ class ranking_competition extends so_sql
 	 */
 	function next_comp_this_year($date,$cats,$nation,$cup=0)
 	{
-		// old competitions might have regular expressions of the cats attending them
-		$or_query = array();
-		foreach($cats as $rkey)
-		{
-			$or_query[] = 'find_in_set('.$this->db->quote($rkey).",IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen))";
-			$or_query[] = $this->db->quote($rkey). " REGEXP IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen)";
-		}
-		$ret = $this->search(array(),false,'datum ASC','','',false,'AND',array(0,1),array(
+		$where = array(
 			'nation' => $nation,
 			'datum > '.$this->db->quote($date),
 			'datum <= '.$this->db->quote((int)$date.'-12-31'),
 			$cup ? 'serie='.(int)$cup : 'faktor > 0.0',
-			$this->check_in_cats($cats),
-		));
+		);
+		if ($cats)
+		{
+			$where[] = $this->check_in_cats($cats);
+		}
+		$ret = $this->search(array(), false, 'datum ASC', '', '', false, 'AND', array(0,1), $where);
+
 		if ($this->debug) echo "<p>competition::next_comp_this_year('$date',".print_r($cats,true).",'$nation',$cup) = '$ret[rkey]'</p>\n";
 
 		return $ret ? $ret[0] : false;
@@ -467,6 +465,7 @@ class ranking_competition extends so_sql
 		foreach((array)$cats as $rkey)
 		{
 			$or_query[] = 'find_in_set('.$this->db->quote($rkey).",IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen))";
+			// old competitions might have regular expressions of the cats attending them
 			$or_query[] = $this->db->quote($rkey). " REGEXP IF(INSTR(gruppen,'@'),LEFT(gruppen,INSTR(gruppen,'@')-1),gruppen)";
 		}
 		return '('.implode(' OR ',$or_query).')';
