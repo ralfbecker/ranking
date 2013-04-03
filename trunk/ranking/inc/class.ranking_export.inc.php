@@ -894,7 +894,7 @@ class ranking_export extends boresult
 	/**
 	 * Export a (cup) ranking
 	 *
-	 * @param int|string $cat id or rkey of category
+	 * @param int|string|array $cat id or rkey or category as array
 	 * @param string $date=null date of ranking, default today
 	 * @param int|string $cup id or rkey of cup to generate a cup-ranking
 	 * @param boolean $force_cache=false true use cache even for $ignore_caching_hosts
@@ -904,7 +904,7 @@ class ranking_export extends boresult
 	{
 		if (empty($date)) $date = '.';
 		$location = 'calendar:'.json_encode(array(
-			'cat' => $cat,
+			'cat' => is_array($cat) ? $cat['GrpId'] : $cat,
 			'date' => $date,
 			'cup' => $cup,
 		));
@@ -917,7 +917,7 @@ class ranking_export extends boresult
 		{
 			throw new Exception(lang('Cup not found!!!'));
 		}
-		if (!($cat = $this->cats->read($cat)))
+		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
 			throw new Exception(lang('Category not found!!!'));
 		}
@@ -1479,7 +1479,7 @@ class ranking_export extends boresult
 					if ($name != 'ranking')
 					{
 						if (empty($cat['serien_pat'])) break;	// no cup defined
-						$cup = str_replace('??', sprintf("%02d", (int)$date % 100), $cat['serien_pat']);
+						$cup = str_replace('??', sprintf("%02d", (int)($date=='.'?$year:$date) % 100), $cat['serien_pat']);
 					}
 					if (!$cup || ($cup = $this->cup->read($cup)))
 					{
