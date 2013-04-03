@@ -501,10 +501,10 @@ class ranking_calculation
 		);
 		$params = func_get_args();
 		if (count($params) < count($names)) $params = array_pad($params, count($names), null);
+		$params['end'] = $date;
 		$ranking['params'] = array_combine($names, array_slice($params, 0, count($names)));
 		$ranking['competitions'] = $competitions;
 		$ranking['categorys'] = $categorys;
-		$ranking['end'] = $date;
 
 		//_debug_array($ranking);exit;
 		return $ranking;
