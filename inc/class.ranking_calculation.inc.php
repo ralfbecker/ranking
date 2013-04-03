@@ -59,10 +59,11 @@ class ranking_calculation
 	 * @param int $_comp
 	 * @param int|string|array $_cats
 	 * @param int $_cup
+	 * @param string &$date=null on return date of ranking
 	 * @param array &$date_comp=null on return latest competition
 	 * @return array see ranking_calculation::aggregate
 	 */
-	public function nat_team_ranking($_comp, $_cats, $_cup, array &$date_comp=null)
+	public function nat_team_ranking($_comp, $_cats, $_cup, $date=null, array &$date_comp=null)
 	{
 		$valid_cats = array();
 
@@ -226,7 +227,7 @@ class ranking_calculation
 		{
 			$filter['WetId'] = $comp['WetId'];
 		}
-		$ret = $this->aggregated('.', $filter, $quota, 'nation', true, $min_cats, $max_comps, $date_comp);
+		$ret = $this->aggregated($date, $filter, $quota, 'nation', true, $min_cats, $max_comps, $date_comp);
 
 		if ($cup)
 		{
