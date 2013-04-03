@@ -273,7 +273,7 @@ class ranking_export extends boresult
 			$cat = $cat_rkey2id[$cat];
 		}
 		// can we use the cached data und do we have it?
-		$location = 'export_route:'.$comp.':'.$cat.':'.$heat;
+		$location = 'route:'.$comp.':'.$cat.':'.$heat;
 		// switch caching off for speed-cli.php, as it can not (un)set the cache,
 		// because of permissions of /tmp/egw_cache only writable by webserver-user
 		// for all other purposes caching is ok and should be enabled
@@ -903,7 +903,7 @@ class ranking_export extends boresult
 	public function export_ranking($cat,$date=null,$cup=null,$force_cache=false)
 	{
 		if (empty($date)) $date = '.';
-		$location = 'calendar:'.json_encode(array(
+		$location = 'ranking:'.json_encode(array(
 			'cat' => is_array($cat) ? $cat['GrpId'] : $cat,
 			'date' => $date,
 			'cup' => $cup,
@@ -1433,7 +1433,7 @@ class ranking_export extends boresult
 	 */
 	public function export_profile($athlete, $cat=null)
 	{
-		$location = '$profile:'.$athlete.':'.$cat;
+		$location = 'profile:'.$athlete.':'.$cat;
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) && is_numeric($comp) &&
 			($data = egw_cache::getInstance('ranking', $location)))
 		{
@@ -1584,6 +1584,13 @@ class ranking_export extends boresult
 		if ($cup) $filter['SerId'] = (int)$cup;
 		if ($cat) $filter['GrpId'] = array_map('intval', explode(',', $cat));
 
+		$location = 'aggregated:'.json_encode($filter+array('date' => $date));
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
+			($data = egw_cache::getInstance('ranking', $location)))
+		{
+			return $data;
+		}
+
 		switch($type)
 		{
 			case 'nat_team_ranking':
@@ -1655,7 +1662,21 @@ class ranking_export extends boresult
 			'competitions' => $competitions,
 			'categorys' => $categorys,
 		);
+		// calculate expiration date based on date of ranking and duration of last competition
+		list($y,$m,$d) = explode('-', $result['end']);
+		$date = mktime(0,0,0,$m,$d,$y);
+		if (substr($result['end'], -6) == '-12-31' || (time()-$date)/86400 > $date_comp['duration'])
+		{
+			$result['expires'] = self::EXPORT_RANKING_OLD_TTL;
+		}
+		else
+		{
+			$result['expires'] = self::EXPORT_RANKING_TTL;
+		}
+		$result['etag'] = md5(serialize($result));
 		//_debug_array($result); exit;
+		egw_cache::setInstance('ranking', $location, $result);
+
 		return $result;
 	}
 

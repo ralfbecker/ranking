@@ -266,7 +266,7 @@ class ranking_calculation
 	 * @return array of array with values 'rank', 'name', 'points', 'counting', 'comps' (array)
 	 * 	plus categorys and competitions arrays
 	 */
-	public function aggregated($date='.', array $filter=array(), $best_results=3, $by='nation', $use_cup_points=true,
+	public function aggregated(&$date='.', array $filter=array(), $best_results=3, $by='nation', $use_cup_points=true,
 		$min_cats=null, $max_comps=null, &$date_comp=null, $window=12)
 	{
 		//error_log(__METHOD__."(date='$date', filter=".array2string($filter).", best_results=$best_results, by='$by', use_cup_points=".array2string($use_cup_points).", min_cats=$min_cats, max_comps=$max_comps)");
@@ -295,12 +295,19 @@ class ranking_calculation
 			{
 				throw new egw_exception_wrong_parameter ("Competition '$filter[WetId]' NOT found!");
 			}
+			$date = $date_comp['datum'];
 		}
 		elseif ($date == '.' || !isset($date) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $date))
 		{
 			if ($date == '.' || !isset($date)) $date = date('Y-m-d');
 
 			$date_comp = $this->bo->comp->last_comp($date, $filter['GrpId'], $filter['nation'], $filter['SerId']);
+			$date = $date_comp['datum'];
+
+			if (!$this->bo->comp->next_comp_this_year($date_comp['datum'],$filter['GrpId'],$filter['nation'],$filter['SerId']))
+			{
+				$date = (int)$date_comp['datum'] . '-12-31';	// no further comp. -> stand 31.12.
+			}
 		}
 		else
 		{
@@ -309,7 +316,6 @@ class ranking_calculation
 				throw new egw_exception_wrong_parameter ("Competition '$date' NOT found!");
 			}
 		}
-		$date = $date_comp['datum'];
 
 		// if no single competition, use date filter for window
 		if (empty($filter['WetId']))
@@ -498,6 +504,7 @@ class ranking_calculation
 		$ranking['params'] = array_combine($names, array_slice($params, 0, count($names)));
 		$ranking['competitions'] = $competitions;
 		$ranking['categorys'] = $categorys;
+		$ranking['end'] = $date;
 
 		//_debug_array($ranking);exit;
 		return $ranking;
