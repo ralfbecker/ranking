@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-13 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -380,8 +380,15 @@ class uiresult extends boresult
 			else
 			{
 				$sel_options['import_cat'] = array('' => lang('Into current category'));
-				$sel_options['import_cat'] += $this->cats->names(array('rkey' => $comp['gruppen'],'sex' => $cat['sex'],'GrpId!='.(int)$cat['GrpId']),0);
-				// add cats from other competitions with identical date
+				// filter by same gender and not identical
+				$sel_options['import_cat'] += $this->cats->names(array('sex' => $cat['sex'],'GrpId!='.(int)$cat['GrpId']), -1,
+					// sort by same nation first
+					'nation'.($cat['nation']?'='.$this->db->quote($cat['nation']):' IS NULL').' DESC,'.
+					// then by having an agegroup or not
+					'(from_year IS NOT NULL OR to_year IS NOT NULL) '.
+						(category::age_group($cat, $comp['datum']) ?  'DESC' : 'ASC'), false);
+				/* disabled as we add now all categories sorted by most probably ones first
+				//add cats from other competitions with identical date
 				if (($comps = $this->comp->names(array('datum' => $comp['datum'],'WetId!='.(int)$comp['WetId']), 0)))
 				{
 					foreach($comps as $id => $label)
@@ -395,7 +402,7 @@ class uiresult extends boresult
 							}
 						}
 					}
-				}
+				}*/
 			}
 			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
 			{

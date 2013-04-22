@@ -7,11 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * category object
@@ -286,15 +284,16 @@ class category extends so_sql
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
 	 * @param int $rkeys -1: GrpId=>rkey:name 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
 	 * @param string $sort='rkey'
+	 * @param boolean $check_sort=true false: not running $sort throught preg, only to be used for constants!
 	 * @returns array with all Cups in the from specified in $rkeys
 	 */
-	function &names($keys=array(),$rkeys=2,$sort='')
+	function &names($keys=array(),$rkeys=2,$sort='',$check_sort=true)
 	{
 		if ($sort == 'SUI')
 		{
 			$sort = self::sui_cat_sort();
 		}
-		elseif (!$sort || !preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort))
+		elseif (!$sort || $check_sort && !preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort))
 		{
 			$sort = $rkeys == 0 || $rkeys == 1 ? 'name' : 'rkey';
 		}
