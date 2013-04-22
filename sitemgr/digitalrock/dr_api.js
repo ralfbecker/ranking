@@ -773,11 +773,10 @@ var Startlist = (function() {
 			jQuery(this.container).append(this.header);
 			this.header.addClass('listHeader');
 			
+			// display a toc with all available heats, if not explicitly disabled (toc=0) or beamer
 			if (!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/) && this.discipline != 'ranking')
 			{
-				var toc = jQuery(document.createElement('ul'));
-				jQuery(this.container).append(toc);
-				toc.addClass('listToc');
+				var toc = jQuery(document.createElement('ul')).addClass('listToc');
 				for (var r in _data.route_names)
 				{
 					var li = jQuery(document.createElement('li'));
@@ -810,6 +809,15 @@ var Startlist = (function() {
 						li.text(_data.route_names[r]);
 					}
 					toc.prepend(li);
+				}
+				// only add toc, if we have more then one route
+				if (toc.children().length > 1)
+				{
+					jQuery(this.container).append(toc);
+				}
+				else
+				{
+					toc.remove();
 				}
 			}
 			// create new table
