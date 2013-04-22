@@ -245,8 +245,8 @@ class ranking_competition_ui extends boranking
 			'gruppen'   => $this->cats->names(array('nation' => $this->comp->data['nation'])),
 			'cat'       => $this->cats->names(array('nation' => $this->comp->data['nation']),-1),
 			'prequal_comps' => $this->comp->names(array(
-				!$this->comp->data['datum'] ? 'datum > \''.(date('Y')-2).'\'' :
-					'datum < '.$this->db->quote($this->comp->data['datum']).' AND datum > \''.((int)$this->comp->data['datum']-2).'-01-01\'',
+				!$this->comp->data['datum'] ? 'datum > \''.(date('Y')-3).'\'' :
+					'datum < '.$this->db->quote($this->comp->data['datum']).' AND datum > \''.((int)$this->comp->data['datum']-3).'-01-01\'',
 				'nation' => $this->comp->data['nation'],
 			)),
 			'host_nation' => $this->athlete->distinct_list('nation'),
