@@ -1599,7 +1599,7 @@ class ranking_export extends boresult
 				{
 					throw new Exception ("National team ranking only defined for competitions or cups!");
 				}
-				$feds = $this->calc->nat_team_ranking($comp, $cat, $cup, $date_comp);
+				$feds = $this->calc->nat_team_ranking($comp, $cat, $cup, $date, $date_comp);
 				$name = 'National Team Ranking';
 				$aggregated_name = 'Nation';
 				break;
