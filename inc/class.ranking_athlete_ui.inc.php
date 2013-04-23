@@ -39,7 +39,7 @@ class ranking_athlete_ui extends boranking
 	 *
 	 * @var int
 	 */
-	const MINIMUM_AGE = 5;
+	const MINIMUM_AGE = 3;
 
 	function __construct()
 	{
