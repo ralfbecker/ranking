@@ -387,7 +387,6 @@ class uiresult extends boresult
 					// then by having an agegroup or not
 					'(from_year IS NOT NULL OR to_year IS NOT NULL) '.
 						(category::age_group($cat, $comp['datum']) ?  'DESC' : 'ASC'), false);
-				/* disabled as we add now all categories sorted by most probably ones first
 				//add cats from other competitions with identical date
 				if (($comps = $this->comp->names(array('datum' => $comp['datum'],'WetId!='.(int)$comp['WetId']), 0)))
 				{
@@ -402,7 +401,7 @@ class uiresult extends boresult
 							}
 						}
 					}
-				}*/
+				}
 			}
 			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
 			{
