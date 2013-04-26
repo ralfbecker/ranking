@@ -21,7 +21,7 @@ class ranking_export extends boresult
 	 * @var array
 	 */
 	public static $ignore_caching_hosts = array(
-		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost'
+		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost','test.dev'
 	);
 
 	/**
@@ -290,7 +290,9 @@ class ranking_export extends boresult
 			{
 				try {
 					$data = $instance->_export_route($comp, $cat, $heat);
-					if (count($data['route_names']) == 1 && (!isset($heat) || (string)$heat === '') && $data['route_order'] != 0)
+					if (count($data['route_names']) == 1 &&
+							(!isset($heat) || (string)$heat === '') && $data['route_order'] != 0 ||
+						!$data['participants'])
 					{
 						$data = $instance->_export_route($comp, $cat, 0);
 					}
