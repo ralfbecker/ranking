@@ -680,8 +680,17 @@ var Startlist = (function() {
 				break;			
 		}
 	
-		// fix route_names containing only one qualification are send as array because index 0
-		if (Array.isArray(_data.route_names)) _data.route_names = { '0': _data.route_names[0] };
+		// fix route_names containing only one or two qualifications are send as array because index 0 and 1
+		if (Array.isArray(_data.route_names))
+		{
+			var route_names = _data.route_names;
+			delete _data.route_names;
+			_data.route_names = {};
+			for(var i=0; i < route_names.length; ++i)
+			{
+				_data.route_names[i] = route_names[i];
+			}
+		}
 	
 		// keep route_names to detect additional routes on updates
 		if (typeof this.route_names == 'undefined')
