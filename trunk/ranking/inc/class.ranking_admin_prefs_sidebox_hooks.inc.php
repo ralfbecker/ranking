@@ -22,7 +22,7 @@ class ranking_admin_prefs_sidebox_hooks
 		$location = is_array($args) ? $args['location'] : $args;
 		//echo "<p>ranking_admin_prefs_sidebox_hooks::all_hooks(".print_r($args,True).") appname='$appname', location='$location'</p>\n";
 
-		if ($location == 'sidebox_menu')
+		if ($location == 'sidebox_menu' || $location == 'return_ranking_views')
 		{
 			// add ranking version to the eGW version
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
@@ -39,6 +39,7 @@ class ranking_admin_prefs_sidebox_hooks
 				'Ranking'       => egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
 				'Accounting'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index')),
 			);
+			if ($location == 'return_ranking_views') return $file;
 			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
 
 			$file = array();
@@ -85,7 +86,10 @@ class ranking_admin_prefs_sidebox_hooks
 		if ($GLOBALS['egw_info']['user']['apps']['preferences'] && $location != 'admin')
 		{
 			$file = array(
-				'Preferences'     => egw::link('/preferences/preferences.php','appname='.$appname),
+				'Preferences'     => egw::link('/index.php',array(
+					'menuaction' => 'preferences.uisettings.index',
+					'appname' => $appname,
+				)),
 			);
 			if ($location == 'preferences')
 			{
@@ -132,16 +136,12 @@ class ranking_admin_prefs_sidebox_hooks
 	 */
 	static function hook_settings($hook_data)
 	{
-		$ranking_views = array(
-			'ranking.ranking_competition_ui.index'   => lang('Competitions'),
-			'ranking.ranking_cup_ui.index'           => lang('Cups'),
-		//	'ranking.uicats.index'           => lang('Categories'),
-			'ranking.ranking_athlete_ui.index'       => lang('Athletes'),
-			'ranking.uiregistration.index'   => lang('Registration'),
-			'ranking.uiresult.index'         => lang('Resultservice'),
-			'ranking.uiregistration.result'  => lang('Results'),
-			'ranking.uiranking.index'        => lang('Ranking'),
-		);
+		$ranking_views = array();
+		foreach(self::all_hooks('return_ranking_views') as $label => $url)
+		{
+			$ranking_views[preg_replace('/^.*menuaction=([^&]+).*/', '$1', $url)] = $label;
+		}
+
 		return array(
 			'default_view' => array(
 				'type'   => 'select',
