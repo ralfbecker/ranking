@@ -22,14 +22,14 @@
 				</row>
 				<row height="60">
 					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="set_try(this.value)" options=",1,20"/>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="set_try(this.value)" options=",1,25"/>
 					</menulist>
 					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,20"/>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,25"/>
 					</menulist>
 					<hbox options="0,0">
 						<menulist>
-							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="check_top(this)" options="No,1,20"/>
+							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="check_top(this)" options="No,1,25"/>
 						</menulist>
 						<buttononly align="right" label="Update" id="button[update]" onclick="update_boulder();" class="leftPad5"/>
 					</hbox>
