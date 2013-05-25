@@ -12,7 +12,7 @@
 		<script type="text/javascript">
 			var resultlist;
 			$(document).ready(function() {
-				resultlist = new Resultlist('table','http://egw.ifsc-climbing.org/egw/ranking/json.php'+location.search);
+				resultlist = new Resultlist('table',location.pathname.replace(/sitemgr.*$/,'/json.php')+location.search);
 				
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});
