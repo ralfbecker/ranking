@@ -797,9 +797,10 @@ class boresult extends boranking
 	 * 		If multiple people are updating, you should provide the result of the time of display,
 	 * 		to not accidently overwrite results entered by someone else!
 	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
+	 * @param boolean $update_checked=false false: do NOT update checked value, true: also update checked value
 	 * @return boolean|int number of changed results or false on error
 	 */
-	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0)
+	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false)
 	{
 		$this->error = null;
 
@@ -871,11 +872,15 @@ class boresult extends boranking
 				}
 			}
 
+			// do NOT allow to modify checked via update of all results
+			if (!$update_checked) unset($data['checked']);
+error_log(__METHOD__."() results=".array2string($results));
 			foreach($data as $key => $val)
 			{
 				// something changed?
 				if ((!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) &&
-					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
+					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS ||
+					$key == 'checked' || strpos($key, 'top') === 0 || strpos($key, 'zone') === 0))
 				{
 					if (($key == 'start_number' || $key == 'start_number_1') && strchr($val,'+') !== false)
 					{
@@ -883,11 +888,18 @@ class boresult extends boranking
 						++$modified;
 						continue;
 					}
+					$this->route_result->read($keys);
+
+					if ($this->route_result->data['checked'] && !$update_checked)
+					{
+						//error_log(__METHOD__."() Athlete #$id already checked --> update failed!");
+						$this->error[$id]['denied'] = lang('Athlete scorecard already checked, update denied!');
+						continue 2;	// do not allow to overwrite a result marked as checked
+					}
 					//error_log(__METHOD__."() --> saving #$id because $key='$val' changed, was '{$old[$key]}'");
 					$data['result_modified'] = time();
 					$data['result_modifier'] = $this->user;
 
-					$this->route_result->read($keys);
 					//error_log(__METHOD__."() old: route_result->data=".array2string($this->route_result->data));
 					$this->route_result->save($data);
 					//error_log(__METHOD__."() new: route_result->data=".array2string($this->route_result->data));

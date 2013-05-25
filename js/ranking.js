@@ -541,7 +541,7 @@ function bonus_clicked(button)
 {
 	var bonus = document.getElementById('exec[zone]');
 	
-	if (!bonus.value || bonus.value == '0')
+//	if (!bonus.value || bonus.value == '0')
 	{
 		bonus.value = try_num(1);
 		check_bonus(bonus);
@@ -678,4 +678,28 @@ function boulder_next()
 
 	// need to call this manually, as changing selectedIndex does NOT trigger onchange
 	boulder_changed(PerId);
+}
+
+/**
+ * Update boulder results of current row
+ * 
+ * @param dom _elem button or checkbox
+ * @param int _perId
+ */
+function update_boulder_row(_elem, _perId)
+{
+	var row = document.getElementById(_perId);
+	var values = egw_json_getFormValues(row);
+	if (typeof values.exec == 'undefined') { 
+		values = {exec: {nm: {rows: {set: {}}}}};
+		values.exec.nm.rows.set[_perId] = {};
+	}
+	var update_checked = false;
+
+	if (_elem.type == 'checkbox')
+	{
+		values.exec.nm.rows.set[_perId].checked = _elem.checked;	// uncheck checkbox get not submitted
+		update_checked = true;
+	}
+	xajax_doXMLHTTP('ranking.uiresult.ajax_update', _elem.form.etemplate_exec_id.value, values, update_checked);
 }
