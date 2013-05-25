@@ -85,7 +85,7 @@ class ranking_boulder_measurement
 		// change zone$n === 'empty' --> ''
 		if ($update['zone'.$set_current] === 'empty') $update['zone'.$set_current] = '';
 
-		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
+		error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
 		if (boresult::$instance->save_result($keys,array($PerId => $update),$query['route_type'],$query['discipline']))
 		{
 			list($new_result) = boresult::$instance->route_result->search($keys+array('PerId' => $PerId),false);
@@ -118,7 +118,7 @@ class ranking_boulder_measurement
 					$errors[$error] = $error;
 				}
 			}
-			$response->addAlert(lang('Error').': '.implode(', ',$errors));
+			$response->alert(lang('Error').': '.implode(', ',$errors));
 			$msg = '';
 		}
 		elseif (boresult::$instance->route->read($keys) &&

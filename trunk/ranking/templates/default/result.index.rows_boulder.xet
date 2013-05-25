@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.7.005">
+	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -86,6 +86,8 @@
 				<column disabled="!@num_problems=/[78]/"/>
 				<column disabled="!@num_problems=8"/>
 				<column disabled="@no_prev_heat"/>
+				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
@@ -113,6 +115,8 @@
 					<description value="7" class="place"/>
 					<description value="8" class="place"/>
 					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
+					<image align="center" label="Scorecard checked" src="check" class="noPrint"/>
+					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
 					<template class="onlyPrint" id="ranking.result.footer" span="all"/>
@@ -221,6 +225,16 @@
 						<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
 					</box>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
+					<vbox align="center" options="0,0" class="noPrint">
+						<checkbox align="center" statustext="|Scorecard checked" id="set[$row_cont[PerId]][checked]" onchange="update_boulder_row(this, $row_cont[PerId]);" class="noPrint"/>
+						<buttononly align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" onclick="return update_boulder_row(this, $row_cont[PerId]);" class="small $cont[rw_result]"/>
+					</vbox>
+					<vbox options="0,0" class="noPrint">
+						<date-time id="${row}[result_modified]" readonly="true"/>
+						<menulist>
+							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true"/>
+						</menulist>
+					</vbox>
 				</row>
 			</rows>
 		</grid>

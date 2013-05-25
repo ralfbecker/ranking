@@ -932,6 +932,9 @@ class route_result extends so_sql
 		}
 		if (isset($data['ranking'])) $data['result_detail']['ranking'] = $data['ranking'];
 
+		// store checked state in result_details
+		if (isset($data['checked'])) $data['result_detail']['checked'] = $data['checked'];
+
 		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
 
 		return $data;
@@ -953,7 +956,7 @@ class route_result extends so_sql
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
 		}
-		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent') as $name)
+		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent','checked') as $name)
 		{
 			if (isset($new[$name])) $this->data[$name] = $new[$name];
 		}

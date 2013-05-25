@@ -553,6 +553,23 @@ class uiresult extends boresult
 			if($query['route'] >= 0)
 			{
 				$rows['set'][$row[$this->route_result->id_col]] = $row;
+				// disable input in for checked results
+				if ($row['checked'])
+				{
+					foreach($row as $name => $val)
+					{
+						if ($name != 'checked')
+						{
+							$readonlys['set['.$row[$this->route_result->id_col].']['.$name.']'] = true;
+						}
+					}
+					// boulder top/zone is not set, if no result
+					for($i = 1; $i <= $query['num_problems']; ++$i)
+					{
+						$readonlys['set['.$row['PerId'].'][top'.$i.']'] = $readonlys['set['.$row['PerId'].'][zone'.$i.']'] = true;
+					}
+					$readonlys['apply['.$row['PerId'].']'] = true;
+				}
 			}
 			if (!$quota_line && $query['route_quota'] && $query_in['order'] == 'result_rank' && $query_in['sort'] == 'ASC' &&
 				$row['result_rank'] > $query['route_quota'])	// only show quota line if sorted by rank ASC
@@ -726,6 +743,9 @@ class uiresult extends boresult
 		{
 			$rows['sum_or_bestof'] = lang('Sum');
 		}
+		// disable checked and modified column for sitemgr or result display
+		$rows['no_result_modified'] = $rows['no_check'] = !empty($GLOBALS['Common_BO']);
+
 		return $total;
 	}
 
@@ -822,6 +842,7 @@ class uiresult extends boresult
 					'order'      => 'start_order',
 					'sort'       => 'ASC',
 					'show_result'=> 1,
+					'hide_header'=> true,
 					'csv_fields' => array(
 						'start_order'  => array('label' => lang('Startorder'),  'type' => 'int'),
 						'start_number' => array('label' => lang('Startnumber'), 'type' => 'int'),
@@ -836,7 +857,8 @@ class uiresult extends boresult
 						'acl_fed'      => array('label' => lang('Regionalzentrum'),'type' => 'select'),
 						'fed_parent'   => array('label' => lang('Landesverband'),'type' => 'select'),
 						'email'        => array('label' => lang('EMail'),       'type' => 'text'),
-					)
+					),
+					'row_id' => 'PerId',
 				);
 			}
 			if ($_GET['calendar']) $content['nm']['calendar'] = $_GET['calendar'];
@@ -1259,18 +1281,34 @@ class uiresult extends boresult
 	 *
 	 *
 	 * @param string $request_id eTemplate request id
-	 * @param string $name can be repeated multiple time together with value
+	 * @param string|array $name can be repeated multiple time together with value, or a single array/object
 	 * @param string $value
 	 * @return string
 	 */
-	function ajax_update($request_id,$name,$value)
+	function ajax_update($request_id,$name,$value=null)
 	{
 		//$start = microtime(true);
 		$response = egw_json_response::get();
 
 		if (!($request =& etemplate_request::read($request_id)))
 		{
-			$response->addAlert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
+			$response->alert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
+			return;
+		}
+		$update_checked = is_array($name) ? (bool)$value : false;
+		if (is_array($name))
+		{
+			$content = $name;
+			$to_process = array();
+			foreach($content['exec']['nm']['rows']['set'] as $id => $values)
+			{
+				foreach($values as $name => $value)
+				{
+					$name = "exec[nm][rows][set][$id][$name]";
+					if (!isset($request->to_process[$name])) continue;
+					$to_process[$name] = $request->to_process[$name];
+				}
+			}
 		}
 		else
 		{
@@ -1286,129 +1324,147 @@ class uiresult extends boresult
 				etemplate::set_array($content,$name,$value=array_shift($params));
 				//$args .= ",$name='$value'";
 			}
-			//$response->addAlert("ajax_update('\$request_id',$args)"); return;
-
+			//$response->alert("ajax_update('\$request_id',$args)"); return;
 			//_debug_array($request->preserv); exit;
-			$content = $content['exec'];
-			$tpl = new etemplate();	// process_show is NOT static
-			if ($tpl->process_show($content,$to_process,'exec'))
+		}
+		$content = $content['exec'];
+		$tpl = new etemplate();	// process_show is NOT static
+		if (($errors = $tpl->process_show($content,$to_process,'exec')))
+		{
+			// validation errors
+			$response->alert(implode("\n", $errors));
+		}
+		else
+		{
+			//$response->alert('result='.array2string($content['nm']['rows']['set']).', update_checked='.array2string($update_checked));
+			$keys = array(
+				'WetId' => $request->preserv['nm']['comp'],
+				'GrpId' => $request->preserv['nm']['cat'],
+				'route_order' => $request->preserv['nm']['route'] < 0 ? -1 : $request->preserv['nm']['route'],
+			);
+			if ($this->route_result->isRelay != ($request->preserv['nm']['discipline'] == 'speedrelay'))
 			{
-				// validation errors
-				$response->addAlert(implode("\n",$GLOBALS['egw_info']['etemplate']['validation_errors']));
+				$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
+					$request->preserv['nm']['discipline'] == 'speedrelay');
+			}
+			list($id) = each($content['nm']['rows']['set']);
+			$old_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
+
+			if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],
+				$request->preserv['nm']['route_type'],$request->preserv['nm']['discipline'],null,
+				$request->preserv['nm']['quali_preselected'], $update_checked))
+			{
+				$new_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
+				$msg = lang('Heat updated');
+				/*$response->call('refresh_boulder_row', $id, $new_result['checked'],
+					egw_time::to((int)$new_result['result_modified'], 'd.m.Y H:i'),
+					common::grab_owner_name($new_result['result_modifier']));*/
+				// for boulder refresh everything, as updating modified column is difficult
+				if ($request->preserv['nm']['discipline'] == 'boulder')
+				{
+					$response->script("document.location.href='".egw::link('/ranking/index.php', array('msg' => $msg))."';");
+				}
 			}
 			else
 			{
-				$keys = array(
-					'WetId' => $request->preserv['nm']['comp'],
-					'GrpId' => $request->preserv['nm']['cat'],
-					'route_order' => $request->preserv['nm']['route'] < 0 ? -1 : $request->preserv['nm']['route'],
-				);
-				if ($this->route_result->isRelay != ($request->preserv['nm']['discipline'] == 'speedrelay'))
+				$msg = lang('Nothing to update');
+			}
+			if ($this->error)
+			{
+				foreach($this->error as $id => $data)
 				{
-					$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
-						$request->preserv['nm']['discipline'] == 'speedrelay');
-				}
-				list($id) = each($content['nm']['rows']['set']);
-				$old_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
-
-				if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],
-					$request->preserv['nm']['route_type'],$request->preserv['nm']['discipline'],null,$request->preserv['nm']['quali_preselected']))
-				{
-					$new_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
-					$msg = lang('Heat updated');
-				}
-				else
-				{
-					$msg = lang('Nothing to update');
-				}
-				if ($this->error)
-				{
-					foreach($this->error as $id => $data)
+					foreach($data as $field => $error)
 					{
-						foreach($data as $field => $error)
-						{
-							$errors[$error] = $error;
-						}
+						$errors[$error] = $error;
 					}
-					$response->addAlert(lang('Error').': '.implode(', ',$errors));
-					$msg = '';
 				}
-				else
+				$msg = lang('Error').': '.implode(', ',$errors);
+				$response->alert($msg);
+				// boulder refresh everything to update checked scorecards
+				if ($request->preserv['nm']['discipline'] == 'boulder')
 				{
-					$first_name = preg_replace('/^.*\[([^\]]+)\]$/','\\1',$first_name);
-					if($this->route->read($keys))
+					$response->script("document.location.href='".egw::link('/ranking/index.php', array('msg' => $msg))."';");
+				}
+				$msg = '';
+			}
+			else
+			{
+				$first_name = preg_replace('/^.*\[([^\]]+)\]$/','\\1',$first_name);
+				if($this->route->read($keys))
+				{
+					if (($dsp_id=$this->route->data['dsp_id']) && ($frm_id=$this->route->data['frm_id']))
 					{
-						if (($dsp_id=$this->route->data['dsp_id']) && ($frm_id=$this->route->data['frm_id']))
-						{
-							// add display update(s)
-							$display = new ranking_display($this->db);
-							$display->activate($frm_id,$id,$dsp_id,$keys['GrpId'],$keys['route_order']);
-						}
-						//$response->addAlert('first_name='.$first_name);
-						switch($first_name)
-						{
-							case 'result_height':
+						// add display update(s)
+						$display = new ranking_display($this->db);
+						$display->activate($frm_id,$id,$dsp_id,$keys['GrpId'],$keys['route_order']);
+					}
+					//$response->alert('first_name='.$first_name);
+					switch($first_name)
+					{
+						case 'result_height':
+							$to_update = array(
+								'current_1' => $id,
+							);
+							break;
+
+						case 'result_time':
+							if ($request->preserv['nm']['route'] >= 2)
+							{
+								$to_update = array(
+									'current_1' => $id,
+									'current_2' => $this->get_co($keys,$id),
+								);
+								break;
+							}
+							else
+							{
 								$to_update = array(
 									'current_1' => $id,
 								);
-								break;
+							}
+							break;
 
-							case 'result_time':
-								if ($request->preserv['nm']['route'] >= 2)
-								{
-									$to_update = array(
-										'current_1' => $id,
-										'current_2' => $this->get_co($keys,$id),
-									);
-									break;
-								}
-								else
-								{
-									$to_update = array(
-										'current_1' => $id,
-									);
-								}
-								break;
-
-							case 'result_time_r':
-								if ($request->preserv['nm']['route'] >= 2)
-								{
-									$to_update = array(
-										'current_1' => $this->get_co($keys,$id),
-										'current_2' => $id,
-									);
-								}
-								else
-								{
-									$to_update = array(
-										'current_1' => $id,
-									);
-								}
-								break;
-
-							case 'result_time_1':	// relay
-								// we need to check, if id is the co (right climber) or not
-								$co = $this->get_co($keys,$id,$id_isnt_co);
+						case 'result_time_r':
+							if ($request->preserv['nm']['route'] >= 2)
+							{
 								$to_update = array(
-									'current_1' => $id_isnt_co ? $id : $co,
-									'current_2' => $id_isnt_co ? $co : $id,
+									'current_1' => $this->get_co($keys,$id),
+									'current_2' => $id,
 								);
-								break;
-						}
+							}
+							else
+							{
+								$to_update = array(
+									'current_1' => $id,
+								);
+							}
+							break;
+
+						case 'result_time_1':	// relay
+							// we need to check, if id is the co (right climber) or not
+							$co = $this->get_co($keys,$id,$id_isnt_co);
+							$to_update = array(
+								'current_1' => $id_isnt_co ? $id : $co,
+								'current_2' => $id_isnt_co ? $co : $id,
+							);
+							break;
+					}
+					if ($to_update)
+					{
 						$this->route->update($to_update+array(
 							'route_modified' => time(),
 							'route_modifier' => $GLOBALS['egw_info']['user']['account_id'],
 						));
 					}
-					//error_log(__METHOD__."() new_result=".array2string($new_result).", old_result=".array2string($old_result));
-					if ($new_result && ($new_result['result_rank'] != $old_result['result_rank'] ||
-						isset($new_result['time_sum']) && $new_result['time_sum'] != $old_result['time_sum']))	// the ranking has changed
-					{
-						$this->_update_ranks($keys,$response,$request);
-					}
 				}
-				if ($msg) $response->assign('msg','innerHTML',$msg);
+				//error_log(__METHOD__."() new_result=".array2string($new_result).", old_result=".array2string($old_result));
+				if ($new_result && ($new_result['result_rank'] != $old_result['result_rank'] ||
+					isset($new_result['time_sum']) && $new_result['time_sum'] != $old_result['time_sum']))	// the ranking has changed
+				{
+					$this->_update_ranks($keys,$response,$request);
+				}
 			}
+			if ($msg) $response->assign('msg','innerHTML',$msg);
 		}
 		//error_log("processing of ajax_update took ".sprintf('%4.2lf s',microtime(true)-$start));
 	}
@@ -1506,7 +1562,7 @@ class uiresult extends boresult
 
 		if (!($request =& etemplate_request::read($request_id)))
 		{
-			$response->addAlert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
+			$response->alert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
 			return $this->_stop_time_measurement($response);
 		}
 		$keys = array(
@@ -1518,14 +1574,14 @@ class uiresult extends boresult
 			!($old_result = $this->route_result->read($keys+array('PerId'=>$PerId))) ||
 			!($PerId < 0 && $route['route_order'] >= 2) && !($athlete = $this->athlete->read($PerId)))
 		{
-			$response->addAlert("internal error: ".__FILE__.': '.__LINE__);
+			$response->alert("internal error: ".__FILE__.': '.__LINE__);
 			return $this->_stop_time_measurement($response);
 		}
 		$timy = new ranking_time_measurement($route['route_time_host'],$route['route_time_port']);
 
 		if (!$timy->is_connected())
 		{
-			$response->addAlert(lang("Can't connect to time controll program at '%1': %2",$route['route_time_host'].':'.$route['route_time_port'],$timy->error));
+			$response->alert(lang("Can't connect to time controll program at '%1': %2",$route['route_time_host'].':'.$route['route_time_port'],$timy->error));
 			return $this->_stop_time_measurement($response);
 		}
 		// allow the request to run max. 15min and close the session, to not block other request from that session
@@ -1568,7 +1624,7 @@ class uiresult extends boresult
 				else
 				{
 					// other participant not found --> error
-					$response->addAlert(lang("Can't find co-participant!"));
+					$response->alert(lang("Can't find co-participant!"));
 					$timy->close();
 					return $this->_stop_time_measurement($response);
 				}
@@ -1578,7 +1634,7 @@ class uiresult extends boresult
 				if (!($other_athlete = $this->athlete->read($other_PerId=$old_other['PerId'])))
 				{
 					// other participant not found --> error
-					$response->addAlert(lang("Can't find co-participant!"));
+					$response->alert(lang("Can't find co-participant!"));
 					$timy->close();
 					return $this->_stop_time_measurement($response);
 				}
@@ -1693,7 +1749,7 @@ class uiresult extends boresult
 					break;
 
 				case 'false':
-					$response->addAlert(lang('False start %1: %2',$event_side != 'r' ? lang('left') : lang('right'),
+					$response->alert(lang('False start %1: %2',$event_side != 'r' ? lang('left') : lang('right'),
 						$event_side != 'b' ? $time : $time2).($event_side == 'b' ? ', '.lang('right').': '.$time : ''));
 					//if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
 					$stop = true;
