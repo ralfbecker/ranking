@@ -14,6 +14,36 @@ error_reporting(E_ALL & ~E_NOTICE);
 ini_set('mbstring.internal_encoding','utf-8');
 if (!headers_sent()) header('Content-type: text/html; charset=utf-8');
 
+if (!function_exists('array2string'))
+{
+	/**
+	 * Format array or other types as (one-line) string, eg. for error_log statements
+	 *
+	 * @param mixed $var variable to dump
+	 * @return string
+	 */
+	function array2string($var)
+	{
+		switch (($type = gettype($var)))
+		{
+			case 'boolean':
+				return $var ? 'TRUE' : 'FALSE';
+			case 'string':
+				return "'$var'";
+			case 'integer':
+			case 'double':
+			case 'resource':
+				return $var;
+			case 'NULL':
+				return 'NULL';
+			case 'object':
+			case 'array':
+				return str_replace(array("\n",'    '/*,'Array'*/),'',print_r($var,true));
+		}
+		return 'UNKNOWN TYPE!';
+	}
+}
+
 global $gruppe,$grp_inc,$url_drock,$url_icc_info,$t_see_also,$jpgs;
 if (!include_once '.db_rang.php')
 {
@@ -41,13 +71,18 @@ if (defined('DR_PATH'))	// running inside sitemgr
 else
 {
 	$GLOBALS['dr_config'] = array(
-		'result'  => 'result.php?',
-		'pstambl' => 'pstambl.php?',
+		//'result'  => 'result.php?',
+		//'pstambl' => 'pstambl.php?',
 		'pstambl_target' => false,
 		'ranglist' => 'ranglist.php?',
 		'nat_team_ranking' => 'nat_team_ranking.php?',
-		'startlist' => '/egroupware/ranking/starter.php?',
-		'resultservice' => '/egroupware/ranking/result.php?'
+		//'startlist' => '/egroupware/ranking/starter.php?',
+		//'resultservice' => '/egroupware/ranking/result.php?',
+		// new json feed based URLs:
+		'resultservice' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
+		'result' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
+		'startlist' => '/egroupware/ranking/sitemgr/digitalrock/starters.html#',
+		'pstambl' => '/egroupware/ranking/sitemgr/digitalrock/pstambl.html#',
 	);
 }
 

@@ -12,7 +12,7 @@
 		<script type="text/javascript">
 			var results;
 			$(document).ready(function() {
-				results = new Results('table',location.pathname.replace(/sitemgr.*$/,'/json.php')+location.search);
+				results = new Results('table',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')));
 				
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});
