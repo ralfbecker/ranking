@@ -540,14 +540,9 @@ function try_num(set_value, set_anyway)
 function bonus_clicked(button)
 {
 	var bonus = document.getElementById('exec[zone]');
+	bonus.value = try_num(1);
+	check_bonus(bonus);
 	
-//	if (!bonus.value || bonus.value == '0')
-	{
-		bonus.value = try_num(1);
-		check_bonus(bonus);
-	
-		//if (!bonus.isNaN) update_boulder();
-	}
 	update_boulder('bonus');
 }
 
