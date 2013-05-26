@@ -106,7 +106,7 @@ class ranking_export extends boresult
 	{
 		switch($_SERVER['HTTP_HOST'])
 		{
-			case 'ralfsmacbook.local':
+//			case 'ralfsmacbook.local':
 			case 'www.ifsc-climbing.org':
 			case 'ifsc.egroupware.net':
 			case 'egw.ifsc-climbing.org':

@@ -92,7 +92,7 @@
 <script type="text/javascript">
 	var profile;
 	$(document).ready(function() {
-		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+location.search);
+		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')));
 		
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);
 	});
