@@ -142,7 +142,7 @@ class ranking_export extends boresult
 			}
 			else
 			{
-				$base .= '/result.php?comp=';
+				$base .= egw::link('/ranking/sitemgr/digitalrock/eliste.html#comp=');
 			}
 		}
 		return $base.$comp.'&cat='.$cat;
@@ -170,14 +170,14 @@ class ranking_export extends boresult
 			}
 			else
 			{
-				$base .= '/pstambl.php?person=';
+				$base .= egw::link('/ranking/sitemgr/digitalrock/pstambl.html#person=');
 			}
 		}
 		return $base.$athlete['PerId'].($cat ? '&cat='.$cat : '');
 	}
 
 	/**
-	 * Get URL for a result
+	 * Get URL for a ranking
 	 *
 	 * Currently /result.php is used for every HTTP_HOST not www.ifsc-climbing.org,
 	 * for which /index.php?page_name=result is used.
