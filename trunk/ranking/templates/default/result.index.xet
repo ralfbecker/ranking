@@ -105,8 +105,8 @@
 				</row>
 				<row class="row $row_cont[quota_class]">
 					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
-					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
+					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
@@ -123,7 +123,7 @@
 					</hbox>
 					<textbox type="float" align="center" id="set[$row_cont[PerId]][result_time]" class="$cont[lead_time_class]"/>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1"/>
-					<buttononly align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_height]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_height]').value,'exec[nm][rows][set][$row_cont[PerId]][result_plus]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_plus]').value);" class="small $cont[rw_result]"/>
+					<buttononly align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply" onclick="update_row(this, $row_cont[PerId]);" class="small $cont[rw_result]"/>
 				</row>
 			</rows>
 		</grid>

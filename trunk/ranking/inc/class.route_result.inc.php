@@ -1279,7 +1279,6 @@ class route_result extends so_sql
 		return $cols;
 	}
 
-
 	/**
 	 * Check the status / existance of start list or result for all categories of given competitions
 	 *
@@ -1298,5 +1297,26 @@ class route_result extends so_sql
 			}
 		}
 		return $status;
+	}
+
+	/**
+	 * Read results and return them in an array indexed by PerId or team_id ($this->id_cold)
+	 *
+	 * @param array $keys
+	 * @return array PerId => array pairs
+	 */
+	function results_by_id(array $keys)
+	{
+		$by_id = array();
+		if (($values = $this->search($keys, '*')))
+		{
+			// reindex by id
+			foreach($values as $key => $value)
+			{
+				$by_id[$value[$this->id_col]] = $value;
+			}
+		}
+		//error_log(__METHOD__."(".array2string($keys).") returning ".array2string($by_id));
+		return $by_id;
 	}
 }

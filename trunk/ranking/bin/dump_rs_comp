@@ -18,7 +18,7 @@ delete=
 	exit 1;
 }
 WetId=$1
-db_name=${2:-rang}
+db_name=${2:-rang4ifsc}
 tables="Routes RouteResults RelayResults"
 
 # delete previous data

@@ -84,6 +84,13 @@ class ranking_so
 	private $calc;
 
 	/**
+	 * Error message
+	 *
+	 * @var string
+	 */
+	public $error = '';
+
+	/**
 	 * sub-objects, which get automatic instanciated by __get()
 	 *
 	 * @var array
