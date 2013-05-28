@@ -858,7 +858,7 @@ class uiresult extends boresult
 						'fed_parent'   => array('label' => lang('Landesverband'),'type' => 'select'),
 						'email'        => array('label' => lang('EMail'),       'type' => 'text'),
 					),
-					'row_id' => 'PerId',
+					//'row_id' => 'PerId',	// required for (not yet used) context menu, but stops input fields in NM from working!
 				);
 			}
 			if ($_GET['calendar']) $content['nm']['calendar'] = $_GET['calendar'];
@@ -1348,10 +1348,11 @@ class uiresult extends boresult
 					$request->preserv['nm']['discipline'] == 'speedrelay');
 			}
 			list($id) = each($content['nm']['rows']['set']);
+			$old = $GLOBALS['egw']->session->appsession('set_'.$keys['WetId'].'_'.$keys['GrpId'].'_'.$keys['route_order'],'ranking');
 			$old_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));
 
-			if (is_array($content['nm']['rows']['set']) && $this->save_result($keys,$content['nm']['rows']['set'],
-				$request->preserv['nm']['route_type'],$request->preserv['nm']['discipline'],null,
+			if (is_array($content['nm']['rows']['set']) && $this->save_result($keys, $content['nm']['rows']['set'],
+				$request->preserv['nm']['route_type'], $request->preserv['nm']['discipline'], $old,
 				$request->preserv['nm']['quali_preselected'], $update_checked))
 			{
 				$new_result = $this->route_result->read($keys+array($this->route_result->id_col=>$id));

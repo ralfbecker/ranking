@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox class="extra_startlist">
+					<groupbox cols="1" rows="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox class="extra_result">
+					<groupbox cols="1" rows="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%">
 			<columns>
 				<column/>
@@ -123,8 +123,8 @@
 				</row>
 				<row class="row $row_cont[quota_class]">
 					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
-					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
+					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description id="${row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
@@ -225,9 +225,9 @@
 						<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
 					</box>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
-					<vbox align="center" options="0,0" class="noPrint">
-						<checkbox align="center" statustext="|Scorecard checked" id="set[$row_cont[PerId]][checked]" onchange="update_boulder_row(this, $row_cont[PerId]);" class="noPrint"/>
-						<buttononly align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" onclick="return update_boulder_row(this, $row_cont[PerId]);" class="small $cont[rw_result]"/>
+					<vbox align="center" class="noPrint">
+						<checkbox align="center" statustext="|Scorecard checked" id="set[$row_cont[PerId]][checked]" onchange="update_row(this, $row_cont[PerId]);" class="noPrint"/>
+						<buttononly align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" onclick="update_row(this, $row_cont[PerId]);" class="small $cont[rw_result]"/>
 					</vbox>
 					<vbox options="0,0" class="noPrint">
 						<date-time id="${row}[result_modified]" readonly="true"/>

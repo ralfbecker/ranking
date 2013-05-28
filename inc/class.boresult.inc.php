@@ -792,17 +792,20 @@ class boresult extends boranking
 	 * @param array $results PerId => data pairs
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_*, TWOxTWO_QUALI
 	 * @param string $discipline 'lead', 'speed', 'boulder' or 'speedrelay'
-	 * @param array $old_values values at the time of display, to check if somethings changed
-	 * 		default is null, which causes save_result to read the results now.
+	 * @param array $old_values PerId/team_id => array pairs, default null
+	 * 		Values at the time of display, to check if somethings changed,
+	 * 		which causes save_result to read the results now.
 	 * 		If multiple people are updating, you should provide the result of the time of display,
 	 * 		to not accidently overwrite results entered by someone else!
 	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
 	 * @param boolean $update_checked=false false: do NOT update checked value, true: also update checked value
+	 * @param array $current_vaules=null just read current results, or null
 	 * @return boolean|int number of changed results or false on error
 	 */
 	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false)
 	{
-		$this->error = null;
+		//error_log(__METHOD__."(".array2string($keys).", results=".array2string($results).", route_type=$route_type, discipline='$discipline', old_values=".array2string($old_values).", quali_preselected=$quali_preselected, update_checked=$update_checked)");
+		$this->error = '';
 
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
@@ -829,33 +832,45 @@ class boresult extends boranking
 		unset($results[0]);
 
 		//echo "<p>".__METHOD__."(".array2string($keys).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
-		if (is_null($old_values) && $results)
+		if ((is_null($old_values) || $discipline == 'boulder') && $results)
 		{
-			$keys[$this->route_result->id_col] = array_keys($results);
-			$old_values = $this->route_result->search($keys,'*');
+			$current_values = $this->route_result->results_by_id($keys+array($this->route_result->id_col=>$id));
+			if (is_null($old_values)) $old_values = $current_values;
 		}
 		$modified = 0;
 		foreach($results as $id => $data)
 		{
 			$keys[$this->route_result->id_col] = $id;
 
-			foreach($old_values as $old) if ($old[$this->route_result->id_col] == $id) break;
-			if ($old[$this->route_result->id_col] != $id)
-			{
-				unset($old);
-			}
-			else
-			{
-				$old['result_time'] = $old['result_time_l'];
-			}
+			// if $update_checked, ignore old result, just set given result in $data
+			$old = $update_checked ? array() : $old_values[$id];
+			if ($old) $old['result_time'] = $old['result_time_l'];
+			$current = $current_values[$id];
+
+			//error_log(__METHOD__."() #$id: current=".array2string($current));
+			//error_log(__METHOD__."() #$id: old=".array2string($old));
+			//error_log(__METHOD__."() #$id: data=".array2string($data));
+
 			// boulder result
 			for ($i=1; $i <= route_result::MAX_BOULDERS && isset($data['top'.$i]); ++$i)
 			{
+				// if no change in a single boulder compared to old result, use current result, not old one for storing
+				if ($old && $old['top'.$i] == $data['top'.$i] && $old['zone'.$i] == $data['zone'.$i])
+				{
+					$data['zone'.$i] = $current['zone'.$i];
+					$data['top'.$i] = $current['top'.$i];
+					//error_log(__METHOD__."() #$id: $i. boulder unchanged use current result top=".array2string($current['top'.$i]).", zone=".array2string($current['zone'.$i]));
+					continue;
+				}
+				//else error_log(__METHOD__."() #$id: $i. boulder changed top=".array2string($data['top'.$i]).", zone=".array2string($data['zone'.$i]));
+
 				if ($data['top'.$i] && (int)$data['top'.$i] < (int)$data['zone'.$i])
 				{
 					$this->error[$id]['zone'.$i] = lang('Can NOT be higher than top!');
 				}
 			}
+			//error_log(__METHOD__."() #$id: data=".array2string($data));
+
 			if (isset($data['tops']))	// boulder result with just the sums
 			{
 				// todo: validation
@@ -874,13 +889,12 @@ class boresult extends boranking
 
 			// do NOT allow to modify checked via update of all results
 			if (!$update_checked) unset($data['checked']);
-error_log(__METHOD__."() results=".array2string($results));
+
 			foreach($data as $key => $val)
 			{
 				// something changed?
-				if ((!$old && (string)$val !== '' || (string)$old[$key] != (string)$val) &&
-					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS ||
-					$key == 'checked' || strpos($key, 'top') === 0 || strpos($key, 'zone') === 0))
+				if ((!$old && (string)$val !== '' || $old && (string)$old[$key] != (string)$val) &&
+					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
 				{
 					if (($key == 'start_number' || $key == 'start_number_1') && strchr($val,'+') !== false)
 					{
