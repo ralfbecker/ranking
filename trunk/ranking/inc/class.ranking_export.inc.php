@@ -373,6 +373,18 @@ class ranking_export extends boresult
 		$route['comp_name'] = $comp['name'];
 		$route['nation'] = $comp['nation'];
 
+		// set quali_preselected, if set for category
+		if (($route['quali_preselected'] = $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected'])) &&
+			($heat == 0 || $heat == 1))
+		{
+			try {
+				$ranking = $this->export_ranking($cat, $comp['datum'], $comp['serie']);
+			}
+			catch(Exception $e) {
+				unset($ranking);	// ignore no ranking defined or no result yet
+			}
+		}
+
 		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
 		{
 			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
@@ -491,6 +503,18 @@ class ranking_export extends boresult
 			}
 			// use english names
 			$row += self::athlete_attributes($row, $comp['nation'], $cat['GrpId']);
+
+			if ($ranking)	// add ranking to athlete
+			{
+				foreach($ranking['participants'] as $participant)
+				{
+					if ($participant['PerId'] == $row['PerId'])
+					{
+						$row['ranking'] = $participant['result_rank'];
+						break;
+					}
+				}
+			}
 
 			// remove &nbsp; in boulderheight results
 			if ($discipline == 'boulderheight')
@@ -968,19 +992,22 @@ class ranking_export extends boresult
 			'start' => $start,
 			'end' => $date,
 			'max_comp' => $max_comp,
-			'comp' => array(
-				'WetId' => $comp['WetId'],
-				'name' => $comp['name'],
-				'date' => $comp['datum'],
-			),
 			'nation' => $cat['nation'],
 			'participants' => $rows,
-			'route_name' => $comp['name'].' ('.implode('.', array_reverse(explode('-', $comp['datum']))).')',
+			'route_name' => $comp ? $comp['name'].' ('.implode('.', array_reverse(explode('-', $comp['datum']))).')' : '',
 			'route_names' => $route_names,
 			'route_result' => implode('.', array_reverse(explode('-', $date))),
 			'route_order' => -1,
 			'discipline' => 'ranking',
 		);
+		if ($comp)	// comp not set if date given
+		{
+			$data['comp'] = array(
+				'WetId' => $comp['WetId'],
+				'name' => $comp['name'],
+				'date' => $comp['datum'],
+			);
+		}
 		if ($cup)
 		{
 			$data['comp_name'] = $cup['name'];
