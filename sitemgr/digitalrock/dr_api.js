@@ -653,6 +653,19 @@ var Startlist = (function() {
 				};
 				break;
 		}
+
+		// if quali_preselected and heat = 1||2, we have to use a function to get either start_order or text "preselected"
+		if (_data.quali_preselected && (_data.route_order == 0 || _data.route_order == 1))
+		{
+			var quali_preselected = _data.quali_preselected;
+			var start_order = this.startlist_cols.start_order;
+			this.startlist_cols.start_order = function(_data,_tag,col) {
+				if (_tag == 'th') return start_order;
+				if (_data.ranking < quali_preselected) return 'Vorqualifiziert';	//'preselected';
+				return _data[col];
+			};
+		}
+	
 		var sort;
 		// if we have no result columns or no ranked participant, show a startlist
 		if (typeof this.result_cols == 'undefined' || !_data.participants[0].result_rank)
@@ -679,7 +692,7 @@ var Startlist = (function() {
 				this.replace_attribute(this.columns, 'nation', 'city', 'City');
 				break;			
 		}
-	
+		
 		// fix route_names containing only one or two qualifications are send as array because index 0 and 1
 		if (Array.isArray(_data.route_names))
 		{
