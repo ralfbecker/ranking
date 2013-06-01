@@ -661,7 +661,7 @@ var Startlist = (function() {
 			var start_order = this.startlist_cols.start_order;
 			this.startlist_cols.start_order = function(_data,_tag,col) {
 				if (_tag == 'th') return start_order;
-				if (_data.ranking < quali_preselected) return 'Vorqualifiziert';	//'preselected';
+				if (_data.ranking <= quali_preselected) return 'Vorqualifiziert';	//'preselected';
 				return _data[col];
 			};
 		}
