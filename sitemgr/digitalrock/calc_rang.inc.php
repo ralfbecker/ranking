@@ -10,7 +10,7 @@
  * @version $Id$
  */
 
-if ($_SERVER['HTTP_HOST'] == 'localhost')
+if (in_array($_SERVER['HTTP_HOST'], array('localhost','ralfsmacbook.local')))
 {
 	$cache_time = false;	// no caching
 }
@@ -122,8 +122,8 @@ function calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret
  *		icc.inc.php definiert $mgroups, das einem rkey mehrere Gruppen zuordnen kann
  *		Die max. Anzahl bester Ergebnisse gilt fuer jede Gruppe extra!
  * 10.06.2006: EYC nicht-europ. Teiln. zaehlen nicht fuer Punkte
- * 24.03.2008: 2008 overall ranking (no older overall or combinded ranking supported)
- * 27.10.2008: overall ranking requires results (with points > 0!) in 2 or more cats
+ * 24.03.2008: cvs r1.15-1.17: 2008 overall ranking (no older overall or combinded ranking supported)
+ * 27.10.2008: cvs r1.21: overall ranking requires results (with points > 0!) in 2 or more cats
  */
 function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$ret_ex_aquo,
 	&$ret_nicht_gewertet,$serie='')
@@ -434,5 +434,5 @@ WHERE WetId IN (
 	WHERE serie =$cup->SerId
 ) AND GrpId IN ($cat->GrpIds) AND Results.platz > 0
 HAVING num_cats >= $MinCats
-ORDER BY Results.PerId, Results.GrpId, pkt DESC";
+ORDER BY Results.PerId, Results.GrpId, pkt DESC,Results.datum DESC";
 }

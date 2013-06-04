@@ -313,7 +313,7 @@ class result extends so_sql
 			' AND w.serie='.(int) $cup['SerId'].
 			" AND r.cup_pkt > 0".
 			' AND w.datum <= '.$this->db->quote($stand).
-			' ORDER BY r.PerId,r.cup_pkt DESC',__LINE__,__FILE__) as $row)
+			' ORDER BY r.PerId,r.GrpId,r.cup_pkt DESC,w.datum DESC',__LINE__,__FILE__) as $row)
 		{
 			$results[] = $this->athlete->db2data($row);
 		}

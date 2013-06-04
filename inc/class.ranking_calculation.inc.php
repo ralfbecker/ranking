@@ -558,6 +558,8 @@ class ranking_calculation
 		{
 			$cat = $this->bo->cats->read($cat);
 		}
+		$overall = count($cat['GrpIds']) > 1;
+
 		if ($this->debug) echo "<p>boranking::ranking(cat='$cat[rkey]',stand='$stand',...,cup='$cup[rkey]')</p>\n";
 
 		if (!$stand || $stand == '.')	// last comp. before today
@@ -595,7 +597,14 @@ class ranking_calculation
 		}
 		if ($this->debug) echo "<p>boranking::ranking: stand='$stand', comp='$comp[rkey]'</p>\n";
 
-		if ($cup)
+		if ($overall)
+		{
+			$max_comp = 5;
+			$min_cats = 2;
+
+			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
+		}
+		elseif ($cup)
 		{
 			$max_comp = $this->bo->cup->get_max_comps($cat['rkey'],$cup);
 
@@ -654,21 +663,31 @@ class ranking_calculation
 		}
 		$pers = false;
 		$pkte = $anz = $platz = array();
+		if ($overall) $results[] = array('PerId' => 0);	// marker to check last result for $min_cats
 		foreach($results as $result)
 		{
+			// combined: remove result if number of cats < $min_cats
+			if ($overall && $id && $id != $result['PerId'] && count($anz[$id]) < $min_cats)
+			{
+				unset($pers[$id]);
+				unset($pkte[$id]);
+				unset($anz[$id]);
+				unset($not_counting[$id]);
+				if (!$result['PerId']) continue;	// ignore marker
+			}
 			$id = $result['PerId'];
 			$nc = false;
 			if (!isset($pers[$id]))		// Person neu --> anlegen
 			{
 				$pers[$id] = $result;
 				$pkte[$id] = sprintf('%04.2f',$result['pkt']);
-				$anz[$id] = 1;
+				$anz[$id][$result['GrpId']] = 1;
 				++$platz[$result['platz']][$id];
 			}
-			elseif (!$max_comp || $anz[$id] < $max_comp)
+			elseif (!$max_comp || $anz[$id][$result['GrpId']] < $max_comp)
 			{
 				$pkte[$id] = sprintf('%04.2f',$pkte[$id] + $result['pkt']);
-				$anz[$id]++;
+				$anz[$id][$result['GrpId']]++;
 				++$platz[$result['platz']][$id];
 			}
 			else
@@ -680,12 +699,13 @@ class ranking_calculation
 					++$platz[$result['platz']][$id];
 				}
 			}
-			$pers[$id]['results'][$result['WetId']] = $result['platz'].".\n".
+			$result_id = $result['WetId'].($overall?'_'.$result['GrpId']:'');
+			$pers[$id]['results'][$result_id] = $result['platz'].".\n".
 				($nc ? '(' : '').sprintf('%04.2f',$result['pkt']).($nc ? ')' : '');
 
-			if (is_array($comps) && !isset($comps[$result['WetId']]))
+			if (is_array($comps) && !isset($comps[$result_id]))
 			{
-				$comps[$result['WetId']] = $this->bo->comp->read($result['WetId']);
+				$comps[$result_id] = $this->bo->comp->read($result['WetId']);
 			}
 		}
 		if (!$pers)

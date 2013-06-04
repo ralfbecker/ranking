@@ -947,6 +947,8 @@ class ranking_export extends boresult
 		{
 			throw new Exception(lang('Category not found!!!'));
 		}
+		$overall = count($cat['GrpIds']) > 1;
+
 		$comps = array();
 		if (!($ranking = $this->calc->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
 		{
@@ -968,16 +970,27 @@ class ranking_export extends boresult
 		// sort competitions by date
 		uasort($comps, function($a,$b){return strcmp($a['datum'],$b['datum']);});
 		unset($data);
-		$route_names = array();
-		foreach($comps as $WetId => &$data)
+		$route_names = $cats = array();
+		foreach($comps as $result_id => &$data)
 		{
 			if (empty($data['dru_bez']))
 			{
 				$parts = preg_split('/ ?- ?/', $data['name']);
 				list($data['dru_bez']) = explode('/', array_pop($parts));
 			}
+			if ($overall)
+			{
+				list(,$GrpId) = explode('_', $result_id);
+				if (!isset($cats[$GrpId])) $cats[$GrpId] = $this->cats->read($GrpId);
+				$discipline = ' ('.strtoupper($cats[$GrpId]['discipline'][0]).')';
+			}
 			// HACK: appending a space, to force JSON to keep order given here
-			$route_names[$WetId.' '] = $data['dru_bez']."\n".implode('.', array_reverse(explode('-', $data['datum'])));
+			else
+			{
+				$result_id .= ' ';
+			}
+			$route_names[$result_id] = $data['dru_bez'].$discipline."\n".
+				implode('.', array_reverse(explode('-', $data['datum'])));
 		}
 		unset($data);
 		$data = array(
