@@ -148,6 +148,7 @@ class category extends so_sql
 		if (isset(self::$mgroups[$data['rkey']]))
 		{
 			$data['GrpIds'] = array_keys(self::$mgroups[$data['rkey']]);
+			$data['mgroups'] = self::$mgroups[$data['rkey']];
 		}
 		else
 		{

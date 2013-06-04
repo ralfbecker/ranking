@@ -589,6 +589,7 @@ class ranking_calculation
 
 			$cats = array($cat['rkey']);
 			if ($this->bo->cats->cat2old[$cat['rkey']]) $cats[] = $this->bo->cats->cat2old[$cat['rkey']];
+			if (isset($cat['mgroups'])) $cats = $cat['mgroups'];
 
 			if (!$this->bo->comp->next_comp_this_year($comp['datum'],$cats,$cat['nation'],$cup['SerId']))
 			{
