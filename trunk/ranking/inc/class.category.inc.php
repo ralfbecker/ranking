@@ -71,6 +71,24 @@ class category extends so_sql
 	var $charset,$source_charset;
 
 	/**
+	 * Members of overall ranking groups, not yet in database, identical to icc.inc.php file
+	 *
+	 * @var array
+	 */
+	static $mgroups = array(
+		'ICC_MX' => array(
+			1 => 'ICC_M',
+			6 => 'ICC_MB',
+			23 => 'ICC_MS',
+		),
+		 'ICC_FX' => array(
+		 	2 => 'ICC_F',
+			5 => 'ICC_FB',
+			24 => 'ICC_FS',
+		),
+	);
+
+	/**
 	 * SQL for results column, counting results from all *Results tables for given GrpId
 	 *
 	 * @var string
@@ -80,7 +98,7 @@ class category extends so_sql
 	/**
 	 * constructor of the category class
 	 */
-	function category($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null)
 	{
 		$this->so_sql('ranking','Gruppen',$db);	// call constructor of derived class
 
@@ -124,11 +142,17 @@ class category extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
+			$data = translation::convert($data,$this->source_charset);
 		}
-		// setting up meta-groups, not yet saved int the db
-		$data['GrpIds'] = $data['GrpIds'] ? explode(',',$data['GrpIds']) : array();
-		if ($data['GrpId']) $data['GrpIds'][] = $data['GrpId'];
+		// set meta-groups for overall ranking categories
+		if (isset(self::$mgroups[$data['rkey']]))
+		{
+			$data['GrpIds'] = array_keys(self::$mgroups[$data['rkey']]);
+		}
+		else
+		{
+			$data['GrpIds'] = array($data['GrpId']);
+		}
 
 		return $data;
 	}
@@ -154,7 +178,7 @@ class category extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = translation::convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}

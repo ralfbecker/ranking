@@ -761,9 +761,11 @@ var Startlist = (function() {
 					// for ranking, we add link to results
 					if (_data.discipline == 'ranking')
 					{
-						this.columns['result'+parseInt(route)] = {	// parseInt(route) to remove space append to force js to keep the order
+						route = route.replace(/ $/, '');	// remove space append to force js to keep the order
+						var comp_cat = route.split('_');
+						this.columns['result'+route] = {
 							'label': _data.route_names[route],
-							'url': '#!comp='+parseInt(route)+'&cat='+_data.cat.GrpId
+							'url': '#!comp='+comp_cat[0]+'&cat='+(comp_cat[1] || _data.cat.GrpId)
 						};
 					}
 					else
