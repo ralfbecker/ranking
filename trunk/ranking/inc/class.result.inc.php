@@ -25,7 +25,6 @@ class result extends so_sql
 	var $ff_table      = 'Feldfaktoren';
 	var $pkte_table    = 'PktSystemPkte';
 	var $charset,$source_charset;
-	var $athlete;
 
 	/**
 	 * constructor of the competition class
@@ -38,18 +37,20 @@ class result extends so_sql
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = translation::charset();
+	}
 
-		foreach(array(
-				'athlete'  => 'ranking_athlete',
-			) as $var => $class)
-		{
-			$egw_name = /*'ranking_'.*/$class;
-			if (!isset($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
-			}
-			$this->$var = $GLOBALS['egw']->$egw_name;
-		}
+	/**
+	 * changes the data from the db-format to our work-format
+	 *
+	 * @param array $data if given works on that array and returns result, else works on internal data-array
+	 * @return array
+	 */
+	function athlete_db2data($data=null)
+	{
+		static $athlete;
+		if (!isset($athlete)) $athlete = boranking::getInstance()->athlete;
+
+		return $athlete->db2data($data);
 	}
 
 	/**
@@ -257,7 +258,10 @@ class result extends so_sql
 	}*/
 
 	/**
-	 * get competitiors prequalified for a given competition, because of a certain place in spec. competitions
+	 * Get competitiors prequalified for a given competition, because of a certain place in spec. competitions
+	 *
+	 * All categories with matching discipline and gender are used, not just categories from competition.
+	 * Eg. youth champions are counting for adult world-cups, if youth-championship is selected.
 	 *
 	 * @param int/array $comp WetId or complete competition array
 	 * @param int/array $cat GrpId or complete category array
@@ -269,27 +273,30 @@ class result extends so_sql
 		{
 			$comp = $this->read($comp);
 		}
-		if (is_array($cat) || !is_numeric($cat))
-		{
-			if (!$cat['GrpId'])
-			{
-				$cat = $this->read($cat);
-			}
-			$cat = $cat['GrpId'];
-		}
+		if (!isset($boranking)) $boranking = boranking::getInstance();
+		if (!is_array($cat)) $cat = $boranking->cats->read($cat);
+
 		$prequals = array();
 		if ($cat && $comp['WetId'] && $comp['prequal_comp'] > 0 && $comp['prequal_comps'])
 		{
-			foreach((array)$this->search(array(),'DISTINCT PerId','','','',false,'AND',false,array(
-				'GrpId' => $cat,
+			$cats = array($cat['GrpId'] => true);
+			foreach((array)$this->search(array(),'DISTINCT PerId,GrpId','','','',false,'AND',false,array(
 				'WetId' => explode(',',$comp['prequal_comps']),
 				'platz <= '.(int)$comp['prequal_comp'],
 			)) as $athlet)
 			{
-				$prequals[] = $athlet['PerId'];
+				if (!isset($cats[$athlet['GrpId']]) && $cat['discipline'])
+				{
+					$reg_cat = $boranking->cats->read($athlet['GrpId']);
+					$cats[$athlet['GrpId']] = $reg_cat['discipline'] == $cat['discipline'] && $reg_cat['sex'] == $cat['sex'];
+				}
+				if ($cats[$athlet['GrpId']])
+				{
+					$prequals[] = $athlet['PerId'];
+				}
 			}
 		}
-		//echo "result::prequalified($comp[rkey],$cat)="; _debug_array($prequals);
+		//echo "<p>".__METHOD__."(comp=$comp[rkey], cat=$cat[rkey]/$cat[discipline]) prequal_comp=$comp[prequal_comp], prequal_comps=".array2string($comp['prequal_comps']); _debug_array($prequals);
 		return array_values($prequals);
 	}
 
@@ -315,7 +322,7 @@ class result extends so_sql
 			' AND w.datum <= '.$this->db->quote($stand).
 			' ORDER BY r.PerId,r.GrpId,r.cup_pkt DESC,w.datum DESC',__LINE__,__FILE__) as $row)
 		{
-			$results[] = $this->athlete->db2data($row);
+			$results[] = $this->athlete_db2data($row);
 		}
 		return $results;
 	}
@@ -343,7 +350,7 @@ class result extends so_sql
 			(int) $from_year.' <= YEAR(geb_date) AND YEAR(geb_date) <= '.(int) $to_year : '').
 			' ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__) as $row)
 		{
-			$results[] = $this->athlete->db2data($row);
+			$results[] = $this->athlete_db2data($row);
 		}
 		return $results;
 	}
@@ -363,7 +370,7 @@ class result extends so_sql
 		foreach($this->db->select($this->result_table, $this->result_table.'.*,'.$extra_cols, $filter, __LINE__, __FILE__,
 			false, $append, 'ranking', 0, $join) as $row)
 		{
-			$result = $this->athlete->db2data($row);
+			$result = $this->athlete_db2data($row);
 			foreach(explode(',', $extra_cols) as $col)
 			{
 				$name = $col;

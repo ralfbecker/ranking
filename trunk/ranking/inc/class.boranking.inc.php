@@ -263,6 +263,20 @@ class boranking extends ranking_so
 	}
 
 	/**
+	 * Singleton to get a boranking instance
+	 *
+	 * @return boranking
+	 */
+	static public function getInstance()
+	{
+		if (!is_object($GLOBALS['boranking']))
+		{
+			$GLOBALS['boranking'] = new boranking;
+		}
+		return $GLOBALS['boranking'];
+	}
+
+	/**
 	 * php4 constructor
 	 *
 	 * @deprecated use __construct()
