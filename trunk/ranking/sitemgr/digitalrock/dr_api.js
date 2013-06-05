@@ -798,52 +798,8 @@ var Startlist = (function() {
 			this.header.addClass('listHeader');
 			
 			// display a toc with all available heats, if not explicitly disabled (toc=0) or beamer
-			if (!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/) && this.discipline != 'ranking')
-			{
-				var toc = jQuery(document.createElement('ul')).addClass('listToc');
-				for (var r in _data.route_names)
-				{
-					var li = jQuery(document.createElement('li'));
-					if (r != this.route_order)
-					{
-						var a = jQuery(document.createElement('a'));
-						a.text(_data.route_names[r]);
-						var reg_exp = /route=[^&]+/;
-						var url = location.href.replace(reg_exp, 'route='+r);
-						if (url.indexOf('route=') == -1) url += '&route='+r;
-						a.attr('href', url);
-						if (this.navigateTo)
-						{
-							a.click(this.navigateTo);
-						}
-						else
-						{
-							var that = this;
-							a.click(function(e){
-								that.json_url = that.json_url.replace(reg_exp, this.href.match(reg_exp)[0]);
-								if (that.json_url.indexOf('route=') == -1) that.json_url += '&route='+r;
-								that.update();
-								e.preventDefault();
-							});
-						}
-						li.append(a);
-					}
-					else
-					{
-						li.text(_data.route_names[r]);
-					}
-					toc.prepend(li);
-				}
-				// only add toc, if we have more then one route
-				if (toc.children().length > 1)
-				{
-					jQuery(this.container).append(toc);
-				}
-				else
-				{
-					toc.remove();
-				}
-			}
+			this.displayToc(_data);
+
 			// create new table
 			this.table = new DrTable(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null,this.navigateTo);
 		
@@ -853,17 +809,87 @@ var Startlist = (function() {
 		}
 		else
 		{
+			// update a toc with all available heats, if not explicitly disabled (toc=0) or beamer
+			this.displayToc(_data);
+
 			// update existing table
 			this.table.update(_data.participants,_data.route_result ? _data.route_quota : null);
 		}
 		// set/update header line
 		this.setHeader(_data);
 	
-		// if route is NOT offical, update list every 10 sec
-		if (!_data.route_result) 
+		// if route is NOT offical, update list every 10 sec, of category not offical update every 5min (to get new heats)
+		if (!_data.category_offical && this.discipline != 'ranking') 
 		{
 			var list = this;
-			this.update_handle = window.setTimeout(function(){list.update();},10000);
+			this.update_handle = window.setTimeout(function(){list.update();},!_data.route_result ? 10000 : 300000);
+		}
+	};
+	/**
+	 * Create or update TOC (list of available routes for navigation)
+	 * 
+	 * Can be disabled via "toc=0" or "beamer=1" in json_url. Always disabled for rankings.
+	 * 
+	 * @param _data route data object
+	 */            
+	Startlist.prototype.displayToc = function(_data)
+	{
+		if (this.json_url.match(/toc=0/) || this.json_url.match(/beamer=1/) || this.discipline == 'ranking')
+		{
+			return;	// --> no toc
+		}
+		var toc = this.container.find('ul.listToc');
+		var new_toc = !toc.length;
+		if (new_toc)
+			toc = jQuery(document.createElement('ul')).addClass('listToc');
+		else
+			toc.empty();
+
+		for (var r in _data.route_names)
+		{
+			var li = jQuery(document.createElement('li'));
+			if (r != this.route_order)
+			{
+				var a = jQuery(document.createElement('a'));
+				a.text(_data.route_names[r]);
+				var reg_exp = /route=[^&]+/;
+				var url = location.href.replace(reg_exp, 'route='+r);
+				if (url.indexOf('route=') == -1) url += '&route='+r;
+				a.attr('href', url);
+				if (this.navigateTo)
+				{
+					a.click(this.navigateTo);
+				}
+				else
+				{
+					var that = this;
+					a.click(function(e){
+						that.json_url = that.json_url.replace(reg_exp, this.href.match(reg_exp)[0]);
+						if (that.json_url.indexOf('route=') == -1) that.json_url += '&route='+r;
+						that.update();
+						e.preventDefault();
+					});
+				}
+				li.append(a);
+			}
+			else
+			{
+				li.text(_data.route_names[r]);
+			}
+			toc.prepend(li);
+		}
+		// only add toc, if we have more then one route
+		if (!new_toc)
+		{
+			// already added
+		}
+		else if (toc.children().length > 1)
+		{
+			jQuery(this.container).append(toc);
+		}
+		else
+		{
+			toc.remove();
 		}
 	};
 	/**
@@ -1127,11 +1153,8 @@ var Resultlist = (function() {
 					'start_number': 'StartNr',
 					'result': 'Result'
 				};
-				// route defaults to -1 if not set or empty
-				var route = this.json_url.match(/route=([0-9]+)/);
-				route = route && route[1] !== '' ? route[1] : -1;
 				// for boulder heats use new display, but not for general result!
-				if (_data.discipline == 'boulder' && (!detail || detail[1] == 2) && route != -1)
+				if (_data.discipline == 'boulder' && (!detail || detail[1] == 2) && _data.route_order != -1)
 				{
 					delete this.result_cols.result;
 					var that = this;

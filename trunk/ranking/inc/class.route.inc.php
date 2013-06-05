@@ -75,7 +75,7 @@ class route extends so_sql
 			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
 			$this->db->delete('RelayResults',$keys,__LINE__,__FILE__);
 
-			boresult::delete_export_route_cache($keys);
+			boresult::delete_export_route_cache($keys, null, null, true);
 		}
 		return $ret;
 	}
