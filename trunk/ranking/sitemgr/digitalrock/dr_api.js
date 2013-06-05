@@ -1906,6 +1906,10 @@ var Competitions = (function() {
 			filter.append(select);
 		}
 		this.container.append(filter);
+		var competitions = jQuery(document.createElement('div')).addClass('competitions');
+		this.container.append(competitions);
+		var now = (new Date()).getTime();
+		var closest, closest_dist;
 		
 		for(var i=0; i < _data.competitions.length; ++i)
 		{
@@ -1969,7 +1973,19 @@ var Competitions = (function() {
 			}
 			if (have_links) comp_div.append(links_ul);
 			if (have_cats) comp_div.append(cats_ul);
-			this.container.append(comp_div);
+			competitions.append(comp_div);
+			
+			var dist = Math.abs((new Date(competition.date)).getTime() - now);
+			if (typeof closest_dist == 'undefined' || dist < closest_dist)
+			{
+				closest_dist = dist;
+				closest = comp_div[0];
+			}
+		}
+		if (closest && year == (new Date()).getFullYear()) 
+		{
+			closest.scrollIntoView();		// scrolls competition div AND whole document to show closest
+			document.body.scrollTo(0,0);	// scrolls whole document back up
 		}
 	};
 	Competitions.prototype.changeYear = function(year)
