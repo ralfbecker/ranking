@@ -21,7 +21,7 @@ class ranking_export extends boresult
 	 * @var array
 	 */
 	public static $ignore_caching_hosts = array(
-		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost','test.dev'
+//		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost','test.dev'
 	);
 
 	/**
@@ -371,6 +371,7 @@ class ranking_export extends boresult
 		// append category name to route name
 		$route['route_name'] .= ' '.$cat['name'];
 		$route['comp_name'] = $comp['name'];
+		$route['comp_date'] = $comp['datum'];
 		$route['nation'] = $comp['nation'];
 
 		// set quali_preselected, if set for category
@@ -421,6 +422,22 @@ class ranking_export extends boresult
 				'GrpId' => $cat['GrpId'],
 			),'route_order');
 		}
+		// if we have more then one route, add general result, in case is has never been stored to database
+		if (count($route['route_names']) > 1 && !isset($route['route_names']['-1']))
+		{
+			$route['route_names']['-1'] = lang('General Result');
+		}
+		else
+		{
+			$general_result = $heat == -1 ? $route : $this->route->read(array(
+				'WetId' => $comp['WetId'],
+				'GrpId' => $cat['GrpId'],
+				'route_order' => -1,
+			));
+		}
+		// mark whole category offical/finished if general result is offical or competition date 10+ days over
+		$route['category_offical'] = $general_result && ($general_result['route_status'] == STATUS_RESULT_OFFICIAL ||
+			egw_time::to($comp['datum'],'ts') - time() > 10*24*3600);
 
 		switch($discipline)
 		{
@@ -1034,7 +1051,8 @@ class ranking_export extends boresult
 		// calculate expiration date based on date of ranking and duration of last competition
 		list($y,$m,$d) = explode('-', $date);
 		$date = mktime(0,0,0,$m,$d,$y);
-		if (substr($data['end'], -6) == '-12-31' || (time()-$date)/86400 > $comp['duration'])
+		// ToDo: need to take next competition into account, not just last one in ranking
+		if (substr($data['end'], -6) == '-12-31')// || (time()-$date)/86400 > $comp['duration'])
 		{
 			$data['expires'] = self::EXPORT_RANKING_OLD_TTL;
 		}
@@ -1052,7 +1070,7 @@ class ranking_export extends boresult
 	/**
 	 * Cache and expires time for results from a running competition
 	 */
-	const EXPORT_RESULTS_RUNNING_EXPIRES = 900;
+	const EXPORT_RESULTS_RUNNING_EXPIRES = 300;
 	/**
 	 * Cache and expires time for results from a finished/historic competition
 	 */
@@ -1220,8 +1238,9 @@ class ranking_export extends boresult
 
 		list($y,$m,$d) = explode('-', $comp['datum']);
 		$comp_ts = mktime(0, 0, 0, $m, $d, $y);
-		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration'] ?
-			self::EXPORT_RESULTS_HISTORIC_EXPIRES : self::EXPORT_RESULTS_RUNNING_EXPIRES;
+		// ToDo: need to take next competition into account, not just currently displayed one
+		$data['expires'] = /*(time()-$comp_ts)/86400 > $comp['duration'] ?
+			self::EXPORT_RESULTS_HISTORIC_EXPIRES :*/ self::EXPORT_RESULTS_RUNNING_EXPIRES;
 
 		$data['etag'] = md5(serialize($data));
 
