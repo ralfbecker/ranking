@@ -678,13 +678,15 @@ class boranking extends ranking_so
 					{
 						$ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);
 					}
-					foreach((array)$ranking as $athlet)
+					if ($ranking)
+					foreach($ranking as $athlet)
 					{
 						if ($athlet['platz'] > $prequal_ranking) break;
 
 						if (!in_array($athlet['PerId'],$prequalified[$cat_id]))
 						{
-							$prequalified[$cat_id][] = $athlet['PerId'];
+							if (isset($prequalified[$cat_id][$athlet['PerId']])) $prequalified[$cat_id][$athlet['PerId']] .= "\n";
+							$prequalified[$cat_id][$athlet['PerId']] .= $athlet['platz'].'. ranking';
 						}
 					}
 				}
@@ -710,7 +712,7 @@ class boranking extends ranking_so
 		$all_cats = $nat_prequals = array();
 		foreach($prequalified as $cat => $prequals)
 		{
-			$all_cats = array_merge($all_cats,$prequals);
+			$all_cats = array_merge($all_cats, array_keys($prequals));
 			$nat_prequals[$cat] = array();
 		}
 		$all_cats = array_unique($all_cats);
@@ -733,10 +735,11 @@ class boranking extends ranking_so
 			{
 				foreach($prequalified as $cat => $prequals)
 				{
-					if (in_array($athlete['PerId'],$prequalified[$cat]))
+					if (isset($prequals[$athlete['PerId']]))
 					{
 						if ($this->in_agegroup($athlete['geb_date'],$cat,$comp))
 						{
+							$athlete['prequal'] = $prequals[$athlete['PerId']];
 							$nat_prequals[$cat][$athlete['PerId']] = $athlete;
 						}
 						else
