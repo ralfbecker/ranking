@@ -280,10 +280,11 @@ class result extends so_sql
 		if ($cat && $comp['WetId'] && $comp['prequal_comp'] > 0 && $comp['prequal_comps'])
 		{
 			$cats = array($cat['GrpId'] => true);
-			foreach((array)$this->search(array(),'DISTINCT PerId,GrpId','','','',false,'AND',false,array(
+			foreach((array)$this->search(array(),'PerId,GrpId,platz,Wettkaempfe.name AS comp,Gruppen.name AS cat','','','',false,'AND',false,array(
 				'WetId' => explode(',',$comp['prequal_comps']),
 				'platz <= '.(int)$comp['prequal_comp'],
-			)) as $athlet)
+				'platz > 0',	// no registered
+			),'JOIN Wettkaempfe USING(WetId) JOIN Gruppen USING(GrpId)') as $athlet)
 			{
 				if (!isset($cats[$athlet['GrpId']]) && $cat['discipline'])
 				{
@@ -292,12 +293,13 @@ class result extends so_sql
 				}
 				if ($cats[$athlet['GrpId']])
 				{
-					$prequals[] = $athlet['PerId'];
+					if (isset($prequals[$athlet['PerId']])) $prequals[$athlet['PerId']] .= "\n";
+					$prequals[$athlet['PerId']] .= $athlet['platz'].'. '.$athlet['comp'].' ('.$athlet['cat'].')';
 				}
 			}
 		}
 		//echo "<p>".__METHOD__."(comp=$comp[rkey], cat=$cat[rkey]/$cat[discipline]) prequal_comp=$comp[prequal_comp], prequal_comps=".array2string($comp['prequal_comps']); _debug_array($prequals);
-		return array_values($prequals);
+		return $prequals;
 	}
 
 	/**

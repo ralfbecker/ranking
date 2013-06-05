@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.register.form" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.register.form" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%">
 			<columns>
 				<column width="83"/>
@@ -68,7 +68,7 @@
 							<row class="row">
 								<description id="rows[$row][nation]" no_lang="1" font_style="b"/>
 								<hbox options="0,0">
-									<description id="rows[$row][$col][cn]" no_lang="1" class="@rows[$row][$col][class]"/>
+									<description statustext="@rows[$row][$col][prequal]" id="rows[$row][$col][cn]" no_lang="1" class="@rows[$row][$col][class]"/>
 									<button align="right" disabled="true" label="Delete" id="@rows[$row][$col][delete_button]" image="delete"/>
 									<button align="right" disabled="true" label="Register" id="@rows[$row][$col][register_button]" image="new"/>
 								</hbox>

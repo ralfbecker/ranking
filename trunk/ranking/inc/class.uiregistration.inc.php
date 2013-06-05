@@ -550,6 +550,7 @@ class uiregistration extends boranking
 				$delete_button = 'delete['.$starter['GrpId'].'/'.$starter['PerId'].']';
 				$nat_starters[$i][$col] = $starter+array(
 					'cn' => strtoupper($starter['nachname']).', '.$starter['vorname'],
+					'prequal' => $starter['prequal'],
 					'class' => $nation && $i >= $quota ? 'complimentary' : 'registered',
 					'delete_button' => $delete_button,
 				);
