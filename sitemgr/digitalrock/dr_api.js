@@ -1984,8 +1984,11 @@ var Competitions = (function() {
 		}
 		if (closest && year == (new Date()).getFullYear()) 
 		{
-			closest.scrollIntoView();		// scrolls competition div AND whole document to show closest
-			document.body.scrollTo(0,0);	// scrolls whole document back up
+			// need to delay scrolling a bit, layout seems to need some time
+			window.setTimeout(function() {
+				closest.scrollIntoView();		// scrolls competition div AND whole document to show closest
+				document.body.scrollTo(0,0);	// scrolls whole document back up
+			}, 100);
 		}
 	};
 	Competitions.prototype.changeYear = function(year)
