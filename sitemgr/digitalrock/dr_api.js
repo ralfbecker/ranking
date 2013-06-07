@@ -823,6 +823,7 @@ var Startlist = (function() {
 		{
 			var list = this;
 			this.update_handle = window.setTimeout(function(){list.update();}, _data.expires*1000);
+			//console.log('setting up refresh in '+_data.expires+' seconds');
 		}
 	};
 	/**
@@ -1163,7 +1164,7 @@ var Resultlist = (function() {
 						return that.getBoulderResult.call(that, _data, _tag, num_problems);
 					};
 					//Resultlist.prototype.getBoulderResult;
-					if (detail && detail[1] == 2) this.result_cols.result = 'Sum';
+					if (!detail || detail[1] != 0) this.result_cols.result = 'Sum';
 				}
 				break;
 		}
