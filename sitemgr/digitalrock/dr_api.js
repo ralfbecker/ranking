@@ -1931,7 +1931,9 @@ var Competitions = (function() {
 		this.container.append(filter);
 		var competitions = jQuery(document.createElement('div')).addClass('competitions');
 		this.container.append(competitions);
-		var now = (new Date()).getTime();
+		var now = new Date();
+		// until incl. Wednesday (=3) we display competitions from last week first, after that from this week
+		var week_to_display = now.getWeek() - (now.getDay() <= 3 ? 1 : 0);
 		var closest, closest_dist;
 		
 		for(var i=0; i < _data.competitions.length; ++i)
@@ -1998,7 +2000,7 @@ var Competitions = (function() {
 			if (have_cats) comp_div.append(cats_ul);
 			competitions.append(comp_div);
 			
-			var dist = Math.abs((new Date(competition.date)).getTime() - now);
+			var dist = Math.abs((new Date(competition.date)).getWeek() - week_to_display);
 			if (typeof closest_dist == 'undefined' || dist < closest_dist)
 			{
 				closest_dist = dist;
@@ -2474,4 +2476,12 @@ if(!Object.create)
         F.prototype=o;
         return new F();
     };
+}
+
+if (!Date.getWeek)
+{
+	Date.prototype.getWeek = function() {
+	    var onejan = new Date(this.getFullYear(),0,1);
+	    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
+	};	
 }
