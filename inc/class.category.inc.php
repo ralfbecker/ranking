@@ -410,7 +410,7 @@ class category extends so_sql
 	 * @param int &$to_year on return finishing year
 	 * @return boolean true if cat uses an age_group, false otherwise
 	 */
-	static function age_group(array $cat,$stand,&$from_year,&$to_year)
+	static function age_group(array $cat,$stand,&$from_year=null,&$to_year=null)
 	{
 		if (($from_year = $cat['from_year']) < 0) // neg. is age not year
 		{
