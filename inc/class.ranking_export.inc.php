@@ -226,7 +226,7 @@ class ranking_export extends boresult
 	 *
 	 * @var int
 	 */
-	const EXPORT_ROUTE_RECENT_OFFICAL_EXPIRES = 3600;
+	const EXPORT_ROUTE_RECENT_OFFICAL_EXPIRES = 300;
 	/**
 	 * Timeout for recently official
 	 *
@@ -256,15 +256,19 @@ class ranking_export extends boresult
 			$route_order = $comp['route_order'];
 			$comp = $comp['WetId'];
 		}
-		egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':'.$route_order);
-		egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':-1');
-		egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':');	// used if no route is specified!
+		egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':'.$route_order);
+		//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
+		egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':-1');
+		//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
+		egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':');	// used if no route is specified!
+		//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
 
 		if ($previous_heats)
 		{
 			while($route_order-- > 0)
 			{
-				egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':'.$route_order);
+				egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':'.$route_order);
+				//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
 			}
 		}
 	}
@@ -964,6 +968,25 @@ class ranking_export extends boresult
 	const EXPORT_RANKING_OLD_TTL = 86400;
 
 	/**
+	 * Get location for ranking cache
+	 *
+	 * @param int|string|array $cat
+	 * @param string $date
+	 * @param string $cup
+	 * @return string
+	 */
+	protected static function export_ranking_location($cat,$date=null,$cup=null)
+	{
+		if (empty($date)) $date = '.';
+
+		return 'ranking:'.json_encode(array(
+			'cat' => is_array($cat) ? $cat['GrpId'] : $cat,
+			'date' => $date,
+			'cup' => $cup,
+		));
+	}
+
+	/**
 	 * Export a (cup) ranking
 	 *
 	 * @param int|string|array $cat id or rkey or category as array
@@ -975,11 +998,7 @@ class ranking_export extends boresult
 	public function export_ranking($cat,$date=null,$cup=null,$force_cache=false)
 	{
 		if (empty($date)) $date = '.';
-		$location = 'ranking:'.json_encode(array(
-			'cat' => is_array($cat) ? $cat['GrpId'] : $cat,
-			'date' => $date,
-			'cup' => $cup,
-		));
+		$location = self::export_ranking_location($cat, $date, $cup);
 		if (($force_cache || !in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts)) &&
 			($data = egw_cache::getInstance('ranking', $location)))
 		{
@@ -1078,16 +1097,34 @@ class ranking_export extends boresult
 		$data['comp_name'] .= ': '.$cat['name'];
 
 		// calculate expiration date based on date of ranking and duration of last competition
-		list($y,$m,$d) = explode('-', $date);
-		$date = mktime(0,0,0,$m,$d,$y);
-		// ToDo: need to take next competition into account, not just last one in ranking
-		if (substr($data['end'], -6) == '-12-31')// || (time()-$date)/86400 > $comp['duration'])
+		$date_ts = egw_time::to($date, 'ts');
+		//error_log(__METHOD__."() comp=".array2string($comp)." (time()=".time()." - date_ts=$date_ts)/86400 = ".(time()-$date_ts)/86400);
+		if (substr($data['end'], -6) == '-12-31' || (time()-$date_ts)/86400 > $comp['duration'])
 		{
 			$data['expires'] = self::EXPORT_RANKING_OLD_TTL;
+			//error_log(__METHOD__."() using old expires time ".$data['expires']);
 		}
 		else
 		{
 			$data['expires'] = self::EXPORT_RANKING_TTL;
+			//error_log(__METHOD__."() running competition expires time ".$data['expires']);
+		}
+		// get next competition (not limited to this year (cup is limited by definition))
+		if ($data['expires'] == self::EXPORT_RANKING_OLD_TTL &&
+			($next_comp = $this->comp->next_comp($comp['datum'], $cat['rkey'], $comp['nation'], $cup?$cup['SerId']:0, true, false)))
+		{
+			$next_comp_ts = egw_time::to($next_comp['datum'], 'ts');
+
+			if (time() > $next_comp_ts)	// waiting for next result
+			{
+				$data['expires'] = self::EXPORT_RANKING_TTL;
+				//error_log(__METHOD__."() waiting for next result ".$data['expires']);
+			}
+			// next result due in less then expires seconds --> set shorter time
+			elseif (time()+$data['expires'] > $next_comp_ts)
+			{
+				$data['expires'] = max($next_comp_ts - time(), self::EXPORT_RANKING_TTL);
+			}
 		}
 		$data['etag'] = md5(serialize($data));
 
@@ -1104,6 +1141,50 @@ class ranking_export extends boresult
 	 * Cache and expires time for results from a finished/historic competition
 	 */
 	const EXPORT_RESULTS_HISTORIC_EXPIRES = 86400;
+
+	/**
+	 * Delete results cached from a competition
+	 *
+	 * Used to invalidate cache of results AND rankings feeds
+	 *
+	 * @param array $comp
+	 * @param int $cat GrpId of result to invalidate
+	 */
+	public static function delete_results_cache(array $comp, $cat=null)
+	{
+		// results feed is independent of category, because it contains all categories of the competition
+		$location = 'results:'.json_encode(array('.', null, null, null));
+		egw_cache::unsetInstance('ranking', $location);
+		//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
+
+		if ($comp['nation'])
+		{
+			$location = 'results:'.json_encode(array($comp['nation'], null, null, null));
+			egw_cache::unsetInstance('ranking', $location);
+			//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
+		}
+		if ($comp['fed_id'])
+		{
+			$location = 'results:'.json_encode(array($comp['nation'], null, null, array('fed_id' => $comp['fed_id'])));
+			egw_cache::unsetInstance('ranking', $location);
+			//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
+		}
+
+		// invalidate ranking feeds for current date '.' (also for cup-ranking, if comp belongs to one)
+		if ($cat)
+		{
+			// current ranking
+			egw_cache::unsetInstance('ranking', $location=self::export_ranking_location($cat, '.'));
+			//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
+
+			if ($comp['serie'])
+			{
+				// current cup ranking
+				egw_cache::unsetInstance('ranking', $location=self::export_ranking_location($cat, '.', $comp['serie']));
+				//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
+			}
+		}
+	}
 
 	/**
 	 * Export results from all categories of a competition
@@ -1265,12 +1346,26 @@ class ranking_export extends boresult
 			}
 		}
 
-		list($y,$m,$d) = explode('-', $comp['datum']);
-		$comp_ts = mktime(0, 0, 0, $m, $d, $y);
-		// ToDo: need to take next competition into account, not just currently displayed one
-		$data['expires'] = /*(time()-$comp_ts)/86400 > $comp['duration'] ?
-			self::EXPORT_RESULTS_HISTORIC_EXPIRES :*/ self::EXPORT_RESULTS_RUNNING_EXPIRES;
+		$comp_ts = egw_time::to($comp['datum'], 'ts');
+		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration'] ?
+			self::EXPORT_RESULTS_HISTORIC_EXPIRES : self::EXPORT_RESULTS_RUNNING_EXPIRES;
 
+		// get next competition (not limited to this year or counting comp / faktor > 0)
+		if ($data['expires'] == self::EXPORT_RESULTS_HISTORIC_EXPIRES &&
+			($next_comp = $this->comp->next_comp($comp['datum'], null, $comp['nation'], 0, false, false)))
+		{
+			$next_comp_ts = egw_time::to($next_comp['datum'], 'ts');
+
+			if (time() > $next_comp_ts)	// waiting for next result
+			{
+				$data['expires'] = self::EXPORT_RESULTS_RUNNING_EXPIRES;
+			}
+			// next result due in less then expires seconds --> set shorter time
+			elseif (time()+$data['expires'] > $next_comp_ts)
+			{
+				$data['expires'] = max($next_comp_ts - time(), self::EXPORT_RESULTS_RUNNING_EXPIRES);
+			}
+		}
 		$data['etag'] = md5(serialize($data));
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
