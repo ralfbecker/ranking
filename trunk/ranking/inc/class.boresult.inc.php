@@ -1957,7 +1957,7 @@ class boresult extends boranking
 	 */
 	public static function delete_export_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false)
 	{
-		ranking_export::delete_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false);
+		ranking_export::delete_route_cache($comp, $cat, $route_order, $previous_heats);
 	}
 
 	/**
