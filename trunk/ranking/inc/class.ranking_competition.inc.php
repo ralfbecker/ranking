@@ -426,28 +426,53 @@ class ranking_competition extends so_sql
 	 * ToDo: change function/query to work for non-MySQL DB's too
 	 *
 	 * @param string $date in 'Y-m-d' format
-	 * @param array/string $cats (array of) cat-rkey's
+	 * @param array|string $cats (array of) cat-rkey's
 	 * @param string $nation of the competition (calendar)
 	 * @param int $cup=0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
-	 * @return array/boolean array with competition or false on error (eg. none found)
+	 * @param boolean $ignore_factor_0=true true competition with a factor of 0 are ignored, false all comp. are returned
+	 * @return array|boolean array with competition or false on error (eg. none found)
 	 */
-	function next_comp_this_year($date,$cats,$nation,$cup=0)
+	function next_comp($date,$cats,$nation,$cup=0,$ignore_factor_0=true,$limit_this_year=false)
 	{
 		$where = array(
 			'nation' => $nation,
 			'datum > '.$this->db->quote($date),
-			'datum <= '.$this->db->quote((int)$date.'-12-31'),
-			$cup ? 'serie='.(int)$cup : 'faktor > 0.0',
 		);
+		if ($limit_this_year)
+		{
+			$where[] = 'datum <= '.$this->db->quote((int)$date.'-12-31');
+		}
+		if ($cup)
+		{
+			$where['serie'] = $cup;
+		}
+		elseif ($ignore_factor_0)
+		{
+			$where[] = 'faktor > 0.0';
+		}
 		if ($cats)
 		{
 			$where[] = $this->check_in_cats($cats);
 		}
 		$ret = $this->search(array(), false, 'datum ASC', '', '', false, 'AND', array(0,1), $where);
 
-		if ($this->debug) echo "<p>competition::next_comp_this_year('$date',".print_r($cats,true).",'$nation',$cup) = '$ret[rkey]'</p>\n";
+		if ($this->debug) error_log(__METHOD__."('$date',".print_r($cats,true).",'$nation',$cup) = ".array2string($ret ? $ret[0]['rkey'] : $ret));
 
 		return $ret ? $ret[0] : false;
+	}
+
+	/**
+	 * get the next competition after $date in the _same_ year in a given category, calendar and cup
+	 *
+	 * @param string $date in 'Y-m-d' format
+	 * @param array|string $cats (array of) cat-rkey's
+	 * @param string $nation of the competition (calendar)
+	 * @param int $cup=0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
+	 * @return array|boolean array with competition or false on error (eg. none found)
+	 */
+	function next_comp_this_year($date,$cats,$nation,$cup=0)
+	{
+		return $this->next_comp($date, $cats, $nation, $cup, true, true);
 	}
 
 	/**

@@ -1346,6 +1346,9 @@ class boranking extends ranking_so
 		// not sure if the new code still uses that, but it does not hurt ;-)
 		$this->result->save_feldfactor($keys['WetId'],$keys['GrpId'],$feldfactor * $comp['faktor']);
 
+		// invalidate results and ranking feeds
+		ranking_export::delete_results_cache($comp, $keys['GrpId']);
+
 		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2lf',$feldfactor));
 	}
 	/**
