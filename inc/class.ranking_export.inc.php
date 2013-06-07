@@ -241,6 +241,35 @@ class ranking_export extends boresult
 	const EXPORT_ROUTE_OFFICAL_EXPIRES = 86400;
 
 	/**
+	 * Delete export route cache for given route and additionaly the general result
+	 *
+	 * @param int|array $comp WetId or array with values for WetId, GrpId and route_order
+	 * @param int $cat=null GrpId
+	 * @param int $route_order=null
+	 * @param boolean $previous_heats=false also invalidate previous heats, eg. if new heats got created to include them in route_names
+	 */
+	public static function delete_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false)
+	{
+		if (is_array($comp))
+		{
+			$cat = $comp['GrpId'];
+			$route_order = $comp['route_order'];
+			$comp = $comp['WetId'];
+		}
+		egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':'.$route_order);
+		egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':-1');
+		egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':');	// used if no route is specified!
+
+		if ($previous_heats)
+		{
+			while($route_order-- > 0)
+			{
+				egw_cache::unsetInstance('ranking','route:'.$comp.':'.$cat.':'.$route_order);
+			}
+		}
+	}
+
+	/**
 	 * Export route for xml or json access, cached access
 	 *
 	 * Get's called from save_result with $update_cache===true, to keep the cache updated
@@ -319,7 +348,7 @@ class ranking_export extends boresult
 			// update general result too?
 			if ($update_cache && $heat > 0)
 			{
-				egw_cache::setInstance('ranking', 'export_route:'.$comp.':'.$cat.':-1',
+				egw_cache::setInstance('ranking', 'route:'.$comp.':'.$cat.':-1',
 					self::$instance->_export_route($comp, $cat, -1), self::EXPORT_ROUTE_TTL);
 			}
 		}

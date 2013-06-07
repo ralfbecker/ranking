@@ -1957,23 +1957,7 @@ class boresult extends boranking
 	 */
 	public static function delete_export_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false)
 	{
-		if (is_array($comp))
-		{
-			$cat = $comp['GrpId'];
-			$route_order = $comp['route_order'];
-			$comp = $comp['WetId'];
-		}
-		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':'.$route_order);
-		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':-1');
-		egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':');	// used if no route is specified!
-
-		if ($previous_heats)
-		{
-			while($route_order-- > 0)
-			{
-				egw_cache::unsetInstance('ranking','export_route:'.$comp.':'.$cat.':'.$route_order);
-			}
-		}
+		ranking_export::delete_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false);
 	}
 
 	/**

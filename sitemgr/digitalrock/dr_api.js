@@ -822,7 +822,7 @@ var Startlist = (function() {
 		if (!_data.category_offical && this.discipline != 'ranking') 
 		{
 			var list = this;
-			this.update_handle = window.setTimeout(function(){list.update();},!_data.route_result ? 10000 : 300000);
+			this.update_handle = window.setTimeout(function(){list.update();}, _data.expires*1000);
 		}
 	};
 	/**
