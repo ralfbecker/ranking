@@ -1149,6 +1149,8 @@ class ranking_export extends boresult
 	 *
 	 * @param array $comp
 	 * @param int $cat GrpId of result to invalidate
+	 * @ToDo invalidate profiles of participants
+	 * @ToDo invalidate aggregated rankings (multiple categories!)
 	 */
 	public static function delete_results_cache(array $comp, $cat=null)
 	{
@@ -1183,6 +1185,22 @@ class ranking_export extends boresult
 				egw_cache::unsetInstance('ranking', $location=self::export_ranking_location($cat, '.', $comp['serie']));
 				//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 			}
+			/* ToDo: aggregated ranking is from mulitple categories
+			switch($comp['nation'])
+			{
+				case 'GER':	// sektionen wertung
+					'nat_team_ranking';
+				case 'SUI':	// regionalzentren wertung
+					break;
+				default:	// international: national team ranking
+					egw_cache::unsetInstance('ranking', $location=self::export_aggregated_location('nat_team_ranking', '.', $comp['WetId'], null, $cat));
+					//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
+					if ($comp['serie'])
+					{
+						egw_cache::unsetInstance('ranking', $location=self::export_aggregated_location('nat_team_ranking', '.', $comp['WetId'], $comp['serie'], $cat));
+						//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
+					}
+			}*/
 		}
 	}
 
@@ -1750,17 +1768,18 @@ class ranking_export extends boresult
 	}
 
 	/**
-	 * Export an aggregated ranking: national team ranking, sektionen wertung, ...
+	 * Location for caching of an aggregated ranking: national team ranking, sektionen wertung, ...
 	 *
 	 * @param string $type 'nat_team_ranking', 'sektionenwertung', 'regionalzentren'
 	 * @param string $date='.'
 	 * @param int $comp=null
 	 * @param int $cup=null
-	 * @param int $cat=null
+	 * @param int|string $cat=null (multiple comma-separated) cat id(s)
+	 * @param array &$filter=null on return filter
 	 * @throws Exception
-	 * @return array
+	 * @return string
 	 */
-	public function export_aggregated($type, $date='.', $comp=null, $cup=null, $cat=null)
+	public static function export_aggregated_location($type, $date='.', $comp=null, $cup=null, $cat=null, &$filter=null)
 	{
 		if (empty($date)) $date = '.';
 
@@ -1769,7 +1788,27 @@ class ranking_export extends boresult
 		if ($cup) $filter['SerId'] = (int)$cup;
 		if ($cat) $filter['GrpId'] = array_map('intval', explode(',', $cat));
 
-		$location = 'aggregated:'.json_encode($filter+array('date' => $date));
+		$location = 'aggregated:'.json_encode($filter+array('type' => $type, 'date' => $date));
+		error_log(__METHOD__."(".array2string(func_get_args()).") returning '$location'");
+		return $location;
+	}
+
+	/**
+	 * Export an aggregated ranking: national team ranking, sektionen wertung, ...
+	 *
+	 * @param string $type 'nat_team_ranking', 'sektionenwertung', 'regionalzentren'
+	 * @param string $date='.'
+	 * @param int $comp=null
+	 * @param int $cup=null
+	 * @param int|string $cat=null (multiple comma-separated) cat id(s)
+	 * @throws Exception
+	 * @return array
+	 */
+	public function export_aggregated($type, $date='.', $comp=null, $cup=null, $cat=null)
+	{
+		if (empty($date)) $date = '.';
+
+		$location = self::export_aggregated_location($type, $date, $comp, $cup, $cat, $filter);
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
 			($data = egw_cache::getInstance('ranking', $location)))
 		{
@@ -1833,7 +1872,7 @@ class ranking_export extends boresult
 				));
 			}
 		}
-		$result = $params+array(
+		$data = $params+array(
 			'nation' => $filter['nation'],
 			'comp_filter' => $comp,
 			'comp_name' => $date_comp['name'],
@@ -1848,21 +1887,40 @@ class ranking_export extends boresult
 			'categorys' => $categorys,
 		);
 		// calculate expiration date based on date of ranking and duration of last competition
-		list($y,$m,$d) = explode('-', $result['end']);
-		$date = mktime(0,0,0,$m,$d,$y);
-		if (substr($result['end'], -6) == '-12-31' || (time()-$date)/86400 > $date_comp['duration'])
+		$date_ts = egw_time::to($data['end'], 'ts');
+		//error_log(__METHOD__."() comp=".array2string($date_comp)." (time()=".time()." - date_ts=$date_ts)/86400 = ".(time()-$date_ts)/86400);
+		if (substr($data['end'], -6) == '-12-31' || (time()-$date_ts)/86400 > $date_comp['duration'])
 		{
-			$result['expires'] = self::EXPORT_RANKING_OLD_TTL;
+			$data['expires'] = self::EXPORT_RANKING_OLD_TTL;
+			//error_log(__METHOD__."() using old expires time ".$data['expires']);
 		}
 		else
 		{
-			$result['expires'] = self::EXPORT_RANKING_TTL;
+			$data['expires'] = self::EXPORT_RANKING_TTL;
+			//error_log(__METHOD__."() running competition expires time ".$data['expires']);
 		}
-		$result['etag'] = md5(serialize($result));
-		//_debug_array($result); exit;
-		egw_cache::setInstance('ranking', $location, $result);
+		// get next competition (for cup only)
+		if ($data['expires'] == self::EXPORT_RANKING_OLD_TTL && $cup &&
+			($next_comp = $this->comp->next_comp($date_comp['datum'], $cat['rkey'], $date_comp['nation'], $cup['SerId'], true, false)))
+		{
+			$next_comp_ts = egw_time::to($next_comp['datum'], 'ts');
 
-		return $result;
+			if (time() > $next_comp_ts)	// waiting for next result
+			{
+				$data['expires'] = self::EXPORT_RANKING_TTL;
+				//error_log(__METHOD__."() waiting for next result ".$data['expires']);
+			}
+			// next result due in less then expires seconds --> set shorter time
+			elseif (time()+$data['expires'] > $next_comp_ts)
+			{
+				$data['expires'] = max($next_comp_ts - time(), self::EXPORT_RANKING_TTL);
+			}
+		}
+		$data['etag'] = md5(serialize($data));
+		//_debug_array($data); exit;
+		egw_cache::setInstance('ranking', $location, $data);
+
+		return $data;
 	}
 
 	/**
