@@ -761,9 +761,9 @@ var Startlist = (function() {
 					// for ranking, we add link to results
 					if (_data.discipline == 'ranking')
 					{
-						route = route.replace(/ $/, '');	// remove space append to force js to keep the order
-						var comp_cat = route.split('_');
-						this.columns['result'+route] = {
+						var id = route.replace(/ $/, '');	// remove space append to force js to keep the order
+						var comp_cat = id.split('_');
+						this.columns['result'+id] = {
 							'label': _data.route_names[route],
 							'url': '#!comp='+comp_cat[0]+'&cat='+(comp_cat[1] || _data.cat.GrpId)
 						};
