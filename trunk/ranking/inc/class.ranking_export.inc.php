@@ -21,7 +21,7 @@ class ranking_export extends boresult
 	 * @var array
 	 */
 	public static $ignore_caching_hosts = array(
-//		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost','test.dev'
+		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost','test.dev'
 	);
 
 	/**
@@ -1808,6 +1808,11 @@ class ranking_export extends boresult
 	{
 		if (empty($date)) $date = '.';
 
+		// normalize rkey for cup to numeric cup-id
+		if ($cup && !is_numeric($cup) && ($c = $this->cup->read($cup)))
+		{
+			$cup = $c['SerId'];
+		}
 		$location = self::export_aggregated_location($type, $date, $comp, $cup, $cat, $filter);
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
 			($data = egw_cache::getInstance('ranking', $location)))
