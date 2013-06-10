@@ -1257,7 +1257,7 @@ class boranking extends ranking_so
 			// 2006+ EYS counts only european nations
 			if ((int)$comp['datum'] >= 2006 && preg_match('/_(EYC|EYS)$/',$cup['rkey']))
 			{
-				$allowed_nations = $this->european_nations;
+				$allowed_nations = $this->calc->european_nations;
 			}
 			$this->pkte->get_pkte($cup['pkte'],$cup_pkte);
 		}
