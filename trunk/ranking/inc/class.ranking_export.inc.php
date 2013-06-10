@@ -1693,7 +1693,7 @@ class ranking_export extends boresult
 			$data['photo'] = $this->athlete->picture_url();
 			if ($data['photo'][0] == '/' || parse_url($data['photo'], PHP_URL_HOST) == $_SERVER['HTTP_HOST'])
 			{
-				$data['photo'] = self::base_url().($data['photo'][0] == '/' ? $data['photo'] : parse_url($data['photo'], PHP_URL_PATH));
+				$data['photo'] = self::base_url(true).($data['photo'][0] == '/' ? $data['photo'] : parse_url($data['photo'], PHP_URL_PATH));
 			}
 
 			// if category given fetch ranking
