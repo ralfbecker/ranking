@@ -748,6 +748,7 @@ class ranking_export extends boresult
 		'quota_extra' => false, //'extra_quotas',
 		'prequal_extra' => false, //'extra_prequals',
 		'user_timezone_read' => false,
+		'quali_preselected' => false,
 	);
 	public static $rename_cat = array(
 		'serien_pat' => false,	// not interesting
@@ -772,6 +773,11 @@ class ranking_export extends boresult
 	 * @var array
 	 */
 	public static $calendar_exclude = array(
+		3,		// ICC_LIZ
+		8, 9,	// X_*_ADR
+		10,		// X_PASS_A
+		21,		// X_COACH
+		22,		// X_DROCK
 		120,	// ICC-TOF: Team Officals
 	);
 
@@ -822,7 +828,7 @@ class ranking_export extends boresult
 
 		//error_log(__METHOD__."('$nation', $year, ".array2string($filter).') --> where='.array2string($where));
 		$competitions = $this->comp->search(null,false,'datum ASC','','','','AND',false,$where);
-		$cats = $cups = $ids = $rkey2cat = $id2cup = array();
+		$cats = $cups = $ids = $rkey2cat = $GrpId2cat = $id2cup = array();
 		foreach($competitions as &$comp)
 		{
 			$comp = self::rename_key($comp, self::$rename_comp);
@@ -838,6 +844,7 @@ class ranking_export extends boresult
 			{
 				$cat = self::rename_key($cat, self::$rename_cat);
 				$rkey2cat[$cat['rkey']] =& $cat;
+				$GrpId2cat[$cat['GrpId']] =& $cat;
 			}
 			//_debug_array($cats); die('STOP');
 		}
@@ -853,11 +860,13 @@ class ranking_export extends boresult
 		// query status (existence for start list or result)
 		$status = $this->result->result_status($ids);
 		$status = $this->route_result->result_status($ids,$status);
+		unset($cat);
 		//_debug_array($status); die('Stop');
 		foreach($competitions as &$comp)
 		{
 			// add cat id, name, status and url
-			if (isset($comp['cats']) && is_array($comp['cats']))
+			if (isset($comp['cats']) && is_array($comp['cats']) ||
+				isset($status[$comp['WetId']]) && is_array($status[$comp['WetId']]))
 			{
 				foreach($comp['cats'] as $key => &$cat)
 				{
@@ -875,9 +884,27 @@ class ranking_export extends boresult
 					if (isset($cat['status']))
 					{
 						$cat['url'] = $this->result_url($comp['WetId'], $c['GrpId']);
+						unset($status[$comp['WetId']][$c['GrpId']]);
 					}
 				}
 				$comp['cats'] = array_values($comp['cats']);	// reindex, in case excluded cat was deleted
+
+				// include cats with result, but not mentioned in gruppen column
+				foreach((array)$status[$comp['WetId']] as $id => $stat)
+				{
+					if (in_array($id, self::$calendar_exclude)) continue;
+					$c =& $GrpId2cat[$id];
+					if (isset($c) || ($c = $this->cats->read($id)) && ($c = self::rename_key($c, self::$rename_cat)))
+					{
+						$comp['cats'][] = array(
+							'GrpId' => $id,
+							'name' => $c['name'],
+							'status' => $stat,
+							'url' => $this->result_url($comp['WetId'], $id),
+						);
+					}
+					unset($c);
+				}
 			}
 			// add cup name
 			if ($comp['cup'])
@@ -892,7 +919,6 @@ class ranking_export extends boresult
 				$comp += $attachments;
 			}
 		}
-
 		$data = array(
 			'competitions' => $competitions,
 			'cats' => $cats,
