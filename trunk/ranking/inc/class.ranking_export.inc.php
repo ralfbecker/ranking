@@ -182,11 +182,12 @@ class ranking_export extends boresult
 	 * Currently /result.php is used for every HTTP_HOST not www.ifsc-climbing.org,
 	 * for which /index.php?page_name=result is used.
 	 *
-	 * @param int $cat
+	 * @param int|array $cat
 	 * @param int $cup=null
+	 * @param int $comp=null
 	 * @return string
 	 */
-	static function ranking_url($cat, $cup=null)
+	static function ranking_url($cat, $cup=null, $comp=null)
 	{
 		static $base;
 		if (is_null($base))
@@ -201,7 +202,11 @@ class ranking_export extends boresult
 				$base .= '/ranking.php?cat=';
 			}
 		}
-		return $base.$cat.($cup ? '&cup='.$cup : '');
+		if (is_array($cat)) $cat = $cat['GrpId'];
+		if (is_array($cup)) $cup = $cup['SerId'];
+		if (is_array($comp)) $comp = $comp['WetId'];
+
+		return $base.$cat.($cup ? '&cup='.$cup : '').($comp ? '&comp='.$comp : '');
 	}
 
 	/**
@@ -1175,6 +1180,9 @@ class ranking_export extends boresult
 		// invalidate ranking feeds for current date '.' (also for cup-ranking, if comp belongs to one)
 		if ($cat)
 		{
+			// invalidate general result feeds, as they contain see-also link to ranking
+			self::delete_route_cache($comp['WetId'], $cat);
+
 			// current ranking
 			egw_cache::unsetInstance('ranking', $location=self::export_ranking_location($cat, '.'));
 			//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
@@ -1465,16 +1473,14 @@ class ranking_export extends boresult
 		{
 			$see_also[] = array(
 				'name' => 'Ranking'.' '.'after'.' '.$comp['name'],
-				'url' => '/ranglist.php?comp='.$comp['WetId'].'&cat='.(is_array($cat) ? $cat['GrpId'] : $cat).
-					'&type=ranking',
+				'url' => self::ranking_url($cat, null, $comp),
 			);
 		}
 		if ($comp['serie'] && ($cup = $this->cup->read($comp['serie'])))
 		{
 			$see_also[] = array(
 				'name' => $cup['name'].' '.'after'.' '.$comp['name'],
-				'url' => '/ranglist.php?comp='.$comp['WetId'].'&cat='.(is_array($cat) ? $cat['GrpId'] : $cat).
-					'&cup='.$cup['SerId'].'&type=ranking',
+				'url' => self::ranking_url($cat, $cup, $comp),
 			);
 		}
 		return $see_also ? array('see_also' => $see_also) : array();
