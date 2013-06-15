@@ -913,10 +913,16 @@ class ranking_competition extends so_sql
 	{
 		if (is_null($quali_preselected)) $quali_preselected = $this->data['quali_preselected'];
 
+		$preselected = 0;
 		foreach((array)$quali_preselected as $pre)
 		{
-			if ($pre['cat'] == $cat || !$pre['cat']) return $pre['num'];
+			if ($pre['cat'] == $cat || !$pre['cat'])
+			{
+				$preselected = $pre['num'];
+				break;
+			}
 		}
-		return 0;
+		//error_log(__METHOD__."($cat, ".array2string($quali_preselected).") returning $preselected");
+		return $preselected;
 	}
 }
