@@ -799,10 +799,10 @@ class boresult extends boranking
 	 * 		to not accidently overwrite results entered by someone else!
 	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
 	 * @param boolean $update_checked=false false: do NOT update checked value, true: also update checked value
-	 * @param array $current_vaules=null just read current results, or null
+	 * @param string $order_by='start_order ASC' ordering of list for setting start-numbers
 	 * @return boolean|int number of changed results or false on error
 	 */
-	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false)
+	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false,$order_by='start_order ASC')
 	{
 		//error_log(__METHOD__."(".array2string($keys).", results=".array2string($results).", route_type=$route_type, discipline='$discipline', old_values=".array2string($old_values).", quali_preselected=$quali_preselected, update_checked=$update_checked)");
 		$this->error = '';
@@ -898,7 +898,7 @@ class boresult extends boranking
 				{
 					if (($key == 'start_number' || $key == 'start_number_1') && strchr($val,'+') !== false)
 					{
-						$this->set_start_number($keys,$val);
+						$this->set_start_number($keys, $val, $order_by);
 						++$modified;
 						continue;
 					}
@@ -952,13 +952,14 @@ class boresult extends boranking
 	 *
 	 * @param array $keys 'WetId','GrpId', 'route_order', $this->route_result->id_col (PerId/team_id)
 	 * @param string $number [start]+increment
+	 * @param string $order_by='start_order ASC' ordering of list for setting start-numbers
 	 */
-	function set_start_number($keys,$number)
+	function set_start_number($keys, $number, $order_by='start_order ASC')
 	{
 		$id = $keys[$this->route_result->id_col];
 		unset($keys[$this->route_result->id_col]);
 		list($start,$increment) = explode('+',$number);
-		foreach($this->route_result->search($keys,false,'start_order') as $data)
+		foreach($this->route_result->search($keys, false, $order_by) as $data)
 		{
 			if (!$id || $data[$this->route_result->id_col] == $id)
 			{
