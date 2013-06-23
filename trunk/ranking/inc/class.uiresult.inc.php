@@ -978,7 +978,8 @@ class uiresult extends boresult
 					$old = $GLOBALS['egw']->session->appsession('set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route'],'ranking');
 					if (is_array($content['nm']['rows']['set']) &&
 						$this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old,
-							$this->comp->quali_preselected($content['nm']['cat'], $comp['quali_preselected'])))
+							$this->comp->quali_preselected($content['nm']['cat'], $comp['quali_preselected']),
+							false, $content['nm']['order'].' '.$content['nm']['sort']))
 					{
 						$msg = lang('Heat updated');
 					}
