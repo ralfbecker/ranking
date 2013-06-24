@@ -2001,7 +2001,7 @@ var Competitions = (function() {
 			if (have_cats) comp_div.append(cats_ul);
 			competitions.append(comp_div);
 			
-			var dist = Math.abs((new Date(competition.date)).getWeek() - week_to_display);
+			var dist = Math.abs(Date.parse(competition.date).getWeek() - week_to_display);
 			if (typeof closest_dist == 'undefined' || dist < closest_dist)
 			{
 				closest_dist = dist;
