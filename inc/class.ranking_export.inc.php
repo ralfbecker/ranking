@@ -1123,7 +1123,7 @@ class ranking_export extends boresult
 		}
 		else
 		{
-			$data['comp_name'] = 'Ranglist';
+			$data['comp_name'] = $cat['nation'] ? 'Ranking' : 'World Ranking';
 		}
 		$data['comp_name'] .= ': '.$cat['name'];
 
