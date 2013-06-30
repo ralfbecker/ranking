@@ -1316,7 +1316,7 @@ var Results = (function() {
 		}
 		// fill competition chooser
 		var option = jQuery(document.createElement('option'));
-		option.text('Select an other competition ...');
+		option.text('Select another competition ...');
 		this.comp_chooser.append(option);
 		for(var i=0; i < _data.competitions.length; ++i)
 		{
@@ -1750,7 +1750,7 @@ var Profile = (function() {
 		'		<td class="profileRank">$$rankings/3/rank$$</td>\n'+
 		'	</tr>\n'+
 		'	<tr class="profileResultHeader profileMarginTop">\n'+
-		'		<td colspan="6"><a href="javascript:widget.widget.toggleResults()" title="show all results">best results:</a></td>\n'+
+		'		<td colspan="6"><a href="javascript:widget.widget.toggleResults()" title="click to toggle between best results and all results">best results / all results:</a></td>\n'+
 		'	</tr>\n'+
 		'   </thead>\n'+
 		'   <tbody>\n'+
