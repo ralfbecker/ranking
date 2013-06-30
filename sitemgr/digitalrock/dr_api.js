@@ -1136,6 +1136,12 @@ var Resultlist = (function() {
 						label: this.result_cols.points,
 						url: location.href+'&detail=1'
 					};
+					// add calculation to see-also links
+					if (typeof _data.see_also == 'undefined') _data.see_also = [];
+					_data.see_also.push({
+						name: 'calculation of this ranking',
+						url: location.href+'&detail=1'
+					});
 				}
 				break;
 	
@@ -2111,13 +2117,24 @@ var Aggregated = (function() {
 			'rank': 'Rank',
 			'nation': { 'label': _data.aggregated_name, 'colspan': 2},
 			'name': _data.aggregated_name,
-			'points': {'label': 'Points','click': function(e) {
+			'points': {'label': 'Points'}
+		};
+		if (location.hash.indexOf('detail=1') == -1)
+		{
+			this.columns.points.click = function(e) {
 				var hidden_cols = that.container.find('.result,.calculationHidden');
 				var display = hidden_cols.length ? jQuery(hidden_cols[0]).css('display') : 'none';
 				hidden_cols.css('display', display == 'none' ? 'table-cell' : 'none');
+				location.hash += '&detail=1';
 				e.preventDefault();
-			}}
-		};
+			};
+			// add calculation to see-also links
+			if (typeof _data.see_also == 'undefined') _data.see_also = [];
+			_data.see_also.push({
+				name: 'calculation of this ranking',
+				url: location.href+'&detail=1'
+			});
+		}
 		if (_data.aggregate_by != 'nation') delete this.columns.nation;
 	
 		if (typeof this.table == 'undefined')
@@ -2158,7 +2175,7 @@ var Aggregated = (function() {
 				this.header2.text(names);
 			}
 		}
-		
+
 		// make _data available to other methods
 		this.data = _data;
 	
