@@ -889,6 +889,7 @@ var Startlist = (function() {
 			toc.remove();
 		}
 		// add category toc
+		if (typeof _data.categorys == 'undefined') return;
 		var toc = this.container.find('ul.listCatToc');
 		var new_toc = !toc.length;
 		if (new_toc)
