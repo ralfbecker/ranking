@@ -700,6 +700,25 @@ class ranking_export extends boresult
 		{
 			$ret += $this->see_also_result($comp, $cat);
 		}
+		// add other categories
+		foreach($this->route->search(array(
+			'WetId' => $comp['WetId'],
+		)) as $route)
+		{
+			if (!isset($ret['categorys'][$route['GrpId']]) || $ret['categorys'][$route['GrpId']]['route_order'] < $route['route_order'])
+			{
+				$ret['categorys'][$route['GrpId']] = array(
+					'GrpId' => $route['GrpId'],
+					'route_order' => $route['route_order'],
+				);
+			}
+		}
+		foreach($this->cats->names(array('GrpId' => array_keys($ret['categorys'])), 0) as $id => $name)
+		{
+			$ret['categorys'][$id]['name'] = $name;
+		}
+		$ret['categorys'] = array_values($ret['categorys']);
+
 		$ret['etag'] = md5(serialize($ret));
 
 		return $ret;
@@ -1477,6 +1496,25 @@ class ranking_export extends boresult
 			'last_modified' => $last_modified,
 		);
 		$ret += $this->see_also_result($comp, $cat);
+
+		// add other categories
+		foreach($this->result->search(array(
+			'WetId' => $comp['WetId'],
+			'platz > 0',
+		), 'DISTINCT GrpId') as $route)
+		{
+			if (!isset($ret['categorys'][$route['GrpId']]))
+			{
+				$ret['categorys'][$route['GrpId']] = array(
+					'GrpId' => $route['GrpId'],
+				);
+			}
+		}
+		foreach($this->cats->names(array('GrpId' => array_keys($ret['categorys'])), 0) as $id => $name)
+		{
+			$ret['categorys'][$id]['name'] = $name;
+		}
+		$ret['categorys'] = array_values($ret['categorys']);
 
 		$ret['etag'] = md5(serialize($ret));
 

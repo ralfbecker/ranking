@@ -848,11 +848,11 @@ var Startlist = (function() {
 
 		for (var r in _data.route_names)
 		{
-			var li = jQuery(document.createElement('li'));
 			if (r != this.route_order)
 			{
+				var li = jQuery(document.createElement('li'));
 				var a = jQuery(document.createElement('a'));
-				a.text(_data.route_names[r]);
+				a.text(_data.route_names[r].replace(' - ', '-'));
 				var reg_exp = /route=[^&]+/;
 				var url = location.href.replace(reg_exp, 'route='+r);
 				if (url.indexOf('route=') == -1) url += '&route='+r;
@@ -872,19 +872,15 @@ var Startlist = (function() {
 					});
 				}
 				li.append(a);
+				toc.prepend(li);
 			}
-			else
-			{
-				li.text(_data.route_names[r]);
-			}
-			toc.prepend(li);
 		}
 		// only add toc, if we have more then one route
 		if (!new_toc)
 		{
 			// already added
 		}
-		else if (toc.children().length > 1)
+		else if (toc.children().length)
 		{
 			jQuery(this.container).append(toc);
 		}
@@ -892,6 +888,112 @@ var Startlist = (function() {
 		{
 			toc.remove();
 		}
+		// add category toc
+		var toc = this.container.find('ul.listCatToc');
+		var new_toc = !toc.length;
+		if (new_toc)
+			toc = jQuery(document.createElement('ul')).addClass('listCatToc');
+		else
+			toc.empty();
+		var cats = this.shortenNames(_data.categorys, 'name');
+		for(var i=0; i < cats.length; ++i)
+		{
+			var cat = cats[i];
+			if (cat.GrpId != _data.GrpId)
+			{
+				var li = jQuery(document.createElement('li'));
+				var a = jQuery(document.createElement('a'));
+				a.text(cat.name);
+				var reg_exp = /cat=[^&]+/;
+				var url = location.href.replace(reg_exp, 'cat='+cat.GrpId);
+				if (url.indexOf('cat=') == -1) url += '&cat='+cat.GrpId;
+				a.attr('href', url);
+				if (this.navigateTo)
+				{
+					a.click(this.navigateTo);
+				}
+				else
+				{
+					var that = this;
+					a.click(function(e){
+						that.json_url = that.json_url.replace(reg_exp, this.href.match(reg_exp)[0]);
+						if (that.json_url.indexOf('cat=') == -1) that.json_url += 'cat='+cat.GrpId;
+						that.update();
+						e.preventDefault();
+					});
+				}
+				li.append(a);
+				toc.append(li);
+			}
+		}
+		// only add toc, if we have more then one route
+		if (!new_toc)
+		{
+			// already added
+		}
+		else if (toc.children().length)
+		{
+			jQuery(this.container).append(toc);
+		}
+		else
+		{
+			toc.remove();
+		}
+	};
+	/**
+	 * Shorten several names by removing parts common to all and remove spacing (eg. "W O M E N" --> "WOMEN")
+	 * 
+	 * shortenNames["M E N speed", "W O M E N speed"]) returns ["MEN", "WOMEN"]
+	 * 
+	 * @param array names array of strings or objects with attribute attr
+	 * @param string attr attribute name to use or undefined
+	 * @return array
+	 */
+	Startlist.prototype.shortenNames = function(names, attr)
+	{
+		if (!jQuery.isArray(names) || !names.length) return names;
+		var split_by_regexp = / +/;
+		var spacing_regexp = /([A-Z]) ([A-Z])/;
+		var strs = [];
+		for(var i=0; i < names.length; ++i)
+		{
+			var name = names[i];
+			if (attr) name = name[attr];
+			var n;
+			while(name != (n = name.replace(spacing_regexp, '$1$2'))) name = n;
+			strs.push(name.split(split_by_regexp));
+		}
+		var first = strs[0];
+		for(var i=0; i < first.length; ++i)
+		{
+			for(var j=1; j < strs.length; ++j)
+			{
+				if (jQuery.inArray(first[i], strs[j]) == -1)
+				{
+					break;
+				}
+			}
+			if (j == strs.length)	// in all strings --> remove first[i] from all strings
+			{
+				for(var j=0; j < strs.length; ++j)
+				{
+					strs[j].splice(jQuery.inArray(first[i], strs[j]), 1);
+				}				
+			}
+		}
+		for(var j=0; j < strs.length; ++j)
+		{
+			strs[j] = strs[j].join(' ');
+			if (attr)
+			{
+				names[j][attr] = strs[j];
+			}
+			else
+			{
+				names[j] = strs[j];
+			}
+		}
+		return names;
 	};
 	/**
 	 * Set header with a (provisional) Result or Startlist prefix
