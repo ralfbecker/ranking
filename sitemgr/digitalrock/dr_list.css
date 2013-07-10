@@ -99,15 +99,23 @@ ul.seeAlso li {
 /**
  * Toc row
  */
-ul.listToc {
+ul.listToc, ul.listCatToc {
 	padding: 0;
 	margin: 0;
-	margin-top: 5px;
+	x-margin-top: 5px;
+	float: left;
 }
-ul.listToc li {
+ul.listCatToc {
+	float: right;
+}
+ul.listToc li, ul.listCatToc li {
 	display: inline-block;
 	margin-right: 15px !important;
 	text-transform: uppercase;
+	line-height: 1.2;
+}
+ul.listCatToc li {
+	text-transform: none;
 }
 
 /**
@@ -193,6 +201,9 @@ tr.profileMarginTop > td {
 	font-weight: bold;
 	font-style: normal;
 	font-size: 120%;
+}
+.profileData td:first-child {
+	width: 2em;
 }
 /**
  * Aggregated rankings
