@@ -926,7 +926,7 @@ class route_result extends so_sql
 			}
 			unset($data['result_detail']);	// do NOT store existing problem specific results
 		}
-		if (isset($data['ability_percent']))
+		if ((float)$data['ability_percent'])
 		{
 			if ($data['result_height']) $data['result_height'] *= 100.0/$data['ability_percent'];
 			$data['result_detail']['ability_percent'] = $data['ability_percent'];
