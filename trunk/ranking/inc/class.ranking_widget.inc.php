@@ -99,6 +99,21 @@ class ranking_widget
 	public function __construct($json_url, $throw_error=false)
 	{
 		$this->json_url = $json_url;
+
+		// need to use https url for https
+		if ($_SERVER['HTTPS'] && substr($json_url, 0, 7) === 'http://')
+		{
+			if (substr($json_url, 0, 29) === 'http://egw.ifsc-climbing.org/')
+			{
+				$this->json_url = str_replace('http://egw.ifsc-climbing.org/', 'https://ifsc.egroupware.net/', $json_url);
+			}
+			else
+			{
+				$this->json_url = str_replace('http://', '//', $json_url);
+			}
+		}
+
+		$this->throw_error = $throw_error;
 	}
 
 	/**
