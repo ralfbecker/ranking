@@ -69,7 +69,7 @@
 								<description id="rows[$row][nation]" no_lang="1" font_style="b"/>
 								<hbox options="0,0">
 									<description statustext="@rows[$row][$col][prequal]" id="rows[$row][$col][cn]" no_lang="1" class="@rows[$row][$col][class]"/>
-									<button align="right" disabled="true" label="Delete" id="@rows[$row][$col][delete_button]" image="delete"/>
+									<button align="right" disabled="true" label="Delete" id="@rows[$row][$col][delete_button]" onclick="return confirm('Delete this athlete');" image="delete"/>
 									<button align="right" disabled="true" label="Register" id="@rows[$row][$col][register_button]" image="new"/>
 								</hbox>
 							</row>
