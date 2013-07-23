@@ -785,10 +785,11 @@ class uiregistration extends boranking
 						$values[$csv] = $val;
 					}
 					// convert by default to iso-8859-1, as this seems to be the default of excel
-					echo translation::convert(implode(';',$values),$charset,
-						$_GET['charset'] ? $_GET['charset'] : 'iso-8859-1')."\n";
+					$csv_charset = $GLOBALS['egw_info']['user']['preferences']['common']['csv_charset'];
+					if (empty($csv_charset)) $csv_charset = 'iso-8859-1';
+					echo translation::convert(implode(';',$values), $charset, $csv_charset)."\n";
 				}
-				$GLOBALS['egw']->common->egw_exit();
+				common::egw_exit();
 			}
 			if ($content['upload'] && is_uploaded_file($content['file']['tmp_name']))
 			{
