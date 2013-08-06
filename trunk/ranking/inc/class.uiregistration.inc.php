@@ -173,7 +173,7 @@ class uiregistration extends boranking
 		$content['nm']['show_all'] = $show_all;
 
 		$select_options = array(
-			'cat' => $this->cats->names(array('rkey' => $comp['gruppen']),0),
+			'cat' => $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
 			'license' => $this->license_labels,
 		);
 		//_debug_array($content);
