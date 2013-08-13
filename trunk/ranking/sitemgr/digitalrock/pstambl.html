@@ -77,7 +77,7 @@
 		<td class="profileRank">$$rankings/3/rank$$</td>
 	</tr>
 	<tr class="profileResultHeader profileMarginTop">
-		<td colspan="6"><a href="javascript:profile.toggleResults()" title="show all results">best results:</a></td>
+		<td colspan="6"><a href="javascript:profile.toggleResults()" title="click to toggle between best results and all results">best results / all results:</a></td>
 	</tr>
    </thead>
    <tbody>
@@ -92,7 +92,8 @@
 <script type="text/javascript">
 	var profile;
 	$(document).ready(function() {
-		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')));
+		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')),
+			jQuery('#profile').html());
 		
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);
 	});
