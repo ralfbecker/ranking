@@ -1176,11 +1176,9 @@ class route_result extends so_sql
 	 */
 	function delete_participant($keys)
 	{
-		$to_delete = $this->search($keys,true,'','start_order');
+		$to_delete = $this->search($keys,true,'','start_order,start_order2n');
 
 		if (!$this->delete($keys)) return false;
-
-		boresult::delete_export_route_cache($keys);
 
 		foreach($to_delete as $data)
 		{
@@ -1192,6 +1190,24 @@ class route_result extends so_sql
 					'start_order > '.(int)$data['start_order'],
 				)),__LINE__,__FILE__);
 		}
+		// update 2. lane start-order, if existing
+		if ($to_delete[0]['start_order2n'])
+		{
+			$num_participants = (int)$this->db->select($this->table_name, 'COUNT(*)', array(
+				'WetId' => $data['WetId'],
+				'GrpId' => $data['GrpId'],
+				'route_order' => $data['route_order'],
+			))->fetchColumn();
+
+			$this->db->query("UPDATE $this->table_name SET start_order2n=1+((FLOOR($num_participants/2)+start_order-1) % $num_participants) WHERE ".
+				$this->db->expression($this->table_name,array(
+					'WetId' => $data['WetId'],
+					'GrpId' => $data['GrpId'],
+					'route_order' => $data['route_order'],
+				)),__LINE__,__FILE__);
+		}
+		boresult::delete_export_route_cache($keys);
+
 		return true;
 	}
 
