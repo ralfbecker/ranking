@@ -52,11 +52,17 @@
 				/* Format and display */	
 				if (secondsRemaining<10) secondsRemaining = "0" + secondsRemaining;
 				$('#inner').text(minutesRemaining+':'+secondsRemaining);
+				
+				if (stopOn0 && minutesRemaining == '0' && secondsRemaining == '00') clearInterval(timer);
 			};
+			
+			var timer;
+			var stopOn0 = false;
 
 			$(document).ready(function(){
-				$('#basic-modal-content').modal();
+				$('#basic-modal-content').modal({minHeight:'220px'});
 				$('#restart').hide();
+				$('#stopOn0Span').hide();
 				
 				$('#start').click(function() {
 					theRotationInterval = $('#time').val();	// minutes
@@ -74,13 +80,32 @@
 
 					countdownTimer();
 					
-					setInterval(function(){countdownTimer();}, 300);
+					timer = setInterval(function(){countdownTimer();}, 300);
 					$.modal.close();
+				});
+				
+				$('#final').change(function(){
+					if (this.checked) {
+						$('#stopOn0Span').show();
+					} else {
+						$('#stopOn0Span').hide();
+						stopOn0 = false;
+					}
+				});
+				
+				$('#stopOn0').change(function(){
+					stopOn0 = this.checked && $('#final').is(':checked');
+				});
+				
+				$('#apply').click(function(){
+					$('body').css('color', $('#color').val());
+					$('body').css('background-color', $('#background').val());
 				});
 				
 				$('#restart').click(function() {
 					theStartTime = new Date().getTime();
 					beep1.play();
+					timer = setInterval(function(){countdownTimer();}, 300);
 					countdownTimer();
 				});
 			});
@@ -99,8 +124,11 @@
 			<input id="time" name="time" type="number" min="2" max="10" step="1" value="4" />
 			<label for="time"> min </label>
 			<input id="start" type="button" value="Start" />
-			<p><input id="final" type="checkbox" />
-			<label for="final">use final timer (starts again at press of restart)</label></p>
+			<p><input id="final" type="checkbox" /><label for="final">use final timer (starts again at press of restart)</label><br/>
+			&nbsp; &nbsp; <span id="stopOn0Span" style="display: none"><input id="stopOn0" type="checkbox" /><label for="stopOn0" >stop timer on 0, otherwise count up again</label></span></p>
+			<p>Color <input id="color" type="color" value="#bbbbbb" size="7"/> 
+			Background <input id="background" type="color" value="#333333" size="7"/>
+			<input type="button" value="Apply" id="apply"/></p>
 		</div>
 		
 		<!-- restart button for final timer -->
