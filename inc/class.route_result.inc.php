@@ -183,7 +183,12 @@ class route_result extends so_sql
 			if (!$this->isRelay)
 			{
 				$join = self::ATHLETE_JOIN;
-				$extra_cols = array_merge($extra_cols,array('vorname','nachname','Federations.nation AS nation','geb_date','Federations.verband AS verband','Federations.fed_url AS fed_url','ort','plz',));
+				$extra_cols = array_merge($extra_cols, array(
+					'vorname','nachname','Federations.nation AS nation','geb_date',
+					'Federations.verband AS verband','Federations.fed_url AS fed_url',
+					'Federations.fed_id AS fed_id','Federations.fed_parent AS fed_parent',
+					'ort','plz',
+				));
 
 				//if ($comp_nation == 'SUI')	// ToDo pass nation, so we dont need to do this join for other federations than SAC
 				{
