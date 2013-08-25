@@ -152,7 +152,16 @@ class ranking_boulder_measurement
 		$keys = self::query2keys($query);
 		$keys['PerId'] = $PerId;
 
-		if (list($data) = boresult::$instance->route_result->search($keys,false))
+		if (empty($keys['route_type']))	// route_type is needed to get correct rank of previous heat / avoid SQL error!
+		{
+			if (!($route = boresult::$instance->route->read($keys)))
+			{
+				throw new egw_exception_wrong_parameter('Route not found!');
+			}
+			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
+		}
+
+		if (list($data) = boresult::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$keys))
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			foreach($update as $id => $key)
