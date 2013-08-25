@@ -88,7 +88,9 @@ class ranking_boulder_measurement
 		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
 		if (boresult::$instance->save_result($keys,array($PerId => $update),$query['route_type'],$query['discipline']))
 		{
-			list($new_result) = boresult::$instance->route_result->search($keys+array('PerId' => $PerId),false);
+			// search filter needs route_type to not give SQL error
+			$filter = $keys+array('PerId' => $PerId,'route_type' => $query['route_type'], 'discipline' => $query['discipline']);
+			list($new_result) = boresult::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter);
 			$msg = boresult::athlete2string($new_result,true);
 			if ($query['discipline'] == 'boulder')
 			{
