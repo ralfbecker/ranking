@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox cols="1" rows="1" class="extra_startlist">
+					<groupbox class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox cols="1" rows="1" class="extra_result">
+					<groupbox class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -75,6 +75,7 @@
 				<column/>
 				<column/>
 				<column width="50"/>
+				<column width="50"/>
 				<column disabled="!@num_problems"/>
 				<column disabled="@num_problems"/>
 				<column disabled="!@num_problems"/>
@@ -103,6 +104,7 @@
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-header align="center" label="License" id="PerId"/>
+					<nextmatch-sortheader align="center" label="Start- order" id="start_order" class="noPrint"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
@@ -123,15 +125,16 @@
 				</row>
 				<row class="row $row_cont[quota_class]">
 					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
-					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
+					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description id="${row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
 					<description id="${row}[acl_fed]"/>
 					<description value="$row_cont[plz]" id="${row}[ort]"/>
 					<description align="center" id="{$row}[PerId]" no_lang="1"/>
-					<description align="center" value="$row_cont[start_order]" id="{$row}[start_number]" no_lang="1"/>
+					<description align="center" id="${row}[start_order]" class="noPrint"/>
+					<description align="center" id="{$row}[start_number]" no_lang="1"/>
 					<description align="center" id="{$row}[result]" no_lang="1"/>
 					<vbox options="0,0">
 						<hbox align="right" class="noPrint" options="0,0">
