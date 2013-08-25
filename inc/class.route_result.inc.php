@@ -146,6 +146,11 @@ class route_result extends so_sql
 			$criteria[$this->table_name.'.'.$this->id_col] = $criteria[$this->id_col];
 			unset($criteria[$this->id_col]);
 		}
+		if (is_array($filter) && isset($filter['PerId']))
+		{
+			$filter[] = $this->db->expression($this->table_name, $this->table_name.'.', array('PerId' => $filter['PerId']));
+			unset($filter['PerId']);
+		}
 		if (is_array($filter) && array_key_exists('route_type',$filter))	// pseudo-filter to transport the route_type
 		{
 			$route_type = $filter['route_type'];
