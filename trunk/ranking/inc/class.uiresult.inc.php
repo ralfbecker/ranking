@@ -262,7 +262,8 @@ class uiresult extends boresult
 					break;
 
 				case 'ranking':
-					$param['msg'] = $msg = $this->import_ranking($content, $comp['nation'] != 'NULL' ? $comp['nation'] : null, $content['import_cat']);
+					$param['msg'] = $msg = $this->import_ranking($content, $comp['fed_id'] ? $comp['fed_id'] :
+						($comp['nation'] != 'NULL' ? $comp['nation'] : null), $content['import_cat']);
 					break;
 			}
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent

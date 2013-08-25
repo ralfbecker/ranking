@@ -1461,7 +1461,7 @@ class boresult extends boranking
 	 * Import the general result of a competition into the ranking
 	 *
 	 * @param array $keys WetId, GrpId, discipline, route_type, route_order=-1
-	 * @param string $filter_nation=null only import athletes of the given nation
+	 * @param string|int $filter_nation=null only import athletes of the given nation or integer fed_id
 	 * @param string $import_cat=null only import athletes of the given category
 	 * @return string message
 	 */
@@ -1475,9 +1475,9 @@ class boresult extends boranking
 		{
 			list($import_cat, $import_comp) = explode(':', $import_cat);
 			$import_cat = $this->cats->read($import_cat);
-			if ($import_comp && ($import_comp = $this->comp->read($import_comp)) && $import_comp['nation'])
+			if ($import_comp && ($import_comp = $this->comp->read($import_comp)) && ($import_comp['nation'] || $import_comp['fed_id']))
 			{
-				$filter_nation = $import_comp['nation'];
+				$filter_nation = $import_comp['fed_id'] ? $import_comp['fed_id'] : $import_comp['nation'];
 			}
 		}
 		$skipped = $last_rank = $ex_aquo = 0;
@@ -1491,9 +1491,11 @@ class boresult extends boranking
 			'route_type' => $keys['route_type'] == TWO_QUALI_SPEED ? ONE_QUALI : $keys['route_type'],
 		)) as $row)
 		{
+			error_log('row='.array2string($row));
 			if ($row['result_rank'])
 			{
-				if ($filter_nation && $row['nation'] != $filter_nation)
+				if ($filter_nation && (!is_numeric($filter_nation) && $row['nation'] != $filter_nation ||
+					is_numeric($filter_nation) && $row['fed_id'] != $filter_nation && $row['fed_parent'] != $filter_nation))
 				{
 					$skipped++;
 					continue;
@@ -1529,7 +1531,19 @@ class boresult extends boranking
 		if ($skipped)
 		{
 			if ($import_cat) $reason = $import_cat['name'];
-			if ($filter_nation) $reason .= ($reason ? ' '.lang('or').' ' : '').$filter_nation;
+
+			if ($filter_nation)
+			{
+				$reason .= ($reason ? ' '.lang('or').' ' : '');
+				if (!is_numeric($filter_nation))
+				{
+					$reason .= $filter_nation;
+				}
+				elseif (($federation = $this->federation->read($filter_nation)))
+				{
+					$reason .= $federation['verband'];
+				}
+			}
 		}
 		return parent::import_ranking($keys, $result).($skipped ? "\n".lang('(%1 athletes not from %2 skipped)', $skipped, $reason) : '');
 	}
