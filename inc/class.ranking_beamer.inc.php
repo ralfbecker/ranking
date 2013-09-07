@@ -106,7 +106,11 @@ class ranking_beamer
 		$link = '/ranking/sitemgr/digitalrock/'.($content['startlist'] ? 's' : 'e').'liste.html';
 		$params = array('comp' => $content['comp']);
 		if ((string)$content['detail'] !== '') $params['detail'] = $content['detail'];
-		if ($content['beamer']) $params['beamer'] = 1;
+		if ($content['beamer'])
+		{
+			$params['beamer'] = 1;
+			$params['rotate'] = '';	// required for automatic up-down scrolling
+		}
 		foreach($cats as $n => $cat)
 		{
 			if (!$cat || (string)$routes[$n] === '') continue;
