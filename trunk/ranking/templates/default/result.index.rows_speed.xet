@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox class="extra_startlist">
+					<groupbox cols="1" rows="1" class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox class="extra_result">
+					<groupbox cols="1" rows="1" class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -111,8 +111,8 @@
 				</row>
 				<row class="x $row_cont[class] $row_cont[quota_class]">
 					<description align="center" id="set[$row_cont[PerId]][result_rank]" no_lang="1" readonly="true" class="place"/>
-					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
+					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
@@ -124,7 +124,7 @@
 					<hbox align="center" options="0,0">
 						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
 						<textbox type="float" id="set[$row_cont[PerId]][result_time]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
-						<menulist>
+						<menulist class="noPrint">
 							<menupopup class="$cont[rw_result] leftPad5" id="set[$row_cont[PerId]][eliminated]"/>
 						</menulist>
 						<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);" class="small noPrint"/>
@@ -133,7 +133,7 @@
 					<hbox align="center" options="0,0">
 						<description id="{$row}[result_r]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
 						<textbox type="float" id="set[$row_cont[PerId]][result_time_r]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
-						<menulist>
+						<menulist class="noPrint">
 							<menupopup class="$cont[rw_result] leftPad5" id="set[$row_cont[PerId]][eliminated_r]"/>
 						</menulist>
 						<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);" class="small noPrint"/>
