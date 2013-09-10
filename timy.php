@@ -16,16 +16,16 @@ define('DISPLAY_TIMEOUT',200000);	// baud 2400 --> 500000, 9600 --> 2000000
 /**
  * Programmierung Display:
  * - Taste drücken bis "br 09" kommt: br ist menupunkt (brightness), 09 ist wert
- * - Aendern des Menupunktes bzw Wertes wenn er blinkt Taste drücken 
+ * - Aendern des Menupunktes bzw Wertes wenn er blinkt Taste drücken
  * - Auf Menupunkt SE gehen und dort h9 (9 = 9600 baud einstellen, 2 = 2400 baud)
  * - Weiter menupunkt aendern bis Anzeige schwarz
- * 
+ *
  * Nach Neustart des timy.php Kontrollprogramms, MUSS auch der Timy gelöscht werden
  * (da die Sequenznummern sich sonst überschneiden, da timy.php von vorne beginnt):
  * --> Neustart von Dualtimer Programm:
  * Liste Taste (oberhalb 7+8) blaettern bis programms, OK, F0 Change drücken, Dualtimer auswählen, OK
  * CLR zum Löschen der Zeiten drücken, danach beliebige Taste drücken
- * 
+ *
  * Abbruch nach Sturz: Erneut auf [Start] drücken UND gestürztem Tn "Sturz" eintragen und aktualisieren
  */
 // max. time the false start was trigered before the start, to interpret it as false start
@@ -37,7 +37,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 if (!extension_loaded('mbstring')) dl('mbstring.so');
 if (ini_get('mbstring.func_overload') != 7) echo "mbstring.func_overload=7 required!!!\n\n";
 
-if (isset($_SERVER['HTTP_HOST']))	// security precaution: forbit calling Timy demon as web-page
+if (php_sapi_name() !== 'cli')	// security precaution: forbit calling Timy demon as web-page
 {
 	die('<h1>timy.php must NOT be called as web-page --> exiting !!!</h1>');
 }
@@ -74,7 +74,7 @@ if (!function_exists('lang'))
 	{
 		$args = func_get_args();
 		$str = array_shift($args);
-		
+
 		return str_replace(array('%1','%2','%3','%4','%5','%6','%6'),$args,$str);
 	}
 }
@@ -105,7 +105,7 @@ foreach($display_interfaces as $display_interface)
 	if (strchr($display_interface,':') !== false && substr($display_interface,0,6) != 'php://')
 	{
 		list($host,$port) = explode(':',$display_interface);
-	
+
 		$display = fsockopen($host,$port);
 	}
 	else
@@ -141,7 +141,7 @@ echo "Timy configured for precision $precision (digits behind the dot) and round
 define('DIAG_DISPLAY',"\r%04d: %7.{$precision}lfs  %04d: %7.{$precision}lfs");
 //stoped:       A016C        5:18.02
 //running:      B015.        7:45
-//intermediate: B015A        7:13.60        
+//intermediate: B015A        7:13.60
 define('DISPLAY_FORMAT',"A%03d%s       %2.2s:%s   \rB%03d%s       %2.2s:%s   \r");
 
 // event loop
@@ -155,7 +155,7 @@ while(true)
 	$read[] = $timy;
 	$read[] = $control;
 	//echo "stream_select(array(".implode(', ',$read)."),null,null,".floor(DISPLAY_TIMEOUT).",".ceil(DISPLAY_TIMEOUT*1000000).")\n";
-	
+
 	// if we have a running time, we have to set a timeout for the next DISPLAY_TIMEOUT interval
 	if (($start = $right_mstart ? $right_mstart : $left_mstart))
 	{
@@ -203,7 +203,7 @@ while(true)
 					continue;
 				}
 				$caddr = stream_socket_get_name($f,true);
-				
+
 				$client_bufs[$caddr] .= fgets($f);
 				echo $caddr.': '.$client_bufs[$caddr];
 				if (substr($client_bufs[$caddr],-1) == "\n")
@@ -239,13 +239,13 @@ function handle_time($str)
 	global $left_notify, $right_notify,$precision;
 
 	if (is_numeric($str{0})) return;	// ignore 1/10s timestamp of pc-timer mode
-	
+
 	echo "\n".$str;
-	
+
 	$t_str = trim(substr($str,10,13));
 	list($h,$m,$s) = explode(':',$t_str);
 	$time = 3600 * $h + 60 * $m + $s;
-	
+
 	$channel = null;
 	if ($str{6} == 'C')
 	{
@@ -271,7 +271,7 @@ function handle_time($str)
 		$channel = 22 + (int)($str{5} != 'r');
 	}
 	$sequence = (int)substr($str,1,4);
-	
+
 	echo "$channel: $time ($sequence)\n\n";
 
 	if (is_numeric($channel))	// $channel===null, matches 0 otherwise!
@@ -323,14 +323,14 @@ function handle_time($str)
 				notify_clients($which,'false',$which != 'left' ? $false_starts['r'] : $false_starts['l'],$false_starts['l']);
 			}
 			break;
-		
+
 		case 1:		// right stop
 			$time = timy_round($time - $right_fstart);
 			$times[_sequence2startnr($sequence)] += $time;
 			notify_clients('right','stop',$time);
 			$right_fstart = $right_mstart = null;
 			break;
-			
+
 		case 4:	// left stop
 			$time = timy_round($time - $left_fstart);
 			$times[_sequence2startnr($sequence)] += $time;
@@ -349,27 +349,27 @@ function handle_time($str)
 			$left_fstart = $left_mstart = null;
 			notify_clients('left','stop',$time);
 			break;
-*/	
+*/
 		case 2:	// right false start
 			$right_false = $time;
 			break;
-			
+
 		case 5:	// left false start
 			$left_false = $time;
 			break;
-			
+
 		case 20:	// right startnr
 			$right_sequence = $sequence;
 			$right_false = $right_fstart = $right_mstart = null;
 			break;
-		
+
 		case 21:	// left startnr
 			$left_sequence = $sequence;
 			$left_false = $left_fstart = $left_mstart = null;
 			break;
 	}
 	echo "left ($left_sequence): time={$times[_sequence2startnr($left_sequence)]}, fstart=$left_fstart, mstart=$left_mstart, false=$left_false; right ($right_sequence): time={$times[_sequence2startnr($right_sequence)]}, fstart=$right_fstart, mstart=$right_mstart, false=$right_false\n";
-	
+
 	handle_display();
 }
 
@@ -381,7 +381,7 @@ function handle_display()
 {
 	global $times,$left_sequence, $right_sequence, $left_mstart, $right_mstart;
 	global $displays,$precision;
-	
+
 	$now = microtime(true);
 
 	$lsnr = _sequence2startnr($left_sequence);
@@ -434,7 +434,7 @@ function handle_client($client,$str)
 	global $timy,$clients,$times;
 	// clients to notify on finished or aborted measurements
 	global $left_notify, $right_notify;
-	
+
 	list($command,$side,$startnr,$time,$athlete) = explode(':',trim($str),5);
 	switch($command)	// remove "\n"
 	{
@@ -450,14 +450,14 @@ function handle_client($client,$str)
 				$left_notify = $client;
 			}
 			break;
-			
-		case 'close':		
+
+		case 'close':
 			unset($clients[array_search($client,$clients)]);
 			fclose($client);
 			if ($left_notify == $client) $left_notify = null;
 			if ($right_notify == $client) $right_notify = null;
 			break;
-			
+
 		case 'start':	// set startnr, time and athlete
 			if ($startnr) fwrite($timy,'DTP'.$startnr.': '.$athlete."\n");
 			$sequence = $startnr ? _get_free_sequence($startnr) : 0;
@@ -474,17 +474,17 @@ function handle_client($client,$str)
 function _get_free_sequence($snr)
 {
 	static $sequences = array();
-	
+
 	$n = 0;
-	do 
+	do
 	{
 		$seq = $n*($n < 10 ? 1000 : 100) + $snr;
 		++$n;
 	}
 	while (in_array($seq,$sequences));
-	
+
 	$sequences[] = $seq;
-	
+
 	return $seq;
 }
 
@@ -502,24 +502,24 @@ function notify_clients($which,$event,$time,$time2=null)
 	// clients to notify on finished or aborted measurements
 	global $left_notify, $right_notify;
 	global $precision;
-	
+
 	if ($which !== 'left')	// right or both
 	{
 		$client =& $right_notify;
 	}
 	else	// left
 	{
-		$client =& $left_notify;	
+		$client =& $left_notify;
 	}
 	if (!is_resource($client)) return;	// noone subscribed
-	
+
 	if (feof($client))	// client no longer listening
 	{
 		$client = null;
 		return false;
 	}
 	$str = $which{0}.':'.$event.':'.number_format($time,$precision).($which == 'both' ? ':'.number_format($time2,$precision) : '');
-	
+
 	//echo "notify_clients($which,$event,$time,$time2): $str\n";
 
 	return fwrite($client,$str."\n");
@@ -545,7 +545,7 @@ function _sequence2startnr($s)
 function timy_round($time)
 {
 	global $rounding,$precision;	// 0=floor (default), 1=ceil, 2=round
-	
+
 	if ($rounding != 2)
 	{
 		$pot = pow(10,$precision);

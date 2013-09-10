@@ -12,7 +12,7 @@
  * @version $Id$
  */
 
-if (isset($_SERVER['HTTP_HOST']))	// security precaution: forbit calling admin-cli as web-page
+if (php_sapi_name() !== 'cli')	// security precaution: forbit calling admin-cli as web-page
 {
 	die('<h1>import-cli.php must NOT be called as web-page --> exiting !!!</h1>');
 }
