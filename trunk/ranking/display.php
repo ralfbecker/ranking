@@ -23,7 +23,7 @@ if (!extension_loaded('mbstring')) dl('mbstring.so');
 if (ini_get('mbstring.func_overload') != 7) echo "mbstring.func_overload=7 required!!!\n\n";
 
 //$_SERVER['argc']=3; $_SERVER['argv']=array('display.php','ralf','ralbec32');
-if (isset($_SERVER['HTTP_HOST']))	// security precaution: forbit calling display demon as web-page
+if (php_sapi_name() !== 'cli')	// security precaution: forbit calling display demon as web-page
 {
 	die('<h1>display.php must NOT be called as web-page --> exiting !!!</h1>');
 }

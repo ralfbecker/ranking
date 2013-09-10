@@ -2,7 +2,7 @@
 <?php
 /**
  * eGroupWare digital ROCK Rankings - bridge to old ROCK programs
- * 
+ *
  * Use fuse and sshfs to mount old granit filesystem to webserver eg:
  * granit: ssh -R2022:localhost:22 root@www.ifsc-climbing.org
  * www:    sshfs -o reconnect,cache_stat_timeout=0 -p 2022 ralf@localhost:/var/www/html/2010/10_arco /var/www/ifsc-climbing
@@ -27,7 +27,7 @@ ini_set('display_errors',false);
 if (!extension_loaded('mbstring')) dl('mbstring.so');
 if (ini_get('mbstring.func_overload') != 7) echo "mbstring.func_overload=7 required!!!\n\n";
 
-if (isset($_SERVER['HTTP_HOST']))	// security precaution: forbit calling display demon as web-page
+if (php_sapi_name() !== 'cli')	// security precaution: forbit calling display demon as web-page
 {
 	die('<h1>bridge.php must NOT be called as web-page --> exiting !!!</h1>');
 }
@@ -54,7 +54,7 @@ ob_end_flush();
 
 /**
  * callback if the session-check fails, redirects via xajax to login.php
- * 
+ *
  * @param array &$account account_info with keys 'login', 'passwd' and optional 'passwd_type'
  * @return boolean/string true if we allow the access and account is set, a sessionid or false otherwise
  */
