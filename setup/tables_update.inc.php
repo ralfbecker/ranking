@@ -1585,3 +1585,25 @@ function ranking_upgrade1_9_013()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.014';
 }
 
+
+/**
+ * Add cup parameters for minimum disciplines and dropping results equally (German Youth 2013+)
+ *
+ * ALTER TABLE `Serien` ADD `min_disciplines` SMALLINT
+ * ALTER TABLE `Serien` ADD `drop_equally` TINYINT
+ *
+ * @return string
+ */
+function ranking_upgrade1_9_014()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','min_disciplines',array(
+		'type' => 'int',
+		'precision' => '2'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','drop_equally',array(
+		'type' => 'bool'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.015';
+}
+

@@ -32,8 +32,8 @@
 						</menulist>
 					</vbox>
 					<hbox align="center">
-						<button statustext="View this cup" label="View" id="view[$row_cont[SerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.view&amp;SerId=$row_cont[SerId]'),'_blank','dependent=yes,width=800,height=350,scrollbars=yes,status=yes'); return false;" image="view"/>
-						<button statustext="Edit this cup" label="Edit" id="edit[$row_cont[SerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.edit&amp;SerId=$row_cont[SerId]'),'_blank','dependent=yes,width=800,height=350,scrollbars=yes,status=yes'); return false;" image="edit"/>
+						<button statustext="View this cup" label="View" id="view[$row_cont[SerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.view&amp;SerId=$row_cont[SerId]'),'_blank','dependent=yes,width=800,height=420,scrollbars=yes,status=yes'); return false;" image="view"/>
+						<button statustext="Edit this cup" label="Edit" id="edit[$row_cont[SerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.edit&amp;SerId=$row_cont[SerId]'),'_blank','dependent=yes,width=800,height=420,scrollbars=yes,status=yes'); return false;" image="edit"/>
 						<button align="center" statustext="Delete this cup" label="Delete" id="delete[$row_cont[SerId]]" onclick="return confirm('Delete this cup');" image="delete"/>
 					</hbox>
 				</row>
@@ -61,7 +61,7 @@
 					<description/>
 				</row>
 				<row>
-					<nextmatch align="center" id="nm" options="ranking.cup.list.rows" span="all"/>
+					<nextmatch align="center" id="nm" template="ranking.cup.list.rows" span="all"/>
 				</row>
 				<row>
 					<button statustext="Add a cup" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.edit'),'_blank','dependent=yes,width=800,height=350,scrollbars=yes,status=yes'); return false;"/>

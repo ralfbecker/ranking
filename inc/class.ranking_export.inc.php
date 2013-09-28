@@ -1120,6 +1120,8 @@ class ranking_export extends boresult
 			'start' => $start,
 			'end' => $date,
 			'max_comp' => $max_comp,
+			'min_disciplines' => $not_counting['min_disciplines'],
+			'drop_equally' => $not_counting['drop_equally'],
 			'nation' => $cat['nation'],
 			'participants' => $rows,
 			'route_name' => $comp ? $comp['name'].' ('.implode('.', array_reverse(explode('-', $comp['datum']))).')' : '',

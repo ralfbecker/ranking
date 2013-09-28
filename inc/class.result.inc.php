@@ -315,10 +315,11 @@ class result extends so_sql
 	{
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,".
-			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId".
-			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
+			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline".
+			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.platz > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
+			' AND r.GrpID=c.GrpId'.
 			' AND w.serie='.(int) $cup['SerId'].
 			" AND r.cup_pkt > 0".
 			' AND w.datum <= '.$this->db->quote($stand).
@@ -343,10 +344,11 @@ class result extends so_sql
 	{
 		$results = array();
 		foreach($this->db->query($sql="SELECT $this->athlete_table.*,".
-			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId'.
-			" FROM $this->result_table r,$this->comp_table w,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
+			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline'.
+			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
 			' AND r.GrpId '.(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').
+			' AND r.GrpID=c.GrpId'.
 			' AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
 			($from_year && $to_year ? ' AND NOT ISNULL(geb_date) AND '.
 			(int) $from_year.' <= YEAR(geb_date) AND YEAR(geb_date) <= '.(int) $to_year : '').

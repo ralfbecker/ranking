@@ -331,6 +331,7 @@ measurement aborted!	ranking	en	Measurement aborted!
 merge	ranking	en	Merge
 merge selected federations with the one opened for editing	ranking	en	Merge selected federations with the one opened for editing
 merges this entry into the selected one.	ranking	en	Merges this entry into the selected one.
+minimum disciplines	ranking	en	Minimum disciplines
 minus	ranking	en	minus
 more	ranking	en	More
 name(s)	ranking	en	name(s)
@@ -445,6 +446,7 @@ remove the grafic	ranking	en	Remove the grafic
 removed the %1	ranking	en	Removed the %1
 repeat	ranking	en	Repeat
 replace: %1	ranking	en	replace: %1
+require to drop results equally by discipline	ranking	en	Require to drop results equally by discipline
 required information missing, application rejected!	ranking	en	Required information missing, application rejected!
 result	ranking	en	Result
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)

@@ -512,6 +512,17 @@ class ranking_calculation
 	}
 
 	/**
+	 * Vars to use for ranking and to_ranking
+	 */
+	private $pers = array();
+	private $pkte = array();
+	private $disciplines = array();
+	private $cats = array();
+	private $platz = array();
+	private $not_counting = array();
+	private $counting = array();
+
+	/**
 	 * Calculates a ranking of type $rls->window_type:
 	 *  monat = $rls->window_anz Monate zaehlen faer Rangl.
 	 *  wettk = $rls->window_anz Wettkaempfe ---- " -----
@@ -547,7 +558,7 @@ class ranking_calculation
 	 * 10.06.2006: EYC nicht-europ. Teiln. zaehlen nicht fuer Punkte
 	 * 01.01.2009: Int. competition use "averaged" points for ex aquo
 	 */
-	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup='',
+	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup=null,
 		array &$comps=null, &$max_comp=null)
 	{
 		if ($cup && !is_array($cup))
@@ -601,14 +612,16 @@ class ranking_calculation
 		if ($overall)
 		{
 			$max_comp = 5;
-			$min_cats = 2;
+			$min_disciplines = 2;
 
 			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
 		}
 		elseif ($cup)
 		{
 			$max_comp = $this->bo->cup->get_max_comps($cat['rkey'],$cup);
-
+			$min_disciplines = $cup['min_disciplines'];
+			$drop_equally = $cup['drop_equally'];
+			//error_log(__METHOD__."(".array2string(func_get_args()).") max_comp=$max_comp, max_drop_per_discipline=$max_drop_per_disciline, min_disciplines=$min_disciplines");
 			if ((int) $stand >= 2000 && !in_array($cat['rkey'],(array)$cup['gruppen']))
 			{
 				return false;			// no cup (ranking) defined for that group
@@ -662,73 +675,108 @@ class ranking_calculation
 			}
 			$results =& $this->bo->result->ranking_results($cat['GrpIds'],$stand,$start,$from_year,$to_year);
 		}
-		$pers = false;
-		$pkte = $anz = $platz = array();
-		if ($overall) $results[] = array('PerId' => 0);	// marker to check last result for $min_cats
+		$this->pers = $this->pkte = $this->disciplines = $this->cats = $this->platz = $this->not_counting = $this->counting = array();
+		if ($overall || $min_disciplines) $results[] = array('PerId' => 0);	// marker to check last result for $min_disciplines
 		foreach($results as $result)
 		{
-			// combined: remove result if number of cats < $min_cats
-			if ($overall && $id && $id != $result['PerId'] && count($anz[$id]) < $min_cats)
+			// combined: remove result if number of cats < $min_disciplines
+			if (($overall || $min_disciplines) && $id && $id != $result['PerId'] && count($this->disciplines[$id]) < $min_disciplines)
 			{
-				unset($pers[$id]);
-				unset($pkte[$id]);
-				unset($anz[$id]);
-				unset($not_counting[$id]);
+				$this->pkte[$id] = 0;
+				/*unset($this->pers[$id]);
+				unset($this->pkte[$id]);
+				unset($this->cats[$id]);
+				unset($this->disciplines[$id]);
+				unset($this->not_counting[$id]);*/
 				if (!$result['PerId']) continue;	// ignore marker
 			}
 			$id = $result['PerId'];
-			$nc = false;
-			if (!isset($pers[$id]))		// Person neu --> anlegen
-			{
-				$pers[$id] = $result;
-				$pkte[$id] = sprintf('%04.2f',$result['pkt']);
-				$anz[$id][$result['GrpId']] = 1;
-				++$platz[$result['platz']][$id];
-			}
-			elseif (!$max_comp || $anz[$id][$result['GrpId']] < $max_comp)
-			{
-				$pkte[$id] = sprintf('%04.2f',$pkte[$id] + $result['pkt']);
-				$anz[$id][$result['GrpId']]++;
-				++$platz[$result['platz']][$id];
-			}
-			else
-			{
-				$not_counting[$id][$result['WetId']][$result['GrpId']] = $result['pkt'];
-				$nc = true;
-				if ($cup && $cup['split_by_places'] != 'only_counting')
-				{
-					++$platz[$result['platz']][$id];
-				}
-			}
 			$result_id = $result['WetId'].($overall?'_'.$result['GrpId']:'');
-			$pers[$id]['results'][$result_id] = $result['platz'].".\n".
-				($nc ? '(' : '').sprintf('%04.2f',$result['pkt']).($nc ? ')' : '');
-
 			if (is_array($comps) && !isset($comps[$result_id]))
 			{
 				$comps[$result_id] = $this->bo->comp->read($result['WetId']);
 			}
+			//if (!isset($this->pers[$id])) error_log(__METHOD__."() *** $result[nachname] $result[vorname] ***");
+			$reserve_for_min_disciplines = $min_disciplines - count($this->disciplines[$id]);
+			if ($reserve_for_min_disciplines < 0 || !$min_disciplines) $reserve_for_min_disciplines = 0;
+			if (!$max_comp || $this->cats[$id][$result['GrpId']] < $max_comp-
+				(isset($this->disciplines[$id][$result['discipline']]) ? $reserve_for_min_disciplines : 0))
+			{
+				$this->_counting($result, $overall);
+			}
+			else
+			{
+				// we want to drop equal (+/-1) numbers from each discipline and already droped one from current discipline
+				// --> search if we have multiple results from other discipline counting, but less droped
+				if ($drop_equally && isset($this->not_counting[$id][$result['discipline']]))
+				{
+					//error_log(__METHOD__."() checking for other result to drop $result[platz]. {$comps[$result_id][name]} $result[pkt] $result[discipline]");
+					$worst_counting = null;
+					foreach($this->counting[$id] as $discipline => $res)
+					{
+						if ($discipline == $result['discipline'] || //$this->not_counting[$discipline]) continue;
+							count($this->not_counting[$discipline])>=count($this->not_counting[$id][$result['discipline']])) continue;
+						//error_log(__METHOD__."() checking counting results for $discipline");
+						foreach($res as $k => $r)
+						{
+							if (!isset($worst_counting) || $worst_counting['pkt'] > $r['pkt'])
+							{
+								$worst_counting = $r;
+							}
+						}
+					}
+					if ($worst_counting)
+					{
+						//error_log(__METHOD__."() worst_counting = ".array2string($worst_counting));
+						// add current result --> check for a better, but not counting result
+						$better_not_counting = null;
+						foreach((array)$this->not_counting[$id][$result['discipline']] as $k => $r)
+						{
+							if ($result['pkt'] < $r['pkt'] && (!isset($better_not_counting) || $better_not_counting['pkt'] < $r['pkt']))
+							{
+								$better_not_counting = $r;
+							}
+						}
+						// if better then current result found --> remove it from not-counting, add to counting and add current to not-counting
+						if ($better_not_counting)
+						{
+							//error_log(__METHOD__."() better_not_counting = ".array2string($better_not_counting));
+							$this->_not_counting($better_not_counting, $cup, $overall, false);
+							$this->_counting($better_not_counting, $overall);
+							$this->_not_counting($result, $cup, $overall);
+						}
+						else	// add current to counting
+						{
+							//error_log(__METHOD__."() NO better_not_counting, not_counting[$id][$result[discipline]]= ".array2string($this->not_counting[$id][$result['discipline']]));
+							$this->_counting($result, $overall);
+						}
+						// remove worst counting result from counting and add to not-counting (below)
+						$this->_counting($result=$worst_counting, $overall, false);
+					}
+				}
+				$this->_not_counting($result, $cup, $overall);
+			}
 		}
-		if (!$pers)
+		if (!$this->pers)
 		{
-			return ($pers);
+			return $this->pers;
 		}
-		arsort ($pkte);
+		arsort ($this->pkte);
 
 		if ($cup && $cup['SerId'] == 60)	// EYC 2003. not sure what this is for, why only 2003?
 		{
 			switch($cup['split_by_places'])
 			{
 				case 'first':
-					$max_pkte = current($pkte);
-					if (next($pkte) != $max_pkte)
+					$max_pkte = current($this->pkte);
+					if (next($this->pkte) != $max_pkte)
 					{
 						break;	// kein exAquo of 1. platz ==> fertig
 					}
 				case 'all':
 				case 'only_counting':
 					$max_platz = 0;
-					foreach($platz as $pl => $ids)
+					foreach($this->platz as $pl => $ids)
 					{
 						if ($pl > $max_platz)
 						{
@@ -737,35 +785,119 @@ class ranking_calculation
 					}
 					for($pl=1; $pl <= $max_platz; ++$pl)
 					{
-						reset($pkte);
+						reset($this->pkte);
 						do
 						{
-							$id = key($pkte);
-							$pkte[$id] .= sprintf('.%02d',intval($platz[$pl][$id]));
+							$id = key($this->pkte);
+							$this->pkte[$id] .= sprintf('.%02d',intval($this->platz[$pl][$id]));
 						}
-						while(next($pkte) && (!isset($max_pkte) || substr(current($pkte),0,7) == $max_pkte));
+						while(next($this->pkte) && (!isset($max_pkte) || substr(current($this->pkte),0,7) == $max_pkte));
 					}
-					arsort ($pkte);
+					arsort ($this->pkte);
 					break;
 			}
-			reset($pkte);
+			reset($this->pkte);
 		}
 		$abs_pl = 1;
 		$last_pkte = $last_platz = 0;
-		foreach($pkte as $id => $pkt)
+		foreach($this->pkte as $id => $pkt)
 		{
-			$pers[$id]['platz'] = $abs_pl > 1 && $pkt == $last_pkte ? $last_platz : ($last_platz = $abs_pl);
+			$this->pers[$id]['platz'] = $abs_pl > 1 && $pkt == $last_pkte ? $last_platz : ($last_platz = $abs_pl);
 			$ex_aquo[$last_platz] = 1+$abs_pl-$last_platz;
 			$abs_pl++;
-			$last_pkte = $pers[$id]['pkt'] = $pkt;
-			$rang[sprintf("%04d%s%s",$pers[$id]['platz'],$pers[$id]['nachname'],$pers[$id]['vorname'])] =& $pers[$id];
+			$last_pkte = $this->pers[$id]['pkt'] = $pkt;
+			$rang[sprintf("%04d%s%s",$this->pers[$id]['platz'],$this->pers[$id]['nachname'],$this->pers[$id]['vorname'])] =& $this->pers[$id];
+			if (!$pkt) $this->pers[$id]['platz'] = 'no';
 		}
 		ksort ($rang);			// array $rang contains now the ranking, sorted by points, lastname, firstname
 
 		$ret_ex_aquo =& $ex_aquo;
-		$ret_pers = $pers;
-		$not_counting =& $not_counting;
+		$ret_pers = $this->pers;
+		$not_counting = $this->not_counting;
+		$not_counting['min_disciplines'] = $min_disciplines;
+		$not_counting['drop_equally'] = $drop_equally;
 
 		return $rang;
+	}
+
+	/**
+	 * Add or remove result counting for ranking
+	 *
+	 * @param array $result
+	 * @param boolean $overall=false true: overall ranking
+	 * @param boolean $add=true true: add, false: remove
+	 */
+	private function _counting(array $result, $overall=false, $add=true)
+	{
+		$id = $result['PerId'];
+		$result_id = $result['WetId'].($overall?'_'.$result['GrpId']:'');
+		$inc = $add ? 1 : -1;
+		//error_log(__METHOD__."() ".($add ? 'adding' : 'removing')." from counting $result[platz]. #$result_id $result[pkt] $result[discipline]");
+
+		if (!isset($this->pers[$id]))		// Person neu --> anlegen
+		{
+			$this->pers[$id] = $result;
+		}
+		$this->pkte[$id] = sprintf('%04.2f',$this->pkte[$id] + $inc*$result['pkt']);
+		$this->disciplines[$id][$result['discipline']] += $inc;
+		$this->cats[$id][$result['GrpId']] += $inc;
+		$this->platz[$result['platz']][$id] += $inc;
+		$this->pers[$id]['results'][$result_id] = $result['platz'].".\n". sprintf('%04.2f',$result['pkt']);
+
+		if ($add)
+		{
+			$this->counting[$id][$result['discipline']][] = $result;
+		}
+		else
+		{
+			foreach($this->counting[$id][$result['discipline']] as $key => $value)
+			{
+				if ($result['WetId'] == $value['WetId'] && $result['GrpId'] == $value['GrpId'])
+				{
+					unset($this->counting[$id][$result['discipline']][$key]);
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Add result not-counting to ranking
+	 *
+	 * @param array $result
+	 * @param array $cup=null
+	 * @param boolean $overall=false true: overall ranking
+	 * @param boolean $add=true true: add, false: remove
+	 */
+	private function _not_counting(array $result, $cup=null, $overall=false, $add=true)
+	{
+		$id = $result['PerId'];
+		$result_id = $result['WetId'].($overall?'_'.$result['GrpId']:'');
+		$inc = $add ? 1 : -1;
+		//error_log(__METHOD__."() ".($add ? 'adding' : 'removing')." from not-counting $result[platz]. #$result_id $result[pkt] $result[discipline]");
+
+		if ($add)
+		{
+			$this->not_counting[$id][$result['WetId']][$result['GrpId']] = $result['pkt'];
+			$this->not_counting[$id][$result['discipline']][] = $result;
+			$this->pers[$id]['results'][$result_id] = $result['platz'].".\n".
+				'('.sprintf('%04.2f',$result['pkt']).')';
+		}
+		else
+		{
+			unset($this->not_counting[$id][$result['WetId']][$result['GrpId']]);
+			foreach($this->not_counting[$id][$result['discipline']] as $key => $value)
+			{
+				if ($result['WetId'] == $value['WetId'] && $result['GrpId'] == $value['GrpId'])
+				{
+					unset($this->not_counting[$id][$result['discipline']][$key]);
+					break;
+				}
+			}
+		}
+		if ($cup && $cup['split_by_places'] != 'only_counting')
+		{
+			$this->platz[$result['platz']][$id] += $inc;
+		}
 	}
 }
