@@ -9,13 +9,13 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top" height="115">
-					<description value="Categories" for="gruppen"/>
+					<description for="gruppen" value="Categories"/>
 					<listbox id="gruppen" no_lang="1" rows="9"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -40,6 +40,11 @@
 							</row>
 						</rows>
 					</grid>
+				</row>
+				<row class="row">
+					<description value="Minimum disciplines" for="min_disciplines"/>
+					<textbox type="integer" id="min_disciplines"/>
+					<checkbox label="Require to drop results equally by discipline" id="drop_equally"/>
 				</row>
 				<row class="row">
 					<description value="Pointalocation" for="pkte"/>
@@ -71,7 +76,7 @@
 			.nowrap { white-space: nowrap; }\r\n.gray { color: gray; }
 		</styles>
 	</template>
-	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -81,52 +86,28 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Pointalocation" for="pkte"/>
+					<description for="pkte" value="Pointalocation"/>
 					<menulist>
 						<menupopup statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" for="pkt_bis"/>
+					<description for="pkt_bis" value="til place"/>
 					<menulist>
 						<menupopup type="select-percent" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Factor" for="faktor"/>
+					<description for="faktor" value="Factor"/>
 					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Fieldfactorpoints" for="feld_pkte"/>
+					<description for="feld_pkte" value="Fieldfactorpoints"/>
 					<menulist>
 						<menupopup statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
 					</menulist>
-					<description value="til place" for="feld_bis"/>
+					<description for="feld_bis" value="til place"/>
 					<menulist>
 						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 					</menulist>
-				</row>
-				<row class="th">
-					<description value="Prequalified competitiors" span="all"/>
-				</row>
-				<row class="row" valign="top">
-					<description value="Qualification" for="quali_preselected"/>
-					<grid id="quali_preselected">
-						<columns>
-							<column/>
-							<column/>
-							<column/>
-						</columns>
-						<rows>
-							<row>
-								<menulist>
-									<menupopup id="${row}[cat]" options="Category"/>
-								</menulist>
-								<textbox type="integer" statustext="|Participants, at least on that place in the used ranking or cup, don't need to climb qualification" id="${row}[num]" min="0"/>
-								<description/>
-							</row>
-						</rows>
-					</grid>
-					<description/>
-					<description/>
 				</row>
 			</rows>
 		</grid>
@@ -142,7 +123,7 @@
 					<description value="Presets for competitions" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Competition name" for="presets[name]"/>
+					<description for="presets[name]" value="Competition name"/>
 					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
 				</row>
 				<row class="row">
@@ -152,7 +133,7 @@
 					</menulist>
 				</row>
 				<row>
-					<template id="ranking.comp.edit.ranking" content="presets" span="all"/>
+					<template content="presets" id="ranking.comp.edit.ranking" span="all"/>
 				</row>
 			</rows>
 		</grid>
@@ -163,10 +144,14 @@
 				<column width="15%"/>
 				<column width="20%"/>
 				<column width="100"/>
+				<column/>
+				<column/>
 			</columns>
 			<rows>
 				<row>
 					<description id="msg" no_lang="1" span="all" class="redItalic"/>
+					<description/>
+					<description/>
 					<description/>
 					<description/>
 				</row>
@@ -193,11 +178,11 @@
 					<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" id="rkey" size="10" maxlength="8"/>
 				</row>
 				<row>
-					<tabbox id="tabs" span="all">
+					<tabbox id="ranking.cup.edit.general|ranking.cup.edit.ranking|ranking.cup.edit.presets" span="all">
 						<tabs>
-							<tab id="general" label="Categories"/>
-							<tab id="ranking" label="Ranking"/>
-							<tab id="presets" label="Presets"/>
+							<tab id="ranking.cup.edit.general" label="Categories"/>
+							<tab id="ranking.cup.edit.ranking" label="Ranking"/>
+							<tab id="ranking.cup.edit.presets" label="Presets"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.cup.edit.general"/>
@@ -207,7 +192,7 @@
 					</tabbox>
 				</row>
 				<row>
-					<hbox cols="4" rows="1" span="2">
+					<hbox span="2">
 						<button statustext="Edit this cup" label="Edit" id="edit"/>
 						<button statustext="saves the changes made" label="Save" id="save"/>
 						<button statustext="apply the changes made" label="Apply" id="apply"/>

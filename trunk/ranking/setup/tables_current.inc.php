@@ -73,7 +73,9 @@ $phpgw_baseline = array(
 			'presets' => array('type' => 'text'),
 			'modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
 			'modifier' => array('type' => 'int','precision' => '4'),
-			'fed_id' => array('type' => 'int','precision' => '4')
+			'fed_id' => array('type' => 'int','precision' => '4'),
+			'min_disciplines' => array('type' => 'int','precision' => '2'),
+			'drop_equally' => array('type' => 'bool')
 		),
 		'pk' => array('SerId'),
 		'fk' => array(),

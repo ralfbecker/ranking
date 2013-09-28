@@ -327,6 +327,7 @@ measurement aborted!	ranking	de	Messung abgebrochen!
 merge	ranking	de	Vereinigen
 merge selected federations with the one opened for editing	ranking	de	Vereinige ausgewählte Verbände mit dem zu Bearbeiten geöffneten
 merges this entry into the selected one.	ranking	de	Vereinige diesen Eintrag mit und IN dem ausgewählten
+minimum disciplines	ranking	de	Minimalzahl Diziplinen
 minus	ranking	de	minus
 more	ranking	de	Mehr
 name(s)	ranking	de	Namen
@@ -441,6 +442,7 @@ remove the grafic	ranking	de	Bild entfernen
 removed the %1	ranking	de	Das %1 wurde gelöscht
 repeat	ranking	de	Wiederholen
 replace: %1	ranking	de	Ersetze: %1
+require to drop results equally by discipline	ranking	de	Streichresultate erfolgen gleichmäßig pro Disziplin
 required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
 result	ranking	de	Ergebnis
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
