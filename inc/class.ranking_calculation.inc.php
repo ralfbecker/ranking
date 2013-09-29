@@ -679,15 +679,10 @@ class ranking_calculation
 		if ($overall || $min_disciplines) $results[] = array('PerId' => 0);	// marker to check last result for $min_disciplines
 		foreach($results as $result)
 		{
-			// combined: remove result if number of cats < $min_disciplines
+			// combined: set points=0, if number of disciplines < $min_disciplines (UI can then choose to show or hide these)
 			if (($overall || $min_disciplines) && $id && $id != $result['PerId'] && count($this->disciplines[$id]) < $min_disciplines)
 			{
 				$this->pkte[$id] = 0;
-				/*unset($this->pers[$id]);
-				unset($this->pkte[$id]);
-				unset($this->cats[$id]);
-				unset($this->disciplines[$id]);
-				unset($this->not_counting[$id]);*/
 				if (!$result['PerId']) continue;	// ignore marker
 			}
 			$id = $result['PerId'];
@@ -807,7 +802,7 @@ class ranking_calculation
 			$abs_pl++;
 			$last_pkte = $this->pers[$id]['pkt'] = $pkt;
 			$rang[sprintf("%04d%s%s",$this->pers[$id]['platz'],$this->pers[$id]['nachname'],$this->pers[$id]['vorname'])] =& $this->pers[$id];
-			if (!$pkt) $this->pers[$id]['platz'] = 'no';
+			if (!$pkt) $this->pers[$id]['platz'] = '';
 		}
 		ksort ($rang);			// array $rang contains now the ranking, sorted by points, lastname, firstname
 

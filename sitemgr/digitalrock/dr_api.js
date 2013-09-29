@@ -234,8 +234,9 @@ var DrTable = (function() {
 	 * @param _ascending
 	 * @param _quota quota if quota line should be drawn in result
 	 * @param _navigateTo click method for profiles
+	 * @param _showUnranked if true AND _sort=='result_rank' show participants without rank, default do NOT show them
 	 */
-	function DrTable(_data,_columns,_sort,_ascending,_quota,_navigateTo)
+	function DrTable(_data,_columns,_sort,_ascending,_quota,_navigateTo,_showUnranked)
 	{
 		this.data      = _data;
 		this.columns   = _columns;
@@ -245,6 +246,7 @@ var DrTable = (function() {
 		this.ascending = _ascending;
 		this.quota = parseInt(_quota);
 		this.navigateTo = _navigateTo;
+		this.showUnranked = _showUnranked ? true : false;
 		// hash with PerId => tr containing athlete
 		this.athletes = {};
 		
@@ -298,7 +300,7 @@ var DrTable = (function() {
 			else	// single result row
 			{
 				if (this.sort == 'result_rank' && 
-					(typeof data.result_rank == 'undefined' || data.result_rank < 1))
+					(typeof data.result_rank == 'undefined' && !this.showUnranked || data.result_rank < 1))
 				{
 					break;	// no more ranked competitiors
 				}
@@ -801,7 +803,9 @@ var Startlist = (function() {
 			this.displayToc(_data);
 
 			// create new table
-			this.table = new DrTable(_data.participants,this.columns,this.sort,true,_data.route_result ? _data.route_quota : null,this.navigateTo);
+			this.table = new DrTable(_data.participants,this.columns,this.sort,true,
+				_data.route_result ? _data.route_quota : null,this.navigateTo,
+				_data.discipline == 'ranking' && detail);
 		
 			jQuery(this.container).append(this.table.dom);
 	
