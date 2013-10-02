@@ -613,6 +613,8 @@ class ranking_calculation
 		{
 			$max_comp = 5;
 			$min_disciplines = 2;
+			// int. overal requires points to count as a valid result for a discipline
+			$use_0_point_results = false;
 
 			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
 		}
@@ -620,6 +622,8 @@ class ranking_calculation
 		{
 			$max_comp = $this->bo->cup->get_max_comps($cat['rkey'],$cup);
 			$min_disciplines = $cup['min_disciplines'];
+			// use results with 0 points, as at least GER youth, counts that for disciplines
+			$use_0_point_results = (boolean)$min_disciplines;
 			$drop_equally = $cup['drop_equally'];
 			//error_log(__METHOD__."(".array2string(func_get_args()).") max_comp=$max_comp, max_drop_per_discipline=$max_drop_per_disciline, min_disciplines=$min_disciplines");
 			if ((int) $stand >= 2000 && !in_array($cat['rkey'],(array)$cup['gruppen']))
@@ -664,7 +668,8 @@ class ranking_calculation
 		if ($cup)
 		{
 			$results =& $this->bo->result->cup_results($cup,$cat['GrpIds'],$stand,
-				stristr($cup['rkey'],'EYC') || stristr($cup['rkey'],'EYS') ? $this->european_nations : false);
+				stristr($cup['rkey'],'EYC') || stristr($cup['rkey'],'EYS') ? $this->european_nations : false,
+				$use_0_point_results);
 		}
 		else
 		{

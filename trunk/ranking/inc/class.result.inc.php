@@ -309,9 +309,10 @@ class result extends so_sql
 	 * @param array $cats array of integer cat-id's (GrpId)
 	 * @param string $stand date as 'Y-m-d'
 	 * @param array $allowed_nations=null array with 3-digit nation-codes to limit the nations to return, default all
+	 * @param boolean $use_0_point_results=false should we return results with 0 points (place > 30)
 	 * @return array ordered by PerId and number of points of arrays with full athlete-data, platz, pkt, WetId, GrpId
 	 */
-	function &cup_results(array $cup,$cats,$stand,$allowed_nations)
+	function &cup_results(array $cup,$cats,$stand,$allowed_nations,$use_0_point_results=false)
 	{
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,".
@@ -321,7 +322,7 @@ class result extends so_sql
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND r.GrpID=c.GrpId'.
 			' AND w.serie='.(int) $cup['SerId'].
-			" AND r.cup_pkt > 0".
+			($use_0_point_results ? '' : ' AND r.cup_pkt > 0').
 			' AND w.datum <= '.$this->db->quote($stand).
 			' ORDER BY r.PerId,r.GrpId,r.cup_pkt DESC,w.datum DESC',__LINE__,__FILE__) as $row)
 		{
