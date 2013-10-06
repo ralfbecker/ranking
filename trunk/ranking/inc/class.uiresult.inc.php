@@ -146,11 +146,13 @@ class uiresult extends boresult
 
 						$to_set = array();
 						$to_set['route_status'] = $content['route_status'] = STATUS_STARTLIST;	// set status to startlist
+						/* RB 2013-10-06 commented as it does NOT allow to set quota=0 when creating a final
+						   not sure why it was there in the first place
 						if (!$content['route_quota'])
 						{
 							$content['route_quota'] = $to_set['route_quota'] =
 								$this->default_quota($discipline,$content['route_order'],$content['quali_type'],$num);
-						}
+						}*/
 						if ($this->route->read($content,true)) $this->route->save($to_set);
 					}
 					else
