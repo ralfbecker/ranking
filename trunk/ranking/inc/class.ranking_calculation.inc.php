@@ -682,6 +682,7 @@ class ranking_calculation
 		}
 		$this->pers = $this->pkte = $this->disciplines = $this->cats = $this->platz = $this->not_counting = $this->counting = array();
 		if ($overall || $min_disciplines) $results[] = array('PerId' => 0);	// marker to check last result for $min_disciplines
+		//error_log(__METHOD__."() overall=$overall, max_comp=$max_comp, min_disciplines=$min_disciplines, drop_equally=$drop_equally");
 		foreach($results as $result)
 		{
 			// combined: set points=0, if number of disciplines < $min_disciplines (UI can then choose to show or hide these)
@@ -698,7 +699,7 @@ class ranking_calculation
 			}
 			//if (!isset($this->pers[$id])) error_log(__METHOD__."() *** $result[nachname] $result[vorname] ***");
 			$reserve_for_min_disciplines = $min_disciplines - count($this->disciplines[$id]);
-			if ($reserve_for_min_disciplines < 0 || !$min_disciplines) $reserve_for_min_disciplines = 0;
+			if (!$drop_equally || $reserve_for_min_disciplines < 0 || !$min_disciplines) $reserve_for_min_disciplines = 0;
 			if (!$max_comp || $this->cats[$id][$result['GrpId']] < $max_comp-
 				(isset($this->disciplines[$id][$result['discipline']]) ? $reserve_for_min_disciplines : 0))
 			{
