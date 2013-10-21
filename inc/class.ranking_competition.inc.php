@@ -379,7 +379,7 @@ class ranking_competition extends so_sql
 			if ($criteria['rkey']) $criteria['rkey'] = strtoupper($criteria['rkey']);
 		}
 		//$this->debug = 1;
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
 
 	/**
@@ -411,12 +411,12 @@ class ranking_competition extends so_sql
 		{
 			$query[] = $this->db->expression($this->result_table,array('GrpId' => $cats));
 		}
-		$ret = $this->search(array(),false,$this->table_name.'.datum DESC','','',false,
+		$ret = $this->search(array(),$this->table_name.'.*',$this->table_name.'.datum DESC','','',false,
 			'AND',array($num-1,1),$query,",$this->result_table WHERE $this->table_name.WetId=$this->result_table.WetId
 			AND $this->table_name.datum <= ".$this->db->quote($date));
 
 		if ($this->debug) echo "<p>competition::last_comp('$date',".print_r($cats,true).",'$nation',$cup)=".$ret[0]['rkey']."</p>\n";
-
+		//error_log(__METHOD__."('$date',".array2string($cats).",'$nation',$cup)=".$ret[0]['rkey']);
 		return $ret ? $ret[0] : false;
 	}
 
