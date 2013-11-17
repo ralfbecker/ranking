@@ -199,7 +199,7 @@ class ranking_export extends boresult
 			}
 			else
 			{
-				$base .= '/ranking.php?cat=';
+				$base .= '/ranglist.php?type=ranking&cat=';
 			}
 		}
 		if (is_array($cat)) $cat = $cat['GrpId'];
@@ -1497,7 +1497,7 @@ class ranking_export extends boresult
 			'participants'  => $results,
 			'last_modified' => $last_modified,
 		);
-		$ret += $this->see_also_result($comp, $cat);
+		$ret += $this->see_also_result($comp, $cat, 'result');
 
 		// add other categories
 		foreach($this->result->search(array(
@@ -1530,9 +1530,10 @@ class ranking_export extends boresult
 	 *
 	 * @param array $comp
 	 * @param int $cat
+	 * @param string $type=null "result"
 	 * @return array with array of links ("name", "url") for key "see_also", empty array otherwise
 	 */
-	public function see_also_result(array $comp, $cat)
+	public function see_also_result(array $comp, $cat, $type=null)
 	{
 		$see_also = array();
 		if ((double)$comp['faktor'] > 0)
@@ -1547,6 +1548,15 @@ class ranking_export extends boresult
 			$see_also[] = array(
 				'name' => $cup['name'].' '.'after'.' '.$comp['name'],
 				'url' => self::ranking_url($cat, $cup, $comp),
+			);
+		}
+		// Dt. Landesmeisterschaft --> Landeswertung verlinken
+		if ($type !== 'result' && $comp['nation'] == 'GER' &&
+			($fed = $this->federation->read($comp['fed_id'])) && $fed['fed_parent'] == 1)
+		{
+			$see_also[] = array(
+				'name' => 'Wertung '.$fed['verband'],
+				'url' => self::result_url($comp['WetId'], $cat['GrpId']).'&type=result',
 			);
 		}
 		return $see_also ? array('see_also' => $see_also) : array();
