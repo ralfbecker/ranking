@@ -1050,8 +1050,7 @@ class boresult extends boranking
 			$stand = $comp['datum'];
  			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
 
-			$browser =& CreateObject('phpgwapi.browser');
-			$browser->content_header($cat['name'].' - '.$route['route_name'].'.csv','text/comma-separated-values');
+			html::content_header($cat['name'].' - '.$route['route_name'].'.csv','text/comma-separated-values');
 			$name2csv = array(
 				'WetId'    => 'comp',
 				'GrpId'    => 'cat',
