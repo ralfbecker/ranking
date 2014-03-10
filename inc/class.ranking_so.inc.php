@@ -18,6 +18,19 @@
  * and passes it to it's sub-objects which are private and get instanciated on demand by a __get() method.
  *
  * These sub-objects implement DB access to the various tables of the rang database.
+ *
+ * @property-read pktsystem $pkte
+ * @property-read rls_system $rls
+ * @property-read cats $category
+ * @property-read ranking_cup $cup
+ * @property-read ranking_competition $comp
+ * @property-read ranking_athlete $athlete
+ * @property-read result $result
+ * @property-read route $route
+ * @property-read route_result $route_result
+ * @property-read ranking_federation $federation;
+ * @property-read ranking_display $display;
+ * @property-read ranking_calculation $calc;
  */
 class ranking_so
 {

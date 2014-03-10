@@ -417,6 +417,14 @@ class result extends so_sql
 		{
 			return false;
 		}
+		// delete GrpId=0 and WetId=0 records from $from used to ease finding new athletes in their category
+		// gives SQL error because of doublicate primary key, if not deleted
+		$this->db->delete($this->table_name, array(
+			'PerId' => $from,
+			'GrpId' => 0,
+			'WetId' => 0,
+		), __LINE__, __FILE__);
+
 		$this->db->update($this->table_name,array('PerId'=>$to),array('PerId'=>$from),__LINE__,__FILE__,'ranking');
 
 		return $this->db->affected_rows();
