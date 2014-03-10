@@ -35,7 +35,7 @@ $cats = array(
 //		'rang_title'=> '',
 		'bgcolor'   => '#D8E8FF',
 		'nat_team_ranking' => !isset($_REQUEST['year']) || $_REQUEST['year'] >= 2005,
-		'cat_id' => array(71),
+		'cat_id' => array(71,258),
 	),
 	'masters' => array(
 		'label'  => 'Masters',
@@ -53,7 +53,7 @@ $cats = array(
 		'grps'	 => $icc_para,
 		'wettk_reg' => '^[0-9]{2,2}_PE.*',
 		'bgcolor'   => '#F0F0F0',
-		'cat_id' => array(256),
+		'cat_id' => array(256,259),
 	),
 );
 
