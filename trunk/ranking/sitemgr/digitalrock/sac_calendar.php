@@ -35,7 +35,7 @@ $cats = array(
 		'rang_title'=> 'CUWR continuously updated WORLDRANKING',
 		'bgcolor'   => '#B8C8FF',
 		'nat_team_ranking' => !isset($_REQUEST['year']) || $_REQUEST['year'] >= 2005,
-		'cat_id'    => array(68,69,70,86),
+		'cat_id'    => array(68,69,70,86,259),
 	),
 	'youth' => array(
 		'label'  => 'Int. Jugend',
@@ -45,7 +45,7 @@ $cats = array(
 		'serie_reg' => '^[0-9]{2,2}_EYC',
 		'rang_title'=> '',
 		'bgcolor'   => '#D8E8FF',
-		'cat_id'    => array(71),
+		'cat_id'    => array(71,258),
 	),
 	'sui' => array(
 		'label'  => 'Erwachsene',
