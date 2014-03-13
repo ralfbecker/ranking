@@ -472,10 +472,11 @@ class ranking_athlete_ui extends boranking
 				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
 			}
 			// forbid non-admins or users without competition edit rights to change
-			// the name of an athlete who has not climbed for more then one year
+			// the name of an athlete who has not climbed for more then two years
 			// (gard against federations "reusing" athlets)
-			if ($this->athlete->data['PerId'] && ranking_athlete::age($this->athlete->data['last_comp']) > 1 &&
-				!($this->is_admin || $this->edit_rights[$this->athlete->data['nation']] || $this->edit_rights['NULL']))
+			if ($this->athlete->data['PerId'] && $this->athlete->data['last_comp'] &&
+				ranking_athlete::age($this->athlete->data['last_comp']) > 2 &&
+				!($this->is_admin || array_intersect(array($this->athlete->data['nation'], 'NULL'), $this->edit_rights)))
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = true;
 			}
