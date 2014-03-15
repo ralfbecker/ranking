@@ -276,6 +276,7 @@ class ranking_competition_ui extends boranking
 				'nation' => !!$this->only_nation_edit,
 				'fed_id' => is_numeric($this->only_nation_edit),
 				'edit'   => !$view || !$this->acl_check_comp($this->comp->data),
+				'copy'   => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
 			);
 			// if only federation rights (no national rights), switch of ranking tab, to not allow changes there
 			if (!$this->acl_check($this->comp->data['nation'], EGW_ACL_EDIT))
