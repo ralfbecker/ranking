@@ -678,6 +678,10 @@ class route_result extends so_sql
 				}
 				break;
 
+			case 'selfscore':
+				$data['result'] = count($data['score']);
+				break;
+
 			case 'speedrelay':
 				for($i = 1; $i <= 3; ++$i)
 				{
@@ -937,6 +941,7 @@ class route_result extends so_sql
 				}
 			}
 			unset($data['result_detail']);	// do NOT store existing problem specific results
+			if ($data['score']) $data['result_detail'] = array('score' => $data['score']);
 		}
 		if ((float)$data['ability_percent'])
 		{
@@ -969,7 +974,7 @@ class route_result extends so_sql
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
 		}
-		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent','checked') as $name)
+		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent','checked','score') as $name)
 		{
 			if (isset($new[$name])) $this->data[$name] = $new[$name];
 		}
@@ -1019,6 +1024,7 @@ class route_result extends so_sql
 				}
 				break;
 			case 'boulder':
+			case 'selfscore':
 				$mode = $this->rank_boulder;
 				$order_by = 'result_top IS NULL,result_top DESC,result_zone IS NULL,result_zone DESC';
 		}

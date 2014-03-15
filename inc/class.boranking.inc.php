@@ -39,6 +39,7 @@ class boranking extends ranking_so
 		'speed' => 'speed',
 		'speedrelay' => 'speedrelay',
 		'boulderheight' => 'boulder: height, tries',	// height and tries, as used in Arco
+		'selfscore' => 'boulder: self-scoring',	// self-scoring honesty system
 	);
 	var $pkt_names;
 	var $cat_names;

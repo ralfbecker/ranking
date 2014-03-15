@@ -48,7 +48,7 @@ function check_top(top)
 
 /**
  * onChange of tops: if bonus not set, set it to the same number of tops
- *  if tops > zones alert user and set tops to zones or 
+ *  if tops > zones alert user and set tops to zones or
  *  if less tries then tops alert user and set tries to tops
  *
  * @param top top select box
@@ -64,9 +64,9 @@ function check_tops(top)
 		alert('Top > Bonus!');
 		bonus.value = top.value;
 	}
-	
+
 	var tries = document.getElementById(top.name.replace(/tops/g,'top_tries'));
-	
+
 	if (tries && !tries.value && parseInt(top.value) > 0) tries.value = top.value;
 
 	if (tries && parseInt(top.value) > 0 && parseInt(top.value) > parseInt(tries.value))
@@ -115,9 +115,9 @@ function check_zones(bonus)
 	{
 		top.value = bonus.value;
 	}
-	
+
 	var tries = document.getElementById(bonus.name.replace(/zones/g,'zone_tries'));
-	
+
 	if (tries && !tries.value && parseInt(bonus.value) > 0) tries.value = bonus.value;
 
 	if (tries && parseInt(bonus.value) > 0 && parseInt(bonus.value) > parseInt(tries.value))
@@ -129,7 +129,7 @@ function check_zones(bonus)
 
 /**
  * Start the time measurement
- * 
+ *
  * @param button
  * @param athlete
  */
@@ -150,7 +150,7 @@ var TOP_PLUS = 9999;	// option-value of 'Top' in plus selectbox
 
 /**
  * Change athlete, onchange for ahtlete selection
- * 
+ *
  * @param selectbox
  */
 function change_athlete(selectbox)
@@ -162,7 +162,7 @@ function change_athlete(selectbox)
 		var route_order = document.getElementById('exec[nm][route]').value;
 
 		unmark_holds();
-		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value, 
+		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value,
 			{ 'exec[result_height]': 'result_height', 'exec[result_plus]': 'result_plus' },
 			{ 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order });
 	}
@@ -175,7 +175,7 @@ function change_athlete(selectbox)
 
 /**
  * Update athlete, send new result to server
- * 
+ *
  * @param boolean scroll_mark=true
  */
 function update_athlete(scroll_mark)
@@ -184,7 +184,7 @@ function update_athlete(scroll_mark)
 	var GrpId = document.getElementById('exec[nm][cat]').value;
 	var route_order = document.getElementById('exec[nm][route]').value;
 	var PerId = document.getElementById('exec[nm][PerId]').value;
-	
+
 	if (PerId)
 	{
 		var height = document.getElementById('exec[result_height]');
@@ -196,7 +196,7 @@ function update_athlete(scroll_mark)
 			plus.value   = TOP_PLUS;
 		}
 		if (typeof scroll_mark == 'undefined' || scroll_mark)
-		{	 
+		{
 			var holds = getHoldsByHeight(plus.value == TOP_PLUS ? TOP_HEIGHT : height.value);
 			if (holds.length)
 			{
@@ -205,13 +205,13 @@ function update_athlete(scroll_mark)
 			}
 		}
 		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { 'result_height': height.value, 'result_plus': plus.value}, 1, {
-			'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});				
+			'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
 	}
 }
 
 /**
  * Mark holds: red and bold
- * 
+ *
  * @param holds
  */
 function mark_holds(holds)
@@ -221,7 +221,7 @@ function mark_holds(holds)
 
 /**
  * Unmark holds: black and normal
- * 
+ *
  * @param holds holds to mark, default all
  */
 function unmark_holds(holds)
@@ -233,7 +233,7 @@ function unmark_holds(holds)
 
 /**
  * Load topo
- * 
+ *
  * @param string path
  * @param array holds handholds to display or undefined to query them from the server
  */
@@ -242,7 +242,7 @@ function load_topo(path)
 	var topo = document.getElementById('topo');
 
 	remove_handholds();
-	
+
 	topo.src = window.egw_webserverUrl+(path ? '/webdav.php'+path : '/phpgwapi/templates/default/images/transparent.png');
 
 	if (path) xajax_doXMLHTTP('ranking_measurement::ajax_load_topo',path);
@@ -250,18 +250,18 @@ function load_topo(path)
 
 /**
  * Handler for a click on the topo image
- * 
+ *
  * @param eventObject e
  */
 function topo_clicked(e)
 {
 	//console.log(e);
-	
+
 	var topo = e.target;
 	//console.log(topo);
-	
+
 	var PerId = document.getElementById('exec[nm][PerId]').value;
-	
+
 	if (!PerId)
 	{
 		// FF 15 has offsetX/Y values in e.orginalEvent.layerX/Y (Chrome&IE use offsetX/Y)
@@ -281,7 +281,7 @@ var activ_hold;
 
 /**
  * Handler for a click on a hold
- * 
+ *
  * @param eventObject e
  */
 function hold_clicked(e)
@@ -290,15 +290,15 @@ function hold_clicked(e)
 	active_hold = $j(active_hold.nodeName != 'DIV' ? active_hold.parentNode : activeNode);	// img or span clicked, not container div itself
 	//console.log(active_hold);
 	//console.log(active_hold.data('hold'));
-	
+
 	var PerId = document.getElementById('exec[nm][PerId]').value;
-	
+
 	if (!PerId)	// edit topo mode
 	{
 		var popup = document.getElementById('exec[hold_popup]');
 		var height = document.getElementById('exec[hold_height]');
 		var top = document.getElementById('exec[hold_top]');
-		
+
 		popup.style.display = 'block';
 		if (!(height.disabled = top.checked = active_hold.data('hold').height == TOP_HEIGHT))
 		{
@@ -311,7 +311,7 @@ function hold_clicked(e)
 		document.getElementById('exec[result_plus]').value = '0';
 
 		mark_holds(active_hold);
-		update_athlete(false);	// false = no automatic scroll	
+		update_athlete(false);	// false = no automatic scroll
 	}
 }
 
@@ -326,7 +326,7 @@ function hold_popup_close()
 
 /**
  * Submit hold popup (and close it)
- * 
+ *
  * @param button
  */
 function hold_popup_submit(button)
@@ -347,7 +347,7 @@ function hold_popup_submit(button)
 
 /**
  * Display a single handhold
- * 
+ *
  * @param object hold
  */
 function add_handhold(hold)
@@ -369,13 +369,13 @@ function add_handhold(hold)
 	$j(container).append(span);
 	$j(container).data('hold',hold);
 	$j(container).click(hold_clicked);
-	
+
 	$j('div.topoContainer').append(container);
 }
 
 /**
  * Display an array of handholds
- * 
+ *
  * @param array holds
  */
 function show_handholds(holds)
@@ -391,9 +391,9 @@ function remove_handholds()
 
 /**
  * Recalculate handhold position, eg. when window get's resized or topo image is loaded
- * 
+ *
  * Required because topo image is scaled to width:100% AND displayed in a container div with fixed height and overflow:auto
- * 
+ *
  * @param boolean resizeContainer=true
  */
 function recalc_handhold_positions(resizeContainer)
@@ -419,18 +419,18 @@ function print_topo()
 {
 	$j('div.topoContainer').width('18cm');	// % placed handholds do NOT work with % with on print!
 	$j('div.topoContainer').css('height','auto');
-	
+
 	$j('div.topoContainer').css('visible');
-	
+
 	recalc_handhold_positions(false);
-	
+
 	window.focus();
 	window.print();
 }
 
 /**
  * Get holds with a given height
- * 
+ *
  * @param int|float height
  * @returns array
  */
@@ -445,7 +445,7 @@ function getHoldsByHeight(height)
 
 /**
  * Init topo stuff, get's call on document.ready via $GLOBALS['egw_info']['flags']['java_script']
- * 
+ *
  * @param array holds
  */
 function init_topo(holds)
@@ -454,7 +454,7 @@ function init_topo(holds)
 	$j('#topo').load(recalc_handhold_positions);
 	$j('#topo').click(topo_clicked);
 	if (holds && holds.length) show_handholds(holds);
-	
+
 	// mark current athlets height
 	var height = parseFloat(document.getElementById('exec[result_height]').value);
 	var plus = document.getElementById('exec[result_plus]').value;
@@ -471,7 +471,7 @@ function init_topo(holds)
 
 /**
  * [Try] button clicked --> update number
- * 
+ *
  * @param input type="button" button
  */
 function try_clicked(button)
@@ -479,7 +479,7 @@ function try_clicked(button)
 	var label = button.value;
 	var num = try_num();
 	try_num(++num);
-	
+
 	var bonus = document.getElementById('exec[zone]');
 
 	// set bonus 'No'=0, for 1. try, if there's no bonus yet
@@ -494,19 +494,19 @@ function try_clicked(button)
 
 /**
  * Set tries to given number
- * 
+ *
  * @param n
  */
 function set_try(n)
 {
 	try_num(n-1, true);
-	
+
 	try_clicked(document.getElementById('exec[button][try]'));
 }
 
 /**
  * Get number of try from label of try button
- * 
+ *
  * @param int set_value 0: reset, 1: set to 1, if not already higher
  * @param boolean set_anyway set, even if number is smaller
  * @returns int number of try
@@ -517,12 +517,12 @@ function try_num(set_value, set_anyway)
 
 	var num = parseInt(try_button.value);
 	if (isNaN(num)) num = 0;
-	
+
 	if (typeof set_value != 'undefined')
 	{
 		var label = try_button.value;
 		label = label.replace(/^[0-9]+. /,'');
-		
+
 		if (set_value == 0 || num < set_value || set_anyway)
 		{
 			document.getElementById('exec[try]').value = num = set_value;
@@ -534,7 +534,7 @@ function try_num(set_value, set_anyway)
 
 /**
  * Bonus button clicked
- * 
+ *
  * @param button
  */
 function bonus_clicked(button)
@@ -542,13 +542,13 @@ function bonus_clicked(button)
 	var bonus = document.getElementById('exec[zone]');
 	bonus.value = try_num(1);
 	check_bonus(bonus);
-	
+
 	update_boulder('bonus');
 }
 
 /**
  * Bonus button clicked
- * 
+ *
  * @param button
  */
 function top_clicked(button)
@@ -562,7 +562,7 @@ function top_clicked(button)
 		if(!bonus.value || bonus.value == '0') bonus.value = num;
 		top.value = num;
 		check_top(top);
-		
+
 		//update_boulder();
 	}
 	update_boulder('top');
@@ -583,7 +583,7 @@ function update_boulder(clicked)
 	{
 		var bonus = document.getElementById('exec[zone]').value;
 		var top = document.getElementById('exec[top]').value;
-		
+
 		if (typeof protocol != 'undefined')
 		{
 			protocol.record({
@@ -598,12 +598,12 @@ function update_boulder(clicked)
 				'try': clicked ? try_num() : null
 			});
 		}
-		
+
 		var update = {};
 		update['zone'+n] = bonus === '' ? 'empty' : bonus;	// egw_json_encode sends '' as null, which get not stored!
 		update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
 
-		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});				
+		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
 	}
 }
 
@@ -621,7 +621,7 @@ function init_boulder()
 	document.getElementById('exec[button][try]').disabled = !PerId || !n;
 	document.getElementById('exec[button][bonus]').disabled = !PerId || !n;
 	document.getElementById('exec[button][top]').disabled = !PerId || !n;
-	
+
 	if (!document.getElementById('table'))
 	{
 		var table = document.createElement('div');
@@ -636,14 +636,14 @@ function init_boulder()
 
 /**
  * Boulder or athlete changed
- * 
+ *
  * @param selectbox
  */
 function boulder_changed(selectbox)
 {
 	var PerId = document.getElementById('exec[nm][PerId]').value;
 	var n = document.getElementById('exec[nm][boulder_n]').value;
-	
+
 	// ToDo load values from server
 	if (PerId && n)
 	{
@@ -668,7 +668,7 @@ function boulder_changed(selectbox)
 function boulder_next()
 {
 	var PerId = document.getElementById('exec[nm][PerId]');
-	
+
 	PerId.selectedIndex = PerId.selectedIndex + 1;	// ++ works NOT reliable ...
 
 	// need to call this manually, as changing selectedIndex does NOT trigger onchange
@@ -677,7 +677,7 @@ function boulder_next()
 
 /**
  * Update result of current row
- * 
+ *
  * @param dom _elem [apply] button or scorecard checkbox (boulder only)
  * @param int _perId
  */
@@ -686,7 +686,7 @@ function update_row(_elem, _perId)
 	//var row = document.getElementById(_perId);
 	var row = jQuery(_elem).parents('table.egwGridView_grid > tbody > tr')[0];
 	var values = egw_json_getFormValues(row);
-	if (typeof values.exec == 'undefined') { 
+	if (typeof values.exec == 'undefined') {
 		values = {exec: {nm: {rows: {set: {}}}}};
 		values.exec.nm.rows.set[_perId] = {};
 	}
@@ -700,4 +700,13 @@ function update_row(_elem, _perId)
 	xajax_doXMLHTTP('ranking.uiresult.ajax_update', _elem.form.etemplate_exec_id.value, values, update_checked);
 }
 
+/**
+ * selfscore scorecard
+ */
+function update_scorecard()
+{
+	var values = egw_json_getFormValues(jQuery('form')[0]);
 
+	xajax_doXMLHTTP('ranking_selfscore_measurement::ajax_update_result', values.exec.nm.PerId, values.exec.score,
+		{'WetId': values.exec.comp.WetId, 'GrpId': values.exec.nm.cat, 'route_order': values.exec.nm.route});
+}
