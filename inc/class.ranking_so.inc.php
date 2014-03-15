@@ -115,7 +115,7 @@ class ranking_so
 		'cup'     => 'ranking_cup',
 		'comp'    => 'ranking_competition',
 		'athlete' => 'ranking_athlete',
-		'result'  => 'result',
+		'result'  => 'ranking_result',
 		'route'   => 'route',
 		'route_result'  => 'route_result',
 		'federation' => 'ranking_federation',
