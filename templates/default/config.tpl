@@ -56,37 +56,6 @@
      <input size="80" name="newsettings[import_url]" value="{value_import_url}">
     </td>
    </tr>
-
-   <tr class="th">
-    <td colspan="2"><b>Autoimport from rock programms</b>:</td>
-   </tr>
-   <tr class="row_on">
-    <td>Competition to use:</td>
-    <td>
-     <select name="newsettings[rock_import_calendar]">{hook_rock_import_calendar}</select>
-     <select name="newsettings[rock_import_comp]">{hook_rock_import_comp}</select>
-    </td>
-   </tr>
-   <tr class="row_off">
-    <td>Path for rock files to import (without year):</td>
-    <td>
-     <input name="newsettings[rock_import_path]" value="{value_rock_import_path}">
-    </td>
-   </tr>
-   <tr class="row_on">
-    <td>1. route to import (rock-route/category/heat):</td>
-    <td>
-    	<input name="newsettings[rock_import1]" value="{value_rock_import1}">
-    	<select name="newsettings[rock_import_cat1]">{hook_rock_import_cat1}</select>
-     	<select name="newsettings[rock_import_route1]">{hook_rock_import_route1}</select>
-   </td>
-   <tr class="row_off">
-    <td>2. route to import (rock-route/category/heat):</td>
-    <td>
-    	<input name="newsettings[rock_import2]" value="{value_rock_import2}">
-    	<select name="newsettings[rock_import_cat2]">{hook_rock_import_cat2}</select>
-     	<select name="newsettings[rock_import_route2]">{hook_rock_import_route2}</select>
-   </td>
 <!-- END body -->
 
 <!-- BEGIN footer -->

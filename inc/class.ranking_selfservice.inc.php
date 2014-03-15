@@ -177,6 +177,7 @@ class ranking_selfservice extends boranking
 		echo "</tr></table>\n</form>\n";
 
 		// list other competitons with selfservice registration
+		$found = null;
 		foreach($this->comp->search('', false, 'datum', '', '*', false, 'AND', false, array(
 			'datum > '.$this->db->quote(time(), 'date'),
 			'datum <= '.$this->db->quote(strtotime('+6 month'), 'date'),
@@ -211,10 +212,9 @@ class ranking_selfservice extends boranking
 	 *
 	 * @param array $comp
 	 * @param array $athlete
-	 * @param boolean $check_has_result=false true: check if category already has a result
 	 * @return array GrpId => name pairs
 	 */
-	private function matching_cats(array $comp, array $athlete, $check_has_result=true)
+	private function matching_cats(array $comp, array $athlete)
 	{
 		$cats = array();
 		foreach($comp['gruppen'] as $rkey)
@@ -386,7 +386,7 @@ class ranking_selfservice extends boranking
 					echo "<p>".lang('Try again after %1 minutes.',self::LOGIN_SUSPENDED/60)."</p>\n";
 					common::egw_exit();
 				}
-				elseif (!$loged_in && !auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
+				elseif (!auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
 				{
 					$this->athlete->update(array(
 						'last_login' => $this->athlete->now,
@@ -457,7 +457,7 @@ class ranking_selfservice extends boranking
 		if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
 
 		$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
-		self::mail("$athlete[vorname] $athlete[$nachname] <$athlete[email]>",
+		self::mail("$athlete[vorname] $athlete[nachname] <$athlete[email]>",
 			$athlete+array(
 				'LINK' => preg_match('/\.txt$/',$template) ? $link : '<a href="'.$link.'">'.$link.'<a>',
 				'SERVER_NAME' => $_SERVER['SERVER_NAME'],
@@ -478,7 +478,7 @@ class ranking_selfservice extends boranking
 	{
 		//$email = "$replacements[vorname] $replacements[nachname] <info@digitalrock.de>";
 		$is_txt = preg_match('/\.txt$/', $template);
-		if (!($body = file_get_contents($template)))
+		if (!($file = file_get_contents($template)))
 		{
 			throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
 		}
@@ -487,12 +487,13 @@ class ranking_selfservice extends boranking
 		{
 			$replace['$$'.$name.'$$'] = $value;
 		}
-		$body = strtr($body, $replace);
-		list($subject,$body) = preg_split("/\r?\n/",$body,2);
+		$subject_body = strtr($file, $replace);
+		list($subject,$body) = preg_split("/\r?\n/", $subject_body, 2);
 
 		$mailer = new send();
 		$mailer->IsHTML(!$is_txt);
 
+		$matches = null;
 		if (preg_match_all('/"?(.+)"?<(.+)>,?/',$email,$matches))
 		{
 			$names = $matches[1];

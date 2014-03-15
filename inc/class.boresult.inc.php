@@ -64,13 +64,6 @@ class boresult extends boranking
 	 * @var array
 	 */
 	var $plus,$plus_labels;
-	/**
-	 * Logfile for the bridge to the rock programms running via async service
-	 * Set to null to switch it of.
-	 *
-	 * @var string
-	 */
-	var $rock_bridge_log = '/tmp/rock_bridge.log';
 
 	/**
 	 * Instance of boresult, if instancated
@@ -331,7 +324,7 @@ class boresult extends boranking
 	 */
 	function get_registered($keys,$only_nations=false)
 	{
-		static $stored_keys,$starters;
+		static $stored_keys=null,$starters=null;
 		if ($keys !== $stored_keys)
 		{
 			$starters = $this->result->read($keys,'',true,'nation,reg_nr');
@@ -470,7 +463,7 @@ class boresult extends boranking
 		//echo "<p>".__METHOD__."(".array2string($keys).",$start_order,$discipline) ko_system=$ko_system</p>\n";
 		if ($ko_system && $keys['route_order'] > 2)
 		{
-			return $this->_startlist_from_ko_heat($keys,$prev_route);
+			return $this->_startlist_from_ko_heat($keys);
 		}
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
@@ -529,6 +522,7 @@ class boresult extends boranking
 				$cols = array();
 				if (self::is_two_quali_all($prev_route['route_type'])) $prev_keys['route_order'] = 0;
 				$prev_keys[] = 'result_rank IS NOT NULL';	// otherwise not started athletes qualify too
+				$route_names = null;
 				$join = $this->route_result->_general_result_join(array(
 					'WetId' => $keys['WetId'],
 					'GrpId' => $keys['GrpId'],
@@ -771,7 +765,8 @@ class boresult extends boranking
 	 */
 	function _ranking_sql($cat,$stand,$PerId='PerId')
 	{
-	 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$mode == 2 ? $comp['serie'] : '');
+		$nul = null;
+	 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);//,$mode == 2 ? $comp['serie'] : '');
 		if (!$ranking) return null;
 
 		$sql = 'CASE '.$PerId;
@@ -834,7 +829,7 @@ class boresult extends boranking
 		//echo "<p>".__METHOD__."(".array2string($keys).",,$route_type,'$discipline')</p>\n"; _debug_array($results);
 		if ((is_null($old_values) || $discipline == 'boulder') && $results)
 		{
-			$current_values = $this->route_result->results_by_id($keys+array($this->route_result->id_col=>$id));
+			$current_values = $this->route_result->results_by_id($keys);//+array($this->route_result->id_col=>$id));
 			if (is_null($old_values)) $old_values = $current_values;
 		}
 		$modified = 0;
@@ -1048,6 +1043,7 @@ class boresult extends boranking
 			//_debug_array($athletes); return;
 
 			$stand = $comp['datum'];
+			$nul = $test = $ranking = null;
  			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
 
 			html::content_header($cat['name'].' - '.$route['route_name'].'.csv','text/comma-separated-values');
@@ -1243,12 +1239,10 @@ class boresult extends boranking
 	 *
 	 * @param array $keys WetId, GrpId, route_order and optional 'route_type' and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
-	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
 	 * @return array|string array with imported data (array of array for route_result->save) or string with error message
 	 */
-	protected function parse_xml($keys,$file,$add_athletes=false)
+	protected function parse_xml($keys,$file)
 	{
-		$rank_missing = false;
 		$route_type = $keys['route_type'];
 		$discipline = $keys['discipline'];
 		$keys = array_intersect_key($keys, array_flip(array('WetId','GrpId','route_order')));
@@ -1419,6 +1413,7 @@ class boresult extends boranking
 	static function parse_time($str,&$eliminated=null)
 	{
 		$eliminated = '';
+		$matches = null;
 		if (!isset($str) || (string)$str == '')
 		{
 			// empty / not set
@@ -1472,8 +1467,8 @@ class boresult extends boranking
 		}
 		if ($import_cat)
 		{
-			list($import_cat, $import_comp) = explode(':', $import_cat);
-			$import_cat = $this->cats->read($import_cat);
+			list($import_cat_id, $import_comp) = explode(':', $import_cat);
+			$import_cat = $this->cats->read($import_cat_id);
 			if ($import_comp && ($import_comp = $this->comp->read($import_comp)) && ($import_comp['nation'] || $import_comp['fed_id']))
 			{
 				$filter_nation = $import_comp['fed_id'] ? $import_comp['fed_id'] : $import_comp['nation'];
@@ -1548,237 +1543,6 @@ class boresult extends boranking
 	}
 
 	/**
-	 * Gets called via the async service if an automatic import from the rock programms is configured
-	 *
-	 * @param array $hook_data
-	 */
-	function import_from_rock($hook_data)
-	{
-		//echo "import_from_rock"; _debug_array($this->config);
-		$this->_bridge_log("**** bridge run started");
-		foreach($this->config as $name => $value) if (substr($name,0,11)=='rock_import') $this->_bridge_log("config[$name]='$value'");
-
-		if (!$this->config['rock_import_comp'] || !($comp = $this->comp->read($this->config['rock_import_comp'])))
-		{
-			$this->_bridge_log("no competition configured or competition ({$this->config['rock_import_comp']}) not found!");
-			return;
-		}
-
-		for ($n = 1; $n <= 2; ++$n)
-		{
-			if (!($rroute = $this->config['rock_import'.$n]))
-			{
-				$this->_bridge_log("$n: No route configured!");
-				continue;
-			}
-
-			list(,$rcomp) = explode('.',$rroute);
-			$year = 2000 + (int) $rcomp;
-			$file = $this->config['rock_import_path'].'/'.$year.'/'.$rcomp.'/'.$rroute.'.php';
-
-			$imported = $this->import_rock($file,$comp,$this->config['rock_import_route'.$n]);
-			if (is_int($imported))
-			{
-				$this->_bridge_log("$n: number of participants imported: ".$imported);
-			}
-			else
-			{
-				$this->_bridge_log($n.': '.$imported);
-			}
-		}
-		$this->_bridge_log("**** bridge run finished");
-	}
-
-	/**
-	 * Import an ROCK export file into result-service
-	 *
-	 * @param string $file full path to export file
-	 * @param array $comp result service competition
-	 * @param int $route result service route_order
-	 * @param int $cat=null cat if not autodetected from $file
-	 * @return string|int string with error message or number of participants imported
-	 */
-	function import_rock($file,array $comp,$heat,$cat=null)
-	{
-		if (!file_exists($file))
-		{
-			return "File '$file' not found!";
-		}
-		include($file);
-
-		if (!is_array($route) || !$route['teilnehmer'])
-		{
-			return "File '$file' does not include a rock route or participants!";
-		}
-
-		if (!$cat) $cat = $route['GrpId'];
-
-		if (!$cat || !($cat = $this->cats->read($cat)) ||
-			!in_array($cat['rkey'],$comp['gruppen']) || $route['GrpId'] != $cat['GrpId'])
-		{
-			//_debug_array($cat);
-			//_debug_array($comp);
-			//$route['teilnehmer'] = 'not shown'; _debug_array($route);
-			return "Category not configured, not belonging to the competition or not found!";
-		}
-		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
-		$route_imported = $this->_rock2route($route);
-
-		if (!$this->route->read($keys = array(
-			'WetId' => $comp['WetId'],
-			'GrpId' => $cat['GrpId'],
-			'route_order' => (int)$heat,
-		)))
-		{
-			// create a new route
-			$this->route->init($keys);
-			$this->route->save($route_imported);
-			//_debug_array($this->route->data);
-		}
-		elseif($this->route->data['route_status'] == STATUS_RESULT_OFFICIAL)
-		{
-			return "Result already offical!";	// we dont change the result if it's offical!
-		}
-		else
-		{
-			// incorporate changes, not sure if we should do that automatic ???
-			unset($route_imported['route_type']);
-			unset($route_imported['route_name']);
-			$this->route->save($route_imported);
-			//_debug_array($this->route->data);
-		}
-		$this->route_result->delete($keys+array('PerId NOT IN ('.implode(',',array_keys($route['teilnehmer'])),')'));
-		foreach($route['teilnehmer'] as $PerId => $data)
-		{
-			$keys['PerId'] = $PerId;
-			$this->route_result->init($keys);
-			$this->route_result->save($this->_rock2result($data,$discipline));
-		}
-		return count($route['teilnehmer']);
-	}
-
-	/**
-	 * translate a rock participant into a result-service result
-	 *
-	 * @param array $rdata rock participant data
-	 * @param string $discipline lead, speed or boulder
-	 * @return array
-	 */
-	function _rock2result($rdata,$discipline)
-	{
-		list($PerId,$GrpId) = explode('+',$rdata['key']);
-
-		$data = array(
-			'PerId' => $PerId,
-			'GrpId' => $GrpId,
-			'start_order' => $rdata['startfolgenr'],
-			'start_number' => $rdata['startnummer'], //$rdata['startfolgenr'] != $rdata['startnummer'] ? $rdata['startnummer'] : null,
-			'result_rank' =>  $rdata['platz'] ? (int)$rdata['platz'] : null,
-		);
-		if (!$rdata['platz']) return $data;	// no result yet
-
-		switch ($discipline)
-		{
-			case 'lead':
-				$height = $rdata['hoehe'][0];
-				if (strpos($height,'Top') !== false)
-				{
-					$height = TOP_HEIGHT;
-					$plus   = TOP_PLUS;
-				}
-				else
-				{
-					switch(substr($height,-1))
-					{
-						case '+': $plus = 1; break;
-						case '-': $plus = -1; break;
-						default: $plus = 0; break;
-					}
-					// round removed digits if they are zero: 10.00 --> 10, 10.50 --> 10.5
-					$height = round(substr($height,0,-1),2);
-				}
-				$data['result_height'] = $height;
-				$data['result_plus'] = $plus;
-				break;
-
-			case 'speed':
-				$data['result_time'] = $rdata['time'][0] ? 100*$rdata['time'][0] : null;
-				break;
-
-			case 'boulder':
-				if ($rdata['boulder'][0])
-				{
-					$data['top1'] = '';		// otherwise the result is not recogniced as a boulder result!
-					for($i = 1; $i <= 6; ++$i)
-					{
-						$result = trim($rdata['boulder'][$i]);
-						if ($result{0} == 't')
-						{
-							list(,$data['top'.$i],,$data['zone'.$i]) = preg_split('/[tzb ]/',$result);
-						}
-						else
-						{
-							$data['zone'.$i] = (string)(int)substr($result,1);
-						}
-					}
-				}
-				else
-				{
-					unset($data['result_rank']);	// otherwise not climbed athlets are already ranked
-				}
-				break;
-		}
-		return $data;
-	}
-
-	/**
-	 * translate a rock route into a result-service route
-	 *
-	 * @param array $route rock route-data
-	 * @return array
-	 */
-	function _rock2route($route)
-	{
-		list($iso_open,$iso_close) = preg_split('/ ?- ?/',$route['isolation'],2);
-
-		$ret = array(
-			'route_name' => $route['bezeichnung'],
-			'route_judge' => $route['jury'][0],
-			'route_status' => $route['frei_str'] ? STATUS_RESULT_OFFICIAL : STATUS_STARTLIST,
-			'route_type' => ONE_QUALI,	// ToDo: set it from the erge_modus
-			'route_iso_open' => $iso_open,
-			'route_iso_open' => $iso_close,
-			'route_start' => $route['start'],
-			'route_result' => $route['frei_str'],
-			'route_quota' => $route['quote'],
-			'route_num_problems' => substr($route['erge_modus'],0,9) == 'BoulderZ:' ?
-				count(explode('+',substr($route['erge_modus'],9))) : null,
-		);
-		// current participant(s)
-		if ($ret['route_num_problems'])	// boulder uses akt_tns[1,2,..]
-		{
-			for ($i = 1; $i <= $ret['route_num_problems']; ++$i)
-			{
-				$ret['current_'.$i] = $route['akt_tns'][$i] ? $route['akt_tns'][$i] : null;
-			}
-		}
-		else
-		{
-			$ret['current_1'] = $route['akt_tns'][0] ? $route['akt_tns'][0] : null;
-		}
-		return $ret;
-	}
-
-	function _bridge_log($str)
-	{
-		if ($this->rock_bridge_log && ($f = @fopen($this->rock_bridge_log,'a+')))
-		{
-			fwrite ($f,date('Y-m-d H:i:s: ').$str."\n");
-			fclose($f);
-		}
-	}
-
-	/**
 	 * Get the default quota for a given disciplin, route_order and optional quali_type or participants number
 	 *
 	 * @param string $discipline 'speed', 'lead' or 'boulder'
@@ -1795,10 +1559,13 @@ class boresult extends boranking
 		{
 			case 'speed':
 				if (!is_numeric($num_participants)) break;
-				for($n = 16; $n > 1; $n /= 2) if ($num_participants > $n || !$route_order && $num_participants >= $n)
+				for($n = 16; $n > 1; $n /= 2)
 				{
-					$quota = $n;
-					break;
+					if ($num_participants > $n || !$route_order && $num_participants >= $n)
+					{
+						$quota = $n;
+						break;
+					}
 				}
 				break;
 
