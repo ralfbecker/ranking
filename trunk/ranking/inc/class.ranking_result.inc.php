@@ -14,7 +14,7 @@
 /**
  * result object
  */
-class result extends so_sql
+class ranking_result extends so_sql
 {
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 	);
