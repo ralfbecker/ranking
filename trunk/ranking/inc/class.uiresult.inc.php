@@ -41,6 +41,22 @@ class uiresult extends boresult
 				'route_order' => $_GET['route'] == '-2' ? -1 : $_GET['route'],	// -2 pairing speed --> show general result
 			);
 		}
+		elseif ($content['discipline'] == 'selfscore')
+		{
+			$matches = null;
+			if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:[0-9]+)?$/', $content['selfscore_mode'], $matches) ||
+				!($matches[1] > 0))
+			{
+				etemplate::set_validation_error('selfscore_mode', 'Wrong format!');
+				unset($content['button']);
+			}
+			else
+			{
+				$content['route_num_problems'] = (int)$matches[1];
+				$content['selfscore_num'] = $matches[3] > 0 ? (int)$matches[3] : 10;
+				$content['selfscore_points'] = $matches[5] > 0 ? (int)$matches[5] : null;
+			}
+		}
 		// read $comp, $cat, $discipline and check the permissions
 		$comp = $cat = $discipline = null;
 		if (!($ok = $this->init_route($content,$comp,$cat,$discipline)))
@@ -273,6 +289,15 @@ class uiresult extends boresult
 				echo '<html><head><script type="text/javascript">'.$js."</script></head></html>\n";
 				common::egw_exit();
 			}
+		}
+		if ($discipline == 'selfscore')
+		{
+			$content['selfscore_mode'] = $content['route_num_problems'].'/'.$content['selfscore_num'].
+				($content['selfscore_points'] ? ':'.$content['selfscore_points'] : '');
+		}
+		else
+		{
+			$tmpl->disableElement('selfscore_mode');
 		}
 		$content += array(
 			'msg' => $msg,
@@ -1117,7 +1142,7 @@ class uiresult extends boresult
 		}
 		// add measurement for judges and admins, if on a regular lead route (not on general result)
 		if ($comp && $cat && ($this->is_judge($comp,false,$route) || $this->is_admin) && $content['nm']['route'] != -1 &&
-			in_array($content['nm']['discipline'], array('lead','boulder')))
+			in_array($content['nm']['discipline'], array('lead','boulder','selfscore')))
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
 		}
@@ -1172,6 +1197,10 @@ class uiresult extends boresult
 				case 'lead':
 					ranking_measurement::measurement($content, $sel_options, $readonlys);
 					$content['measurement_template'] = 'ranking.result.measurement';
+					break;
+				case 'selfscore':
+					ranking_selfscore_measurement::measurement($content, $sel_options, $readonlys);
+					$content['measurement_template'] = 'ranking.result.selfscore_measurement';
 					break;
 				case 'boulder':
 					ranking_boulder_measurement::measurement($content, $sel_options, $readonlys);
@@ -1543,6 +1572,7 @@ class uiresult extends boresult
 				default:
 				case 'lead':    return 'ranking.result.index.rows_lead';
 				case 'speed':   return 'ranking.result.index.rows_speed';
+				case 'selfscore':
 				case 'boulder': return 'ranking.result.index.rows_boulder';
 				case 'speedrelay': return 'ranking.result.index.rows_relay_speed';
 			}

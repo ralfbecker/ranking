@@ -1607,3 +1607,20 @@ function ranking_upgrade1_9_014()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.015';
 }
 
+
+function ranking_upgrade1_9_015()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','selfscore_num',array(
+		'type' => 'int',
+		'precision' => '2',
+		'comment' => 'number or boulders per rows on scorecard'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','selfscore_points',array(
+		'type' => 'int',
+		'precision' => '2',
+		'comment' => 'points per boulder distributed on all tops'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.016';
+}
+

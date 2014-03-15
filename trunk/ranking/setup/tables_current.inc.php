@@ -271,7 +271,9 @@ $phpgw_baseline = array(
 			'boulder_time' => array('type' => 'int','precision' => '4','comment' => 'boulder rotation time in sec'),
 			'boulder_startet' => array('type' => 'int','precision' => '8','comment' => 'last boulder rotation started timestamp'),
 			'route_judges' => array('type' => 'varchar','precision' => '255','comment' => 'judges for just that route'),
-			'discipline' => array('type' => 'varchar','precision' => '16','comment' => 'lead, speed, boulder or NULL to use from category or competition')
+			'discipline' => array('type' => 'varchar','precision' => '16','comment' => 'lead, speed, boulder or NULL to use from category or competition'),
+			'selfscore_num' => array('type' => 'int','precision' => '2','comment' => 'number or boulders per rows on scorecard'),
+			'selfscore_points' => array('type' => 'int','precision' => '2','comment' => 'points per boulder distributed on all tops')
 		),
 		'pk' => array('WetId','GrpId','route_order'),
 		'fk' => array(),
