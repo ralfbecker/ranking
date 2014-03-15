@@ -42,6 +42,7 @@ class uiresult extends boresult
 			);
 		}
 		// read $comp, $cat, $discipline and check the permissions
+		$comp = $cat = $discipline = null;
 		if (!($ok = $this->init_route($content,$comp,$cat,$discipline)))
 		{
 			$js = "alert('".addslashes(lang('Permission denied !!!'))."'); window.close();";
@@ -60,11 +61,8 @@ class uiresult extends boresult
 		// check if user has NO edit rights
 		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)))
 		{
-			foreach($content as $name => $value)
-			{
-				$readonlys[$name] = true;
-			}
-			$readonlys['button[save]'] = $readonlys['button[apply]'] = true;
+			$readonlys['__ALL__'] = true;
+			$readonlys['button[cancel]'] = false;
 		}
 		elseif ($content['button'] || $content['topos']['delete'])
 		{
@@ -120,6 +118,7 @@ class uiresult extends boresult
 					$param['msg'] = $msg = lang('Heat saved');
 					if ($content['topo_upload'])
 					{
+						$topo_path = null;
 						$msg .= "\n".ranking_measurement::save_topo($content, $content['topo_upload'], $topo_path) ?
 							lang('Topo uploaded as %1.', $topo_path) : lang('Error uploading topo!');
 					}
@@ -511,7 +510,7 @@ class uiresult extends boresult
 		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 		$extra_cols = $query['csv_export'] ? array('strasse','email') : array();
-		$total = $this->route_result->get_rows($query,$rows,$readonlys,$join='',$need_full_no_count=false,$only_keys=false,$extra_cols);
+		$total = $this->route_result->get_rows($query,$rows,$readonlys,$join='',false,false,$extra_cols);
 		//echo $total; _debug_array($rows);
 
 		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
@@ -525,6 +524,7 @@ class uiresult extends boresult
 		{
 			$comp = $this->comp->read($query['comp']);
 			$stand = $comp['datum'];
+			$nul = $test = $ranking = null;
 			if (!$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul,$query['ranking']==2?$comp['serie']:'') && $query['ranking'] == 2 &&
 				// if there no cup ranking yet (first competition) --> use the one from last year
 				($last_cup = $this->cup->read($last_cup_rkey=str_replace('??',substr((int)$comp['datum']-1,-2),$cat['serien_pat']))))
@@ -546,6 +546,8 @@ class uiresult extends boresult
 		}
 		$need_start_number = false;
 		$need_lead_time_column = false;
+		$quota_line = false;
+		$unranked = array();
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
@@ -559,7 +561,7 @@ class uiresult extends boresult
 				// disable input in for checked results
 				if ($row['checked'])
 				{
-					foreach($row as $name => $val)
+					foreach(array_keys($row) as $name)
 					{
 						if ($name != 'checked')
 						{
@@ -587,8 +589,8 @@ class uiresult extends boresult
 			}
 			if (!isset($rows[$k]['class'])) $rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on';
 			if (substr($query['discipline'],0,5) == 'speed' && $query['route'] >= 2 &&
-				(strstr($query['template'],'startlist') && $order == 'start_order' ||
-				!strstr($query['template'],'startlist') && !$row['result_rank'] && $order == 'result_rank'))
+				(strstr($query['template'],'startlist') && $query['order'] == 'start_order' ||
+				!strstr($query['template'],'startlist') && !$row['result_rank'] && $query['order'] == 'result_rank'))
 			{
 				if (!$unranked)
 				{
@@ -653,6 +655,7 @@ class uiresult extends boresult
 			{
 				foreach(array('result','result1') as $n)
 				{
+					$matches = null;
 					if (preg_match('/^([0-9.]+)(\\+|-|&nbsp;)?$/',$row[$n],$matches))
 					{
 						$rows[$k][$n] = str_replace('.00','',number_format($matches[1]/100.0*$row['ability_percent'],2)).$matches[2];
@@ -832,7 +835,7 @@ class uiresult extends boresult
 		}
 		if (!is_array($content))
 		{
-			$content = array('nm' => egw_cache::getSession('ranking', 'result', $query));
+			$content = array('nm' => egw_cache::getSession('ranking', 'result'));
 			if (!is_array($content['nm']) || !$content['nm']['get_rows'])
 			{
 				if (!is_array($content['nm'])) $content['nm'] = array();
@@ -1378,7 +1381,7 @@ class uiresult extends boresult
 			{
 				foreach($this->error as $id => $data)
 				{
-					foreach($data as $field => $error)
+					foreach($data as $error)
 					{
 						$errors[$error] = $error;
 					}
@@ -1447,6 +1450,7 @@ class uiresult extends boresult
 
 						case 'result_time_1':	// relay
 							// we need to check, if id is the co (right climber) or not
+							$id_isnt_co = null;
 							$co = $this->get_co($keys,$id,$id_isnt_co);
 							$to_update = array(
 								'current_1' => $id_isnt_co ? $id : $co,
@@ -1479,7 +1483,7 @@ class uiresult extends boresult
 	 *
 	 * @param array $keys
 	 * @param int $id PerId or team_id
-	 * @param boolean $id_isnt_co=null true if id is NOT the co, false otherwise
+	 * @param boolean &$id_isnt_co=null true if id is NOT the co, false otherwise
 	 * @return NULL|int
 	 */
 	protected function get_co(array $keys,$id,&$id_isnt_co=null)

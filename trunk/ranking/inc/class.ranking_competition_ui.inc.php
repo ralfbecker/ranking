@@ -147,7 +147,7 @@ class ranking_competition_ui extends boranking
 					{
 						$msg .= ', '.lang("Error: renaming the attachments !!!");
 					}
-					foreach($this->comp->attachment_prefixes as $type => $prefix)
+					foreach(array_keys($this->comp->attachment_prefixes) as $type)
 					{
 						$file = $content['upload_'.$type];
 						if (is_array($file) && $file['tmp_name'] && $file['name'])
@@ -374,13 +374,11 @@ class ranking_competition_ui extends boranking
 	{
 		$tmpl = new etemplate('ranking.comp.list');
 
-		$content = $content['nm']['rows'];
-
-		if ($content['delete'] || $_GET['delete'] > 0)
+		if ($content['nm']['rows']['delete'] || $_GET['delete'] > 0)
 		{
-			if ($content['delete'])
+			if ($content['nm']['rows']['delete'])
 			{
-				list($id) = each($content['delete']);
+				list($id) = each($content['nm']['rows']['delete']);
 			}
 			elseif($_GET['delete'] > 0)
 			{

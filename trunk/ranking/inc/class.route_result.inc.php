@@ -104,6 +104,7 @@ class route_result extends so_sql
 	 */
 	function __construct($source_charset='',$db=null,$pdf_dir=null,$relay=false)
 	{
+		unset($pdf_dir);
 		$this->isRelay = $relay;
 		$this->id_col =  $relay ? 'team_id' : 'PerId';
 		//$this->debug = 1;
@@ -241,6 +242,7 @@ class route_result extends so_sql
 				}
 				$order_by_parts = preg_split('/[ ,]/',$order_by);
 
+				$route_names = null;
 				$join .= $this->_general_result_join(array(
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
 					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
@@ -271,7 +273,7 @@ class route_result extends so_sql
 						// if exist need to check first final route too, as prequalifed are not ranking in quali
 						(isset($route_names[2]) ? ' OR r2.result_rank IS NOT NULL' : '').')';
 				}
-				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
+				$rows =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 
 				if (!$rows) return $rows;
 
@@ -356,7 +358,7 @@ class route_result extends so_sql
 		{
 			$extra_cols[] = $this->table_name.'.'.$this->id_col.' AS '.$this->id_col;
 		}
-		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
 
 	/**
@@ -773,7 +775,7 @@ class route_result extends so_sql
 		if (strlen($name) <= $max) return;
 
 		// add a space after each dash or comma, if there's none already
-		$name = preg_replace('/([-,]+ *)/','\\1 ',$name);
+		if (true) $name = preg_replace('/([-,]+ *)/','\\1 ',$name);
 
 		// check all space separated parts for their length
 		$parts = explode(' ',$name);
@@ -1097,7 +1099,7 @@ class route_result extends so_sql
 		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
-		$first_places = array();
+		$old_rank = $old_speed_rank = null;
 		foreach($result as $i => &$data)
 		{
 			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
@@ -1338,7 +1340,7 @@ class route_result extends so_sql
 		if (($values = $this->search($keys, '*')))
 		{
 			// reindex by id
-			foreach($values as $key => $value)
+			foreach($values as $value)
 			{
 				$by_id[$value[$this->id_col]] = $value;
 			}
