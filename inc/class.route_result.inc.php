@@ -444,16 +444,17 @@ class route_result extends so_sql
 	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array())
 	{
 		//echo "<p>".__METHOD__."(".print_r($keys,true).",".print_r($extra_cols,true).",,,type=$route_type,$discipline,".print_r($result_cols,true).")</p>\n";
+		unset($discipline);
 		if (!isset($GLOBALS['egw']->route) || !is_object($GLOBALS['egw']->route))
 		{
 			$GLOBALS['egw']->route = new route($this->source_charset,$this->db);
 		}
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
 		//echo "route_names="; _debug_array($route_names);
-		$order_by = array("$this->table_name.result_rank");	// Quali
+		$order_bys = array("$this->table_name.result_rank");	// Quali
 
 		$join = "\n";
-		foreach($route_names as $route_order => $label)
+		foreach(array_keys($route_names) as $route_order)
 		{
 			if ($route_order < 0) continue;	// general result
 			if ($route_type == TWOxTWO_QUALI)
@@ -476,21 +477,21 @@ class route_result extends so_sql
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order,$route_type).')';
-				$order_by = array($product);
-				if ($route_type == TWO_QUALI_ALL_SUM) $order_by[0] .= ' DESC';
+				$order_bys = array($product);
+				if ($route_type == TWO_QUALI_ALL_SUM) $order_bys[0] .= ' DESC';
 				$extra_cols[] = "$product AS quali_points";
 			}
 			else
 			{
-				$order_by[] = "r$route_order.result_rank";
+				$order_bys[] = "r$route_order.result_rank";
 			}
 			// not participating in one qualification (order 0 or 1) of TWO_QUALI_ALL is ok
 			if (!in_array($route_type, array(TWO_QUALI_ALL, TWO_QUALI_ALL_NO_COUNTBACK)) || $route_order >= 2)
 			{
-				$order_by[] = "r$route_order.result_rank IS NULL";
+				$order_bys[] = "r$route_order.result_rank IS NULL";
 			}
 		}
-		$order_by = implode(',',array_reverse($order_by));
+		$order_by = implode(',',array_reverse($order_bys));
 		if ($this->isRelay)
 		{
 			$order_by .= ',RelayResults.team_nation ASC,RelayResults.team_name ASC';
