@@ -1141,8 +1141,8 @@ class uiresult extends boresult
 			if (!($route = $this->route->read($keys))) $keys['route_order'] = $content['nm']['route'] = '';
 		}
 		// add measurement for judges and admins, if on a regular lead route (not on general result)
-		if ($comp && $cat && ($this->is_judge($comp,false,$route) || $this->is_admin) && $content['nm']['route'] != -1 &&
-			in_array($content['nm']['discipline'], array('lead','boulder','selfscore')))
+		if ($comp && $cat && ($this->is_judge($comp,false,$route) || $this->is_admin || $content['nm']['discipline'] == 'selfscore') &&
+			$content['nm']['route'] != -1 && in_array($content['nm']['discipline'], array('lead','boulder','selfscore')))
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
 		}
@@ -1217,7 +1217,8 @@ class uiresult extends boresult
 		// no startlist, no rights at all or result offical -->disable all update possebilities
 		if (($readonlys['button[apply]'] =
 			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) && !$this->is_judge($comp,false,$route) ||
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) && !$this->is_judge($comp,false,$route) &&
+			!($content['nm']['discipline'] == 'selfscore' && $this->is_selfservice() && $content['nm']['show_result'] == 4) ||
 			$route['route_status'] == STATUS_RESULT_OFFICIAL ||
 			$content['nm']['route'] < 0 || $content['nm']['show_result'] > 1 && $content['nm']['show_result'] != 4))
 		{

@@ -1,0 +1,48 @@
+/**
+ * EGroupware digital ROCK Rankings
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2014 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
+
+body {
+	margin: 10px !important;
+}
+p, td, body {
+	font-size: 14px;
+}
+p.error {
+	color: red;
+}
+form.form_1button {
+	display: inline-block;
+}
+
+/**
+ * Formatting for scorecard
+ */
+h1#action-scorecard {
+	padding-top: 50px;
+}
+.compHeader {
+	position: fixed;
+	top: 10px;
+	background-color: silver;
+}
+#exec\[button\]\[download\], #exec\[result_popup\] {
+	display: none;
+}
+table#exec\[score\]\[score\] {
+	border: 2px solid black;
+	border-collapse: collapse;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+table#exec\[score\]\[score\] td {
+	padding: 5px;
+}

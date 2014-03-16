@@ -33,17 +33,9 @@ class ranking_selfservice extends boranking
 	 */
 	function selfservice($PerId, $action)
 	{
-		echo "<style type='text/css'>
-	body {
-		margin: 10px !important;
-	}
-	p, td, body {
-		font-size: 14px;
-	}
-	p.error {
-		color: red;
-	}
-</style>\n";
+		egw_framework::validate_file('.', 'selfservice', 'ranking');
+		egw_framework::includeCSS('ranking', 'selfservice', false);
+		if (substr($_GET['action'], 0, 10) != 'scorecard-') echo $GLOBALS['egw']->framework->header();
 
 		$athlete = array();
 		unset($this->athlete->acl2clear[ranking_athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
@@ -62,28 +54,33 @@ class ranking_selfservice extends boranking
 			translation::$userlang = $lang;
 			translation::init();
 		}
+		list($action,$action_id) = explode('-', $action, 2);
+
 		if ($athlete)
 		{
-			echo "<h1>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
+			echo "<h1 id='action-$action'>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
 		}
 		if ((!$athlete || !$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId) &&
 			!($PerId = $this->selfservice_auth($athlete, $action)))
 		{
 			return;
 		}
-		list($action,$action_id) = explode('-', $action);
-		switch($action)
+		switch((string)$action)
 		{
 			case 'profile':
-			case '':
 				egw::redirect_link('/index.php',array(
 					'menuaction' => 'ranking.ranking_athlete_ui.edit',
 					'PerId' => $PerId,
 				));
 				break;
 
+			case '':
 			case 'register':
 				$this->selfservice_register($athlete, $action_id);
+				break;
+
+			case 'scorecard':
+				$this->selfservice_scorecard($athlete, $action_id);
 				break;
 
 			case 'logout':
@@ -101,84 +98,120 @@ class ranking_selfservice extends boranking
 	}
 
 	/**
-	 * Do a selfservice registration for an already authorized athlete and a given WetId
+	 * Selfservice scorecard
 	 *
 	 * @param array $athlete
-	 * @param int $WetId
+	 * @param string $action_id WetId-GrpId-route_order
 	 */
-	private function selfservice_register(array $athlete, $WetId)
+	private function selfservice_scorecard(array $athlete, $action_id)
+	{
+		$this->profile_logout_buttons($athlete);
+
+		list($WetId, $GrpId, $route_order) = explode('-', $action_id);
+
+		//egw::redirect_link('/index.php',
+		$_GET = array(
+			'menuaction' => 'ranking.uiresult.index',
+			'comp' => $WetId,
+			'cat' => $GrpId,
+			'route' => $route_order,
+			'athlete' => $athlete['PerId'],
+			'show_result' => 4,
+		);
+		ExecMethod('ranking.uiresult.index');
+	}
+
+	/**
+	 * Selfservice for an already authorized athlete: either register for given WetId or show an index of possible actions
+	 *
+	 * @param array $athlete
+	 * @param int $WetId=0
+	 */
+	private function selfservice_register(array $athlete, $WetId=0)
 	{
 		//echo "<p>".__METHOD__."(array(PerId=>$athlete[PerId],nachname='$athlete[nachname]',vorname=$athlete[vorname]',...), $WetId)</p>\n";
-		if (!$WetId || !($comp = $this->comp->read($WetId)))
+		if ($WetId)
 		{
-			throw egw_exception_wrong_parameter("Unknown competition ID $WetId!");
-		}
-		echo "<p><b>$comp[name]</b></p>\n<p>".$this->comp->datespan()."</p>\n";
-
-		if (!$comp['selfregister'])
-		{
-			die("<p class='error'>".lang('Competition does NOT allow self-registration!')."</p>\n");
-		}
-		if (!$this->comp->open_comp_match($athlete))
-		{
-			die("<p class='error'>".lang('Competition is NOT open to your federation!')."</p>\n");
-		}
-		if ($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']))
-		{
-			die("<p class='error'>".lang('Registration for this competition is over!')."</p>\n");
-		}
-		if ($athlete['license'] == 's')
-		{
-			die("<p class='error'>".lang('Athlete is suspended !!!')."</p>\n");
-		}
-		// check available categories (matching sex and evtl. agegroup) and if athlete is already registered
-		if (!($cats = $this->matching_cats($comp, $athlete)))
-		{
-			die("<p class='error'>".lang('Competition has no categories you are allowed to register for!')."</p>\n");
-		}
-		asort($cats);
-
-		$registered =& $this->result->read(array(
-			'WetId' => $WetId,
-			'PerId' => $athlete['PerId'],
-		));//,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
-		if (!$registered) $registered = array();
-		foreach($registered as &$data)
-		{
-			$data = $data['GrpId'];
-		}
-
-		if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['password']))
-		{
-			//_debug_array($_POST['GrpId']);
-			foreach(array_merge(array_diff((array)$_POST['GrpId'],$registered),array_diff($registered,(array)$_POST['GrpId'])) as $GrpId)
+			if (!($comp = $this->comp->read($WetId)))
 			{
-				try {
-					if ($this->register($comp,(int)$GrpId,$athlete,$mode=in_array($GrpId,$registered)?2:0))
-					{
-						echo "<p class='error'>".lang(!$mode?'%1, %2 registered for category %3':'%1, %2 deleted for category %3',
-							strtoupper($athlete['nachname']), $athlete['vorname'], $cats[$GrpId]);
-					}
-					else
-					{
-						echo "<p class='error'>".lang('Error: registration')."</p>\n";
-					}
-				}
-				catch(Exception $e) {
-					die("<p class='error'>".$e->getMessage()."</p>\n");
-				}
+				throw egw_exception_wrong_parameter("Unknown competition ID $WetId!");
 			}
-			$registered = (array)$_POST['GrpId'];
-		}
-		echo "<p>".lang('Please check the categories you want to register for:')."</p>\n";
-		echo "<form method='POST'>\n<table><tr valign='bottom'>\n";
-		echo '<td>'.html::checkbox_multiselect('GrpId', $registered, $cats)."</td>\n";
-		echo '<td>'.html::input('',lang('Register'),'submit')."</td>\n";
-		echo "</tr></table>\n</form>\n";
+			echo "<p><b>$comp[name]</b></p>\n<p>".$this->comp->datespan()."</p>\n";
 
+			if (!$comp['selfregister'])
+			{
+				die("<p class='error'>".lang('Competition does NOT allow self-registration!')."</p>\n");
+			}
+			if (!$this->comp->open_comp_match($athlete))
+			{
+				die("<p class='error'>".lang('Competition is NOT open to your federation!')."</p>\n");
+			}
+			if ($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']))
+			{
+				die("<p class='error'>".lang('Registration for this competition is over!')."</p>\n");
+			}
+			if ($athlete['license'] == 's')
+			{
+				die("<p class='error'>".lang('Athlete is suspended !!!')."</p>\n");
+			}
+			// check available categories (matching sex and evtl. agegroup) and if athlete is already registered
+			if (!($cats = $this->matching_cats($comp, $athlete)))
+			{
+				die("<p class='error'>".lang('Competition has no categories you are allowed to register for!')."</p>\n");
+			}
+			asort($cats);
+
+			$registered =& $this->result->read(array(
+				'WetId' => $WetId,
+				'PerId' => $athlete['PerId'],
+			));//,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
+			if (!$registered) $registered = array();
+			foreach($registered as &$data)
+			{
+				$data = $data['GrpId'];
+			}
+
+			if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['password']))
+			{
+				//_debug_array($_POST['GrpId']);
+				foreach(array_merge(array_diff((array)$_POST['GrpId'],$registered),array_diff($registered,(array)$_POST['GrpId'])) as $GrpId)
+				{
+					try {
+						if ($this->register($comp,(int)$GrpId,$athlete,$mode=in_array($GrpId,$registered)?2:0))
+						{
+							echo "<p class='error'>".lang(!$mode?'%1, %2 registered for category %3':'%1, %2 deleted for category %3',
+								strtoupper($athlete['nachname']), $athlete['vorname'], $cats[$GrpId]);
+						}
+						else
+						{
+							echo "<p class='error'>".lang('Error: registration')."</p>\n";
+						}
+					}
+					catch(Exception $e) {
+						die("<p class='error'>".$e->getMessage()."</p>\n");
+					}
+				}
+				$registered = (array)$_POST['GrpId'];
+			}
+			echo "<p>".lang('Please check the categories you want to register for:')."</p>\n";
+			echo "<form method='POST'>\n<table><tr valign='bottom'>\n";
+			echo '<td>'.html::checkbox_multiselect('GrpId', $registered, $cats)."</td>\n";
+			echo '<td>'.html::input('',lang('Register'),'submit')."</td>\n";
+			echo "</tr></table>\n</form>\n";
+		}
+		// list selfscoring
+		$selfscore_found = 0;
+		foreach(ranking_selfscore_measurement::open($athlete) as $comp)
+		{
+			if (!$selfscore_found++) echo "<p>".lang('Open scorecards:')."</p>\n<ul>\n";
+			echo "<li>".$this->comp->datespan($comp).': '.
+				html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'scorecard-'.$comp['WetId'].'-'.$comp['GrpId'].'-'.$comp['route_order'])).
+				"</li>\n";
+		}
+		if ($selfscore_found) echo "</ul>\n";
 		// list other competitons with selfservice registration
-		$found = null;
-		foreach($this->comp->search('', false, 'datum', '', '*', false, 'AND', false, array(
+		$found = 0;
+		foreach((array)$this->comp->search('', false, 'datum', '', '*', false, 'AND', false, array(
 			'datum > '.$this->db->quote(time(), 'date'),
 			'datum <= '.$this->db->quote(strtotime('+6 month'), 'date'),
 			'selfregister>0',
@@ -196,37 +229,25 @@ class ranking_selfservice extends boranking
 		}
 		if ($found) echo "</ul>\n";
 
-		// Edit profile and logout buttons
-		echo "<p>".html::input('profile', lang('Edit Profile'), 'button', 'onClick="location.href=\''.
-			egw::link('/index.php',array(
-					'menuaction' => 'ranking.ranking_athlete_ui.edit',
-					'PerId' => $athlete['PerId'],
-				)).'\'"')."\n".
-			html::input('logout', lang('Logout'), 'submit', 'onClick="location.href=\''.
-				egw::link('/ranking/athlete.php',array('action' => 'logout')).'\'"')."</p>\n";
-
+		$this->profile_logout_buttons($athlete);
 	}
 
 	/**
-	 * Return cats of a competition an athlete is allowed to register for
+	 * Show profile and logout buttons
 	 *
-	 * @param array $comp
-	 * @param array $athlete
-	 * @return array GrpId => name pairs
+	 * @param int|array $athlete
 	 */
-	private function matching_cats(array $comp, array $athlete)
+	private function profile_logout_buttons($athlete)
 	{
-		$cats = array();
-		foreach($comp['gruppen'] as $rkey)
-		{
-			if (!($cat = $this->cats->read($rkey))) continue;
-			if ($cat['sex'] && $cat['sex'] != $athlete['sex']) continue;
-			if (!$this->cats->in_agegroup($athlete['geb_date'], $cat, (int)$comp['datum'])) continue;
-			if ($this->comp->has_results($comp['WetId'],$cat['GrpId'])) continue;
-
-			$cats[$cat['GrpId']] = $cat['name'];
-		}
-		return $cats;
+		// Edit profile and logout buttons
+		echo "<p id='profile-logout-buttons'>".
+			html::form_1button('profile', lang('Edit Profile'), '', egw::link('/index.php',array(
+				'menuaction' => 'ranking.ranking_athlete_ui.edit',
+				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
+			)))."\n".
+			html::form_1button('logout', lang('Logout'), '',
+				egw::link('/ranking/athlete.php',array('action' => 'logout'))).
+			"</p>\n";
 	}
 
 	/**
@@ -249,11 +270,11 @@ class ranking_selfservice extends boranking
 	/**
 	 * Athlete selfservice: password check and recovery
 	 *
-	 * @param array $athlete
-	 * @param string $action
+	 * @param array &$athlete
+	 * @param string &$action
 	 * @return int PerId if we are authenticated for it nor null if not
 	 */
-	private function selfservice_auth(array &$athlete, $action)
+	private function selfservice_auth(array &$athlete, &$action)
 	{
 		if (!$athlete && isset($_POST['email']))
 		{
@@ -359,7 +380,7 @@ class ranking_selfservice extends boranking
 						'('.lang('Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.',7).")</p>\n";
 					echo "<form action='$link' method='POST'>\n<table>\n";
 					echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' value='".htmlspecialchars($_POST['password'])."' /></td>".
-						"<td><label><input type='checkbox' onclick=\"this.form.password.type=this.form.password2.type=this.checked?'text':'password';\">".lang('show password')."</label></td></tr>\n";
+						"<td><label><input type='checkbox' id='show_passwd'>".lang('show password')."</label></td></tr>\n";
 					echo "<tr><td>".lang('Repeat')."</td><td><input type='password' name='password2' value='".htmlspecialchars($_POST['password2'])."' /></td>";
 					echo "<td><input type='submit' value='".lang('Set password')."' /></td></tr>\n";
 					echo "</table>\n</form>\n";
@@ -407,6 +428,7 @@ class ranking_selfservice extends boranking
 
 					setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
 
+					if ($action == 'logout') $action = '';
 					return $athlete['PerId'];	// we are now authenticated for $athlete['PerId']
 				}
 			}

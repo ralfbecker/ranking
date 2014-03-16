@@ -15,6 +15,7 @@ $GLOBALS['egw_info'] = array(
 	'flags' => array(
 		'currentapp'	=> 'ranking',
 		'nonavbar'		=> True,
+		'noheader'      => true,
 		'autocreate_session_callback' => 'check_anon_access',
 ));
 include('../header.inc.php');

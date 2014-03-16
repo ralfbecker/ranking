@@ -634,7 +634,7 @@ class boresult extends boranking
 				}
 				if (!(isset($data['ranking']) && $data['ranking'] <= $preselected))	// not prequalified
 				{
-					//echo "<p>not prequalified</p>";
+					echo "<p>not prequalified</p>";
 					continue;
 				}
 				$data['start_order'] = $start_order++;
@@ -805,7 +805,8 @@ class boresult extends boranking
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) &&
-			!$this->is_judge($comp, false, $keys))	// check additionally for route_judges
+			!$this->is_judge($comp, false, $keys) &&	// check additionally for route_judges
+			!($discipline == 'selfscore' && count($results) == 1 && isset($results[$this->is_selfservice()])))
 		{
 			return $this->error = false;	// permission denied
 		}

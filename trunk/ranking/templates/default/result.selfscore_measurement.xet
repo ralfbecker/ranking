@@ -3,7 +3,7 @@
 <overlay>
 	<template id="ranking.result.selfscore_measurement" template="" lang="" group="0" version="1.9.001">
 		<menulist>
-			<menupopup label="Scorecard" id="nm[PerId]" onchange="boulder_changed(this);" options="Select one"/>
+			<menupopup label="Scorecard" id="nm[PerId]" onchange="scorecard_changed(this);" options="Select one"/>
 		</menulist>
 		<grid border="1" id="score">
 			<columns>
@@ -15,6 +15,6 @@
 				</row>
 			</rows>
 		</grid>
-		<buttononly label="Update" id="button[apply]"/>
+		<buttononly label="Update" id="button[apply]" onclick="update_scorecard(); return false;"/>
 	</template>
 </overlay>
