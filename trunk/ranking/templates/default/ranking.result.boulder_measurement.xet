@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.boulder_measurement" template="" lang="" group="0" version="1.9.002">
+		<grid width="x">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row height="60">
+					<description value="Boulder" options=",,,PerId"/>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup type="select-number" id="nm[boulder_n]" onchange="boulder_changed(this);" options=",1,{$cont[nm][num_problems]}"/>
+						</menulist>
+					</hbox>
+					<menulist>
+						<menupopup label="Athlete" id="nm[PerId]" onchange="boulder_changed(this);" options="Select one"/>
+					</menulist>
+				</row>
+				<row height="60">
+					<menulist>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="set_try(this.value)" options=",1,25"/>
+					</menulist>
+					<menulist>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,25"/>
+					</menulist>
+					<hbox options="0,0">
+						<menulist>
+							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="check_top(this)" options="No,1,25"/>
+						</menulist>
+						<buttononly align="right" label="Update" id="button[update]" onclick="update_boulder();" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row>
+					<hbox span="all" class="buttonBox">
+						<buttononly label="Try" id="button[try]" onclick="try_clicked(this);" class="tryButton"/>
+						<buttononly label="Bonus" id="button[bonus]" onclick="bonus_clicked(this);" class="bigButton"/>
+						<buttononly label="Top" id="button[top]" onclick="top_clicked(this);" class="bigButton"/>
+						<buttononly label="&gt;&gt;" id="button[next]" onclick="boulder_next();" class="bigButton"/>
+						<buttononly align="right" label="Protocol" onclick="protocol.display();"/>
+					</hbox>
+					<description/>
+					<description/>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.bigButton input, .tryButton input {
+   font-size: 250%;
+   border-radius: 20px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+.tryButton input {
+   width: 4em;
+}
+table.buttonBox {
+   padding-top: 10px;
+   padding-bottom: 10px;
+}
+#table h1 {
+  display: none;
+}
+select {
+  font-size: 150%;
+}
+		</styles>
+	</template>
+</overlay>
