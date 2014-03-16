@@ -615,12 +615,15 @@ var resultlist;
 function init_boulder()
 {
 	var PerId = document.getElementById('exec[nm][PerId]').value;
-	var n = document.getElementById('exec[nm][boulder_n]').value;
+	var boulder_n = document.getElementById('exec[nm][boulder_n]');
+	var n = boulder_n ? boulder_n.value : null;
 
-	document.getElementById('exec[button][update]').disabled = !PerId || !n;
+	jQuery('#exec\[button\]\[update\],#exec\[button\]\[try\],#exec\[button\]\[bonus\],#exec\[button\]\[top\]')
+		.attr('disabled', !PerId || !n);
+	/*document.getElementById('exec[button][update]').disabled = !PerId || !n;
 	document.getElementById('exec[button][try]').disabled = !PerId || !n;
 	document.getElementById('exec[button][bonus]').disabled = !PerId || !n;
-	document.getElementById('exec[button][top]').disabled = !PerId || !n;
+	document.getElementById('exec[button][top]').disabled = !PerId || !n;*/
 
 	if (!document.getElementById('table'))
 	{
@@ -705,8 +708,69 @@ function update_row(_elem, _perId)
  */
 function update_scorecard()
 {
-	var values = egw_json_getFormValues(jQuery('form')[0]);
+	var values = egw_json_getFormValues(jQuery('form[name=eTemplate]')[0]);
 
 	xajax_doXMLHTTP('ranking_selfscore_measurement::ajax_update_result', values.exec.nm.PerId, values.exec.score,
 		{'WetId': values.exec.comp.WetId, 'GrpId': values.exec.nm.cat, 'route_order': values.exec.nm.route});
 }
+
+/**
+ * Boulder or athlete changed
+ *
+ * @param selectbox
+ */
+function scorecard_changed(selectbox)
+{
+	var PerId = document.getElementById('exec[nm][PerId]').value;
+
+	// we only have one checkbox, if loaded without an athlete --> need a submit to let server autorepeat selectboxes
+	if (jQuery('input[name^=exec\\[score\\]]').length == 1)
+	{
+		selectbox.form.submit();
+		return;
+	}
+	// ToDo load values from server
+	if (PerId)
+	{
+		var WetId = document.getElementById('exec[comp][WetId]').value;
+		var GrpId = document.getElementById('exec[nm][cat]').value;
+		var route_order = document.getElementById('exec[nm][route]').value;
+
+		xajax_doXMLHTTP('ranking_selfscore_measurement::ajax_load_athlete', PerId,
+			{ 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
+	}
+	init_boulder();
+}
+
+/**
+ * Set scorecard checkboxes
+ *
+ * @param {object} score 0@: 1, 0A: 1, ...
+ * @param {boolean} update true: allow update, false show readonly
+ */
+function set_scorecard(score, update)
+{
+	var id_regexp = /[0-9]+[@A-Z]+/;
+	jQuery('input[name^=exec\\[score\\]]')
+		.attr('disabled', !update)
+		.each(function(){
+			var id = this.id.match(id_regexp)[0];
+			if (score && (score[id] > 0) != this.checked) this.checked = score[id] > 0;
+		});
+
+	var apply = jQuery('#exec\\[button\\]\\[apply\\]');
+	apply[update ? 'show' : 'hide'].call(apply);
+}
+
+
+$j(function(){
+	if (jQuery('#exec\\[nm\\]\\[show_result\\]').val() == 4)
+	{
+		init_boulder();
+		if (jQuery('#egw_script_id').attr('data-ranking-readonly'))
+		{
+			set_scorecard(null, false);
+		}
+	}
+});
+

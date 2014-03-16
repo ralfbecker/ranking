@@ -28,6 +28,11 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
 		egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
 
+		if ($_SERVER['REQUEST_METHOD'] == 'GET' && (int)$_GET['athlete'] > 0)
+		{
+			$content['nm']['PerId'] = (int)$_GET['athlete'];
+		}
+
 		$keys = self::query2keys($content['nm']);
 		// if we have a startlist, add participants to sel_options
 		if (boresult::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
@@ -70,6 +75,10 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 				}
 				$sel_options['PerId'][$row['PerId']] = boresult::athlete2string($row, false);
 			}
+		}
+		if (!self::update_allowed($content['comp'], $content['nm']['route_data'], $content['nm']['PerId']))
+		{
+			egw_framework::set_extra('ranking', 'readonly', true);
 		}
 	}
 
@@ -149,5 +158,117 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		//$response->alert(__METHOD__."($PerId, $height, '$plus', $set_current) $msg");
 		$response->jquery('#msg', 'text', array($msg));
 		$response->script('if (typeof resultlist != "undefined") resultlist.update();');
+	}
+
+	/**
+	 * Load data of a given athlete
+	 *
+	 * @param int $PerId
+	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
+	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
+	 * @param array &$data=null on return athlete data for extending class
+	 */
+	public static function ajax_load_athlete($PerId, array $state=null, array &$data=null)
+	{
+		$query =& self::get_check_session($comp,$state);
+
+		$response = egw_json_response::get();
+
+		//$response->alert(__METHOD__."($PerId) ".array2string(self::query2keys($query)));
+		$keys = self::query2keys($query);
+		$keys['PerId'] = $PerId;
+
+		if (empty($keys['route_type']))	// route_type is needed to get correct rank of previous heat / avoid SQL error!
+		{
+			if (!($route = boresult::$instance->route->read($keys)))
+			{
+				throw new egw_exception_wrong_parameter('Route not found!');
+			}
+			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
+		}
+
+		if (list($data) = boresult::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$keys))
+		{
+			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
+			$num_problems = $route['route_num_problems'];
+			$num_cols = $route['selfscore_num'];
+			$score = array();
+			for($n=$r=0; $r*$num_cols < $num_problems; ++$r)
+			{
+				for($c=0; $c < $num_cols; ++$c)
+				{
+					$col = boetemplate::num2chrs($c-1);
+					if ($n++ < $num_problems && $data['score'][$n])
+					{
+						$score[$r.$col] = (int)$data['score'][$n];
+					}
+				}
+			}
+			$response->call('set_scorecard', $score, self::update_allowed($comp, $route, $PerId));
+			$query['PerId'] = $PerId;
+
+			$response->jquery('#msg', 'text', array(boresult::athlete2string($data)));
+		}
+	}
+
+	public static function update_allowed(array $comp, array $route, $PerId)
+	{
+		return boresult::$instance->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+			boresult::$instance->is_judge($comp,false,$route) ||
+			boresult::$instance->is_selfservice() == $PerId;
+	}
+
+	/**
+	 * Get open selfscore competition and routes for given PerId
+	 *
+	 * @param array $athlete
+	 * @return array of array with comp and route data merged
+	 */
+	public static function open(array $athlete)
+	{
+		$found = $WetIds = array();
+		foreach((array)boresult::$instance->route->search(null, $only_keys=false,'route_order ASC','','',False,'AND',false,array(
+			'route_status' => 1,
+			'discipline' => 'selfscore',
+		)) as $route)
+		{
+			$WetIds[$route['WetId']][$route['GrpId']] = $route;
+		}
+		if ($WetIds)
+		{
+			foreach((array)boresult::$instance->comp->search(array('WetId' => array_keys($WetIds)), false) as $comp)
+			{
+				// check if comp open to athletes federation
+				if (!boresult::$instance->comp->open_comp_match($athlete, $comp)) continue;
+				// check comp has category for athlete
+				if (!($cats = boresult::$instance->matching_cats($comp, $athlete))) continue;
+				// check cats intersect with selfscore cats
+				if (!($cats = array_intersect_key($cats, array_flip(array_keys($WetIds[$comp['WetId']]))))) continue;
+				// check if athlete registered for comp and cat
+				foreach($cats as $cat => $name)
+				{
+					if (boresult::$instance->result->has_registration($keys=array(
+						'WetId' => $comp['WetId'],
+						'GrpId' => $cat,
+						'PerId' => $athlete['PerId'],
+					)))
+					{
+						$route = $WetIds[$comp['WetId']][$cat];
+						$keys['route_order'] = $route['route_order'];
+						// check and if not include athlete in startlist of route
+						if (!boresult::$instance->has_results($keys))
+						{
+							if ($route['route_order']) continue;	// only add automatic to qualification
+
+							boresult::$instance->generate_startlist($comp, $cat, $route['route_order']);
+							if (!boresult::$instance->has_results($keys)) continue;	// was not added
+						}
+						$found[] = array_merge($comp, $route);
+					}
+					//else error_log(__METHOD__."() $athlete[nachname], $athlete[vorname] ($athlete[nation]) NOT registed for $comp[name]");
+				}
+			}
+		}
+		return $found;
 	}
 }

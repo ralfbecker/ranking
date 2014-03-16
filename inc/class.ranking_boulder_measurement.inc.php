@@ -26,11 +26,6 @@ class ranking_boulder_measurement
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
 	{
 		//error_log(__METHOD__."() user_agent=".html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
-		$GLOBALS['egw_info']['flags']['java_script'] .= '<script type="text/javascript">
-	$j(document).ready(function(){
-		init_boulder();
-	});
-</script>'."\n";
 		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
 			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
 
@@ -224,7 +219,8 @@ class ranking_boulder_measurement
 		{
 			throw new egw_exception_wrong_parameter("Competition $query[comp] NOT found!");
 		}
-		if (!boresult::$instance->is_admin && !boresult::$instance->is_judge($comp, false, self::query2keys($query)))
+		if (!boresult::$instance->is_admin && !boresult::$instance->is_judge($comp, false, self::query2keys($query)) &&
+			$query['discipline'] != 'selfscore')
 		{
 			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
 		}

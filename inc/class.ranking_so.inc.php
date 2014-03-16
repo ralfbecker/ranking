@@ -25,7 +25,7 @@
  * @property-read ranking_cup $cup
  * @property-read ranking_competition $comp
  * @property-read ranking_athlete $athlete
- * @property-read result $result
+ * @property-read ranking_result $result
  * @property-read route $route
  * @property-read route_result $route_result
  * @property-read ranking_federation $federation;

@@ -232,6 +232,17 @@ class ranking_result extends so_sql
 	}
 
 	/**
+	 * Checks if there are any results incl. registrations or startlists for given keys
+	 *
+	 * @param array $keys with index WetId, PerId and/or GrpId
+	 * @return boolean/int number of found registrations or false on error
+	 */
+	function has_registration($keys)
+	{
+		return $this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__)->fetchColumn();
+	}
+
+	/**
 	 * searches db for rows matching searchcriteria
 	 *
 	 * '*' and '?' are replaced with sql-wildcards '%' and '_'

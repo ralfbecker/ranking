@@ -417,7 +417,7 @@ class boranking extends ranking_so
 	 * Check or set if we do athlete selfservice
 	 *
 	 * @param int $set=null
-	 * @return int
+	 * @return int PerId of logged in athlete
 	 */
 	function is_selfservice($set=null)
 	{
@@ -823,6 +823,25 @@ class boranking extends ranking_so
 	}
 
 	/**
+	 * Check if athlete is registered for a competition and category
+	 *
+	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
+	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
+	 * - startnumber in the next 7 bits (($pkt >> 6) & 255))
+	 * - route in the other bits ($pkt >> 14)
+	 *
+	 * @param int $comp WetId
+	 * @param int $cat GrpId
+	 * @param int|array $athlete PerId or complete athlete array
+	 * @return boolean true if athlete is registered, false otherwise
+	 */
+	function is_registered($comp,$cat,$athlete)
+	{
+		if (!$comp || !$cat || !$athlete) return false;
+
+	}
+
+	/**
 	 * Check if a given birthdate is in the age-group of a category
 	 *
 	 * @param int|string $birthdate birthdate Y-m-d or birthyear
@@ -851,6 +870,28 @@ class boranking extends ranking_so
 			$year = (int)$comp['datum'];
 		}
 		return $this->cats->in_agegroup($birthdate,$cat,$year);
+	}
+
+	/**
+	 * Return cats of a competition an athlete is allowed to register for
+	 *
+	 * @param array $comp
+	 * @param array $athlete
+	 * @return array GrpId => name pairs
+	 */
+	function matching_cats(array $comp, array $athlete)
+	{
+		$cats = array();
+		foreach($comp['gruppen'] as $rkey)
+		{
+			if (!($cat = $this->cats->read($rkey))) continue;
+			if ($cat['sex'] && $cat['sex'] != $athlete['sex']) continue;
+			if (!$this->cats->in_agegroup($athlete['geb_date'], $cat, (int)$comp['datum'])) continue;
+			if ($this->comp->has_results($comp['WetId'],$cat['GrpId'])) continue;
+
+			$cats[$cat['GrpId']] = $cat['name'];
+		}
+		return $cats;
 	}
 
 	/**
