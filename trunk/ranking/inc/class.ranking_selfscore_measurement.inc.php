@@ -127,7 +127,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		{
 			// search filter needs route_type to not give SQL error
 			$filter = $keys+array('PerId' => $PerId,'route_type' => $query['route_type'], 'discipline' => $query['discipline']);
-			list($new_result) = boresult::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter);
+			list($new_result) = boresult::$instance->route_result->search(array(),false,'','','',false,'AND',false,$filter);
 			$msg = boresult::athlete2string($new_result,true);
 		}
 		else
@@ -136,9 +136,9 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		}
 		if (boresult::$instance->error)
 		{
-			foreach(boresult::$instance->error as $id => $data)
+			foreach(boresult::$instance->error as $data)
 			{
-				foreach($data as $field => $error)
+				foreach($data as $error)
 				{
 					$errors[$error] = $error;
 				}
