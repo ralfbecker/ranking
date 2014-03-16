@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.selfscore_measurement" template="" lang="" group="0" version="1.9.001">
+		<menulist>
+			<menupopup label="Scorecard" id="nm[PerId]" onchange="boulder_changed(this);" options="Select one"/>
+		</menulist>
+		<grid border="1" id="score">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<checkbox align="right" label="@$row{$col}[num]" id="$row{$col}[top]"/>
+				</row>
+			</rows>
+		</grid>
+		<buttononly label="Update" id="button[apply]"/>
+	</template>
+</overlay>
