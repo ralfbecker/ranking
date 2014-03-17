@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -62,7 +62,20 @@ class ranking_athlete extends so_sql
 	 */
 	var $cats;
 
+	/**
+	 * URL for athlete pictures (not configurable!)
+	 *
+	 * @var string
+	 */
 	var $picture_url = '/jpgs';
+
+	/**
+	 * Filesystem path for athlete pictures
+	 *
+	 * Set in __construct to value from site configuration or $_SERVER[DOCUMENT_ROOT]/jpgw (if nothing configured)
+	 *
+	 * @var string
+	 */
 	var $picture_path = '../../../jpgs';
 	var $acl2clear = array(
 		self::ACL_DENY_BIRTHDAY  => array('geb_date'),
@@ -142,7 +155,8 @@ class ranking_athlete extends so_sql
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
-		$this->picture_path = $_SERVER['DOCUMENT_ROOT'].'/jpgs';
+		$config = config::read('ranking');
+		$this->picture_path = empty($config['picture_path']) ? $_SERVER['DOCUMENT_ROOT'].'/jpgs' : $config['picture_path'];
 
 		$this->license_year = (int) date('Y');
 

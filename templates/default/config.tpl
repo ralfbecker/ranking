@@ -19,6 +19,13 @@
     <td>{lang_VFS_directory_for_topo_files_(excluding_the_year)}</td>
     <td><input name="newsettings[vfs_topo_dir]" value="{value_vfs_topo_dir}"></td>
    </tr>
+   <tr class="row_on">
+	<td>{lang_Filesystem_path_for_upload_of_athlete_pictures}<br/>{lang_Default}: "$_SERVER[DOCUMENT_ROOT]/jpgs" (URL: /jpgs)</td>
+    <td>
+     <input size="80" name="newsettings[picture_path]" value="{value_picture_path}">
+    </td>
+   </tr>
+
    <tr class="th">
     <td colspan="2"><b>{lang_Ranking_database}</b> ({lang_only_fill_values_different_from_eGW}):</td>
    </tr>
