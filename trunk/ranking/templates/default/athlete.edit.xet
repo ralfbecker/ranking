@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.athlete.edit.contact" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.athlete.edit.contact" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="210">
 			<columns>
 				<column width="100"/>
@@ -12,7 +12,7 @@
 			<rows>
 				<row class="row">
 					<description value="Email" for="email"/>
-					<url-email statustext="use access control to deny display on the website" id="email" options="30,40"/>
+					<url-email statustext="use access control to deny display on the website" id="email" options="30,60"/>
 					<description value="Homepage" for="homepage"/>
 					<url statustext="URL to own homepage, eg. http://domain.com" id="homepage" options="40,60"/>
 				</row>
@@ -28,13 +28,13 @@
 				</row>
 				<row class="row">
 					<description value="City" for="ort"/>
-					<textbox statustext="use access control to deny display on the website" id="ort" size="30" maxlength="35"/>
+					<textbox statustext="use access control to deny display on the website" id="ort" size="30" maxlength="60"/>
 					<description value="Postalcode" for="plz"/>
 					<textbox statustext="incl. nation-code" id="plz" size="8" maxlength="8"/>
 				</row>
 				<row class="row">
 					<description value="Street" for="strasse"/>
-					<textbox statustext="use access control to deny display on the website" id="strasse" size="30" maxlength="35"/>
+					<textbox statustext="use access control to deny display on the website" id="strasse" size="30" maxlength="60"/>
 					<description statustext="use access control to deny display on the website" value="Title" for="anrede"/>
 					<textbox id="anrede" size="40" maxlength="40"/>
 				</row>
@@ -80,7 +80,7 @@
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.9.001">
-		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="120px" width="100%" toolbar="true"/>
+		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="120px" width="100%" expand_toolbar="true"/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -148,7 +148,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.9.002">
+	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.9.003">
 		<grid width="100%">
 			<columns>
 				<column width="100"/>
@@ -163,9 +163,9 @@
 				</row>
 				<row class="th">
 					<description value="Last name" for="nachname"/>
-					<textbox statustext="Family name of the athlete in latin chars! Accents and umlauts are ok" id="nachname" needed="1" size="20" maxlength="20"/>
+					<textbox statustext="Family name of the athlete in latin chars! Accents and umlauts are ok" id="nachname" needed="1" size="20" maxlength="40"/>
 					<description value="First name" for="vorname"/>
-					<textbox statustext="First name of the athlete in Latin chars! Accents and umlauts are ok" id="vorname" needed="1" size="20" maxlength="20"/>
+					<textbox statustext="First name of the athlete in Latin chars! Accents and umlauts are ok" id="vorname" needed="1" size="20" maxlength="40"/>
 					<hbox align="right">
 						<menulist>
 							<menupopup id="license_nation" onchange="1"/>
@@ -196,12 +196,12 @@
 					<description value="Birthdate" for="geb_date"/>
 					<date statustext="use access control to deny display on the website" id="geb_date" options="Y-m-d"/>
 					<description value="Place of birth" for="geb_ort"/>
-					<textbox statustext="where is the athlete born (incl. nation)" id="geb_ort" size="35" maxlength="35" span="all"/>
+					<textbox statustext="where is the athlete born (incl. nation)" id="geb_ort" size="35" maxlength="60" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Federation" for="verband"/>
-					<menulist span="2" class="selectboxFullWidth">
-						<menupopup id="fed_id"/>
+					<menulist span="2">
+						<menupopup id="fed_id" class="selectboxFullWidth"/>
 					</menulist>
 				</row>
 				<row>
