@@ -1607,7 +1607,14 @@ function ranking_upgrade1_9_014()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.015';
 }
 
-
+/**
+ * Add selfscore parameters
+ *
+ * ALTER TABLE `Routes` ADD `selfscore_num` SMALLINT
+ * ALTER TABLE `Routes` ADD `selfscore_points` SMALLINT
+ *
+ * @return string
+ */
 function ranking_upgrade1_9_015()
 {
 	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','selfscore_num',array(
@@ -1622,5 +1629,47 @@ function ranking_upgrade1_9_015()
 	));
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.016';
+}
+
+/**
+ * Enlarge several athletes columns
+ *
+ * ALTER TABLE `Personen` MODIFY COLUMN `nachname` VARCHAR(40) NOT NULL
+ * ALTER TABLE `Personen` MODIFY COLUMN `vorname` VARCHAR(40) NOT NULL
+ * ALTER TABLE `Personen` MODIFY COLUMN `strasse` VARCHAR(60)
+ * ALTER TABLE `Personen` MODIFY COLUMN `ort` VARCHAR(60)
+ * ALTER TABLE `Personen` MODIFY COLUMN `geb_ort` VARCHAR(60)
+ * ALTER TABLE `Personen` MODIFY COLUMN `email` VARCHAR(60)
+ */
+function ranking_upgrade1_9_016()
+{
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Personen','nachname',array(
+		'type' => 'varchar',
+		'precision' => '40',
+		'nullable' => False
+	));
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Personen','vorname',array(
+		'type' => 'varchar',
+		'precision' => '40',
+		'nullable' => False
+	));
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Personen','strasse',array(
+		'type' => 'varchar',
+		'precision' => '60'
+	));
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Personen','ort',array(
+		'type' => 'varchar',
+		'precision' => '60'
+	));
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Personen','geb_ort',array(
+		'type' => 'varchar',
+		'precision' => '60'
+	));
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Personen','email',array(
+		'type' => 'varchar',
+		'precision' => '60'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.017';
 }
 
