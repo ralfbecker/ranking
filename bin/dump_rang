@@ -1,0 +1,26 @@
+#!/bin/bash
+
+HOST=localhost
+DB=egroupware
+
+[ -n "$1" ] && HOST=$1
+[ -n "$2" ] && DB=$2
+
+SSH=''
+[ "$HOST" == "localhost" ] || SSH="ssh -C $HOST"
+
+#echo "HOST=$HOST, DB=$DB, SSH=$SSH"
+
+# dump all tables but Personen
+$SSH mysqldump $DB Athlete2Fed Federations Feldfaktoren Gruppen Gruppen2Personen Licenses RelayResults Results RouteResults Routes Serien Wettkaempfe
+# dump schema from Personen
+$SSH mysqldump --no-data $DB Personen
+# create table PersonenExport without "personal" data
+$SSH mysql $DB <<EOF
+DROP TABLE IF EXISTS PersonenExport;
+CREATE TABLE PersonenExport
+SELECT PerId,rkey,nachname,vorname,sex,ort,concat(year(geb_date),"-01-01"),acl
+FROM Personen
+EOF
+# dump data from PersonenExport and rename it to Personen
+$SSH mysqldump $DB --no-create-info PersonenExport|sed 's/PersonenExport/Personen/g'|sed 's/^INSERT INTO `Personen` VALUES/INSERT INTO `Personen` (PerId,rkey,nachname,vorname,sex,ort,geb_date,acl) VALUES/'
