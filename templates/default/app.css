@@ -7,7 +7,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
 
 .gray { color: gray; }
@@ -28,7 +28,7 @@
 .noWrap { white-space: nowrap; }
 .speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; height: 7ex; }
 @media print {
-	.speed_athlete { padding: 1mm; } 
+	.speed_athlete { padding: 1mm; }
 	tr.row_on,tr.row_off{
 		border-bottom: thin gray dotted;
 		padding-top: 0px; margin-top:0px;
@@ -72,4 +72,15 @@ input#deleteButton {
 div#table table.DrTable td.federation, div#table table.DrTable th.federation,
 div#table table.DrTable td.city, div#table table.DrTable th.city {
 	display: none;
+}
+
+/* selfscore styling */
+table#exec\[score\]\[score\] {
+	border: 2px solid black;
+	border-collapse: collapse;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+table#exec\[score\]\[score\] td {
+	padding: 5px;
 }
