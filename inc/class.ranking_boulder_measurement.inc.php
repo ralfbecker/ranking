@@ -25,6 +25,7 @@ class ranking_boulder_measurement
 	 */
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
 	{
+		unset($readonlys);
 		//error_log(__METHOD__."() user_agent=".html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
 		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
 			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
@@ -70,6 +71,7 @@ class ranking_boulder_measurement
 	 */
 	public static function ajax_update_result($PerId,$update,$set_current=1, $state=null)
 	{
+		$comp = null;
 		$query =& self::get_check_session($comp,$state);
 
 		$response = egw_json_response::get();
@@ -85,7 +87,7 @@ class ranking_boulder_measurement
 		{
 			// search filter needs route_type to not give SQL error
 			$filter = $keys+array('PerId' => $PerId,'route_type' => $query['route_type'], 'discipline' => $query['discipline']);
-			list($new_result) = boresult::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter);
+			list($new_result) = boresult::$instance->route_result->search(array(),false,'','','',False,'AND',false,$filter);
 			$msg = boresult::athlete2string($new_result,true);
 			if ($query['discipline'] == 'boulder')
 			{
@@ -110,7 +112,7 @@ class ranking_boulder_measurement
 		{
 			foreach(boresult::$instance->error as $id => $data)
 			{
-				foreach($data as $field => $error)
+				foreach($data as $error)
 				{
 					$errors[$error] = $error;
 				}
@@ -132,6 +134,72 @@ class ranking_boulder_measurement
 	}
 
 	/**
+	 * Update (multiple) protocol records
+	 *
+	 * @param array $record
+	 */
+	public static function ajax_protocol_update(array $record)
+	{
+		$response = array();
+		foreach(func_get_args() as $record)
+		{
+			$comp = null;
+			$query =& self::get_check_session($comp, $record+array('route_order' => $record['route']));
+			$keys = self::query2keys($query);
+
+			// if a state given, check if we are still in same state and reject update as "outdated"
+			if ($record['state'])
+			{
+				$current_values = boresult::$instance->route_result->results_by_id($keys);
+				foreach($record['state'] as $name => $value)
+				{
+					if ($current_values[$name] != $value)
+					{
+						$response[] = $record + array(
+							'stored' => 'outdated',
+						);
+						continue 2;
+					}
+				}
+			}
+
+			$update = array(
+				$record['PerId'] => array(
+					'top'.$record['boulder'] => (int)$record['top'],
+					'zone'.$record['boulder'] => $record['bonus'],
+				),
+			);
+			if (boresult::$instance->save_result($keys, $update, $query['route_type'], $query['discipline']))
+			{
+				// search filter needs route_type to not give SQL error
+				$filter = $keys+array(
+					'PerId' => $record['PerId'],
+					'route_type' => $query['route_type'],
+					'discipline' => $query['discipline'],
+				);
+				list($new_result) = boresult::$instance->route_result->search(array(),false,'','','',False,'AND',false,$filter);
+				$msg = boresult::athlete2string($new_result,true);
+				if ($query['discipline'] == 'boulder')
+				{
+					$msg = ($record['top'] ? 't'.$record['top'].' ' : '').'b'.$record['bonus'].': '.$msg;
+				}
+			}
+			else
+			{
+				$msg = lang('Nothing to update');
+			}
+			$response[] = $record + array(
+				'msg' => $msg,
+				'stored' => true,
+			);
+		}
+		egw_json_request::isJSONRequest(false);	// switch regular json_response handling off
+		Header('Content-Type: application/json; charset=utf-8');
+		echo json_encode($response);
+		common::egw_exit();
+	}
+
+	/**
 	 * Load data of a given athlete
 	 *
 	 * @param int $PerId
@@ -141,6 +209,7 @@ class ranking_boulder_measurement
 	 */
 	public static function ajax_load_athlete($PerId,array $update, array $state=null, array &$data=null)
 	{
+		$comp = null;
 		$query =& self::get_check_session($comp,$state);
 
 		$response = egw_json_response::get();
@@ -158,7 +227,7 @@ class ranking_boulder_measurement
 			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
 		}
 
-		if (list($data) = boresult::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$keys))
+		if ((list($data) = boresult::$instance->route_result->search(array(),false,'','','',False,'AND',false,$keys)))
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			foreach($update as $id => $key)

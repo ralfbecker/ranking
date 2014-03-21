@@ -3,18 +3,21 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2013 by RalfBecker@digitalROCK.de
+ * @copyright 2013-14 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
 
 /**
  * Object to record and display boulder measurement
- * 
+ *
  * Protocol ist stored in localStorage and therefore presistent between requests and browser restarts.
- * 
+ *
  * Protocol entries are send to server immediatly after recording and additionally periodically if transmissions fail.
+ *
+ * @param {string} _webserverUrl EGroupware url
+ * @constructor
  */
-function boulderProtocol()
+function boulderProtocol(_webserverUrl)
 {
 	this.columns = {
 		'boulder': '#',
@@ -24,20 +27,16 @@ function boulderProtocol()
 		'updated': 'Updated',
 		'stored':  'Stored'
 	};
+	this.resend = null;
+	this.resend_timeout = 1;
+	this.webserverUrl = _webserverUrl;
+
 }
 
 /**
  * Add or update a protocol entry
- * 
- * @param r.WetId
- * @param r.GrpId
- * @param r.route
- * @param r.PerId
- * @param r.boulder
- * @param r.try
- * @param r.bonus
- * @param r.top
- * @param r.clicked 'try', 'bonus', 'top'
+ *
+ * @param {object} r with attributes WetId, GrpId, route, PerId, boulder, try, bonus, top, clicked: 'try', 'bonus', 'top'
  */
 boulderProtocol.prototype.record = function(r)
 {
@@ -51,34 +50,128 @@ boulderProtocol.prototype.record = function(r)
 		'history': ''
 	};
 	// update history, check if try already recored
-	var trys = store.history.match(/[0-9]+[^0-9 ]*/g);
-	var last_try = trys ? trys.pop() : null;
-	if (!last_try || !r['try'] || parseInt(last_try) != r['try'])
+	if (!r.clicked || r.clicked == 'apply')
 	{
-		last_try = ''+(!r['try'] ? Math.max(r.top, r.bonus) : r['try']);
-		store.history += (store.history ? ' ' : '')+last_try;
+		store.history += (store.history?' ':'')+(r.top?'t'+r.top:'')+(r.bonus?'b'+r.bonus:'0');
 	}
-	if (!r.clicked || (r.clicked == 'bonus' || r.clicked == 'top') &&
-		last_try.indexOf(r.clicked[0]) == -1)
+	else
 	{
-		store.history += r.clicked ? r.clicked[0] : (r.bonus ? 'b'+(r.top ? 't' : '') : '');
+		var trys = store.history.match(/[0-9]+[^0-9 ]*/g);
+		var last_try = trys ? trys.pop() : null;
+		if (!last_try || !r['try'] || parseInt(last_try) != r['try'])
+		{
+			last_try = ''+(!r['try'] ? Math.max(r.top, r.bonus) : r['try']);
+			store.history += (store.history ? ' ' : '')+last_try;
+		}
+		if ((r.clicked == 'bonus' || r.clicked == 'top') &&
+			last_try.indexOf(r.clicked[0]) == -1)
+		{
+			store.history += r.clicked ? r.clicked[0] : (r.bonus ? 'b'+(r.top ? 't' : '') : '');
+		}
 	}
 	store.top = r.top;
 	store.bonus = r.bonus;
 	store.updated = new Date;
 	store.stored = false;
-	
+
 	// store data
 	this.set(store);
-	
+
 	// display data
 	this.update(store);
+
+	// sending pending results to server (not neccessary if only tries changed)
+	if (!r.state || r.top != r.state.top || r.bonus != r.state.bonus || r.try == 1)
+	{
+		this.send({
+			'WetId': r.WetId,
+			'GrpId': r.GrpId,
+			'route': r.route
+		});
+	}
+};
+
+/**
+ * Sending (all) pending results to server
+ *
+ * If sending them fails, show number of untransmitted records to user and install
+ * timeout to try sending them again.
+ *
+ * If sending succeeds mark records as transmitted and reset eventualy existing
+ * number of untransmitted records.
+ *
+ * @param {object} _filter what records to send
+ * @param {boolean} _clear_resend
+ */
+boulderProtocol.prototype.send = function(_filter, _clear_resend)
+{
+	// if we got an error from server, wait for timeout to expire (called with _clear_resend=true)
+	// before trying new send, but updating number of pending records
+	if (this.resend && !_clear_resend) return;
+	this.resend = null;
+
+	var filter = _filter || {};
+	filter.stored = false;
+	//Assemble the actual request object containing the json data string
+	var to_send = this.listUpdated(false, filter);
+	if (!to_send.length) return;	// nothing to send
+	for(var i=0; i < to_send.length; ++i)
+	{
+		delete to_send[i].history;
+		delete to_send[i].stored;
+		delete to_send[i].athlete;
+	}
+
+	jQuery.ajax({
+		url: this.webserverUrl+'/json.php?menuaction=ranking.ranking_boulder_measurement.ajax_protocol_update',
+		context: this,
+		data: {
+			json_data: egw.jsonEncode({
+				request: {
+					parameters: to_send
+				}
+			})
+		},
+		dataType: 'json',
+		type: 'POST',
+		success: function(_data)
+		{
+			for(var i=0; i < _data.length; i++)
+			{
+				var data = _data[i];
+				// get current record
+				var record = this.get(this.key(data));
+				// mark record as stored, if it has NOT been updated in meantime
+				if (this.key(record) == this.key(to_send[i]) &&
+					record.top == to_send[i].top && record.bonus == to_send[i].bonus)
+				{
+					record.stored = typeof data.stored == 'undefined' ? true : data.stored;
+					this.set(record);
+					this.update(record);
+					jQuery('#msg').text(data.msg+(record.stored!==true?' ('+record.stored+')':''));
+				}
+			}
+			// reset timeout to default of 1
+			this.resend_timeout = 1;
+		},
+		error: function(_jqXHR, _type, _ex)
+		{
+			jQuery('#msg').text('communication with server failed: '+_type+' '+_ex);
+			if (!this.resend)
+			{
+				this.resend = window.setTimeout(jQuery.proxy(this.send, this, _filter, true), 1000*this.resend_timeout);
+				if (this.resend_timeout < 64) this.resend_timeout *= 2;
+			}
+		}
+	});
+	jQuery('#msg').text(to_send.length+' pending');
 };
 
 /**
  * Key for boulder result in localStorage
- * @param r with attributes r.WetId, r.GrpId, r.route, r.PerId and r.boulder
- * @returns {String}
+ *
+ * @param {object} r with attributes r.WetId, r.GrpId, r.route, r.PerId and r.boulder
+ * @returns {string}
  */
 boulderProtocol.prototype.key = function(r)
 {
@@ -87,16 +180,16 @@ boulderProtocol.prototype.key = function(r)
 
 /**
  * Read record from localstore
- * 
- * @param int|string|object r object with attributes r.WetId, r.GrpId, r.route, r.PerId and r.boulder or integer index (0-based)
- * @param remove true remove item from storage
- * @returns false if not localstore supported, null if not found or object with stored data
+ *
+ * @param {int|string|object} r object with attributes r.WetId, r.GrpId, r.route, r.PerId and r.boulder or integer index (0-based)
+ * @param {boolean} remove true remove item from storage
+ * @returns {boolean} false if not localstore supported, null if not found or object with stored data
  */
 boulderProtocol.prototype.get = function(r, remove)
 {
 	if (!window.localStorage) return false;
-	
-	var key = typeof r == 'number' ? window.localStorage.key(r) : 
+
+	var key = typeof r == 'number' ? window.localStorage.key(r) :
 		typeof r == 'string' ? r : this.key(r);
 
 	if (!key || typeof window.localStorage[key] == 'undefined')
@@ -105,7 +198,6 @@ boulderProtocol.prototype.get = function(r, remove)
 	}
 	var ret = JSON.parse(window.localStorage[key]);
 	ret.updated = new Date(ret.updated);
-	ret.stored = ret.stored == 'true';
 
 	if (remove) delete window.localStorage[key];
 
@@ -114,40 +206,55 @@ boulderProtocol.prototype.get = function(r, remove)
 
 /**
  * Read record from localstore
- * 
- * @param r with attributes r.WetId, r.GrpId, r.route, r.PerId and r.boulder
- * @returns false if not localstore supported, true if successful stored
+ *
+ * @param {object} r with attributes r.WetId, r.GrpId, r.route, r.PerId and r.boulder
+ * @returns {boolean} false if not localstore supported, true if successful stored
  */
 boulderProtocol.prototype.set = function(r)
 {
 	if (!window.localStorage) return false;
-	
+
 	var key = this.key(r);
 	window.localStorage[key] = JSON.stringify(r);
-	
+
 	return true;
 };
 
 /**
  * Return list of all records sorted by updated timestamp
- * 
- * @param boolean _newest_first default oldest first
- * @return Array with all records
+ *
+ * @param {boolean} [_newest_first=false] default oldest first
+ * @param {object} [_filter=] only return records matching given filter
+ * @return {array} with all or filtered records
+ * @memberOf boulderProtocol.prototype
  */
-boulderProtocol.prototype.listUpdated = function(_newest_first)
+boulderProtocol.prototype.listUpdated = function(_newest_first, _filter)
 {
 	if (!window.localStorage) return [];
-	
+
 	var all = [];
 	for(var i=0; i < window.localStorage.length; ++i)
 	{
 		var key = window.localStorage.key(i);
 		if (key.substr(0, 8) == 'boulder:')
 		{
-			all.push(this.get(key));
+			var record = this.get(key);
+			var match = true;
+			if (_filter)
+			{
+				for (var attr in _filter)
+				{
+					if (_filter[attr] != record[attr])
+					{
+						match = false;
+						break;
+					}
+				}
+			}
+			if (match) all.push(record);
 		}
 	}
-	
+
 	// sort array by updated timestamp
 	var sign = _newest_first ? -1 : 1;
 	all.sort(function(a,b){
@@ -184,6 +291,8 @@ boulderProtocol.prototype.resize = function()
 
 /**
  * Create protocol div
+ *
+ * @memberOf boulderProtocol.prototype
  */
 boulderProtocol.prototype.create = function()
 {
@@ -193,7 +302,7 @@ boulderProtocol.prototype.create = function()
 	jQuery('body').append(this.protocol_div);
 	this.protocol_div.height(jQuery(window).height()-18);
 	this.protocol_div.width(jQuery(window).width()-18);
-	
+
 	// close button
 	var buttons = jQuery(document.createElement('div')).attr('id', 'protocolButtons');
 	this.protocol_div.append(buttons);
@@ -215,7 +324,7 @@ boulderProtocol.prototype.create = function()
 			that.tbody.empty();
 		}
 	});
-	
+
 	// protocol table
 	this.protocol_table = jQuery(document.createElement('table')).attr('id', 'protocolTable').addClass('DrTable');
 	var thead = jQuery(document.createElement('thead'));
@@ -228,7 +337,7 @@ boulderProtocol.prototype.create = function()
 	this.protocol_table.append(thead);
 	this.tbody = jQuery(document.createElement('tbody'));
 	this.protocol_table.append(this.tbody);
-	
+
 	// display all rows in localStore with last updated first
 	var all = this.listUpdated();
 	for(var i=0; i < all.length; ++i)
@@ -237,7 +346,7 @@ boulderProtocol.prototype.create = function()
 	}
 
 	this.protocol_div.append(this.protocol_table);
-	
+
 	// bind our resize handler to window resize and orientationchange event
 	jQuery(window).resize(function(){
 		that.resize();
@@ -252,6 +361,8 @@ boulderProtocol.prototype.create = function()
 
 /**
  * Update or add data row
+ *
+ * @param {object} _data
  */
 boulderProtocol.prototype.update = function(_data)
 {
@@ -292,14 +403,14 @@ boulderProtocol.prototype.update = function(_data)
 
 /**
  * Get athlete name from athlete selecttion
- * 
- * @param int PerId
+ *
+ * @param {number} PerId
  * @return string
  */
 boulderProtocol.prototype.athlete = function(PerId)
 {
 	var select = document.getElementById('exec[nm][PerId]');
-	
+
 	if (select && select.options)
 	{
 		for(var i=1; i < select.options.length; ++i)
@@ -316,5 +427,5 @@ boulderProtocol.prototype.athlete = function(PerId)
 
 var protocol;
 jQuery(document).ready(function(){
-	protocol = new boulderProtocol();
+	protocol = new boulderProtocol(egw_webserverUrl);
 });
