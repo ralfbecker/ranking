@@ -1,15 +1,15 @@
 /**
  * digital ROCK jQuery based Javascript API
- * 
+ *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
  * @copyright 2010-13 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
- 
+
 /**
  * Widgets defined in this file:
- * 
+ *
  * - DrWidget: universal widget, which can display all data-types and implement reload-free / in-place navigation
  * - Resultlist: displays results and rankings, inherits from Startlist
  * - Startlist: displays startlists and implementes automatic scrolling and rotation through multiple results
@@ -21,13 +21,13 @@
  * - Aggregated: displays an aggregated ranking: national team ranking, GER sektionenwertung or SUI regionalzentren
  * - DrBaseWidget: virtual base of all widgets implements json(p) loading of data
  * - DrTable: creates and updates a table from data and a column definition, used by most widgets
- * 
+ *
  * In almost all cases you only need to use DrWidget as shown in following example:
- * 
+ *
  * <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
  * <script type="text/javascript" src="http://www.digitalrock.de/egroupware/ranking/js/dr_api.js"></script>
  * <link type="text/css" rel="StyleSheet" href="http://www.digitalrock.de/egroupware/ranking/templates/default/dr_list.css" />
- * 
+ *
  * <div id="container" />
  * <script>
  * 		var widget;
@@ -35,7 +35,7 @@
  *			widget = new DrWidget('container', http://www.digitalrock.de/egroupware/ranking/json.php');
  *		}
  * </script>
- * 
+ *
  * @link http://www.digitalrock.de/egroupware/ranking/README describes available parameters for json url
  * @link https://developers.google.com/webmasters/ajax-crawling/ describes supported ajax crawling scheme
  * @link http://svn.outdoor-training.de/repos/trunk/ranking/inc/class.ranking_widget.inc.php php class implementing ajax crawling
@@ -45,25 +45,25 @@
  * Example with multi-result scrolling (use c= and r= for cat and route)
  *
  * http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?comp=1251&cat=1&route=2&detail=0&rotate=c=1,r=2:c=2,r=2
- * 
+ *
  * You can also supply an optional parameter w= (think of German "Wettkampf" as "c" was already taken) to rotate though different competitions (the first of which is specified by the "comp" parameter in the original URL.
  *
  * Example https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?comp=1395&beamer=1&cat=1&route=0&rotate=w=1395,c=1,r=0:w=1396,c=1,r=0
- * 
+ *
  * The interesting part here is rotate=w=1395,c=1,r=0:w=1396,c=1,r=0
  */
 
 /**
  * Baseclass for all widgets
- * 
+ *
  * We only use jQuery() here (not $() or $j()!) to be able to run as well inside EGroupware as with stock jQuery from googleapis.
  */
 var DrBaseWidget = (function() {
 	/**
 	 * Constructor for all widgets from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 */
@@ -93,21 +93,21 @@ var DrBaseWidget = (function() {
 	};
 	/**
 	 * Update Widget from json_url
-	 * 
+	 *
 	 * To be able to cache jsonp requests in CDN, we have to use the same callback.
 	 * Using same callback leads to problems with concurrent requests: failed: parsererror (jsonp was not called)
 	 * To work around that we queue jsonp request, if there's already one running.
-	 * 
+	 *
 	 * Queue is maintained globally in Startlist.jsonp_queue, as requests come from different objects!
-	 * 
-	 * @param boolean ignore_queue used internally to start next object in queue without requeing it
+	 *
+	 * @param {boolean} ignore_queue used internally to start next object in queue without requeing it
 	 */
 	DrBaseWidget.prototype.update = function(ignore_queue)
 	{
 		// remove our own parameters and current year from json url to improve caching
 		var url = this.json_url.replace(/(detail|beamer|rotate|toc)=[^&]*(&|$)/, '')
 			.replace(new RegExp('year='+(new Date).getFullYear()+'(&|$)'), '').replace(/&$/, '');
-		
+
 		// do we need a jsonp request
 		var jsonp = this.json_url.indexOf('//') != -1 && this.json_url.split('/', 3) != location.href.split('/', 3);
 		if (typeof DrBaseWidget.jsonp_queue == 'undefined') DrBaseWidget.jsonp_queue = [];
@@ -127,7 +127,7 @@ var DrBaseWidget = (function() {
 				dataType: jsonp ? 'jsonp' : 'json',
 				jsonpCallback: 'jsonp',	// otherwise jQuery generates a random name, not cachable by CDN
 				cache: true,
-				type: 'GET', 
+				type: 'GET',
 				success: function(_data) {
 					// if we are first object in queue, remove us
 					if (DrBaseWidget.jsonp_queue[0] === this) DrBaseWidget.jsonp_queue.shift();
@@ -145,9 +145,9 @@ var DrBaseWidget = (function() {
 	};
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * Virtual, need to be implemented in inheriting objects!
-	 * 
+	 *
 	 * @param _data
 	 */
 	DrBaseWidget.prototype.handleResponse = function(_data)
@@ -156,14 +156,14 @@ var DrBaseWidget = (function() {
 	};
 	/**
 	 * Add list with see also links, if not beamer or toc disabled
-	 * 
+	 *
 	 * @param _see_also
 	 */
 	DrBaseWidget.prototype.seeAlso = function(_see_also)
 	{
 		this.container.find('ul.seeAlso').remove();
 
-		if (typeof _see_also != 'undefined' && _see_also.length > 0 && 
+		if (typeof _see_also != 'undefined' && _see_also.length > 0 &&
 			!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/))
 		{
 			var ul = jQuery(document.createElement('ul')).attr('class', 'seeAlso');
@@ -188,11 +188,11 @@ var DrBaseWidget = (function() {
 	};
 	/**
 	 * Replace attribute named from with one name to and value keeping the order of the attributes
-	 * 
-	 * @param object obj
-	 * @param string from
-	 * @param string to
-	 * @param mixed value
+	 *
+	 * @param {object} obj
+	 * @param {string} from
+	 * @param {string} to
+	 * @param {*}  value
 	 */
 	DrBaseWidget.prototype.replace_attribute = function(obj, from, to, value)
 	{
@@ -225,9 +225,9 @@ var DrBaseWidget = (function() {
 var DrTable = (function() {
 	/**
 	 * Constructor for table with given data and columns
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _data array with data for each participant
 	 * @param _columns hash with column name => header
 	 * @param _sort column name to sort by
@@ -249,9 +249,9 @@ var DrTable = (function() {
 		this.showUnranked = _showUnranked ? true : false;
 		// hash with PerId => tr containing athlete
 		this.athletes = {};
-		
+
 		this.sortData();
-		
+
 		// header
 		this.dom = document.createElement('table');
 		jQuery(this.dom).addClass('DrTable');
@@ -259,15 +259,15 @@ var DrTable = (function() {
 		jQuery(this.dom).append(thead);
 		var row = this.createRow(this.columns,'th');
 		jQuery(thead).append(row);
-		
+
 		// athlets
 		var tbody = jQuery(document.createElement('tbody'));
 		jQuery(this.dom).append(tbody);
-		
+
 		for (var i=0; i < this.data.length; ++i)
 		{
 			var data = this.data[i];
-	
+
 			if (Array.isArray(data.results))	// category with result
 			{
 				if (typeof this.column_count == 'undefined')
@@ -299,7 +299,7 @@ var DrTable = (function() {
 			}
 			else	// single result row
 			{
-				if (this.sort == 'result_rank' && 
+				if (this.sort == 'result_rank' &&
 					(typeof data.result_rank == 'undefined' && !this.showUnranked || data.result_rank < 1))
 				{
 					break;	// no more ranked competitiors
@@ -309,10 +309,10 @@ var DrTable = (function() {
 		}
 		//console.log(this.athletes);
 	}
-	
+
 	/**
 	 * Update table with new data, trying to re-use existing rows
-	 * 
+	 *
 	 * @param _data array with data for each participant
 	 * @param _quota quota if quota line should be drawn in result
 	 */
@@ -322,16 +322,16 @@ var DrTable = (function() {
 		if (typeof _quota != 'undefined') this.quota = parseInt(_quota);
 		//console.log(this.data);
 		this.sortData();
-		
+
 		var tbody = this.dom.firstChild.nextSibling;
 		var pos;
-	
+
 		// uncomment to test update: reverses the list on every call
 		//if (this.data[0].PerId == tbody.firstChild.id) this.data.reverse();
-		
+
 		var athletes = this.athletes;
 		this.athletes = {};
-	
+
 		for(var i=0; i < this.data.length; ++i)
 		{
 			var data = this.data[i];
@@ -344,7 +344,7 @@ var DrTable = (function() {
 			{
 				row = athletes[data.team_id];
 			}
-			if (this.sort == 'result_rank' && 
+			if (this.sort == 'result_rank' &&
 				(typeof data.result_rank == 'undefined' || data.result_rank < 1))
 			{
 				break;	// no more ranked competitiors
@@ -377,18 +377,24 @@ var DrTable = (function() {
 			jQuery('#'+pos.id+' ~ tr').remove();
 		}
 	};
-	
+
 	/**
 	 * Update given data-row with changed content
+	 *
+	 * @param {object} _row
+	 * @param {object} _data
 	 * @todo
 	 */
 	DrTable.prototype.updateRow = function(_row,_data)
 	{
-		
+
 	};
-	
+
 	/**
 	 * Create new data-row with all columns from this.columns
+	 *
+	 * @param {object} _data
+	 * @param {string} [_tag=td]
 	 */
 	DrTable.prototype.createRow = function(_data,_tag)
 	{
@@ -409,9 +415,9 @@ var DrTable = (function() {
 		for(var col in this.columns)
 		{
 			if (--span > 0) continue;
-			
+
 			var url = _data.url;
-			
+
 			// if object has a special getter func, call it
 			var col_data;
 			if (typeof this.columns[col] == 'function')
@@ -438,11 +444,11 @@ var DrTable = (function() {
 			}
 			else if (col.indexOf('/') != -1)
 				col = col.substr(col.lastIndexOf('/')+1);
-	
+
 			var tag = document.createElement(_tag);
 			tag.className = col;
 			jQuery(row).append(tag);
-			
+
 			// add pstambl link to name & vorname
 			if (typeof url != 'undefined' && (col == 'lastname' || col == 'firstname'))
 			{
@@ -500,7 +506,7 @@ var DrTable = (function() {
 			}
 		}
 		// add or remove quota line
-		if (this.sort == 'result_rank' && this.quota && _data.result_rank && 
+		if (this.sort == 'result_rank' && this.quota && _data.result_rank &&
 			parseInt(_data.result_rank) >= 1 && parseInt(_data.result_rank) > this.quota)
 		{
 			row.className = 'quota_line';
@@ -508,10 +514,10 @@ var DrTable = (function() {
 		}
 		return row;
 	};
-	
+
 	/**
 	 * Sort data according to sort criteria
-	 * 
+	 *
 	 * @todo get using this.sortNummeric callback working
 	 */
 	DrTable.prototype.sortData = function()
@@ -523,23 +529,23 @@ var DrTable = (function() {
 			var rank_b = _b['result_rank'];
 			if (typeof rank_b == 'undefined' || rank_b < 1) rank_b = 9999;
 			var ret = rank_a - rank_b;
-			
+
 			if (!ret) ret = _a['lastname'] > _b['lastname'] ? 1 : -1;
 			if (!ret) ret = _a['firstname'] > _b['firstname'] ? 1 : -1;
-			
+
 			return ret;
 		}
-		
+
 		switch(this.sort)
 		{
 			case false:	// dont sort
 				break;
-	
+
 			case 'result_rank':
 				// not necessary as server returns them sorted this way
 				//this.data.sort(sortResultRank);
 				break;
-	
+
 			default:
 				var sort = this.sort;
 				this.data.sort(function(_a,_b){
@@ -561,9 +567,9 @@ var DrTable = (function() {
 var Startlist = (function() {
 	/**
 	 * Constructor for startlist from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 */
@@ -585,15 +591,15 @@ var Startlist = (function() {
 	    // margin in which to reverse scrolling
 	    // CAUTION: At the beginning, we scroll pixelwise through the margin, one pixel each sleep_for seconds. Do not change the margin unless you know what you do.
 		this.margin = 2;
-		
+
 		// helper variable
 		var now = new Date();
 		this.sleep_until = now.getTime() + 10000;
 		this.first_run = true;
 		this.do_rotate = false;
-	
+
 		this.update();
-	
+
 		if (this.json_url.match(/rotate=/)) {
 			var list = this;
 			// 20110716: This doesn't seem to be needed anymore. Comment it for now.
@@ -604,17 +610,17 @@ var Startlist = (function() {
 	// inherit from DrBaseWidget
 	Startlist.prototype = new DrBaseWidget();
 	Startlist.prototype.constructor = Startlist;
-	
+
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Startlist.prototype.handleResponse = function(_data)
 	{
 		//console.log(_data);
 		var detail = this.json_url.match(/detail=([^&]+)/);
-	
+
 		switch(_data.discipline)
 		{
 			case 'speedrelay':
@@ -628,22 +634,22 @@ var Startlist = (function() {
 					'start_order': 'StartNr',
 					'team_name': 'Teamname',
 					//'team_nation': 'Nation',
-					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
-					'athletes/0/firstname': '', 
-					'athletes/0/result_time': '', 
-					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
-					'athletes/1/firstname': '', 
-					'athletes/1/result_time': '', 
-					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
-					'athletes/2/firstname': '', 
+					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3},
+					'athletes/0/firstname': '',
+					'athletes/0/result_time': '',
+					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3},
+					'athletes/1/firstname': '',
+					'athletes/1/result_time': '',
+					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3},
+					'athletes/2/firstname': '',
 					'athletes/2/result_time': ''
 				} : {	// detail=0
 					'start_order': 'StartNr',
 					'team_name': 'Teamname',
-					'team_nation': 'Nation'	
+					'team_nation': 'Nation'
 				});
 				break;
-				
+
 			default:
 				this.startlist_cols = {
 					'start_order': {'label': 'StartNr', 'colspan': 2},
@@ -667,7 +673,7 @@ var Startlist = (function() {
 				return _data[col];
 			};
 		}
-	
+
 		var sort;
 		// if we have no result columns or no ranked participant, show a startlist
 		if (typeof this.result_cols == 'undefined' || !_data.participants[0].result_rank)
@@ -683,7 +689,7 @@ var Startlist = (function() {
 			this.columns = this.result_cols;
 			sort = 'result_rank';
 		}
-		
+
 		// for SUI and GER competitions replace nation
 		switch (_data.nation)
 		{
@@ -692,9 +698,9 @@ var Startlist = (function() {
 				break;
 			case 'SUI':
 				this.replace_attribute(this.columns, 'nation', 'city', 'City');
-				break;			
+				break;
 		}
-		
+
 		// fix route_names containing only one or two qualifications are send as array because index 0 and 1
 		if (Array.isArray(_data.route_names))
 		{
@@ -706,16 +712,16 @@ var Startlist = (function() {
 				_data.route_names[i] = route_names[i];
 			}
 		}
-	
+
 		// keep route_names to detect additional routes on updates
 		if (typeof this.route_names == 'undefined')
-		{ 
+		{
 			this.route_names = _data.route_names;
 		}
 		// remove whole table, if the discipline is speed and the number of route_names changes
 		if (_data.discipline == 'speed' && this.json_url.match(/route=-1/) ) // && this.route_names != _data.route_names)
 		{
-			for (var i=2; i < 10; i++) 
+			for (var i=2; i < 10; i++)
 			{
 				if (typeof _data.route_names[i] != typeof this.route_names[i])
 				{
@@ -735,14 +741,14 @@ var Startlist = (function() {
 			this.json_url != this.last_json_url)
 		{
 			jQuery(this.container).empty();
-			delete this.table;		
+			delete this.table;
 		}
 		this.discipline = _data.discipline;
 		this.sort = sort;
 		this.route_order = _data.route_order;
 		this.detail = detail;
 		this.last_json_url = this.json_url;
-	
+
 		if (typeof this.table == 'undefined')
 		{
 			// for general result use one column per heat
@@ -772,20 +778,20 @@ var Startlist = (function() {
 					}
 					else
 					{
-						this.columns['result'+route] = _data.route_names[route];					
+						this.columns['result'+route] = _data.route_names[route];
 					}
 				}
 				// evtl. add points column
 				if (_data.participants[0].quali_points)
 					this.columns['quali_points'] = 'Points';
-				
+
 				title_prefix = '';
 			}
 			if (this.columns.result && _data.participants[0].rank_prev_heat && !this.json_url.match(/detail=0/))
 			{
 				this.columns['rank_prev_heat'] = 'previous heat';
 			}
-			
+
 			// competition
 			this.comp_header = jQuery(document.createElement('h1'));
 			jQuery(this.container).append(this.comp_header);
@@ -798,7 +804,7 @@ var Startlist = (function() {
 			this.header = jQuery(document.createElement('h1'));
 			jQuery(this.container).append(this.header);
 			this.header.addClass('listHeader');
-			
+
 			// display a toc with all available heats, if not explicitly disabled (toc=0) or beamer
 			this.displayToc(_data);
 
@@ -806,9 +812,9 @@ var Startlist = (function() {
 			this.table = new DrTable(_data.participants,this.columns,this.sort,true,
 				_data.route_result ? _data.route_quota : null,this.navigateTo,
 				_data.discipline == 'ranking' && detail);
-		
+
 			jQuery(this.container).append(this.table.dom);
-	
+
 			this.seeAlso(_data.see_also);
 		}
 		else
@@ -821,9 +827,9 @@ var Startlist = (function() {
 		}
 		// set/update header line
 		this.setHeader(_data);
-	
+
 		// if route is NOT offical, update list every 10 sec, of category not offical update every 5min (to get new heats)
-		if (!_data.category_offical && this.discipline != 'ranking') 
+		if (!_data.category_offical && this.discipline != 'ranking')
 		{
 			var list = this;
 			this.update_handle = window.setTimeout(function(){list.update();}, _data.expires*1000);
@@ -832,11 +838,11 @@ var Startlist = (function() {
 	};
 	/**
 	 * Create or update TOC (list of available routes for navigation)
-	 * 
+	 *
 	 * Can be disabled via "toc=0" or "beamer=1" in json_url. Always disabled for rankings.
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Startlist.prototype.displayToc = function(_data)
 	{
 		if (this.json_url.match(/toc=0/) || this.json_url.match(/beamer=1/) || this.discipline == 'ranking')
@@ -947,12 +953,12 @@ var Startlist = (function() {
 	};
 	/**
 	 * Shorten several names by removing parts common to all and remove spacing (eg. "W O M E N" --> "WOMEN")
-	 * 
+	 *
 	 * shortenNames["M E N speed", "W O M E N speed"]) returns ["MEN", "WOMEN"]
-	 * 
-	 * @param array names array of strings or objects with attribute attr
-	 * @param string attr attribute name to use or undefined
-	 * @return array
+	 *
+	 * @param {array}  names array of strings or objects with attribute attr
+	 * @param {string} attr attribute name to use or undefined
+	 * @return {array}
 	 */
 	Startlist.prototype.shortenNames = function(names, attr)
 	{
@@ -964,8 +970,10 @@ var Startlist = (function() {
 		{
 			var name = names[i];
 			if (attr) name = name[attr];
-			var n;
-			while(name != (n = name.replace(spacing_regexp, '$1$2'))) name = n;
+			do {
+				var n = name;
+				name = name.replace(spacing_regexp, '$1$2');
+			} while (n != name);
 			strs.push(name.split(split_by_regexp));
 		}
 		var first = strs[0];
@@ -983,7 +991,7 @@ var Startlist = (function() {
 				for(var j=0; j < strs.length; ++j)
 				{
 					strs[j].splice(jQuery.inArray(first[i], strs[j]), 1);
-				}				
+				}
 			}
 		}
 		for(var j=0; j < strs.length; ++j)
@@ -1002,22 +1010,22 @@ var Startlist = (function() {
 	};
 	/**
 	 * Set header with a (provisional) Result or Startlist prefix
-	 * 
+	 *
 	 * @param _data
 	 * @return
 	 */
 	Startlist.prototype.setHeader = function(_data)
 	{
-		var title_prefix = (this.sort == 'start_order' ? 'Startlist' : 
+		var title_prefix = (this.sort == 'start_order' ? 'Startlist' :
 			(_data.route_result ? 'Result' : 'provisional Result'))+': ';
-	
+
 		var header = _data.route_name;
 		// if NOT detail=0 and not for general result, add prefix before route name
 		if (!this.json_url.match(/detail=0/) && _data.route_order != -1)
 			header = title_prefix+header;
-		
+
 		document.title = header;
-		
+
 		this.comp_header.empty();
 		this.comp_header.text(_data.comp_name);
 		this.result_date.empty();
@@ -1050,7 +1058,7 @@ var Startlist = (function() {
 		    // sleep: in this case we do nothing
 			return;
 		}
-		
+
 		if (this.do_rotate) {
 		    // we scheduled a rotation. Do it and then return.
 			this.rotateURL();
@@ -1108,12 +1116,12 @@ var Startlist = (function() {
 		} else if (( this.scroll_dir != 1) && (scrollTopPosition <= this.margin)) {
 			// DOWN
 			this.scroll_dir = 1;
-			if (! this.first_run ) { 
-			    do_sleep = 1; 
+			if (! this.first_run ) {
+			    do_sleep = 1;
 			    this.do_rotate = true;
 			}
 		}
-		
+
 		// Arm the sleep timer
 		//if (do_sleep > 0) { console.log("Sleeping for " + do_sleep * this.sleep_for + " seconds"); }
 	    this.sleep_until = now.getTime() + (this.sleep_for * 1000 * do_sleep);
@@ -1169,9 +1177,9 @@ var Startlist = (function() {
 var Resultlist = (function() {
 	/**
 	 * Constructor for result from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 */
@@ -1182,18 +1190,18 @@ var Resultlist = (function() {
 	// inherit from Startlist
 	Resultlist.prototype = new Startlist();
 	Resultlist.prototype.constructor = Resultlist;
-	
+
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * Reimplemented to use different columns depending on discipline
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Resultlist.prototype.handleResponse = function(_data)
 	{
 		var detail = this.json_url.match(/detail=([^&]+)/);
-	
+
 		switch(_data.discipline)
 		{
 			case 'speedrelay':
@@ -1208,24 +1216,24 @@ var Resultlist = (function() {
 					'result_rank': 'Rank',
 					'team_name': 'Teamname',
 					//'team_nation': 'Nation',
-					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3}, 
-					'athletes/0/firstname': '', 
-					'athletes/0/result_time': '', 
-					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3}, 
-					'athletes/1/firstname': '', 
-					'athletes/1/result_time': '', 
-					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3}, 
-					'athletes/2/firstname': '', 
+					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3},
+					'athletes/0/firstname': '',
+					'athletes/0/result_time': '',
+					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3},
+					'athletes/1/firstname': '',
+					'athletes/1/result_time': '',
+					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3},
+					'athletes/2/firstname': '',
 					'athletes/2/result_time': '',
 					'result': 'Sum'
 				} : {	// detail=0
 					'result_rank': 'Rank',
 					'team_name': 'Teamname',
 					'team_nation': 'Nation',
-					'result': 'Sum'				
+					'result': 'Sum'
 				});
 				break;
-			
+
 			case 'ranking':
 				this.result_cols = {
 					'result_rank': 'Rank',
@@ -1235,7 +1243,7 @@ var Resultlist = (function() {
 					'points': 'Points',
 					'result' : 'Result'
 				};
-				if (!detail || detail[1] == '0') 
+				if (!detail || detail[1] == '0')
 				{
 					delete this.result_cols.result;
 					// allow to click on points to show single results
@@ -1251,7 +1259,7 @@ var Resultlist = (function() {
 					});
 				}
 				break;
-	
+
 			default:
 				this.result_cols = detail && detail[1] == '0' ? {
 					'result_rank': 'Rank',
@@ -1282,7 +1290,7 @@ var Resultlist = (function() {
 				break;
 		}
 		Startlist.prototype.handleResponse.call(this, _data);
-		
+
 		if (_data.discipline == 'ranking' && detail && detail[1] == '1' && _data.max_comp)
 		{
 			var tfoot = jQuery(document.createElement('tfoot'));
@@ -1295,7 +1303,7 @@ var Resultlist = (function() {
 			{
 				th.html('Für '+(_data.cup ? 'den '+_data.cup.name : 'die Rangliste')+' zählen die '+_data.max_comp+' besten Ergebnisse, nicht zählende Ergebnisse sind eingeklammert.'+
 						(_data.min_disciplines ? '<br/>Teilnahme an mindestens '+_data.min_disciplines+' Disziplinen ist erforderlich.' : '')+
-						(_data.drop_equally ? ' Streichresultate erfolgen in allen Disziplinen gleichmäßig.' : ''));				
+						(_data.drop_equally ? ' Streichresultate erfolgen in allen Disziplinen gleichmäßig.' : ''));
 			}
 			else
 			{
@@ -1305,10 +1313,10 @@ var Resultlist = (function() {
 			}
 		}
 	};
-	
+
 	/**
 	 * Get DOM nodes for display of graphical boulder-result
-	 * 
+	 *
 	 * @param _data
 	 * @param _tag 'th' for header, 'td' for data rows
 	 * @param _num_problems
@@ -1317,9 +1325,9 @@ var Resultlist = (function() {
 	Resultlist.prototype.getBoulderResult = function(_data,_tag,_num_problems)
 	{
 		if (_tag == 'th') return 'Result';
-	
+
 		var tag = document.createElement('div');
-		
+
 		for(var i=1; i <= _num_problems; ++i)
 		{
 			var boulder = document.createElement('div');
@@ -1362,16 +1370,16 @@ var Resultlist = (function() {
 var Results = (function() {
 	/**
 	 * Constructor for results from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 */
 	function Results(_container,_json_url)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
-		
+
 		this.update();
 	}
 	// inherite from DrBaseWidget
@@ -1379,9 +1387,9 @@ var Results = (function() {
 	Results.prototype.constructor = Results;
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Results.prototype.handleResponse = function(_data)
 	{
 		this.columns = {
@@ -1398,9 +1406,9 @@ var Results = (function() {
 				break;
 			case 'SUI':
 				this.replace_attribute(this.columns, 'nation', 'city', 'City');
-				break;			
+				break;
 		}
-	
+
 		if (typeof this.table == 'undefined')
 		{
 			// competition chooser
@@ -1415,7 +1423,7 @@ var Results = (function() {
 				else
 					that.update();
 			});
-			
+
 			// competition
 			this.comp_header = jQuery(document.createElement('h1'));
 			this.comp_header.addClass('compHeader');
@@ -1446,7 +1454,7 @@ var Results = (function() {
 		}
 		this.comp_header.text(_data.name);
 		this.comp_date.text(_data.date_span);
-		
+
 		for(var i=0; i < _data.categorys.length; ++i)
 		{
 			var cat = _data.categorys[i];
@@ -1455,17 +1463,17 @@ var Results = (function() {
 				that.showCompleteResult(e);
 			};
 		}
-		
+
 		// create new table
 		this.table = new DrTable(_data.categorys,this.columns,'result_rank',true,null,this.navigateTo);
-	
+
 		this.container.append(this.table.dom);
-		
+
 		this.seeAlso(_data.see_also);
 	};
 	/**
 	 * Switch from Results (of all categories) to Resultlist (of a single category)
-	 * 
+	 *
 	 * @param e
 	 */
 	Results.prototype.showCompleteResult = function(e)
@@ -1484,16 +1492,16 @@ var Results = (function() {
 var Starters = (function() {
 	/**
 	 * Constructor for results from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 */
 	function Starters(_container,_json_url)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
-		
+
 		this.update();
 	}
 	// inherite from DrBaseWidget
@@ -1501,9 +1509,9 @@ var Starters = (function() {
 	Starters.prototype.constructor = Starters;
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Starters.prototype.handleResponse = function(_data)
 	{
 		this.data = _data;
@@ -1526,12 +1534,12 @@ var Starters = (function() {
 		}
 		this.comp_header.text(_data.name+' : '+_data.date_span);
 		if (_data.deadline) this.comp_date.text('Deadline: '+_data.deadline);
-		
+
 		this.table = jQuery(document.createElement('table')).addClass('DrTable');
 		this.container.append(this.table);
 		var thead = jQuery(document.createElement('thead'));
 		this.table.append(thead);
-		
+
 		// create header row
 		var row = jQuery(document.createElement('tr'));
 		var th = jQuery(document.createElement('th'));
@@ -1547,10 +1555,10 @@ var Starters = (function() {
 			cats[_data.categorys[i].GrpId] = i;
 		}
 		thead.append(row);
-		
+
 		var tbody = jQuery(document.createElement('tbody'));
 		this.table.append(tbody);
-	
+
 		var fed;
 		this.fed_rows = [];
 		this.fed_rows_pos = [];
@@ -1597,7 +1605,7 @@ var Starters = (function() {
 			this.fed_rows_pos[r]++;
 		}
 		this.fillUpFedRows();
-	
+
 		var tfoot = jQuery(document.createElement('tfoot'));
 		this.table.append(tfoot);
 		var th = jQuery(document.createElement('th'));
@@ -1607,11 +1615,11 @@ var Starters = (function() {
 	};
 	/**
 	 * Fill a single fed-row up to a given position with empty td's
-	 * 
-	 * @param int _r row-number
-	 * @param int _to column-number, default whole row
+	 *
+	 * @param {number} _r row-number
+	 * @param {number} _to column-number, default whole row
 	 */
-	Starters.prototype.fillUpFedRow = function(_r, _to) 
+	Starters.prototype.fillUpFedRow = function(_r, _to)
 	{
 		if (typeof _to == 'undefined') _to = this.data.categorys.length;
 		while (this.fed_rows_pos[_r] < _to)
@@ -1624,7 +1632,7 @@ var Starters = (function() {
 	/**
 	 * Fill up all fed rows with empty td's
 	 */
-	Starters.prototype.fillUpFedRows = function() 
+	Starters.prototype.fillUpFedRows = function()
 	{
 		for(var r=0; r < this.fed_rows.length; ++r)
 		{
@@ -1633,7 +1641,7 @@ var Starters = (function() {
 	};
 	/**
 	 * Get name of federation specified by given id
-	 * 
+	 *
 	 * @param _fed_id
 	 * @returns string with name
 	 */
@@ -1658,9 +1666,9 @@ var Starters = (function() {
 var Profile = (function() {
 	/**
 	 * Constructor for profile from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 * @param _template optional string with html-template
@@ -1668,10 +1676,10 @@ var Profile = (function() {
 	function Profile(_container,_json_url,_template)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
-		
+
 		if (_template) this.template = _template;
 		this.container.empty();
-		
+
 		this.bestResults = 12;
 
 		this.update();
@@ -1681,9 +1689,9 @@ var Profile = (function() {
 	Profile.prototype.constructor = Profile;
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Profile.prototype.handleResponse = function(_data)
 	{
 		// replace non-result data
@@ -1720,7 +1728,7 @@ var Profile = (function() {
 		html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
 		{
 			if (match.indexOf('$$results/N/') == -1) return match;
-	
+
 			// find and mark N best results
 			var year = (new Date).getFullYear();
 			var limits = [];
@@ -1742,7 +1750,7 @@ var Profile = (function() {
 				}
 			}
 			var weight_limit = limits.pop();
-			
+
 			var rows = '';
 			var l = 0;
 			for(var i=0; i < _data.results.length; ++i)
@@ -1890,9 +1898,9 @@ var Profile = (function() {
 var ResultTemplate = (function() {
 	/**
 	 * Constructor for ResultTemplate from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 * @param _template optional string with html-template
@@ -1900,8 +1908,8 @@ var ResultTemplate = (function() {
 	function ResultTemplate(_container,_json_url,_template)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
-		
-		if (_template) 
+
+		if (_template)
 			this.template = _template;
 		else
 			this.template = this.container.html();
@@ -1914,13 +1922,13 @@ var ResultTemplate = (function() {
 	ResultTemplate.prototype.constructor = ResultTemplate;
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	ResultTemplate.prototype.handleResponse = function(_data)
 	{
 		// if route is NOT offical, update list every 10 sec
-		if (!_data.route_result && typeof this.update_handle == 'undefined') 
+		if (!_data.route_result && typeof this.update_handle == 'undefined')
 		{
 			var list = this;
 			this.update_handle = window.setInterval(function(){
@@ -1933,7 +1941,7 @@ var ResultTemplate = (function() {
 			window.clearInterval(this.update_handle);
 			delete this.update_handle;
 		}
-	
+
 		// replace non-result data
 		var pattern = /\$\$([^$]+)\$\$/g;
 		var html = this.template.replace(pattern, function(match, placeholder)
@@ -1958,7 +1966,7 @@ var ResultTemplate = (function() {
 		html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
 		{
 			if (match.indexOf('$$participants/N/') == -1) return match;
-	
+
 			var rows = '';
 			for(var i=0; i < _data.participants.length; ++i)
 			{
@@ -1974,7 +1982,7 @@ var ResultTemplate = (function() {
 			}
 			return rows;
 		});
-		
+
 		// replace container
 		this.container.html(html);
 	};
@@ -1987,17 +1995,17 @@ var ResultTemplate = (function() {
 var Competitions = (function() {
 	/**
 	 * Constructor for ompetitions / calendar from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
-	 * @param _filters object 
+	 * @param _filters object
 	 */
 	function Competitions(_container,_json_url,_filters)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
-		
+
 		if (typeof _filters != 'undefined') this.filters = _filters;
 		this.year_regexp = /([&?])year=(\d+)/;
 
@@ -2008,18 +2016,18 @@ var Competitions = (function() {
 	Competitions.prototype.constructor = Competitions;
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Competitions.prototype.handleResponse = function(_data)
 	{
 		this.container.empty();
-	
+
 		var year = this.json_url.match(this.year_regexp);
 		year = year ? parseInt(year[2]) : (new Date).getFullYear();
 		var h1 = jQuery(document.createElement('h1')).text('Calendar '+year);
 		this.container.append(h1);
-		
+
 		var filter = jQuery(document.createElement('div')).addClass('filter');
 		var select = jQuery(document.createElement('select')).attr('name', 'year');
 		var years = _data.years || [year+1, year, year-1];
@@ -2037,7 +2045,7 @@ var Competitions = (function() {
 		});
 		select.attr('style', 'margin-right: 5px');
 		filter.append(select);
-	
+
 		if (typeof this.filters != 'undefied')
 		{
 			select = jQuery(document.createElement('select')).attr('name', 'filter');
@@ -2060,11 +2068,11 @@ var Competitions = (function() {
 		// until incl. Wednesday (=3) we display competitions from last week first, after that from this week
 		var week_to_display = now.getWeek() - (now.getDay() <= 3 ? 1 : 0);
 		var closest, closest_dist;
-		
+
 		for(var i=0; i < _data.competitions.length; ++i)
 		{
 			var competition = _data.competitions[i];
-			
+
 			var comp_div = jQuery(document.createElement('div')).addClass('competition');
 			comp_div.append(jQuery(document.createElement('div')).addClass('title').text(competition.name));
 			comp_div.append(jQuery(document.createElement('div')).addClass('date').text(competition.date_span));
@@ -2113,7 +2121,7 @@ var Competitions = (function() {
 				if (typeof competition[l] == 'undefined' || competition[l] === null) continue;
 				var a = jQuery(document.createElement('a'));
 				a.attr('href', competition[l]);
-				if (l != 'starters') 
+				if (l != 'starters')
 					a.attr('target', '_blank');
 				else if (this.navigateTo)
 					a.click(this.navigateTo);
@@ -2124,7 +2132,7 @@ var Competitions = (function() {
 			if (have_links) comp_div.append(links_ul);
 			if (have_cats) comp_div.append(cats_ul);
 			competitions.append(comp_div);
-			
+
 			var dist = Math.abs(Date.parse(competition.date).getWeek() - week_to_display);
 			if (typeof closest_dist == 'undefined' || dist < closest_dist)
 			{
@@ -2132,7 +2140,7 @@ var Competitions = (function() {
 				closest = comp_div[0];
 			}
 		}
-		if (closest && year == (new Date()).getFullYear()) 
+		if (closest && year == (new Date()).getFullYear())
 		{
 			// need to delay scrolling a bit, layout seems to need some time
 			window.setTimeout(function() {
@@ -2191,16 +2199,16 @@ var Competitions = (function() {
 var Aggregated = (function() {
 	/**
 	 * Constructor for aggregated rankings (nat. team ranking, sektionenwertung, ...) from given json url
-	 * 
+	 *
 	 * Table get appended to specified _container
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 */
 	function Aggregated(_container,_json_url)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
-		
+
 		this.update();
 	}
 	// inherite from DrBaseWidget
@@ -2208,13 +2216,13 @@ var Aggregated = (function() {
 	Aggregated.prototype.constructor = Aggregated;
 	/**
 	 * Callback for loading data via ajax
-	 * 
+	 *
 	 * @param _data route data object
-	 */            
+	 */
 	Aggregated.prototype.handleResponse = function(_data)
 	{
 		var that = this;
-		
+
 		// if we are not controlled by DrWidget, install our own navigation
 		if (!this.navigateTo)
 		{
@@ -2254,16 +2262,16 @@ var Aggregated = (function() {
 			});
 		}
 		if (_data.aggregate_by != 'nation') delete this.columns.nation;
-	
+
 		if (typeof this.table == 'undefined')
 		{
 			this.ranking_name = jQuery(document.createElement('h1')).addClass('rankingName');
 			this.container.append(this.ranking_name);
-		
+
 			// cup or competition
 			this.header = jQuery(document.createElement('h2')).addClass('rankingHeader');
 			this.container.append(this.header);
-			
+
 			// category names
 			this.header2 = jQuery(document.createElement('h3')).addClass('rankingHeader2');
 			this.container.append(this.header2);
@@ -2296,7 +2304,7 @@ var Aggregated = (function() {
 
 		// make _data available to other methods
 		this.data = _data;
-	
+
 		var comps = [];
 		for(var c in _data.competitions) comps.push(_data.competitions[c]);
 		// use competition columns for more then one comp. and international or SUI
@@ -2323,7 +2331,7 @@ var Aggregated = (function() {
 			{
 				this.columns['result'+cats[c].GrpId] = function(_data, _tag, _name) {
 					return that.cat_column.call(that, _data, _tag, _name);
-				};			
+				};
 			}
 		}
 		if (!_data.use_cup_points)	// display all ranking points with 2 digits
@@ -2335,7 +2343,7 @@ var Aggregated = (function() {
 		}
 		// create new table
 		this.table = new DrTable(_data.federations, this.columns, false, true, null, this.navigateTo);
-	
+
 		// add table footer with note about how many results are counting
 		var tfoot = jQuery(document.createElement('tfoot'));
 		jQuery(this.table.dom).append(tfoot);
@@ -2346,14 +2354,14 @@ var Aggregated = (function() {
 		th.attr('colspan', cols);
 		th.text('For '+_data.name+' '+_data.best_results+' best results per competition and category are counting. '+
 				'Not counting results are in brackets.');
-		
+
 		this.container.append(this.table.dom);
-		
+
 		this.seeAlso(_data.see_also);
 	};
 	/**
 	 * Display a competition column
-	 * 
+	 *
 	 * @param _data
 	 * @param _tag tag 'th' for header or 'td' for data row
 	 * @param _name column-name
@@ -2391,7 +2399,7 @@ var Aggregated = (function() {
 	};
 	/**
 	 * Display a category column
-	 * 
+	 *
 	 * @param _data
 	 * @param _tag tag 'th' for header or 'td' for data row
 	 * @param _name column-name
@@ -2469,7 +2477,7 @@ var Aggregated = (function() {
 var DrWidget = (function() {
 	/**
 	 * call appropriate widget to display data specified by _json_url or location
-	 * 
+	 *
 	 * @param _container
 	 * @param _json_url url for data to load
 	 * @param _arg3 object with widget specific 3. argument, eg. { Competitions: {filters}, Profile: 'template-id' }
@@ -2479,10 +2487,10 @@ var DrWidget = (function() {
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
 
 		this.arg3 = _arg3 || {};
-		
+
 		var matches = this.json_url.match(/\?.*$/);
 		this.update(matches ? matches[0] : null);
-		
+
 		// install this.update as PopState handler
 		this.installPopState();
 	}
@@ -2491,14 +2499,14 @@ var DrWidget = (function() {
 	DrWidget.prototype.constructor = DrWidget;
 	/**
 	 * Navigate to a certain result-page
-	 * 
+	 *
 	 * @param _params default if not specified first location.hash then location.search
 	 */
 	DrWidget.prototype.navigateTo = function(_params)
 	{
 		delete this.prevent_initial_pop;
 		var params = '!'+_params.replace(/^.*(#!|#|\?)/, '');
-		
+
 		// update location hash, to reflect current page-content
 		if (document.location.hash != '#'+params) document.location.hash = params;
 	};
@@ -2506,9 +2514,9 @@ var DrWidget = (function() {
 	{
 		var params = _params || location.hash || location.search;
 		params = params.replace(/^.*(#!|#|\?)/, '');
-	
+
 		this.json_url = this.json_url.replace(/\?.*$/, '')+'?'+params;
-		
+
 		// check which widget is needed to render requested content
 		function hasParam(_param, _value)
 		{
@@ -2581,7 +2589,7 @@ var DrWidget = (function() {
 
 /**
  * Dynamically load a css file
- * 
+ *
  * @param href url to css file
  */
 function load_css(href)
@@ -2619,5 +2627,5 @@ if (!Date.getWeek)
 	Date.prototype.getWeek = function() {
 	    var onejan = new Date(this.getFullYear(),0,1);
 	    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
-	};	
+	};
 }
