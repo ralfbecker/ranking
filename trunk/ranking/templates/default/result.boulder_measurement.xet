@@ -40,7 +40,7 @@
 						<buttononly label="Bonus" id="button[bonus]" onclick="bonus_clicked(this);" class="bigButton"/>
 						<buttononly label="Top" id="button[top]" onclick="top_clicked(this);" class="bigButton"/>
 						<buttononly label="&gt;&gt;" id="button[next]" onclick="boulder_next();" class="bigButton"/>
-						<buttononly align="right" label="Protocol" onclick="protocol.display();"/>
+						<buttononly align="right" label="Protocol" id="protocol" onclick="protocol.display();"/>
 					</hbox>
 					<description/>
 					<description/>
@@ -48,13 +48,13 @@
 			</rows>
 		</grid>
 		<styles>
-			.bigButton input, .tryButton input {
+			.bigButton button, .tryButton button, .bigButton input, .tryButton input {
    font-size: 250%;
    border-radius: 20px;
    padding-left: 10px;
    padding-right: 10px;
 }
-.tryButton input {
+.tryButton button, .tryButton input {
    width: 4em;
 }
 table.buttonBox {

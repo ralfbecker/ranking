@@ -470,12 +470,30 @@ function init_topo(holds)
  */
 
 /**
+ * Get current state
+ *
+ * @returns {object} with values for attributes try, bonus and top
+ */
+function get_state()
+{
+	var bonus = document.getElementById('exec[zone]');
+	var top = document.getElementById('exec[top]');
+
+	return {
+		try: try_num(),
+		bonus: bonus.value,
+		top: top.value
+	};
+}
+
+/**
  * [Try] button clicked --> update number
  *
  * @param input type="button" button
  */
 function try_clicked(button)
 {
+	var state = get_state();
 	var label = button.value;
 	var num = try_num();
 	try_num(++num);
@@ -489,7 +507,7 @@ function try_clicked(button)
 		// store on server
 		//update_boulder();
 	}
-	update_boulder('try');
+	update_boulder('try', state);
 }
 
 /**
@@ -539,11 +557,12 @@ function try_num(set_value, set_anyway)
  */
 function bonus_clicked(button)
 {
+	var state = get_state();
 	var bonus = document.getElementById('exec[zone]');
 	bonus.value = try_num(1);
 	check_bonus(bonus);
 
-	update_boulder('bonus');
+	update_boulder('bonus', state);
 }
 
 /**
@@ -553,6 +572,7 @@ function bonus_clicked(button)
  */
 function top_clicked(button)
 {
+	var state = get_state();
 	var bonus = document.getElementById('exec[zone]');
 	var top = document.getElementById('exec[top]');
 	var num = try_num(1);
@@ -565,13 +585,13 @@ function top_clicked(button)
 
 		//update_boulder();
 	}
-	update_boulder('top');
+	update_boulder('top', state);
 }
 
 /**
  * Sending bonus and top for PerId to server
  */
-function update_boulder(clicked)
+function update_boulder(clicked, state)
 {
 	var WetId = document.getElementById('exec[comp][WetId]').value;
 	var n = document.getElementById('exec[nm][boulder_n]').value;
@@ -587,23 +607,26 @@ function update_boulder(clicked)
 		if (typeof protocol != 'undefined')
 		{
 			protocol.record({
-				'WetId': WetId,
-				'GrpId': GrpId,
-				'route': route_order,
-				'PerId': PerId,
-				'boulder': n,
-				'bonus': bonus,
-				'top': top,
-				'clicked': clicked,
-				'try': clicked ? try_num() : null
+				WetId: WetId,
+				GrpId: GrpId,
+				route: route_order,
+				PerId: PerId,
+				boulder: n,
+				bonus: bonus,
+				top: top,
+				clicked: clicked,
+				try: clicked ? try_num() : null,
+				state: state
 			});
 		}
+		else	// old direct transmission, if no protocol object available
+		{
+			var update = {};
+			update['zone'+n] = bonus === '' ? 'empty' : bonus;	// egw_json_encode sends '' as null, which get not stored!
+			update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
 
-		var update = {};
-		update['zone'+n] = bonus === '' ? 'empty' : bonus;	// egw_json_encode sends '' as null, which get not stored!
-		update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
-
-		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
+			xajax_doXMLHTTP('ranking_boulder_measurement::ajax_update_result', PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
+		}
 	}
 }
 
@@ -647,7 +670,12 @@ function boulder_changed(selectbox)
 	var PerId = document.getElementById('exec[nm][PerId]').value;
 	var n = document.getElementById('exec[nm][boulder_n]').value;
 
-	// ToDo load values from server
+	// reset values (in case connection is lost)
+	document.getElementById('exec[zone]').value = document.getElementById('exec[top]').value = '';
+	try_num(0);
+	init_boulder();
+
+	// loading values from server
 	if (PerId && n)
 	{
 		var WetId = document.getElementById('exec[comp][WetId]').value;
@@ -657,12 +685,6 @@ function boulder_changed(selectbox)
 		xajax_doXMLHTTP('ranking_boulder_measurement::ajax_load_athlete', PerId, { 'exec[zone]': 'zone'+n, 'exec[top]': 'top'+n },
 			{ 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
 	}
-	else
-	{
-		document.getElementById('exec[zone]').value = document.getElementById('exec[top]').value = '';
-	}
-	try_num(0);
-	init_boulder();
 }
 
 /**
