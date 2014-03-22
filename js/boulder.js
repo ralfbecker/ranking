@@ -126,7 +126,7 @@ boulderProtocol.prototype.send = function(_filter, _clear_resend)
 		url: this.webserverUrl+'/json.php?menuaction=ranking.ranking_boulder_measurement.ajax_protocol_update',
 		context: this,
 		data: {
-			json_data: egw.jsonEncode({
+			json_data: JSON.stringify({
 				request: {
 					parameters: to_send
 				}
