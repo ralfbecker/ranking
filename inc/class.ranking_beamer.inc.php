@@ -122,6 +122,7 @@ class ranking_beamer
 			}
 			$rotate .= ($rotate ? ':' : '').'c='.$cat.',r='.$routes[$n];
 		}
+		if ($content['padding']) $params['padding'] = $content['padding'];
 		$content['href'] = egw::link($link,$params).(strpos($rotate,':') !== false ? '&rotate='.$rotate : '');
 		$parts = parse_url($content['href']);
 		$content['href'] = $parts['path'].'?'.$parts['query'];
