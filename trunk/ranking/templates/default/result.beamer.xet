@@ -10,8 +10,8 @@
 			<rows>
 				<row class="noPrint" disabled="@nm[cat]" part="header">
 					<hbox options="0,0" span="all">
-						<menulist class="rightPad5">
-							<menupopup statustext="Select calendar" id="calendar" no_lang="1" onchange="1"/>
+						<menulist>
+							<menupopup statustext="Select calendar" id="calendar" no_lang="1" onchange="1" class="rightPad5"/>
 						</menulist>
 						<menulist>
 							<menupopup id="comp" no_lang="1" onchange="1" options="Select competition"/>
@@ -25,6 +25,7 @@
 						</menulist>
 						<checkbox label="Startlist" id="startlist" onchange="1" class="leftPad5"/>
 						<checkbox label="Beamer" id="beamer" onchange="1" class="leftPad5"/>
+						<textbox blur="top right bottom left px" label="Padding" id="padding" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row part="footer">
