@@ -15,8 +15,8 @@
 						<menulist>
 							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
 						</menulist>
-						<menulist class="selectboxFullWidth">
-							<menupopup statustext="|Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat"/>
+						<menulist>
+							<menupopup statustext="|Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat" class="selectboxFullWidth"/>
 						</menulist>
 						<button statustext="Import the result into the ranking" label="Import into ranking" id="button[ranking]" class="leftPad5"/>
 					</hbox>
@@ -25,14 +25,14 @@
 					<description value="Startlist"/>
 					<hbox options="0,0" span="all">
 						<button label="Generate Startlist" id="button[startlist]"/>
-						<menulist class="leftPad5 selectboxFullWidth">
-							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10"/>
+						<menulist>
+							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10" class="leftPad5 selectboxFullWidth"/>
 						</menulist>
-						<menulist class="leftPad5 selectboxFullWidth">
-							<menupopup statustext="|Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat"/>
+						<menulist>
+							<menupopup statustext="|Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat" class="leftPad5 selectboxFullWidth"/>
 						</menulist>
-						<menulist class="leftPad5 selectboxFullWidth">
-							<menupopup statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order"/>
+						<menulist>
+							<menupopup statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order" class="leftPad5 selectboxFullWidth"/>
 						</menulist>
 					</hbox>
 				</row>
@@ -74,8 +74,8 @@
 					<hbox options="0,0" span="all">
 						<file id="file"/>
 						<button label="Upload" id="button[upload]" class="leftPad5"/>
-						<menulist class="leftPad5">
-							<menupopup id="upload_options" options="Options"/>
+						<menulist>
+							<menupopup id="upload_options" options="Options" class="leftPad5"/>
 						</menulist>
 					</hbox>
 				</row>
@@ -108,14 +108,14 @@
 						<menulist>
 							<menupopup label="1. Display" id="dsp_id" onchange="1" options="None"/>
 						</menulist>
-						<menulist class="leftPad5">
-							<menupopup type="select-number" label="Line" id="frm_line" options=",1,$cont[max_line]"/>
+						<menulist>
+							<menupopup type="select-number" label="Line" id="frm_line" options=",1,$cont[max_line]" class="leftPad5"/>
 						</menulist>
-						<menulist class="leftPad5">
-							<menupopup label="2. Display" id="dsp_id2" onchange="1" options="None"/>
+						<menulist>
+							<menupopup label="2. Display" id="dsp_id2" onchange="1" options="None" class="leftPad5"/>
 						</menulist>
-						<menulist class="leftPad5">
-							<menupopup type="select-number" label="Line" id="frm_line2" options=",1,$cont[max_line2]"/>
+						<menulist>
+							<menupopup type="select-number" label="Line" id="frm_line2" options=",1,$cont[max_line2]" class="leftPad5"/>
 						</menulist>
 					</hbox>
 				</row>
@@ -160,7 +160,59 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.result.route" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.result.route.registration" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%" height="280" id="athlete">
+			<columns>
+				<column width="100"/>
+				<column width="200"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<description value="Search" for="PerId"/>
+					<link-entry blur="Name" id="PerId" onchange="1" options="ranking" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Lastname" for="nachname"/>
+					<textbox id="nachname" size="30" maxlength="40"/>
+					<description value="Firstname" for="vorname"/>
+					<textbox id="vorname" size="30" maxlength="40"/>
+				</row>
+				<row class="row">
+					<description value="Birthdate" for="geb_date"/>
+					<date id="geb_date" options="Y-m-d"/>
+					<description value="EMail" for="email"/>
+					<url-email id="email" options="30,60"/>
+				</row>
+				<row class="row">
+					<description value="Nation" for="nation"/>
+					<menulist>
+						<menupopup id="nation"/>
+					</menulist>
+					<description value="City" for="ort"/>
+					<textbox id="ort" size="30" maxlength="60"/>
+				</row>
+				<row class="row">
+					<description value="Federation" for="fed_id"/>
+					<menulist span="all">
+						<menupopup id="fed_id"/>
+					</menulist>
+				</row>
+				<row>
+					<button label="Register" id="register"/>
+					<checkbox label="Send EMail to set password to athlete" id="password_email" span="all"/>
+				</row>
+				<row height="120">
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.route" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%">
 			<columns>
 				<column width="120"/>
@@ -188,9 +240,10 @@
 						<menulist>
 							<menupopup id="discipline"/>
 						</menulist>
-						<menulist class="leftPad5">
-							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,8,1"/>
+						<menulist>
+							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,8,1" class="leftPad5"/>
 						</menulist>
+						<textbox blur="num[/row][:points]" statustext="|num[/row][:points] optional points per boulder (distributed on all tops) or 1 point per top" id="selfscore_mode" validator="/^([0-9]+)(\/[0-9]+)?(:[0-9]+)?$/"/>
 					</hbox>
 				</row>
 				<row class="row">
@@ -198,8 +251,8 @@
 					<menulist>
 						<menupopup id="route_order" no_lang="1" readonly="true"/>
 					</menulist>
-					<menulist class="noWrap">
-						<menupopup align="right" id="route_type" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;"/>
+					<menulist>
+						<menupopup align="right" id="route_type" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;" class="noWrap"/>
 					</menulist>
 				</row>
 				<row class="th">
@@ -213,11 +266,13 @@
 							<tab id="general" label="General"/>
 							<tab id="comment" label="Comment"/>
 							<tab id="measure" label="Measurement"/>
+							<tab id="registration" label="Registration"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.result.route.general"/>
 							<template id="ranking.result.route.comment"/>
 							<template id="ranking.result.route.measure"/>
+							<template id="ranking.result.route.registration"/>
 						</tabpanels>
 					</tabbox>
 				</row>

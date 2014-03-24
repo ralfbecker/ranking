@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-13 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -75,18 +75,26 @@ class uiresult extends boresult
 			$content['slist_order'] = self::quali_startlist_default($discipline,$content['route_type'],$comp['nation']);
 		}
 		// check if user has NO edit rights
-		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)))
+		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) &&
+			// allow register button for selfscore and route-judges
+			!($discipline == 'selfscore' && $content['athlete']['register'] && $this->is_judge($comp, false, $content)))
 		{
 			$readonlys['__ALL__'] = true;
 			$readonlys['button[cancel]'] = false;
+			//error_log(__LINE__.": discipline=$discipline, button={$content['button']['register']}, is_judge()=".array2string($this->is_judge($comp, false, $content)));
 		}
-		elseif ($content['button'] || $content['topos']['delete'])
+		elseif ($content['button'] || $content['topos']['delete'] || $content['athlete']['register'])
 		{
 			if ($content['topos']['delete'])
 			{
 				list($topo) = each($content['topos']['delete']);
 				unset($content['topos']);
 				$button = 'delete_topo';
+			}
+			elseif ($content['athlete']['register'])
+			{
+				$button = 'register';
+				unset($content['athlete']['register']);
 			}
 			else
 			{
@@ -282,6 +290,96 @@ class uiresult extends boresult
 					$param['msg'] = $msg = $this->import_ranking($content, $comp['fed_id'] ? $comp['fed_id'] :
 						($comp['nation'] != 'NULL' ? $comp['nation'] : null), $content['import_cat']);
 					break;
+
+				case 'register':
+					// check judge right or for selfscore route-judge rights
+					if ($content['route_status'] == STATUS_RESULT_OFFICIAL || !$this->is_judge($comp, false) &&
+						($content['discipline'] != 'selfscore' || !$this->is_judge($comp, false, $content)))
+					{
+						//error_log(__METHOD__.__LINE__."() route_status=$content[route_status], route_judges=".array2string($content['route_judges']).", comp=".array2string($comp).", is_judge()=".array2string($this->is_judge($comp, false)));
+						$msg .= lang('Permission denied !!!');
+						break;
+					}
+					$athlete = $content['athlete'];
+					if (!($athlete['PerId'] > 0) && !(strlen($athlete['vorname']) < 2 || strlen($athlete['nachname']) < 2 ||
+						!$athlete['nation'] || !$athlete['fed_id']))
+					{
+						$msg .= lang('You either need to search an athlete or enter required fields to add him!');
+						break;
+					}
+					$keys = array_intersect_key($content, array_flip(array('WetId', 'GrpId', 'route_order')));
+					// check athlete not already registered
+					if ($athlete['PerId'] > 0 && ($this->route_result->read($keys+array('PerId' => $athlete['PerId']))))
+					{
+						$msg .= lang('%1 is already registered!', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+						break;
+					}
+					// meets registration requirements
+					if ($athlete['license'] == 's')
+					{
+						$msg .= lang('Athlete is suspended !!!');
+						break;
+					}
+					if (!($cat = $this->cats->read($keys['GrpId'])) ||
+						$cat['sex'] && $cat['sex'] != $athlete['sex'] ||
+						!$this->cats->in_agegroup($athlete['geb_date'], $cat, (int)$comp['datum']) ||
+						!$this->comp->open_comp_match($athlete))
+					{
+						$msg .= lang('Athlete does NOT meet registration requirements (age, gender, federation)!');
+						break;
+					}
+					// store email of existing athlete
+					if ($athlete['PerId'] && $athlete['email'] && ($stored = $this->athlete->read($athlete['PerId'])) &&
+						$athlete['email'] != $stored['email'])
+					{
+						$this->athlete->save(array('email' => $athlete['email']));
+					}
+					if (!($athlete['PerId'] > 0))
+					{
+						$msg .= "Saving new athletes not (yet) implemented!";
+						break;
+						unset($athlete['PerId']);
+						$this->athlete->init($athlete);
+						if ($this->athlete->save())
+						{
+							$msg .= lang('Error: while saving !!!');
+							break;
+						}
+						$msg .= lang('%1 saved',lang('Athlete'));
+						$athlete = $this->athlete->data;
+					}
+					// register athlete
+					$start_order = count($this->route_result->search($keys, true))+1;
+					$this->route_result->init($keys+array(
+						'PerId' => $athlete['PerId'],
+						'start_order' => $start_order,
+					));
+					$this->route_result->save();
+					$msg .= ($msg ? "\n" : '').lang('%1 registered.', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+
+					if ($content['athlete']['password_email'])
+					{
+						if (!$athlete['email'])
+						{
+							$msg .= "\n".lang('EMail required to send password email!');
+						}
+						else
+						{
+							try {
+								$selfservice = new ranking_selfservice();
+								$selfservice->password_reset_mail($athlete);
+								$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
+							}
+							catch (Exception $e) {
+								$msg .= "\n".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
+									$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
+							}
+						}
+					}
+					$content['athlete'] = array('password_email' => $content['athlete']['password_email']);
+					$param['msg'] = $msg;
+					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
+					break;
 			}
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent
 			{
@@ -294,10 +392,12 @@ class uiresult extends boresult
 		{
 			$content['selfscore_mode'] = $content['route_num_problems'].'/'.$content['selfscore_num'].
 				($content['selfscore_points'] ? ':'.$content['selfscore_points'] : '');
+			// first call for selfscore: check password-email
+			if ($_SERVER['REQUEST_METHOD'] == 'GET') $content['athlete']['password_email'] = true;
 		}
 		else
 		{
-			$tmpl->disableElement('selfscore_mode');
+			$tmpl->disable_cells('selfscore_mode');
 		}
 		$content += array(
 			'msg' => $msg,
@@ -327,7 +427,7 @@ class uiresult extends boresult
 		}
 		$readonlys['discipline'] = !!$content['route_order'];	// for no only allow to set discipline in 1. quali
 
-		foreach(array('new_route','route_type','route_order','dsp_id','frm_id','dsp_id2','frm_id2') as $name)
+		foreach(array('new_route','route_type','route_order','dsp_id','frm_id','dsp_id2','frm_id2','selfscore_mode','route_judges') as $name)
 		{
 			$preserv[$name] = $content[$name];
 		}
@@ -355,6 +455,31 @@ class uiresult extends boresult
 			),
 			'slist_order' => self::slist_order_options($comp['serie']),
 		);
+		// athlete selected in registration
+		if ($content['athlete']['PerId'] > 0 &&
+			($athlete = $this->athlete->read(array('PerId' => $content['athlete']['PerId']))))
+		{
+			$keys = array_intersect_key($content, array_flip(array('WetId', 'GrpId', 'route_order')));
+			if ($this->route_result->read($keys+array('PerId' => $content['athlete']['PerId'])))
+			{
+				$content['msg'] = lang('%1 is already registered!', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+				$content['athlete'] = array('password_email' => $content['athlete']['password_email']);
+			}
+			else
+			{
+				$content['athlete'] = $preserv['athlete'] = $athlete;
+				$sel_options['fed_id'] = array($content['athlete']['fed_id'] => $content['athlete']['verband']);
+				$sel_options['nation'] = array($content['athlete']['nation'] => $content['athlete']['nation']);
+				$readonlys['athlete'] = array(
+					'vorname' => true,
+					'nachname' => true,
+					'ort' => true,
+					'geb_date' => true,
+					'fed_id' => true,
+					'nation' => true,
+				);
+			}
+		}
 		if ($content['route_order'] == -1)
 		{
 			unset($sel_options['route_status'][0]);
@@ -379,14 +504,30 @@ class uiresult extends boresult
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
-			foreach($this->route->db_cols as $col)
-			{
-				$readonlys[$col] = true;
-			}
-			$readonlys['button[upload]'] = $readonlys['button[ranking]'] = $readonlys['button[startlist]'] =
-				$readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] =
-				$readonlys['import_cat'] = $readonlys['add_cat'] = true;
+			$readonlys = array('__ALL__' => true);
+			$readonlys['button[cancel]'] = false;
 			$content['no_upload'] = true;
+
+			// route judge is allowed to register athletes for selfscore
+			if ($this->is_judge($comp, false, $content) && $content['discipline'] == 'selfscore' &&
+				$content['route_status'] != STATUS_RESULT_OFFICIAL)
+			{
+				$readonlys['athlete'] = array(
+					'PerId' => false,
+					'PerId[id]' => false,
+					'PerId[query]' => false,
+					'vorname' => false,
+					'nachname' => false,
+					'email' => false,
+					'ort' => false,
+					'geb_date' => false,
+					'fed_id' => false,
+					'nation' => false,
+					'password_email' => false,
+				);
+				$readonlys['register'] = false;
+			}
+			else error_log(__METHOD__.': '.__LINE__.' no rights!');
 		}
 		else
 		{
@@ -406,6 +547,8 @@ class uiresult extends boresult
 			}
 			else
 			{
+				$readonlys['tabs']['registration'] = true;
+
 				$sel_options['import_cat'] = array('' => lang('Into current category'));
 				// filter by same gender and not identical
 				$sel_options['import_cat'] += $this->cats->names(array('sex' => $cat['sex'],'GrpId!='.(int)$cat['GrpId']), -1,
@@ -1040,7 +1183,9 @@ class uiresult extends boresult
 					if (!is_numeric($id) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
 						!$this->delete_participant($keys+array($this->route_result->id_col => $id)))
 					{
-						$msg = lang('Permission denied !!!');
+						$msg = $this->has_results($keys+array($this->route_result->id_col => $id)) ?
+							lang('Has already a result!') : lang('Permission denied !!!');
+						//error_log(__METHOD__."() id=$id, acl_check('$comp[nation], EGW_ACL_RESULT, \$comp)=".array2string($this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)));
 					}
 					else
 					{
@@ -1158,7 +1303,8 @@ class uiresult extends boresult
 		$content['no_compsel'] = $cat && $content['nm']['show_result'] == 4;	// no competition selection in measurement, if a cat is selected
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
 		{
-			$readonlys['button[edit]'] = $readonlys['button[new]'] = true;
+			$readonlys['button[new]'] = true;
+			$readonlys['button[edit]'] = !$this->is_judge($comp, false, $route);
 
 			if (!is_numeric($keys['route_order']) || !$sel_options['route']) $content['no_route_selection'] = true;	// no route yet
 		}

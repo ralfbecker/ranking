@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -487,7 +487,9 @@ class boranking extends ranking_so
 	}
 
 	/**
-	 * checks if user is a judge of a given competition, this counts only 1 week (see judge_right_days) before and after the competition!!!
+	 * Checks if user is a judge of a given competition, this counts only 1 week (see judge_right_days) before and after the competition!!!
+	 *
+	 * Allways returns true for admins or if user has result rights for competition federation!
 	 *
 	 * @param array|int $comp competitiion array or id
 	 * @param boolean $allow_before=false grant judge-rights unlimited time before the competition
@@ -501,19 +503,28 @@ class boranking extends ranking_so
 		{
 			return false;
 		}
+		// admin or result-rights for competition federation
+		if ($this->is_admin || $this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp))
+		{
+			return true;
+		}
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = (mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
 		//echo "<p>".__METHOD__."($comp[rkey]: $comp[name] ($comp[datum])) distance=$distance</p>\n";
 
 		$is_judge = $comp && is_array($comp['judges']) && in_array($this->user,$comp['judges']) &&
-			($allow_before && $distance > 0 || abs($distance) <= $this->judge_right_days);
+			// days before competition-start <= judge_right_days or $allow_before for infinit before
+			($distance >= 0 && ($allow_before || $distance <= $this->judge_right_days) ||
+			// days after competition-end (start+duration) <= judge_right_days
+			$distance < 0 && abs($distance) <= $this->judge_right_days+$comp['duration']);
 
 		if (!$is_judge && $route && (is_array($route) && isset($route['route_judges']) ||
 			($route = $this->route->read($route))) && $route['route_judges'] &&
 			$route['route_status'] != STATUS_RESULT_OFFICIAL &&			// only 'til result is offical
 			$distance < 1 && abs($distance) <= $this->judge_right_days)	// and one day before competition started
 		{
-			$is_judge = in_array($this->user, explode(',',$route['route_judges']));
+			$is_judge = in_array($this->user, is_array($route['route_judges']) ?
+				$route['route_judges'] : explode(',', $route['route_judges']));
 		}
 		//if (!$is_judge) error_log(__METHOD__."(#$comp[WetId]=$comp[rkey], $allow_before, ".array2string($route).") distance=$distance, route_judges=$route[route_judges] returning ".array2string($is_judge).' '.function_backtrace());
 		return $is_judge;
@@ -820,25 +831,6 @@ class boranking extends ranking_so
 			'pkt'  => $num,
 			'datum' => date('Y-m-d'),
 		));
-	}
-
-	/**
-	 * Check if athlete is registered for a competition and category
-	 *
-	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
-	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
-	 * - startnumber in the next 7 bits (($pkt >> 6) & 255))
-	 * - route in the other bits ($pkt >> 14)
-	 *
-	 * @param int $comp WetId
-	 * @param int $cat GrpId
-	 * @param int|array $athlete PerId or complete athlete array
-	 * @return boolean true if athlete is registered, false otherwise
-	 */
-	function is_registered($comp,$cat,$athlete)
-	{
-		if (!$comp || !$cat || !$athlete) return false;
-
 	}
 
 	/**
