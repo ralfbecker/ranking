@@ -295,12 +295,18 @@ class boranking extends ranking_so
 	 * Having EGW_ACL_ATHLETE or EGW_ACL_REGISTER for NULL=international, is equivalent to having that right for ANY nation.
 	 * EGW_ACL_RESULT requires _both_ EGW_ACL_EDIT or EGW_ACL_REGISTER (for the nation of the calendar/competition)
 	 *
+	 * Competition specific rights are checked for EGW_ACL_(REGISTER|RESULT), if $comp given, and
+	 * route specific ones, if $route given.
+	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international
 	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER|RESULT}
 	 * @param array|int $comp=null competition array or id, default null
+	 * @param boolean $allow_before=false grant judge-rights unlimited time before the competition
+	 * @param array $route=null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
+	 * 	if route judges should be checked too, default null=no route judges
 	 * @return boolean true if access is granted, false otherwise
 	 */
-	function acl_check($nation,$required,$comp=null)
+	function acl_check($nation,$required,$comp=null,$allow_before=false,$route=null)
 	{
 		static $acl_cache = array();
 
@@ -327,8 +333,10 @@ class boranking extends ranking_so
 					($required == EGW_ACL_ATHLETE || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
 			}
 		}
-		// check competition specific judges rights for REGISTER and RESULT too
-		$granted = $acl_cache[$nation][$required] || $comp && in_array($required,array(EGW_ACL_REGISTER,EGW_ACL_RESULT)) && $this->is_judge($comp);
+		$granted = $acl_cache[$nation][$required] ||
+			// check competition specific judges rights for REGISTER and RESULT too
+			$comp && in_array($required, array(EGW_ACL_REGISTER, EGW_ACL_RESULT)) &&
+				$this->is_judge($comp, $allow_before, $route);
 		//error_log(__METHOD__."('$nation', $required, ".array2string($comp).') returning '.array2string($granted));
 		return $granted;
 	}
@@ -502,11 +510,6 @@ class boranking extends ranking_so
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
 			return false;
-		}
-		// admin or result-rights for competition federation
-		if ($this->is_admin || $this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp))
-		{
-			return true;
 		}
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = (mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);

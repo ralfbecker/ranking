@@ -75,13 +75,12 @@ class uiresult extends boresult
 			$content['slist_order'] = self::quali_startlist_default($discipline,$content['route_type'],$comp['nation']);
 		}
 		// check if user has NO edit rights
-		if (($view = !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) &&
+		if (($view = !$this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp, false,
 			// allow register button for selfscore and route-judges
-			!($discipline == 'selfscore' && $content['athlete']['register'] && $this->is_judge($comp, false, $content)))
+			$discipline == 'selfscore' && $content['athlete']['register'] ? $content : null)))
 		{
 			$readonlys['__ALL__'] = true;
 			$readonlys['button[cancel]'] = false;
-			//error_log(__LINE__.": discipline=$discipline, button={$content['button']['register']}, is_judge()=".array2string($this->is_judge($comp, false, $content)));
 		}
 		elseif ($content['button'] || $content['topos']['delete'] || $content['athlete']['register'])
 		{
@@ -293,8 +292,9 @@ class uiresult extends boresult
 
 				case 'register':
 					// check judge right or for selfscore route-judge rights
-					if ($content['route_status'] == STATUS_RESULT_OFFICIAL || !$this->is_judge($comp, false) &&
-						($content['discipline'] != 'selfscore' || !$this->is_judge($comp, false, $content)))
+					if ($content['route_status'] == STATUS_RESULT_OFFICIAL ||
+						!$this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp, false,
+							$content['discipline'] == 'selfscore' ? $content : null))
 					{
 						//error_log(__METHOD__.__LINE__."() route_status=$content[route_status], route_judges=".array2string($content['route_judges']).", comp=".array2string($comp).", is_judge()=".array2string($this->is_judge($comp, false)));
 						$msg .= lang('Permission denied !!!');
@@ -1409,7 +1409,7 @@ class uiresult extends boresult
 		// no startlist, no rights at all or result offical -->disable all update possebilities
 		if (($readonlys['button[apply]'] =
 			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) && !$this->is_judge($comp,false,$route) &&
+			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp,false,$route) &&
 			!($content['nm']['discipline'] == 'selfscore' && $this->is_selfservice() && $content['nm']['show_result'] == 4) ||
 			$route['route_status'] == STATUS_RESULT_OFFICIAL ||
 			$content['nm']['route'] < 0 || $content['nm']['show_result'] > 1 && $content['nm']['show_result'] != 4))
