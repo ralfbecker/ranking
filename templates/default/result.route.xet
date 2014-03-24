@@ -169,15 +169,19 @@
 				<column/>
 			</columns>
 			<rows>
-				<row class="th">
+				<row class="row">
 					<description value="Search" for="PerId"/>
-					<link-entry blur="Name" id="PerId" onchange="1" options="ranking" span="all"/>
+					<link-entry blur="Name" id="PerId" onchange="1" options="ranking"/>
+					<description value="Gender" for="sex"/>
+					<menulist>
+						<menupopup id="sex" class="inputRequired"/>
+					</menulist>
 				</row>
 				<row class="row">
 					<description value="Lastname" for="nachname"/>
-					<textbox id="nachname" size="30" maxlength="40"/>
+					<textbox id="nachname" size="30" maxlength="40" class="inputRequired"/>
 					<description value="Firstname" for="vorname"/>
-					<textbox id="vorname" size="30" maxlength="40"/>
+					<textbox id="vorname" size="30" maxlength="40" class="inputRequired"/>
 				</row>
 				<row class="row">
 					<description value="Birthdate" for="geb_date"/>
@@ -188,7 +192,7 @@
 				<row class="row">
 					<description value="Nation" for="nation"/>
 					<menulist>
-						<menupopup id="nation"/>
+						<menupopup id="nation" onchange="1" class="inputRequired"/>
 					</menulist>
 					<description value="City" for="ort"/>
 					<textbox id="ort" size="30" maxlength="60"/>
@@ -196,8 +200,10 @@
 				<row class="row">
 					<description value="Federation" for="fed_id"/>
 					<menulist span="all">
-						<menupopup id="fed_id"/>
+						<menupopup id="fed_id" class="inputRequired"/>
 					</menulist>
+					<description/>
+					<description/>
 				</row>
 				<row>
 					<button label="Register" id="register"/>

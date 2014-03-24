@@ -301,8 +301,9 @@ class uiresult extends boresult
 						break;
 					}
 					$athlete = $content['athlete'];
-					if (!($athlete['PerId'] > 0) && !(strlen($athlete['vorname']) < 2 || strlen($athlete['nachname']) < 2 ||
-						!$athlete['nation'] || !$athlete['fed_id']))
+					$required_misssing = strlen($athlete['vorname']) < 2 || strlen($athlete['nachname']) < 2 ||
+						!$athlete['nation'] || !$athlete['fed_id'];
+					if (!($athlete['PerId'] > 0) && $required_misssing)
 					{
 						$msg .= lang('You either need to search an athlete or enter required fields to add him!');
 						break;
@@ -336,8 +337,6 @@ class uiresult extends boresult
 					}
 					if (!($athlete['PerId'] > 0))
 					{
-						$msg .= "Saving new athletes not (yet) implemented!";
-						break;
 						unset($athlete['PerId']);
 						$this->athlete->init($athlete);
 						if ($this->athlete->save())
@@ -467,9 +466,10 @@ class uiresult extends boresult
 			}
 			else
 			{
-				$content['athlete'] = $preserv['athlete'] = $athlete;
+				$content['athlete'] = $preserv['athlete'] = $athlete+array('password_email' => $content['athlete']['password_email']);
 				$sel_options['fed_id'] = array($content['athlete']['fed_id'] => $content['athlete']['verband']);
 				$sel_options['nation'] = array($content['athlete']['nation'] => $content['athlete']['nation']);
+				$sel_options['sex'] = $this->genders;
 				$readonlys['athlete'] = array(
 					'vorname' => true,
 					'nachname' => true,
@@ -477,7 +477,53 @@ class uiresult extends boresult
 					'geb_date' => true,
 					'fed_id' => true,
 					'nation' => true,
+					'sex' => true,
 				);
+			}
+		}
+		// registration and no athlete selected: fill nation and fed_id selectboxes
+		if (!($content['athlete']['PerId']) && !$readonlys['tabs']['registration'])
+		{
+			if ($cat['sex'])
+			{
+				$sel_options['sex'] = array($cat['sex'] => $this->genders[$cat['sex']]);
+				$content['athlete']['sex'] = $cat['sex'];
+				//if ($cat['sex']) $readonlys['athlete']['sex'] = true;
+			}
+			else
+			{
+				$sel_options['sex'] = $this->genders;
+				unset($sel_options['sex']['']);
+			}
+			if (!$comp['nation'] || $comp['open_comp'] == 3)	// 3: international open
+			{
+				$sel_options['nation'] = $this->athlete->distinct_list('nation');
+			}
+			elseif($comp['open_comp'] == 2)	// 2: D, A, CH
+			{
+				$sel_options['nation'] = array(
+					'AUT' => 'AUT',
+					'GER' => 'GER',
+					'SUI' => 'SUI',
+				);
+			}
+			else
+			{
+				$sel_options['nation'] = array(
+					$comp['nation'] => $comp['nation'],
+				);
+			}
+			if (empty($content['athlete']['nation']))
+			{
+				$content['athlete']['nation'] = $comp['nation'];
+			}
+			if ($content['athlete']['nation'])
+			{
+				$sel_options['fed_id'] = $this->athlete->federations($content['athlete']['nation'], !$comp['nation']);
+			}
+			else
+			{
+				$sel_options['fed_id'] = array(lang('Select a nation first'));
 			}
 		}
 		if ($content['route_order'] == -1)
