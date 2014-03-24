@@ -571,6 +571,7 @@ class uiresult extends boresult
 					'fed_id' => false,
 					'nation' => false,
 					'password_email' => false,
+					'sex' => false,
 				);
 				$readonlys['register'] = false;
 			}
