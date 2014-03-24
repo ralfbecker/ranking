@@ -339,6 +339,7 @@ class uiresult extends boresult
 					{
 						unset($athlete['PerId']);
 						$this->athlete->init($athlete);
+						$this->athlete->generate_rkey();
 						if ($this->athlete->save())
 						{
 							$msg .= lang('Error: while saving !!!');
