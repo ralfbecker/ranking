@@ -328,6 +328,8 @@ class uiresult extends boresult
 						$msg .= lang('Athlete does NOT meet registration requirements (age, gender, federation)!');
 						break;
 					}
+					// temporary reset all ACL but deny-profile, so save does NOT remove birthdate, email and city data
+					$this->athlete->acl2clear = array(ranking_athlete::ACL_DENY_PROFILE => $this->athlete->acl2clear[ranking_athlete::ACL_DENY_PROFILE]);
 					// store email of existing athlete
 					if ($athlete['PerId'] && $athlete['email'] && ($stored = $this->athlete->read($athlete['PerId'])) &&
 						$athlete['email'] != $stored['email'])
