@@ -455,27 +455,32 @@ class uiresult extends boresult
 			'slist_order' => self::slist_order_options($comp['serie']),
 		);
 		// athlete selected in registration
-		if ($content['athlete']['PerId'] > 0 &&
-			($athlete = $this->athlete->read(array('PerId' => $content['athlete']['PerId']))))
+		if ($content['athlete']['PerId'] > 0)
 		{
-			$keys = array_intersect_key($content, array_flip(array('WetId', 'GrpId', 'route_order')));
-			if ($this->route_result->read($keys+array('PerId' => $content['athlete']['PerId'])))
+			// temporary reset all ACL but deny-profile, so route-judge in registration get birthdate, email and city data
+			$this->athlete->acl2clear = array(ranking_athlete::ACL_DENY_PROFILE => $this->athlete->acl2clear[ranking_athlete::ACL_DENY_PROFILE]);
+
+			if (($athlete = $this->athlete->read(array('PerId' => $content['athlete']['PerId']))))
 			{
-				$content['msg'] = lang('%1 is already registered!', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+				$keys = array_intersect_key($content, array_flip(array('WetId', 'GrpId', 'route_order')));
+				if ($this->route_result->read($keys+array('PerId' => $content['athlete']['PerId'])))
+				{
+					$content['msg'] = lang('%1 is already registered!', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+				}
+				$content['athlete'] = $preserv['athlete'] = $athlete+array('password_email' => $content['athlete']['password_email']);
+				$sel_options['fed_id'] = array($content['athlete']['fed_id'] => $content['athlete']['verband']);
+				$sel_options['nation'] = array($content['athlete']['nation'] => $content['athlete']['nation']);
+				$sel_options['sex'] = $this->genders;
+				$readonlys['athlete'] = array(
+					'vorname' => true,
+					'nachname' => true,
+					'ort' => true,
+					'geb_date' => true,
+					'fed_id' => true,
+					'nation' => true,
+					'sex' => true,
+				);
 			}
-			$content['athlete'] = $preserv['athlete'] = $athlete+array('password_email' => $content['athlete']['password_email']);
-			$sel_options['fed_id'] = array($content['athlete']['fed_id'] => $content['athlete']['verband']);
-			$sel_options['nation'] = array($content['athlete']['nation'] => $content['athlete']['nation']);
-			$sel_options['sex'] = $this->genders;
-			$readonlys['athlete'] = array(
-				'vorname' => true,
-				'nachname' => true,
-				'ort' => true,
-				'geb_date' => true,
-				'fed_id' => true,
-				'nation' => true,
-				'sex' => true,
-			);
 		}
 		// registration and no athlete selected: fill nation and fed_id selectboxes
 		if (!($content['athlete']['PerId']) && !$readonlys['tabs']['registration'])
