@@ -519,6 +519,7 @@ class uiresult extends boresult
 			if (empty($content['athlete']['nation']))
 			{
 				$content['athlete']['nation'] = $comp['nation'];
+				$content['athlete']['fed_id'] = $comp['fed_id'];
 			}
 			if ($content['athlete']['nation'])
 			{
