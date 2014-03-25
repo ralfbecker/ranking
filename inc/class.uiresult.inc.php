@@ -308,13 +308,12 @@ class uiresult extends boresult
 						$msg .= lang('You either need to search an athlete or enter required fields to add him!');
 						break;
 					}
-					$keys = array_intersect_key($content, array_flip(array('WetId', 'GrpId', 'route_order')));
-					// check athlete not already registered
-					if ($athlete['PerId'] > 0 && ($this->route_result->read($keys+array('PerId' => $athlete['PerId']))))
+					if ($content['athlete']['password_email'] && !$athlete['email'])
 					{
-						$msg .= lang('%1 is already registered!', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+						$msg .= "\n".lang('EMail required to send password email!');
 						break;
 					}
+					$keys = array_intersect_key($content, array_flip(array('WetId', 'GrpId', 'route_order')));
 					// meets registration requirements
 					if ($athlete['license'] == 's')
 					{
@@ -348,32 +347,32 @@ class uiresult extends boresult
 						$msg .= lang('%1 saved',lang('Athlete'));
 						$athlete = $this->athlete->data;
 					}
-					// register athlete
-					$start_order = count($this->route_result->search($keys, true))+1;
-					$this->route_result->init($keys+array(
-						'PerId' => $athlete['PerId'],
-						'start_order' => $start_order,
-					));
-					$this->route_result->save();
-					$msg .= ($msg ? "\n" : '').lang('%1 registered.', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
-
-					if ($content['athlete']['password_email'])
+					// check athlete not already registered
+					if ($athlete['PerId'] > 0 && ($this->route_result->read($keys+array('PerId' => $athlete['PerId']))))
 					{
-						if (!$athlete['email'])
-						{
-							$msg .= "\n".lang('EMail required to send password email!');
+						$msg .= "\n".lang('%1 is already registered!', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+					}
+					else	// register athlete
+					{
+						$start_order = count($this->route_result->search($keys, true))+1;
+						$this->route_result->init($keys+array(
+							'PerId' => $athlete['PerId'],
+							'start_order' => $start_order,
+						));
+						$this->route_result->save();
+						$msg .= ($msg ? "\n" : '').lang('%1 registered.', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
+					}
+					// send password email
+					if ($content['athlete']['password_email'] && $athlete['email'])
+					{
+						try {
+							$selfservice = new ranking_selfservice();
+							$selfservice->password_reset_mail($athlete);
+							$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
 						}
-						else
-						{
-							try {
-								$selfservice = new ranking_selfservice();
-								$selfservice->password_reset_mail($athlete);
-								$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
-							}
-							catch (Exception $e) {
-								$msg .= "\n".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
-									$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
-							}
+						catch (Exception $e) {
+							$msg .= "\n".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
+								$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
 						}
 					}
 					$content['athlete'] = array('password_email' => $content['athlete']['password_email']);
@@ -463,24 +462,20 @@ class uiresult extends boresult
 			if ($this->route_result->read($keys+array('PerId' => $content['athlete']['PerId'])))
 			{
 				$content['msg'] = lang('%1 is already registered!', $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
-				$content['athlete'] = array('password_email' => $content['athlete']['password_email']);
 			}
-			else
-			{
-				$content['athlete'] = $preserv['athlete'] = $athlete+array('password_email' => $content['athlete']['password_email']);
-				$sel_options['fed_id'] = array($content['athlete']['fed_id'] => $content['athlete']['verband']);
-				$sel_options['nation'] = array($content['athlete']['nation'] => $content['athlete']['nation']);
-				$sel_options['sex'] = $this->genders;
-				$readonlys['athlete'] = array(
-					'vorname' => true,
-					'nachname' => true,
-					'ort' => true,
-					'geb_date' => true,
-					'fed_id' => true,
-					'nation' => true,
-					'sex' => true,
-				);
-			}
+			$content['athlete'] = $preserv['athlete'] = $athlete+array('password_email' => $content['athlete']['password_email']);
+			$sel_options['fed_id'] = array($content['athlete']['fed_id'] => $content['athlete']['verband']);
+			$sel_options['nation'] = array($content['athlete']['nation'] => $content['athlete']['nation']);
+			$sel_options['sex'] = $this->genders;
+			$readonlys['athlete'] = array(
+				'vorname' => true,
+				'nachname' => true,
+				'ort' => true,
+				'geb_date' => true,
+				'fed_id' => true,
+				'nation' => true,
+				'sex' => true,
+			);
 		}
 		// registration and no athlete selected: fill nation and fed_id selectboxes
 		if (!($content['athlete']['PerId']) && !$readonlys['tabs']['registration'])
@@ -1228,7 +1223,9 @@ class uiresult extends boresult
 					break;
 
 				case 'delete':
-					if (!is_numeric($id) || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+					if (!is_numeric($id) ||
+						!($this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+							$route['discipline'] == 'selfscore' && $this->is_judge($comp, false, $route)) ||
 						!$this->delete_participant($keys+array($this->route_result->id_col => $id)))
 					{
 						$msg = $this->has_results($keys+array($this->route_result->id_col => $id)) ?
