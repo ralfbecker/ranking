@@ -187,7 +187,7 @@
 					<description value="Birthdate" for="geb_date"/>
 					<date id="geb_date" options="Y-m-d"/>
 					<description value="EMail" for="email"/>
-					<url-email id="email" options="30,60"/>
+					<url-email id="email" options="30,60" class="inputRequired"/>
 				</row>
 				<row class="row">
 					<description value="Nation" for="nation"/>
@@ -207,7 +207,7 @@
 				</row>
 				<row>
 					<button label="Register" id="register"/>
-					<checkbox label="Send EMail to set password to athlete" id="password_email" span="all"/>
+					<checkbox label="Send EMail to set password to athlete" id="password_email" onchange="var email=jQuery('#exec\\[athlete\\]\\[email\\]').parent(); email[this.checked ? 'addClass' : 'removeClass'].call(email, 'inputRequired');" span="all"/>
 				</row>
 				<row height="120">
 					<description/>
