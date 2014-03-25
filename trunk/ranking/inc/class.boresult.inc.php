@@ -1018,7 +1018,10 @@ class boresult extends boranking
 	{
 		if (!$keys['WetId'] || !$keys[$this->route_result->id_col] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+			!($this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+				// route-judges are allowed to delete participants for selfscore
+				($route = $this->route->read($keys)) && $route['discipline'] == 'selfscore' &&
+					$this->is_judge($comp, false, $route)) ||
 			$this->has_results($keys))
 		{
 			return false; // permission denied

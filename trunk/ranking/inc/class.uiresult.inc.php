@@ -1232,8 +1232,6 @@ class uiresult extends boresult
 
 				case 'delete':
 					if (!is_numeric($id) ||
-						!($this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
-							$route['discipline'] == 'selfscore' && $this->is_judge($comp, false, $route)) ||
 						!$this->delete_participant($keys+array($this->route_result->id_col => $id)))
 					{
 						$msg = $this->has_results($keys+array($this->route_result->id_col => $id)) ?
