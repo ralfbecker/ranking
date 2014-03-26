@@ -693,6 +693,7 @@ var Startlist = (function() {
 		switch(_data.display_athlete)
 		{
 			case 'city':
+			case 'pc_city':
 				this.replace_attribute(this.columns, 'nation', 'city', 'City');
 				break;
 			case 'federation':
