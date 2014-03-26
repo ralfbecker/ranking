@@ -887,6 +887,8 @@ class uiresult extends boresult
 			{
 				$rows[$k]['start_order'] = lang('Prequalified');
 			}
+
+			if ($query['display_athlete'] == ranking_competition::CITY) unset($row['plz']);
 		}
 		// disable lead time-column in print, if not used
 		if (!$need_lead_time_column) $rows['lead_time_class'] = 'noPrint';
@@ -947,6 +949,7 @@ class uiresult extends boresult
 				$rows['no_nation'] = $rows['no_PerId'] = true;
 				break;
 			case ranking_competition::PC_CITY:
+			case ranking_competition::CITY:
 				$rows['no_nation'] = $rows['no_verband'] = $rows['no_acl_fed'] = $rows['no_PerId'] = true;
 				break;
 			case ranking_competition::NATION_PC_CITY:
