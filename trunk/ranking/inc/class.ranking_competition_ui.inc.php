@@ -28,6 +28,7 @@ class ranking_competition_ui extends boranking
 		'' => 'Default',
 		ranking_competition::NATION => 'Nation',
 		ranking_competition::FEDERATION => 'Federation',
+		ranking_competition::CITY => 'City',
 		ranking_competition::PC_CITY => 'PC City',
 		ranking_competition::NATION_PC_CITY => 'Nation PC City',
 	);
