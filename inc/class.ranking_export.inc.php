@@ -411,6 +411,8 @@ class ranking_export extends boresult
 		$route['comp_name'] = $comp['name'];
 		$route['comp_date'] = $comp['datum'];
 		$route['nation'] = $comp['nation'];
+		$route['display_athlete'] = $comp['display_athlete'] ? $comp['display_athlete'] :
+			ranking_competition::nation2display_athlete($comp['nation']);
 
 		// set quali_preselected, if set for category
 		if (($route['quali_preselected'] = $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected'])) &&
@@ -525,7 +527,7 @@ class ranking_export extends boresult
 			'next_1','next_2','next_3','next_4','next_5','next_6','next_7','next_8',
 			'RelayResults.*',	// not needed and gives warning in xml export
 		)));
-		if ($discipline != 'boulder') unset($route['route_num_problems']);
+		if (!in_array($discipline, array('boulder','selfscore'))) unset($route['route_num_problems']);
 
 		if ($discipline == 'speedrelay')	// fetch athlete names
 		{
@@ -2046,17 +2048,13 @@ class ranking_export extends boresult
 			'birthyear' => substr($athlete['geb_date'], 0, 4),
 			'nation' => $athlete['nation'],
 			'federation' => $athlete['verband'],
+			'city' => $athlete['ort'],
 			'fed_url' => $athlete['fed_url'],
 			'url' => self::profile_url($athlete, $cat),
 		);
-		switch ($nation)
+		if ($nation == 'GER')
 		{
-			case 'GER':
 				$data['federation'] = preg_replace("/^(DAV|Sektion|Deutscher|Dt|Alpenverein|[:., ])*/i", '', $athlete['verband']);
-				break;
-			case 'SUI':
-				$data['city'] = $athlete['ort'];
-				break;
 		}
 		return $data;
 	}

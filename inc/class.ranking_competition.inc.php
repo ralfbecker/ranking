@@ -97,6 +97,29 @@ class ranking_competition extends so_sql
 	}
 
 	/**
+	 * Get default display_athlete value for a nation
+	 *
+	 * @param string $nation
+	 * @return string ranking_competition::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY) constants
+	 */
+	public function nation2display_athlete($nation, $intern=false)
+	{
+		switch($nation)
+		{
+			default:
+			case 'GER':
+				return self::FEDERATION;
+
+			case '':	// international
+			case 'NULL':
+				return self::NATION;
+
+			case 'SUI':
+				return $intern ? self::FEDERATON : self::CITY;
+		}
+	}
+
+	/**
 	 * initializes an empty competition
 	 *
 	 * reimplemented from so_sql to set some defaults
