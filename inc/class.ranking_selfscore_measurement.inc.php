@@ -234,10 +234,24 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		{
 			$WetIds[$route['WetId']][$route['GrpId']] = $route;
 		}
+		//error_log(__LINE__.': '.__METHOD__."(".array2string($athlete).") WetIds=".array2string($WetIds));
 		if ($WetIds)
 		{
 			foreach((array)boresult::$instance->comp->search(array('WetId' => array_keys($WetIds)), false) as $comp)
 			{
+				//error_log(__LINE__.': '.__METHOD__."() comp=".array2string($comp));
+				// check if athlete is direct registered into a route
+				foreach($WetIds[$comp['WetId']] as $route)
+				{
+					//error_log(__LINE__.': '.__METHOD__."() route=".array2string($route));
+					if (($result = boresult::$instance->route_result->read($keys=array_intersect_key($route, array_flip(array('WetId','GrpId','route_order')))+array(
+						'PerId' => $athlete['PerId'],
+					))))
+					{
+						$found[] = array_merge($comp, $route);
+						continue 2;
+					}
+				}
 				// check if comp open to athletes federation
 				if (!boresult::$instance->comp->open_comp_match($athlete, $comp)) continue;
 				// check comp has category for athlete
@@ -259,8 +273,11 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 						if (!boresult::$instance->has_results($keys))
 						{
 							if ($route['route_order']) continue;	// only add automatic to qualification
-
-							boresult::$instance->generate_startlist($comp, $cat, $route['route_order']);
+							$start_order = count($this->route_result->search(array_diff_key($keys, array('PerId'=>0)), true))+1;
+							$this->route_result->init($keys+array(
+								'start_order' => $start_order,
+							));
+							$this->route_result->save();
 							if (!boresult::$instance->has_results($keys)) continue;	// was not added
 						}
 						$found[] = array_merge($comp, $route);
