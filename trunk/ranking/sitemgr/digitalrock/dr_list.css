@@ -34,7 +34,8 @@ table.DrTable th, table.DrTable td {
  */
 table.DrTable th.lastname, table.DrTable td.lastname, table.DrTable td.firstname, table.DrTable td.boulder,
 table.DrTable td.team_name, table.DrTable tbody th, .Starters table.DrTable th, .Starters table.DrTable td,
-table.DrTable th.federation, table.DrTable td.federation {
+table.DrTable th.federation, table.DrTable td.federation,
+table.DrTable th.city, table.DrTable td.city {
 	padding-left: 5px;
 	text-align: left;
 }
@@ -49,7 +50,7 @@ table.DrTable tbody th a {
 	text-transform: uppercase;
 }
 .Starters .lastname:after {
-	content: ", ";	
+	content: ", ";
 }
 
 /**
@@ -102,7 +103,6 @@ ul.seeAlso li {
 ul.listToc, ul.listCatToc {
 	padding: 0;
 	margin: 0;
-	x-margin-top: 5px;
 	float: left;
 }
 ul.listCatToc {
@@ -130,7 +130,7 @@ div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {
 	position: relative;
 }
 td.boulder > div {
-	white-space: nowrap;	
+	white-space: nowrap;
 }
 
 div.boulderNone {
@@ -172,7 +172,7 @@ div.Profile {
 	width: 100%;
 }
 .profileHeader .profileNation {
-	margin: 5px 0 5px 0;	
+	margin: 5px 0 5px 0;
 }
 .profileLogo {
 	text-align: right;
@@ -183,7 +183,7 @@ div.Profile {
 .profileData td {
 	font-style: italic;
 }
-td.profileAge, td.profileBirthdate, td.profileBirthplace, td.profileCity, td.profileStreet, td.profileRank, 
+td.profileAge, td.profileBirthdate, td.profileBirthplace, td.profileCity, td.profileStreet, td.profileRank,
 td.profilePractice, td.profileOtherSports, td.profileProfessional, td.profileHeight, td.profileWeight {
 	font-weight: bold;
 	font-style: normal;
@@ -229,13 +229,13 @@ tr.profileMarginTop > td {
 }
 .Aggregated td.result span.rank {
 	display: inline-block;
-	width: 1.5em;	
+	width: 1.5em;
 }
 .Aggregated td.result span.rank:after, .Aggregated td.rank:after {
-	content: ".";	
+	content: ".";
 }
 .Aggregated td.result span.points {
-	float: right;	
+	float: right;
 }
 .Aggregated .rankingHeader2 {
 	white-space: pre;
@@ -257,7 +257,7 @@ section#gkMainbody .Resultlist table.DrTable .start_number {
 /* display wide lists over right _WORLDCOMP. menu, not under it */
 section#gkMainbody table.DrTable {
 	position: relative;
-	z-index: 1;	
+	z-index: 1;
 }
 /* hide digitalROCK logo */
 section#gkMainbody td.profileLogo {

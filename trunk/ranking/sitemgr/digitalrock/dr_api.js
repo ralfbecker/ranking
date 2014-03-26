@@ -690,14 +690,23 @@ var Startlist = (function() {
 			sort = 'result_rank';
 		}
 
-		// for SUI and GER competitions replace nation
-		switch (_data.nation)
+		switch(_data.display_athlete)
 		{
-			case 'GER':
-				this.replace_attribute(this.columns, 'nation', 'federation', 'DAV Sektion');
-				break;
-			case 'SUI':
+			case 'city':
 				this.replace_attribute(this.columns, 'nation', 'city', 'City');
+				break;
+			case 'federation':
+				var fed_label = 'Federation';
+				switch(_data.nation)
+				{
+					case 'GER':
+						fed_label = 'DAV Sektion';
+						break;
+					case 'SUI':
+						fed_label = 'Sektion';
+						break;
+				}
+				this.replace_attribute(this.columns, 'nation', 'federation', fed_label);
 				break;
 		}
 
@@ -856,6 +865,7 @@ var Startlist = (function() {
 		else
 			toc.empty();
 
+		var href = location.href.replace(/\?(.*)#/, '#');	// prevent query and hash messing up navigation
 		for (var r in _data.route_names)
 		{
 			if (r != this.route_order)
@@ -864,7 +874,7 @@ var Startlist = (function() {
 				var a = jQuery(document.createElement('a'));
 				a.text(_data.route_names[r].replace(' - ', '-'));
 				var reg_exp = /route=[^&]+/;
-				var url = location.href.replace(reg_exp, 'route='+r);
+				var url = href.replace(reg_exp, 'route='+r);
 				if (url.indexOf('route=') == -1) url += '&route='+r;
 				a.attr('href', url);
 				if (this.navigateTo)
@@ -916,7 +926,7 @@ var Startlist = (function() {
 				var a = jQuery(document.createElement('a'));
 				a.text(cat.name);
 				var reg_exp = /cat=[^&]+/;
-				var url = location.href.replace(reg_exp, 'cat='+cat.GrpId);
+				var url = href.replace(reg_exp, 'cat='+cat.GrpId);
 				if (url.indexOf('cat=') == -1) url += '&cat='+cat.GrpId;
 				a.attr('href', url);
 				if (this.navigateTo)

@@ -930,23 +930,15 @@ class uiresult extends boresult
 			$rows[$name] =& $query[$name];
 		}
 		// what columns to show for an athlete: can be set per comp. or has a national default
-		switch($query['display_athlete'] ? $query['display_athlete'] : (string)$query['calendar'])
+		switch($query['display_athlete'] ? $query['display_athlete'] :
+			ranking_competition::nation2display_athlete($query['calendar'], true))	// true = internal use, not feed export
 		{
-			case '':	// international
-			case 'NULL':	// international
 			case ranking_competition::NATION:
 				$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 				break;
 			default:
-			case 'GER':
 			case ranking_competition::FEDERATION:
-				$rows['fed_label'] = 'Sektion';
 				$rows['no_ort'] = $rows['no_nation'] = $rows['no_acl_fed'] = true;
-				break;
-			case 'SUI':
-				$rows['fed_label'] = 'Sektion';
-				$rows['acl_fed_label'] = 'Regionalzentrum';
-				$rows['no_nation'] = $rows['no_PerId'] = true;
 				break;
 			case ranking_competition::PC_CITY:
 			case ranking_competition::CITY:
@@ -954,6 +946,17 @@ class uiresult extends boresult
 				break;
 			case ranking_competition::NATION_PC_CITY:
 				$rows['no_verband'] = $rows['no_acl_fed'] = $rows['no_PerId'] = true;
+				break;
+		}
+		switch($query['calendar'])
+		{
+			case 'SUI':
+				$rows['acl_fed_label'] = 'Regionalzentrum';
+				$rows['fed_label'] = 'Sektion';
+				unset($rows['no_acl_fed']);
+				break;
+			case 'GER':
+				$rows['fed_label'] = 'DAV Sektion';
 				break;
 		}
 		// jury list --> switch extra columns on and all federation columns off
