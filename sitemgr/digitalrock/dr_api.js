@@ -1323,6 +1323,20 @@ var Resultlist = (function() {
 					(_data.drop_equally ? ' Not counting results are selected from all disciplines equally.' : ''));
 			}
 		}
+		if (_data.statistics && typeof dr_statistics == 'function' && jQuery.jqplot && _data.discipline == 'selfscore')
+		{
+			var stats_node = jQuery('.dr_statistics', this.container);
+			if (!stats_node.length)
+			{
+				stats_node = jQuery('<div/>')
+					.attr('id', 'dr_statistics')
+					.addClass('dr_statistics')
+					.appendTo(this.container);
+			}
+			stats_node.empty();
+
+			dr_statistics('dr_statistics', _data);
+		}
 	};
 
 	/**
