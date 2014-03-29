@@ -98,7 +98,7 @@ function remove_empty(array $arr)
 	}
 	return $arr;
 }
-$json = json_encode(remove_empty($result));
+$json = json_encode($result=remove_empty($result));
 
 if (isset($_GET['debug']) && $_GET['debug'])
 {
@@ -108,7 +108,7 @@ if (isset($_GET['debug']) && $_GET['debug'])
 			echo "<pre>".print_r($result,true)."</pre>\n";
 			// fall through
 		default:
-			echo "<pre>".htmlspecialchars($json)."</pre>\n";
+			echo "<pre>".htmlspecialchars(json_encode($result, JSON_PRETTY_PRINT))."</pre>\n";
 			break;
 	}
 }
