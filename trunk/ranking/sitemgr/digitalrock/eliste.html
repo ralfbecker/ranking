@@ -3,8 +3,11 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 		<script type="text/javascript" src="dr_api.js"></script>
+		<script type="text/javascript" src="../../js/dr_statistics.js"></script>
+		<script type="text/javascript" src="../../../phpgwapi/js/jquery/jqplot/jquery.jqplot.js"></script>
+		<link type="text/css" rel="StyleSheet" href="../../../phpgwapi/js/jquery/jqplot/jquery.jqplot.css" />
 		<link type="text/css" rel="StyleSheet" href="dr_list.css" />
 	</head>
 	<body>
@@ -14,7 +17,7 @@
 			$(document).ready(function() {
 				var padding = location.search.match(/padding=([^&]+)/);
 				if (padding) jQuery('body').css('padding', decodeURIComponent(padding[1].replace(/\+/, '%20')));
-				resultlist = new DrWidget('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.search||location.hash.replace(/^#!?/, '?')));
+				resultlist = new DrWidget('table',/*location.pathname.replace(/sitemgr.*$/,'json.php')*/'http://www.digitalrock.de/egroupware/ranking/json.php'+(location.search||location.hash.replace(/^#!?/, '?')));
 
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});
