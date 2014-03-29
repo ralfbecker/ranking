@@ -108,6 +108,7 @@ foreach($result as $name => &$value)
 			else	// only participants / arrays get here
 			{
 				$xml->startElement($name);
+				if ($name == 'statistic') $xml->writeAttribute('boulder',$id);
 				write_array($xml,$val);
 				$xml->endElement();
 			}

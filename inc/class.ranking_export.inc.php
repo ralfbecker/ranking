@@ -544,7 +544,7 @@ class ranking_export extends boresult
 			//echo "<pre>".print_r($athletes,true)."</pre>\n";die('Stop');
 		}
 
-		$tn = $unranked = array();
+		$tn = $unranked = $statistics = array();
 		foreach($result as $key => $row)
 		{
 			if (isset($row['quali_points']) && $row['quali_points'])
@@ -608,12 +608,46 @@ class ranking_export extends boresult
 			// remove single boulder meaningless in general result, or not existing boulder
 			if ($discipline == 'boulder')
 			{
-				for($i = 1; $i <= 8; ++$i)
+				for($i = 1; $i <= route_result::MAX_BOULDERS; ++$i)
 				{
 					if ($heat == -1 || $i > $route['route_num_problems'])
 					{
 						unset($row['boulder'.$i]);
 					}
+				}
+			}
+			// statistics
+			if ($row['result_rank'])
+			{
+				switch($discipline)
+				{
+					case 'selfscore':
+						for($i = 1; $i <= $route['route_num_problems']; $i++)
+						{
+							if ($row['score'][$i]) ++$statistics[$i]['top'];
+						}
+						break;
+					case 'boulder':
+						for($i = 1; $i <= $route['route_num_problems']; $i++)
+						{
+							foreach(array('bonus' => 'zone', 'top' => 'top') as $name => $row_name)
+							{
+								if ($row[$row_name.$i])
+								{
+									++$statistics[$i][$name];
+									if (!isset($statistics[$i][$name.'_min']) || $statistics[$i][$name.'_min'] > $row[$row_name.$i])
+									{
+										$statistics[$i][$name.'_min'] = $row[$row_name.$i];
+									}
+									if (!isset($statistics[$i][$name.'_max']) || $statistics[$i][$name.'_max'] < $row[$row_name.$i])
+									{
+										$statistics[$i][$name.'_max'] = $row[$row_name.$i];
+									}
+									$statistics[$i][$name.'_avg'] += $row[$row_name.$i];
+								}
+							}
+						}
+						break;
 				}
 			}
 			// for speed show time_sum as result, plus result_l and result_r
@@ -694,6 +728,30 @@ class ranking_export extends boresult
 			'participants'  => $tn,
 			'last_modified' => $last_modified,
 		);
+		if ($statistics)
+		{
+			switch($discipline)
+			{
+				case 'boulder':
+					foreach($statistics as $num => &$stats)
+					{
+						foreach(array('top', 'bonus') as $name)
+						{
+							if ($stats[$name])
+							{
+								$stats[$name.'_avg'] = round($stats[$name.'_avg'] / $stats[$name], 1);
+							}
+							else
+							{
+								$stats[$name] = 0;
+								$stats[$name.'_min'] = $stats[$name.'_max'] = $stats[$name.'_avg'] = '';
+							}
+						}
+					}
+			}
+			$ret['statistics'] = $statistics;
+		}
+
 		// for official results add ranking and cup links
 		if ($this->result->has_results(array(
 			'WetId' => $comp['WetId'],
