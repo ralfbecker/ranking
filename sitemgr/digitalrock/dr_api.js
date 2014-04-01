@@ -1323,6 +1323,33 @@ var Resultlist = (function() {
 					(_data.drop_equally ? ' Not counting results are selected from all disciplines equally.' : ''));
 			}
 		}
+		if (_data.statistics && (_data.discipline == 'selfscore' || this.json_url.match('&stats=')))
+		{
+			if (!jQuery('#jqplot-css').length)
+			{
+				jQuery('<link/>', {
+					id: 'jqplot-css',
+					href: ranking_url+'../phpgwapi/js/jquery/jqplot/jquery.jqplot.css',
+					type: 'text/css'
+				}).appendTo('head');
+				var ranking_url = this.json_url.replace(/json.php.*$/, '').replace('http://www.digitalrock.de','');
+				var load = [ranking_url+'../phpgwapi/js/jquery/jqplot/jquery.jqplot.js',
+					ranking_url+'../phpgwapi/js/jquery/jqplot/plugins/jqplot.highlighter.js',
+					ranking_url+'js/dr_statistics.js'];
+				for(var i=0; i < load.length; ++i)
+				{
+					load[i] = jQuery.ajax({
+						url: load[i],
+						dataType: "script",
+						cache: true	// no cache buster!
+					});
+				}
+				var container = this.container;
+				jQuery.when.apply(jQuery, load).done(function(){
+					dr_statistics(container, _data);
+				});
+			}
+		}
 		if (_data.statistics && typeof dr_statistics == 'function' && jQuery.jqplot && _data.discipline == 'selfscore')
 		{
 			var stats_node = jQuery('.dr_statistics', this.container);
