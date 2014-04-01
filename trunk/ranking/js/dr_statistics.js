@@ -9,11 +9,24 @@
 
 /**
  * Display some statistics about a boulder / result
- * @param {string} _id
+ * @param {DOMElement|string} _parent parent node or jQuery selector of it
  * @param {object} _data with attribute statistics
  */
-function dr_statistics(_id, _data)
+function dr_statistics(_parent, _data)
 {
+	// find & empty or create container
+	var stats_node = jQuery('.dr_statistics', _parent);
+	if (!stats_node.length)
+	{
+		stats_node = jQuery('<div/>')
+			.attr('id', 'dr_statistics')
+			.addClass('dr_statistics')
+			.appendTo(_parent);
+	}
+	else
+	{
+		stats_node.empty();
+	}
 	var data = {
 		top: [], top_min: [], top_max: [], top_avg: [],
 		bonus: [], bonus_min: [], bonus_max: [], bonus_avg: []
@@ -28,7 +41,7 @@ function dr_statistics(_id, _data)
 	}
 
 	//jQuery.jqplot(_id,  [[[1, 2],[3,5.12],[5,13.1],[7,33.6],[9,85.9],[11,219.9]]]);
-	jQuery.jqplot(_id,  [data.top, data.bonus, data.top_avg, data.bonus_avg], {
+	jQuery.jqplot('dr_statistics',  [data.top, data.bonus, data.top_avg, data.bonus_avg], {
 		axes: {
 			xaxis: {
 				label: "Boulder",
@@ -39,6 +52,13 @@ function dr_statistics(_id, _data)
 			yaxis: {
 				min: 0
 			}
+		},
+		highlighter: {
+			show: true,
+			showTooltip: true,
+			tooltipAxes: 'both',
+			formatString: 'Boulder %s: %s',
+			tooltipLocation: 'ne'
 		}
 	});
 }
