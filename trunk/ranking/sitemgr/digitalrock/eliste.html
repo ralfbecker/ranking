@@ -14,7 +14,7 @@
 			$(document).ready(function() {
 				var padding = location.search.match(/padding=([^&]+)/);
 				if (padding) jQuery('body').css('padding', decodeURIComponent(padding[1].replace(/\+/, '%20')));
-				resultlist = new DrWidget('table',/*location.pathname.replace(/sitemgr.*$/,'json.php')*/'http://www.digitalrock.de/egroupware/ranking/json.php'+(location.search||location.hash.replace(/^#!?/, '?')));
+				resultlist = new DrWidget('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.search||location.hash.replace(/^#!?/, '?')));
 
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});
