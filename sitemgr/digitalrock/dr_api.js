@@ -3,7 +3,7 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2010-13 by RalfBecker@digitalROCK.de
+ * @copyright 2010-14 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
 
@@ -1327,12 +1327,12 @@ var Resultlist = (function() {
 		{
 			if (!jQuery('#jqplot-css').length)
 			{
+				var ranking_url = this.json_url.replace(/json.php.*$/, '');
 				jQuery('<link/>', {
 					id: 'jqplot-css',
 					href: ranking_url+'../phpgwapi/js/jquery/jqplot/jquery.jqplot.css',
 					type: 'text/css'
 				}).appendTo('head');
-				var ranking_url = this.json_url.replace(/json.php.*$/, '').replace('http://www.digitalrock.de','');
 				var load = [ranking_url+'../phpgwapi/js/jquery/jqplot/jquery.jqplot.js',
 					ranking_url+'../phpgwapi/js/jquery/jqplot/plugins/jqplot.highlighter.js',
 					ranking_url+'js/dr_statistics.js'];
@@ -1349,20 +1349,10 @@ var Resultlist = (function() {
 					dr_statistics(container, _data);
 				});
 			}
-		}
-		if (_data.statistics && typeof dr_statistics == 'function' && jQuery.jqplot && _data.discipline == 'selfscore')
-		{
-			var stats_node = jQuery('.dr_statistics', this.container);
-			if (!stats_node.length)
+			else
 			{
-				stats_node = jQuery('<div/>')
-					.attr('id', 'dr_statistics')
-					.addClass('dr_statistics')
-					.appendTo(this.container);
+				dr_statistics(this.container, _data);
 			}
-			stats_node.empty();
-
-			dr_statistics('dr_statistics', _data);
 		}
 	};
 
