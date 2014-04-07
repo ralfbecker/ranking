@@ -1840,6 +1840,7 @@ class ranking_export extends boresult
 								'SerId' => $cup['SerId'],
 								'url' => self::ranking_url($cat['GrpId'], $cup ? $cup['SerId'] : null),
 								'date' => $ranking['end'],
+								'points' => $participant['PerId'] == $athlete['PerId'] ? $participant['points'] : '',
 							);
 						}
 						catch(Exception $e) {
