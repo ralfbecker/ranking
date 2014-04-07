@@ -1,4 +1,4 @@
-Please note: 
+Please note:
 ===========
 - www.digitalrock.de uses "/egroupware", while http://egw.ifsc-climbing.org uses "/egw"!
 - Only use CDN domain http://egw.ifsc-climbing.org and NOT https://ifsc.egroupware.net/ for any public access!
@@ -145,7 +145,7 @@ Calendar data via XML or JSON
 calendar data feed is triggered by setting "nation" GET parameter, or NOT setting "comp" parameter.
 Optional parameters:
 - year: to switch to a calendar of a different year then the current one
-- filter: allows to filter competitions by a given column and value(s), 
+- filter: allows to filter competitions by a given column and value(s),
 	eg. "filter[cat_id]=!71,72" returns only competitions not having cat_id=71 or 72
 	you can use most fields below to filter by
 
@@ -213,7 +213,7 @@ Ranking data is (on purpose) very similar to competition results:
 - route_order: always -1
 - discipline: always "ranking"
 
-You can use similar code / widgets to display rankings as you use for results. 
+You can use similar code / widgets to display rankings as you use for results.
 
 Examples:
 --------
@@ -270,7 +270,7 @@ Examples:
 - XML:  http://egw.ifsc-climbing.org/egw/ranking/xml.php?comp=1494&type=starters
 - JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?comp=1494&type=starters
 
-Only supported parameter is comp=<numeric competition id>. 
+Only supported parameter is comp=<numeric competition id>.
 You always need to add &type=starters, as otherwise you request a (not yet existing) result and get an error!
 
 Data include usual competition data as eg. in calendar, plus categorys array containing following data for each category
@@ -317,7 +317,7 @@ If category given:
   * 2: last year (world) cup
   * 3: two years ago (world) cup
   with following data:
-  * rank: in ranking
+  * rank, points: in ranking
   * date, name, url: of ranking
   * SerId: nummerical id of cup
 Recorded results of athlete as array with following data per result:
