@@ -7,29 +7,27 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * rls_system object, a rls defines how the ranking is calculated
  */
-class rls_system extends so_sql
+class ranking_rls_system extends so_sql
 {
 	var $charset,$source_charset;
 
 	/**
 	 * constructor of the rls_system class
 	 */
-	function rls_system($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','RangListenSysteme',$db);	// call constructor of derived class
+		parent::__construct('ranking','RangListenSysteme',$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
-		
-		$this->charset = $GLOBALS['egw']->translation->charset();
+
+		$this->charset = translation::charset();
 	}
 
 	/**

@@ -7,17 +7,15 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
 
 /**
  * pktsystem object
  *
  */
-class pktsystem extends so_sql
+class ranking_pktsystem extends so_sql
 {
 	/* var $public_functions = array(
 		'init'	=> True,
@@ -47,9 +45,9 @@ class pktsystem extends so_sql
 	 * pktsystem of the competition class
 	 *
 	 */
-	function pktsystem($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','PktSysteme',$db);	// call constructor of derived class
+		parent::__construct('ranking','PktSysteme',$db);	// call constructor of derived class
 
 /*    not needed so far
 		$this->pkte = new so_sql;
@@ -77,7 +75,7 @@ class pktsystem extends so_sql
 		}
 		return $arr;
 	}
-	
+
 	/**
 	 * Get points per place of a given point-system
 	 *
@@ -85,7 +83,7 @@ class pktsystem extends so_sql
 	 * @param array &$pkte on return array with points indexed by place
 	 * @return double sum of all points
 	 */
-	function get_pkte ($PktId,&$pkte) 
+	function get_pkte ($PktId,&$pkte)
 	{
 		if (!is_numeric($PktId) && $this->read(array('rkey'=>$PktId)))
 		{

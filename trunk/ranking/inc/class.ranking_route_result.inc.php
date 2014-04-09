@@ -7,12 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT . '/etemplate/inc/class.so_sql.inc.php');
-require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.route.inc.php');
 require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.boresult.inc.php');
 
 define('TOP_PLUS',9999);
@@ -42,7 +40,7 @@ define('STATUS_RESULT_OFFICIAL',2);
 /**
  * route object
  */
-class route_result extends so_sql
+class ranking_route_result extends so_sql
 {
 	/**
 	 * Name of the result table

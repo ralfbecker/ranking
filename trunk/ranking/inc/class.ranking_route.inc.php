@@ -7,16 +7,14 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.route_result.inc.php');
 
 /**
  * route object
  */
-class route extends so_sql
+class ranking_route extends so_sql
 {
 	var $charset,$source_charset;
 
@@ -30,7 +28,7 @@ class route extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = is_object($GLOBALS['egw']->translation) ? $GLOBALS['egw']->translation->charset() : 'iso-8859-1';
+		$this->charset = translation::charset();
 	}
 
 	/**
@@ -65,13 +63,6 @@ class route extends so_sql
 
 		if (($ret = parent::delete($keys)))
 		{
-			/* dont know why this dont work: delete is in the query log, but it get's not executed, rows_effected=0
-			if (!is_object($GLOBALS['egw']->route_result))
-			{
-				$GLOBALS['egw']->route_result = new route_result($this->source_charset,$this->db);
-			}
-			$GLOBALS['egw']->route_result->delete($keys);
-			*/
 			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
 			$this->db->delete('RelayResults',$keys,__LINE__,__FILE__);
 

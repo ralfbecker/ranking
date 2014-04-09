@@ -12,8 +12,6 @@
  */
 
 require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.route_result.inc.php');
 
 class boresult extends boranking
 {
