@@ -8,22 +8,20 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
 
 class ranking_display_format extends so_sql2
 {
 	/**
-	 * Reference to the global boresult object
+	 * Reference to the global ranking_result_bo object
 	 *
-	 * @var boresult
+	 * @var ranking_result_bo
 	 */
 	var $result;
 	/**
 	 * all cols in data which are not (direct)in the db, for data_merge
-	 * 
+	 *
 	 * @var array
 	 */
 	var $non_db_cols = array('frm_heat');
@@ -36,17 +34,13 @@ class ranking_display_format extends so_sql2
 	 */
 	function __construct(egw_db $db=null)
 	{
-		if (!is_object($GLOBALS['boresult']))
-		{
-			$GLOBALS['boresult'] = new boresult();
-		}
-		$this->result =& $GLOBALS['boresult'];
+		$this->result = ranking_result_bo::getInstance();
 
-		if (is_null($db)) $db = $GLOBALS['boresult']->db;
-		
+		if (is_null($db)) $db = $this->result->db;
+
 		parent::__construct('ranking','DisplayFormats',$db);	// calling the constructor of so_sql for DisplayFormats table
 	}
-	
+
 	/**
 	 * Get the content of a format line (printed format string)
 	 *
@@ -64,9 +58,9 @@ class ranking_display_format extends so_sql2
 	{
 		//echo "display_format::get_content(,line=$line,next_line=$next_line,$athlete,$GrpId,$route_order,$center,$dsp_lines)\n";
 		$showtime = null;
-		
+
 		if ($next_line) $line++;
-		
+
 		if (!$this->GrpId && $GrpId)
 		{
 			$this->GrpId = $GrpId;
@@ -76,14 +70,14 @@ class ranking_display_format extends so_sql2
 		{
 			$lines = explode("\r\n",$this->frm_content);
 			$count_lines = count($lines)/$dsp_lines;
-		
+
 			if ($line >= $count_lines-1)				// last line or behind
 			{
 				$reread_list = $line == $count_lines-1;	// only read list once at the start of the list
 				foreach($all=array_slice($lines,$dsp_lines*($count_lines-1),$dsp_lines) as $format)
 				{
 					$multiline_advanced = false;
-	
+
 					if (strpos($format,'%P') !== false || strpos($format,'%Q') !== false)		// result list
 					{
 						if (!($athlete = $this->_get_athlete('result_rank',1+$line-$count_lines,$reread_list)))
@@ -148,7 +142,7 @@ class ranking_display_format extends so_sql2
 			}
 			if (!isset($format))
 			{
-				$format = implode("\n",array_slice($lines,$dsp_lines*(0 <= $line && $line < $count_lines ? $line : 0),$dsp_lines));	
+				$format = implode("\n",array_slice($lines,$dsp_lines*(0 <= $line && $line < $count_lines ? $line : 0),$dsp_lines));
 				list($format,$showtime) = explode('|',$format);	// separate showtime
 				$str = $this->_print_line($format,$athlete);
 			}
@@ -161,7 +155,7 @@ class ranking_display_format extends so_sql2
 		}
 		return $str;
 	}
-	
+
 	/**
 	 * Get the data of the athlete at startlist position $num
 	 *
@@ -230,12 +224,12 @@ class ranking_display_format extends so_sql2
 		{
 			$format = str_replace(array('%p%%V.........$%h$','%p%%V.......$%h$'),
 				array('%V............%%L&','%V..........%%L&'),$format);
-		}		
+		}
 		//echo "<p>ranking_display_format::_print_line('$format',$PerId)</p>\n";
 		if (preg_match_all('/([%&$]{1})([a-zA-Z0-9]+)[^%&$#]*([%&$#]{1})/',$format,$parts))
 		{
 			list($fulls,$starts,$types,$ends) = $parts;
-			
+
 			foreach($types as $n => $type)
 			{
 				switch($starts[$n])
@@ -307,7 +301,7 @@ class ranking_display_format extends so_sql2
 			case 'W':	// comp long
 			case 'w':	// comp short
 				return $this->_get_comp_value($type,$len);
-			
+
 			case 'c':	// category
 			case 'R':	// category: heat
 			case 'r':	// heat
@@ -315,7 +309,7 @@ class ranking_display_format extends so_sql2
 			case 'j':	// jury-namen
 			case 'J':	// times (0=Isolation open, 1=Isolation close, 2=Begin heat)
 				return $this->_get_heat_value($type,$len);
-			
+
 			case 'V':	// firstname lastname
 			case 'v':	// firstname
 			case 'N':	// lastname, firstname
@@ -356,7 +350,7 @@ class ranking_display_format extends so_sql2
 		};
 		return '?'.$type.'?';
 	}
-	
+
 	/**
 	 * Get a competition specific value
 	 *
@@ -367,7 +361,7 @@ class ranking_display_format extends so_sql2
 	function _get_comp_value($type,$len)
 	{
 		static $comp;
-		
+
 		if (!(int)$this->WetId || (!is_array($comp) || $comp['WetId'] != $this->WetId) && !($comp = $this->result->comp->read($this->WetId)))
 		{
 			return false;
@@ -376,13 +370,13 @@ class ranking_display_format extends so_sql2
 		{
 			case 'W':	// comp long
 				return $comp['name'];
-				
+
 			case 'w':	// comp short
 				return $comp['dru_bez'];
 		}
 		return '?'.$type.'?';
 	}
-	
+
 	/**
 	 * Get a heat specific value
 	 *
@@ -393,9 +387,9 @@ class ranking_display_format extends so_sql2
 	function _get_heat_value($type,$len)
 	{
 		static $route;
-		
+
 		if (!($keys = $this->route_keys()) ||
-			(!is_array($route) || $route['WetId'] != $this->WetId || $route['GrpId'] != $this->GrpId || $route['route_order'] != $this->route_order) && 
+			(!is_array($route) || $route['WetId'] != $this->WetId || $route['GrpId'] != $this->GrpId || $route['route_order'] != $this->route_order) &&
 			!($route = $this->result->route->read($keys)))
 		{
 			return false;
@@ -424,14 +418,14 @@ class ranking_display_format extends so_sql2
 
 			case 'J1':	// Isolation closes
 				return $route['route_iso_close'];
-				
+
 			case 'J':
 			case 'J2':	// Begin of heat
 				return $route['route_start'];
 		}
 		return '?'.$type.'?';
 	}
-	
+
 	/**
 	 * Get a athlete specific value
 	 *
@@ -481,13 +475,13 @@ class ranking_display_format extends so_sql2
 				$str = $type{0} == 'V' ? $firstname.' '.$lastname : $lastname.', '.$firstname;
 				if (strlen($str) == $len+1) $str_replace(array('. ',', '),array('.',','),$str);
 				return $str;
-				
+
 			case 'h':
 			case 'H':
 				if (!$athlete['result_rank']) return '';
 				return $athlete['result_plus'] == TOP_PLUS ? 'Top' : sprintf($type{0}=='H'?'%5.2lf%s':'%s%s',
 					$athlete['result_height'],$athlete['result_plus'] ? ($athlete['result_plus']==1?'+':'-'):'');
-				
+
 			case 't':
 				switch($type{1})
 				{
@@ -509,14 +503,14 @@ class ranking_display_format extends so_sql2
 			case 'p':
 			case 'Q':
 				return $athlete['result_rank'] ? $athlete['result_rank'].'.' : '';
-				
+
 			default:
 				if (isset($type2col[$type])) return $athlete[$type2col[$type]];
 				break;
 		}
 		return '?'.$type.'?';
 	}
-	
+
 	/**
 	 * Get the keys of a route selected for this format
 	 *
@@ -537,9 +531,9 @@ class ranking_display_format extends so_sql2
 		if ($set_type_discipline)
 		{
 			if (!($route = $this->result->route->read($keys))) return false;
-			
+
 			$keys['route_type'] = $route['route_type'];
-			
+
 			if (!($comp = $this->result->comp->read($this->WetId)))
 			{
 				return false;
@@ -559,12 +553,12 @@ class ranking_display_format extends so_sql2
 		}
 		return $keys;
 	}
-	
+
 	/**
 	 * Update line-numbers to be continues starting with 1, while ignoring a given frm_id
-	 * 
+	 *
 	 * You need to specify $dsp_id and $WetId, if they are not set in the internal data (there's no read before)!
-	 * 
+	 *
 	 * @param int $ignore_id=null if given, id to be ignored
 	 * @param int $ignore_line=null if given, line-number to be skiped
 	 * @param int $dsp_id=null display to use or null to use the display of the current format
@@ -607,7 +601,7 @@ class ranking_display_format extends so_sql2
 		}
 		return $updated;
 	}
-	
+
 	/**
 	 * Get the maximum line number of a given display (dsp_id) and competition (WetId), ignoring an optional given id
 	 *
@@ -617,7 +611,7 @@ class ranking_display_format extends so_sql2
 	function max_line($frm=null)
 	{
 		if (is_null($frm)) $frm =& $this->data;
-		
+
 		$where = array(
 			'dsp_id' => $frm['dsp_id'],
 			'WetId'  => $frm['WetId'],
@@ -638,15 +632,15 @@ class ranking_display_format extends so_sql2
 	function last_updated($frm=null)
 	{
 		if (is_null($frm)) $frm =& $this->data;
-		
+
 		$this->db->select($this->table_name,'MAX(frm_updated)',array(
 			'dsp_id' => $frm['dsp_id'],
 			'WetId'  => $frm['WetId'],
 		),__LINE__,__FILE__);
-		
+
 		return $this->db->next_record() ? (int)$this->db->from_timestamp($this->db->f(0)) : 0;
 	}
-	
+
 	/**
 	 * changes the data from the db-format to your work-format
 	 *
@@ -692,7 +686,7 @@ class ranking_display_format extends so_sql2
 		}
 		return $data;
 	}
-	
+
 	/**
 	 * Copy all formats of the current competition (or $from_comp) to a new one
 	 *
@@ -707,12 +701,12 @@ class ranking_display_format extends so_sql2
 		//echo "<p>ranking_display_format::copyall($to_comp,$from_comp,$dsp_id)</p>\n";
 
 		if (!(int)$to_comp || !(int)$from_comp || !(int)$dsp_id) return false;
-		
+
 		$rows = $this->search(array(),false,'frm_line','','',false,'AND',false,array(
 			'dsp_id' => $dsp_id,
 			'WetId'  => $from_comp,
 		));
-		
+
 		if (!$rows) return false;
 
 		$id2line = array();

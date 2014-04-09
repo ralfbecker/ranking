@@ -35,8 +35,8 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 
 		$keys = self::query2keys($content['nm']);
 		// if we have a startlist, add participants to sel_options
-		if (boresult::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
-			($rows = boresult::$instance->route_result->search('',false,'start_order ASC','','','','AND',false,$keys+array(
+		if (ranking_result_bo::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
+			($rows = ranking_result_bo::$instance->route_result->search('',false,'start_order ASC','','','','AND',false,$keys+array(
 				'route_type' => $content['nm']['route_type'],
 				'discipline' => $content['nm']['discipline'],
 			))))
@@ -73,7 +73,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 						}
 					}
 				}
-				$sel_options['PerId'][$row['PerId']] = boresult::athlete2string($row, false);
+				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
 			}
 		}
 		if (!self::update_allowed($content['comp'], $content['nm']['route_data'], $content['nm']['PerId']))
@@ -99,7 +99,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		$keys = self::query2keys($query);
 		//$response->alert(__METHOD__."($PerId, ".array2string($update).") ".array2string($keys));
 
-		if (!($route = boresult::$instance->route->read($keys)))
+		if (!($route = ranking_result_bo::$instance->route->read($keys)))
 		{
 			$response->alert(lang('Route not found!'));
 			return;
@@ -132,20 +132,20 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		);
 
 		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
-		if (boresult::$instance->save_result($keys,array($PerId => $to_update),$query['route_type'],$query['discipline']))
+		if (ranking_result_bo::$instance->save_result($keys,array($PerId => $to_update),$query['route_type'],$query['discipline']))
 		{
 			// search filter needs route_type to not give SQL error
 			$filter = $keys+array('PerId' => $PerId,'route_type' => $query['route_type'], 'discipline' => $query['discipline']);
-			list($new_result) = boresult::$instance->route_result->search(array(),false,'','','',false,'AND',false,$filter);
-			$msg = boresult::athlete2string($new_result,true);
+			list($new_result) = ranking_result_bo::$instance->route_result->search(array(),false,'','','',false,'AND',false,$filter);
+			$msg = ranking_result_bo::athlete2string($new_result,true);
 		}
 		else
 		{
 			$msg = lang('Nothing to update');
 		}
-		if (boresult::$instance->error)
+		if (ranking_result_bo::$instance->error)
 		{
-			foreach(boresult::$instance->error as $data)
+			foreach(ranking_result_bo::$instance->error as $data)
 			{
 				foreach($data as $error)
 				{
@@ -180,14 +180,14 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 
 		if (empty($keys['route_type']))	// route_type is needed to get correct rank of previous heat / avoid SQL error!
 		{
-			if (!($route = boresult::$instance->route->read($keys)))
+			if (!($route = ranking_result_bo::$instance->route->read($keys)))
 			{
 				throw new egw_exception_wrong_parameter('Route not found!');
 			}
 			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
 		}
 
-		if (list($data) = boresult::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$keys))
+		if (list($data) = ranking_result_bo::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$keys))
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			$num_problems = $route['route_num_problems'];
@@ -207,15 +207,15 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 			$response->call('set_scorecard', $score, self::update_allowed($comp, $route, $PerId));
 			$query['PerId'] = $PerId;
 
-			$response->jquery('#msg', 'text', array(boresult::athlete2string($data)));
+			$response->jquery('#msg', 'text', array(ranking_result_bo::athlete2string($data)));
 		}
 	}
 
 	public static function update_allowed(array $comp, array $route, $PerId)
 	{
-		return boresult::$instance->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
-			boresult::$instance->is_judge($comp,false,$route) ||
-			boresult::$instance->is_selfservice() == $PerId;
+		return ranking_result_bo::$instance->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+			ranking_result_bo::$instance->is_judge($comp,false,$route) ||
+			ranking_result_bo::$instance->is_selfservice() == $PerId;
 	}
 
 	/**
@@ -227,7 +227,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	public static function open(array $athlete)
 	{
 		$found = $WetIds = array();
-		foreach((array)boresult::$instance->route->search(null, $only_keys=false,'route_order ASC','','',False,'AND',false,array(
+		foreach((array)ranking_result_bo::$instance->route->search(null, $only_keys=false,'route_order ASC','','',False,'AND',false,array(
 			'route_status' => 1,
 			'discipline' => 'selfscore',
 		)) as $route)
@@ -237,14 +237,14 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		//error_log(__LINE__.': '.__METHOD__."(".array2string($athlete).") WetIds=".array2string($WetIds));
 		if ($WetIds)
 		{
-			foreach((array)boresult::$instance->comp->search(array('WetId' => array_keys($WetIds)), false) as $comp)
+			foreach((array)ranking_result_bo::$instance->comp->search(array('WetId' => array_keys($WetIds)), false) as $comp)
 			{
 				//error_log(__LINE__.': '.__METHOD__."() comp=".array2string($comp));
 				// check if athlete is direct registered into a route
 				foreach($WetIds[$comp['WetId']] as $route)
 				{
 					//error_log(__LINE__.': '.__METHOD__."() route=".array2string($route));
-					if (($result = boresult::$instance->route_result->read($keys=array_intersect_key($route, array_flip(array('WetId','GrpId','route_order')))+array(
+					if (($result = ranking_result_bo::$instance->route_result->read($keys=array_intersect_key($route, array_flip(array('WetId','GrpId','route_order')))+array(
 						'PerId' => $athlete['PerId'],
 					))))
 					{
@@ -253,15 +253,15 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 					}
 				}
 				// check if comp open to athletes federation
-				if (!boresult::$instance->comp->open_comp_match($athlete, $comp)) continue;
+				if (!ranking_result_bo::$instance->comp->open_comp_match($athlete, $comp)) continue;
 				// check comp has category for athlete
-				if (!($cats = boresult::$instance->matching_cats($comp, $athlete))) continue;
+				if (!($cats = ranking_result_bo::$instance->matching_cats($comp, $athlete))) continue;
 				// check cats intersect with selfscore cats
 				if (!($cats = array_intersect_key($cats, array_flip(array_keys($WetIds[$comp['WetId']]))))) continue;
 				// check if athlete registered for comp and cat
 				foreach($cats as $cat => $name)
 				{
-					if (boresult::$instance->result->has_registration($keys=array(
+					if (ranking_result_bo::$instance->result->has_registration($keys=array(
 						'WetId' => $comp['WetId'],
 						'GrpId' => $cat,
 						'PerId' => $athlete['PerId'],
@@ -270,7 +270,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 						$route = $WetIds[$comp['WetId']][$cat];
 						$keys['route_order'] = $route['route_order'];
 						// check and if not include athlete in startlist of route
-						if (!boresult::$instance->has_results($keys))
+						if (!ranking_result_bo::$instance->has_results($keys))
 						{
 							if ($route['route_order']) continue;	// only add automatic to qualification
 							$start_order = count($this->route_result->search(array_diff_key($keys, array('PerId'=>0)), true))+1;
@@ -278,7 +278,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 								'start_order' => $start_order,
 							));
 							$this->route_result->save();
-							if (!boresult::$instance->has_results($keys)) continue;	// was not added
+							if (!ranking_result_bo::$instance->has_results($keys)) continue;	// was not added
 						}
 						$found[] = array_merge($comp, $route);
 					}

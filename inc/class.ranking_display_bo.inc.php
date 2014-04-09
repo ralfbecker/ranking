@@ -7,18 +7,16 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
 
 class ranking_display_bo
 {
 	/**
-	 * Instance of boresults
+	 * Instance of ranking_result_bo
 	 *
-	 * @var boresult
+	 * @var ranking_result_bo
 	 */
 	var $result;
 	/**
@@ -41,16 +39,12 @@ class ranking_display_bo
 	 */
 	function __construct()
 	{
-		if (!is_object($GLOBALS['boresult']))
-		{
-			$GLOBALS['boresult'] = new boresult();
-		}
-		$this->result =& $GLOBALS['boresult'];
-		
+		$this->result = ranking_result_bo::getInstance();
+
 		$this->display = new ranking_display($this->result->db);			// initialising the display class
 		$this->format = new ranking_display_format($this->result->db);		// initialising the display format class
 	}
-	
+
 	/**
 	 * Returns the "heats" Category - Heat pairs as array(cat_id:route_order => label)
 	 *

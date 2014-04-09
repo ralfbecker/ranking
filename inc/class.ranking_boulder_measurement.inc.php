@@ -35,8 +35,8 @@ class ranking_boulder_measurement
 
 		$keys = self::query2keys($content['nm']);
 		// if we have a startlist, add participants to sel_options
-		if (boresult::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
-			($rows = boresult::$instance->route_result->search('',false,'start_order ASC','','','','AND',false,$keys+array(
+		if (ranking_result_bo::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
+			($rows = ranking_result_bo::$instance->route_result->search('',false,'start_order ASC','','','','AND',false,$keys+array(
 				'route_type' => $content['nm']['route_type'],
 				'discipline' => $content['nm']['discipline'],
 			))))
@@ -54,7 +54,7 @@ class ranking_boulder_measurement
 					$content['top'] = (string)$row['top'.$content['nm']['boulder_n']];
 					$content['zone'] = (string)$row['zone'.$content['nm']['boulder_n']];
 				}
-				$sel_options['PerId'][$row['PerId']] = boresult::athlete2string($row, false);
+				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
 			}
 		}
 		// init protocol
@@ -83,12 +83,12 @@ class ranking_boulder_measurement
 		if ($update['zone'.$set_current] === 'empty') $update['zone'.$set_current] = '';
 
 		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
-		if (boresult::$instance->save_result($keys,array($PerId => $update),$query['route_type'],$query['discipline']))
+		if (ranking_result_bo::$instance->save_result($keys,array($PerId => $update),$query['route_type'],$query['discipline']))
 		{
 			// search filter needs route_type to not give SQL error
 			$filter = $keys+array('PerId' => $PerId,'route_type' => $query['route_type'], 'discipline' => $query['discipline']);
-			list($new_result) = boresult::$instance->route_result->search(array(),false,'','','',False,'AND',false,$filter);
-			$msg = boresult::athlete2string($new_result,true);
+			list($new_result) = ranking_result_bo::$instance->route_result->search(array(),false,'','','',False,'AND',false,$filter);
+			$msg = ranking_result_bo::athlete2string($new_result,true);
 			if ($query['discipline'] == 'boulder')
 			{
 				$msg = ($update['top'.$set_current] ? 't'.$update['top'.$set_current].' ' : '').
@@ -102,15 +102,15 @@ class ranking_boulder_measurement
 		// update current participant
 		if ($set_current)
 		{
-			boresult::$instance->route->update($keys+array(
+			ranking_result_bo::$instance->route->update($keys+array(
 				'current_'.$set_current => $PerId,
 				'route_modified' => time(),
 				'route_modifier' => $GLOBALS['egw_info']['user']['account_id'],
 			),false);
 		}
-		if (boresult::$instance->error)
+		if (ranking_result_bo::$instance->error)
 		{
-			foreach(boresult::$instance->error as $id => $data)
+			foreach(ranking_result_bo::$instance->error as $id => $data)
 			{
 				foreach($data as $error)
 				{
@@ -120,9 +120,9 @@ class ranking_boulder_measurement
 			$response->alert(lang('Error').': '.implode(', ',$errors));
 			$msg = '';
 		}
-		elseif (boresult::$instance->route->read($keys) &&
-			($dsp_id=boresult::$instance->route->data['dsp_id']) &&
-			($frm_id=boresult::$instance->route->data['frm_id']))
+		elseif (ranking_result_bo::$instance->route->read($keys) &&
+			($dsp_id=ranking_result_bo::$instance->route->data['dsp_id']) &&
+			($frm_id=ranking_result_bo::$instance->route->data['frm_id']))
 		{
 			// add display update(s)
 			$display = new ranking_display($this->db);
@@ -150,7 +150,7 @@ class ranking_boulder_measurement
 			// if a state given, check if we are still in same state and reject update as "outdated"
 			if ($record['state'])
 			{
-				$current_values = boresult::$instance->route_result->results_by_id($keys);
+				$current_values = ranking_result_bo::$instance->route_result->results_by_id($keys);
 				foreach($record['state'] as $name => $value)
 				{
 					if ($current_values[$name] != $value)
@@ -169,7 +169,7 @@ class ranking_boulder_measurement
 					'zone'.$record['boulder'] => $record['bonus'],
 				),
 			);
-			if (boresult::$instance->save_result($keys, $update, $query['route_type'], $query['discipline']))
+			if (ranking_result_bo::$instance->save_result($keys, $update, $query['route_type'], $query['discipline']))
 			{
 				// search filter needs route_type to not give SQL error
 				$filter = $keys+array(
@@ -177,8 +177,8 @@ class ranking_boulder_measurement
 					'route_type' => $query['route_type'],
 					'discipline' => $query['discipline'],
 				);
-				list($new_result) = boresult::$instance->route_result->search(array(),false,'','','',False,'AND',false,$filter);
-				$msg = boresult::athlete2string($new_result,true);
+				list($new_result) = ranking_result_bo::$instance->route_result->search(array(),false,'','','',False,'AND',false,$filter);
+				$msg = ranking_result_bo::athlete2string($new_result,true);
 				if ($query['discipline'] == 'boulder')
 				{
 					$msg = ($record['top'] ? 't'.$record['top'].' ' : '').'b'.$record['bonus'].': '.$msg;
@@ -220,14 +220,14 @@ class ranking_boulder_measurement
 
 		if (empty($keys['route_type']))	// route_type is needed to get correct rank of previous heat / avoid SQL error!
 		{
-			if (!($route = boresult::$instance->route->read($keys)))
+			if (!($route = ranking_result_bo::$instance->route->read($keys)))
 			{
 				throw new egw_exception_wrong_parameter('Route not found!');
 			}
 			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
 		}
 
-		if ((list($data) = boresult::$instance->route_result->search(array(),false,'','','',False,'AND',false,$keys)))
+		if ((list($data) = ranking_result_bo::$instance->route_result->search(array(),false,'','','',False,'AND',false,$keys)))
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			foreach($update as $id => $key)
@@ -245,7 +245,7 @@ class ranking_boulder_measurement
 			}
 			$query['PerId'] = $PerId;
 
-			$response->jquery('#msg', 'text', array(boresult::athlete2string($data)));
+			$response->jquery('#msg', 'text', array(ranking_result_bo::athlete2string($data)));
 		}
 	}
 
@@ -284,11 +284,11 @@ class ranking_boulder_measurement
 			}
 		}
 
-		if (!($comp = boresult::$instance->comp->read($query['comp'])))
+		if (!($comp = ranking_result_bo::$instance->comp->read($query['comp'])))
 		{
 			throw new egw_exception_wrong_parameter("Competition $query[comp] NOT found!");
 		}
-		if (!boresult::$instance->is_admin && !boresult::$instance->is_judge($comp, false, self::query2keys($query)) &&
+		if (!ranking_result_bo::$instance->is_admin && !ranking_result_bo::$instance->is_judge($comp, false, self::query2keys($query)) &&
 			$query['discipline'] != 'selfscore')
 		{
 			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
@@ -301,10 +301,10 @@ class ranking_boulder_measurement
 	 */
 	public static function init_static()
 	{
-		include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-		if (!isset(boresult::$instance))
+		include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_result_bo.inc.php');
+		if (!isset(ranking_result_bo::$instance))
 		{
-			new boresult();
+			new ranking_result_bo();
 		}
 	}
 }

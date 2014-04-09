@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -78,7 +78,7 @@ class ranking_topo
 		$keys['WetId'] = $comp_arr['WetId'];
 		$keys['GrpId'] = $cat_arr['GrpId'];
 
-		if (!($route = boresult::$instance->route->read($keys)))
+		if (!($route = ranking_result_bo::$instance->route->read($keys)))
 		{
 			throw new egw_exception_wrong_parameter(lang('Route NOT found !!!'));
 		}
@@ -286,7 +286,7 @@ class ranking_topo
 		foreach($ranking as $athlete)
 		{
 			$col = $athlete['PerId'] == $current && $current_color ? $current_color : $color;
-			$text = boresult::athlete2string($athlete, 'rank');
+			$text = ranking_result_bo::athlete2string($athlete, 'rank');
 
 			if (($hold = self::getHoldsByHeight($athlete['result_plus'] == TOP_PLUS ? 999 : $athlete['result_height'])))
 			{
@@ -433,7 +433,7 @@ class ranking_topo
 	static public function getRanking(array $keys, $current=null, $num=3, $place=1)
 	{
 		$athletes = array();
-		if (($ranking = boresult::$instance->route_result->search($keys,false,'result_rank ASC')))
+		if (($ranking = ranking_result_bo::$instance->route_result->search($keys,false,'result_rank ASC')))
 		{
 			foreach($ranking as $athlete)
 			{
@@ -454,10 +454,10 @@ class ranking_topo
 	 */
 	public static function init_static()
 	{
-		include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-		if (!isset(boresult::$instance))
+		include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_result_bo.inc.php');
+		if (!isset(ranking_result_bo::$instance))
 		{
-			new boresult();
+			new ranking_result_bo();
 		}
 	}
 

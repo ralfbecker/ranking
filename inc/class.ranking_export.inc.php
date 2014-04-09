@@ -7,13 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-13 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-
-class ranking_export extends boresult
+class ranking_export extends ranking_result_bo
 {
 	/**
 	 * Disable caching for following development systems
@@ -212,8 +210,8 @@ class ranking_export extends boresult
 	/**
 	 * Livetime of cache entries
 	 *
-	 * Can be fairly high, as cache is kept consistent, by calls from boresult::save_result to immediatly update the cache
-	 * and calls to boresult::delete_export_route_cache() to invalidate it from route and route_result classes for deletes or updates.
+	 * Can be fairly high, as cache is kept consistent, by calls from ranking_result_bo::save_result to immediatly update the cache
+	 * and calls to ranking_result_bo::delete_export_route_cache() to invalidate it from route and route_result classes for deletes or updates.
 	 *
 	 * @var int
 	 */

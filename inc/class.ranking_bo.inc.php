@@ -1242,7 +1242,7 @@ class ranking_bo extends ranking_so
 			}
 		}
 		$feldfakt = round($feldfakt / $max_pkte,2);
-		//echo "<p>boresult::feldfactor('$comp[rkey]','$cat[rkey]')==$feldfakt (has_feldfakt=$has_feldfakt)</p>\n";
+		//echo "<p>".__METHOD__."('$comp[rkey]','$cat[rkey]')==$feldfakt (has_feldfakt=$has_feldfakt)</p>\n";
 		return $feldfakt;
 	}
 
