@@ -48,11 +48,11 @@ class ranking_so
 	 */
 	var $db;
 	/**
-	 * @var pktsystem
+	 * @var ranking_pktsystem
 	 */
 	private $pkte;
 	/**
-	 * @var rls_system
+	 * @var ranking_rls_system
 	 */
 	private $rls;
 	/**
@@ -72,15 +72,15 @@ class ranking_so
 	 */
 	private $athlete;
 	/**
-	 * @var result
+	 * @var ranking_result
 	 */
 	private $result;
 	/**
-	 * @var route
+	 * @var ranking_route
 	 */
 	private $route;
 	/**
-	 * @var route_result
+	 * @var ranking_route_result
 	 */
 	private $route_result;
 	/**
@@ -109,15 +109,15 @@ class ranking_so
 	 * @var array
 	 */
 	static $sub_classes = array(
-		'pkte'    => 'pktsystem',
-		'rls'     => 'rls_system',
+		'pkte'    => 'ranking_pktsystem',
+		'rls'     => 'ranking_rls_system',
 		'cats'    => 'ranking_category',
 		'cup'     => 'ranking_cup',
 		'comp'    => 'ranking_competition',
 		'athlete' => 'ranking_athlete',
 		'result'  => 'ranking_result',
-		'route'   => 'route',
-		'route_result'  => 'route_result',
+		'route'   => 'ranking_route',
+		'route_result'  => 'ranking_route_result',
 		'federation' => 'ranking_federation',
 		'display' => 'ranking_display',
 		'calc'    => 'ranking_calculation',
