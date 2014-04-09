@@ -43,11 +43,11 @@ class ranking_beamer
 				'beamer' => 1,
 			);
 		}
-		if($content['comp']) $comp = boresult::$instance->comp->read($content['comp']);
+		if($content['comp']) $comp = ranking_result_bo::$instance->comp->read($content['comp']);
 
-		if (boresult::$instance->only_nation)
+		if (ranking_result_bo::$instance->only_nation)
 		{
-			$calendar = boresult::$instance->only_nation;
+			$calendar = ranking_result_bo::$instance->only_nation;
 			$tmpl->disable_cells('calendar');
 		}
 		elseif ($comp && !$content['calendar'])
@@ -60,7 +60,7 @@ class ranking_beamer
 		}
 		else
 		{
-			list($calendar) = each(boresult::$instance->ranking_nations);
+			list($calendar) = each(ranking_result_bo::$instance->ranking_nations);
 		}
 		if (!$comp || ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
 		{
@@ -75,14 +75,14 @@ class ranking_beamer
 				0 => lang('None'),
 				1 => lang('More'),
 			),
-			'calendar' => boresult::$instance->ranking_nations,
-			'comp'     => boresult::$instance->comp->names(array(
+			'calendar' => ranking_result_bo::$instance->ranking_nations,
+			'comp'     => ranking_result_bo::$instance->comp->names(array(
 				'nation' => $calendar,
-				'datum < '.boresult::$instance->db->quote(date('Y-m-d',time()+10*24*3600)),	// starting 10 days from now
-				'datum > '.boresult::$instance->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
+				'datum < '.ranking_result_bo::$instance->db->quote(date('Y-m-d',time()+10*24*3600)),	// starting 10 days from now
+				'datum > '.ranking_result_bo::$instance->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
-			'cat'      => boresult::$instance->cats->names(array('rkey' => $comp['gruppen']),0),
+			'cat'      => ranking_result_bo::$instance->cats->names(array('rkey' => $comp['gruppen']),0),
 		);
 
 		$routes = $cats = array();
@@ -95,7 +95,7 @@ class ranking_beamer
 
 				$sel_options["route[$n]"] = array(
 					'-1' => lang('General result'),
-				)+boresult::$instance->route->query_list('route_name','route_order',array(
+				)+ranking_result_bo::$instance->route->query_list('route_name','route_order',array(
 						'WetId' => $comp['WetId'],
 						'GrpId' => $content['cat'][$i],
 					),'route_order DESC');
@@ -143,10 +143,10 @@ class ranking_beamer
 	 */
 	public static function init_static()
 	{
-		include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-		if (!isset(boresult::$instance))
+		include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_result_bo.inc.php');
+		if (!isset(ranking_result_bo::$instance))
 		{
-			new boresult();
+			new ranking_result_bo();
 		}
 	}
 }

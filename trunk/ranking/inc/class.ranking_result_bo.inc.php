@@ -11,7 +11,7 @@
  * @version $Id$
  */
 
-class boresult extends ranking_bo
+class ranking_result_bo extends ranking_bo
 {
 	/**
 	 * values and labels for route_order
@@ -62,9 +62,9 @@ class boresult extends ranking_bo
 	var $plus,$plus_labels;
 
 	/**
-	 * Instance of boresult, if instancated
+	 * Instance of ranking_result_bo, if instancated
 	 *
-	 * @var boresult
+	 * @var ranking_result_bo
 	 */
 	public static $instance;
 
@@ -95,19 +95,8 @@ class boresult extends ranking_bo
 			TOP_PLUS => lang('Top'),
 		);
 
-		// makeing the boresult object availible for other objects
+		// makeing the ranking_result_bo object availible for other objects
 		self::$instance = $this;
-	}
-
-	/**
-	 * php4 constructor
-	 *
-	 * @deprecated use __construct()
-	 * @return boresult
-	 */
-	function boresult()
-	{
-		self::__construct();
 	}
 
 	/**
@@ -934,7 +923,7 @@ class boresult extends ranking_bo
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		// delete the export_route cache
-		boresult::delete_export_route_cache($keys);
+		ranking_result_bo::delete_export_route_cache($keys);
 
 		return $modified ? $modified : $n;
 	}
@@ -1587,7 +1576,7 @@ class boresult extends ranking_bo
 				}
 				break;
 		}
-		//echo "<p>boresult::default_quota($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
+		//echo "<p>".__METHOD__."($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
 		return $quota;
 	}
 
@@ -1716,17 +1705,17 @@ class boresult extends ranking_bo
 	}
 
 	/**
-	 * Singleton to get a boresult instance
+	 * Singleton to get a ranking_result_bo instance
 	 *
-	 * @return boresult
+	 * @return ranking_result_bo
 	 */
 	static public function getInstance()
 	{
-		if (!is_object($GLOBALS['boresult']))
+		if (!is_object($GLOBALS['ranking_result_bo']))
 		{
-			$GLOBALS['boresult'] = new boresult;
+			$GLOBALS['ranking_result_bo'] = new ranking_result_bo;
 		}
-		return $GLOBALS['boresult'];
+		return $GLOBALS['ranking_result_bo'];
 	}
 
 	/**

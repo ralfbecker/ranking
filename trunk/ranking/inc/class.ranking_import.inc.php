@@ -7,13 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2008-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-
-class ranking_import extends boresult
+class ranking_import extends ranking_result_bo
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -629,7 +627,7 @@ class ranking_import extends boresult
 		// import result into ranking (not result-service!)
 		if ($do_result_import)
 		{
-			$error = ranking_bo::import_ranking(array(	// $this->import_ranking is from boresult!
+			$error = ranking_bo::import_ranking(array(	// $this->import_ranking is from ranking_result_bo!
 				'WetId' => $keys['comp'],
 				'GrpId' => $keys['cat'],
 			), $result);

@@ -11,8 +11,6 @@
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT . '/ranking/inc/class.boresult.inc.php');
-
 define('TOP_PLUS',9999);
 define('TOP_HEIGHT',99999999);
 define('ELIMINATED_TIME',999999);
@@ -86,13 +84,13 @@ class ranking_route_result extends so_sql
 	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time >= r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
 
 	/**
-	 * Discipline only set by boresult->save_result, to be used in data2db
+	 * Discipline only set by ranking_result_bo->save_result, to be used in data2db
 	 *
 	 * @var string
 	 */
 	var $discipline;
 	/**
-	 * Type of route (how many qualifications) only set by boresult->save_result, to be used in data2db
+	 * Type of route (how many qualifications) only set by ranking_result_bo->save_result, to be used in data2db
 	 *
 	 * @var int
 	 */
@@ -300,7 +298,7 @@ class ranking_route_result extends so_sql
 							//echo "route_order=$route_order, result_rank=$row[result_rank] --> no further countback ";
 							break;		// no further countback
 						}
-						if (boresult::is_two_quali_all($route_type) && $route_order == 1)
+						if (ranking_result_bo::is_two_quali_all($route_type) && $route_order == 1)
 						{
 							if ($route_type == TWO_QUALI_ALL_SUM)	// sum is in quali_points and higher points are better
 							{
@@ -372,7 +370,7 @@ class ranking_route_result extends so_sql
 		{
 			return $this->rank_lead_sum;
 		}
-		if ($route_order == 2 && boresult::is_two_quali_all($route_type))
+		if ($route_order == 2 && ranking_result_bo::is_two_quali_all($route_type))
 		{
 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
 			$r = 'r1';
@@ -459,7 +457,7 @@ class ranking_route_result extends so_sql
 			{
 				if (in_array($route_order,array(2,3))) continue;	// base of the query, no need to join
 			}
-			elseif ($route_order < 2-(int)boresult::is_two_quali_all($route_type))
+			elseif ($route_order < 2-(int)ranking_result_bo::is_two_quali_all($route_type))
 			{
 				continue;	// no need to join the qualification
 			}
@@ -471,7 +469,7 @@ class ranking_route_result extends so_sql
 			}
 			if ($route_type == TWOxTWO_QUALI && $route_order < 2) continue;	// dont order by the 1. quali
 
-			if (boresult::is_two_quali_all($route_type) && $route_order == 1)
+			if (ranking_result_bo::is_two_quali_all($route_type) && $route_order == 1)
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order,$route_type).')';
@@ -1162,7 +1160,7 @@ class ranking_route_result extends so_sql
 			$old_time = $data['result_time_l'];
 			$old_rank = $data['new_rank'];
 		}
-		if ($modified) boresult::delete_export_route_cache($keys);
+		if ($modified) ranking_result_bo::delete_export_route_cache($keys);
 
 		return $modified;
 	}
@@ -1180,7 +1178,7 @@ class ranking_route_result extends so_sql
 	{
 		if ((!$err = parent::save($keys, $extra_where)))
 		{
-			boresult::delete_export_route_cache($this->data);
+			ranking_result_bo::delete_export_route_cache($this->data);
 		}
 		return $err;
 	}
@@ -1223,7 +1221,7 @@ class ranking_route_result extends so_sql
 					'route_order' => $data['route_order'],
 				)),__LINE__,__FILE__);
 		}
-		boresult::delete_export_route_cache($keys);
+		ranking_result_bo::delete_export_route_cache($keys);
 
 		return true;
 	}

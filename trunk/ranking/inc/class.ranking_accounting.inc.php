@@ -7,13 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2009-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2009-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-
-class ranking_accounting extends boresult
+class ranking_accounting extends ranking_result_bo
 {
 	/**
 	 * fed_id of SAC Nichtmitglieder

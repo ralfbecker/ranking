@@ -66,7 +66,7 @@ class ranking_route extends so_sql
 			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
 			$this->db->delete('RelayResults',$keys,__LINE__,__FILE__);
 
-			boresult::delete_export_route_cache($keys, null, null, true);
+			ranking_result_bo::delete_export_route_cache($keys, null, null, true);
 		}
 		return $ret;
 	}
@@ -141,7 +141,7 @@ class ranking_route extends so_sql
 		$this->data['route_modified'] = time();
 		$this->data['route_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 
-		boresult::delete_export_route_cache($this->data, null, null, true);	// true = invalidate prev. heats
+		ranking_result_bo::delete_export_route_cache($this->data, null, null, true);	// true = invalidate prev. heats
 
 		return parent::save(null,$extra_where);
 	}
@@ -157,7 +157,7 @@ class ranking_route extends so_sql
 	 */
 	function update($fields,$merge=true)
 	{
-		boresult::delete_export_route_cache($merge ? array_merge($this->data, $fields) : $fields);
+		ranking_result_bo::delete_export_route_cache($merge ? array_merge($this->data, $fields) : $fields);
 
 		return parent::update($fields,$merge);
 	}

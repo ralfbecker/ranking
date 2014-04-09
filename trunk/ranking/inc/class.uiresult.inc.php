@@ -11,9 +11,7 @@
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boresult.inc.php');
-
-class uiresult extends boresult
+class uiresult extends ranking_result_bo
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -897,7 +895,7 @@ class uiresult extends boresult
 		$rows['no_printnumber'] = !$need_start_number;
 		$rows['no_start_number'] = !$need_start_number && $query['route_status'] == STATUS_RESULT_OFFICIAL;
 
-		// report the set-values at time of display back to index() for calling boresult::save_result
+		// report the set-values at time of display back to index() for calling ranking_result_bo::save_result
 		$GLOBALS['egw']->session->appsession('set_'.$query['comp'].'_'.$query['cat'].'_'.$query['route'],'ranking',$rows['set']);
 
 		// show previous heat only if it's counting
@@ -910,7 +908,7 @@ class uiresult extends boresult
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
 		if (!in_array($query['discipline'],array('speed','boulder')))
 		{
-			$rows['route_type'] = boresult::is_two_quali_all($query['route_type']) ? 'TWO_QUALI_ALL' :
+			$rows['route_type'] = ranking_result_bo::is_two_quali_all($query['route_type']) ? 'TWO_QUALI_ALL' :
 				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' :
 				($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
 		}

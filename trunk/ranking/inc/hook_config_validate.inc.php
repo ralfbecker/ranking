@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -17,10 +17,10 @@
 */
 $GLOBALS['egw_info']['server']['found_validation_hook'] = True;
 
-if (!is_object($GLOBALS['boresult']))
+if (!is_object($GLOBALS['ranking_result_bo']))
 {
 	try {
-		$GLOBALS['boresult'] = CreateObject('ranking.boresult');
+		$GLOBALS['ranking_result_bo'] = new ranking_result_bo();
 	}
 	catch(Exception $e) {
 		$GLOBALS['config_error'] .= "Invalid DB configuration!";

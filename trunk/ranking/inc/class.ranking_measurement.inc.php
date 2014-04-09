@@ -50,8 +50,8 @@ class ranking_measurement extends ranking_boulder_measurement
 		$keys = self::query2keys($content['nm']);
 		unset($keys['hold_topo']);
 		// if we have a startlist, add participants to sel_options
-		if (boresult::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
-			($rows = boresult::$instance->route_result->search('',false,'start_order ASC','','','','AND',false,$keys+array(
+		if (ranking_result_bo::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
+			($rows = ranking_result_bo::$instance->route_result->search('',false,'start_order ASC','','','','AND',false,$keys+array(
 				'route_type' => $content['nm']['route_type'],
 				'discipline' => $content['nm']['discipline'],
 			))))
@@ -68,7 +68,7 @@ class ranking_measurement extends ranking_boulder_measurement
 					$content['result_height'] = $row['result_height'];
 					$content['result_plus']   = $row['result_plus'];
 				}
-				$sel_options['PerId'][$row['PerId']] = boresult::athlete2string($row, false);
+				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
 			}
 		}
 		if ($content['nm']['topo'])
@@ -192,21 +192,21 @@ class ranking_measurement extends ranking_boulder_measurement
 		{
 			if (isset($hold[$name])) $hold['hold_'.$name] = round(100.0*$hold[$name]);	// we store 100th % or cm
 		}
-		$table_def = boresult::$instance->db->get_table_definitions('ranking',self::HOLDS_TABLE);
+		$table_def = ranking_result_bo::$instance->db->get_table_definitions('ranking',self::HOLDS_TABLE);
 		$hold = array_intersect_key($hold,$table_def['fd']);
 
 		if ($hold['hold_id'] > 0)
 		{
-			boresult::$instance->db->update(self::HOLDS_TABLE, $hold, array('hold_id'=>$hold['hold_id']), __LINE__, __FILE__, 'ranking');
+			ranking_result_bo::$instance->db->update(self::HOLDS_TABLE, $hold, array('hold_id'=>$hold['hold_id']), __LINE__, __FILE__, 'ranking');
 		}
 		else
 		{
-			$hold['hold_height'] = boresult::$instance->db->select(self::HOLDS_TABLE, 'MAX(hold_height)',
+			$hold['hold_height'] = ranking_result_bo::$instance->db->select(self::HOLDS_TABLE, 'MAX(hold_height)',
 				array_intersect_key($hold,array_flip(array('WetId','GrpId','route_order','hold_topo'))),
 				__LINE__, __FILE__, false, '', 'ranking')->fetchColumn()+100;
 
-			boresult::$instance->db->insert(self::HOLDS_TABLE, $hold, false, __LINE__, __FILE__, 'ranking');
-			$hold['hold_id'] = boresult::$instance->db->get_last_insert_id(self::HOLDS_TABLE, 'hold_id');
+			ranking_result_bo::$instance->db->insert(self::HOLDS_TABLE, $hold, false, __LINE__, __FILE__, 'ranking');
+			$hold['hold_id'] = ranking_result_bo::$instance->db->get_last_insert_id(self::HOLDS_TABLE, 'hold_id');
 		}
 		$hold = self::db2hold($hold);
 
@@ -238,7 +238,7 @@ class ranking_measurement extends ranking_boulder_measurement
 	public static function get_holds(array $keys)
 	{
 		$holds = array();
-		foreach(boresult::$instance->db->select(self::HOLDS_TABLE, array('hold_id','hold_xpercent','hold_ypercent','hold_height','hold_type'),
+		foreach(ranking_result_bo::$instance->db->select(self::HOLDS_TABLE, array('hold_id','hold_xpercent','hold_ypercent','hold_height','hold_type'),
 				array_intersect_key($keys,array_flip(array('WetId','GrpId','route_order','hold_topo'))),
 				__LINE__, __FILE__, false, '', 'ranking') as $hold)
 		{
@@ -255,10 +255,10 @@ class ranking_measurement extends ranking_boulder_measurement
 	 */
 	public static function delete_hold($hold)
 	{
-		boresult::$instance->db->delete(self::HOLDS_TABLE, is_array($hold) ? $hold : array('hold_id' => $hold),
+		ranking_result_bo::$instance->db->delete(self::HOLDS_TABLE, is_array($hold) ? $hold : array('hold_id' => $hold),
 			__LINE__, __FILE__, 'ranking');
 
-		return boresult::$instance->db->affected_rows();
+		return ranking_result_bo::$instance->db->affected_rows();
 	}
 
 	/**
@@ -297,20 +297,20 @@ class ranking_measurement extends ranking_boulder_measurement
 	 */
 	public static function get_topo_dir(array $route, $create=true, $check_perms=true, &$comp=null, &$cat=null)
 	{
-		$dir = boresult::$instance->config['vfs_topo_dir'];
+		$dir = ranking_result_bo::$instance->config['vfs_topo_dir'];
 		if ($dir[0] != '/' || !egw_vfs::file_exists($dir) || !egw_vfs::is_dir($dir))
 		{
 			throw new egw_exception_wrong_userinput(lang('Wrong or NOT configured VFS directory').': '.$dir);
 		}
-		if (!($comp = boresult::$instance->comp->read($route['WetId'])))
+		if (!($comp = ranking_result_bo::$instance->comp->read($route['WetId'])))
 		{
 			throw new egw_exception_wrong_parameter("Competition $route[WetId] NOT found!");
 		}
-		if ($check_perms && !boresult::$instance->is_admin && !boresult::$instance->is_judge($comp))
+		if ($check_perms && !ranking_result_bo::$instance->is_admin && !ranking_result_bo::$instance->is_judge($comp))
 		{
 			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
 		}
-		if (!($cat = boresult::$instance->cats->read($route['GrpId'])))
+		if (!($cat = ranking_result_bo::$instance->cats->read($route['GrpId'])))
 		{
 			throw new egw_exception_wrong_parameter("Category $route[GrpId] NOT found!");
 		}
