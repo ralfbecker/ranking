@@ -94,12 +94,6 @@ class ranking_athlete extends so_sql
 	 * @var int
 	 */
 	var $license_year;
-	/**
-	 * Reference to the boranking instance
-	 *
-	 * @var boranking
-	 */
-	var $boranking;
 
 	/**
 	 * Timestaps that need to be adjusted to user-time on reading or saving
@@ -218,7 +212,7 @@ class ranking_athlete extends so_sql
 			// echo "<p>ranking_athlete::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
 
 			// blank out the acl'ed fields, if user has no athletes rights
-			if (is_object($GLOBALS['boranking']) && !$GLOBALS['boranking']->acl_check_athlete($data))
+			if (is_object($GLOBALS['ranking_bo']) && !$GLOBALS['ranking_bo']->acl_check_athlete($data))
 			{
 				foreach($this->acl2clear as $deny => $to_clear)
 				{

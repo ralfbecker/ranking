@@ -21,7 +21,7 @@ define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
 /**
  * ranking business object/logic
  */
-class boranking extends ranking_so
+class ranking_bo extends ranking_so
 {
 	var $split_by_places = array(
 		'no' => 'No never',
@@ -153,7 +153,6 @@ class boranking extends ranking_so
 	 * Constructor
 	 *
 	 * @param array $extra_classes=array()
-	 * @return boranking
 	 */
 	function __construct(array $extra_classes=array())
 	{
@@ -259,34 +258,22 @@ class boranking extends ranking_so
 		{
 			unset($this->license_nations['NULL']);
 		}
-		// makeing the boranking object availible for other objects
-		$GLOBALS['boranking'] = $this;
+		// makeing the ranking_bo object availible for other objects
+		$GLOBALS['ranking_bo'] = $this;
 	}
 
 	/**
-	 * Singleton to get a boranking instance
+	 * Singleton to get a ranking_bo instance
 	 *
-	 * @return boranking
+	 * @return ranking_bo
 	 */
 	static public function getInstance()
 	{
-		if (!is_object($GLOBALS['boranking']))
+		if (!is_object($GLOBALS['ranking_bo']))
 		{
-			$GLOBALS['boranking'] = new boranking;
+			$GLOBALS['ranking_bo'] = new ranking_bo;
 		}
-		return $GLOBALS['boranking'];
-	}
-
-	/**
-	 * php4 constructor
-	 *
-	 * @deprecated use __construct()
-	 * @param array $extra_classes=array()
-	 * @return boranking
-	 */
-	function boranking(array $extra_classes=array())
-	{
-		self::__construct($extra_classes);
+		return $GLOBALS['ranking_bo'];
 	}
 
 	/**
@@ -641,7 +628,7 @@ class boranking extends ranking_so
 		}
 		foreach($do_cat ? array($do_cat) : $comp['gruppen'] as $cat)
 		{
-			//echo "boranking::prequalified($comp[rkey],$do_cat) cat='$cat($cat[rkey])'<br>\n";
+			//echo __METHOD__."($comp[rkey],$do_cat) cat='$cat($cat[rkey])'<br>\n";
 			if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 			{
 				return false;
@@ -787,7 +774,7 @@ class boranking extends ranking_so
 	 */
 	function register($comp,$cat,$athlete,$mode=0)
 	{
-		if ($this->debug) echo "<p>boranking::register($comp,$cat,".(is_array($athlete)?$athlete['PerId']:$athlete).",$mode)</p>\n";
+		if ($this->debug) echo "<p>".__METHOD__."($comp,$cat,".(is_array($athlete)?$athlete['PerId']:$athlete).",$mode)</p>\n";
 		if (is_array($comp)) $comp = $comp['WetId'];
 		if (!$comp || !$cat || !$athlete) return false;
 
@@ -1203,7 +1190,7 @@ class boranking extends ranking_so
 	 */
 	function set_ui_state($calendar=null,$comp=null,$cat=null)
 	{
-		//echo "<p>boranking::set_ui_state(calendar='$calendar',comp=$comp,cat=$cat) menuaction=$_GET[menuaction]</p>\n";
+		//echo "<p>".__METHOD__."(calendar='$calendar',comp=$comp,cat=$cat) menuaction=$_GET[menuaction]</p>\n";
 		foreach(array('registration','result','import') as $type)
 		{
 			$data = $GLOBALS['egw']->session->appsession($type,'ranking');

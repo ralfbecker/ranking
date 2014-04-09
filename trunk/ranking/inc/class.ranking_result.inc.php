@@ -47,8 +47,8 @@ class ranking_result extends so_sql
 	 */
 	function athlete_db2data($data=null)
 	{
-		static $athlete;
-		if (!isset($athlete)) $athlete = boranking::getInstance()->athlete;
+		static $athlete=null;
+		if (!isset($athlete)) $athlete = ranking_bo::getInstance()->athlete;
 
 		return $athlete->db2data($data);
 	}
@@ -284,7 +284,7 @@ class ranking_result extends so_sql
 		{
 			$comp = $this->read($comp);
 		}
-		if (!isset($boranking)) $boranking = boranking::getInstance();
+		$boranking = ranking_bo::getInstance();
 		if (!is_array($cat)) $cat = $boranking->cats->read($cat);
 
 		$prequals = array();

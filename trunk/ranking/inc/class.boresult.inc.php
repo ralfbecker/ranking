@@ -7,13 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-
-class boresult extends boranking
+class boresult extends ranking_bo
 {
 	/**
 	 * values and labels for route_order

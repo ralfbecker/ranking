@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -588,7 +588,7 @@ class ranking_competition extends so_sql
 		$check = array('WetId' => $WetId);
 		if ($GrpId) $check['GrpId'] = $GrpId;
 
-		return $has_results[$WetId][(string)$GrpId] = $GLOBALS['boranking']->result->has_results($check);
+		return $has_results[$WetId][(string)$GrpId] = $GLOBALS['ranking_bo']->result->has_results($check);
 	}
 
 	/**

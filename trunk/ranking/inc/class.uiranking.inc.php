@@ -7,14 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006/7 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-require_once(EGW_INCLUDE_ROOT.'/etemplate/inc/class.etemplate.inc.php');
-
-class uiranking extends boranking
+class uiranking extends ranking_bo
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -22,11 +19,6 @@ class uiranking extends boranking
 	var $public_functions = array(
 		'index' => true,
 	);
-
-	function uiranking()
-	{
-		$this->boranking();
-	}
 
 	/**
 	 * Show a ranking

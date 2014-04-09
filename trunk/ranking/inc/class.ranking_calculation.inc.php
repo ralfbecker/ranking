@@ -7,11 +7,9 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2013 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2013-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 
 /**
  * Calculate diverse rankings:
@@ -23,9 +21,9 @@ require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 class ranking_calculation
 {
 	/**
-	 * Reference to boranking class
+	 * Reference to ranking_bo class
 	 *
-	 * @var boranking
+	 * @var ranking_bo
 	 */
 	protected $bo;
 
@@ -48,9 +46,9 @@ class ranking_calculation
 	 */
 	var $debug = false;
 
-	public function __construct(boranking $bo=null)
+	public function __construct(ranking_bo $bo=null)
 	{
-		$this->bo = $bo ? $bo : new boranking();
+		$this->bo = $bo ? $bo : new ranking_bo();
 	}
 
 	/**
@@ -571,7 +569,7 @@ class ranking_calculation
 		}
 		$overall = count($cat['GrpIds']) > 1;
 
-		if ($this->debug) echo "<p>boranking::ranking(cat='$cat[rkey]',stand='$stand',...,cup='$cup[rkey]')</p>\n";
+		if ($this->debug) echo "<p>".__METHOD__."(cat='$cat[rkey]',stand='$stand',...,cup='$cup[rkey]')</p>\n";
 
 		if (!$stand || $stand == '.')	// last comp. before today
 		{
@@ -607,7 +605,7 @@ class ranking_calculation
 				$stand = (int)$comp['datum'] . '-12-31';	// no further comp. -> stand 31.12.
 			}
 		}
-		if ($this->debug) echo "<p>boranking::ranking: stand='$stand', comp='$comp[rkey]'</p>\n";
+		if ($this->debug) echo "<p>".__METHOD__.": stand='$stand', comp='$comp[rkey]'</p>\n";
 
 		if ($overall)
 		{
@@ -649,7 +647,7 @@ class ranking_calculation
 					$start = date('Y-m-d',mktime(0,0,0,$month-$rls['window_anz'],$day+1,$year));
 					break;
 				case 'wettk_athlet':
-					die( "boranking::ranking: Windowtype 'wettk_athlet' is no longer supported !!!" );
+					die(__METHOD__.": Windowtype 'wettk_athlet' is no longer supported !!!" );
 					break;
 				case 'wettk':			// ranking using a given number of competitions in the category
 				case 'wettk_nat':		// ------------------ " ----------------------- in any category
@@ -663,7 +661,7 @@ class ranking_calculation
 					break;
 			}
 		}
-		if ($this->debug) echo "<p>boranking::ranking: start='$start'</p>\n";
+		if ($this->debug) echo "<p>".__METHOD__.": start='$start'</p>\n";
 
 		if ($cup)
 		{
