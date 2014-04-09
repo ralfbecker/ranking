@@ -83,7 +83,7 @@ class ranking_competition extends so_sql
 		$this->charset = translation::charset();
 
 		foreach(array(
-				'cats'  => 'category',
+				'cats'  => 'ranking_category',
 			) as $var => $class)
 		{
 			$egw_name = /*'ranking_'.*/$class;

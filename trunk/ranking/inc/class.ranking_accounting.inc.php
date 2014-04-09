@@ -48,7 +48,7 @@ class ranking_accounting extends boresult
 		switch (($order = $query['order']))
 		{
 			case 'start_order':
-				$query['order'] = category::sui_cat_sort(route_result::RESULT_TABLE.'.GrpId').',start_order';
+				$query['order'] = ranking_category::sui_cat_sort(route_result::RESULT_TABLE.'.GrpId').',start_order';
 				break;
 		}
 		$comp = $this->comp->read($query['comp']);

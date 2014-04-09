@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -21,7 +21,7 @@
  *
  * @property-read pktsystem $pkte
  * @property-read rls_system $rls
- * @property-read cats $category
+ * @property-read ranking_category $cats
  * @property-read ranking_cup $cup
  * @property-read ranking_competition $comp
  * @property-read ranking_athlete $athlete
@@ -56,7 +56,7 @@ class ranking_so
 	 */
 	private $rls;
 	/**
-	 * @var category
+	 * @var ranking_category
 	 */
 	private $cats;
 	/**
@@ -111,7 +111,7 @@ class ranking_so
 	static $sub_classes = array(
 		'pkte'    => 'pktsystem',
 		'rls'     => 'rls_system',
-		'cats'    => 'category',
+		'cats'    => 'ranking_category',
 		'cup'     => 'ranking_cup',
 		'comp'    => 'ranking_competition',
 		'athlete' => 'ranking_athlete',
