@@ -14,7 +14,7 @@
 /**
  * category object
  */
-class category extends so_sql
+class ranking_category extends so_sql
 {
 	/**
 	 * @var array $data['rkey']2old maps new to old category-names
@@ -191,7 +191,7 @@ class category extends so_sql
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
-		//echo "<p>category::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
+		//echo "<p>".__METHOD__."(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
 		if (is_array($criteria))
 		{
@@ -366,7 +366,7 @@ class category extends so_sql
 					break;
 			}
 		}
-		//echo "<p>category::names(".print_r($keys,true).") = <pre>".print_r($names,true)."</pre>\n";
+		//echo "<p>".__METHOD__."(".print_r($keys,true).") = <pre>".print_r($names,true)."</pre>\n";
 		return $names;
 	}
 
@@ -397,7 +397,7 @@ class category extends so_sql
 						$cats[] = $rkey;
 					}
 		}
-		//echo "<p>category::cat_rexp2rkeys('$rexp')=".print_r($cats,true)."</p>\n";
+		//echo "<p>".__METHOD__."('$rexp')=".print_r($cats,true)."</p>\n";
 		return $cats;
 	}
 
@@ -424,7 +424,7 @@ class category extends so_sql
 		{
 			$y = $from_year; $from_year = $to_year; $to_year = $y;
 		}
-		//echo "category::age_group(,'$stand',from=$from_year, to=$to_year)"; _debug_array($cat);
+		//echo "".__METHOD__."(,'$stand',from=$from_year, to=$to_year)"; _debug_array($cat);
 		return $cat['from_year'] || $cat['to_year'];
 	}
 

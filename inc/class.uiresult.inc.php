@@ -607,7 +607,7 @@ class uiresult extends boresult
 					'nation'.($cat['nation']?'='.$this->db->quote($cat['nation']):' IS NULL').' DESC,'.
 					// then by having an agegroup or not
 					'(from_year IS NOT NULL OR to_year IS NOT NULL) '.
-						(category::age_group($cat, $comp['datum']) ?  'DESC' : 'ASC'), false);
+						(ranking_category::age_group($cat, $comp['datum']) ?  'DESC' : 'ASC'), false);
 				//add cats from other competitions with identical date
 				if (($comps = $this->comp->names(array('datum' => $comp['datum'],'WetId!='.(int)$comp['WetId']), 0)))
 				{

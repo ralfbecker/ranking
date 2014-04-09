@@ -20,7 +20,7 @@ class ranking_cup extends so_sql
 	/**
 	 * reference to the category object
 	 *
-	 * @var category
+	 * @var ranking_category
 	 */
 	var $cats;
 
@@ -47,7 +47,7 @@ class ranking_cup extends so_sql
 		$this->charset = translation::charset();
 
 		foreach(array(
-				'cats'  => 'category',
+				'cats'  => 'ranking_category',
 			) as $var => $class)
 		{
 			$egw_name = /*'ranking_'.*/$class;
