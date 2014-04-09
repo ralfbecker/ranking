@@ -7,8 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 class ranking_display extends so_sql2
@@ -23,11 +23,11 @@ class ranking_display extends so_sql2
 	 */
 	function __construct(egw_db $db=null)
 	{
-		if (is_null($db)) $db = $GLOBALS['boranking']->db;
-		
+		if (is_null($db)) $db = $GLOBALS['ranking_bo']->db;
+
 		parent::__construct('ranking','Displays',$db);	// calling the constructor of so_sql for Displays table
 	}
-	
+
 	/**
 	 * Output a string to the display
 	 *
@@ -39,7 +39,7 @@ class ranking_display extends so_sql2
 		static $dsp_format;
 		static $fdisplay;
 		static $egw_charset;
-		
+
 		if (is_null($egw_charset)) $egw_charset = $GLOBALS['egw']->translation->charset();
 
 		if (is_null($dsp_format))			// evaluate the string to parse \033 or eg. \r
@@ -56,7 +56,7 @@ class ranking_display extends so_sql2
 			}
 		}
 		if (is_null($str)) $str = $this->dsp_current;
-		
+
 		//echo "egw_charset='$egw_charset', dsp_charset='$this->dsp_charset'\n";
 		if ($this->dsp_charset && strcasecmp($egw_charset,$this->dsp_charset))
 		{
@@ -85,10 +85,10 @@ class ranking_display extends so_sql2
 		}
 		return true;
 	}
-	
+
 	/**
 	 * callback for preg_replace_callback to do replacements for {{line:start:length}}
-	 * 
+	 *
 	 * The content to replace is in the class-var $this->content!
 	 *
 	 * @param array $matches array('{{line:start:length}}',line,start,length)
@@ -97,7 +97,7 @@ class ranking_display extends so_sql2
 	function replace_content($matches)
 	{
 		$lines = explode("\n",$this->content);
-		
+
 		return substr($lines[(int)$matches[1]].str_repeat(' ',$this->dsp_cols),$matches[2],$matches[3]);
 	}
 
@@ -172,11 +172,11 @@ class ranking_display extends so_sql2
 
 		return true;
 	}
-	
+
 	/**
 	 * List the displays as user has access to
-	 * 
-	 * 
+	 *
+	 *
 	 * @param int $account_id=null user to check if not the current one
 	 * @return array dsp_id => dsp_name pairs
 	 */
@@ -190,7 +190,7 @@ class ranking_display extends so_sql2
 		}
 		return $this->query_list('dsp_name','dsp_id',$where,'dsp_id');
 	}
-	
+
 	/**
 	 * checks if the current user has access to the display (controller)
 	 *
@@ -198,10 +198,10 @@ class ranking_display extends so_sql2
 	 */
 	function check_access()
 	{
-		return $GLOBALS['egw_info']['user']['apps']['admin'] || 
+		return $GLOBALS['egw_info']['user']['apps']['admin'] ||
 			is_array($this->dsp_access) && in_array($GLOBALS['egw_info']['user']['account_id'],$this->dsp_access);
 	}
-	
+
 	/**
 	 * changes the data from the db-format to your work-format
 	 *
@@ -251,7 +251,7 @@ class ranking_display extends so_sql2
 		}
 		return $data;
 	}
-	
+
 	/**
 	 * Reimplemented to always increment a column 'dsp_etag' as modification counter
 	 *
@@ -262,15 +262,15 @@ class ranking_display extends so_sql2
 	{
 		if (!$keys) $keys = array();
 		$keys[] = 'dsp_etag=dsp_etag+1';
-		
+
 		return parent::save($keys);
 	}
-	
+
 	/**
 	 * Update only the given fields, if the primary key is not given, it will be taken from $this->data
 	 *
 	 * Reimplemented to always increment a column 'dsp_etag' as modification counter
-	 * 
+	 *
 	 * @param array $fields
 	 * @param boolean $merge=true if true $fields will be merged with $this->data (after update!), otherwise $this->data will be just $fields
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
@@ -279,7 +279,7 @@ class ranking_display extends so_sql2
 	{
 		if (!$fields) $fields = array();
 		$fields[] = 'dsp_etag=dsp_etag+1';
-		
+
 		return parent::update($fields,$merge);
 	}
 }

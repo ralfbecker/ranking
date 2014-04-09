@@ -7,16 +7,14 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2012 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2012-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
-
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
 
 /**
  * athletes selfservie: profile, registration
  */
-class ranking_selfservice extends boranking
+class ranking_selfservice extends ranking_bo
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction

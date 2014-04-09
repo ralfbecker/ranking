@@ -629,7 +629,7 @@ class ranking_import extends boresult
 		// import result into ranking (not result-service!)
 		if ($do_result_import)
 		{
-			$error = boranking::import_ranking(array(	// $this->import_ranking is from boresult!
+			$error = ranking_bo::import_ranking(array(	// $this->import_ranking is from boresult!
 				'WetId' => $keys['comp'],
 				'GrpId' => $keys['cat'],
 			), $result);

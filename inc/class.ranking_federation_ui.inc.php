@@ -7,13 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2008-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.boranking.inc.php');
-
-class ranking_federation_ui extends boranking
+class ranking_federation_ui extends ranking_bo
 {
 	/**
 	 * functions callable via menuaction
