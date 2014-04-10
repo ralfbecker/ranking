@@ -115,7 +115,7 @@ class ranking_competition extends so_sql
 				return self::NATION;
 
 			case 'SUI':
-				return $intern ? self::FEDERATON : self::CITY;
+				return $intern ? self::FEDERATION : self::CITY;
 		}
 	}
 
