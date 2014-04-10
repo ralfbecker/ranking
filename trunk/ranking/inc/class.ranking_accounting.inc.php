@@ -46,7 +46,7 @@ class ranking_accounting extends ranking_result_bo
 		switch (($order = $query['order']))
 		{
 			case 'start_order':
-				$query['order'] = ranking_category::sui_cat_sort(route_result::RESULT_TABLE.'.GrpId').',start_order';
+				$query['order'] = ranking_category::sui_cat_sort(ranking_route_result::RESULT_TABLE.'.GrpId').',start_order';
 				break;
 		}
 		$comp = $this->comp->read($query['comp']);
@@ -59,15 +59,15 @@ class ranking_accounting extends ranking_result_bo
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 //		$total = $this->route_result->get_rows($query,$rows,$readonlys);
 		// we use ranking_athlete::get_rows, to also get the license data (joined with the results table)
-		$join = ' JOIN '.route_result::RESULT_TABLE.' ON '.ranking_athlete::ATHLETE_TABLE.'.PerId='.route_result::RESULT_TABLE. '.PerId AND '.
-			$this->db->expression(route_result::RESULT_TABLE,$query['col_filter']);
+		$join = ' JOIN '.ranking_route_result::RESULT_TABLE.' ON '.ranking_athlete::ATHLETE_TABLE.'.PerId='.ranking_route_result::RESULT_TABLE. '.PerId AND '.
+			$this->db->expression(ranking_route_result::RESULT_TABLE,$query['col_filter']);
 		// col_filter is only for license-date, other filters are already used in the above join
 		$query['col_filter'] = array(
 			'license_nation' => $query['calendar'],
 			'license_year'   => (int)$comp['datum'],
 		);
 
-		$total = $this->athlete->get_rows($query,$rows,$readonlys,$join,false,false,'start_number,start_order,'.route_result::RESULT_TABLE.'.GrpId AS GrpId');
+		$total = $this->athlete->get_rows($query,$rows,$readonlys,$join,false,false,'start_number,start_order,'.ranking_route_result::RESULT_TABLE.'.GrpId AS GrpId');
 		//echo $total; _debug_array($rows); //die('Stop');
 
 		$rows['total'] = $rows['fed'] = 0.0;

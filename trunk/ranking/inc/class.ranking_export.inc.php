@@ -606,7 +606,7 @@ class ranking_export extends ranking_result_bo
 			// remove single boulder meaningless in general result, or not existing boulder
 			if ($discipline == 'boulder')
 			{
-				for($i = 1; $i <= route_result::MAX_BOULDERS; ++$i)
+				for($i = 1; $i <= ranking_route_result::MAX_BOULDERS; ++$i)
 				{
 					if ($heat == -1 || $i > $route['route_num_problems'])
 					{

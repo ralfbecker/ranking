@@ -565,7 +565,7 @@ class ranking_result_bo extends ranking_bo
 			}
 			$order_by .= ',RAND()';					// --> randomized
 		}
-		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n";
+		//echo "<p>".__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n";
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
 		//_debug_array($starters);
 
@@ -702,7 +702,7 @@ class ranking_result_bo extends ranking_bo
 		$cols[] = 'start_order';
 		$starters =& $this->route_result->search('',$cols,
 			$order_by='start_order','','',false,'AND',false,$prev_keys);
-		//echo "<p>route_result::search('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
+		//echo "<p>".__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
 
 		// reindex by _new_ start_order
 		foreach($starters as &$starter)
@@ -857,7 +857,7 @@ class ranking_result_bo extends ranking_bo
 			//error_log(__METHOD__."() #$id: data=".array2string($data));
 
 			// boulder result
-			for ($i=1; $i <= route_result::MAX_BOULDERS && isset($data['top'.$i]); ++$i)
+			for ($i=1; $i <= ranking_route_result::MAX_BOULDERS && isset($data['top'.$i]); ++$i)
 			{
 				// if no change in a single boulder compared to old result, use current result, not old one for storing
 				if ($old && $old['top'.$i] == $data['top'.$i] && $old['zone'.$i] == $data['zone'.$i])
@@ -968,21 +968,31 @@ class ranking_result_bo extends ranking_bo
 		{
 			if (!$id || $data[$this->route_result->id_col] == $id)
 			{
+				$to_write = array(
+					'result_modified' => time(),
+					'result_modifier' => $this->user,
+				);
+				$where = $keys;
+				$where[$this->route_result->id_col] = $data[$this->route_result->id_col];
+				// for quali always update every heat, after only update current and further heats
+				unset($where['route_order']);
+				if ($keys['route_order'] >= 2) $where[] = 'route_order >= '.(int)$keys['route_order'];
+
 				for ($i = 0; $i <= 3; ++$i)
 				{
 					$col = 'start_number'.($i ? '_'.$i : '');
 					if (!array_key_exists($col,$data)) continue;
 					if ($data[$this->route_result->id_col] == $id && $start)
 					{
-						$last = $data[$col] = $start;
+						$last = $to_write[$col] = $start;
 						unset($id);
 					}
 					else
 					{
-						$last = $data[$col] = is_numeric($increment) ? $last + $increment : $last;
+						$last = $to_write[$col] = is_numeric($increment) ? $last + $increment : $last;
 					}
 				}
-				$this->route_result->save($data);
+				$this->db->update($this->route_result->table_name, $to_write, $where, __LINE__, __FILE__, $this->route_result->app);
 			}
 		}
 	}
