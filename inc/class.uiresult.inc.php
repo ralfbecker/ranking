@@ -707,7 +707,7 @@ class uiresult extends ranking_result_bo
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['GrpId'] = $query['cat'];
 		$query['col_filter']['route_order'] = $query['route'];
-		// this is to transport the route_type to route_result::search's filter param
+		// this is to transport the route_type to ranking_route_result::search's filter param
 		$query['col_filter']['route_type'] = $query['route_type'];
 		$query['col_filter']['discipline'] = $query['discipline'];
 		$query['col_filter']['quali_preselected'] = $query['quali_preselected'];
