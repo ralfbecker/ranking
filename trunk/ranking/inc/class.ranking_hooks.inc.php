@@ -7,14 +7,14 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 /**
  * Rankings - Hooks: diverse static methods to be called as hooks
  */
-class ranking_admin_prefs_sidebox_hooks
+class ranking_hooks
 {
 	static function all_hooks($args)
 	{
@@ -166,7 +166,7 @@ class ranking_admin_prefs_sidebox_hooks
 		return array(
 			'query' => 'ranking.ranking_athlete.link_query',
 			'title' => 'ranking.ranking_athlete.link_title',
-//			'titles' => 'ranking.athlete.link_titles',
+//			'titles' => 'ranking.ranking_athlete.link_titles',
 			'view' => array(
 				'menuaction' => 'ranking.ranking_athlete_ui.edit'
 			),
