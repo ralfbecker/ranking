@@ -69,9 +69,9 @@ class ranking_result_bo extends ranking_bo
 		TWOxTWO_QUALI  => 'two * two Qualification',		// multiply the rank of 2 quali rounds on two routes each
 	);
 	var $quali_types_speed = array(
+		TWO_QUALI_BESTOF=> 'best of two (record format)',
 		ONE_QUALI       => 'one Qualification',
 		TWO_QUALI_SPEED => 'two Qualification',
-		TWO_QUALI_BESTOF=> 'best of two (record format)',
 	);
 	var $eliminated_labels = array(
 		''=> '',
@@ -269,15 +269,13 @@ class ranking_result_bo extends ranking_bo
 			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM)),		// true = stagger, false = no stagger
 			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']), $add_cat);
 
-		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF)	// set 2. lane for record format
+		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF && !$route_order)	// set 2. lane for record format qualification
 		{
 			unset($starter);
-			$anz = count($starters[1]);
 			foreach($starters[1] as &$starter)
 			{
-				$starter['start_order2n'] = $starter['start_order'] <= floor($anz/2) ?
-					$starter['start_order'] + ceil($anz/2) :	// (bigger) first half
-					$starter['start_order'] - floor($anz/2);	// (smaller) second half
+				// Example for 21 starters: 1. in Lane A will be 11. in LaneB
+				$starter['start_order2n'] = self::stagger($starter['start_order'], count($starters[1]));
 			}
 		}
 
@@ -603,18 +601,10 @@ class ranking_result_bo extends ranking_bo
 				}
 				$data['start_order'] = $this->ko_start_order[$prev_route['route_quota']][$start_order++];
 			}
-			// 2. quali is stagger'ed of 1. quali (50-100,1-49)
+			// 2. quali is stagger'ed of 1. quali
 			elseif(in_array($prev_route['route_type'],array(TWO_QUALI_ALL,TWO_QUALI_ALL_SEED_STAGGER)) && $keys['route_order'] == 1)
 			{
-				if ($start_order <= floor($half_starters))
-				{
-					$data['start_order'] = $start_order+ceil($half_starters);
-				}
-				else
-				{
-					$data['start_order'] = $start_order-floor($half_starters);
-				}
-				++$start_order;
+				$data['start_order'] = self::stagger($start_order++, count($starters));
 			}
 			else
 			{
@@ -1671,7 +1661,14 @@ class ranking_result_bo extends ranking_bo
 			else
 			{
 				$keys['route_order'] = '0';
-				$keys['route_type'] = ONE_QUALI;
+				switch($discipline)
+				{
+					case 'speed':
+						$keys['route_type'] = TWO_QUALI_BESTOF;
+						break;
+					default:
+						$keys['route_type'] = ONE_QUALI;
+				}
 			}
 			$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') :
 				($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
