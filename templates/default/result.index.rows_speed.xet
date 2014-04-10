@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox cols="1" rows="1" class="extra_startlist">
+					<groupbox class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox cols="1" rows="1" class="extra_result">
+					<groupbox class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -100,8 +100,8 @@
 					<nextmatch-sortheader align="center" label="Start- order" id="start_order" class="noPrint"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
 					<nextmatch-sortheader align="center" label="Time" id="result_time"/>
-					<nextmatch-sortheader align="center" label="2. Lane" id="start_order2n"/>
-					<description align="center" value="2. Time"/>
+					<nextmatch-sortheader align="center" label="Lane B" id="start_order2n"/>
+					<description align="center" value="Time"/>
 					<nextmatch-header align="center" label="Ability" id="ability_percent"/>
 					<nextmatch-sortheader align="center" label="@sum_or_bestof" id="result_time"/>
 					<description align="center" value="Actions" class="noPrint"/>
@@ -111,8 +111,8 @@
 				</row>
 				<row class="x $row_cont[class] $row_cont[quota_class]">
 					<description align="center" id="set[$row_cont[PerId]][result_rank]" no_lang="1" readonly="true" class="place"/>
-					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
+					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
@@ -124,8 +124,8 @@
 					<hbox align="center" options="0,0">
 						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
 						<textbox type="float" id="set[$row_cont[PerId]][result_time]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
-						<menulist class="noPrint">
-							<menupopup class="$cont[rw_result] leftPad5" id="set[$row_cont[PerId]][eliminated]"/>
+						<menulist>
+							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated]"/>
 						</menulist>
 						<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);" class="small noPrint"/>
 					</hbox>
@@ -133,8 +133,8 @@
 					<hbox align="center" options="0,0">
 						<description id="{$row}[result_r]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
 						<textbox type="float" id="set[$row_cont[PerId]][result_time_r]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
-						<menulist class="noPrint">
-							<menupopup class="$cont[rw_result] leftPad5" id="set[$row_cont[PerId]][eliminated_r]"/>
+						<menulist>
+							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated_r]"/>
 						</menulist>
 						<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);" class="small noPrint"/>
 					</hbox>
