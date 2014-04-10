@@ -11,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox cols="1" rows="1" class="extra_startlist">
+					<groupbox class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -39,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox cols="1" rows="1" class="extra_result">
+					<groupbox class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -62,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_startlist" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.result.index.rows_startlist" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -90,7 +90,7 @@
 				<row class="th" part="header">
 					<nextmatch-sortheader align="center" label="Start- order" id="start_order"/>
 					<nextmatch-header align="center" label="Start- number" id="printnumber" class="onlyPrint"/>
-					<nextmatch-sortheader label="2. Lane" id="start_order2n"/>
+					<nextmatch-sortheader label="Lane B" id="start_order2n"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_number" class="noPrint"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
@@ -114,8 +114,8 @@
 					<description align="center" id="{$row}[start_number]" no_lang="1" class="onlyPrint"/>
 					<description align="center" id="{$row}[start_order2n]" no_lang="1"/>
 					<textbox align="center" id="set[$row_cont[PerId]][start_number]" no_lang="1" size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" class="noPrint"/>
-					<description id="{$row}[nachname]" no_lang="1" options="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" options="$row_cont[link]" class="leftPad5"/>
+					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
