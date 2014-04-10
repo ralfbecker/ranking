@@ -393,7 +393,15 @@ class ranking_athlete_ui extends ranking_bo
 		switch($content['license_nation'])
 		{
 			case 'SUI':
-				$content['license_msg'] = 'Wir haben die Lizenzanfrage für diese/n Athleten/in erhalten. Deinem Regionalzentrum wird Ende Saison eine Rechnung über den Gesamtbetrag der Lizenzkosten zugestellt.\nDie Lizenzen werden euch vor dem ersten Wettkampf und danach nach Bedarf zugeschickt.\n\nFortfahren?\n\nNous avons bien reçu la demande de licence pour cet/te athlète, ton centre régional recevra une facture du coût total des licences à la fin de la saison.\nLes licences vous seront envoyées avant la première compétition et ensuite selon demande.\n\nContinuer';
+				$content['license_msg'] = 'Wir haben die Lizenzanfrage für diese/n Athleten/in erhalten. Deinem Regionalzentrum wird Ende Saison eine Rechnung über den Gesamtbetrag der Lizenzkosten zugestellt.
+Die Jahreslizenzen werden nicht mehr in Papierform abgegeben. Die Lizenz-Nummer jedes Athleten ist im digitalROCK erfasst und jederzeit überprüfbar.
+
+Fortfahren?
+
+Nous avons bien reçu la demande de licence pour cet/te athlète, ton centre régional recevra une facture du coût total des licences à la fin de la saison.
+La licence annuelle ne sera plus imprimée sur papier. Le numéro de licence de chaque athlète est visible dans le système de digitalROCK.
+
+Continuer';
 				break;
 
 			default:
