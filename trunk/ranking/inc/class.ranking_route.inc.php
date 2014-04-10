@@ -92,7 +92,7 @@ class ranking_route extends so_sql
 		if (!$ret && $keys['route_order'] == -1)		// general result not found --> return a default one
 		{
 			$keys['route_order'] = 0;
-			if (($ret = parent::read($keys,$extra_cols,$join)))
+			if (($ret = parent::read($keys)))
 			{
 				$ret = $this->init(array(
 					'WetId' => $ret['WetId'],
@@ -141,9 +141,25 @@ class ranking_route extends so_sql
 		$this->data['route_modified'] = time();
 		$this->data['route_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 
+		$err = parent::save(null,$extra_where);
+
+		// if route-type changed in qualification change it in other heats too
+		if (!$err && !$this->data['route_order'] && $this->db->select($this->table_name, 'COUNT(*)', array(
+			'WetId' => $this->data['WetId'],
+			'GrpId' => $this->data['GrpId'],
+			'route_type != '.(int)$this->data['route_type'],
+		))->fetchColumn())
+		{
+			$this->db->update($this->table_name, array(
+				'route_type' => $this->data['route_type'],
+			), array(
+				'WetId' => $this->data['WetId'],
+				'GrpId' => $this->data['GrpId'],
+			));
+		}
 		ranking_result_bo::delete_export_route_cache($this->data, null, null, true);	// true = invalidate prev. heats
 
-		return parent::save(null,$extra_where);
+		return $err;
 	}
 
 	/**
