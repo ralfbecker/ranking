@@ -845,7 +845,7 @@ class uiregistration extends ranking_bo
 		);
 		// save calendar, competition & cat between calls in the session
 		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
-		$this->set_ui_state($perserv['calendar'],$preserv['comp'],$preserv['cat']);
+		$this->set_ui_state($preserv['calendar'],$preserv['comp'],$preserv['cat']);
 
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
