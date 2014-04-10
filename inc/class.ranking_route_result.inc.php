@@ -11,29 +11,10 @@
  * @version $Id$
  */
 
-define('TOP_PLUS',9999);
-define('TOP_HEIGHT',99999999);
-define('ELIMINATED_TIME',999999);
-define('WILDCARD_TIME',1);
-
-define('ONE_QUALI',0);
-define('TWO_QUALI_HALF',1);
-define('TWO_QUALI_ALL',2);				// EYS (and all TWO_QUALI_ALL*, if route::read($keys,false) is used)
-define('TWO_QUALI_SPEED',3);
-define('TWOxTWO_QUALI',4);				// two quali rounds on two routes each
-define('TWO_QUALI_ALL_SEED_STAGGER',5);	// lead on 2 routes for all on flash
-define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
-define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
-define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
-define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012+ EYC, no countback, otherwise like TWO_QUALI_ALL
-
-define('LEAD',4);
-define('BOULDER',8);
-define('SPEED',16);
-
-define('STATUS_UNPUBLISHED',0);
-define('STATUS_STARTLIST',1);
-define('STATUS_RESULT_OFFICIAL',2);
+if (!defined('ONE_QUALI'))
+{
+	include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_result_bo.inc.php');
+}
 
 /**
  * route object
@@ -373,24 +354,12 @@ class ranking_route_result extends so_sql
 		if ($route_order == 2 && ranking_result_bo::is_two_quali_all($route_type))
 		{
 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
-			$r = 'r1';
-			// result_rank == NULL is counted wrong if we do: $r.result_rank=c$r.result_rank
-			$rank_equal = "(CASE WHEN $r.result_rank IS NULL THEN c$r.result_rank IS NULL ELSE $r.result_rank=c$r.result_rank END)";
-			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $rank_equal";
-			//pre 2008: $c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
-			$r = 'r2';
-			$rank_equal = "(CASE WHEN $r.result_rank IS NULL THEN c$r.result_rank IS NULL ELSE $r.result_rank=c$r.result_rank END)";
-			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $rank_equal";
-			//pre 2008: $c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
-			$r = 'r1';
-			// athlets not climbined in one quali, get ranked last in that quali
-			$unranked = "(SELECT MAX($this->table_name.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
-			$r1 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
-			//pre 2008: $r1 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
-			$r = 'r2';
-			$unranked = "(SELECT MAX($this->table_name.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
-			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
-			//pre 2008: $r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
+			$c1 = $this->_count_ex_aquo('r1');
+			$c2 = $this->_count_ex_aquo('r2');
+
+			$r1 = $this->_unranked('r1');
+			$r2 = $this->_unranked('r2');
+
 			//pre 2008: rounding to 2 digits: return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
 			return "SELECT SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2) FROM $this->table_name r1".
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.$this->id_col=r2.$this->id_col".
@@ -422,6 +391,22 @@ class ranking_route_result extends so_sql
 		}
 		return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
 			'p.route_order '.($route_order == 2 ? 'IN (0,1)' : '='.(int)($route_order-1))." AND $this->table_name.$this->id_col=p.$this->id_col";
+	}
+
+	private function _count_ex_aquo($r)
+	{
+		// result_rank == NULL is counted wrong if we do: $r.result_rank=c$r.result_rank
+		$rank_equal = "(CASE WHEN $r.result_rank IS NULL THEN c$r.result_rank IS NULL ELSE $r.result_rank=c$r.result_rank END)";
+		//pre 2008: "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $r.result_rank=c$r.result_rank";
+		return "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND $r.route_order=c$r.route_order AND $rank_equal";
+	}
+
+	private function _unranked($r)
+	{
+		// athlets not climbined in one quali, get ranked last in that quali
+		$unranked = "(SELECT MAX($this->table_name.result_rank)+1 FROM $this->table_name WHERE $r.WetId=$this->table_name.WetId AND $r.GrpId=$this->table_name.GrpId AND $r.route_order=$this->table_name.route_order)";
+		//pre 2008: "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r.result_rank END)";
+		return "(CASE WHEN $r.result_rank IS NULL THEN $unranked ELSE $r.result_rank END)";
 	}
 
 	/**
