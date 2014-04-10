@@ -912,7 +912,9 @@ class uiresult extends ranking_result_bo
 				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' :
 				($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
 		}
-		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'];
+		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'] ||
+			// record format uses 2 lanes only for quali
+			$query['route_type'] == TWO_QUALI_BESTOF && $query['route'];
 		$rows['num_problems'] = $query['num_problems'];
 		$rows['readonly'] = $query['readonly'];
 		$rows['no_ranking'] = !$ranking;
