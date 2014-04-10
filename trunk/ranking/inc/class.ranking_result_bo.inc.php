@@ -11,6 +11,30 @@
  * @version $Id$
  */
 
+define('TOP_PLUS',9999);
+define('TOP_HEIGHT',99999999);
+define('ELIMINATED_TIME',999999);
+define('WILDCARD_TIME',1);
+
+define('ONE_QUALI',0);
+define('TWO_QUALI_HALF',1);
+define('TWO_QUALI_ALL',2);				// EYS (and all TWO_QUALI_ALL*, if route::read($keys,false) is used)
+define('TWO_QUALI_SPEED',3);
+define('TWOxTWO_QUALI',4);				// two quali rounds on two routes each
+define('TWO_QUALI_ALL_SEED_STAGGER',5);	// lead on 2 routes for all on flash
+define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
+define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
+define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
+define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012+ EYC, no countback, otherwise like TWO_QUALI_ALL
+
+define('LEAD',4);
+define('BOULDER',8);
+define('SPEED',16);
+
+define('STATUS_UNPUBLISHED',0);
+define('STATUS_STARTLIST',1);
+define('STATUS_RESULT_OFFICIAL',2);
+
 class ranking_result_bo extends ranking_bo
 {
 	/**
