@@ -148,7 +148,7 @@ class ranking_route extends so_sql
 			'WetId' => $this->data['WetId'],
 			'GrpId' => $this->data['GrpId'],
 			'route_type != '.(int)$this->data['route_type'],
-		))->fetchColumn())
+		), __LINE__, __FILE__)->fetchColumn())
 		{
 			$this->db->update($this->table_name, array(
 				'route_type' => $this->data['route_type'],
