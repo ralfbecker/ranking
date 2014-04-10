@@ -1080,11 +1080,7 @@ class ranking_bo extends ranking_so
 		}
 		if ($stagger)
 		{
-			// 2. half of each route is the other list
-			$x = $startlist[1];
-			$startlist[1] = array_merge($startlist[1],$startlist[2]);
-			$startlist[2] = array_merge($startlist[2],$x);
-			unset($x);
+			$startlist[1] = $startlist[2] = array_merge($startlist[1],$startlist[2]);
 		}
 		// reverse the startlist if neccessary
 		for ($route = 1; $route <= $num_routes; ++$route)
@@ -1096,11 +1092,11 @@ class ranking_bo extends ranking_so
 			}
 			foreach($startlist[$route] as $n => $athlete)
 			{
-				$startlist[$route][$n]['start_order'] = 1+$n;
+				$startlist[$route][$n]['start_order'] = !$stagger || $route != 2 ? 1+$n : self::stagger(1+$n, count($startlist[$route]));
 				// preserv the start_number if given
 				if ($old_startlist) $startlist[$route][$n]['start_number'] = $old_startlist[$athlete['PerId']]['start_number'];
 				// we preserve the registration number in the last 6 bit's
-				$startlist[$route][$n]['pkt'] = (($route-1) << 14) + ((1+$n) << 6) + ($athlete['pkt'] & 63);
+				$startlist[$route][$n]['pkt'] = (($route-1) << 14) + (($startlist[$route][$n]['start_order']) << 6) + ($athlete['pkt'] & 63);
 			}
 		}
 		if (is_array($old_startlist))
@@ -1128,6 +1124,21 @@ class ranking_bo extends ranking_so
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Get staggered startorder for $anz participants
+	 *
+	 * Example for 21 starters: 1. in Lane A will be 11. in Lane B
+	 *
+	 * @param int $start_order on lane A
+	 * @param int $anz
+	 * @return int start_order on lane B
+	 */
+	static function stagger($start_order, $anz)
+	{
+		error_log(__METHOD__."($start_order, $anz) returning ".(1+((floor($anz/2)+$start_order-1) % $anz)));
+		return 1+((floor($anz/2)+$start_order-1) % $anz);
 	}
 
 	/**
