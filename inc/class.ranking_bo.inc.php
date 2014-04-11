@@ -1137,7 +1137,7 @@ class ranking_bo extends ranking_so
 	 */
 	static function stagger($start_order, $anz)
 	{
-		error_log(__METHOD__."($start_order, $anz) returning ".(1+((floor($anz/2)+$start_order-1) % $anz)));
+		//error_log(__METHOD__."($start_order, $anz) returning ".(1+((floor($anz/2)+$start_order-1) % $anz)));
 		return 1+((floor($anz/2)+$start_order-1) % $anz);
 	}
 
