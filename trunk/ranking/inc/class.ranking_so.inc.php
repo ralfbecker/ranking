@@ -12,22 +12,22 @@
  */
 
 /**
- * eGroupWare digital ROCK Rankings - storage object
+ * EGroupware digital ROCK Rankings - storage object
  *
  * This is not a storage object itself: It created the DB connection to the (separate) rang database
  * and passes it to it's sub-objects which are private and get instanciated on demand by a __get() method.
  *
  * These sub-objects implement DB access to the various tables of the rang database.
  *
- * @property-read pktsystem $pkte
- * @property-read rls_system $rls
+ * @property-read ranking_pktsystem $pkte
+ * @property-read ranking_rls_system $rls
  * @property-read ranking_category $cats
  * @property-read ranking_cup $cup
  * @property-read ranking_competition $comp
  * @property-read ranking_athlete $athlete
  * @property-read ranking_result $result
- * @property-read route $route
- * @property-read route_result $route_result
+ * @property-read ranking_route $route
+ * @property-read ranking_route_result $route_result
  * @property-read ranking_federation $federation;
  * @property-read ranking_display $display;
  * @property-read ranking_calculation $calc;
@@ -126,11 +126,8 @@ class ranking_so
 
 	/**
 	 * Constructor
-	 *
-	 * @param array $extra_classes
-	 * @return soranking
 	 */
-	function __construct(array $extra_classes=array())
+	function __construct()
 	{
 		$this->db = self::get_rang_db($this->config);
 	}
@@ -185,7 +182,7 @@ class ranking_so
 	 */
 	public static function cat_rkey2id($rkey,$name='',$parent=null)
 	{
-		static $cats,$global_parent,$rkey2id;
+		static $cats=null,$global_parent=null,$rkey2id=null;
 		if (is_null($cats))
 		{
 			$cats = new categories(categories::GLOBAL_ACCOUNT,categories::GLOBAL_APPNAME);
@@ -208,7 +205,7 @@ class ranking_so
 
 		if (!isset($rkey2id[$rkey]))
 		{
-			foreach($cats->return_sorted_array($start=0,$limit=false,$query='',$sort='ASC',$order='cat_name',$globals=true, $global_parent) as $cat)
+			foreach($cats->return_sorted_array(0, false, '', 'ASC', 'cat_name', true, $global_parent) as $cat)
 			{
 				if (!is_array($cat['data'])) $cat['data'] = unserialize($cat['data']);
 				if (!$cat['data']) $cat['data'] = array();
@@ -245,10 +242,6 @@ class ranking_so
 		{
 			if (!isset(self::$sub_classes[$name]))
 			{
-				if (!class_exists('egw_exception_wrong_parameter',true))
-				{
-					return false;	// eGW 1.4, can be removed if 1.4 support is no longer needed
-				}
 				throw new egw_exception_wrong_parameter("NO sub-class '$name'!");
 			}
 			$class = self::$sub_classes[$name];
