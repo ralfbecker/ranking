@@ -435,7 +435,8 @@ class uiresult extends ranking_result_bo
 			'GrpId' => array($cat['GrpId']  => $cat['name']),
 			'route_order' => $this->order_nums,
 			'route_status' => $this->stati,
-			'route_type' => $discipline == 'speed' ? $this->quali_types_speed : $this->quali_types,
+			'route_type' => isset($this->quali_types_dicipline[$discipline]) ?
+				$this->quali_types_dicipline[$discipline] : $this->quali_types,
 			'discipline' => $this->disciplines,
 			'upload_options' => array(
 				1 => array(
@@ -454,6 +455,11 @@ class uiresult extends ranking_result_bo
 			),
 			'slist_order' => self::slist_order_options($comp['serie']),
 		);
+		if (isset($content['route_type']) && !isset($sel_options['route_type'][$content['route_type']]))
+		{
+			$sel_options['route_type'][$content['route_type']] = isset($this->quali_types[$content['route-type']]) ?
+				$this->quali_types[$content['route-type']] : lang('Unknown type').' #'.$content['route-type'];
+		}
 		// athlete selected in registration
 		if ($content['athlete']['PerId'] > 0)
 		{
@@ -1738,7 +1744,7 @@ class uiresult extends ranking_result_bo
 				{
 					$co = $results[$n-1];
 				}
-				error_log(__METHOD__."(".array2string($keys).",{$this->route_result->id_col}=$id,".array2string($id_isnt_co).") returning ".array2string($co[$this->route_result->id_col]));
+				//error_log(__METHOD__."(".array2string($keys).",{$this->route_result->id_col}=$id,".array2string($id_isnt_co).") returning ".array2string($co[$this->route_result->id_col]));
 				return $co[$this->route_result->id_col];
 			}
 		}

@@ -21,6 +21,15 @@ if (!defined('ONE_QUALI'))
  */
 class ranking_route_result extends so_sql
 {
+	const TOP_PLUS = 9999;
+	const TOP_HEIGHT = 99999999;
+	const ELIMINATED_TIME = 999999;
+	const WILDCARD_TIME = 1;
+	/**
+	 * Number of false starts without penality / being eliminated
+	 */
+	const MAX_FALSE_STARTS = 1;
+
 	/**
 	 * Name of the result table
 	 */
@@ -211,6 +220,7 @@ class ranking_route_result extends so_sql
 					case 'speedrelay':
 						$result_cols[] = 'result_time';
 						$result_cols[] = 'start_order';
+						$result_cols[] = 'result_detail';	// false_start
 						break;
 					case 'boulder':
 						$result_cols[] = 'result_top';
@@ -529,7 +539,9 @@ class ranking_route_result extends so_sql
 		// "unpack" result-details, only if we are NO general result, as it messes up the general result
 		if ($data['result_detail'] && !$data['general_result'])
 		{
-			foreach(unserialize($data['result_detail']) as $name => $value)
+			$data['result_detail'] = self::unserialize($data['result_detail']);
+
+			foreach($data['result_detail'] as $name => $value)
 			{
 				$data[$name] = $value;
 			}
@@ -561,10 +573,10 @@ class ranking_route_result extends so_sql
 								lang('Top') : $data['result_height'.$suffix];
 							$data['result'.$suffix] .= '&nbsp;'.(100-$data['result_plus'.$suffix]).'.';
 						}
-						elseif ($data['result_height'.$suffix] == TOP_HEIGHT)
+						elseif ($data['result_height'.$suffix] == self::TOP_HEIGHT)
 						{
 							$data['result_height'.$to_suffix] = '';
-							$data['result_plus'.$to_suffix]   = TOP_PLUS;
+							$data['result_plus'.$to_suffix]   = self::TOP_PLUS;
 							$data['result'.$to_suffix] = lang('Top');
 						}
 						elseif ($data['result_height'.$suffix])
@@ -607,11 +619,11 @@ class ranking_route_result extends so_sql
 				}
 				if ($data['other_detail'])
 				{
-					$data['other_detail'] = unserialize($data['other_detail']);
+					$data['other_detail'] = self::unserialize($data['other_detail']);
 				}
 				if ($data['rank_prev_heat'] && $data['route_type'] == TWOxTWO_QUALI && in_array($data['route_order'],array(2,3)))
 				{
-					$data['rank_prev_heat'] = unserialize($data['rank_prev_heat']);
+					$data['rank_prev_heat'] = self::unserialize($data['rank_prev_heat']);
 					$data['rank_prev_heat'] = sprintf('%4.2lf',$data['rank_prev_heat']['qoints']);
 				}
 				if ($data['ability_percent'] && $data['result_height'])
@@ -677,18 +689,22 @@ class ranking_route_result extends so_sql
 			case 'speed':
 				if ($data['result_time'] || $data['eliminated'] || $data['eliminated_r'])	// speed result
 				{
+					if ($data['false_start'] > self::MAX_FALSE_STARTS)
+					{
+						$data['result_time'] = null;
+						$data['time_sum'] = $data['result'] = lang('%1. false start', $data['false_start']);
+					}
 					if (!array_key_exists('result_time2',$data) && !$data['ability_percent'])
 					{
 						if ($data['result_time'])
 						{
-							$data['result_time'] *= 0.001;
-							if ($data['result_time'] == ELIMINATED_TIME)
+							if ($data['result_time'] == 1000*self::ELIMINATED_TIME)
 							{
 								$data['eliminated'] = 1;
 								$data['result_time'] = null;
 								$data['time_sum'] = $data['result'] = lang('fall');
 							}
-							elseif ($data['result_time'] == WILDCARD_TIME)
+							elseif ($data['result_time'] == 1000*self::WILDCARD_TIME)
 							{
 								$data['eliminated'] = 0;
 								$data['result_time'] = null;
@@ -696,6 +712,7 @@ class ranking_route_result extends so_sql
 							}
 							else
 							{
+								$data['result_time'] *= 0.001;
 								$data['time_sum'] = $data['result'] = sprintf('%4.2lf',$data['result_time']);
 							}
 						}
@@ -718,11 +735,13 @@ class ranking_route_result extends so_sql
 							if ($data['result_time'.$suffix])
 							{
 								$data['result_time'.$suffix] *= 0.001;
-								if ($data['result_time'.$suffix] == ELIMINATED_TIME)
+								if ($data['result_time'.$suffix] == self::ELIMINATED_TIME)
 								{
-									$data['result'.$suffix] = lang('fall');
+									$detail = self::unserialize($data['result_detail'.$suffix]);
+									$data['result'.$suffix] = $detail['false_start'] > self::MAX_FALSE_STARTS ?
+										lang('%1. false start', $detail['false_start']) : lang('fall');
 								}
-								elseif ($data['result_time'.$suffix] == WILDCARD_TIME)
+								elseif ($data['result_time'.$suffix] == self::WILDCARD_TIME)
 								{
 									$data['result'.$suffix] = lang('Wildcard');
 								}
@@ -748,6 +767,19 @@ class ranking_route_result extends so_sql
 		if ($data['geb_date']) $data['birthyear'] = (int)$data['geb_date'];
 
 		return $data;
+	}
+
+	/**
+	 * Unserialize data from either json_encode or serialize
+	 *
+	 * As of 1.9.017 update, we should only get json_encode data.
+	 *
+	 * @param string $data
+	 * @return array
+	 */
+	public static function unserialize($data)
+	{
+		return !$data ? array() : ($data[0] == '{' ? json_decode($data, true) : unserialize($data));
 	}
 
 	/**
@@ -787,9 +819,9 @@ class ranking_route_result extends so_sql
 		{
 			$data =& $this->data;
 		}
-		if ($data['result_plus'] == TOP_PLUS)	// top
+		if ($data['result_plus'] == self::TOP_PLUS)	// top
 		{
-			$data['result_height'] = TOP_HEIGHT;
+			$data['result_height'] = self::TOP_HEIGHT;
 			$data['result_plus']   = 0;
 		}
 		elseif ($data['result_height'])
@@ -827,15 +859,15 @@ class ranking_route_result extends so_sql
 				{
 					$data['result_time'] = round(1000 * $data['result_time']);
 				}
-				else
+				else//if ($data['false_start'] <= self::MAX_FALSE_STARTS)
 				{
-					$data['result_time'] = round(1000 * ELIMINATED_TIME);
+					$data['result_time'] = round(1000 * self::ELIMINATED_TIME);
 				}
 			}
 			elseif ((string)$data['eliminated'] !== '' || $data['eliminated_r'])
 			{
 				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ?
-					($data['eliminated'] ? ELIMINATED_TIME : WILDCARD_TIME) : ELIMINATED_TIME));
+					($data['eliminated'] ? self::ELIMINATED_TIME : self::WILDCARD_TIME) : self::ELIMINATED_TIME));
 			}
 			else
 			{
@@ -863,7 +895,7 @@ class ranking_route_result extends so_sql
 			if ((string)$data['eliminated'] !== '' && !($data['result_time'] && !$data['eliminated']))
 			{
 				$data['result_time'] = round(1000 * ((string)$data['elimitated'] !== '' ?
-					($data['eliminated'] ? ELIMINATED_TIME : WILDCARD_TIME) : ELIMINATED_TIME));
+					($data['eliminated'] ? self::ELIMINATED_TIME : self::WILDCARD_TIME) : self::ELIMINATED_TIME));
 			}
 		}
 		elseif ($data['result_time'] || isset($data['eliminated']))	// speed with result on only one route
@@ -874,12 +906,21 @@ class ranking_route_result extends so_sql
 			);
 			switch((string)$data['eliminated'])
 			{
-				case '1': $data['result_time'] = ELIMINATED_TIME; break;
-				case '0': $data['result_time'] = WILDCARD_TIME; break;
+				case '1': $data['result_time'] = self::ELIMINATED_TIME; break;
+				case '0': $data['result_time'] = self::WILDCARD_TIME; break;
 			}
 			if ($data['result_time'])
 			{
 				$data['result_time'] = round(1000 * $data['result_time']);
+			}
+		}
+		if ($data['false_start'] > 0)
+		{
+			$data['result_detail']['false_start'] = (int)$data['false_start'];
+
+			if ($data['false_start'] > self::MAX_FALSE_STARTS)
+			{
+				$data['result_time'] = round(1000 * self::ELIMINATED_TIME);
 			}
 		}
 		// saving the boulder results, if there are any
@@ -935,7 +976,7 @@ class ranking_route_result extends so_sql
 		// store checked state in result_details
 		if (isset($data['checked'])) $data['result_detail']['checked'] = $data['checked'];
 
-		if (is_array($data['result_detail'])) $data['result_detail'] = serialize($data['result_detail']);
+		if (is_array($data['result_detail'])) $data['result_detail'] = json_encode($data['result_detail']);
 
 		return $data;
 	}
@@ -956,7 +997,7 @@ class ranking_route_result extends so_sql
 			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
 		}
-		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent','checked','score') as $name)
+		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent','checked','score','false_start') as $name)
 		{
 			if (isset($new[$name])) $this->data[$name] = $new[$name];
 		}
@@ -1072,7 +1113,9 @@ class ranking_route_result extends so_sql
 			}
 			if ($route_type == TWOxTWO_QUALI && in_array($keys['route_order'],array(2,3)))
 			{
-				usort($result,create_function('$a,$b','return round(100*$a["new_quali_points"])-round(100*$b["new_quali_points"]);'));
+				usort($result, function($a, $b) {
+					return round(100*$a['new_quali_points']) - round(100*$b['new_quali_points']);
+				});
 				$old = null;
 				foreach($result as $i => &$data)
 				{
@@ -1093,7 +1136,7 @@ class ranking_route_result extends so_sql
 			// for ko-system of speed the rank is only 1 (winner) or 2 (looser)
 			if (substr($discipline,0,5) == 'speed' && $keys['route_order'] >= 2 && $data['new_rank'])
 			{
-				if ($data['eliminated']) $data['time_sum'] = ELIMINATED_TIME;
+				if ($data['eliminated']) $data['time_sum'] = self::ELIMINATED_TIME;
 				$new_speed_rank = $data['new_rank'];
 				if ($data['new_rank'] > 1)	// all winners must have rank=1(!)
 				{
@@ -1123,11 +1166,11 @@ class ranking_route_result extends so_sql
 				if ($data['new_qoints'] != $data['qoints'] || $data['new_quali_points'] != $data['quali_points'])
 				{
 					// keep existing details, like ranking for prequalified
-					$to_update['result_detail'] = $data['detail'] ? unserialize($data['detail']) : array();
+					$to_update['result_detail'] = self::unserialize($data['detail']);
 					$to_update['result_detail']['qoints'] = $data['new_qoints'];
 					$to_update['result_detail']['quali_points'] = $data['new_quali_points'];
 					//echo "<p>qoints: $data[qoints] --> $qoints</p>\n";
-					$to_update['result_detail'] = serialize($to_update['result_detail']);
+					$to_update['result_detail'] = json_encode($to_update['result_detail']);
 				}
 			}
 //_debug_array($data); _debug_array($to_update);
@@ -1142,7 +1185,7 @@ class ranking_route_result extends so_sql
 				++$modified;
 			}
 			$old_prev_rank = $data['rank_prev_heat'];
-			$old_time = $data['result_time_l'];
+			$old_time = $data['result_time_l'] ? $data['result_time_l'] : $data['time_sum'];
 			$old_rank = $data['new_rank'];
 		}
 		if ($modified) ranking_result_bo::delete_export_route_cache($keys);

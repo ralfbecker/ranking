@@ -11,6 +11,9 @@
  * @version $Id$
  */
 
+/**
+ * @deprecated use ranking_route_result::(TOP_(PLUS|HEIGHT)|(ELIMINATED|WILDCARD)_TIME)
+ */
 define('TOP_PLUS',9999);
 define('TOP_HEIGHT',99999999);
 define('ELIMINATED_TIME',999999);
@@ -25,7 +28,7 @@ define('TWO_QUALI_ALL_SEED_STAGGER',5);	// lead on 2 routes for all on flash
 define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
 define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
 define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
-define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012+ EYC, no countback, otherwise like TWO_QUALI_ALL
+define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012 EYC, no countback, otherwise like TWO_QUALI_ALL
 
 define('LEAD',4);
 define('BOULDER',8);
@@ -54,24 +57,46 @@ class ranking_result_bo extends ranking_bo
 		STATUS_RESULT_OFFICIAL => 'result official',
 	);
 	/**
-	 * Different types of qualification
+	 * All qualification-type, some are historical and not offered for new routes
 	 *
 	 * @var array
 	 */
 	var $quali_types = array(
 		ONE_QUALI      => 'one Qualification',
 		TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
-		TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
 		TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
-		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder',	// lead on 2 routes for all on sight
+		TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
+		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
+		// speed only
+		TWO_QUALI_BESTOF=> 'best of two (record format)',
+		TWO_QUALI_SPEED => 'two Qualification',
+		// historical
 		TWO_QUALI_ALL_SUM => 'two Qualification with height sum',							// lead on 2 routes with height sum counting
 		TWO_QUALI_ALL_NO_COUNTBACK => 'two Qualification for all, no countback',			// lead 2012 EYC
 		TWOxTWO_QUALI  => 'two * two Qualification',		// multiply the rank of 2 quali rounds on two routes each
 	);
-	var $quali_types_speed = array(
-		TWO_QUALI_BESTOF=> 'best of two (record format)',
-		ONE_QUALI       => 'one Qualification',
-		TWO_QUALI_SPEED => 'two Qualification',
+	/**
+	 * Different qualification types by discipline selectable for new routes
+	 *
+	 * @var array
+	 */
+	var $quali_types_dicipline = array(
+		'lead' => array(
+			TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
+			TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
+			TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
+			ONE_QUALI      => 'one Qualification',
+			TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
+		),
+		'boulder' => array(
+			ONE_QUALI      => 'one Qualification',
+			TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
+		),
+		'speed' => array(
+			TWO_QUALI_BESTOF=> 'best of two (record format)',
+			ONE_QUALI       => 'one Qualification',
+			TWO_QUALI_SPEED => 'two Qualification',
+		),
 	);
 	var $eliminated_labels = array(
 		''=> '',
@@ -573,12 +598,12 @@ class ranking_result_bo extends ranking_bo
 			$max_rank = $starters[count($starters)-1]['result_rank']-1;
 		}
 		$start_order = 1;
-		$half_starters = count($starters)/2;
 		foreach($starters as $n => $data)
 		{
 			// get ranking value of prequalified
-			if (!empty($data['ranking']) && ($data['ranking'] = unserialize($data['ranking'])))
+			if (!empty($data['ranking']) && ($data['ranking'] = ranking_route_result::unserialize($data['ranking'])))
 			{
+				$data['false_start'] = $data['ranking']['false_start'];
 				$data['ranking'] = $data['ranking']['ranking'];
 			}
 			// applying a quota for TWO_QUALI_ALL, taking ties into account!
@@ -627,7 +652,7 @@ class ranking_result_bo extends ranking_bo
 			foreach($starters as $n => $data)
 			{
 				// get ranking value of prequalified
-				if (!empty($data['ranking']) && ($data['ranking'] = unserialize($data['ranking'])))
+				if (!empty($data['ranking']) && ($data['ranking'] = ranking_route_result::unserialize($data['ranking'])))
 				{
 					$data['ranking'] = $data['ranking']['ranking'];
 				}
@@ -690,6 +715,7 @@ class ranking_result_bo extends ranking_bo
 		// which column get propagated to next heat
 		$cols = $this->route_result->startlist_cols();
 		$cols[] = 'start_order';
+		$cols[] = 'result_detail AS detail';	// AS detail to not automatically unserialize (we only want false_start)
 		$starters =& $this->route_result->search('',$cols,
 			$order_by='start_order','','',false,'AND',false,$prev_keys);
 		//echo "<p>".__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
@@ -698,6 +724,10 @@ class ranking_result_bo extends ranking_bo
 		foreach($starters as &$starter)
 		{
 			unset($starter['result_rank']);
+			// copy number of false_start from previous heat
+			$detail = ranking_route_result::unserialize($starter['detail']);
+			unset($starter['detail']);
+			$starter['false_start'] = $detail['false_start'];
 			$start_order = (int)(($starter['start_order']+1)/2);
 			$starters_by_startorder[$start_order] =& $starter;
 		}
@@ -1666,6 +1696,18 @@ class ranking_result_bo extends ranking_bo
 					case 'speed':
 						$keys['route_type'] = TWO_QUALI_BESTOF;
 						break;
+					case 'lead':
+						switch($comp['nation'])
+						{
+							case 'SUI':
+								$keys['route_type'] = TWO_QUALI_ALL_NO_STAGGER;
+								break;
+							default:
+								$keys['route_type'] = TWO_QUALI_ALL_SEED_STAGGER;
+								break;
+						}
+						break;
+					case 'boulder':
 					default:
 						$keys['route_type'] = ONE_QUALI;
 				}

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -1026,9 +1026,9 @@ function ranking_upgrade1_5_007()
 			$results[$row['GrpId']][$row['PerId']] = $row;
 			$ex_aquo[$row['GrpId']][$allowed_nations ? $ex_platz : $row['platz']]++;
 		}
-		foreach($results as $GrpId => &$rows)
+		foreach($results as &$rows)
 		{
-			foreach($rows as $PerId => $row)
+			foreach($rows as $row)
 			{
 				$platz = isset($row['cup_platz']) ? $row['cup_platz'] : $row['platz'];
 				$update = array('cup_platz' => $row['cup_platz']);
@@ -1145,7 +1145,7 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 			'nation' => $nation != 'int' ? $nation : null,
 		),__LINE__,__FILE__,false,'','ranking') as $row)
 		{
-			unset($cat_id);
+			$cat_id = null;
 			foreach($cats as $rkey => $pattern)
 			{
 				if (preg_match('/'.$pattern.'/i',$row['rkey']))
@@ -1673,3 +1673,23 @@ function ranking_upgrade1_9_016()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.017';
 }
 
+/**
+ * Store result_detail column json_encoded instead PHP serialized
+ *
+ * @return string
+ */
+function ranking_upgrade1_9_017()
+{
+	foreach($GLOBALS['egw_setup']->db->select('RouteResults', 'WetId,GrpId,PerId,result_detail', 'result_detail IS NOT NULL',
+		__LINE__, __FILE__, false, '', 'ranking') as $row)
+	{
+		if (!is_array($detail = unserialize($row['result_detail']))) continue;
+
+		unset($row['result_detail']);
+
+		$GLOBALS['egw_setup']->db->update('RouteResults', array(
+			'result_detail' => json_encode($detail),
+		), $row, __LINE__, __FILE__, 'ranking');
+	}
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.018';
+}
