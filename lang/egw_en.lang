@@ -8,6 +8,7 @@
 %1 saved	ranking	en	%1 saved
 %1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
+%1. false start	ranking	en	%1. false start
 %1. heat	ranking	en	%1. Round
 %1. topo	ranking	en	%1. topo
 %1. try	ranking	en	%1. try
@@ -236,6 +237,7 @@ error: while saving !!!	ranking	en	Error: while saving !!!
 exists without saving the changes	ranking	en	exists without saving the changes
 factor	ranking	en	Factor
 fall	ranking	en	fall
+false start	ranking	en	False start
 false start %1: %2	ranking	en	False start %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	en	Family name of the athlete in latin chars! Accents and umlauts are ok
 fax	ranking	en	Fax

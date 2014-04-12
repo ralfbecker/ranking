@@ -8,6 +8,7 @@
 %1 saved	ranking	de	%1 gespeichert
 %1, %2 deleted for category %3	ranking	de	%1, %2 gelöscht für Kategorie %3
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
+%1. false start	ranking	de	%1. Fehlstart
 %1. heat	ranking	de	%1. Runde
 %1. topo	ranking	de	%1. Topo
 %1. try	ranking	de	%1. Try
@@ -232,6 +233,7 @@ error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
 exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
 factor	ranking	de	Faktor
 fall	ranking	de	Sturz
+false start	ranking	de	Fehlstart
 false start %1: %2	ranking	de	Fehlstart %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Familienname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 fax	ranking	de	Fax
