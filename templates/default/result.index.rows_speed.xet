@@ -98,7 +98,7 @@
 					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-header align="center" label="License" id="PerId"/>
-					<nextmatch-sortheader align="center" label="Start- order" id="start_order" class="noPrint"/>
+					<nextmatch-sortheader align="center" label="@@start_order_label" id="start_order" class="noPrint"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
 					<description align="center" value="False start"/>
 					<nextmatch-sortheader align="center" label="Time" id="result_time"/>
