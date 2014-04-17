@@ -1209,7 +1209,7 @@ class ranking_export extends ranking_result_bo
 		// calculate expiration date based on date of ranking and duration of last competition
 		$date_ts = egw_time::to($date, 'ts');
 		//error_log(__METHOD__."() comp=".array2string($comp)." (time()=".time()." - date_ts=$date_ts)/86400 = ".(time()-$date_ts)/86400);
-		if (substr($data['end'], -6) == '-12-31' || (time()-$date_ts)/86400 > $comp['duration'])
+		if (substr($data['end'], -6) == '-12-31' || (time()-$date_ts)/86400 > $comp['duration']+1)	// +1 to compensate for timezones
 		{
 			$data['expires'] = self::EXPORT_RANKING_OLD_TTL;
 			//error_log(__METHOD__."() using old expires time ".$data['expires']);
@@ -1221,7 +1221,9 @@ class ranking_export extends ranking_result_bo
 		}
 		// get next competition (not limited to this year (cup is limited by definition))
 		if ($data['expires'] == self::EXPORT_RANKING_OLD_TTL &&
-			($next_comp = $this->comp->next_comp($comp['datum'], $cat['rkey'], $comp['nation'], $cup?$cup['SerId']:0, true, false)))
+			($next_comp = $this->comp->next_comp($comp['datum'],
+				$cat['mgroups'] ? $cat['mgroups'] : $cat['rkey'],	// for overall we have to use contained categories
+				$comp['nation'], $cup?$cup['SerId']:0, true, false)))
 		{
 			$next_comp_ts = egw_time::to($next_comp['datum'], 'ts');
 
@@ -1478,7 +1480,7 @@ class ranking_export extends ranking_result_bo
 		}
 
 		$comp_ts = egw_time::to($comp['datum'], 'ts');
-		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration'] ?
+		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration']+1 ?	// +1 to compensate for different timezones
 			self::EXPORT_RESULTS_HISTORIC_EXPIRES : self::EXPORT_RESULTS_RUNNING_EXPIRES;
 
 		// get next competition (not limited to this year or counting comp / faktor > 0)
