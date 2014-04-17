@@ -88,7 +88,7 @@
 					<template id="ranking.result.header$cont[calendar]" span="all"/>
 				</row>
 				<row class="th" part="header">
-					<nextmatch-sortheader align="center" label="Start- order" id="start_order"/>
+					<nextmatch-sortheader align="center" label="@@start_order_label" id="start_order"/>
 					<nextmatch-header align="center" label="Start- number" id="printnumber" class="onlyPrint"/>
 					<nextmatch-sortheader label="Lane B" id="start_order2n"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_number" class="noPrint"/>

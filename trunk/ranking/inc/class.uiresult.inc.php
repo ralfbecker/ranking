@@ -1490,6 +1490,17 @@ class uiresult extends ranking_result_bo
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
 			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
 
+		// for speed with two qualification rename "Startorder" to "Lane A"
+		if (!$route['route_order'] && $content['nm']['discipline'] == 'speed' &&
+			in_array($route['route_type'], array(TWO_QUALI_SPEED,TWO_QUALI_BESTOF)))
+		{
+			// eTemplate2: $tmpl->setElementAttribute('start_order', 'label', lang('Lane A'));
+			$content['start_order_label'] = lang('Lane A');
+		}
+		else
+		{
+			$content['start_order_label'] = lang('Start- order');
+		}
 		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 
