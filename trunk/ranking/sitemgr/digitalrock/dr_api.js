@@ -572,10 +572,12 @@ var Startlist = (function() {
 	 *
 	 * @param _container
 	 * @param _json_url url for data to load
+	 * @param {boolean} _no_navigation do NOT display TOC
 	 */
-	function Startlist(_container,_json_url)
+	function Startlist(_container, _json_url, _no_navigation)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
+		this.no_navigation = _no_navigation;
 		// do not continue, as constructor is called when inheriting from Startlist without parameters!
 		if (typeof _container == 'undefined') return;
 
@@ -793,7 +795,16 @@ var Startlist = (function() {
 				}
 				// evtl. add points column
 				if (_data.participants[0].quali_points)
+				{
 					this.columns['quali_points'] = 'Points';
+					// delete single qualification results
+					if (this.no_navigation)
+					{
+						delete this.columns.result0;
+						delete this.columns.result1;
+						this.columns['quali_points'] = 'Qualification';
+					}
+				}
 
 				title_prefix = '';
 			}
@@ -855,7 +866,7 @@ var Startlist = (function() {
 	 */
 	Startlist.prototype.displayToc = function(_data)
 	{
-		if (this.json_url.match(/toc=0/) || this.json_url.match(/beamer=1/) || this.discipline == 'ranking')
+		if (this.json_url.match(/toc=0/) || this.json_url.match(/beamer=1/) || this.discipline == 'ranking' || this.no_navigation)
 		{
 			return;	// --> no toc
 		}
@@ -1193,10 +1204,11 @@ var Resultlist = (function() {
 	 *
 	 * @param _container
 	 * @param _json_url url for data to load
+	 * @param {boolean} _no_navigation
 	 */
-	function Resultlist(_container,_json_url)
+	function Resultlist(_container, _json_url, _no_navigation)
 	{
-		Startlist.prototype.constructor.call(this, _container, _json_url);
+		Startlist.prototype.constructor.call(this, _container, _json_url, _no_navigation);
 	}
 	// inherit from Startlist
 	Resultlist.prototype = new Startlist();
@@ -1417,10 +1429,12 @@ var Results = (function() {
 	 *
 	 * @param _container
 	 * @param _json_url url for data to load
+	 * @param {boolean} _no_navigation do not show competition chooser
 	 */
-	function Results(_container,_json_url)
+	function Results(_container,_json_url, _no_navigation)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
+		this.no_navigation = _no_navigation;
 
 		this.update();
 	}
@@ -1454,18 +1468,20 @@ var Results = (function() {
 		if (typeof this.table == 'undefined')
 		{
 			// competition chooser
-			this.comp_chooser = jQuery(document.createElement('select'));
-			this.comp_chooser.addClass('compChooser');
-			this.container.append(this.comp_chooser);
-			var that = this;
-			this.comp_chooser.change(function(e){
-				that.json_url = that.json_url.replace(/comp=[^&]+/, 'comp='+this.value);
-				if (that.navigateTo)
-					that.navigateTo(that.json_url);
-				else
-					that.update();
-			});
-
+			if (!this.no_navigation)
+			{
+				this.comp_chooser = jQuery(document.createElement('select'));
+				this.comp_chooser.addClass('compChooser');
+				this.container.append(this.comp_chooser);
+				var that = this;
+				this.comp_chooser.change(function(e){
+					that.json_url = that.json_url.replace(/comp=[^&]+/, 'comp='+this.value);
+					if (that.navigateTo)
+						that.navigateTo(that.json_url);
+					else
+						that.update();
+				});
+			}
 			// competition
 			this.comp_header = jQuery(document.createElement('h1'));
 			this.comp_header.addClass('compHeader');
@@ -1478,21 +1494,25 @@ var Results = (function() {
 		else
 		{
 			jQuery(this.table.dom).remove();
-			this.comp_chooser.empty();
+			if (!this.no_navigation) this.comp_chooser.empty();
 			this.comp_header.empty();
 			this.comp_date.empty();
 		}
 		// fill competition chooser
-		var option = jQuery(document.createElement('option'));
-		option.text('Select another competition ...');
-		this.comp_chooser.append(option);
-		for(var i=0; i < _data.competitions.length; ++i)
+		if (!this.no_navigation)
 		{
-			var competition = _data.competitions[i];
-			option = jQuery(document.createElement('option'));
-			option.attr({'value':  competition.WetId, 'title': competition.date_span});
-			option.text(competition.name);
+			var option = jQuery(document.createElement('option'));
+			option.text('Select another competition ...');
 			this.comp_chooser.append(option);
+			for(var i=0; i < _data.competitions.length; ++i)
+			{
+				var competition = _data.competitions[i];
+				if (_data.WetId == competition.WetId) continue;	// we dont show current competition
+				option = jQuery(document.createElement('option'));
+				option.attr({'value':  competition.WetId, 'title': competition.date_span});
+				option.text(competition.name);
+				this.comp_chooser.append(option);
+			}
 		}
 		this.comp_header.text(_data.name);
 		this.comp_date.text(_data.date_span);
@@ -2634,6 +2654,126 @@ var DrWidget = (function() {
 		}
 	};
 	return DrWidget;
+})();
+
+/**
+ * Widget to let user choose a competition and category to show its result
+ *
+ * Chooser selectboxes stay visible, when user navigates in result eg. to show a profile
+ */
+var ResultChooser = (function() {
+	/**
+	 * call appropriate widget to display data specified by _json_url or location
+	 *
+	 * @param _container
+	 * @param _json_url url for data to load
+	 * @param {object} _arg3 object with 3. parameter to pass to widget used to display results
+	 */
+	function ResultChooser(_container, _json_url, _arg3)
+	{
+		DrBaseWidget.prototype.constructor.call(this, _container, _json_url.replace(/&cat=[^&]+/, ''));
+
+		this.arg3 = _arg3 || {
+			Results: true,	// show NO own navigation
+			Startlist: true,
+			Resultlist: true
+		};
+
+		var matches = this.json_url.match(/\?.*$/);
+		this.update(matches ? matches[0] : null);
+
+		this.comp_chooser = this.cat_chooser = undefined;
+		var matches = _json_url.match(/&cat=([^&]+)/);
+		this.cat = matches ? matches[1] : undefined;
+
+		this.widget = undefined;
+
+		// install this.update as PopState handler
+		//this.installPopState();
+	}
+	// inherit from DrBaseWidget
+	ResultChooser.prototype = new DrBaseWidget();
+	ResultChooser.prototype.constructor = ResultChooser;
+	/**
+	 * Callback for loading data via ajax
+	 *
+	 * @param _data route data object
+	 */
+	ResultChooser.prototype.handleResponse = function(_data)
+	{
+		if (!this.comp_chooser)
+		{
+			// competition chooser
+			this.comp_chooser = jQuery(document.createElement('select'));
+			this.comp_chooser.addClass('compChooser');
+			this.container.append(this.comp_chooser);
+			var that = this;
+			this.comp_chooser.change(function(e){
+				that.json_url = that.json_url.replace(/comp=[^&]+/, 'comp='+this.value).replace(/&cat=[^&]+/, '');
+				that.update();
+			});
+			this.cat_chooser = jQuery(document.createElement('select'));
+			this.cat_chooser.addClass('catChooser');
+			this.container.append(this.cat_chooser);
+			this.cat_chooser.change(function(e){
+				that.cat = this.value;
+				that.json_url = that.json_url.replace(/comp=[^&]+/, 'comp='+that.comp_chooser.val());
+				if (!that.cat)
+					that.json_url = that.json_url.replace(/&cat=[^&]+/, '');
+				else if (that.json_url.search('cat=') == -1)
+					that.json_url += '&cat='+this.value;
+				else
+					that.json_url = that.json_url.replace(/cat=[^&]+/, 'cat='+this.value);
+				that.widget.navigateTo(that.json_url);
+			});
+		}
+		else
+		{
+			this.comp_chooser.empty();
+			this.cat_chooser.empty();
+		}
+		// fill competition chooser
+		for(var i=0; i < _data.competitions.length; ++i)
+		{
+			var competition = _data.competitions[i];
+			var option = jQuery(document.createElement('option'));
+			option.attr({value:  competition.WetId, title: competition.date_span});
+			option.text(competition.name);
+			if (competition.WetId == _data.WetId) option.attr('selected', true);
+			this.comp_chooser.append(option);
+		}
+		// fill category chooser
+		var option = jQuery(document.createElement('option'));
+		option.attr('value', '');
+		option.text('Select a single category to show ...');
+		this.cat_chooser.append(option);
+		var cat_found = false;
+		for(var i=0; i < _data.categorys.length; ++i)
+		{
+			var cat = _data.categorys[i];
+			option = jQuery(document.createElement('option'));
+			option.attr('value', cat.GrpId);
+			option.text(cat.name);
+			if (cat.GrpId == this.cat)
+			{
+				option.attr('selected', true);
+				cat_found = true;
+			}
+			this.cat_chooser.append(option);
+		}
+		if (!cat_found) this.cat = undefined;
+
+		if (!this.widget)
+		{
+			var widget_container = jQuery(document.createElement('div')).appendTo(this.container);
+			this.widget = new DrWidget(widget_container, this.json_url+(this.cat?'&cat='+this.cat:''), this.arg3);
+		}
+		else
+		{
+			this.widget.navigateTo(this.json_url+(this.cat ? '&cat='+this.cat : ''));
+		}
+	};
+	return ResultChooser;
 })();
 
 /**

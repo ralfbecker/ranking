@@ -241,6 +241,13 @@ tr.profileMarginTop > td {
 	white-space: pre;
 }
 /**
+ * ResultChooser widget
+ */
+.ResultChooser > select {
+	display: block;
+	width: 100%;
+}
+/**
  * Fix some CSS on www.ifsc-climbing.org
  */
 section#gkMainbody table.profileHeader thead tr:hover td, section#gkMainbody table.profileData thead tr:hover td {

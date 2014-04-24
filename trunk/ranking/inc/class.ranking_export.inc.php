@@ -1353,23 +1353,22 @@ class ranking_export extends ranking_result_bo
 		$filter = self::process_filter($filter);
 		$filter['nation'] = $calendar;
 		$filter[] = $this->comp->table_name.'.datum <= '.$this->db->quote(time(), 'date');
+		// show all competitions of previous year
+		$filter[] = $this->comp->table_name.'.datum >= '.$this->db->quote((date('Y')-1).'-01-01');
 		$filter[] = 'platz > 0';
 		$join = 'JOIN '.$this->result->result_table.' USING(WetId)';
 
 		$comps = array();
-		foreach($this->comp->search(null, 'DISTINCT WetId,name,'.$this->comp->table_name.'.datum AS datum,gruppen,nation,quota,rkey', 'datum DESC', '', '', '', 'AND', array(0, 20), $filter, $join) as $c)
+		foreach($this->comp->search(null, 'DISTINCT WetId,name,'.$this->comp->table_name.'.datum AS datum,gruppen,nation,quota,rkey', 'datum DESC', '', '', '', 'AND', false, $filter, $join) as $c)
 		{
 			if (!isset($comp) || $comp['WetId'] == $c['WetId'])
 			{
 				$comp = $c;
 			}
-			else
-			{
-				unset($c['gruppen']);	// not needed/wanted
-				unset($c['duration']);
-				unset($c['date_end']);
-				$comps[] = self::rename_key($c, self::$rename_comp);
-			}
+			unset($c['gruppen']);	// not needed/wanted
+			unset($c['duration']);
+			unset($c['date_end']);
+			$comps[] = self::rename_key($c, self::$rename_comp);
 		}
 		//_debug_array($comps);
 		if (!($cats = $this->result->read(array(
