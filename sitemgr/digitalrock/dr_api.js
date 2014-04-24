@@ -216,6 +216,23 @@ var DrBaseWidget = (function() {
 			}
 		}
 	};
+	/**
+	 * Format a date according to browser local format
+	 *
+	 * @param {string} _ymd yyyy-mm-dd string or everything understood by date constructor
+	 * @returns {string}
+	 */
+	DrBaseWidget.prototype.formatDate = function(_ymd)
+	{
+		if (!_ymd || typeof _ymd != 'string') return '';
+
+		var date = new Date(_ymd);
+
+		return date.toLocaleDateString().replace(/[0-9]+\./g, function(_match){
+			return _match.length <= 2 ? '0'+_match : _match;
+		});
+	};
+
 	return DrBaseWidget;
 })();
 
@@ -1786,6 +1803,7 @@ var Profile = (function() {
 		});
 		// replace result data
 		var bestResults = this.bestResults;
+		var that = this;
 		pattern = /\$\$results\/N\/([^$]+)\$\$/g;
 		html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
 		{
@@ -1830,7 +1848,7 @@ var Profile = (function() {
 						case 'cat_name+name':
 							return (result.GrpId != _data.GrpId ? result.cat_name+': ' : '')+result.name;
 						case 'date':
-							return result.date.split('-').reverse().join('.');
+							return that.formatDate(result.date);
 						default:
 							return typeof result[placeholder] != 'undefined' ? result[placeholder] : '';
 					}
@@ -2437,7 +2455,7 @@ var Aggregated = (function() {
 		{
 			// use comp. shortcut plus date as column header
 			ret.label = (this.data.competitions[id].short || this.data.competitions[id].name.replace(/^.* - /, ''))+"\n"+
-				this.data.competitions[id].date.split('-').reverse().join('.');
+				this.formatDate(this.data.competitions[id].date);
 			// add comp to url evtl. replacing cup
 			ret.url = location.href.indexOf('cup=') == -1 ? location.href+
 				(location.href.indexOf('#!') == -1 ? '#!' : '&')+'comp='+id :
