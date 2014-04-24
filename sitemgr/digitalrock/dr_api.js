@@ -98,7 +98,7 @@ var DrBaseWidget = (function() {
 	 * Using same callback leads to problems with concurrent requests: failed: parsererror (jsonp was not called)
 	 * To work around that we queue jsonp request, if there's already one running.
 	 *
-	 * Queue is maintained globally in Startlist.jsonp_queue, as requests come from different objects!
+	 * Queue is maintained globally in DrBaseWidget.jsonp_queue, as requests come from different objects!
 	 *
 	 * @param {boolean} ignore_queue used internally to start next object in queue without requeing it
 	 */
@@ -2543,9 +2543,16 @@ var DrWidget = (function() {
 	 * Navigate to a certain result-page
 	 *
 	 * @param _params default if not specified first location.hash then location.search
+	 * @param {DrBaseWidget} _widget to clear evtl. pending update timer
 	 */
-	DrWidget.prototype.navigateTo = function(_params)
+	DrWidget.prototype.navigateTo = function(_params, _widget)
 	{
+		// clear pending update timer of widget, to stay on new widget we navigate to now
+		if (_widget && _widget.update_handle)
+		{
+			window.clearTimeout(_widget.update_handle);
+			delete _widget.update_handle;
+		}
 		delete this.prevent_initial_pop;
 		var params = '!'+_params.replace(/^.*(#!|#|\?)/, '');
 
@@ -2611,11 +2618,11 @@ var DrWidget = (function() {
 			this.widget.navigateTo = function(e) {
 				if (typeof e == 'string')
 				{
-					that.navigateTo(e);
+					that.navigateTo(e, that.widget);
 				}
 				else
 				{
-					that.navigateTo(this.href);
+					that.navigateTo(this.href, that.widget);
 					e.preventDefault();
 				}
 			};
