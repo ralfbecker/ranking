@@ -438,7 +438,7 @@ class ranking_route_result extends so_sql
 		unset($discipline);
 		if (!isset($GLOBALS['egw']->route) || !is_object($GLOBALS['egw']->route))
 		{
-			$GLOBALS['egw']->route = new route($this->source_charset,$this->db);
+			$GLOBALS['egw']->route = new ranking_route($this->source_charset,$this->db);
 		}
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
 		//echo "route_names="; _debug_array($route_names);
