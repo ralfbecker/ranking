@@ -204,11 +204,6 @@ class ranking_import extends ranking_result_bo
 		}
 		//echo "<p>calendar='$calendar', comp={$content['keys']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['keys']['route']}</p>\n";
 		// create new view
-		$speed_types = $this->quali_types_speed;
-		foreach($speed_types as &$quali_type)
-		{
-			$quali_type = lang('Speed').': '.lang($quali_type);
-		}
 		$sel_options = array(
 			'delimiter' => array(',' => ',',';' => ';','\t' => 'Tab'),
 			'charset' => array('utf-8' => 'UTF-8','iso-8859-1' => 'ISO-8859-1'),
@@ -231,7 +226,7 @@ class ranking_import extends ranking_result_bo
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC')) ? $routes : array()): array()),
-			'quali_type' => $this->quali_types + $speed_types,
+			'quali_type' => $this->quali_types,
 			'license' => $this->license_labels,
 		);
 		foreach(self::$import_columns as $col => $lables)
