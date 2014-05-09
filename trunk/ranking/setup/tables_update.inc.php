@@ -1680,7 +1680,7 @@ function ranking_upgrade1_9_016()
  */
 function ranking_upgrade1_9_017()
 {
-	foreach($GLOBALS['egw_setup']->db->select('RouteResults', 'WetId,GrpId,PerId,result_detail', 'result_detail IS NOT NULL',
+	foreach($GLOBALS['egw_setup']->db->select('RouteResults', 'WetId,GrpId,PerId,route_order,result_detail', 'result_detail IS NOT NULL',
 		__LINE__, __FILE__, false, '', 'ranking') as $row)
 	{
 		if (!is_array($detail = unserialize($row['result_detail']))) continue;
