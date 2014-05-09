@@ -65,10 +65,10 @@
 						</columns>
 						<rows>
 							<row>
-								<menulist class="selectboxFullWidth">
+								<menulist>
 									<menupopup class="selectboxFullWidth" id="${row}[fed]" options="Federation"/>
 								</menulist>
-								<menulist class="selectboxFullWidth">
+								<menulist>
 									<menupopup class="selectboxFullWidth" id="${row}[cat]" options="Category"/>
 								</menulist>
 								<menulist>
@@ -85,6 +85,12 @@
 					</menulist>
 					<menulist>
 						<menupopup label="Host nation" id="host_nation" no_lang="1" options="Select one"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description for="selfregister" value="Selfregister"/>
+					<menulist span="all">
+						<menupopup statustext="Allow athletes to register themself for this competition" id="selfregister"/>
 					</menulist>
 				</row>
 				<row class="th">
@@ -120,12 +126,6 @@
 						<menupopup type="select-number" id="prequal_comp" options="None,1,10"/>
 					</menulist>
 					<listbox id="prequal_comps" no_lang="1" rows="3" options="max-width:100%"/>
-				</row>
-				<row class="th">
-					<description for="selfregister" value="Selfregister"/>
-					<menulist span="all">
-						<menupopup statustext="Allow athletes to register themself for this competition" id="selfregister"/>
-					</menulist>
 				</row>
 			</rows>
 		</grid>
@@ -206,19 +206,19 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description for="upload_info" value="Information PDF"/>
+					<description value="Information PDF" for="upload_info"/>
 					<image statustext="click to view" label="@files[info][file]" src="files[info][icon]" no_lang="1" href="@files[info][link]" extra_link_target="_blank"/>
 					<button label="Remove the attached PDF" id="remove[info]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_info"/>
 				</row>
 				<row class="row">
-					<description for="upload_startlist" value="Startlist PDF"/>
+					<description value="Startlist PDF" for="upload_startlist"/>
 					<image statustext="click to view" label="@files[startlist][file]" src="files[startlist][icon]" href="@files[startlist][link]" extra_link_target="_blank"/>
 					<button label="Remove the attached PDF" id="remove[startlist]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_startlist"/>
 				</row>
 				<row class="row">
-					<description for="upload_result" value="Result PDF"/>
+					<description value="Result PDF" for="upload_result"/>
 					<image statustext="click to view" label="@files[result][file]" src="files[result][icon]" href="@files[result][link]" extra_link_target="_blank"/>
 					<button label="Remove the attached PDF" id="remove[result]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_result"/>
@@ -249,7 +249,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description for="judges" value="Judges"/>
+					<description value="Judges" for="judges"/>
 					<listbox type="select-account" statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition" id="judges" rows="14"/>
 				</row>
 			</rows>
