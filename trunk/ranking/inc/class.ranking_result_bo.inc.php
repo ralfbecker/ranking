@@ -927,7 +927,7 @@ class ranking_result_bo extends ranking_bo
 						++$modified;
 						continue;
 					}
-					$this->route_result->read($keys);
+					if (!$this->route_result->read($keys)) continue;	// athlete NOT in startlist!
 
 					if ($this->route_result->data['checked'] && !$update_checked)
 					{
