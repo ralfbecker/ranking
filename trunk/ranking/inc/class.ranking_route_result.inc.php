@@ -718,7 +718,8 @@ class ranking_route_result extends so_sql
 						}
 						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
 						{
-							if ($data['false_start'] <= self::MAX_FALSE_STARTS)
+							// do not overwrite false start for final or quali on single route
+							if ($data['false_start'] <= self::MAX_FALSE_STARTS || $data['result_time_l'] && (string)$data['eliminated_l'] === '')
 							{
 								$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) :
 									($data['eliminated_l'] ? lang('fall') : lang('Wildcard'));
