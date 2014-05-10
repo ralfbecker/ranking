@@ -1559,8 +1559,13 @@ class ranking_bo extends ranking_so
 					else
 					{
 						$result['result_time'.$postfix] = '';
-						$result['eliminated'.$postfix] = $arr[$name] ? (int) !in_array(strtolower($arr[$name]),array('wildcard')) : '';
+						$result['eliminated'.$postfix] = $arr[$name] && !preg_match('/^(\d). ?false ?start$/', $arr[$name]) ?
+							(int) !in_array(strtolower($arr[$name]),array('wildcard')) : '';
 					}
+				}
+				if (preg_match('/^(\d). ?false ?start$/', $arr['result'], $matches))
+				{
+					$result['false_start'] = (int)$matches[1];
 				}
 				break;
 
