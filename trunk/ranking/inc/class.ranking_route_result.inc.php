@@ -687,7 +687,7 @@ class ranking_route_result extends so_sql
 				}
 				// fall through
 			case 'speed':
-				if ($data['result_time'] || $data['eliminated'] || $data['eliminated_r'])	// speed result
+				if ($data['result_time'] || $data['eliminated'] || $data['eliminated_r'] || $data['false_start'])	// speed result
 				{
 					if ($data['false_start'] > self::MAX_FALSE_STARTS)
 					{
@@ -718,8 +718,11 @@ class ranking_route_result extends so_sql
 						}
 						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
 						{
-							$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) :
-								($data['eliminated_l'] ? lang('fall') : lang('Wildcard'));
+							if ($data['false_start'] <= self::MAX_FALSE_STARTS)
+							{
+								$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) :
+									($data['eliminated_l'] ? lang('fall') : lang('Wildcard'));
+							}
 							$data['result_time'] = $data['result_time_l'];
 							$data['eliminated'] = $data['eliminated_l'];
 							$data['result_r'] = (string)$data['eliminated_r'] === '' ?
