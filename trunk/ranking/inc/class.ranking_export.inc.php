@@ -14,6 +14,11 @@
 class ranking_export extends ranking_result_bo
 {
 	/**
+	 * Expires time for 404 Not found
+	 */
+	const EXPIRES_404_NOT_FOUND = 900;
+
+	/**
 	 * Disable caching for following development systems
 	 *
 	 * @var array
@@ -78,6 +83,7 @@ class ranking_export extends ranking_result_bo
 		}
 		catch(Exception $e)
 		{
+			egw_session::cache_control(self::EXPIRES_404_NOT_FOUND);		// allow to cache for 15min
 			header("HTTP/1.1 404 Not Found");
 			echo "<html>\n<head>\n\t<title>Error ".$e->getMessage()."</title>\n</head>\n";
 			echo "<body>\n\t<h1>".$e->getMessage()."</h1>\n";
@@ -207,6 +213,14 @@ class ranking_export extends ranking_result_bo
 		return $base.$cat.($cup ? '&cup='.$cup : '').($comp ? '&comp='.$comp : '');
 	}
 
+	/**
+	 * Expires header time for proxys/cdn if there's not yet a startlist
+	 *
+	 * We cant invalidate proxys
+	 *
+	 * @var int
+	 */
+	const EXPORT_ROUTE_NO_STARTLIST = 300;
 	/**
 	 * Livetime of cache entries
 	 *
@@ -346,9 +360,10 @@ class ranking_export extends ranking_result_bo
 				}
 			}
 			// setting expires depending on result offical and how long it is offical
-			$data['expires'] = !isset($data['route_result']) ? self::EXPORT_ROUTE_RUNNING_EXPIRES :
+			$data['expires'] = !$data['participants'] ? self::EXPORT_ROUTE_NO_STARTLIST :	// no startlist yet
+				(!isset($data['route_result']) ? self::EXPORT_ROUTE_RUNNING_EXPIRES :
 				(time()-$data['last_modified'] > self::EXPORT_ROUTE_RECENT_TIMEOUT ?
-					self::EXPORT_ROUTE_OFFICAL_EXPIRES : self::EXPORT_ROUTE_RECENT_OFFICAL_EXPIRES);
+					self::EXPORT_ROUTE_OFFICAL_EXPIRES : self::EXPORT_ROUTE_RECENT_OFFICAL_EXPIRES));
 
 			egw_cache::setInstance('ranking', $location, $data, self::EXPORT_ROUTE_TTL);
 
