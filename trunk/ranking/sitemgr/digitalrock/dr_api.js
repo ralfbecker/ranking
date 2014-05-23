@@ -695,7 +695,7 @@ var Startlist = (function() {
 
 		var sort;
 		// if we have no result columns or no ranked participant, show a startlist
-		if (typeof this.result_cols == 'undefined' || !_data.participants[0].result_rank)
+		if (typeof this.result_cols == 'undefined' || !_data.participants[0].result_rank && _data.discipline != 'ranking')
 		{
 			this.columns = this.startlist_cols;
 			sort = 'start_order';
@@ -849,7 +849,7 @@ var Startlist = (function() {
 			// create new table
 			this.table = new DrTable(_data.participants,this.columns,this.sort,true,
 				_data.route_result ? _data.route_quota : null,this.navigateTo,
-				_data.discipline == 'ranking' && detail);
+				_data.discipline == 'ranking' && (detail || !_data.participants[0].result_rank));
 
 			jQuery(this.container).append(this.table.dom);
 
@@ -1283,7 +1283,7 @@ var Resultlist = (function() {
 					'points': 'Points',
 					'result' : 'Result'
 				};
-				if (!detail || detail[1] == '0')
+				if ((!detail || detail[1] == '0') && _data.participants[0].result_rank)
 				{
 					delete this.result_cols.result;
 					// allow to click on points to show single results
@@ -1331,7 +1331,7 @@ var Resultlist = (function() {
 		}
 		Startlist.prototype.handleResponse.call(this, _data);
 
-		if (_data.discipline == 'ranking' && detail && detail[1] == '1' && _data.max_comp)
+		if (_data.discipline == 'ranking' && (detail && detail[1] == '1' || !_data.participants[0].result_rank) && _data.max_comp)
 		{
 			var tfoot = jQuery(document.createElement('tfoot'));
 			jQuery(this.table.dom).append(tfoot);
