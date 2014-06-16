@@ -10,9 +10,9 @@
 	<body>
 		<div id="table"></div>
 		<script type="text/javascript">
-			var starters;
+			var widget;
 			$(document).ready(function() {
-				starters = new Starters('table',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?'))+'&type=starters');
+				widget = new Starters('table',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?'))+'&type=starters');
 				
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});

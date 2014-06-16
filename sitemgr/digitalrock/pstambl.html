@@ -90,9 +90,9 @@
 </table>
 </div>
 <script type="text/javascript">
-	var profile;
+	var widget;
 	$(document).ready(function() {
-		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')),
+		widget = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')),
 			jQuery('#profile').html());
 		
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);
