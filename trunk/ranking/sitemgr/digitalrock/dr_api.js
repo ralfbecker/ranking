@@ -1015,7 +1015,7 @@ var Startlist = (function() {
 			} while (n != name);
 			strs.push(name.split(split_by_regexp));
 		}
-		var first = strs[0];
+		var first = [].concat(strs[0]);
 		for(var i=0; i < first.length; ++i)
 		{
 			for(var j=1; j < strs.length; ++j)
