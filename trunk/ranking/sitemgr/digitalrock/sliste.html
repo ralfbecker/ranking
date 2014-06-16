@@ -10,11 +10,11 @@
 	<body>
 		<div id="table"></div>
 		<script type="text/javascript">
-			var startlist;
+			var widget;
 			$(document).ready(function() {
 				var padding = location.search.match(/padding=([^&]+)/);
 				if (padding) jQuery('body').css('padding', decodeURIComponent(padding[1].replace(/\+/, '%20')));
-				startlist = new DrWidget('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.search||location.hash.replace(/^#!?/, '?')+'&type=startlist'));
+				widget = new DrWidget('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.search||location.hash.replace(/^#!?/, '?')+'&type=startlist'));
 
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});

@@ -10,9 +10,9 @@
 	<body>
 		<div id="table"></div>
 		<script type="text/javascript">
-			var results;
+			var widget;
 			$(document).ready(function() {
-				results = new ResultChooser('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.hash.replace(/#!?/, '?')||location.search||'?comp=.'));
+				widget = new ResultChooser('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.hash.replace(/#!?/, '?')||location.search||'?comp=.'));
 
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});
