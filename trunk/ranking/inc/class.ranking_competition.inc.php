@@ -438,7 +438,7 @@ class ranking_competition extends so_sql
 		}
 		$ret = $this->search(array(),$this->table_name.'.*',$this->table_name.'.datum DESC','','',false,
 			'AND',array($num-1,1),$query,",$this->result_table WHERE $this->table_name.WetId=$this->result_table.WetId
-			AND $this->table_name.datum <= ".$this->db->quote($date));
+			AND $this->result_table.platz > 0 AND $this->table_name.datum <= ".$this->db->quote($date));
 
 		if ($this->debug) echo "<p>competition::last_comp('$date',".print_r($cats,true).",'$nation',$cup)=".$ret[0]['rkey']."</p>\n";
 		//error_log(__METHOD__."('$date',".array2string($cats).",'$nation',$cup)=".$ret[0]['rkey']);
