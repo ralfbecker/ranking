@@ -6,7 +6,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-11 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -31,7 +31,7 @@ function handle_plus(height,plus_sel_id)
  * onChange of top: if bonus not set, set it to the same number of tries as top
  *  if top < bonus alert user and set top to bonus
  *
- * @param top top select box
+ * @param {DOMNode} top select box
  */
 function check_top(top)
 {
@@ -41,8 +41,10 @@ function check_top(top)
 
 	if (bonus && parseInt(top.value) > 0 && parseInt(top.value) < parseInt(bonus.value))
 	{
-		alert('Top < Bonus!');
-		bonus.value = top.value;
+		window.setTimeout(function(){	// work around iOS bug crashing Safari
+			alert('Top < Bonus!');
+			bonus.value = top.value;
+		}, 10);
 	}
 }
 
@@ -51,7 +53,7 @@ function check_top(top)
  *  if tops > zones alert user and set tops to zones or
  *  if less tries then tops alert user and set tries to tops
  *
- * @param top top select box
+ * @param {DOMNode} top select box
  */
 function check_tops(top)
 {
@@ -61,8 +63,10 @@ function check_tops(top)
 
 	if (bonus && parseInt(top.value) > 0 && parseInt(top.value) > parseInt(bonus.value))
 	{
-		alert('Top > Bonus!');
-		bonus.value = top.value;
+		window.setTimeout(function(){	// work around iOS bug crashing Safari
+			alert('Top > Bonus!');
+			bonus.value = top.value;
+		}, 10);
 	}
 
 	var tries = document.getElementById(top.name.replace(/tops/g,'top_tries'));
@@ -71,15 +75,17 @@ function check_tops(top)
 
 	if (tries && parseInt(top.value) > 0 && parseInt(top.value) > parseInt(tries.value))
 	{
-		alert('Top > Tries!');
-		tries.value = top.value;
+		window.setTimeout(function(){	// work around iOS bug crashing Safari
+			alert('Top > Tries!');
+			tries.value = top.value;
+		}, 10);
 	}
 }
 
 /**
  * onChange of bonus: dont allow to set a bonus bigger then top or no bonus, but a top
  *
- * @param top top select box
+ * @param {DOMNode} bonus select box
  */
 function check_bonus(bonus)
 {
@@ -87,8 +93,10 @@ function check_bonus(bonus)
 
 	if (top && parseInt(top.value) > 0 && parseInt(bonus.value) > parseInt(top.value))
 	{
-		alert('Bonus > Top!');
-		top.value = bonus.value;
+		window.setTimeout(function(){	// work around iOS bug crashing Safari
+			alert('Bonus > Top!');
+			top.value = bonus.value;
+		}, 10);
 	}
 	if (top && parseInt(top.value) > 0 && !bonus.value)
 	{
@@ -100,7 +108,7 @@ function check_bonus(bonus)
  * onChange of zones: dont allow to set a zones bigger then tops or no zones, but a top
  * 	or if less tries then zones alert user and set tries to zones
  *
- * @param top top select box
+ * @param {DOMNode} bonus select box
  */
 function check_zones(bonus)
 {
@@ -108,8 +116,10 @@ function check_zones(bonus)
 
 	if (top && parseInt(top.value) > 0 && parseInt(bonus.value) < parseInt(top.value))
 	{
-		alert('Bonus < Top!');
-		top.value = bonus.value;
+		window.setTimeout(function(){	// work around iOS bug crashing Safari
+			alert('Bonus < Top!');
+			top.value = bonus.value;
+		}, 10);
 	}
 	if (top && parseInt(top.value) > 0 && !bonus.value)
 	{
@@ -122,8 +132,10 @@ function check_zones(bonus)
 
 	if (tries && parseInt(bonus.value) > 0 && parseInt(bonus.value) > parseInt(tries.value))
 	{
-		alert('Bonus > Tries!');
-		tries.value = bonus.value;
+		window.setTimeout(function(){	// work around iOS bug crashing Safari
+			alert('Bonus > Tries!');
+			tries.value = bonus.value;
+		}, 10);
 	}
 }
 
