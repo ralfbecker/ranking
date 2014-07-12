@@ -1,13 +1,13 @@
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<!-- Counts down for n minutes based on system clock -->
-	<head>		
+	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>Boulder Timer</title>
 		<!-- CSS -->
-		<link rel="stylesheet" href="./css/CSContent.css" type="text/css" media="screen"> 
-		<link rel="stylesheet" href="./css/CSModal.css" type="text/css" media="screen"> 
-		<!-- Javascript -->	
+		<link rel="stylesheet" href="./css/CSContent.css" type="text/css" media="screen">
+		<link rel="stylesheet" href="./css/CSModal.css" type="text/css" media="screen">
+		<!-- Javascript -->
 		<script type="text/javascript" src="./js/jquery-1.4.2.min.js"></script>	<!-- Use .min for production -->
 		<script type='text/javascript' src='./js/jquery.simplemodal.js'></script>
 		<!-- Inline functions -->
@@ -18,7 +18,7 @@
 			var theRotationInterval;
 			var finalTimer;
 			var theStartTime;
-			
+
 			/* countdownTimer() */
 			function countdownTimer() {
 				/* Calculate the time remaining */
@@ -27,6 +27,12 @@
 					var secs = Math.floor((now.getTime() - theStartTime)/1000);
 					var minutes = Math.floor((theRotationInterval*60 - secs) / 60);
 					var seconds = Math.abs((theRotationInterval*60 - secs) % 60);
+
+					if (stopOn0 && (minutes < 0 || minutes <= 0 && seconds <= 0))
+					{
+						clearInterval(timer);
+						seconds = minutes = 0;
+					}
 				}
 				else {
 					var minutes = theRotationInterval - (Math.floor(now.getTime()/60000) % theRotationInterval) - 1;
@@ -49,13 +55,11 @@
 				};
 				// we dont want negative minutes in final timer
 				if (minutesRemaining < 0) minutesRemaining = Math.abs(minutesRemaining)-1;
-				/* Format and display */	
+				/* Format and display */
 				if (secondsRemaining<10) secondsRemaining = "0" + secondsRemaining;
 				$('#inner').text(minutesRemaining+':'+secondsRemaining);
-				
-				if (stopOn0 && minutesRemaining == '0' && secondsRemaining == '00') clearInterval(timer);
 			};
-			
+
 			var timer;
 			var stopOn0 = false;
 
@@ -63,27 +67,27 @@
 				$('#basic-modal-content').modal({minHeight:'220px'});
 				$('#restart').hide();
 				$('#stopOn0Span').hide();
-				
+
 				$('#start').click(function() {
 					theRotationInterval = $('#time').val();	// minutes
 					finalTimer = $('#final').attr('checked');
-					
-					if (finalTimer) {	
+
+					if (finalTimer) {
 						beep1.play();
 						$('#restart').show();
 					}
 					theStartTime = new Date().getTime();
 
-					/* Size the display font based on the viewport height */	
+					/* Size the display font based on the viewport height */
 					var theHeight = 0.7 * screen.height;
 					$('#inner').css('height', theHeight).css('top', -theHeight/2).css('font-size', theHeight );
 
 					countdownTimer();
-					
+
 					timer = setInterval(function(){countdownTimer();}, 300);
 					$.modal.close();
 				});
-				
+
 				$('#final').change(function(){
 					if (this.checked) {
 						$('#stopOn0Span').show();
@@ -92,16 +96,16 @@
 						stopOn0 = false;
 					}
 				});
-				
+
 				$('#stopOn0').change(function(){
 					stopOn0 = this.checked && $('#final').is(':checked');
 				});
-				
+
 				$('#apply').click(function(){
 					$('body').css('color', $('#color').val());
 					$('body').css('background-color', $('#background').val());
 				});
-				
+
 				$('#restart').click(function() {
 					theStartTime = new Date().getTime();
 					beep1.play();
@@ -109,7 +113,7 @@
 					countdownTimer();
 				});
 			});
-		</script>		
+		</script>
 	</head>
 	<body id="main_body">
 		<!-- Semantic Markup (empty) -->
@@ -126,11 +130,11 @@
 			<input id="start" type="button" value="Start" />
 			<p><input id="final" type="checkbox" /><label for="final">use final timer (starts again at press of restart)</label><br/>
 			&nbsp; &nbsp; <span id="stopOn0Span" style="display: none"><input id="stopOn0" type="checkbox" /><label for="stopOn0" >stop timer on 0, otherwise count up again</label></span></p>
-			<p>Color <input id="color" type="color" value="#bbbbbb" size="7"/> 
+			<p>Color <input id="color" type="color" value="#bbbbbb" size="7"/>
 			Background <input id="background" type="color" value="#333333" size="7"/>
 			<input type="button" value="Apply" id="apply"/></p>
 		</div>
-		
+
 		<!-- restart button for final timer -->
 		<input id="restart" type="button" value="Restart" />
 	</body>
