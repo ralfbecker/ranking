@@ -1641,6 +1641,7 @@ var Starters = (function() {
 		var fed;
 		this.fed_rows = [];
 		this.fed_rows_pos = [];
+		var num_competitors = 0;
 		for(var i=0; i < _data.athletes.length; ++i)
 		{
 			var athlete = _data.athletes[i];
@@ -1682,6 +1683,8 @@ var Starters = (function() {
 			td.append(lastname).append(firstname);
 			this.fed_rows[r].append(td);
 			this.fed_rows_pos[r]++;
+			// do not count
+			if (athlete.cat != 120) num_competitors++;
 		}
 		this.fillUpFedRows();
 
@@ -1690,7 +1693,7 @@ var Starters = (function() {
 		var th = jQuery(document.createElement('th'));
 		tfoot.append(jQuery(document.createElement('tr')).append(th));
 		th.attr('colspan', 1+_data.categorys.length);
-		th.text('Total of '+_data.athletes.length+' athlets registered in all categories.');
+		th.text('Total of '+num_competitors+' athlets registered in all categories.');
 	};
 	/**
 	 * Fill a single fed-row up to a given position with empty td's
