@@ -1863,7 +1863,14 @@ class uiresult extends ranking_result_bo
 				$athlete = null;
 			}
 			// find out the other participant
-			if ($route['route_order'] < 2 && $old_result['result_time'])	// quali and already measured
+			if ($route['route_order'] < 2 && $route['route_type'] == TWO_QUALI_BESTOF)
+			{
+				$side1 = 'l';
+				$side2 = 'r';
+				list($old_other) = $this->route_result->search($keys+array('start_order2n'=>$old_result['start_order']),false);
+				$other_sorder = null;
+			}
+			elseif ($route['route_order'] < 2 && $old_result['result_time'])	// quali and already measured
 			{
 				$side1 = 'r';
 				$side2 = 'l';
@@ -1914,7 +1921,7 @@ class uiresult extends ranking_result_bo
 		{
 			$timy->send("start:$side1:$startnr:".$old_result['time_sum'].':'.$athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].')');
 		}
-		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI)	// two routes with only one climber, set other to 0
+		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI && $route['route_type'] != TWO_QUALI_BESTOF)	// two routes with only one climber, set other to 0
 		{
 			$timy->send("start:l:0");
 		}
@@ -1924,7 +1931,7 @@ class uiresult extends ranking_result_bo
 			$other_snr = $old_other['start_number'] ? $old_other['start_number'] : $old_other['start_order'];
 			$timy->send("start:$side2:$other_snr:".$old_other['time_sum'].':'.$other_athlete['nachname'].', '.$other_athlete['vorname'].' ('.$other_athlete['nation'].')');
 		}
-		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI)	// two routes with only one climber, set other to 0
+		elseif ($route['route_order'] >= 2 || $route['route_type'] != ONE_QUALI && $route['route_type'] != TWO_QUALI_BESTOF)	// two routes with only one climber, set other to 0
 		{
 			$s = $side1 == 'l' ? 'r' : 'l';
 			$timy->send("start:$s:0");
@@ -1969,15 +1976,17 @@ class uiresult extends ranking_result_bo
 					break;
 
 				case 'stop':
-					$result = $event_side == 'l' ? 'result_time' : 'result_time_r';
+					$result = $event_side == 'l' || $route['route_order'] >= 2 && $route['route_type'] == TWO_QUALI_BESTOF ?
+						'result_time' : 'result_time_r';
+					$got_result = $event_side;
 					if ($event_side == $side1)	// side1
 					{
 						$this->save_result($keys,array($PerId=>array(
 							$result => $time,
 						)),$route['route_type'],'speed');
 						$new_result = $this->route_result->read($keys+array('PerId'=>$PerId));
-						$response->addAssign("exec[nm][rows][set][$PerId][$result]",'value',$time);
-						$response->addAssign("set[$PerId][time_sum]",'innerHTML',$new_result['time_sum']);
+						$response->assign("exec[nm][rows][set][$PerId][$result]",'value',$time);
+						$response->assign("set[$PerId][time_sum]",'innerHTML',$new_result['time_sum']);
 						if ($new_result && $new_result['result_rank'] != $old_result['result_rank'])	// the ranking has changed
 						{
 							$ranking_changed = true;
@@ -1990,8 +1999,8 @@ class uiresult extends ranking_result_bo
 							$result => $time,
 						)),$route['route_type'],'speed');
 						$new_other_result = $this->route_result->read($keys+array('PerId'=>$other_PerId));
-						$response->addAssign("exec[nm][rows][set][$other_PerId][$result]",'value',$time);
-						$response->addAssign("set[$other_PerId][time_sum]",'innerHTML',$new_other_result['time_sum']);
+						$response->assign("exec[nm][rows][set][$other_PerId][$result]",'value',$time);
+						$response->assign("set[$other_PerId][time_sum]",'innerHTML',$new_other_result['time_sum']);
 						if ($new_other_result && $new_other_result['result_rank'] != $old_other['result_rank'])	// the ranking has changed
 						{
 							$ranking_changed = true;
@@ -2009,6 +2018,13 @@ class uiresult extends ranking_result_bo
 					break;
 
 				case 'false':
+					$false_starter = $event_side != 'r' ? $athlete : $other_athlete;
+					$this->save_result($keys,array($false_starter['PerId']=>array(
+						'false_start' => ++$false_starter['false_start'],
+					)),$route['route_type'],'speed');
+					$new_result = $this->route_result->read($keys+array('PerId'=>$false_starter['PerId']));
+					if ($new_result['result_rank'] != $false_starter['result_rank']) $this->_update_ranks ($keys, $response, $request);
+					$response->assign("exec[nm][rows][set][$false_starter[PerId]][false_start]", 'value', $false_starter['false_start']);
 					$response->alert(lang('False start %1: %2',$event_side != 'r' ? lang('left') : lang('right'),
 						$event_side != 'b' ? $time : $time2).($event_side == 'b' ? ', '.lang('right').': '.$time : ''));
 					//if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
@@ -2021,6 +2037,27 @@ class uiresult extends ranking_result_bo
 
 		if (!$stop)
 		{
+			switch ($got_result)	// we have only one result --> set other one to fall
+			{
+				case 'l':
+					$fallen = $other_athlete+$old_other;
+					$fallen_postfix = '_r';
+					break;
+				case 'r':
+					$fallen = $athlete+$old_result;
+					$fallen_postfix = '';
+					break;
+			}
+			if ($fallen)
+			{
+				$this->save_result($keys,array($fallen['PerId']=>array(
+					'eliminated'.$fallen_postfix => '1',
+				)),$route['route_type'],'speed');
+				$response->assign("exec[nm][rows][set][$fallen[PerId]][eliminated$fallen_postfix]", 'value', '1');
+				$this->_update_ranks($keys, $response, $request);
+				return $this->_stop_time_measurement($response,lang('Set "%1" to %2.', $fallen['nachname'].', '.$fallen['vorname'].
+					' ('.($fallen['start_number']?$fallen['start_number']:$fallen['start_order']).')', lang('Fall')));
+			}
 			return $this->_stop_time_measurement($response,lang('Measurement aborted!'));
 		}
 		//error_log("processing of ajax_time_measurement took ".sprintf('%4.2lf s',microtime(true)-$start));
@@ -2053,12 +2090,12 @@ class uiresult extends ranking_result_bo
 	 * Stop the running time measurement ON CLIENT SIDE
 	 *
 	 * @access private
-	 * @param xajaxResponse $response response object with preset responses
+	 * @param egw_json_response $response response object with preset responses
 	 * @return string
 	 */
-	function _stop_time_measurement(&$response,$msg = '')
+	function _stop_time_measurement(egw_json_response $response,$msg = '')
 	{
-		$response->addScript("set_style_by_class('td','ajax-loader','display','none'); document.getElementById('msg').innerHTML='".
-			htmlspecialchars($msg)."';");
+		$response->call('set_style_by_class', 'td', 'ajax-loader', 'display', 'none');
+		$response->jquery('#msg', 'text', array($msg));
 	}
 }

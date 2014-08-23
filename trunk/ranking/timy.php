@@ -14,6 +14,28 @@
 // timeout for the select, aka display refresh rate, in microseconds 0.5s = 500000
 define('DISPLAY_TIMEOUT',200000);	// baud 2400 --> 500000, 9600 --> 2000000
 /**
+ * Timy2 with "Speed Climbing" programm using RS232 via our Prologic Serial/USB converter
+ * (Timy USB does NOT send times, like RS232 and needs "modprobe usbserial vendor=0x0c4a product=0x0889" to detect Timy as serial device)
+ *
+ * Start and stop without false start used
+ * n0001l                      <-- startnumber left
+ * n0003r                      <-- startnumber right
+ *  0003rC0  06:34:40.3983 00  <-- start right
+ *  0001lC3  06:34:40.3983 00  <-- start left
+ *  0001lC4  06:34:55.1950 00  <-- stop left time absolute
+ *  0001lc4  00:00:14.7967 00  <-- stop left time diff to start
+ *  0003rC1  06:34:57.9630 00  <-- stop right time absolute
+ *  0003rc1  00:00:17.5647 00  <-- stop right time diff to start
+ *
+ * False start right side:
+ * n0004l                      <-- startnumber left
+ * n0006r                      <-- startnumber right
+ *  0000rC2  06:35:29.3071 00  <-- false start right, because before rC0
+ *  0006rC0  06:35:29.3762 00  <-- start right
+ *  0004lC3  06:35:29.3762 00  <-- start left
+ *  0000lC5  06:35:31.0879 00  <-- correct start, because after lC3
+ */
+/**
  * Programmierung Display:
  * - Taste drücken bis "br 09" kommt: br ist menupunkt (brightness), 09 ist wert
  * - Aendern des Menupunktes bzw Wertes wenn er blinkt Taste drücken
@@ -90,7 +112,7 @@ else
 {
 	$timy = fopen($timy_interface,'r+');
 	// switching echo off!
-	system("stty 9600 -echo < $timy_interface");
+	system("stty 9600 -echo -crtscts < $timy_interface");
 }
 if (!$timy)
 {
@@ -131,11 +153,11 @@ if (!($control = stream_socket_server($control_addr,$errnr,$error)))
 // reading precision from Timy
 $precision = 2;	// default 1/100 sec
 fwrite($timy,"PRE?\n");
-if (preg_match('/^PRE([0-4].)/',fgets($timy),$matches)) $precision = (int) $matches[1];
+if (preg_match('/^PRE([0-4])/',$out=fgets($timy),$matches)) $precision = (int) $matches[1];
 // reading rounding type from Timy
 $rounding = 0;	// 0=floor (default), 1=ceil, 2=round
 fwrite($timy,"RR?\n");
-if (preg_match('/^RR([0-2].)/',fgets($timy),$matches)) $precision = (int) $matches[1];
+if (preg_match('/^RR([0-2])/',$out=fgets($timy),$matches)) $rounding = (int) $matches[1];
 echo "Timy configured for precision $precision (digits behind the dot) and rounding mode $rounding (0=floor, 1=ceil, 2=round)\n";
 
 define('DIAG_DISPLAY',"\r%04d: %7.{$precision}lfs  %04d: %7.{$precision}lfs");
@@ -494,7 +516,7 @@ function _get_free_sequence($snr)
  * @param string $which "left", "right" or "both"
  * @param string $event eg. start, stop, false
  * @param double $time
- * @param double $time2=null left time if $which == 'both'
+ * @param double $time2 =null left time if $which == 'both'
  * @return int/boolean number of bytes written to client, false on eof
  */
 function notify_clients($which,$event,$time,$time2=null)
