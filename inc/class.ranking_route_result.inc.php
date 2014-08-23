@@ -863,7 +863,7 @@ class ranking_route_result extends so_sql
 				{
 					$data['result_time'] = round(1000 * $data['result_time']);
 				}
-				else//if ($data['false_start'] <= self::MAX_FALSE_STARTS)
+				elseif ($data['eliminated'] || $data['eliminated_r'])
 				{
 					$data['result_time'] = round(1000 * self::ELIMINATED_TIME);
 				}
