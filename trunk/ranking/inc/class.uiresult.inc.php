@@ -284,8 +284,9 @@ class uiresult extends ranking_result_bo
 					break;
 
 				case 'ranking':
-					$param['msg'] = $msg = $this->import_ranking($content, $comp['fed_id'] ? $comp['fed_id'] :
-						($comp['nation'] != 'NULL' ? $comp['nation'] : null), $content['import_cat']);
+					$param['msg'] = $msg = $this->import_ranking($content, $content['import_cat'] === '0' ? null :
+						($comp['fed_id'] ? $comp['fed_id'] : ($comp['nation'] != 'NULL' ? $comp['nation'] : null)),
+						$content['import_cat']);
 					break;
 
 				case 'register':
@@ -605,6 +606,10 @@ class uiresult extends ranking_result_bo
 				$readonlys['tabs']['registration'] = true;
 
 				$sel_options['import_cat'] = array('' => lang('Into current category'));
+				if ($comp['nation'] && $comp['nation'] != 'NULL' && $comp['open_comp'])
+				{
+					$sel_options['import_cat']['0'] = lang('without excluding non-members');
+				}
 				// filter by same gender and not identical
 				$sel_options['import_cat'] += $this->cats->names(array('sex' => $cat['sex'],'GrpId!='.(int)$cat['GrpId']), -1,
 					// sort by same nation first
