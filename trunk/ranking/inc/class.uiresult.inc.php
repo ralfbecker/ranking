@@ -2023,13 +2023,25 @@ class uiresult extends ranking_result_bo
 					break;
 
 				case 'false':
-					$false_starter = $event_side != 'r' ? $athlete : $other_athlete;
-					$this->save_result($keys,array($false_starter['PerId']=>array(
-						'false_start' => ++$false_starter['false_start'],
-					)),$route['route_type'],'speed');
-					$new_result = $this->route_result->read($keys+array('PerId'=>$false_starter['PerId']));
-					if ($new_result['result_rank'] != $false_starter['result_rank']) $this->_update_ranks ($keys, $response, $request);
-					$response->assign("exec[nm][rows][set][$false_starter[PerId]][false_start]", 'value', $false_starter['false_start']);
+					if ($event_side != 'r')	// left (or both) false start
+					{
+						$this->save_result($keys,array($athlete['PerId']=>array(
+							'false_start' => ++$athlete['false_start'],
+						)),$route['route_type'],'speed');
+						$new_result = $this->route_result->read($keys+array('PerId'=>$athlete['PerId']));
+						$ranking_changed = $new_result['result_rank'] != $athlete['result_rank'];
+						$response->assign("exec[nm][rows][set][$athlete[PerId]][false_start]", 'value', $athlete['false_start']);
+					}
+					if ($event_side != 'l')	// right (or both) false start
+					{
+						$this->save_result($keys,array($other_athlete['PerId']=>array(
+							'false_start' => ++$other_athlete['false_start'],
+						)),$route['route_type'],'speed');
+						$new_result = $this->route_result->read($keys+array('PerId'=>$other_athlete['PerId']));
+						$ranking_changed = $ranking_changed || $new_result['result_rank'] != $other_athlete['result_rank'];
+						$response->assign("exec[nm][rows][set][$other_athlete[PerId]][false_start]", 'value', $other_athlete['false_start']);
+					}
+					if ($ranking_changed) $this->_update_ranks ($keys, $response, $request);
 					$response->alert(lang('False start %1: %2',$event_side != 'r' ? lang('left') : lang('right'),
 						$event_side != 'b' ? $time : $time2).($event_side == 'b' ? ', '.lang('right').': '.$time : ''));
 					//if (is_object($display)) $display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);
