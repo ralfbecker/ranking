@@ -344,24 +344,27 @@ function hold_popup_close()
  */
 function hold_popup_submit(button)
 {
-	if (button.name == 'exec[button][save]')
+	switch (button.name)
 	{
-		active_hold.data('hold').height = document.getElementById('exec[hold_top]').checked ?
-			TOP_HEIGHT : document.getElementById('exec[hold_height]').value;
-		xajax_doXMLHTTP('ranking_measurement::ajax_save_hold',active_hold.data('hold'));
-	}
-	else
-	{
-		xajax_doXMLHTTP('ranking_measurement::ajax_delete_hold',active_hold.data('hold').hold_id);
+		case 'exec[button][renumber]':
+		case 'exec[button][save]':
+			active_hold.data('hold').height = document.getElementById('exec[hold_top]').checked ?
+				TOP_HEIGHT : document.getElementById('exec[hold_height]').value;
+			xajax_doXMLHTTP(button.name == 'exec[button][save]' ? 'ranking_measurement::ajax_save_hold' :
+				'ranking_measurement::ajax_renumber_holds', active_hold.data('hold'));
+			break;
+		case 'exec[button][delete]':
+			xajax_doXMLHTTP('ranking_measurement::ajax_delete_hold', active_hold.data('hold').hold_id);
+			break;
 	}
 	active_hold.remove();
 	hold_popup_close();
 }
 
 /**
- * Display a single handhold
+ * Add or update a single handhold
  *
- * @param object hold
+ * @param {object} hold
  */
 function add_handhold(hold)
 {
@@ -369,21 +372,28 @@ function add_handhold(hold)
 	// as container has a fixed height with overflow: auto, we have to scale ypercent to it
 	var y_ratio = $j('#topo').height() / $j('div.topoContainer').height();
 	//console.log('#topo.height='+$j('#topo').height()+' / div.topoContainer.height='+$j('div.topoContainer').height()+' = '+y_ratio);
-	var container = document.createElement('div');
-	container.className = 'topoHandhold';
-	container.style.left = hold.xpercent+'%';
-	container.style.top = (y_ratio*hold.ypercent)+'%';
-	container.title = hold.height >= TOP_HEIGHT ? 'Top' : hold.height;
-	var img = document.createElement('img');
-	img.src = window.egw_webserverUrl+'/ranking/templates/default/images/griff32.png';
-	$j(container).append(img);
-	var span = document.createElement('span');
-	$j(span).text(hold.height >= TOP_HEIGHT ? 'Top' : hold.height);
-	$j(container).append(span);
-	$j(container).data('hold',hold);
-	$j(container).click(hold_clicked);
+	var container = jQuery('#hold_id_'+hold.hold_id);
+	if (!container.length)
+	{
+		var container_div = document.createElement('div');
+		container_div.className = 'topoHandhold';
+		container_div.style.left = hold.xpercent+'%';
+		container_div.style.top = (y_ratio*hold.ypercent)+'%';
+		container = jQuery(container_div);
+		container.attr('id', 'hold_id_'+hold.hold_id);
 
-	$j('div.topoContainer').append(container);
+		jQuery(document.createElement('img'))
+			.appendTo(container)
+			.attr('src', window.egw_webserverUrl+'/ranking/templates/default/images/griff32.png');
+		jQuery(document.createElement('span'))
+			.appendTo(container);
+		container.click(hold_clicked);
+
+		$j('div.topoContainer').append(container);
+	}
+	container.attr('title', hold.height >= TOP_HEIGHT ? 'Top' : hold.height);
+	container.find('span').text(hold.height >= TOP_HEIGHT ? 'Top' : hold.height);
+	container.data('hold', hold);
 }
 
 /**
