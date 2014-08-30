@@ -188,7 +188,7 @@ function change_athlete(selectbox)
 /**
  * Update athlete, send new result to server
  *
- * @param boolean scroll_mark=true
+ * @param {boolean|number} scroll_mark =true or number to add to current height eg. 3 to scroll 3rd heigher hold into view
  */
 function update_athlete(scroll_mark)
 {
@@ -209,11 +209,12 @@ function update_athlete(scroll_mark)
 		}
 		if (typeof scroll_mark == 'undefined' || scroll_mark)
 		{
-			var holds = getHoldsByHeight(plus.value == TOP_PLUS ? TOP_HEIGHT : height.value);
+			var holds = getHoldsByHeight(plus.value == TOP_PLUS ? TOP_HEIGHT :
+				(typeof scroll_mark == 'number' ? scroll_mark : 0)+parseInt(height.value));
 			if (holds.length)
 			{
-				holds[0].scrollIntoView(false);
-				mark_holds(holds);
+				holds.scrollIntoView(typeof scroll_mark == 'number');
+				if (typeof scroll_mark != 'number') mark_holds(holds);
 			}
 		}
 		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { 'result_height': height.value, 'result_plus': plus.value}, 1, {
@@ -299,7 +300,7 @@ var activ_hold;
 function hold_clicked(e)
 {
 	active_hold = e.target;	// hold container
-	active_hold = $j(active_hold.nodeName != 'DIV' ? active_hold.parentNode : activeNode);	// img or span clicked, not container div itself
+	active_hold = $j(active_hold.nodeName != 'DIV' ? active_hold.parentNode : active_hold);	// img or span clicked, not container div itself
 	//console.log(active_hold);
 	//console.log(active_hold.data('hold'));
 
@@ -323,7 +324,7 @@ function hold_clicked(e)
 		document.getElementById('exec[result_plus]').value = '0';
 
 		mark_holds(active_hold);
-		update_athlete(false);	// false = no automatic scroll
+		update_athlete(3);	// 3 = scroll 3 holds heigher into view (false = no automatic scroll)
 	}
 }
 

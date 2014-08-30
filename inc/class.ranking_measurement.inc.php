@@ -25,6 +25,8 @@ class ranking_measurement extends ranking_boulder_measurement
 	 */
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
 	{
+		egw_framework::validate_file('/ranking/js/jquery.scrollIntoView.min.js');
+
 		//echo "<p>nm[topo]=".array2string($content['nm']['topo'])."</p>\n";
 		foreach(self::get_topos($content) as $n => $path)
 		{
