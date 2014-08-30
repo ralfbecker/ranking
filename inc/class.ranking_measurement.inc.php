@@ -127,7 +127,37 @@ class ranking_measurement extends ranking_boulder_measurement
 		}
 		else
 		{
-			$response->script('add_handhold('.json_encode($hold).')');
+			$response->call('add_handhold', $hold);
+		}
+	}
+
+	/**
+	 * Store a hold on server-side
+	 *
+	 * @param array $hold
+	 * @throws egw_exception_wrong_parameter
+	 */
+	public static function ajax_renumber_holds(array $hold)
+	{
+		// save current hold, in case user changed something
+		self::ajax_save_hold($hold);
+
+		$last_height = $hold['height'];
+		$query =& self::get_check_session();
+		$response = egw_json_response::get();
+		foreach(self::get_holds(self::query2keys($query)) as $h)
+		{
+			if ($h['height'] >= $hold['height'] && $h['hold_id'] != $hold['hold_id'])
+			{
+				$h['height'] = ++$last_height;
+
+				if (!($h = self::save_hold(array_merge($h,self::query2keys($query)))))
+				{
+					$response->alert(lang('Error storing handhold!'));
+					break;
+				}
+				$response->call('add_handhold', $h);
+			}
 		}
 	}
 
@@ -242,7 +272,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		$holds = array();
 		foreach(ranking_result_bo::$instance->db->select(self::HOLDS_TABLE, array('hold_id','hold_xpercent','hold_ypercent','hold_height','hold_type'),
 				array_intersect_key($keys,array_flip(array('WetId','GrpId','route_order','hold_topo'))),
-				__LINE__, __FILE__, false, '', 'ranking') as $hold)
+				__LINE__, __FILE__, false, 'ORDER BY hold_height ASC', 'ranking') as $hold)
 		{
 			$holds[] = self::db2hold($hold);
 		}

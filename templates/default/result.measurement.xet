@@ -12,12 +12,12 @@
 						<menulist>
 							<menupopup id="nm[topo]" onchange="load_topo(this.value);"/>
 						</menulist>
-						<menulist class="leftPad5">
-							<menupopup id="nm[PerId]" onchange="change_athlete(this);" options="Edit topo"/>
+						<menulist>
+							<menupopup id="nm[PerId]" onchange="change_athlete(this);" options="Edit topo" class="leftPad5"/>
 						</menulist>
 						<textbox type="float" blur="height" id="result_height" onchange="handle_plus(this,form::name('result_plus'));" size="5" precision="%4.2lf" class="leftPad5"/>
-						<menulist class="leftPad5">
-							<menupopup id="result_plus"/>
+						<menulist>
+							<menupopup id="result_plus" class="leftPad5"/>
 						</menulist>
 						<buttononly label="Update" id="button[update]" onclick="update_athlete();" class="leftPad5"/>
 						<buttononly label="Print" onclick="print_topo(); return false;" options="print" class="leftPad5"/>
@@ -25,7 +25,7 @@
 				</row>
 				<row>
 					<box class="topoContainer">
-						<image src="transparent" options=",,,,topo"/>
+						<image src="transparent" id="topo"/>
 					</box>
 				</row>
 				<row>
@@ -33,6 +33,7 @@
 						<hbox>
 							<textbox type="float" label="Height" id="hold_height"/>
 							<checkbox label="Top" id="hold_top" onchange="var height=document.getElementById(form::name('hold_height')); if (this.checked) height.value=''; height.disabled = this.checked;  if (!this.checked) height.focus();"/>
+							<buttononly align="right" label="Renumber" id="button[renumber]" onclick="hold_popup_submit(this);"/>
 						</hbox>
 						<hbox>
 							<buttononly label="Save" id="button[save]" onclick="hold_popup_submit(this);"/>
