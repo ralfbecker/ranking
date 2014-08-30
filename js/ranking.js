@@ -798,7 +798,9 @@ function set_scorecard(score, update)
 
 
 $j(function(){
-	if (jQuery('#exec\\[nm\\]\\[show_result\\]').val() == 4)
+	// init boulder measurement, but only for boulder (typeof window.Resultlist != 'undefined')
+	// otherwise we stall lead measurement as dr_api/Resultlist is not loaded
+	if (jQuery('#exec\\[nm\\]\\[show_result\\]').val() == 4 && typeof window.Resultlist != 'undefined')
 	{
 		init_boulder();
 		if (jQuery('#egw_script_id').attr('data-ranking-readonly'))
