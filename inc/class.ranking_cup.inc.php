@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -88,6 +88,7 @@ class ranking_cup extends so_sql
 
 					if ($params[0]) $data['nat_team_quota'][$cat] = $params[0];
 					if ($params[1]) $data['max_per_cat'][$cat] = $params[1];
+					if ($params[2]) $data['min_disciplins_per_cat'][$cat] = $params[2];
 				}
 			}
 			$data['gruppen'] = $this->cats->cat_rexp2rkeys($data['gruppen']);
@@ -139,11 +140,14 @@ class ranking_cup extends so_sql
 				if ($data['nat_team_quota'][$cat_rkey] || $data['max_per_cat'][$cat_rkey])
 				{
 					$cat_rkey .= '='.$data['nat_team_quota'][$cat_rkey].
-						($data['max_per_cat'][$cat_rkey] ? '+'.$data['max_per_cat'][$cat_rkey] : '');
+						($data['max_per_cat'][$cat_rkey] ? '+'.$data['max_per_cat'][$cat_rkey] :
+							($data['min_disciplins_per_cat'][$cat_rkey] ? '+' : '')).
+						($data['min_disciplins_per_cat'][$cat_rkey] ? '+'.$data['min_disciplins_per_cat'][$cat_rkey] : '');
 				}
 			}
 			unset($data['nat_team_quota']);
 			unset($data['max_per_cat']);
+			unset($data['min_disciplins_per_cat']);
 
 			$data['gruppen'] = implode(',',$data['gruppen']);
 		}
@@ -209,10 +213,8 @@ class ranking_cup extends so_sql
 	/**
 	 * get max. number of comps. counting for $cat in $cup
 	 *
-	 * ToDo: cat-specific max. number cant be set in the UI
-	 *
 	 * @param string $cat_rkey cat-rkey to check
-	 * @param array $cup=null cup-array to use, default use internal data
+	 * @param array $cup =null cup-array to use, default use internal data
 	 * @return int number of competitions counting
 	 */
 	function get_max_comps($cat_rkey,$cup=null)
@@ -242,6 +244,25 @@ class ranking_cup extends so_sql
 			return ($cup['max_serie'] + $anz_wettk)." (=$anz_wettk$cup[max_serie])";
 		}
 		return $max;
+	}
+
+	/**
+	 * get min. number of disciplines required in $cat in $cup
+	 *
+	 * ToDo: cat-specific min. number cant be set in the UI
+	 *
+	 * @param string $cat_rkey cat-rkey to check
+	 * @param array $cup =null cup-array to use, default use internal data
+	 * @return int number of competitions counting
+	 */
+	function get_min_disciplines($cat_rkey,$cup=null)
+	{
+		if (!is_array($cup))
+		{
+			$cup =& $this->data;
+		}
+		return !empty($cup['min_disciplines_per_cat'][$cat_rkey]) ?
+			$cup['min_disciplines_per_cat'][$cat_rkey] : $cup['min_disciplines'];
 	}
 
 	/**

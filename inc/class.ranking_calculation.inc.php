@@ -619,7 +619,7 @@ class ranking_calculation
 		elseif ($cup)
 		{
 			$max_comp = $this->bo->cup->get_max_comps($cat['rkey'],$cup);
-			$min_disciplines = $cup['min_disciplines'];
+			$min_disciplines = $this->bo->cup->get_min_disciplines($cat['rkey'], $cup);
 			// use results with 0 points, as at least GER youth, counts that for disciplines
 			$use_0_point_results = (boolean)$min_disciplines;
 			$drop_equally = $cup['drop_equally'];

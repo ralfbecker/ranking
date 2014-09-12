@@ -188,6 +188,7 @@ class ranking_cup_ui extends ranking_bo
 			$sel_options,$readonlys,array(
 				'cup_data' => $this->cup->data,
 				'view' => $view,
+				'min_disciplins_per_cat' => $content['min_disciplins_per_cat'],
 			),2);
 	}
 
