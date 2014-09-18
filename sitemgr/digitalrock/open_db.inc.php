@@ -74,11 +74,8 @@ else
 		//'result'  => 'result.php?',
 		//'pstambl' => 'pstambl.php?',
 		'pstambl_target' => false,
-		'ranglist' => 'ranglist.php?',
+		'ranglist' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
 		'nat_team_ranking' => 'nat_team_ranking.php?',
-		//'startlist' => '/egroupware/ranking/starter.php?',
-		//'resultservice' => '/egroupware/ranking/result.php?',
-		// new json feed based URLs:
 		'resultservice' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
 		'result' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
 		'startlist' => '/egroupware/ranking/sitemgr/digitalrock/starters.html#',

@@ -681,14 +681,52 @@ class ranking_calculation
 		$this->pers = $this->pkte = $this->disciplines = $this->cats = $this->platz = $this->not_counting = $this->counting = array();
 		if ($overall || $min_disciplines) $results[] = array('PerId' => 0);	// marker to check last result for $min_disciplines
 		//error_log(__METHOD__."() overall=$overall, max_comp=$max_comp, min_disciplines=$min_disciplines, drop_equally=$drop_equally");
+
+		// enforce disciplines only for dropping equally
+		// (eg. you have not participated in boulder, you can not drop 2 boulder results, before having to drop any other result)
+		// this is implemented by adding 0 point results for every comp/discipline not participated
+		if ($min_disciplines == 1 && $drop_equally)
+		{
+			$comps_and_disciplines = array();
+			foreach($results as $result)
+			{
+				$comp_and_discipline = $result['WetId'].':'.$result['discipline'];
+				if ($comp_and_discipline != ':' && !in_array($comp_and_discipline, $comps_and_disciplines))
+					$comps_and_disciplines[] = $comp_and_discipline;
+			}
+			$current_athlete = null;
+			$current_comps_and_disciplines = array();
+			foreach($results as $result)
+			{
+				if ($current_athlete && $result['PerId'] != $current_athlete)
+				{
+					foreach(array_diff($comps_and_disciplines, $current_comps_and_disciplines) as $comp_and_discipline)
+					{
+						list($comp_id,$disciplin) = explode(':', $comp_and_discipline);
+						$results[] = array(
+							'WetId' => $comp_id,
+							'PerId' => $current_athlete,
+							'GrpId' => $results[0]['GrpId'],
+							'cup_pkt' => 0,
+							'discipline' => $disciplin,
+						);
+					}
+					$current_comps_and_disciplines = array();
+				}
+				$current_athlete = $result['PerId'];
+				$current_comps_and_disciplines[] = $result['WetId'].':'.$result['discipline'];
+			}
+		}
+
+		$id = null;
 		foreach($results as $result)
 		{
 			// combined: set points=0, if number of disciplines < $min_disciplines (UI can then choose to show or hide these)
 			if (($overall || $min_disciplines) && $id && $id != $result['PerId'] && count($this->disciplines[$id]) < $min_disciplines)
 			{
 				$this->pkte[$id] = 0;
-				if (!$result['PerId']) continue;	// ignore marker
 			}
+			if (!$result['PerId']) continue;	// ignore marker
 			$id = $result['PerId'];
 			$result_id = $result['WetId'].($overall?'_'.$result['GrpId']:'');
 			if (is_array($comps) && !isset($comps[$result_id]))
