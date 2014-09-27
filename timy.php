@@ -14,6 +14,15 @@
 // timeout for the select, aka display refresh rate, in microseconds 0.5s = 500000
 define('DISPLAY_TIMEOUT',200000);	// baud 2400 --> 500000, 9600 --> 2000000
 /**
+ * Arco 2014:
+ * - timy seriell (!) über serial/USB Converter mit Mac bzw. openSUSE 12.1 VM verbunden
+ * - timy.php wird auf openSUSE 12.1 VM gestartet: timy.php /dev/ttyUSB0
+ * - ssh root@172.16.163.137 # ssh von mac to VM
+ * - ssh -A -p9922 -g -R10.40.8.211:19999:localhost:19999 root@farm.stylite.de # tunnelt in VM laufendes timy.php auf farm
+ *   (auf farm ist in /etc/ssh/sshd_config GatewayPort=Yes gesetzt, damit 10.40.8.211 funktioniert)
+ * - im resultservice wird Host: 10.40.8.211 und Port: 19999 eingestellt
+ */
+/**
  * Timy2 with "Speed Climbing" programm using RS232 via our Prologic Serial/USB converter
  * (Timy USB does NOT send times, like RS232 and needs "modprobe usbserial vendor=0x0c4a product=0x0889" to detect Timy as serial device)
  *
@@ -52,6 +61,8 @@ define('DISPLAY_TIMEOUT',200000);	// baud 2400 --> 500000, 9600 --> 2000000
  */
 // max. time the false start was trigered before the start, to interpret it as false start
 define('FALSE_START_DISTANCE',1.0);
+// time after start-signal still detected as false start
+define('FALSE_START_AFTER', 0.1);
 
 ini_set('display_errors',true);
 error_reporting(E_ALL & ~E_NOTICE);
@@ -92,10 +103,10 @@ if (!function_exists('lang'))
 	 * @param string $args variable number of arguments
 	 * @return string
 	 */
-	function lang($str,$args)
+	function lang($str)
 	{
 		$args = func_get_args();
-		$str = array_shift($args);
+		array_shift($args);	// remove $str
 
 		return str_replace(array('%1','%2','%3','%4','%5','%6','%6'),$args,$str);
 	}
@@ -257,7 +268,7 @@ $times = array();
 function handle_time($str)
 {
 	global $timy,$times,$left_sequence, $right_sequence, $left_mstart, $right_mstart;
-	static $left_fstart, $right_fstart, $left_false, $right_false;
+	static $left_fstart=null, $right_fstart=null, $left_false=null, $right_false=null;
 	global $left_notify, $right_notify,$precision;
 
 	if (is_numeric($str{0})) return;	// ignore 1/10s timestamp of pc-timer mode
@@ -407,7 +418,7 @@ function handle_display()
 	$now = microtime(true);
 
 	$lsnr = _sequence2startnr($left_sequence);
-	$ltime = number_format($times[$lsnr],$precision);
+	$ltime = is_numeric($times[$lsnr]) ? number_format($times[$lsnr],$precision) : '';
 	$ltype = 'C';
 	if ($left_mstart)	// running time
 	{
@@ -420,7 +431,7 @@ function handle_display()
 	$lmin = substr('  '.$ltime,-3-$precision-2,2);	// 2-digit "minutes" hundred+thausend seconds
 
 	$rsnr = _sequence2startnr($right_sequence);
-	$rtime = number_format($times[$rsnr],$precision);
+	$rtime = is_numeric($times[$rsnr]) ? number_format($times[$rsnr],$precision) : '';
 	$rtype = 'C';
 	if ($right_mstart)	// running time
 	{
