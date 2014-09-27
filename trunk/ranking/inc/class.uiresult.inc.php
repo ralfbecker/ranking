@@ -898,6 +898,19 @@ class uiresult extends ranking_result_bo
 			}
 
 			if ($query['display_athlete'] == ranking_competition::CITY) unset($row['plz']);
+			if ($query['display_athlete'] == ranking_competition::PARENT_FEDERATION && empty($row['acl_fed']))
+			{
+				if ($row['fed_parent'])
+				{
+					static $feds = array();
+					if (!isset($feds[$row['fed_parent']]) && ($fed = $this->federation->read(array('fed_id' => $row['fed_parent']))))
+					{
+						$feds[$row['fed_parent']] = $fed['fed_shortcut'] ? $fed['fed_shortcut'] : $fed['verband'];
+					}
+					$rows[$k]['acl_fed'] = $feds[$row['fed_parent']];
+				}
+				if (empty($rows[$k]['acl_fed'])) $rows[$k]['acl_fed'] = $row['verband'];
+			}
 		}
 		// disable lead time-column in print, if not used
 		if (!$need_lead_time_column) $rows['lead_time_class'] = 'noPrint';
@@ -957,6 +970,9 @@ class uiresult extends ranking_result_bo
 				break;
 			case ranking_competition::NATION_PC_CITY:
 				$rows['no_verband'] = $rows['no_acl_fed'] = $rows['no_PerId'] = true;
+				break;
+			case ranking_competition::PARENT_FEDERATION:
+				$rows['no_ort'] = $rows['no_verband'] = true;
 				break;
 		}
 		switch($query['calendar'])

@@ -46,6 +46,7 @@ class ranking_competition extends so_sql
 	const PC_CITY = 'pc_city';
 	const NATION_PC_CITY = 'nation_pc_city';
 	const CITY = 'city';
+	const PARENT_FEDERATION = 'fed_parent';
 
 	var $selfregister_types = array(
 		0 => 'Not allowed',
