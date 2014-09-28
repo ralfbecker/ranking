@@ -25,6 +25,7 @@ define('DISPLAY_TIMEOUT',200000);	// baud 2400 --> 500000, 9600 --> 2000000
 /**
  * Timy2 with "Speed Climbing" programm using RS232 via our Prologic Serial/USB converter
  * (Timy USB does NOT send times, like RS232 and needs "modprobe usbserial vendor=0x0c4a product=0x0889" to detect Timy as serial device)
+ * ("modprobe usbserial vendor=0x0c4a product=0x088a" for Timy2, but Raspberry Pi seems to have problems with Timy2)
  *
  * Start and stop without false start used
  * n0001l                      <-- startnumber left
@@ -200,7 +201,8 @@ while(true)
 	{
 		$timeout = DISPLAY_TIMEOUT;
 	}
-	if (stream_select($read,$write=null,$except=null,floor($timeout/1000000),$timeout % 1000000))//floor(DISPLAY_TIMEOUT), ceil(DISPLAY_TIMEOUT*1000000)))
+	$write = $except = null;
+	if (stream_select($read, $write, $except, floor($timeout/1000000), $timeout % 1000000))
 	{
 		//echo "stream_select returned, with read: ".implode(', ',$read)."\n";
 		// handle the streams
@@ -220,12 +222,12 @@ while(true)
 				if (($client = stream_socket_accept($control,-1,$caddr)))
 				{
 					stream_set_blocking($client,0);
-					echo "accepted control connection $client from '$caddr'.\n";
+					echo "\naccepted control connection $client from '$caddr'.\n";
 					$clients[] = $client;
 				}
 				else
 				{
-					echo "failed to accept client connection\n";
+					echo "\nfailed to accept client connection\n";
 				}
 			}
 			elseif (in_array($f,$clients,true))	// client connection
@@ -273,7 +275,7 @@ function handle_time($str)
 
 	if (is_numeric($str{0})) return;	// ignore 1/10s timestamp of pc-timer mode
 
-	echo "\n".$str;
+	//echo "\n".$str;
 
 	$t_str = trim(substr($str,10,13));
 	list($h,$m,$s) = explode(':',$t_str);
@@ -305,7 +307,7 @@ function handle_time($str)
 	}
 	$sequence = (int)substr($str,1,4);
 
-	echo "$channel: $time ($sequence)\n\n";
+	//echo "$channel: $time ($sequence)\n\n";
 
 	if (is_numeric($channel))	// $channel===null, matches 0 otherwise!
 	switch($channel)
@@ -401,7 +403,7 @@ function handle_time($str)
 			$left_false = $left_fstart = $left_mstart = null;
 			break;
 	}
-	echo "left ($left_sequence): time={$times[_sequence2startnr($left_sequence)]}, fstart=$left_fstart, mstart=$left_mstart, false=$left_false; right ($right_sequence): time={$times[_sequence2startnr($right_sequence)]}, fstart=$right_fstart, mstart=$right_mstart, false=$right_false\n";
+	//echo "left ($left_sequence): time={$times[_sequence2startnr($left_sequence)]}, fstart=$left_fstart, mstart=$left_mstart, false=$left_false; right ($right_sequence): time={$times[_sequence2startnr($right_sequence)]}, fstart=$right_fstart, mstart=$right_mstart, false=$right_false\n";
 
 	handle_display();
 }

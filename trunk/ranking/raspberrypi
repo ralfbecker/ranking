@@ -1,0 +1,24 @@
+Installing Timy stuff on Raspberry Pi
+=====================================
+
+- buy a Raspberry Pi Model B+ with 8GB Noobs sdcard, a case, a charger and assemble it
+- connect screen via hdmi, keyboard and mouse via usb
+- power on the Pi and do a Raspbian network install (first checkbox in menu)
+- after install use next menu to:
+  + select to boot to commandline
+  + set password for user "pi"
+  + reboot
+- after reboot log in and note down ip: ip -4 addr
+- you can now log into Pi via ssh: ssh pi@<ip-addr>
+- create .ssh directory for user pi: mkdir .ssh ; chmod 700 .ssh
+- copy ssh key to Pi: scp ~/.ssh/authorized_keys pi@<ip-addr>
+- update repos: sudo aptitude update
+- install php and apache2 with:  sudo aptitude install apache-mpm-prefork php5 php5-mbstring
+- install zeroconf/bonjour with: sudo aptitude install libnss-mdns
+- you can now browse http://raspberrypi.local/ or log into Pi with: ssh pi@raspberrypi.local
+- install ranking code with:
+  sudo aptitude install subversion
+  sudo mkdir /usr/share/egroupware
+  sudo chown pi /usr/share/egroupware
+  cd /usr/share/egroupware
+  svn co svn+ssh://stylite@svn.stylite.de/repos/trunk/ranking
