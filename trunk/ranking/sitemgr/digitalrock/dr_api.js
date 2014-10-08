@@ -277,7 +277,7 @@ var DrTable = (function() {
 		var row = this.createRow(this.columns,'th');
 		jQuery(thead).append(row);
 
-		// athlets
+		// athletes
 		var tbody = jQuery(document.createElement('tbody'));
 		jQuery(this.dom).append(tbody);
 
@@ -1693,7 +1693,7 @@ var Starters = (function() {
 		var th = jQuery(document.createElement('th'));
 		tfoot.append(jQuery(document.createElement('tr')).append(th));
 		th.attr('colspan', 1+_data.categorys.length);
-		th.text('Total of '+num_competitors+' athlets registered in all categories.');
+		th.text('Total of '+num_competitors+' athletes registered in all categories.');
 	};
 	/**
 	 * Fill a single fed-row up to a given position with empty td's
