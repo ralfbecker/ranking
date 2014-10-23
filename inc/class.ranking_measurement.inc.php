@@ -338,7 +338,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		{
 			throw new egw_exception_wrong_parameter("Competition $route[WetId] NOT found!");
 		}
-		if ($check_perms && !ranking_result_bo::$instance->is_admin && !ranking_result_bo::$instance->is_judge($comp))
+		if ($check_perms && !ranking_result_bo::$instance->is_admin && !ranking_result_bo::$instance->is_judge($comp, true, $route))
 		{
 			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
 		}
