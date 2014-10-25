@@ -69,6 +69,7 @@ class ranking_measurement extends ranking_boulder_measurement
 				{
 					$content['result_height'] = $row['result_height'];
 					$content['result_plus']   = $row['result_plus'];
+					$content['result_time']   = $row['result_time'];
 				}
 				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
 			}
