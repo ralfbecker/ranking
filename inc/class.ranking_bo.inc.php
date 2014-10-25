@@ -291,16 +291,17 @@ class ranking_bo extends ranking_so
 	 * @param boolean $allow_before=false grant judge-rights unlimited time before the competition
 	 * @param array $route=null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
 	 * 	if route judges should be checked too, default null=no route judges
+	 * @param boolean $use_no_judge =false true: do NOT use judge-rights for athletes eg. confirming licenses
 	 * @return boolean true if access is granted, false otherwise
 	 */
-	function acl_check($nation,$required,$comp=null,$allow_before=false,$route=null)
+	function acl_check($nation,$required,$comp=null,$allow_before=false,$route=null,$use_no_judge=false)
 	{
 		static $acl_cache = array();
 
 		if ($this->is_admin) return true;
 
 		// for ATHLETE rights check $this->athlete_rights, as they also contain rights gained as judge
-		if ($required == EGW_ACL_ATHLETE && in_array($nation,$this->athlete_rights))
+		if ($required == EGW_ACL_ATHLETE && in_array($nation, $use_no_judge ? $this->athlete_rights_no_judge : $this->athlete_rights))
 		{
 			return true;
 		}
@@ -390,6 +391,24 @@ class ranking_bo extends ranking_so
 			if (is_null($fed_grants))
 			{
 				$fed_grants = $this->federation->get_user_grants();
+				// add federation specific judge-rights eg. from a German LV competition
+				$grants = array();
+				foreach($this->judge_athlete_rights() as $fed_id)
+				{
+					if (is_numeric($fed_id) && !isset($fed_grants[$fed_id]))
+					{
+						$fed_grants[$fed_id] = EGW_ACL_ATHLETE;
+						$grants[] = $fed_id;
+					}
+				}
+				// now include the direkt children (eg. sektionen from the landesverbände)
+				if ($grants && ($children = $this->federation->search(array('fed_parent' => $grants),'fed_id,fed_parent')))
+				{
+					foreach($children as $child)
+					{
+						$fed_grants[$child['fed_id']] = EGW_ACL_ATHLETE;
+					}
+				}
 			}
 			$fed_rights = (int)$fed_grants[$athlete['fed_id']] | (int)$fed_grants[$athlete['acl_fed_id']];
 
@@ -554,7 +573,7 @@ class ranking_bo extends ranking_so
 	 */
 	function judge_athlete_rights()
 	{
-		if (!($comps = $this->comp->search(array(),'nation','nation','','',false,'AND',false,array(
+		if (!($comps = $this->comp->search(array(),'nation,fed_id','nation','','',false,'AND',false,array(
 			$this->db->concat("','",'judges',"','").' LIKE '.$this->db->quote('%,'.$this->user.',%'),
 			"datum <= '".date('Y-m-d',time()+$this->judge_right_days*24*3600)."'",
 			"datum >= '".date('Y-m-d',time()-$this->judge_right_days*24*3600)."'",
@@ -565,7 +584,7 @@ class ranking_bo extends ranking_so
 		$nations = array();
 		foreach($comps as $comp)
 		{
-			$nation = $comp['nation'] ? $comp['nation'] : 'NULL';
+			$nation = $comp['fed_id'] ? $comp['fed_id'] : ($comp['nation'] ? $comp['nation'] : 'NULL');
 			if (!in_array($nation,$nations)) $nations[] = $nation;
 		}
 		return $nations;
