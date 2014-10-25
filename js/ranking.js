@@ -175,13 +175,14 @@ function change_athlete(selectbox)
 
 		unmark_holds();
 		xajax_doXMLHTTP('ranking_measurement::ajax_load_athlete', selectbox.value,
-			{ 'exec[result_height]': 'result_height', 'exec[result_plus]': 'result_plus' },
+			{ 'exec[result_height]': 'result_height', 'exec[result_plus]': 'result_plus', 'exec[result_time]': 'result_time' },
 			{ 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order });
 	}
 	else
 	{
 		document.getElementById('exec[result_height]').value = '';
 		document.getElementById('exec[result_plus]').value = '';
+		document.getElementById('exec[result_time]').value = '';
 	}
 }
 
