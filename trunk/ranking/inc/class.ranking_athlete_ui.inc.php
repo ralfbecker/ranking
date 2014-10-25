@@ -60,6 +60,9 @@ class ranking_athlete_ui extends ranking_bo
 	/**
 	 * Edit an athlete
 	 *
+	 * Judges for federation/LV (not (inter-)national) competitions have an implicit add right
+	 * hardcoded for the nation of the LV.
+	 *
 	 * @param array $content
 	 * @param string $msg
 	 */
@@ -100,6 +103,11 @@ class ranking_athlete_ui extends ranking_bo
 				if (isset($_GET['preset']) && isset($_GET['preset']['verband']) && !isset($_GET['preset']['fed_id']))
 				{
 					$this->athlete->data['fed_id'] = $this->federation->get_federation($_GET['preset']['verband'],$_GET['preset']['nation'],true);
+				}
+				// if user is judge on a LV competition, give him just here rights for whole nation
+				if (is_numeric($this->only_nation_athlete) && ($fed = $this->federation->read($this->only_nation_athlete)))
+				{
+					$this->only_nation_athlete = $fed['nation'];
 				}
 				if ($this->only_nation_athlete) $this->athlete->data['nation'] = $this->only_nation_athlete;
 				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
@@ -181,10 +189,15 @@ class ranking_athlete_ui extends ranking_bo
 			$this->athlete->data['acl_fed_id'] = (int)$content['acl_fed_id']['fed_id'];
 			//echo "<br>ranking_athlete_ui::edit: athlete->data ="; _debug_array($this->athlete->data);
 
-			if (($content['save'] || $content['apply']) || $content['apply_license'] || $content['pw_mail'])
+			if (($content['save'] || $content['apply']) || $content['apply_license'])
 			{
 				if ($this->acl_check_athlete($this->athlete->data))
 				{
+					// if user is judge on a LV competition, give him just here rights for whole nation
+					if (is_numeric($this->only_nation_athlete) && ($fed = $this->federation->read($this->only_nation_athlete)))
+					{
+						$content['nation'] = $this->athlete->data['nation'] = $fed['nation'];
+					}
 					if (!$this->athlete->data['rkey'])
 					{
 						$this->athlete->generate_rkey();
@@ -208,6 +221,11 @@ class ranking_athlete_ui extends ranking_bo
 					}
 					else
 					{
+						// we have no edit-rights for that nation, but were allowed to add it as judge
+						if (!$this->acl_check_athlete($this->athlete->data))
+						{
+							$view = true;
+						}
 						$msg .= lang('%1 saved',lang('Athlete'));
 
 						if (is_array($content['foto']) && $content['foto']['tmp_name'] && $content['foto']['name'] && is_uploaded_file($content['foto']['tmp_name']))
@@ -311,18 +329,6 @@ class ranking_athlete_ui extends ranking_bo
 								$msg .= ', '.lang('Athlete is NOT in agegroup of selected license category!');
 							}
 						}
-						if ($content['pw_mail'])
-						{
-							try {
-								$selfservice = new ranking_selfservice();
-								$selfservice->password_reset_mail($this->athlete->data);
-								$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
-							}
-							catch (Exception $e) {
-								$msg .= "\n".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
-									$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
-							}
-						}
 					}
 				}
 				else
@@ -336,6 +342,18 @@ class ranking_athlete_ui extends ranking_bo
 				if (!$required_missing && $this->is_selfservice() != $this->athlete->data['PerId'])
 				{
 					$js = "window.opener.location='$link'; $js";
+				}
+			}
+			if ($content['pw_mail'])
+			{
+				try {
+					$selfservice = new ranking_selfservice();
+					$selfservice->password_reset_mail($this->athlete->data);
+					$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
+				}
+				catch (Exception $e) {
+					$msg .= "\n".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
+						$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
 				}
 			}
 			if ($content['delete'])
@@ -427,12 +445,12 @@ Continuer';
 			'delete' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->data['comp'],
 			'nation' => !!$this->only_nation_athlete,
 			'edit'   => $view || !$edit_rights,
-			'pw_mail'=> $view || !$edit_rights,
+			'pw_mail'=> !$content['email'],
 			// show apply license only if status is 'n' or 'a' AND user has right to apply for license
 			'apply_license' => in_array($content['license'],array('s','c')) ||
 				!$this->acl_check_athlete($this->athlete->data,EGW_ACL_ATHLETE,null,$content['license_nation']),
 			// to simply set the license field, you need athlete rights for the nation of the license
-			'license'=> !$this->acl_check($content['license_nation'],EGW_ACL_ATHLETE),
+			'license'=> !$this->acl_check($content['license_nation'],EGW_ACL_ATHLETE,null,false,null,true),	// true=no judge rights
 			// for now disable merge, if user is no admin: !$this->is_admin || (can be removed later)
 			'merge' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
@@ -510,6 +528,7 @@ Continuer';
 				'license_year' => $content['license_year'],
 				'license_nation' => $content['license_nation'],
 				'license_cat' => $content['license_cat'],
+				'license' => $content['license'],
 				'old_license_nation' => $content['license_nation'],
 				'acl_fed_id' => $content['acl_fed_id'],
 			),2);
