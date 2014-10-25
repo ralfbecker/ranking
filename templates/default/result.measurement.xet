@@ -19,6 +19,7 @@
 						<menulist>
 							<menupopup id="result_plus" class="leftPad5"/>
 						</menulist>
+						<textbox type="float" id="result_time" class="leftPad5"/>
 						<buttononly label="Update" id="button[update]" onclick="update_athlete();" class="leftPad5"/>
 						<buttononly label="Print" onclick="print_topo(); return false;" options="print" class="leftPad5"/>
 					</hbox>

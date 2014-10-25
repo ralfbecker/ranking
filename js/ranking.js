@@ -201,6 +201,7 @@ function update_athlete(scroll_mark)
 	{
 		var height = document.getElementById('exec[result_height]');
 		var plus   = document.getElementById('exec[result_plus]');
+		var time   = document.getElementById('exec[result_time]');
 		// top?
 		if (plus.value == TOP_PLUS || height.value >= TOP_HEIGHT)
 		{
@@ -217,8 +218,8 @@ function update_athlete(scroll_mark)
 				if (typeof scroll_mark != 'number') mark_holds(holds);
 			}
 		}
-		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { 'result_height': height.value, 'result_plus': plus.value}, 1, {
-			'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order});
+		xajax_doXMLHTTP('ranking_measurement::ajax_update_result', PerId, { result_height: height.value, result_plus: plus.value, result_time: time.value}, 1, {
+			WetId: WetId, GrpId: GrpId, route_order: route_order});
 	}
 }
 
