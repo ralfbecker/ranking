@@ -12,6 +12,7 @@
 				<column width="15%"/>
 				<column width="25%"/>
 				<column/>
+				<column/>
 				<column disabled="@no_license"/>
 				<column/>
 				<column/>
@@ -37,6 +38,7 @@
 						<nextmatch-sortheader label="Federation" id="verband"/>
 						<nextmatch-filterheader id="fed_id" options="All" class="selectboxFullWidth"/>
 					</vbox>
+					<nextmatch-sortheader label="Squad" id="kader"/>
 					<nextmatch-sortheader label="Last competition" id="last_comp"/>
 					<vbox no_lang="1" options="0,0">
 						<menulist>
@@ -57,6 +59,7 @@
 					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
 					<description id="${row}[ort]" no_lang="1"/>
 					<description id="${row}[verband]" no_lang="1"/>
+					<description id="${row}[kader]"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
 					<vbox options="0,0">
 						<hbox options="0,0">
@@ -96,7 +99,7 @@
 					<description align="center" id="msg" no_lang="1" class="redItalic"/>
 				</row>
 				<row>
-					<nextmatch id="nm" options="ranking.athlete.index.rows"/>
+					<nextmatch id="nm" template="ranking.athlete.index.rows"/>
 				</row>
 				<row>
 					<button statustext="add a new athlete" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
