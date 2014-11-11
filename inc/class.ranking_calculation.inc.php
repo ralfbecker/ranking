@@ -735,7 +735,7 @@ class ranking_calculation
 			}
 			//if (!isset($this->pers[$id])) error_log(__METHOD__."() *** $result[nachname] $result[vorname] ***");
 			$reserve_for_min_disciplines = $min_disciplines - count($this->disciplines[$id]);
-			if (!$drop_equally || $reserve_for_min_disciplines < 0 || !$min_disciplines) $reserve_for_min_disciplines = 0;
+			if ($reserve_for_min_disciplines < 0 || !$min_disciplines) $reserve_for_min_disciplines = 0;
 			if (!$max_comp || $this->cats[$id][$result['GrpId']] < $max_comp-
 				(isset($this->disciplines[$id][$result['discipline']]) ? $reserve_for_min_disciplines : 0))
 			{
@@ -843,7 +843,8 @@ class ranking_calculation
 			$ex_aquo[$last_platz] = 1+$abs_pl-$last_platz;
 			$abs_pl++;
 			$last_pkte = $this->pers[$id]['pkt'] = $pkt;
-			$rang[sprintf("%04d%s%s",$this->pers[$id]['platz'],$this->pers[$id]['nachname'],$this->pers[$id]['vorname'])] =& $this->pers[$id];
+			// !$pkt?9999:$platz to treat '0.00' better then 0 for $min_disciplines > 0
+			$rang[sprintf("%04d%s%s",!$pkt?9999:$this->pers[$id]['platz'],$this->pers[$id]['nachname'],$this->pers[$id]['vorname'])] =& $this->pers[$id];
 			if (!$pkt) $this->pers[$id]['platz'] = '';
 		}
 		ksort ($rang);			// array $rang contains now the ranking, sorted by points, lastname, firstname
