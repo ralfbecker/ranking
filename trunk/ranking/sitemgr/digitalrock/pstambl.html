@@ -1,7 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
-<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"> 
-	<head> 
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="dr_api.js"></script>
@@ -12,7 +12,7 @@
 <table class="profileHeader">
  <thead>
   <tr>
-   <td class="profilePhoto"><img src="$$photo$$" border="0"></td>  
+   <td class="profilePhoto"><img src="$$photo$$" border="0"></td>
    <td>
   	<h1><a href="$$homepage$$" target="_blank">
 	  <span class="firstname">$$firstname$$</span>
@@ -90,11 +90,11 @@
 </table>
 </div>
 <script type="text/javascript">
-	var widget;
+	var profile;
 	$(document).ready(function() {
-		widget = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')),
+		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace('#', '?')),
 			jQuery('#profile').html());
-		
+
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);
 	});
 
