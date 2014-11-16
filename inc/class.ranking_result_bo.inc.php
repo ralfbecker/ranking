@@ -155,7 +155,7 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param int $year year of competition
 	 * @param string $nation nation of comp.
-	 * @param string $discipline='lead' can be 'boulderheight' to return labels for tries
+	 * @param string $discipline ='lead' can be 'boulderheight' to return labels for tries
 	 * @return array
 	 */
 	function plus_labels($year, $nation, $discipline='lead')
@@ -190,7 +190,7 @@ class ranking_result_bo extends ranking_bo
 	 * Convert athlete array to a string
 	 *
 	 * @param array $athlete array with values for 'vorname', 'nachname', 'nation' and optional 'start_order', 'start_number', 'result_rank', 'result'
-	 * @param boolean|string $show_result=true false: startnumber, null: only name, true: rank&result, 'rank': just rank
+	 * @param boolean|string $show_result =true false: startnumber, null: only name, true: rank&result, 'rank': just rank
 	 * @return string nachname, vorname (nation) prefixed with rank for start-number and postfixed with result
 	 */
 	public static function athlete2string(array $athlete, $show_result=true)
@@ -216,16 +216,16 @@ class ranking_result_bo extends ranking_bo
 	 * @param int/array $comp WetId or complete comp array
 	 * @param int/array $cat GrpId or complete cat array
 	 * @param int $route_order 0/1 for qualification, 2, 3, ... for further heats
-	 * @param int $route_type=ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL*
-	 * @param int $discipline='lead' 'lead', 'speed', 'boulder'
-	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
-	 * @param int $order=null 0=random, 1=reverse ranking, 2=reverse cup, 3=random(distribution ranking), 4=random(distrib. cup), 5=ranking, 6=cup
-	 * @param int $order=null null = default order from self::quali_startlist_default(), int with bitfield of
+	 * @param int $route_type =ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL*
+	 * @param int $discipline ='lead' 'lead', 'speed', 'boulder'
+	 * @param int $max_compl =999 maximum number of climbers from the complimentary list
+	 * @param int $order =null 0=random, 1=reverse ranking, 2=reverse cup, 3=random(distribution ranking), 4=random(distrib. cup), 5=ranking, 6=cup
+	 * @param int $order =null null = default order from self::quali_startlist_default(), int with bitfield of
 	 * 	&1  use ranking for order, unranked are random behind last ranked
 	 *  &2  use cup for order, unranked are random behind last ranked
 	 *  &4  reverse ranking or cup (--> unranked first)
 	 *  &8  use ranking/cup for distribution only, order is random
-	 * @param int $add_cat=null additional category to add registered atheletes from
+	 * @param int $add_cat =null additional category to add registered atheletes from
 	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 */
 	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null,$add_cat=null)
@@ -351,7 +351,7 @@ class ranking_result_bo extends ranking_bo
 	 * Get registered athletes for given competition and category
 	 *
 	 * @param array $keys array with values for WetId and GrpId
-	 * @param boolean $only_nations=false only return array with nations (as key and value)
+	 * @param boolean $only_nations =false only return array with nations (as key and value)
 	 * @return array
 	 */
 	function get_registered($keys,$only_nations=false)
@@ -389,7 +389,7 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param string $discipline 'lead', 'speed', 'boulder'
 	 * @param int $route_type {ONE|TWO|TWOxTWO}_QUALI(_{HALF|ALL|ALL_SEED_STAGGER})?
-	 * @param string $nation=null nation of competition
+	 * @param string $nation =null nation of competition
 	 * @return int 0=random, 1=reverse ranking, 2=reverse cup, 3=random(distribution ranking), 4=random(distrib. cup), 5=ranking, 6=cup
 	 */
 	static function quali_startlist_default($discipline,$route_type,$nation=null)
@@ -485,14 +485,14 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @internal use generate_startlist
 	 * @param array $keys values for WetId, GrpId and route_order
-	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
+	 * @param string $start_order_mode ='reverse' 'reverse' result, like 'previous' heat, as the 'result'
 	 * @param string $discipline
 	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function _startlist_from_previous_heat($keys,$start_order='reverse',$discipline='lead')
+	function _startlist_from_previous_heat($keys,$start_order_mode='reverse',$discipline='lead')
 	{
 		$ko_system = substr($discipline,0,5) == 'speed';
-		//echo "<p>".__METHOD__."(".array2string($keys).",$start_order,$discipline) ko_system=$ko_system</p>\n";
+		//echo "<p>".__METHOD__."(".array2string($keys).",$start_order_mode,$discipline) ko_system=$ko_system</p>\n";
 		if ($ko_system && $keys['route_order'] > 2)
 		{
 			return $this->_startlist_from_ko_heat($keys);
@@ -507,7 +507,7 @@ class ranking_result_bo extends ranking_bo
 			$prev_keys['route_order'] = 0;
 		}
 		if (!($prev_route = $this->route->read($prev_keys,true)) ||
-			$start_order != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
+			$start_order_mode != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
 			$ko_system && !$prev_route['route_quota'])
 		{
 			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
@@ -537,14 +537,14 @@ class ranking_result_bo extends ranking_bo
 			$comp = $this->comp->read($keys['WetId']);
 		}
 		if ($prev_route['route_quota'] == 1 || 				// superfinal
-			$start_order == 'previous' && !$ko_system || 	// 2. Quali uses same startorder
+			$start_order_mode == 'previous' && !$ko_system || 	// 2. Quali uses same startorder
 			$ko_system && $keys['route_order'] > 2)			// speed-final
 		{
 			$order_by = 'start_order';						// --> same starting order as previous heat!
 		}
 		else
 		{
-			if ($ko_system || $start_order == 'result')		// first speed final or start_order by result (eg. boulder 1/2-f)
+			if ($ko_system || $start_order_mode == 'result')		// first speed final or start_order by result (eg. boulder 1/2-f)
 			{
 				$order_by = 'result_rank';					// --> use result of previous heat
 			}
@@ -584,7 +584,7 @@ class ranking_result_bo extends ranking_bo
 			if (($comp = $this->comp->read($keys['WetId'])) &&
 				($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
 			{
-				$order_by .= ','.$ranking_sql.($start_order != 'result' ? ' DESC' : '');	// --> use the (reversed) ranking
+				$order_by .= ','.$ranking_sql.($start_order_mode != 'result' ? ' DESC' : '');	// --> use the (reversed) ranking
 			}
 			$order_by .= ',RAND()';					// --> randomized
 		}
@@ -681,8 +681,8 @@ class ranking_result_bo extends ranking_bo
 	 * Generate a startlist from the result of a previous heat
 	 *
 	 * @param array $keys values for WetId, GrpId and route_order
-	 * @param string $start_order='reverse' 'reverse' result, like 'previous' heat, as the 'result'
-	 * @param boolean $ko_system=false use ko-system
+	 * @param string $start_order ='reverse' 'reverse' result, like 'previous' heat, as the 'result'
+	 * @param boolean $ko_system =false use ko-system
 	 * @param string $discipline
 	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
 	 */
@@ -761,7 +761,7 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param array $keys
 	 * @param int $start_order
-	 * @param array $extra=array()
+	 * @param array $extra =array()
 	 */
 	function _create_wildcard_co(array $keys,$start_order,array $extra=array())
 	{
@@ -821,9 +821,9 @@ class ranking_result_bo extends ranking_bo
 	 * 		which causes save_result to read the results now.
 	 * 		If multiple people are updating, you should provide the result of the time of display,
 	 * 		to not accidently overwrite results entered by someone else!
-	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
-	 * @param boolean $update_checked=false false: do NOT update checked value, true: also update checked value
-	 * @param string $order_by='start_order ASC' ordering of list for setting start-numbers
+	 * @param int $quali_preselected =0 preselected participants for quali --> no countback to quali, if set!
+	 * @param boolean $update_checked =false false: do NOT update checked value, true: also update checked value
+	 * @param string $order_by ='start_order ASC' ordering of list for setting start-numbers
 	 * @return boolean|int number of changed results or false on error
 	 */
 	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false,$order_by='start_order ASC')
@@ -963,7 +963,12 @@ class ranking_result_bo extends ranking_bo
 				if (is_null($route)) $route = $this->route->read($keys);
 				$is_final = !$route['route_quota'];
 			}
-			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final);
+			$selfscore_points = null;
+			if ($discipline == 'selfscore' && ($route || ($route = $this->route->read($keys))))
+			{
+				$selfscore_points = $route['selfscore_points'];
+			}
+			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final,$selfscore_points);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		// delete the export_route cache
@@ -977,7 +982,7 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param array $keys 'WetId','GrpId', 'route_order', $this->route_result->id_col (PerId/team_id)
 	 * @param string $number [start]+increment
-	 * @param string $order_by='start_order ASC' ordering of list for setting start-numbers
+	 * @param string $order_by ='start_order ASC' ordering of list for setting start-numbers
 	 */
 	function set_start_number($keys, $number, $order_by='start_order ASC')
 	{
@@ -1021,7 +1026,7 @@ class ranking_result_bo extends ranking_bo
 	 * Check if a route has a result or a startlist ($startlist_only == true)
 	 *
 	 * @param array $keys WetId, GrpId, route_order
-	 * @param boolean $startlist_only=false check of startlist only (not result)
+	 * @param boolean $startlist_only =false check of startlist only (not result)
 	 * @return boolean true if there's a at least particial result, false if thers none, null if $key is not valid
 	 */
 	function has_results($keys,$startlist_only=false)
@@ -1039,7 +1044,7 @@ class ranking_result_bo extends ranking_bo
 	 * Check if a route has a startlist
 	 *
 	 * @param array $keys WetId, GrpId, route_order
-	 * @param boolean $startlist_only=false check of startlist only (not result)
+	 * @param boolean $startlist_only =false check of startlist only (not result)
 	 * @return boolean true if there's a at least particial result, false if thers none, null if $key is not valid
 	 */
 	function has_startlist($keys)
@@ -1186,22 +1191,22 @@ class ranking_result_bo extends ranking_bo
 	/**
 	 * Upload a route as csv file
 	 *
-	 * @param array $keys WetId, GrpId, route_order and optional 'route_type and 'discipline'
+	 * @param array $_keys WetId, GrpId, route_order and optional 'route_type and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
-	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
-	 * @param boolean|int $ignore_comp_heat=false ignore WetId and route_order, default do NOT, or integer WetId to check agains
-	 * @param boolean $return_data=false true return array with data and do NOT store it
+	 * @param boolean $add_athletes =false add not existing athletes, default bail out with an error
+	 * @param boolean|int $ignore_comp_heat =false ignore WetId and route_order, default do NOT, or integer WetId to check agains
+	 * @param boolean $return_data =false true return array with data and do NOT store it
 	 * @return int|string|array integer number of imported results or string with error message
 	 */
-	function upload($keys,$file,$add_athletes=false,$ignore_comp_heat=false,$return_data=false)
+	function upload($_keys,$file,$add_athletes=false,$ignore_comp_heat=false,$return_data=false)
 	{
-		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) // permission denied
+		if (!$_keys || !$_keys['WetId'] || !$_keys['GrpId'] || !is_numeric($_keys['route_order'])) // permission denied
 		{
 			return lang('Permission denied !!!');
 		}
-		$route_type = $keys['route_type'];
-		$discipline = $keys['discipline'];
-		$keys = array_intersect_key($keys, array_flip(array('WetId','GrpId','route_order')));
+		$route_type = $_keys['route_type'];
+		$discipline = $_keys['discipline'];
+		$keys = array_intersect_key($_keys, array_flip(array('WetId','GrpId','route_order')));
 
 		if (!isset($route_type))
 		{
@@ -1280,15 +1285,15 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * That schema can NOT create routes, as it only contains start-numbers, no PerId's!!!!
 	 *
-	 * @param array $keys WetId, GrpId, route_order and optional 'route_type' and 'discipline'
+	 * @param array $_keys WetId, GrpId, route_order and optional 'route_type' and 'discipline'
 	 * @param string|FILE $file uploaded file name or handle
 	 * @return array|string array with imported data (array of array for route_result->save) or string with error message
 	 */
-	protected function parse_xml($keys,$file)
+	protected function parse_xml($_keys,$file)
 	{
-		$route_type = $keys['route_type'];
-		$discipline = $keys['discipline'];
-		$keys = array_intersect_key($keys, array_flip(array('WetId','GrpId','route_order')));
+		$route_type = $_keys['route_type'];
+		$discipline = $_keys['discipline'];
+		$keys = array_intersect_key($_keys, array_flip(array('WetId','GrpId','route_order')));
 
 		if (!isset($route_type))
 		{
@@ -1498,8 +1503,8 @@ class ranking_result_bo extends ranking_bo
 	 * Import the general result of a competition into the ranking
 	 *
 	 * @param array $keys WetId, GrpId, discipline, route_type, route_order=-1
-	 * @param string|int $filter_nation=null only import athletes of the given nation or integer fed_id
-	 * @param string $import_cat=null only import athletes of the given category
+	 * @param string|int $filter_nation =null only import athletes of the given nation or integer fed_id
+	 * @param string $import_cat =null only import athletes of the given category
 	 * @return string message
 	 */
 	function import_ranking($keys, $filter_nation=null, $import_cat=null)
@@ -1590,8 +1595,8 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param string $discipline 'speed', 'lead' or 'boulder'
 	 * @param int $route_order
-	 * @param int $quali_type=null TWO_QUALI_ALL, TWO_QUALI_HALF, ONE_QUALI
-	 * @param int $num_participants=null
+	 * @param int $quali_type =null TWO_QUALI_ALL, TWO_QUALI_HALF, ONE_QUALI
+	 * @param int $num_participants =null
 	 * @return int
 	 */
 	static function default_quota($discipline,$route_order,$quali_type=null,$num_participants=null)
@@ -1795,9 +1800,9 @@ class ranking_result_bo extends ranking_bo
 	 * Delete export cache for given route and additionaly the general result
 	 *
 	 * @param int|array $comp WetId or array with values for WetId, GrpId and route_order
-	 * @param int $cat=null GrpId
-	 * @param int $route_order=null
-	 * @param boolean $previous_heats=false also invalidate previous heats, eg. if new heats got created to include them in route_names
+	 * @param int $cat =null GrpId
+	 * @param int $route_order =null
+	 * @param boolean $previous_heats =false also invalidate previous heats, eg. if new heats got created to include them in route_names
 	 */
 	public static function delete_export_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false)
 	{
@@ -1808,7 +1813,7 @@ class ranking_result_bo extends ranking_bo
 	 * Fix ordering of result (so it is identical in xml/json and UI)
 	 *
 	 * @param array $query
-	 * @param boolean $isRelay=false
+	 * @param boolean $isRelay =false
 	 */
 	function process_sort(array &$query,$isRelay=false)
 	{

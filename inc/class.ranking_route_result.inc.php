@@ -108,19 +108,19 @@ class ranking_route_result extends so_sql
 	 *
 	 * For a union-query you call search for each query with $start=='UNION' and one more with only $order_by and $start set to run the union-query.
 	 *
-	 * @param array/string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
-	 * @param boolean/string/array $only_keys=true True returns only keys, False returns all cols. or
+	 * @param array|string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
+	 * @param boolean|string|array $only_keys =true True returns only keys, False returns all cols. or
 	 *	comma seperated list or array of columns to return
-	 * @param string $order_by='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
-	 * @param string/array $extra_cols='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $wildcard='' appended befor and after each criteria
-	 * @param boolean $empty=false False=empty criteria are ignored in query, True=empty have to be empty in row
-	 * @param string $op='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
-	 * @param mixed $start=false if != false, return only maxmatch rows begining with start, or array($start,$num), or 'UNION' for a part of a union query
-	 * @param array $filter=null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
-	 * @param string $join='' sql to do a join, added as is after the table-name, eg. "JOIN table2 ON x=y" or
+	 * @param string $order_by ='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
+	 * @param string|array $extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $wildcard ='' appended befor and after each criteria
+	 * @param boolean $empty =false False=empty criteria are ignored in query, True=empty have to be empty in row
+	 * @param string $op ='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
+	 * @param mixed $start =false if != false, return only maxmatch rows begining with start, or array($start,$num), or 'UNION' for a part of a union query
+	 * @param array $filter =null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
+	 * @param string $join ='' sql to do a join, added as is after the table-name, eg. "JOIN table2 ON x=y" or
 	 *	"LEFT JOIN table2 ON (x=y AND z=o)", Note: there's no quoting done on $join, you are responsible for it!!!
-	 * @return boolean/array of matching rows (the row is an array of the cols) or False
+	 * @return boolean|array of matching rows (the row is an array of the cols) or False
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
@@ -429,7 +429,7 @@ class ranking_route_result extends so_sql
 	 * @param array &$route_names route_order => route_name pairs
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @param string $discipline 'lead', 'speed', 'boulder', 'speedrelay'
-	 * @param array $result_cols=array() result relevant col
+	 * @param array $result_cols =array() result relevant col
 	 * @return string join
 	 */
 	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array())
@@ -674,6 +674,11 @@ class ranking_route_result extends so_sql
 
 			case 'selfscore':
 				$data['result'] = count($data['score']);
+				// selfscore with fixed number of points per boulder distributed to all reaching top
+				if ($data['result_top'] != 100*$data['result']-$data['result'])
+				{
+					$data['result'] = ($data['result_top']/100).'/'.$data['result'];
+				}
 				break;
 
 			case 'speedrelay':
@@ -790,7 +795,7 @@ class ranking_route_result extends so_sql
 	 * Appriviate the name to make it better printable
 	 *
 	 * @param string &$name
-	 * @param int $max=12 maximum length
+	 * @param int $max =12 maximum length
 	 */
 	function _shorten_name(&$name,$max=13)
 	{
@@ -1010,20 +1015,20 @@ class ranking_route_result extends so_sql
 	/**
 	 * Update the ranking of a given route
 	 *
-	 * @param array $keys values for keys WetId, GrpId and route_order
-	 * @param boolean $do_countback=true should we do a countback on further heats
-	 * @param int $route_type=ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
-	 * @param string $discipline='lead' 'lead', 'speed', 'boulder', 'speedrelay'
-	 * @param int $quali_preselected=0 preselected participants for quali --> no countback to quali, if set!
-	 * @param boolean $is_final=false important for lead where we use time now in final, if tied after countback
+	 * @param array $_keys values for keys WetId, GrpId and route_order
+	 * @param int $route_type =ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
+	 * @param string $discipline ='lead' 'lead', 'speed', 'boulder', 'speedrelay'
+	 * @param int $quali_preselected =0 preselected participants for quali --> no countback to quali, if set!
+	 * @param boolean $is_final =false important for lead where we use time now in final, if tied after countback
+	 * @param int $selfscore_points =null point distributed per boulder, or null if 1 for each top
 	 * @return int|boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$is_final=null)
+	function update_ranking($_keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$is_final=null,$selfscore_points=null)
 	{
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected)");
-		if (!$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return false;
+		if (!$_keys['WetId'] || !$_keys['GrpId'] || !is_numeric($_keys['route_order'])) return false;
 
-		$keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
+		$keys = array_intersect_key($_keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
 
 		$extra_cols = array();
 		switch($discipline)
@@ -1095,7 +1100,9 @@ class ranking_route_result extends so_sql
 			$order_by .= ',result_time ASC';
 		}
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected) extra_cols=".array2string($extra_cols).", order_by=$order_by");
-		$result = $this->search($keys,$this->id_col.',result_rank,result_detail AS detail',$order_by,$extra_cols);
+		$this->db->transaction_begin();
+		$result = $this->search($keys, $this->id_col.',result_rank,result_detail AS detail',
+			'ORDER BY '.$order_by.' FOR UPDATE', $extra_cols);
 
 		if (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) && $keys['route_order'] < 2 ||		// calculate the points
 			$route_type == TWOxTWO_QUALI && $keys['route_order'] < 4)
@@ -1131,6 +1138,11 @@ class ranking_route_result extends so_sql
 					$old = $data;
 				}
 			}
+		}
+		// if fixed number of points are distributes for a single boulder
+		if ($discipline == 'selfscore' && $selfscore_points)
+		{
+			self::calc_selfscore_points($result, $selfscore_points);
 		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
@@ -1177,6 +1189,11 @@ class ranking_route_result extends so_sql
 					$to_update['result_detail'] = json_encode($to_update['result_detail']);
 				}
 			}
+			// if fixed number of points are distributes for a single boulder, need to update just calculated points
+			if ($discipline == 'selfscore' && $selfscore_points)
+			{
+				$to_update['result_top'] = $to_update['result_zone'] = $data['result_top'];
+			}
 //_debug_array($data); _debug_array($to_update);
 			// for lead finals, do not yet store first places, they might have to use the time
 			if ($data['new_rank'] != $data['result_rank'])
@@ -1192,9 +1209,63 @@ class ranking_route_result extends so_sql
 			$old_time = $data['result_time_l'] ? $data['result_time_l'] : $data['time_sum'];
 			$old_rank = $data['new_rank'];
 		}
+		$this->db->transaction_commit();
+
 		if ($modified) ranking_result_bo::delete_export_route_cache($keys);
 
 		return $modified;
+	}
+
+	/**
+	 * Calculate points and rank by them (not done in database query!)
+	 *
+	 * @param array& $result
+	 * @param int $selfscore_points points to distribute per boulder eg. 1000
+	 */
+	protected static function calc_selfscore_points(array &$result, $selfscore_points)
+	{
+		// count total number of tops
+		$points = array();
+		foreach($result as &$data)
+		{
+			$data['result_detail'] = self::unserialize($data['detail']);
+			foreach((array)$data['result_detail']['score'] as $boulder => $top)
+			{
+				if ($top) $points[$boulder]++;
+			}
+		}
+		// calculate points per boulder
+		foreach($points as $boulder => &$pts)
+		{
+			$pts = $selfscore_points / $pts;
+		}
+		// calculate new points
+		foreach($result as &$data)
+		{
+			$data['result_top'] = 0.0;
+			foreach((array)$data['result_detail']['score'] as $boulder => $top)
+			{
+				if ($top) $data['result_top'] += $points[$boulder];
+			}
+			$data['result_top'] = $data['result_zone'] = round(100.0 * $data['result_top']);
+		}
+		// sort by new points
+		usort($result, function($a, $b)
+		{
+			return $a['result_top'] < $b['result_top'] ? 1 : ($a['result_top'] > $b['result_top'] ? -1 : 0);
+		});
+		// update new rank
+		foreach($result as $i => &$data)
+		{
+			if ($data['result_top'])
+			{
+				$data['new_rank'] = !$i || $result[$i-1]['result_top'] != $data['result_top'] ? 1+$i : $result[$i-1]['new_rank'];
+			}
+			else
+			{
+				$data['new_rank'] = null;
+			}
+		}
 	}
 
 	/**
@@ -1202,8 +1273,8 @@ class ranking_route_result extends so_sql
 	 *
 	 * Reimplemented to remove cached results
 	 *
-	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
-	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function save($keys=null,$extra_where=null)
@@ -1263,7 +1334,7 @@ class ranking_route_result extends so_sql
 	 * Determine the highest existing value of given column for $keys (competition, category and route_order)
 	 *
 	 * @param array $keys
-	 * @param string $col='route_order'
+	 * @param string $col ='route_order'
 	 * @return mixed value of $col or null
 	 */
 	function get_max(array $keys,$col='route_order')
@@ -1292,7 +1363,7 @@ class ranking_route_result extends so_sql
 	 * Determine count of rows matching $keys (competition, category and route_order)
 	 *
 	 * @param array $keys
-	 * @param string $col='*'
+	 * @param string $col ='*'
 	 * @return int
 	 */
 	function get_count(array $keys,$col='*')
@@ -1348,7 +1419,7 @@ class ranking_route_result extends so_sql
 	 * Check the status / existance of start list or result for all categories of given competitions
 	 *
 	 * @param int|array $comps
-	 * @param array $status=array() result of result::result_status to get a combined array (status 0 get NOT overwritten!)
+	 * @param array $status =array() result of result::result_status to get a combined array (status 0 get NOT overwritten!)
 	 * @return array of WetId => GrpId => status: 1=result, 2=startlist
 	 */
 	function result_status($comps,$status=array())

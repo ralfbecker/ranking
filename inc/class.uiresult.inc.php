@@ -24,8 +24,8 @@ class uiresult extends ranking_result_bo
 	/**
 	 * Edit or add a route / heat
 	 *
-	 * @param array $content=null
-	 * @param string $msg=''
+	 * @param array $content =null
+	 * @param string $msg =''
 	 */
 	function route($content=null,$msg='')
 	{
@@ -42,7 +42,7 @@ class uiresult extends ranking_result_bo
 		elseif ($content['discipline'] == 'selfscore')
 		{
 			$matches = null;
-			if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:[0-9]+)?$/', $content['selfscore_mode'], $matches) ||
+			if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:([0-9]+))?$/', $content['selfscore_mode'], $matches) ||
 				!($matches[1] > 0))
 			{
 				etemplate::set_validation_error('selfscore_mode', 'Wrong format!');
