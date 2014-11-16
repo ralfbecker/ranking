@@ -451,6 +451,7 @@ Continuer';
 				!$this->acl_check_athlete($this->athlete->data,EGW_ACL_ATHLETE,null,$content['license_nation']),
 			// to simply set the license field, you need athlete rights for the nation of the license
 			'license'=> !$this->acl_check($content['license_nation'],EGW_ACL_ATHLETE,null,false,null,true),	// true=no judge rights
+			'kader'=> !$this->acl_check($content['license_nation'],EGW_ACL_ATHLETE,null,false,null,true),	// true=no judge rights
 			// for now disable merge, if user is no admin: !$this->is_admin || (can be removed later)
 			'merge' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
