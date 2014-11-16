@@ -97,13 +97,13 @@
 				</row>
 				<row class="row" disabled="!@is_admin">
 					<description value="Key" for="rkey"/>
-					<textbox statustext="internal key, leave it empty to have it automaticaly generated" id="rkey" size="8" maxlength="8" span="all"/>
-				</row>
-				<row class="row" disabled="!@is_admin">
+					<textbox statustext="internal key, leave it empty to have it automaticaly generated" id="rkey" size="8" maxlength="8"/>
 					<description value="License number" for="lizenz"/>
 					<textbox statustext="not used at the moment" id="lizenz" size="6" maxlength="6"/>
+				</row>
+				<row class="row">
 					<description value="Squad" for="kader"/>
-					<textbox statustext="not used at the moment" id="kader" size="5" maxlength="5"/>
+					<textbox statustext="not used at the moment" id="kader" size="5" maxlength="5" span="all"/>
 				</row>
 			</rows>
 		</grid>
