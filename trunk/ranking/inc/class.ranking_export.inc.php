@@ -792,6 +792,7 @@ class ranking_export extends ranking_result_bo
 		}
 		$ret['categorys'] = array_values($ret['categorys']);
 
+		unset($ret['last_modified']);	// to NOT cause etag change by not contained data
 		$ret['etag'] = md5(serialize($ret));
 
 		return $ret;
@@ -1018,6 +1019,7 @@ class ranking_export extends ranking_result_bo
 			'years' => $years,
 		);
 		$data['expires'] = $year < date('Y') ? self::EXPORT_CALENDAR_OLD_TTL : self::EXPORT_CALENDAR_TTL;
+		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
@@ -1253,6 +1255,7 @@ class ranking_export extends ranking_result_bo
 				$data['expires'] = max($next_comp_ts - time(), self::EXPORT_RANKING_TTL);
 			}
 		}
+		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
@@ -1513,6 +1516,7 @@ class ranking_export extends ranking_result_bo
 				$data['expires'] = max($next_comp_ts - time(), self::EXPORT_RESULTS_RUNNING_EXPIRES);
 			}
 		}
+		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
@@ -1592,6 +1596,7 @@ class ranking_export extends ranking_result_bo
 		}
 		$ret['categorys'] = array_values($ret['categorys']);
 
+		unset($ret['last_modified']);	// to NOT cause etag change by not contained data
 		$ret['etag'] = md5(serialize($ret));
 
 		return $ret;
@@ -1712,6 +1717,7 @@ class ranking_export extends ranking_result_bo
 		}
 		$data['expires'] = self::EXPORT_STARTERS_EXPIRES;
 
+		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
@@ -1917,6 +1923,7 @@ class ranking_export extends ranking_result_bo
 		$data['expires'] = !$data['rankings'][0]['rank'] && time()-$data['last_modified'] > 365*86400 ?
 			self::EXPORT_PROFILE_HISTORIC_EXPIRES : self::EXPORT_PROFILE_EXPIRES;
 
+		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
@@ -2079,6 +2086,7 @@ class ranking_export extends ranking_result_bo
 				$data['expires'] = max($next_comp_ts - time(), self::EXPORT_RANKING_TTL);
 			}
 		}
+		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 		//_debug_array($data); exit;
 		egw_cache::setInstance('ranking', $location, $data);
