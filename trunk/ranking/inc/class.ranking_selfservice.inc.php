@@ -27,9 +27,9 @@ class ranking_selfservice extends ranking_bo
 	 * Athlete selfservie: edit profile, register for competitions
 	 *
 	 * @param int $PerId
-	 * @param string $action 'profile'
+	 * @param string $_action 'profile'
 	 */
-	function selfservice($PerId, $action)
+	function selfservice($PerId, $_action)
 	{
 		egw_framework::validate_file('.', 'selfservice', 'ranking');
 		egw_framework::includeCSS('ranking', 'selfservice', false);
@@ -53,7 +53,7 @@ class ranking_selfservice extends ranking_bo
 			translation::$userlang = $lang;
 			translation::init();
 		}
-		list($action,$action_id) = explode('-', $action, 2);
+		list($action,$action_id) = explode('-', $_action, 2);
 
 		if ($athlete)
 		{
@@ -84,6 +84,7 @@ class ranking_selfservice extends ranking_bo
 
 			case 'logout':
 				$this->is_selfservice(0);
+				$athlete = array();
 				// fall through
 			case 'recovery':
 			case 'password':
@@ -124,7 +125,7 @@ class ranking_selfservice extends ranking_bo
 	 * Selfservice for an already authorized athlete: either register for given WetId or show an index of possible actions
 	 *
 	 * @param array $athlete
-	 * @param int $WetId=0
+	 * @param int $WetId =0
 	 */
 	private function selfservice_register(array $athlete, $WetId=0)
 	{
@@ -492,7 +493,7 @@ class ranking_selfservice extends ranking_bo
 	 * @param string $email email address(es comma-separated), or rfc822 "Name <email@domain.com>"
 	 * @param array $replacements name => value pairs, can be used as $$name$$ in template
 	 * @param string $template filename of template, first line is subject, type depends on .txt extension
-	 * @param string $from='digtal ROCK <info@digitalrock.de>'
+	 * @param string $from ='digtal ROCK <info@digitalrock.de>'
 	 * @throws Exception on error
 	 */
 	private static function mail($email, array $replacements, $template, $from='digtal ROCK <info@digitalrock.de>')
