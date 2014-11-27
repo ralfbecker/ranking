@@ -1623,7 +1623,7 @@ var Starters = (function() {
 		var row = jQuery(document.createElement('tr'));
 		var th = jQuery(document.createElement('th'));
 		th.text(typeof _data.federations != 'undefined' ? 'Federation' : 'Nation');
-		row.append(th);
+		if (!this.json_url.match(/no_fed=1/)) row.append(th);
 		var cats = {};
 		for(var i=0; i < _data.categorys.length; ++i)
 		{
@@ -1664,7 +1664,7 @@ var Starters = (function() {
 				row = jQuery(document.createElement('tr'));
 				tbody.append(row);
 				th = jQuery(document.createElement('th'));
-				row.append(th);
+				if (!this.json_url.match(/no_fed=1/)) row.append(th);
 				this.fed_rows.push(row);
 				this.fed_rows_pos.push(0);
 				if (typeof fed == 'undefined' || fed != athlete.reg_fed_id)
