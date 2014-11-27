@@ -1646,7 +1646,7 @@ var Starters = (function() {
 		{
 			var athlete = _data.athletes[i];
 			// evtl. create new row for federation/nation
-			if (typeof fed == 'undefined' || fed != athlete.reg_fed_id)
+			if ((typeof fed == 'undefined' || fed != athlete.reg_fed_id) && !this.json_url.match(/no_fed=1/))
 			{
 				this.fillUpFedRows();
 				// reset fed rows to empty
