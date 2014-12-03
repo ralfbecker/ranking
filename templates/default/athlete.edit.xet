@@ -87,7 +87,8 @@
 			<columns>
 				<column width="100"/>
 				<column width="15%"/>
-				<column width="10%"/>
+				<column/>
+				<column/>
 				<column/>
 			</columns>
 			<rows>
@@ -98,8 +99,9 @@
 				<row class="row" disabled="!@is_admin">
 					<description value="Key" for="rkey"/>
 					<textbox statustext="internal key, leave it empty to have it automaticaly generated" id="rkey" size="8" maxlength="8"/>
-					<description value="License number" for="lizenz"/>
-					<textbox statustext="not used at the moment" id="lizenz" size="6" maxlength="6"/>
+					<textbox statustext="not used at the moment" label="License number" id="lizenz" size="6" maxlength="6"/>
+					<passwd label="Password" id="password"/>
+					<passwd id="password2"/>
 				</row>
 				<row class="row">
 					<description value="Squad" for="kader"/>

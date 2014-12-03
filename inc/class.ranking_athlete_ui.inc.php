@@ -202,7 +202,15 @@ class ranking_athlete_ui extends ranking_bo
 					{
 						$this->athlete->generate_rkey();
 					}
-					if ($old_geb_date && !$this->athlete->data['geb_date'] && !$this->is_admin)
+					if (!$this->is_admin || !$content['password'] || $content['password'] != $content['password2'])
+					{
+						$this->athlete->data['password'] = $content['athlete_data']['password'];
+					}
+					if ($this->is_admin && $content['password'] && $content['password'] != $content['password2'])
+					{
+						$msg .= lang('Both password do NOT match!');
+					}
+					elseif ($old_geb_date && !$this->athlete->data['geb_date'] && !$this->is_admin)
 					{
 						$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
 						$this->athlete->data['geb_date'] = $old_geb_date;
@@ -408,6 +416,10 @@ class ranking_athlete_ui extends ranking_bo
 			'referer' => $content['referer'],
 			'merge_to' => $content['merge_to'],
 		);
+		if ($this->athlete->data['password'] == $content['password'])
+		{
+			unset($content['password']);
+		}
 		switch($content['license_nation'])
 		{
 			case 'SUI':
