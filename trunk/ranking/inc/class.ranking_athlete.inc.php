@@ -234,6 +234,28 @@ class ranking_athlete extends so_sql
 	}
 
 	/**
+	 * merges in new values from the given new data-array
+	 *
+	 * Reimplemented to hash password
+	 *
+	 * @param array $new in form col => new_value with values to set
+	 */
+	function data_merge($new)
+	{
+		if (!is_array($new) || !count($new))
+		{
+			return;
+		}
+		if (isset($new['password']) && stripos($new['password'], '{crypt}$') !== 0)
+		{
+			$new['password'] = auth::encrypt_ldap($new['password'], 'blowfish_crypt');
+			$new['recover_pw_hash'] = $new['recover_pw_time'] = null;
+			$new['login_failed'] = 0;
+		}
+		return parent::data_merge($new);
+	}
+
+	/**
 	 * changes the data from our work-format to the db-format
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array

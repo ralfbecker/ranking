@@ -346,9 +346,7 @@ class ranking_selfservice extends ranking_bo
 						{
 							// store new password
 							if (!$this->athlete->update(array(
-								'recover_pw_hash' => null,
-								'recover_pw_time' => null,
-								'password' => auth::encrypt_ldap($_POST['password'],'sha512_crypt'),
+								'password' => $_POST['password'],	// will be hashed in data_merge
 							)))
 							{
 								// store successful selfservice login
