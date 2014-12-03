@@ -618,3 +618,9 @@ you need to select some federations first!	ranking	de	Sie müssen zuerst einige 
 your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 zip code	ranking	de	Postleitzahl
+mail participants	ranking	de	Teilnehmer anmailen
+mail all participants	ranking	de	Alle Teilnehmer anmailen
+mail participants without password	ranking	de	Teilnehmer ohne Passwort anmailen
+from	ranking	de	Von
+mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	de	Mail an %1 Teilnehmer gesendet, %2 hatten keine EMail Adresse, %3 sind fehlgeschlagen.
+required information missing	ranking	de	Erforderliche Information fehlt

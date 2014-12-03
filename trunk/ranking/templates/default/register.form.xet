@@ -79,9 +79,28 @@
 				<row class="th" disabled="!@count">
 					<description value="Total of %s Athlets registered in all Categories." id="count" no_lang="1" span="all"/>
 				</row>
-				<row class="th" valign="top" disabled="1!@nation">
-					<description value="Teamofficials" for="officials"/>
-					<textbox multiline="true" id="officials" rows="5" cols="64" span="all"/>
+				<row class="th" valign="bottom" height="30" disabled="@no_mail">
+					<description value="Mail participants" span="all" class="bold"/>
+					<description/>
+				</row>
+				<row disabled="@no_mail">
+					<description value="From"/>
+					<textbox blur="Name &lt;email@domain&gt;" id="mail[from]" size="100"/>
+				</row>
+				<row disabled="@no_mail">
+					<description value="Subject"/>
+					<textbox id="mail[subject]" size="100"/>
+				</row>
+				<row disabled="@no_mail">
+					<description/>
+					<textbox multiline="true" id="mail[body]" rows="20" cols="100"/>
+				</row>
+				<row valign="top" height="50" disabled="@no_mail">
+					<description/>
+					<hbox span="all">
+						<button label="Mail all participants" id="mail[button][all]" span="all"/>
+						<button label="Mail participants without password" id="mail[button][no_password]"/>
+					</hbox>
 				</row>
 			</rows>
 		</grid>

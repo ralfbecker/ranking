@@ -437,6 +437,18 @@ class uiregistration extends ranking_bo
 			}
 			$starters =& $this->result->read($where,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
 
+			// mail all participants
+			$mail_allowed = $starters && $allow_register_everyone;
+			$content['no_mail'] = !$mail_allowed;
+			if($mail_allowed && $content['mail']['button'])
+			{
+				$msg = $this->mail($content['mail'], $starters);
+			}
+			if ($mail_allowed && !$content['mail'])
+			{
+				$content['mail'] = $this->mail_defaults();
+			}
+
 			$nat = '';
 			$nat_starters = array();
 			$prequal_lines = 0;
@@ -572,6 +584,8 @@ class uiregistration extends ranking_bo
 			'calendar' => $calendar,
 			'comp'     => $comp ? $comp['WetId'] : null,
 			'nation'   => $nation,
+			'no_mail'  => !isset($content['no_mail']) || $content['no_mail'],
+			'mail'     => $content['mail'],
 		);
 		$content += array(
 			// dont show registration line if no comp, in sitemgr or no registration rights
@@ -602,12 +616,92 @@ class uiregistration extends ranking_bo
 		}
 		// save calendar, competition & nation between calls in the session
 		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
-		$this->set_ui_state($perserv['calendar'],$preserv['comp'],$preserv['cat']);
+		$this->set_ui_state($preserv['calendar'],$preserv['comp'],$preserv['cat']);
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
 			(!$nation || $nation == 'NULL' ? '' : (': '.
 			(is_numeric($nation) && ($fed || ($fed = $this->federation->read($nation))) ? $fed['verband'] : $nation)));
 		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
+	}
+
+	/**
+	 * Send mail to all participants
+	 *
+	 * @param array $data
+	 * @param array $starters
+	 * @return string succes or error message
+	 */
+	function mail(array $data, array $starters)
+	{
+		foreach(array('from', 'subject', 'body', 'button') as $key)
+		{
+			if (empty($data[$key]))
+			{
+				return lang('Required information missing').': '.lang($key);
+			}
+		}
+		list($button) = each($data['button']);
+
+		$success = $no_email = $errors = 0;
+		foreach($starters as $starter)
+		{
+			if (!($athlete = $this->athlete->read($starter['PerId'])))
+			{
+				$errors++;
+				continues;
+			}
+			//if ($athlete['rkey'] != 'RB' || $success > 1) continue;
+			if ($button == 'no_password' && !empty($athlete['password']))
+			{
+				continue;
+			}
+			if (!preg_match('/'.url_widget::EMAIL_PREG.'/i', $athlete['email']))
+			{
+				$no_email++;
+				continue;
+			}
+			static $selfservice = null;
+			if (!isset($selfservice)) $selfservice = new ranking_selfservice();
+
+			try {
+				$selfservice->password_reset_mail($athlete, $data['subject'], $data['body'], $data['from']);
+				$success++;
+			}
+			catch (Exception $e)
+			{
+				$errors++;
+			}
+		}
+		unset($data['button']);
+		// store current values, if different from old defaults
+		if ($data != $this->mail_defaults())
+		{
+			$preferences = $GLOBALS['egw']->preferences;
+			$preferences->add('ranking', 'mail_defaults', $data);
+			$preferences->save_repository();
+		}
+		return lang('Mail to %1 participants send, %2 had no email-address, %3 failed.',
+			$success, $no_email, $errors.($e ? ' ('.$e->getMessage().')' : ''));
+	}
+
+	/**
+	 * Preset default mail content
+	 *
+	 * @return array values for keys 'from', 'subject' and 'body'
+	 */
+	function mail_defaults()
+	{
+		$data = $GLOBALS['egw_info']['user']['preferences']['ranking']['mail_defaults'];
+
+		if (!is_array($data))
+		{
+			$data = array(
+				'from' => $GLOBALS['egw_info']['user']['account_fullname'].' <'.$GLOBALS['egw_info']['user']['account_email'].'>',
+			);
+			list($data['subject'], $data['body']) = preg_split("/\r?\n/",
+				file_get_contents(EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt'), 2);
+		}
+		return $data;
 	}
 
 	/**
