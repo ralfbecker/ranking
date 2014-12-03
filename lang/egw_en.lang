@@ -261,6 +261,7 @@ format #%1 not found!	ranking	en	Format #%1 not found!
 format deleted	ranking	en	Format deleted
 format saved	ranking	en	Format saved
 free text	ranking	en	free text
+from	ranking	en	From
 from other competitions	ranking	en	from other competitions
 from the ranking	ranking	en	from the ranking
 full cathegory name (must not be empty)	ranking	en	full cathegory name (must not be empty)
@@ -324,6 +325,10 @@ lead	ranking	en	lead
 license number	ranking	en	License number
 line	ranking	en	Line
 login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too many unsuccessful tries!
+mail all participants	ranking	en	Mail all participants
+mail participants	ranking	en	Mail participants
+mail participants without password	ranking	en	Mail participants without password
+mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	en	Mail to %1 participants send, %2 had no email-address, %3 failed.
 male	ranking	en	male
 max	ranking	en	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
@@ -449,6 +454,7 @@ removed the %1	ranking	en	Removed the %1
 repeat	ranking	en	Repeat
 replace: %1	ranking	en	replace: %1
 require to drop results equally by discipline	ranking	en	Require to drop results equally by discipline
+required information missing	ranking	en	Required information missing
 required information missing, application rejected!	ranking	en	Required information missing, application rejected!
 result	ranking	en	Result
 result (latest result, result of all cats or result of one cat)	ranking	en	Result (latest result, result of all cats or result of one cat)

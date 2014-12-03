@@ -460,29 +460,48 @@ class ranking_selfservice extends ranking_bo
 	 * Send password-reset-mail to athlete
 	 *
 	 * @param array $athlete
-	 * @throws Exception on error
+	 * @param string $subject =null default first line of ranking/doc/password-reset-mail.txt
+	 * @param string $body =null 2.-last list of above file
+	 * @param string $from ='digtal ROCK <info@digitalrock.de>'
+	 * @param type $is_html =false
+	 * @throws egw_exception_wrong_parameter
 	 */
-	public function password_reset_mail(array $athlete)
+	public function password_reset_mail(array $athlete, $subject=null, $body=null, $from='digtal ROCK <info@digitalrock.de>', $is_html=false)
 	{
-		// create and store recovery hash and time
-		$this->athlete->update(array(
-			'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
-			'recover_pw_time' => $this->athlete->now,
-		));
-		$link = egw::link('/ranking/athlete.php', array(
-			'PerId' => $athlete['PerId'],
-			'action'  => 'password',
-			'hash' => $this->athlete->data['recover_pw_hash'],
-		));
-		if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
+		if (empty($subject) || empty($body))
+		{
+			$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
 
-		$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
+			if (!files_exists($template) || !is_readable($template))
+			{
+				throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
+			}
+			$is_html = preg_match('/\.txt$/',$template);
+
+			list($subject, $body) = preg_split("/\r?\n/", file_get_contents($template), 2);
+		}
+		// generate password reset, if requested in $body
+		if (strpos($body, '$$LINK$$') !== false)
+		{
+			// create and store recovery hash and time
+			$this->athlete->update(array(
+				'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
+				'recover_pw_time' => $this->athlete->now,
+			));
+			$link = egw::link('/ranking/athlete.php', array(
+				'PerId' => $athlete['PerId'],
+				'action'  => 'password',
+				'hash' => $this->athlete->data['recover_pw_hash'],
+			));
+			if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
+		}
+
 		self::mail("$athlete[vorname] $athlete[nachname] <$athlete[email]>",
 			$athlete+array(
-				'LINK' => preg_match('/\.txt$/',$template) ? $link : '<a href="'.$link.'">'.$link.'<a>',
+				'LINK' => !$is_html ? $link : '<a href="'.$link.'">'.$link.'<a>',
 				'SERVER_NAME' => $_SERVER['SERVER_NAME'],
 				'RECOVERY_TIMEOUT' => self::RECOVERY_TIMEOUT/3600,	// in hours (not sec)
-			), $template);
+			), $subject, $body, $from, $is_html);
 	}
 
 	/**
@@ -490,28 +509,24 @@ class ranking_selfservice extends ranking_bo
 	 *
 	 * @param string $email email address(es comma-separated), or rfc822 "Name <email@domain.com>"
 	 * @param array $replacements name => value pairs, can be used as $$name$$ in template
-	 * @param string $template filename of template, first line is subject, type depends on .txt extension
-	 * @param string $from ='digtal ROCK <info@digitalrock.de>'
+	 * @param string $subject
+	 * @param string $body
+	 * @param string $from
+	 * @param boolean $is_html =false $template is html
 	 * @throws Exception on error
 	 */
-	private static function mail($email, array $replacements, $template, $from='digtal ROCK <info@digitalrock.de>')
+	private static function mail($email, array $replacements, $subject, $body, $from, $is_html=false)
 	{
 		//$email = "$replacements[vorname] $replacements[nachname] <info@digitalrock.de>";
-		$is_txt = preg_match('/\.txt$/', $template);
-		if (!($file = file_get_contents($template)))
-		{
-			throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
-		}
 		$replace = array();
 		foreach($replacements as $name => $value)
 		{
+			if (in_array($name, array('password', 'recover_pw_hash', 'recover_pw_time', 'login_failed'))) continue;
 			$replace['$$'.$name.'$$'] = $value;
 		}
-		$subject_body = strtr($file, $replace);
-		list($subject,$body) = preg_split("/\r?\n/", $subject_body, 2);
 
 		$mailer = new send();
-		$mailer->IsHTML(!$is_txt);
+		$mailer->IsHTML($is_html);
 
 		$matches = null;
 		if (preg_match_all('/"?(.+)"?<(.+)>,?/',$email,$matches))
@@ -528,8 +543,8 @@ class ranking_selfservice extends ranking_bo
 		{
 			$mailer->AddAddress($address,$names[$n]);
 		}
-		$mailer->Subject = $subject;
-		$mailer->Body = $body;
+		$mailer->Subject = strtr($subject, $replace);
+		$mailer->Body = strtr($body, $replace);
 
 		$mailer->From = $from;
 		if (preg_match('/"?(.+)"?<(.+)>,?/',$from,$matches))
