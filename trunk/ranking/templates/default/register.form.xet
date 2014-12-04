@@ -100,6 +100,7 @@
 					<hbox span="all">
 						<button label="Mail all participants" id="mail[button][all]" span="all"/>
 						<button label="Mail participants without password" id="mail[button][no_password]"/>
+						<button label="Participants without password or recent reminder" id="mail[button][recent]"/>
 					</hbox>
 				</row>
 			</rows>

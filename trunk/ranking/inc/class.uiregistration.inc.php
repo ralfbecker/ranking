@@ -651,9 +651,16 @@ class uiregistration extends ranking_bo
 				continues;
 			}
 			//if ($athlete['rkey'] != 'RB' || $success > 1) continue;
-			if ($button == 'no_password' && !empty($athlete['password']))
+			switch($button)
 			{
-				continue;
+				case 'all':
+					break;
+				case 'recent':
+					if ($GLOBALS['egw']->db->from_timestamp($athlete['recover_pw_time']) > time()-7*86400) continue 2;
+					// fall through
+				case 'no_password':
+					if (!empty($athlete['password'])) continue 2;
+					break;
 			}
 			if (!preg_match('/'.url_widget::EMAIL_PREG.'/i', $athlete['email']))
 			{

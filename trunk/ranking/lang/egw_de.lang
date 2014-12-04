@@ -257,6 +257,7 @@ format #%1 not found!	ranking	de	Format #%1 nicht gefunden!
 format deleted	ranking	de	Format gelöscht
 format saved	ranking	de	Format gespeichert
 free text	ranking	de	freier Text
+from	ranking	de	Von
 from other competitions	ranking	de	von anderen Wettkämpfen
 from the ranking	ranking	de	von der Rangliste
 full cathegory name (must not be empty)	ranking	de	vollständiger Name der Kategorie (darf nicht leer sein)
@@ -320,6 +321,10 @@ lead	ranking	de	Schwierigkeit
 license number	ranking	de	Lizenznummer
 line	ranking	de	Zeile
 login suspended, too many unsuccessful tries!	ranking	de	Login ausgesetzt, zu viele erfolglosen Versuche!
+mail all participants	ranking	de	Alle Teilnehmer anmailen
+mail participants	ranking	de	Teilnehmer anmailen
+mail participants without password	ranking	de	Teilnehmer ohne Passwort anmailen
+mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	de	Mail an %1 Teilnehmer gesendet, %2 hatten keine EMail Adresse, %3 sind fehlgeschlagen.
 male	ranking	de	männlich
 max	ranking	de	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
@@ -445,6 +450,7 @@ removed the %1	ranking	de	Das %1 wurde gelöscht
 repeat	ranking	de	Wiederholen
 replace: %1	ranking	de	Ersetze: %1
 require to drop results equally by discipline	ranking	de	Streichresultate erfolgen gleichmäßig pro Disziplin
+required information missing	ranking	de	Erforderliche Information fehlt
 required information missing, application rejected!	ranking	de	Erforderliche Information(en) fehlen, Antrag zurückgewiesen!
 result	ranking	de	Ergebnis
 result (latest result, result of all cats or result of one cat)	ranking	de	Ergebnis (aktuelles Ergebnis, Ergebnis alle Kategorien oder nur einer Kategorie)
@@ -618,9 +624,4 @@ you need to select some federations first!	ranking	de	Sie müssen zuerst einige 
 your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 zip code	ranking	de	Postleitzahl
-mail participants	ranking	de	Teilnehmer anmailen
-mail all participants	ranking	de	Alle Teilnehmer anmailen
-mail participants without password	ranking	de	Teilnehmer ohne Passwort anmailen
-from	ranking	de	Von
-mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	de	Mail an %1 Teilnehmer gesendet, %2 hatten keine EMail Adresse, %3 sind fehlgeschlagen.
-required information missing	ranking	de	Erforderliche Information fehlt
+participants without password or recent reminder	ranking	de	Teilnehmer ohne Passwort oder aktuelle Erinnerung
