@@ -1536,7 +1536,7 @@ class uiresult extends ranking_result_bo
 		// disable route- and category-selection, as they lead out of self-service
 		if ($this->is_selfservice())
 		{
-			$content['no_route_selection'] = $readonlys['nm[cat]'] = true;
+			$GLOBALS['egw_info']['flags']['java_script'] .= "<script>\njQuery(function(){jQuery('tr.noPrint').css('display', 'none');});\n</script>";
 		}
 		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
