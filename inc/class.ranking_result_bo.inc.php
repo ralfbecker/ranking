@@ -1779,6 +1779,11 @@ class ranking_result_bo extends ranking_bo
 		{
 			$discipline = $content['discipline'];
 		}
+		// selfscore finals are allways discipline boulder
+		if (!$route_order && $discipline == 'selfscore')
+		{
+			$discipline = $content['discipline'] = 'boulder';
+		}
 		return $msg ? $msg : true;
 	}
 
