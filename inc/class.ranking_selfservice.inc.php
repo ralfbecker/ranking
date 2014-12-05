@@ -295,7 +295,7 @@ class ranking_selfservice extends ranking_bo
 		));
 		if ($athlete && empty($athlete['password']) || in_array($action,array('recovery','password','set')))
 		{
-			if (empty($athlete['password']) && !in_array($action,array('password','set')))
+			if (empty($athlete['password']) && !in_array($action,array('password','set','recovery')))
 			{
 				echo "<p class='error'>".lang("You have not yet a password set!")."</p>\n";
 			}
@@ -472,7 +472,7 @@ class ranking_selfservice extends ranking_bo
 		{
 			$template = EGW_SERVER_ROOT.'/ranking/doc/reset-password-mail.txt';
 
-			if (!files_exists($template) || !is_readable($template))
+			if (!file_exists($template) || !is_readable($template))
 			{
 				throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
 			}
