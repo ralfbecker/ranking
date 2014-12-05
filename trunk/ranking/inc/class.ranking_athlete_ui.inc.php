@@ -374,6 +374,10 @@ class ranking_athlete_ui extends ranking_bo
 			}
 			if ($content['save'] || $content['delete'] || $content['cancel'])
 			{
+				if ($this->is_selfservice())
+				{
+					egw::redirect_link('/ranking/athlete.php');
+				}
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
 				common::egw_exit();
 			}
