@@ -116,7 +116,7 @@ $cats = array(
 		'cat_id' => array(59),
 	),
 	'ger' => array(
-		'label'  => 'Sportklettern',
+		'label'  => 'Lead',
 		'nation' => 'GER',
 		'grps'   => $ger_adult,
 		'serie_grps' => $ger_adult+$ger_junior,
