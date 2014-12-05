@@ -223,6 +223,7 @@ class ranking_route_result extends so_sql
 						$result_cols[] = 'result_detail';	// false_start
 						break;
 					case 'boulder':
+					case 'selfscore':
 						$result_cols[] = 'result_top';
 						$result_cols[] = 'result_zone';
 						break;
@@ -428,7 +429,7 @@ class ranking_route_result extends so_sql
 	 * @param string &$order_by
 	 * @param array &$route_names route_order => route_name pairs
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
-	 * @param string $discipline 'lead', 'speed', 'boulder', 'speedrelay'
+	 * @param string &$discipline 'lead', 'speed', 'boulder', 'speedrelay'
 	 * @param array $result_cols =array() result relevant col
 	 * @return string join
 	 */
@@ -537,7 +538,7 @@ class ranking_route_result extends so_sql
 			}
 		}
 		// "unpack" result-details, only if we are NO general result, as it messes up the general result
-		if ($data['result_detail'] && !$data['general_result'])
+		if ($data['result_detail'] && (!$data['general_result'] || $data['discipline'] == 'selfscore'))
 		{
 			$data['result_detail'] = self::unserialize($data['result_detail']);
 
@@ -632,13 +633,21 @@ class ranking_route_result extends so_sql
 				}
 				break;
 
+			case 'selfscore':
+				$data['result'] = count($data['score']);
+				// selfscore with fixed number of points per boulder distributed to all reaching top
+				if ($data['result_top'] != 100*$data['result']-$data['result'])
+				{
+					$data['result'] = number_format($data['result_top']/100, 2, '.', '').'/'.$data['result'];
+				}
+				// fall through, as final for selfscore is always boulder
 			case 'boulder':
 				for($i=1; $i <= self::MAX_BOULDERS; ++$i)
 				{
 					$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
 						((string)$data['zone'.$i] !== '' ? 'b'.$data['zone'.$i] : '');
 				}
-				$suffix = '';	// general result can have route_order as suffix
+				$suffix = $data['discipline'] == 'selfscore' ? 2 : '';	// general result can have route_order as suffix
 				while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
 				{
 					if (isset($data['result_zone'.$suffix]))
@@ -669,15 +678,6 @@ class ranking_route_result extends so_sql
 						if (!$data['route_order']) $data['result_rank0'] = $data['result_rank'];
 					}
 					++$suffix;
-				}
-				break;
-
-			case 'selfscore':
-				$data['result'] = count($data['score']);
-				// selfscore with fixed number of points per boulder distributed to all reaching top
-				if ($data['result_top'] != 100*$data['result']-$data['result'])
-				{
-					$data['result'] = ($data['result_top']/100).'/'.$data['result'];
 				}
 				break;
 

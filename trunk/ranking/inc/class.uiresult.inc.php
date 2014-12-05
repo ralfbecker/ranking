@@ -720,6 +720,17 @@ class uiresult extends ranking_result_bo
 		$query['col_filter']['route_order'] = $query['route'];
 		// this is to transport the route_type to ranking_route_result::search's filter param
 		$query['col_filter']['route_type'] = $query['route_type'];
+
+		// for selfscore finals are boulder, so we need to check for boulder, if there is a selfscore quali
+		if ($query['discipline'] == 'boulder' && $query['route'] == -1 &&
+			($route = $this->route->read(array(
+				'route_order'=> 0,
+				'WetId' => $query['comp'],
+				'GrpId' => $query['cat'],
+			))))
+		{
+			$query['discipline'] = $route['discipline'];
+		}
 		$query['col_filter']['discipline'] = $query['discipline'];
 		$query['col_filter']['quali_preselected'] = $query['quali_preselected'];
 		// check if route_result object is instancated for relay or not
