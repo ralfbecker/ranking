@@ -14,7 +14,7 @@ body {
 	margin: 10px !important;
 }
 p, td, body {
-	font-size: 14px;
+	font-size: 14px !important;
 }
 p.error {
 	color: red;
@@ -35,6 +35,10 @@ h1#action-scorecard {
 	background-color: silver;
 }
 #exec\[button\]\[download\], #exec\[result_popup\] {
+	display: none;
+}
+/* disable route- and category-selection, as they lead out of self-service */
+tr.noPrint {
 	display: none;
 }
 table#exec\[score\]\[score\] {

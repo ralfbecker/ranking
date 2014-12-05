@@ -1533,11 +1533,6 @@ class uiresult extends ranking_result_bo
 		{
 			$content['start_order_label'] = lang('Start- order');
 		}
-		// disable route- and category-selection, as they lead out of self-service
-		if ($this->is_selfservice())
-		{
-			$GLOBALS['egw_info']['flags']['java_script'] .= "<script>\njQuery(function(){jQuery('tr.noPrint').css('display', 'none');});\n</script>";
-		}
 		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 
