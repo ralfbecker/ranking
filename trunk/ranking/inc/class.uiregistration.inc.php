@@ -443,6 +443,7 @@ class uiregistration extends ranking_bo
 			if($mail_allowed && $content['mail']['button'])
 			{
 				$msg = $this->mail($content['mail'], $starters);
+				unset($content['mail']['button']);
 			}
 			if ($mail_allowed && !$content['mail'])
 			{
