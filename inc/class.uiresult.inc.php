@@ -1533,6 +1533,11 @@ class uiresult extends ranking_result_bo
 		{
 			$content['start_order_label'] = lang('Start- order');
 		}
+		// disable route- and category-selection, as they lead out of self-service
+		if ($this->is_selfservice())
+		{
+			$content['no_route_selection'] = $readonlys['nm[cat]'] = true;
+		}
 		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 
