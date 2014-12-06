@@ -1533,7 +1533,7 @@ class ranking_result_bo extends ranking_bo
 			'route_type' => $keys['route_type'] == TWO_QUALI_SPEED ? ONE_QUALI : $keys['route_type'],
 		)) as $row)
 		{
-			error_log('row='.array2string($row));
+			//error_log('row='.array2string($row));
 			if ($row['result_rank'])
 			{
 				if ($filter_nation && (!is_numeric($filter_nation) && $row['nation'] != $filter_nation ||

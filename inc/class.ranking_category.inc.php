@@ -438,7 +438,7 @@ class ranking_category extends so_sql
 	 */
 	function in_agegroup($birthdate,$cat,$year=null)
 	{
-		static $cats;	// some caching of cats, to not read them multiple times
+		static $cats=array();	// some caching of cats, to not read them multiple times
 
 		if (!is_array($cat))
 		{
@@ -453,7 +453,11 @@ class ranking_category extends so_sql
 		if (!self::age_group($cat,$year,$from_year,$to_year))
 		{
 			$ret = true;
-			$reason = ' (cat does not use age-groups)';
+			//$reason = ' (cat does not use age-groups)';
+		}
+		elseif (!$birthdate)
+		{
+			$ret = false;
 		}
 		else
 		{
