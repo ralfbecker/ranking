@@ -76,3 +76,12 @@ div.bonusTries, div.topTries {
 td.federation, th.federation, td.city, th.city {
 	display: none;
 }
+
+/**
+ * Statistic on boulder results
+ */
+.jqplot-axis {
+	color: white;
+	font-size: 30px;
+	font-family: "Arial Narrow",Arial,Helvetica,sans-serif;
+}
