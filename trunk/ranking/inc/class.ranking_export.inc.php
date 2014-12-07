@@ -103,7 +103,7 @@ class ranking_export extends ranking_result_bo
 	/**
 	 * Return base url
 	 *
-	 * @param boolean $use_egw=false do we need egroupware or website
+	 * @param boolean $use_egw =false do we need egroupware or website
 	 * @return string with schema and host (no path or trailing slash)
 	 */
 	static function base_url($use_egw=false)
@@ -136,7 +136,7 @@ class ranking_export extends ranking_result_bo
 	 */
 	static function result_url($comp, $cat)
 	{
-		static $base;
+		static $base=null;
 		if (is_null($base))
 		{
 			$base = self::base_url();
@@ -159,12 +159,12 @@ class ranking_export extends ranking_result_bo
 	 * for which /index.php?page_name=pstambl is used.
 	 *
 	 * @param array $athlete
-	 * @param int $cat=null
+	 * @param int $cat =null
 	 * @return string
 	 */
 	static function profile_url($athlete,$cat=null)
 	{
-		static $base;
+		static $base=null;
 		if (is_null($base))
 		{
 			$base = self::base_url();
@@ -187,13 +187,13 @@ class ranking_export extends ranking_result_bo
 	 * for which /index.php?page_name=result is used.
 	 *
 	 * @param int|array $cat
-	 * @param int $cup=null
-	 * @param int $comp=null
+	 * @param int $cup =null
+	 * @param int $comp =null
 	 * @return string
 	 */
 	static function ranking_url($cat, $cup=null, $comp=null)
 	{
-		static $base;
+		static $base=null;
 		if (is_null($base))
 		{
 			$base = self::base_url();
@@ -261,9 +261,9 @@ class ranking_export extends ranking_result_bo
 	 * Delete export route cache for given route and additionaly the general result
 	 *
 	 * @param int|array $comp WetId or array with values for WetId, GrpId and route_order
-	 * @param int $cat=null GrpId
-	 * @param int $route_order=null
-	 * @param boolean $previous_heats=false also invalidate previous heats, eg. if new heats got created to include them in route_names
+	 * @param int $cat =null GrpId
+	 * @param int $route_order =null
+	 * @param boolean $previous_heats =false also invalidate previous heats, eg. if new heats got created to include them in route_names
 	 */
 	public static function delete_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false)
 	{
@@ -296,31 +296,31 @@ class ranking_export extends ranking_result_bo
 	 * Get's called from save_result with $update_cache===true, to keep the cache updated
 	 *
 	 * @param int $comp
-	 * @param int|string $cat
-	 * @param int|string $heat=-1 string 'result' to use result from ranking
-	 * @param boolean $update_cache=false false: read result from cache, false: update cache, before using it
+	 * @param int|string $cat GrpId or rkey
+	 * @param int|string $heat =-1 string 'result' to use result from ranking
+	 * @param boolean $update_cache =false false: read result from cache, false: update cache, before using it
 	 * @return array
 	 */
 	public static function export_route($comp,$cat,$heat=-1,$update_cache=false)
 	{
-		static $instance;
+		static $instance=null;
 
 		// normalise cat, we only want to cache one - the numeric - id
 		if (!is_numeric($cat))
 		{
-			$cat = strtolower($cat);
+			$rkey = strtolower($cat);
 			$cat_rkey2id = egw_cache::getInstance('ranking', 'cat_rkey2id');
-			if (!isset($cat_rkey2id[$cat]))
+			if (!isset($cat_rkey2id[$rkey]))
 			{
 				if (!isset($instance)) $instance = new ranking_export();
-				if (!($cat_arr = $instance->cats->read($cat)))
+				if (!($cat_arr = $instance->cats->read($rkey)))
 				{
 					throw new Exception(lang('Category NOT found !!!'));
 				}
-				$cat_rkey2id[$cat] = $cat_arr['GrpId'];
+				$cat_rkey2id[$rkey] = $cat_arr['GrpId'];
 				egw_cache::setInstance('ranking', 'cat_rkey2id', $cat_rkey2id);
 			}
-			$cat = $cat_rkey2id[$cat];
+			$cat = $cat_rkey2id[$rkey];
 		}
 		// can we use the cached data und do we have it?
 		$location = 'route:'.$comp.':'.$cat.':'.$heat;
@@ -382,12 +382,12 @@ class ranking_export extends ranking_result_bo
 	 *
 	 * @param int $comp
 	 * @param int|string|array $cat
-	 * @param int $heat=-1
+	 * @param int $heat =-1
 	 * @return array
 	 */
 	protected  function _export_route($comp,$cat,$heat=-1)
 	{
-		$start = microtime(true);
+		//$start = microtime(true);
 
 		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
@@ -435,7 +435,8 @@ class ranking_export extends ranking_result_bo
 				$ranking = $this->export_ranking($cat, $comp['datum'], $comp['serie']);
 			}
 			catch(Exception $e) {
-				unset($ranking);	// ignore no ranking defined or no result yet
+				unset($e);
+				$ranking = null;	// ignore no ranking defined or no result yet
 			}
 		}
 
@@ -732,13 +733,12 @@ class ranking_export extends ranking_result_bo
 			{
 				$unranked[$row[$this->route_result->id_col]] = $row;
 			}
-			$last_rank = $row['result_rank'];
 		}
-		$tn = array_merge($tn,$unranked);
+		$participants = array_merge($tn,$unranked);
 
 		$ret = $route+array(
 			'discipline'    => $discipline,
-			'participants'  => $tn,
+			'participants'  => $participants,
 			'last_modified' => $last_modified,
 		);
 		if ($statistics)
@@ -746,7 +746,7 @@ class ranking_export extends ranking_result_bo
 			switch($discipline)
 			{
 				case 'boulder':
-					foreach($statistics as $num => &$stats)
+					foreach($statistics as &$stats)
 					{
 						foreach(array('top', 'bonus') as $name)
 						{
@@ -878,8 +878,8 @@ class ranking_export extends ranking_result_bo
 	 * Export a competition calendar for the given year and nation(s)
 	 *
 	 * @param array|string $nations
-	 * @param int $year=null default current year
-	 * @param array $filter=null eg. array('fed_id' => 123)
+	 * @param int $year =null default current year
+	 * @param array $filter =null eg. array('fed_id' => 123)
 	 * @return array or competitions
 	 * @todo turn rename_key call in explicit column-list with from AS to
 	 */
@@ -951,8 +951,7 @@ class ranking_export extends ranking_result_bo
 			//_debug_array($cups); die('STOP');
 		}
 		// query status (existence for start list or result)
-		$status = $this->result->result_status($ids);
-		$status = $this->route_result->result_status($ids,$status);
+		$status = $this->route_result->result_status($ids, $this->result->result_status($ids));
 		unset($cat);
 		//_debug_array($status); die('Stop');
 		foreach($competitions as &$comp)
@@ -1007,7 +1006,7 @@ class ranking_export extends ranking_result_bo
 					'name'  => $id2cup[$comp['cup']]['name'],
 				);
 			}
-			if (($attachments = $this->comp->attachments($comp,$return_link=true,$only_pdf=true,self::base_url(true))))
+			if (($attachments = $this->comp->attachments($comp, true, true, self::base_url(true))))
 			{
 				$comp += $attachments;
 			}
@@ -1115,9 +1114,9 @@ class ranking_export extends ranking_result_bo
 	 * Export a (cup) ranking
 	 *
 	 * @param int|string|array $cat id or rkey or category as array
-	 * @param string $date=null date of ranking, default today
+	 * @param string $date =null date of ranking, default today
 	 * @param int|string $cup id or rkey of cup to generate a cup-ranking
-	 * @param boolean $force_cache=false true use cache even for $ignore_caching_hosts
+	 * @param boolean $force_cache =false true use cache even for $ignore_caching_hosts
 	 * @return array or athletes
 	 */
 	public function export_ranking($cat,$date=null,$cup=null,$force_cache=false)
@@ -1140,6 +1139,7 @@ class ranking_export extends ranking_result_bo
 		$overall = count($cat['GrpIds']) > 1;
 
 		$comps = array();
+		$start = $comp = $pers = $rls = $ex_aquo = $not_counting = $max_comp = null;
 		if (!($ranking = $this->calc->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
 		{
 			throw new Exception(lang('No ranking defined or no results yet for category %1 !!!',$cat['name']));
@@ -1341,12 +1341,12 @@ class ranking_export extends ranking_result_bo
 	 * Export results from all categories of a competition
 	 *
 	 * @param string|int $comp WetId or rkey of competition or '.' or 3-char calendar nation for latest result
-	 * @param int $num=null how many results to return, default 8 for 2 categories (or less), otherwise 3
-	 * @param string $nation=null if set, return all results of that nation
-	 * @param array $filter=null eg. array('fed_id' => 123)
+	 * @param int $num =null how many results to return, default 8 for 2 categories (or less), otherwise 3
+	 * @param string $nation =null if set, return all results of that nation
+	 * @param array $_filter =null eg. array('fed_id' => 123)
 	 * @return array
 	 */
-	public function export_results($comp, $num=null, $nation=null, array $filter=null)
+	public function export_results($comp, $num=null, $nation=null, array $_filter=null)
 	{
 		$location = 'results:'.json_encode(func_get_args());
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
@@ -1368,7 +1368,7 @@ class ranking_export extends ranking_result_bo
 			}
 			$calendar = $comp['nation'];
 		}
-		$filter = self::process_filter($filter);
+		$filter = self::process_filter($_filter);
 		$filter['nation'] = $calendar;
 		$filter[] = $this->comp->table_name.'.datum <= '.$this->db->quote(time(), 'date');
 		// show all competitions of previous year
@@ -1412,7 +1412,7 @@ class ranking_export extends ranking_result_bo
 		{
 			$result_filter = '('.$result_filter.' OR nation='.$this->db->quote($nation).')';
 		}
-		$results = array();
+		$last_modified = null;
 		foreach($this->result->read(array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => array_keys($cats_by_id),
@@ -1609,7 +1609,7 @@ class ranking_export extends ranking_result_bo
 	 *
 	 * @param array $comp
 	 * @param int $cat
-	 * @param string $type=null "result"
+	 * @param string $type =null "result"
 	 * @return array with array of links ("name", "url") for key "see_also", empty array otherwise
 	 */
 	public function see_also_result(array $comp, $cat, $type=null)
@@ -1678,10 +1678,11 @@ class ranking_export extends ranking_result_bo
 			throw new Exception(lang('No starters yet !!!'));
 		}
 		$athletes = $federations = array();
+		$last_modified = null;
 		foreach($this->result->read(array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => -1,
-		), '', true, $results ? '' : ($comp['nation'] ? 'acl_fed_id,fed_parent' : 'nation').',GrpId,pkt') as $result)
+		), '', true, ($comp['nation'] ? 'acl_fed_id,fed_parent' : 'nation').',GrpId,pkt') as $result)
 		{
 			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
 			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
@@ -1793,13 +1794,13 @@ class ranking_export extends ranking_result_bo
 	 * Export starters / registration from all categories of a competition
 	 *
 	 * @param string|int $athlete numeric id or rkey of athlete
-	 * @param string|int $cat=null numeric id or rkey of category, to calculate ranking and cup rankings
+	 * @param string|int $cat =null numeric id or rkey of category, to calculate ranking and cup rankings
 	 * @return array
 	 */
 	public function export_profile($athlete, $cat=null)
 	{
 		$location = 'profile:'.$athlete.':'.$cat;
-		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) && is_numeric($comp) &&
+		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) && is_numeric($athlete) &&
 			($data = egw_cache::getInstance('ranking', $location)))
 		{
 			return $data;
@@ -1866,6 +1867,7 @@ class ranking_export extends ranking_result_bo
 						}
 						catch(Exception $e) {
 							// ignore not existing rankings
+							unset($e);
 						}
 					}
 
@@ -1880,27 +1882,12 @@ class ranking_export extends ranking_result_bo
 			))))
 			{
 				$year = (int)date('Y');
-				$limits = array();
 				foreach($results as $result)
 				{
 					if ($last_modified < ($ts = egw_time::to($result['modified'], 'ts')))
 					{
 						$last_modified = $ts;
 					}
-					/* done on clientside
-					$weight = $result['platz']/2 + ($year-$result['datum']) + 4*!empty($result['nation']);
-					// maintain array of N best competitions (least weight)
-					if (count($limits) < self::WEIGHT_LIMITS || $weight < $limits[count($limits)-1])
-					{
-						foreach($limits as $n => $limit)
-						{
-							if ($limit > $weight) break;
-						}
-						if ($limit < $weight && $n == count($limits)-1) $n = count($limits);
-						$limits = array_merge(array_slice($limits, 0, (int)$n), array($weight),
-							array_slice($limits, (int)$n, self::WEIGHT_LIMITS-1-$n));
-					}
-					*/
 					$data['results'][] = array(
 						'rank' => $result['platz'],
 						'date' => $result['datum'],
@@ -1910,10 +1897,8 @@ class ranking_export extends ranking_result_bo
 						'WetId' => $result['WetId'],
 						'cat_name' => $result['cat_name'],
 						'GrpId' => $result['GrpId'],
-						//'weight' => $weight,
 					);
 				}
-				//$data['weight_limits'] = $limits;
 			}
 
 			unset($data['last_modified']);
@@ -1936,10 +1921,10 @@ class ranking_export extends ranking_result_bo
 	 * Location for caching of an aggregated ranking: national team ranking, sektionen wertung, ...
 	 *
 	 * @param string $type 'nat_team_ranking', 'sektionenwertung', 'regionalzentren'
-	 * @param string $date='.'
-	 * @param int $comp=null
-	 * @param int $cup=null
-	 * @param int|string $cat=null (multiple comma-separated) cat id(s)
+	 * @param string $date ='.'
+	 * @param int $comp =null
+	 * @param int $cup =null
+	 * @param int|string $cat =null (multiple comma-separated) cat id(s)
 	 * @param array &$filter=null on return filter
 	 * @throws Exception
 	 * @return string
@@ -1962,10 +1947,10 @@ class ranking_export extends ranking_result_bo
 	 * Export an aggregated ranking: national team ranking, sektionen wertung, ...
 	 *
 	 * @param string $type 'nat_team_ranking', 'sektionenwertung', 'regionalzentren'
-	 * @param string $date='.'
-	 * @param int $comp=null
-	 * @param int $cup=null
-	 * @param int|string $cat=null (multiple comma-separated) cat id(s)
+	 * @param string $date ='.'
+	 * @param int $comp =null
+	 * @param int $cup =null
+	 * @param int|string $cat =null (multiple comma-separated) cat id(s)
 	 * @throws Exception
 	 * @return array
 	 */
@@ -1978,6 +1963,7 @@ class ranking_export extends ranking_result_bo
 		{
 			$cup = $c['SerId'];
 		}
+		$filter = null;
 		$location = self::export_aggregated_location($type, $date, $comp, $cup, $cat, $filter);
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
 			($data = egw_cache::getInstance('ranking', $location)))
@@ -1993,6 +1979,7 @@ class ranking_export extends ranking_result_bo
 				{
 					throw new Exception ("National team ranking only defined for competitions or cups!");
 				}
+				$date_comp = null;
 				$feds = $this->calc->nat_team_ranking($comp, $cat, $cup, $date, $date_comp);
 				$name = 'National Team Ranking';
 				$aggregated_name = 'Nation';
@@ -2099,7 +2086,7 @@ class ranking_export extends ranking_result_bo
 	 *
 	 * @param array $arr
 	 * @param array $rename array with from => to or from => false pairs
-	 * @param boolean $filter=false true return only fields given in $rename, false return whole $arr
+	 * @param boolean $filter =false true return only fields given in $rename, false return whole $arr
 	 * @return array
 	 */
 	public static function rename_key(array $arr, array $rename, $filter=false)
