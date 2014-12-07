@@ -773,29 +773,41 @@ class ranking_export extends ranking_result_bo
 		{
 			$ret += $this->see_also_result($comp, $cat);
 		}
-		// add other categories
-		foreach($this->route->search(array(
-			'WetId' => $comp['WetId'],
-		)) as $route)
-		{
-			if (!isset($ret['categorys'][$route['GrpId']]) || $ret['categorys'][$route['GrpId']]['route_order'] < $route['route_order'])
-			{
-				$ret['categorys'][$route['GrpId']] = array(
-					'GrpId' => $route['GrpId'],
-					'route_order' => $route['route_order'],
-				);
-			}
-		}
-		foreach($this->cats->names(array('GrpId' => array_keys($ret['categorys'])), 0) as $id => $name)
-		{
-			$ret['categorys'][$id]['name'] = $name;
-		}
-		$ret['categorys'] = array_values($ret['categorys']);
+		// add other categories incl. ranking ones
+		$ret['categorys'] = array_values($this->_route_categories($comp, $this->_result_categories($comp)));
 
 		unset($ret['last_modified']);	// to NOT cause etag change by not contained data
 		$ret['etag'] = md5(serialize($ret));
 
 		return $ret;
+	}
+
+	/**
+	 * Get result-service categories for a given competition
+	 *
+	 * @param int|array $comp
+	 * @param array $categories =array()
+	 * @return array GrpId => array with keys GrpId and name
+	 */
+	protected function _route_categories($comp, $categories=array())
+	{
+		foreach($this->route->search(array(
+			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
+		)) as $route)
+		{
+			if (!isset($categories[$route['GrpId']]) || $categories[$route['GrpId']]['route_order'] < $route['route_order'])
+			{
+				$categories[$route['GrpId']] = array(
+					'GrpId' => $route['GrpId'],
+					'route_order' => $route['route_order'],
+				);
+			}
+		}
+		foreach($this->cats->names(array('GrpId' => array_keys($categories)), 0) as $id => $name)
+		{
+			$categories[$id]['name'] = $name;
+		}
+		return $categories;
 	}
 
 	/**
@@ -1577,29 +1589,41 @@ class ranking_export extends ranking_result_bo
 		);
 		$ret += $this->see_also_result($comp, $cat, 'result');
 
-		// add other categories
-		foreach($this->result->search(array(
-			'WetId' => $comp['WetId'],
-			'platz > 0',
-		), 'DISTINCT GrpId') as $route)
-		{
-			if (!isset($ret['categorys'][$route['GrpId']]))
-			{
-				$ret['categorys'][$route['GrpId']] = array(
-					'GrpId' => $route['GrpId'],
-				);
-			}
-		}
-		foreach($this->cats->names(array('GrpId' => array_keys($ret['categorys'])), 0) as $id => $name)
-		{
-			$ret['categorys'][$id]['name'] = $name;
-		}
-		$ret['categorys'] = array_values($ret['categorys']);
+		// add other categories incl. result-service ones
+		$ret['categorys'] = array_values($this->_result_categories($comp, $this->_route_categories($comp)));
 
 		unset($ret['last_modified']);	// to NOT cause etag change by not contained data
 		$ret['etag'] = md5(serialize($ret));
 
 		return $ret;
+	}
+
+	/**
+	 * Get result (from ranking) categories for a given competition
+	 *
+	 * @param int|array $comp
+	 * @param array $categories =array()
+	 * @return array GrpId => array with keys GrpId and name
+	 */
+	protected function _result_categories($comp, $categories=array())
+	{
+		foreach($this->result->search(array(
+			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
+			'platz > 0',
+		), 'DISTINCT GrpId') as $route)
+		{
+			if (!isset($categories[$route['GrpId']]))
+			{
+				$categories[$route['GrpId']] = array(
+					'GrpId' => $route['GrpId'],
+				);
+			}
+		}
+		foreach($this->cats->names(array('GrpId' => array_keys($categories)), 0) as $id => $name)
+		{
+			$categories[$id]['name'] = $name;
+		}
+		return $categories;
 	}
 
 	/**
