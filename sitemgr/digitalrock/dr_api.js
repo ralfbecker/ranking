@@ -1329,6 +1329,11 @@ var Resultlist = (function() {
 				}
 				break;
 		}
+		// remove start-number column if no start-numbers used (determined on first participant only)
+		if (typeof this.result_cols.start_number != 'undefined' && !_data.participants[0].start_number)
+		{
+			delete this.result_cols.start_number;
+		}
 		Startlist.prototype.handleResponse.call(this, _data);
 
 		if (_data.discipline == 'ranking' && (detail && detail[1] == '1' || !_data.participants[0].result_rank) && _data.max_comp)
@@ -1377,6 +1382,10 @@ var Resultlist = (function() {
 				jQuery.when.apply(jQuery, load).done(function(){
 					dr_statistics(container, _data);
 				});
+				// dono why, but abobe done is not always executed, if files are already cached
+				window.setTimeout(function(){
+					typeof window.dr_statistics != 'undefined' && dr_statistics(container, _data);
+				}, 100);
 			}
 			else
 			{
