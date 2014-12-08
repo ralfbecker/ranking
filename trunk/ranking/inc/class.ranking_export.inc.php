@@ -1389,7 +1389,7 @@ class ranking_export extends ranking_result_bo
 		$join = 'JOIN '.$this->result->result_table.' USING(WetId)';
 
 		$comps = array();
-		foreach($this->comp->search(null, 'DISTINCT WetId,name,'.$this->comp->table_name.'.datum AS datum,gruppen,nation,quota,rkey', 'datum DESC', '', '', '', 'AND', false, $filter, $join) as $c)
+		foreach($this->comp->search(null, 'DISTINCT WetId,name,'.$this->comp->table_name.'.datum AS datum,gruppen,nation,quota,rkey,display_athlete', 'datum DESC', '', '', '', 'AND', false, $filter, $join) as $c)
 		{
 			if (!isset($comp) || $comp['WetId'] == $c['WetId'])
 			{
@@ -1444,6 +1444,8 @@ class ranking_export extends ranking_result_bo
 			'categorys' => array_values($cats_by_id),
 			'competitions' => $comps,
 			'last_modified' => $last_modified,
+			'display_athlete' => $comp['display_athlete'] ? $comp['display_athlete'] :
+				ranking_competition::nation2display_athlete($comp['nation']),
 		);
 		// add see also links to national team ranking and combined ranking
 		if (!$comp['nation'] && $comp['quota'] && (
@@ -1586,6 +1588,8 @@ class ranking_export extends ranking_result_bo
 			'discipline'    => $discipline,
 			'participants'  => $results,
 			'last_modified' => $last_modified,
+			'display_athlete' => $comp['display_athlete'] ? $comp['display_athlete'] :
+				ranking_competition::nation2display_athlete($comp['nation']),
 		);
 		$ret += $this->see_also_result($comp, $cat, 'result');
 

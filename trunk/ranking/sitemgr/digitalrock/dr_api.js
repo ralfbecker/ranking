@@ -217,6 +217,35 @@ var DrBaseWidget = (function() {
 		}
 	};
 	/**
+	 * Replace "nation" column with what's specified in "display_athlete" on competition
+	 *
+	 * @param {string} _display_athlete
+	 * @param {string} _nation
+	 */
+	DrBaseWidget.prototype.replace_nation = function(_display_athlete, _nation)
+	{
+		switch(_display_athlete)
+		{
+			case 'city':
+			case 'pc_city':
+				this.replace_attribute(this.columns, 'nation', 'city', 'City');
+				break;
+			case 'federation':
+				var fed_label = 'Federation';
+				switch(_nation)
+				{
+					case 'GER':
+						fed_label = 'DAV Sektion';
+						break;
+					case 'SUI':
+						fed_label = 'Sektion';
+						break;
+				}
+				this.replace_attribute(this.columns, 'nation', 'federation', fed_label);
+				break;
+		}
+	};
+	/**
 	 * Format a date according to browser local format
 	 *
 	 * @param {string} _ymd yyyy-mm-dd string or everything understood by date constructor
@@ -709,26 +738,7 @@ var Startlist = (function() {
 			sort = 'result_rank';
 		}
 
-		switch(_data.display_athlete)
-		{
-			case 'city':
-			case 'pc_city':
-				this.replace_attribute(this.columns, 'nation', 'city', 'City');
-				break;
-			case 'federation':
-				var fed_label = 'Federation';
-				switch(_data.nation)
-				{
-					case 'GER':
-						fed_label = 'DAV Sektion';
-						break;
-					case 'SUI':
-						fed_label = 'Sektion';
-						break;
-				}
-				this.replace_attribute(this.columns, 'nation', 'federation', fed_label);
-				break;
-		}
+		this.replace_nation(_data.display_athlete, _data.nation);
 
 		// fix route_names containing only one or two qualifications are send as array because index 0 and 1
 		if (Array.isArray(_data.route_names))
@@ -1480,16 +1490,7 @@ var Results = (function() {
 			'firstname' : '',
 			'nation' : 'Nation'
 		};
-		// for SUI and GER competitions replace nation
-		switch (_data.nation)
-		{
-			case 'GER':
-				this.replace_attribute(this.columns, 'nation', 'federation', 'DAV Sektion');
-				break;
-			case 'SUI':
-				this.replace_attribute(this.columns, 'nation', 'city', 'City');
-				break;
-		}
+		this.replace_nation(_data.display_athlete, _data.nation);
 
 		if (typeof this.table == 'undefined')
 		{
