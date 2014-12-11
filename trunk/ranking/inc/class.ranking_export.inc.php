@@ -90,6 +90,7 @@ class ranking_export extends ranking_result_bo
 			echo "<p>The requested ressource was not found on this server.<br>\n<br>\n";
 			echo 'URI: ' . $_SERVER['REQUEST_URI'] . "</p>\n";
 			echo "</body></html>\n";
+			_egw_log_exception($e);
 			exit;
 		}
 		return $result;
@@ -803,9 +804,12 @@ class ranking_export extends ranking_result_bo
 				);
 			}
 		}
-		foreach($this->cats->names(array('GrpId' => array_keys($categories)), 0) as $id => $name)
+		if ($categories)
 		{
-			$categories[$id]['name'] = $name;
+			foreach($this->cats->names(array('GrpId' => array_keys($categories)), 0) as $id => $name)
+			{
+				$categories[$id]['name'] = $name;
+			}
 		}
 		return $categories;
 	}
@@ -1623,9 +1627,12 @@ class ranking_export extends ranking_result_bo
 				);
 			}
 		}
-		foreach($this->cats->names(array('GrpId' => array_keys($categories)), 0) as $id => $name)
+		if ($categories)
 		{
-			$categories[$id]['name'] = $name;
+			foreach($this->cats->names(array('GrpId' => array_keys($categories)), 0) as $id => $name)
+			{
+				$categories[$id]['name'] = $name;
+			}
 		}
 		return $categories;
 	}
