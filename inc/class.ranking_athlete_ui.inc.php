@@ -223,7 +223,7 @@ class ranking_athlete_ui extends ranking_bo
 					{
 						$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->athlete->data['rkey']);
 					}
-					elseif ($this->athlete->save())
+					elseif ($this->athlete->save(null, null, $fed_changed))
 					{
 						$msg .= lang('Error: while saving !!!');
 					}
@@ -235,6 +235,11 @@ class ranking_athlete_ui extends ranking_bo
 							$view = true;
 						}
 						$msg .= lang('%1 saved',lang('Athlete'));
+
+						if ($this->athlete->data['nation'] == 'GER' && $fed_changed)
+						{
+							$msg .= "\n".lang('License should be removed when federation was changed!');
+						}
 
 						if (is_array($content['foto']) && $content['foto']['tmp_name'] && $content['foto']['name'] && is_uploaded_file($content['foto']['tmp_name']))
 						{
