@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -1084,7 +1084,7 @@ function ranking_upgrade1_7_001()
  * ALTER TABLE `Wettkaempfe` ADD `modified` TIMESTAMP NOT NULL
  * ALTER TABLE `Wettkaempfe` ADD `modifier` INTEGER
  *
- * @param egw_db $db=null
+ * @param egw_db $db =null
  * @return string
  */
 function ranking_upgrade1_7_002(egw_db $db=null)
@@ -1692,4 +1692,45 @@ function ranking_upgrade1_9_017()
 		), $row, __LINE__, __FILE__, 'ranking');
 	}
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.018';
+}
+
+/**
+ * Add optional end-date of license for licenses valid for more than a year
+ *
+ * Update sets lic_until for nation=GER and lic_year='2014' to:
+ * - climber 19 years and older in 2014: 9999 (unlimited)
+ *   --> birthyear < 1996
+ * - climber under 19: year he becomes 18
+ *   --> birthyear >= 1996 --> birthyear+18 (1996 --> 2014, no license for 2015!)
+ *
+ * @return string
+ */
+function ranking_upgrade1_9_018()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','lic_until',array(
+		'type' => 'int',
+		'precision' => '2',
+		'comment' => 'optional end-year, default only valid in current year'
+	));
+	$GLOBALS['egw_setup']->db->query("UPDATE Licenses JOIN Personen USING(PerId) SET lic_until=CASE WHEN YEAR(geb_date)<1996 THEN 9999 ELSE YEAR(geb_date)+18 END WHERE nation='GER' AND lic_year=2014", __LINE__, __FILE__);
+
+	// delete everone who already applied for a 2015 license while still having a valid one
+	$to_delete = array();
+	foreach($GLOBALS['egw_setup']->db->query("SELECT lic2015.PerId
+FROM Licenses lic2015
+JOIN Licenses lic2014 ON lic2014.PerId=lic2015.Perid AND lic2014.lic_year=2014
+WHERE lic2015.lic_year=2015 AND lic2014.lic_until>=2015 AND lic2015.nation='GER'", __LINE__, __FILE__) as $row)
+	{
+		$to_delete[] = $row[0];
+	}
+	if ($to_delete)
+	{
+		$GLOBALS['egw_setup']->db->delete('Licenses', array(
+			'lic_year' => 2015,
+			'nation' => 'GER',
+			'PerId' => $to_delete,
+		), __LINE__, __FILE__, 'ranking');
+	}
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.019';
 }

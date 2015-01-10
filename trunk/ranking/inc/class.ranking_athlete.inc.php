@@ -441,13 +441,12 @@ class ranking_athlete extends so_sql
 				unset($filter['license_year']);
 			}
 			//echo "<p>license_year=$license_year, license_nation=$license_nation</p>\n";
-			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' l ON l.PerId='.self::ATHLETE_TABLE.'.PerId AND lic_year='.(int)$license_year.' AND l.nation='.
-				$this->db->quote(!$license_nation || $license_nation == 'NULL' ? '' : $license_nation);
+			$join .= $this->license_join($license_nation, $license_year);
 			$extra_cols[] = 'lic_status AS license';
 			$extra_cols[] = 'l.GrpId AS license_cat';
 			if ($filter['license'])
 			{
-				$filter[] = !$filter['license'] ? 'lic_status IS NULL' :
+				$filter[] = $filter['license'] === 'n' ? 'lic_status IS NULL' :
 					$this->db->expression(self::LICENSE_TABLE,array('lic_status'=>$filter['license']));
 				unset($filter['license']);
 			}
@@ -467,6 +466,31 @@ class ranking_athlete extends so_sql
 			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// LEFT JOIN'ed Results.PerId is NULL if there's no result
 		}
 		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+	}
+
+	/**
+	 * LEFT JOIN license table
+	 *
+	 * @param string $license_nation
+	 * @param int $license_year
+	 * @return string
+	 */
+	protected function license_join($license_nation, $license_year)
+	{
+		return ' LEFT JOIN '.self::LICENSE_TABLE.' l ON l.PerId='.self::ATHLETE_TABLE.'.PerId AND '.
+				' l.nation='.$this->db->quote(!$license_nation || $license_nation == 'NULL' ? '' : $license_nation).' AND '.
+				self::license_valid_sql($license_year);
+	}
+
+	/**
+	 * SQL to check license is valid for a given year
+	 *
+	 * @param int $license_year
+	 * @return string
+	 */
+	protected static function license_valid_sql($license_year)
+	{
+		return '(lic_year='.(int)$license_year.' OR lic_year<='.(int)$license_year.' AND '.(int)$license_year.'<=lic_until)';
 	}
 
 	/**
@@ -657,7 +681,7 @@ class ranking_athlete extends so_sql
 	 * reads row matched by key and puts all cols in the data array
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
-	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string|array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
 	 * @param string $join numeric year, adds a license-column or sql to do a join, see so_sql::read()
 	 * @return array/boolean data if row could be retrived else False
 	 */
@@ -675,10 +699,9 @@ class ranking_athlete extends so_sql
 
 		if (is_numeric($year))
 		{
-			$join .= ' LEFT JOIN '.self::LICENSE_TABLE.' ON '.self::LICENSE_TABLE.".PerId=$this->table_name.PerId AND lic_year=".
-				(int)$year.' AND '.self::LICENSE_TABLE.'.nation='.$this->db->quote(!$nation || $nation == 'NULL' ? '' : $nation);
+			$join .= $this->license_join($nation, $year);
 			$extra_cols[] = 'lic_status AS license';
-			$extra_cols[] = self::LICENSE_TABLE.'.GrpId as license_cat';
+			$extra_cols[] = 'l.GrpId as license_cat';
 		}
 		$extra_cols[] = $this->table_name.'.PerId AS PerId';	// would be NULL if join fails!
 
@@ -705,7 +728,7 @@ class ranking_athlete extends so_sql
 		if (!($status = $this->db->select(self::LICENSE_TABLE,'lic_status',array(
 			'PerId' => is_null($PerId) ? $this->data['PerId'] : $PerId,
 			'nation' => (string)$nation,
-			'lic_year' => $year,
+			self::license_valid_sql($year),
 		),__LINE__,__FILE__,false,'','ranking')->fetchColumn()))
 		{
 			$status = 'n';
@@ -745,24 +768,37 @@ class ranking_athlete extends so_sql
 		$where = array(
 			'PerId' => $PerId,
 			'nation' => !$nation || $nation == 'NULL' ? '' : $nation,
-			'lic_year' => $year,
+			self::license_valid_sql($year),
 		);
 		if (!in_array($status,array('a','c','s'))/* || $status == 'n'*/)
 		{
-			$this->db->delete(self::LICENSE_TABLE,$where,__LINE__,__FILE__,'ranking');
+			// if a German license from a previous year get deleted, end it via lic_until the year before
+			if($nation == 'GER' && ($license=$this->db->select(self::LICENSE_TABLE,'*',$where,__LINE__,__FILE__,false,'','ranking')->fetch()) &&
+				$license['lic_year'] < $year)
+			{
+				$this->db->update(self::LICENSE_TABLE,array(
+					'lic_until' => $year-1
+				),$where,__LINE__,__FILE__,'ranking');
+			}
+			else
+			{
+				$this->db->delete(self::LICENSE_TABLE,$where,__LINE__,__FILE__,'ranking');
+			}
 		}
 		else
 		{
 			// add fake result to find athlete in category
-			$this->db->insert('Results', array(
-				'platz' => 0,
-				'pkt' => 0,
-			),array(
-				'PerId' => $PerId,
-				'GrpId' => $GrpId,
-				'WetId' => 0,
-			), __LINE__, __FILE__, 'ranking');
-
+			if ($GrpId)
+			{
+				$this->db->insert('Results', array(
+					'platz' => 0,
+					'pkt' => 0,
+				),array(
+					'PerId' => $PerId,
+					'GrpId' => $GrpId,
+					'WetId' => 0,
+				), __LINE__, __FILE__, 'ranking');
+			}
 			switch($status)
 			{
 				case 'a': $what = 'applied'; break;
@@ -773,15 +809,24 @@ class ranking_athlete extends so_sql
 				'lic_status' => $status,
 				'lic_'.$what => date('Y-m-d'),
 				'lic_'.$what.'_by' => $GLOBALS['egw_info']['user']['account_id'],
-				'GrpId' => (int)$GrpId ? $GrpId : null,
 			);
-			/*if($this->db->select(self::LICENSE_TABLE,'PerId',$where,__LINE__,__FILE__,false,'','ranking')->fetch())
+			if ($GrpId) $data['GrpId'] = $GrpId;
+
+			if($this->db->select(self::LICENSE_TABLE,'PerId',$where,__LINE__,__FILE__,false,'','ranking')->fetch())
 			{
 				$this->db->update(self::LICENSE_TABLE,$data,$where,__LINE__,__FILE__,'ranking');
 			}
-			else*/
+			else
 			{
-				$this->db->insert(self::LICENSE_TABLE,$data,$where,__LINE__,__FILE__,'ranking');
+				unset($where[0]);	// lic_year=... OR lic_year<=... AND ...<=lic_until
+				$data += $where;
+				$data['lic_year'] = $year;
+				// for GER we need to check birthdate for license vality
+				if ($nation == 'GER' && ($athlete = $this->read($PerId)))
+				{
+					$data['lic_until'] = (int)$athlete['geb_date'] < 1996 ? 9999 : (int)$athlete['geb_date']+18;
+				}
+				$this->db->insert(self::LICENSE_TABLE,$data,false,__LINE__,__FILE__,'ranking');
 			}
 		}
 		if ($PerId == $this->data['PerId'])
@@ -884,7 +929,7 @@ class ranking_athlete extends so_sql
 	 * @param int &$a2f_start start year of (new) federation, only used if the federation changes, always returned
 	 * @param int $PerId=null default current athlete
 	 * @param int $fed_parent=null explicit fed_id of parent (0 deletes)
-	 * @return true if federation is set (or was already), false on error
+	 * @return true if federation is set, null was already set, false on error
 	 */
 	function set_federation($fed_id,&$a2f_start,$PerId=null,$fed_parent=null)
 	{
@@ -926,7 +971,7 @@ class ranking_athlete extends so_sql
 		{
 			//echo "<p>fed not changed, setting old start of $fed[a2f_start]</p>\n";
 			$a2f_start = $fed['a2f_start'];
-			return true;
+			return null;
 		}
 		elseif($a2f_start && $a2f_start > $fed['a2f_start']) 	// federation changed and (valid) start given --> record old one
 		{
@@ -956,9 +1001,10 @@ class ranking_athlete extends so_sql
 	 *
 	 * @param array $keys if given $keys are copied to data before saveing => allows a save as
 	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @param boolean &$set_fed =null on return true: fed changed, null: no change necessary, false: error setting fed
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
-	function save($keys=null,$extra_where=null)
+	function save($keys=null,$extra_where=null,&$set_fed=null)
 	{
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
 
@@ -973,7 +1019,7 @@ class ranking_athlete extends so_sql
 
 		if (!($err = parent::save()) && $this->data['fed_id'])
 		{
-			$this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']);
+			$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']);
 		}
 		return $err;
 	}
