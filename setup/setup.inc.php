@@ -61,6 +61,6 @@ $setup_info['ranking']['depends'][] = array(
 );
 $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
-	'versions' => Array('1.9','14.1')
+	'versions' => Array('1.8','14.1')
 );
 
