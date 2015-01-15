@@ -14,11 +14,13 @@ end	ranking	no	Slutt
 error: while saving !!!	ranking	no	Feil: Under lagring !
 fax	ranking	no	Telefaks
 female	ranking	no	Hunkjønn
+from	ranking	no	Fra
 gender	ranking	no	Hannkjønn
 general	ranking	no	Generell
 id	ranking	no	Id
 import	ranking	no	Importer
 import file	ranking	no	Importer Fil
+mail all participants	ranking	no	Send e-mail til deltagerne
 male	ranking	no	Kjønn
 more	ranking	no	Mer
 or	ranking	no	eller

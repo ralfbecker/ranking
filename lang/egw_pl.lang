@@ -17,17 +17,23 @@ end	ranking	pl	Zakończenie
 error: while saving !!!	ranking	pl	Błąd: podczas zapisywania!
 fax	ranking	pl	Faks
 female	ranking	pl	Kobieta
+from	ranking	pl	Z
 gender	ranking	pl	Płeć
 general	ranking	pl	Główne
+go	ranking	pl	Przejdź
 id	ranking	pl	id
+ignore	ranking	pl	Ignoruj
 import	ranking	pl	Importuj
 import file	ranking	pl	Plik importu
+mail all participants	ranking	pl	wyślij do wszystkich uczestników
 male	ranking	pl	Mężczyzna
 more	ranking	pl	Więcej
+not allowed	ranking	pl	brak zezwolenia
 or	ranking	pl	lub
 permission denied !!!	ranking	pl	Dostęp wzbroniony !!!
 phone	ranking	pl	Rozmowa telefoniczna
 picture	ranking	pl	Obraz
+port	admin	pl	port
 register	ranking	pl	rejestracja
 registration	ranking	pl	Rejestracja
 remark	ranking	pl	Przypomnienie
@@ -40,4 +46,6 @@ street	ranking	pl	Ulica
 unpublished	ranking	pl	nieopublikowany
 up	ranking	pl	w górę
 website	ranking	pl	Strona WWW
+wrong admin-account or -password !!!	ranking	pl	Niepoprawne konto administratora lub hasło !!
+you need to select a file first!	ranking	pl	Musisz najpierw wybrać plik!
 zip code	ranking	pl	Kod pocztowy

@@ -13,11 +13,13 @@ down	ranking	ca	avall
 download	ranking	ca	Descarregar
 end	ranking	ca	Fi
 fax	ranking	ca	Fax
+from	ranking	ca	De
 gender	ranking	ca	Genre
 general	ranking	ca	General
 id	ranking	ca	id
 import	ranking	ca	Importar
 import file	ranking	ca	Importar arxiu
+mail all participants	ranking	ca	correu de tots els participants
 more	ranking	ca	Més
 or	ranking	ca	o
 permission denied !!!	ranking	ca	Permís denegat !!!

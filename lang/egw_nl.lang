@@ -18,13 +18,16 @@ end	ranking	nl	Einde
 error: while saving !!!	ranking	nl	Fout: tijdens het opslaan !!!
 fax	ranking	nl	Fax
 female	ranking	nl	Vrouw
+from	ranking	nl	Van
 gender	ranking	nl	Geslacht
 general	ranking	nl	Algemeen
 go	ranking	nl	Ga
+header	ranking	nl	Kop
 id	ranking	nl	ID
 ignore	ranking	nl	Negeren
 import	ranking	nl	Importeren
 import file	ranking	nl	Bestand importeren
+mail all participants	ranking	nl	Stuur een email naar alle deelnemers
 male	ranking	nl	Man
 more	ranking	nl	Meer
 not allowed	ranking	nl	niet toegestaan

@@ -17,11 +17,13 @@ end	ranking	sv	Slut
 error: while saving !!!	ranking	sv	Fel: Kunde inte spara
 fax	ranking	sv	Telefax
 female	ranking	sv	Kvinna
+from	ranking	sv	Från
 gender	ranking	sv	Kön
 general	ranking	sv	Allmänt
 id	ranking	sv	ID
 import	ranking	sv	Importera
 import file	ranking	sv	Importera fil
+mail all participants	ranking	sv	Skicka e-post till alla deltagare
 male	ranking	sv	Man
 more	ranking	sv	Fler
 or	ranking	sv	Eller
@@ -34,6 +36,7 @@ registration	ranking	sv	Registrering
 remark	ranking	sv	Anmärkning
 rows	ranking	sv	Rader
 saves the changes made	ranking	sv	Spara ändringar
+select an action	ranking	sv	Välj en aktion
 start	ranking	sv	Start
 startdate	ranking	sv	Startdatum
 street	ranking	sv	Gata

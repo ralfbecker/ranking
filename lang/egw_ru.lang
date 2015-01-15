@@ -1,8 +1,10 @@
 %1 deleted	ranking	ru	%1 удален
 accounting	ranking	ru	Учет
 actions	ranking	ru	Действия
+before	ranking	ru	До
 birthday	ranking	ru	Дата рождения
 check all	ranking	ru	Отметить все
+children	ranking	ru	Дочерние
 city	ranking	ru	Город
 columns	ranking	ru	Колонки
 comments	ranking	ru	Комментарии
@@ -10,6 +12,7 @@ confirmed	ranking	ru	Подтверждено
 contact	ranking	ru	Контакт
 database	admin	ru	База данных
 delete this category	ranking	ru	удалить эту категорию
+delimiter	ranking	ru	Снятие ограничений
 display	ranking	ru	Отобразить
 down	ranking	ru	вниз
 download	ranking	ru	Загрузить
@@ -18,6 +21,7 @@ end	ranking	ru	Конец
 error: while saving !!!	ranking	ru	Ошибка: во время сохранения!!!
 fax	ranking	ru	Факс
 female	ranking	ru	Женский
+from	ranking	ru	От
 gender	ranking	ru	Пол
 general	ranking	ru	Общее
 go	ranking	ru	Перейти
@@ -25,8 +29,10 @@ id	ranking	ru	Ид
 ignore	ranking	ru	Игнорировать
 import	ranking	ru	Импорт
 import file	ranking	ru	Импорт файла
+mail all participants	ranking	ru	Отправить письмо всем участником
 male	ranking	ru	Мужской
 more	ranking	ru	Еще
+not allowed	ranking	ru	Не допускается
 or	ranking	ru	или
 permission denied !!!	ranking	ru	Доступ запрещен !!!
 phone	ranking	ru	Телефонный Звонок
@@ -36,12 +42,15 @@ registration	ranking	ru	Регистрация
 remark	ranking	ru	Примечание
 rows	ranking	ru	Ряды
 saves the changes made	ranking	ru	сохранить внесенные изменения
+select an action	ranking	ru	Выберите действие
 start	ranking	ru	Начало
 startdate	ranking	ru	Дата Начала
 street	ranking	ru	Улица
 sum	ranking	ru	Сумма
+try	ranking	ru	Пробовать
 unpublished	ranking	ru	Неопубликовано
 up	ranking	ru	вверх
 website	ranking	ru	Веб-сайт
 wrong admin-account or -password !!!	ranking	ru	Неверная учетная запись администратора или пароль !!!
+you need to select a file first!	ranking	ru	Сначала выберите файл!
 zip code	ranking	ru	Почтовый индекс

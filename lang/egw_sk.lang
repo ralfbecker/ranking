@@ -17,11 +17,13 @@ edit %1	ranking	sk	Upraviť %1
 end	ranking	sk	Koniec
 error: while saving !!!	ranking	sk	Chyba: počas ukladania !!!
 fax	ranking	sk	Fax
+from	ranking	sk	Od
 general	ranking	sk	Všeobecné
 id	ranking	sk	Id
 ignore	ranking	sk	Ignorovať
 import	ranking	sk	Import
 import file	ranking	sk	Importuj súbor
+mail all participants	ranking	sk	Oboslať všetkých účastníkov
 more	ranking	sk	Viac
 not allowed	ranking	sk	nepovolené
 permission denied !!!	ranking	sk	Prístup bol odmietnutý !!!

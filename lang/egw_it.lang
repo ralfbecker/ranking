@@ -1,3 +1,4 @@
+%1 deleted	ranking	it	%1 eliminato
 accounting	ranking	it	Contabilità
 before	ranking	it	prima di
 birthday	ranking	it	Data di nascita
@@ -9,6 +10,7 @@ comments	ranking	it	Commenti
 confirmed	ranking	it	Confermato
 contact	ranking	it	Contatto
 delete this category	ranking	it	Cancella questa categoria
+delimiter	ranking	it	Separatore
 display	ranking	it	Visualizza
 down	ranking	it	Giù
 edit %1	ranking	it	Modifica %1
@@ -16,13 +18,16 @@ end	ranking	it	Fine
 error: while saving !!!	ranking	it	Errore: durante salvataggio !!!
 fax	ranking	it	Fax
 female	ranking	it	Femmina
+from	ranking	it	Da
 gender	ranking	it	Sesso
 general	ranking	it	Generale
 go	ranking	it	Vai
+header	ranking	it	Intestazione (header)
 id	ranking	it	ID
 ignore	ranking	it	Ignora
 import	ranking	it	Importa
 import file	ranking	it	Importa File
+mail all participants	ranking	it	Invia email a tutti i partecipanti
 male	ranking	it	Maschio
 more	ranking	it	Altro
 not allowed	ranking	it	Non permesso
@@ -38,6 +43,8 @@ select an action	ranking	it	Seleziona una azione
 start	ranking	it	Inizio
 startdate	ranking	it	Data di inizio
 street	ranking	it	Via
+sum	ranking	it	Somma
+try	ranking	it	Prova
 unpublished	ranking	it	Non pubblicati
 up	ranking	it	Su
 website	ranking	it	Sito Web

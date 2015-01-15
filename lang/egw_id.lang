@@ -18,6 +18,7 @@ edit %1	ranking	id	Edit %1
 end	ranking	id	Akhir
 fax	ranking	id	Fax
 female	ranking	id	Perempuan
+from	ranking	id	Dari
 gender	ranking	id	Jender
 general	ranking	id	Umum
 go	ranking	id	Go
@@ -25,6 +26,7 @@ id	ranking	id	ID
 ignore	ranking	id	Ignore
 import	ranking	id	Impor
 import file	ranking	id	Impor Berkas
+mail all participants	ranking	id	Surati semua peserta
 male	ranking	id	Laki-laki
 more	ranking	id	Lagi
 not allowed	ranking	id	tidak dibolehkan

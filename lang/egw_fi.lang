@@ -18,6 +18,7 @@ end	ranking	fi	Lopeta
 error: while saving !!!	ranking	fi	Virhe tallentaessa !!!
 fax	ranking	fi	Faksi
 female	ranking	fi	Nainen
+from	ranking	fi	Mistä
 gender	ranking	fi	sukupuoli
 general	ranking	fi	Yleinen
 go	ranking	fi	Mene
@@ -25,6 +26,7 @@ id	ranking	fi	Id
 ignore	ranking	fi	Ohita
 import	ranking	fi	Tuonti
 import file	ranking	fi	Tuo tiedosto
+mail all participants	ranking	fi	Lähetä huomautus kaikille osallistujille
 male	ranking	fi	Mies
 more	ranking	fi	Enemmän
 not allowed	ranking	fi	Ei sallittu

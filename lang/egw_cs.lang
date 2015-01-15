@@ -18,6 +18,7 @@ end	ranking	cs	Konec
 error: while saving !!!	ranking	cs	Chyba při ukládání !!!
 fax	ranking	cs	Fax
 female	ranking	cs	Žena
+from	ranking	cs	Od
 gender	ranking	cs	Pohlaví
 general	ranking	cs	Obecné
 go	ranking	cs	Jít
@@ -25,6 +26,7 @@ id	ranking	cs	ID
 ignore	ranking	cs	Ignorovat
 import	ranking	cs	Importovat
 import file	ranking	cs	Importovat soubor
+mail all participants	ranking	cs	obeslat všechny účastníky
 male	ranking	cs	Muž
 more	ranking	cs	Více
 not allowed	ranking	cs	není povoleno
