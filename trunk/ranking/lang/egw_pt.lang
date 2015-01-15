@@ -1,3 +1,4 @@
+%1 deleted	ranking	pt	% 1 excluído.
 accounting	ranking	pt	Contabilidade
 actions	ranking	pt	Acções
 birthday	ranking	pt	Aniversário
@@ -14,11 +15,14 @@ end	ranking	pt	Fim
 error: while saving !!!	ranking	pt	Erro ao guardar !!!
 fax	ranking	pt	Fax
 female	ranking	pt	Feminino
+from	ranking	pt	De
 gender	ranking	pt	Género
 general	ranking	pt	Geral
+header	ranking	pt	Cabeçalho
 id	ranking	pt	ID
 import	ranking	pt	Importar
 import file	ranking	pt	Importar ficheiro
+mail all participants	ranking	pt	Enviar mensagens a todos os participantes
 male	ranking	pt	Masculino
 more	ranking	pt	Mais
 or	ranking	pt	ou
@@ -29,10 +33,13 @@ registration	ranking	pt	Registo
 remark	ranking	pt	Remarcar
 rows	ranking	pt	Linhas
 saves the changes made	ranking	pt	Guarda as alterações
+select an action	ranking	pt	Selecione uma ação
 start	ranking	pt	Início
 startdate	ranking	pt	Data de início
 street	ranking	pt	Rua
+sum	ranking	pt	Soma
 unpublished	ranking	pt	não publicado
 up	ranking	pt	para cima
 website	ranking	pt	Sítio Web
+you need to select a file first!	ranking	pt	Selecione um arquivo primeiro!
 zip code	ranking	pt	Código postal

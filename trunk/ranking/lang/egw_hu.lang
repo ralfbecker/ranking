@@ -15,12 +15,14 @@ edit %1	ranking	hu	%1 szerkesztése
 end	ranking	hu	Befejezés
 fax	ranking	hu	Fax
 female	ranking	hu	Nő
+from	ranking	hu	Tól:
 gender	ranking	hu	Nem
 general	ranking	hu	Általános
 go	ranking	hu	Menj
 id	ranking	hu	Azonosító
 import	ranking	hu	Import
 import file	ranking	hu	Állomány importálása
+mail all participants	ranking	hu	résztvevők email értesítése
 male	ranking	hu	Férfi
 more	ranking	hu	Több
 or	ranking	hu	vagy

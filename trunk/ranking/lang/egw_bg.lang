@@ -9,10 +9,12 @@ down	ranking	bg	надолу
 download	ranking	bg	Изтегляне
 end	ranking	bg	Край
 fax	ranking	bg	Факс
+from	ranking	bg	От
 general	ranking	bg	Общи
 id	ranking	bg	ИД
 import	ranking	bg	Импорт
 import file	ranking	bg	Импорт на файл
+mail all participants	ranking	bg	изпращане на e-mail до всички участници
 more	ranking	bg	повече
 or	ranking	bg	или
 permission denied !!!	ranking	bg	Достъпът отказан !!!

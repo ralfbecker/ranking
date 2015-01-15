@@ -1,6 +1,7 @@
 %1 deleted	ranking	fr	%1 supprimé(s).
 accounting	ranking	fr	Comptabilité
 actions	ranking	fr	Actions
+before	ranking	fr	Avant
 birthday	ranking	fr	Anniversaire
 check all	ranking	fr	Vérifier tout
 children	ranking	fr	Enfants
@@ -11,6 +12,7 @@ confirmed	ranking	fr	Confirmé
 contact	ranking	fr	Contact
 database	admin	fr	Base de données
 delete this category	ranking	fr	Supprimer cette catégorie
+delimiter	ranking	fr	Délimiteur
 display	ranking	fr	Afficher
 down	ranking	fr	Bas
 download	ranking	fr	Télécharger
@@ -19,13 +21,19 @@ end	ranking	fr	Fin
 error: while saving !!!	ranking	fr	Erreur: lors de l'enregistrement !!!
 fax	ranking	fr	Fax
 female	ranking	fr	Féminin
+from	ranking	fr	Depuis
 gender	ranking	fr	Sexe
 general	ranking	fr	Général
+go	ranking	fr	Allez
+header	ranking	fr	En-tête
 id	ranking	fr	Id
+ignore	ranking	fr	Ignorer
 import	ranking	fr	Importation
 import file	ranking	fr	Importer le fichier
+mail all participants	ranking	fr	envoyer un email à tous les participants
 male	ranking	fr	Masculin
 more	ranking	fr	Plus
+not allowed	ranking	fr	Pas autorisé
 permission denied !!!	ranking	fr	Autorisation refusée !!!
 phone	ranking	fr	Appel téléphonique
 picture	ranking	fr	Image
@@ -39,8 +47,10 @@ start	ranking	fr	Début
 startdate	ranking	fr	Date de départ
 street	ranking	fr	Rue
 sum	ranking	fr	Somme
+try	ranking	fr	Essayer
 unpublished	ranking	fr	non publié
 up	ranking	fr	Haut
 website	ranking	fr	Site Web
 wrong admin-account or -password !!!	ranking	fr	Compte ou mot de passe admin incorrect !
+you need to select a file first!	ranking	fr	Sélectionner d'abord un fichier !
 zip code	ranking	fr	Code postal

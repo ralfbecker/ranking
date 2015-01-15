@@ -12,10 +12,12 @@ down	ranking	el	κάτω
 download	ranking	el	Καταβίβαση
 end	ranking	el	Τέλος
 fax	ranking	el	Fax
+from	ranking	el	Από
 general	ranking	el	Γενικά
 id	ranking	el	Id
 import	ranking	el	Εισαγωγή
 import file	ranking	el	Εισαγωγή Αρχείου
+mail all participants	ranking	el	Αποστολή μηνύματος σε όλους τους συμμετέχοντες
 or	ranking	el	ή
 permission denied !!!	ranking	el	Άδεια απορρίπτεται !!!
 phone	ranking	el	Κλήση τηλεφώνου

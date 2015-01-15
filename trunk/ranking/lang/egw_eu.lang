@@ -12,10 +12,12 @@ download	ranking	eu	Deskargatu
 end	ranking	eu	Bukaera
 error: while saving !!!	ranking	eu	Errorea gordetzerakoan
 fax	ranking	eu	Fax-a
+from	ranking	eu	Norena
 general	ranking	eu	Orokorra
 id	ranking	eu	Id
 import	ranking	eu	Inportatu
 import file	ranking	eu	Inportatu fitxategia
+mail all participants	ranking	eu	Partehartzaile guztiei e-posta bat bidali
 more	ranking	eu	Gehiago
 or	ranking	eu	edo
 permission denied !!!	ranking	eu	Baimena ukatua!

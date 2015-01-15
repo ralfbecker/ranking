@@ -9,9 +9,11 @@ display	ranking	ko	표시
 download	ranking	ko	내려받기
 end	ranking	ko	종료
 fax	ranking	ko	팩스
+from	ranking	ko	부터
 general	ranking	ko	일반
 import	ranking	ko	가져오기
 import file	ranking	ko	파일 가져오기
+mail all participants	ranking	ko	참석자에게 메일전송
 more	ranking	ko	검색조건 추가
 or	ranking	ko	이거나(OR연산)
 phone	ranking	ko	통화

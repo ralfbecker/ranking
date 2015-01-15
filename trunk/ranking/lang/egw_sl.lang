@@ -19,11 +19,13 @@ end	ranking	sl	Konec
 error: while saving !!!	ranking	sl	Napaka: med shranjevanjem!
 fax	ranking	sl	Faks
 female	ranking	sl	Ženski
+from	ranking	sl	Od
 gender	ranking	sl	Spol
 general	ranking	sl	Splošno
 id	ranking	sl	Šifra
 import	ranking	sl	Uvoz
 import file	ranking	sl	Uvozi datoteko
+mail all participants	ranking	sl	Pošlji e-sporočilo vsem udeleženvem
 male	ranking	sl	Moški
 more	ranking	sl	Več
 not allowed	ranking	sl	Ni dovoljenja

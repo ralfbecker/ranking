@@ -1,6 +1,7 @@
 %1 deleted	ranking	es-es	%1 borrado
 accounting	ranking	es-es	Cuentas
 actions	ranking	es-es	Acciones
+before	ranking	es-es	Antes
 birthday	ranking	es-es	Fecha de nacimiento
 check all	ranking	es-es	Marcar todo
 children	ranking	es-es	Hijos
@@ -19,6 +20,7 @@ end	ranking	es-es	Fin
 error: while saving !!!	ranking	es-es	¡¡Error al guardar!!
 fax	ranking	es-es	Fax
 female	ranking	es-es	Femenino
+from	ranking	es-es	De
 gender	ranking	es-es	Género
 general	ranking	es-es	General
 go	ranking	es-es	Ir
@@ -26,6 +28,7 @@ id	ranking	es-es	Id
 ignore	ranking	es-es	Ignorar
 import	ranking	es-es	Importar
 import file	ranking	es-es	Importar fichero
+mail all participants	ranking	es-es	Enviar correo a todos los participantes
 male	ranking	es-es	Masculino
 more	ranking	es-es	Más
 not allowed	ranking	es-es	no permitido
@@ -46,4 +49,5 @@ unpublished	ranking	es-es	sin publicar
 up	ranking	es-es	Arriba
 website	ranking	es-es	Sitio web
 wrong admin-account or -password !!!	ranking	es-es	¡La cuenta de administración o la contraseña son incorrectas!
+you need to select a file first!	ranking	es-es	¡Necesita seleccionar un fichero antes!
 zip code	ranking	es-es	Código postal
