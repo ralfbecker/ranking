@@ -219,7 +219,7 @@ class ranking_competition_ui extends ranking_bo
 			'msg'  => $msg,
 			'tabs' => $content['tabs'],
 			'referer' => $content['referer'] ? $content['referer'] :
-				common::get_referer('/index.php?menuaction=ranking.uicompetition.index'),
+				common::get_referer('/index.php?menuaction=ranking.ranking_competition_ui.index'),
 		);
 		foreach((array) $this->comp->attachments(null,false,false) as $type => $linkdata)
 		{

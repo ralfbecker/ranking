@@ -34,6 +34,7 @@ $t_stand = 'Stand';
 $t_no_cuwr = 'nicht in Rangliste';
 $t_infos = 'Infos';
 $t_show_infos = 'Infos anzeigen';
+$t_info2 = 'weitere Infos';
 $t_starter = 'Starter';
 $t_show_starter = 'Starter anzeigen';
 $t_result = 'Ergebnis';

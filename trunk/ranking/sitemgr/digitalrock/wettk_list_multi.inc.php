@@ -313,6 +313,7 @@ if ($mode != 2)
 			// since 2008 year directory has a nation subdir!
 			$nat = (int)$wettk->datum >= 2008 && $wettk->nation ? $nat = '/'.$wettk->nation : '';
 			$infos   = intval($wettk->datum) . $nat . "/$wettk->rkey.pdf";
+			$info2   = intval($wettk->datum) . $nat . "/i$wettk->rkey.pdf";
 			$starter = intval($wettk->datum) . $nat . "/S$wettk->rkey.pdf";
 			$result  = intval($wettk->datum) . $nat . "/R$wettk->rkey.pdf";
 			$rgrps = wettk_grps($wettk->WetId);
@@ -389,6 +390,10 @@ if ($mode != 2)
 					if (file_exists($file_prefix.$infos))
 					{
 						$minis .= ($minis?"\n| ":'').'<a class="mini_link" href="'.$prefix.$infos.'" target="_blank" title="'.$t_show_infos.'">'.$t_infos.'</a>';
+					}
+					if (file_exists($file_prefix.$info2))
+					{
+						$minis .= ($minis?"\n| ":'').'<a class="mini_link" href="'.$prefix.$info2.'" target="_blank" title="'.$t_show_infos.'">'.$t_info2.'</a>';
 					}
 //_debug_array($wettk);
 					list($y,$m,$d) = explode('-',$wettk->datum);

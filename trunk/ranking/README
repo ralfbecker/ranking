@@ -179,6 +179,7 @@ Meaning of competition values:
     - 4: starters / registration data
   * url: to display data
 - info: url to info pdf
+- info2: url to 2. info pdf
 - result: url to result as pdf, if one got uploaded
 - startlist: url to startlist as pdf, if one got uploaded
 - years: array of year's for which a calendar is available
