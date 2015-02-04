@@ -35,6 +35,7 @@ class ranking_competition extends so_sql
 		'result'    => 'R',
 		'logo'      => 'l',
 		'sponsors'  => 's',
+		'info2'     => 'i',
 	);
 	var $vfs_pdf_dir = '';
 	var $result_table = 'Results';

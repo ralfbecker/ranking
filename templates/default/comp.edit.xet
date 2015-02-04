@@ -196,7 +196,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -210,6 +210,12 @@
 					<image statustext="click to view" label="@files[info][file]" src="files[info][icon]" no_lang="1" href="@files[info][link]" extra_link_target="_blank"/>
 					<button label="Remove the attached PDF" id="remove[info]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_info"/>
+				</row>
+				<row>
+					<description value="2. PDF" for="upload_info2"/>
+					<image statustext="click to view" label="@files[info2][file]" src="files[info2][icon]" no_lang="1" href="@files[info2][link]" extra_link_target="_blank"/>
+					<button label="Remove the attached PDF" id="remove[info2]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<file statustext="each new upload will overwrite the previous one" id="upload_info2"/>
 				</row>
 				<row class="row">
 					<description value="Startlist PDF" for="upload_startlist"/>
@@ -255,7 +261,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit" template="" lang="" group="0" version="1.9.002">
+	<template id="ranking.comp.edit" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%\0">
 			<columns>
 				<column width="15%"/>
@@ -265,7 +271,10 @@
 			</columns>
 			<rows>
 				<row>
-					<description id="msg" no_lang="1" span="4" class="redItalic"/>
+					<description id="msg" no_lang="1" span="all" class="redItalic"/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="th">
 					<description for="nation" value="Nation"/>
