@@ -476,7 +476,7 @@ class ranking_selfservice extends ranking_bo
 			{
 				throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
 			}
-			$is_html = preg_match('/\.txt$/',$template);
+			$is_html = !preg_match('/\.txt$/',$template);
 
 			list($subject, $body) = preg_split("/\r?\n/", file_get_contents($template), 2);
 		}
