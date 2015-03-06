@@ -2029,8 +2029,9 @@ class ranking_export extends ranking_result_bo
 				break;
 			case 'regionalzentren':
 				$filter['nation'] = 'SUI';
+				$filter['GrpId'] = array(34,35,37,38,46,47,68,69);	// only U12-18
 				$by = 'acl_fed_id';
-				$best_results = 1;
+				$best_results = 2;
 				$use_cup_points = true;
 				$name = 'Regionalzentrumswertung';
 				$aggregated_name = 'Regionalzentrum';
