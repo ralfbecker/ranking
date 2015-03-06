@@ -174,7 +174,7 @@ class ranking_competition extends so_sql
 			$start = mktime(12,0,0,(int)$m,(int)$d,(int)$y);
 			$end = $start + ($data['duration']-1)*24*60*60;
 			$data['date_end'] = date('Y-m-d',$end);
-			$data['date_span'] = (int)$d.' '.(date('m',$start) != $m ? lang(date('F',$m)) : '').
+			$data['date_span'] = (int)$d.' '.(date('m',$end) != $m ? lang(date('F',$start)) : '').
 				($data['duration'] > 1 ? ' - '.(int)date('d',$end).' ' : '').lang(date('F',$end)).' '.$y;
 			//echo "<p>y=$y, m=$m, d=$d, duration=$data[duration], start=$start, end=$end=$data[date_end], span=$data[date_span]</p>\n";
 		}
