@@ -29,6 +29,7 @@ $old2new = array(
 	'ranking.uicompetitions.index' => 'ranking.ranking_competition_ui.index',
 	'ranking.uicups.index' => 'ranking.ranking_cup_ui.index',
 	'ranking.uiathletes.index' => 'ranking.ranking_athlete_ui.index',
+	'ranking.uiresult.index' => 'ranking.ranking_result_ui.index',
 );
 if (isset($old2new[$view])) $view = $old2new[$view];
 

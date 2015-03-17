@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
@@ -12,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox class="extra_startlist" cols="1" rows="1">
+					<groupbox class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -40,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox class="extra_result" cols="1" rows="1">
+					<groupbox class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -63,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_relay" template="" lang="" group="0" version="1.7.002">
+	<template id="ranking.result.index.rows_relay" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -106,21 +105,21 @@
 					<description align="center" id="{$row}[start_order]" no_lang="1"/>
 					<description id="{$row}[team_id]"/>
 					<menulist>
-						<menupopup id="set[$row_cont[team_id]][team_nation]" no_lang="1" onchange="if (this.value) xajax_doXMLHTTP('ranking.uiresult.ajax_set_athlets',{$cont[route_data][WetId]},{$cont[route_data][GrpId]},$row_cont[team_id],this.value);" options="Select one"/>
+						<menupopup id="set[$row_cont[team_id]][team_nation]" no_lang="1" onchange="if (this.value) xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_set_athlets',{$cont[route_data][WetId]},{$cont[route_data][GrpId]},$row_cont[team_id],this.value);" options="Select one"/>
 					</menulist>
 					<textbox id="set[$row_cont[team_id]][team_name]" no_lang="1" size="10" maxlength="64" class="required"/>
 					<menulist>
 						<menupopup id="set[$row_cont[team_id]][PerId_1]" no_lang="1"/>
 					</menulist>
-					<textbox align="center" id="set[$row_cont[team_id]][start_number_1]" no_lang="1" size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" class="noPrint"/>
+					<textbox align="center" id="set[$row_cont[team_id]][start_number_1]" no_lang="1" size="3" class="noPrint" validator="/^[0-9]*[+]?-?[0-9]*$/"/>
 					<menulist>
 						<menupopup id="set[$row_cont[team_id]][PerId_2]" no_lang="1"/>
 					</menulist>
-					<textbox align="center" id="set[$row_cont[team_id]][start_number_2]" no_lang="1" size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" class="noPrint"/>
+					<textbox align="center" id="set[$row_cont[team_id]][start_number_2]" no_lang="1" size="3" class="noPrint" validator="/^[0-9]*[+]?-?[0-9]*$/"/>
 					<menulist>
 						<menupopup id="set[$row_cont[team_id]][PerId_3]" no_lang="1"/>
 					</menulist>
-					<textbox align="center" id="set[$row_cont[team_id]][start_number_3]" no_lang="1" size="3" validator="/^[0-9]*[+]?-?[0-9]*$/" class="noPrint"/>
+					<textbox align="center" id="set[$row_cont[team_id]][start_number_3]" no_lang="1" size="3" class="noPrint" validator="/^[0-9]*[+]?-?[0-9]*$/"/>
 					<description/>
 					<description/>
 					<button align="center" label="Delete" id="delete[$row_cont[team_id]]" onclick="return confirm('Delete this participant (can NOT be undone)');" image="delete" class="noPrint"/>

@@ -1,17 +1,17 @@
 <?php
 /**
- * EGroupware digital ROCK Rankings - result UI
+ * EGroupware digital ROCK Rankings - ResultService UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-class uiresult extends ranking_result_bo
+class ranking_result_ui extends ranking_result_bo
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -100,7 +100,7 @@ class uiresult extends ranking_result_bo
 			}
 			// reload the parent window
 			$param = array(
-				'menuaction' => 'ranking.uiresult.index',
+				'menuaction' => 'ranking.ranking_result_ui.index',
 				'comp'  => $content['WetId'],
 				'cat'   => $content['GrpId'],
 				'route' => $content['route_order'],
@@ -671,7 +671,7 @@ class uiresult extends ranking_result_bo
 		//_debug_array($sel_options);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Ranking').' - '.
 			($content['new_route'] ? lang('Add heat') : lang('Edit heat'));
-		$tmpl->exec('ranking.uiresult.route',$content,$sel_options,$readonlys,$preserv,2);
+		$tmpl->exec('ranking.ranking_result_ui.route',$content,$sel_options,$readonlys,$preserv,2);
 	}
 
 	/**
@@ -1103,7 +1103,7 @@ class uiresult extends ranking_result_bo
 			{
 				if (!is_array($content['nm'])) $content['nm'] = array();
 				$content['nm'] += array(
-					'get_rows'   => 'ranking.uiresult.get_rows',
+					'get_rows'   => 'ranking.ranking_result_ui.get_rows',
 					'no_cat'     => true,
 					'no_filter'  => true,
 					'no_filter2' => true,
@@ -1533,32 +1533,32 @@ class uiresult extends ranking_result_bo
 		{
 			$content['start_order_label'] = lang('Start- order');
 		}
-		return $tmpl->exec('ranking.uiresult.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
+		return $tmpl->exec('ranking.ranking_result_ui.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 
 	/**
 	 * Update a result of a single participant
 	 *
 	 * Lead:
-	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 	xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update',this.form.etemplate_exec_id.value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_height]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_height]').value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_plus]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_plus]').value);
 	 * Speed links:
-	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 	xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update',this.form.etemplate_exec_id.value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_time]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][eliminated]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value);
 	 * Speed rechts:
-	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 	xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update',this.form.etemplate_exec_id.value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,
 	 * 		'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value);
 	 * Relay:
-	 * 	xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,
+	 * 	xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update',this.form.etemplate_exec_id.value,
 	 * 		'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',
 	 * 		document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,
 	 * 		'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',

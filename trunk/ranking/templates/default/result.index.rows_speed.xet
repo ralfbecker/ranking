@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
@@ -63,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="1.9.002">
+	<template id="ranking.result.index.rows_speed" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -114,8 +113,8 @@
 				</row>
 				<row class="x $row_cont[class] $row_cont[quota_class]">
 					<description align="center" id="set[$row_cont[PerId]][result_rank]" no_lang="1" readonly="true" class="place"/>
-					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
-					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
+					<description font_style="$row_cont[link]" id="{$row}[nachname]" no_lang="1" class="lastname leftPad5"/>
+					<description font_style="$row_cont[link]" id="{$row}[vorname]" no_lang="1" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
 					<description id="${row}[verband]"/>
@@ -131,7 +130,7 @@
 						<menulist>
 							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated]"/>
 						</menulist>
-						<buttononly statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value,'exec[nm][rows][set][$row_cont[PerId]][false_start]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][false_start]').value);" class="small noPrint"/>
+						<buttononly statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated]').value,'exec[nm][rows][set][$row_cont[PerId]][false_start]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][false_start]').value);" class="small noPrint"/>
 					</hbox>
 					<description align="center" id="${row}[start_order2n]" no_lang="1" class="noPrint"/>
 					<hbox align="center" options="0,0">
@@ -140,7 +139,7 @@
 						<menulist>
 							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated_r]"/>
 						</menulist>
-						<buttononly statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value,'exec[nm][rows][set][$row_cont[PerId]][false_start]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][false_start]').value);" class="small noPrint"/>
+						<buttononly statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[PerId]][result_time_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][result_time_r]').value,'exec[nm][rows][set][$row_cont[PerId]][eliminated_r]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][eliminated_r]').value,'exec[nm][rows][set][$row_cont[PerId]][false_start]',document.getElementById('exec[nm][rows][set][$row_cont[PerId]][false_start]').value);" class="small noPrint"/>
 					</hbox>
 					<textbox type="float" align="center" id="${row}[ability_percent]" readonly="true"/>
 					<description align="center" id="set[$row_cont[PerId]][time_sum]"/>

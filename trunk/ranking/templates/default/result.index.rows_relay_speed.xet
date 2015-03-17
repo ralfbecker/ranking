@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
@@ -12,7 +11,7 @@
 					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
 				</row>
 				<row disabled="!@show_result=0">
-					<groupbox class="extra_startlist" cols="1" rows="1">
+					<groupbox class="extra_startlist">
 						<caption label="Isolation zone and starting time"/>
 						<grid padding="5">
 							<columns>
@@ -40,7 +39,7 @@
 					</groupbox>
 				</row>
 				<row disabled="!@result_official">
-					<groupbox class="extra_result" cols="1" rows="1">
+					<groupbox class="extra_result">
 						<caption label="Result official"/>
 						<grid>
 							<columns>
@@ -63,7 +62,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_relay_speed" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.index.rows_relay_speed" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%">
 			<columns>
 				<column width="5%"/>
@@ -131,11 +130,11 @@
 						<textbox type="float" id="set[$row_cont[team_id]][result_time_3]" precision="%4.2lf" size="5" class="$cont[rw_result]"/>
 						<description id="${row}[result_time_3]" readonly="true" class="$cont[ro_result]"/>
 					</hbox>
-					<menulist class="$cont[rw_result]">
+					<menulist>
 						<menupopup align="center" class="$cont[rw_result]" id="set[$row_cont[team_id]][eliminated]"/>
 					</menulist>
 					<description align="center" id="set[$row_cont[team_id]][time_sum]"/>
-					<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.uiresult.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_2]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_3]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,'exec[nm][rows][set][$row_cont[team_id]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);" class="small $cont[rw_result]"/>
+					<buttononly align="center" statustext="update time" label="Update" id="update" onclick="xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update',this.form.etemplate_exec_id.value,'exec[nm][rows][set][$row_cont[team_id]][result_time_1]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_1]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_2]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_2]').value,'exec[nm][rows][set][$row_cont[team_id]][result_time_3]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][result_time_3]').value,'exec[nm][rows][set][$row_cont[team_id]][eliminated]',document.getElementById('exec[nm][rows][set][$row_cont[team_id]][eliminated]').value);" class="small $cont[rw_result]"/>
 				</row>
 			</rows>
 		</grid>
