@@ -111,14 +111,14 @@ class ranking_selfservice extends ranking_bo
 
 		//egw::redirect_link('/index.php',
 		$_GET = array(
-			'menuaction' => 'ranking.uiresult.index',
+			'menuaction' => 'ranking.ranking_result_ui.index',
 			'comp' => $WetId,
 			'cat' => $GrpId,
 			'route' => $route_order,
 			'athlete' => $athlete['PerId'],
 			'show_result' => 4,
 		);
-		ExecMethod('ranking.uiresult.index');
+		ExecMethod('ranking.ranking_result_ui.index');
 	}
 
 	/**

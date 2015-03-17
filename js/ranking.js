@@ -150,7 +150,7 @@ function start_time_measurement(button,athlete)
 	set_style_by_class('td','ajax-loader','display','inline');
 	document.getElementById('msg').innerHTML='Time measurement';
 
-	xajax_doXMLHTTP('ranking.uiresult.ajax_time_measurement',button.form.etemplate_exec_id.value,athlete);
+	xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_time_measurement',button.form.etemplate_exec_id.value,athlete);
 }
 
 /**
@@ -747,7 +747,7 @@ function update_row(_elem, _perId)
 		values.exec.nm.rows.set[_perId].checked = _elem.checked;	// uncheck checkbox get not submitted
 		update_checked = true;
 	}
-	xajax_doXMLHTTP('ranking.uiresult.ajax_update', _elem.form.etemplate_exec_id.value, values, update_checked);
+	xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_update', _elem.form.etemplate_exec_id.value, values, update_checked);
 }
 
 /**
