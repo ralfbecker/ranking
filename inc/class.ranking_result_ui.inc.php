@@ -29,7 +29,7 @@ class ranking_result_ui extends ranking_result_bo
 	 */
 	function route($content=null,$msg='')
 	{
-		$tmpl = new etemplate('ranking.result.route');
+		$tmpl = new etemplate_new('ranking.result.route');
 
 		if (!is_array($content))
 		{
@@ -59,10 +59,7 @@ class ranking_result_ui extends ranking_result_bo
 		$comp = $cat = $discipline = null;
 		if (!($ok = $this->init_route($content,$comp,$cat,$discipline)))
 		{
-			$js = "alert('".addslashes(lang('Permission denied !!!'))."'); window.close();";
-			common::egw_header();
-			echo '<html><head><script type="text/javascript">'.$js."</script></head></html>\n";
-			common::egw_exit();
+			egw_framework::window_close(lang('Permission denied !!!'));
 		}
 		elseif(is_string($ok))
 		{
@@ -133,7 +130,8 @@ class ranking_result_ui extends ranking_result_bo
 					if ($err)
 					{
 						$msg = lang('Error: saving the heat!!!');
-						$button = $js = '';	// dont exit the window
+						$button = '';	// dont exit the window
+						$refresh = false;
 						break;
 					}
 					$param['msg'] = $msg = lang('Heat saved');
@@ -143,7 +141,7 @@ class ranking_result_ui extends ranking_result_bo
 						$msg .= "\n".ranking_measurement::save_topo($content, $content['topo_upload'], $topo_path) ?
 							lang('Topo uploaded as %1.', $topo_path) : lang('Error uploading topo!');
 					}
-					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
+					$refresh = true;
 
 					// if route is saved the first time, try getting a startlist (from registration or a previous heat)
 					if (!$content['new_route']) break;
@@ -179,7 +177,7 @@ class ranking_result_ui extends ranking_result_bo
 					{
 						$param['msg'] = ($msg .= lang('Error: generating startlist!!!'));
 					}
-					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
+					$refresh = true;
 					break;
 
 				case 'delete':
@@ -187,7 +185,8 @@ class ranking_result_ui extends ranking_result_bo
 					if ($content['route_order'] < $this->route->get_max_order($content['WetId'],$content['GrpId']))
 					{
 						$msg = lang('You can only delete the last heat, not one in between!');
-						$js = $button = '';	// dont exit the window
+						$button = '';	// dont exit the window
+						$refresh = false;
 					}
 					elseif ($this->route->delete(array(
 						'WetId' => $content['WetId'],
@@ -195,12 +194,13 @@ class ranking_result_ui extends ranking_result_bo
 						'route_order' => $content['route_order'])))
 					{
 						$param['msg'] = lang('Heat deleted');
-						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
+						$refresh = true;
 					}
 					else
 					{
 						$msg = lang('Error: deleting the heat!!!');
-						$js = $button = '';	// dont exit the window
+						$button = '';	// dont exit the window
+						$refresh = false;
 					}
 					break;
 
@@ -210,7 +210,8 @@ class ranking_result_ui extends ranking_result_bo
 						if ($this->route->save($content) != 0)
 						{
 							$msg = lang('Error: saving the heat!!!');
-							$button = $js = '';	// dont exit the window
+							$button = '';	// dont exit the window
+							$refresh = false;
 							break;
 						}
 						$param['msg'] = $msg = lang('Heat saved').', ';
@@ -253,12 +254,13 @@ class ranking_result_ui extends ranking_result_bo
 						if ($need_save && $this->route->save($content) != 0)
 						{
 							$msg = lang('Error: saving the heat!!!');
-							$button = $js = '';	// dont exit the window
+							$button = '';	// dont exit the window
+							$refresh = false;
 							break;
 						}
 						$param['msg'] = ($msg .= lang('%1 participants imported',$imported));
 						$param['show_result'] = 1;
-						$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
+						$refresh = true;
 					}
 					else
 					{
@@ -378,14 +380,13 @@ class ranking_result_ui extends ranking_result_bo
 					}
 					$content['athlete'] = array('password_email' => $content['athlete']['password_email']);
 					$param['msg'] = $msg;
-					$js = "opener.location.href='".$GLOBALS['egw']->link('/index.php',$param)."';";
+					$refresh = true;
 					break;
 			}
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent
 			{
-				$js .= 'window.close();';
-				echo '<html><head><script type="text/javascript">'.$js."</script></head></html>\n";
-				common::egw_exit();
+				egw_framework::refresh_opener($msg, 'ranking');
+				egw_framework::window_close();
 			}
 		}
 		if ($discipline == 'selfscore')
@@ -401,8 +402,9 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		$content += array(
 			'msg' => $msg,
-			'js'  => $js ? '<script type="text/javascript">'.$js."</script>" : '',
 		);
+		if ($refresh) egw_framework::refresh_opener ($msg, 'ranking');
+
 		$readonlys['button[delete]'] = $content['new_route'] || $view;
 		$readonlys['route_type'] = !!$content['route_order'];	// can only be set in the first route/quali
 
@@ -665,7 +667,6 @@ class ranking_result_ui extends ranking_result_bo
 				}
 			}
 		}
-		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
 
 		//_debug_array($content);
 		//_debug_array($sel_options);
@@ -1090,7 +1091,7 @@ class ranking_result_ui extends ranking_result_bo
 	 */
 	function index($content=null,$msg='',$pstambl='')
 	{
-		$tmpl = new etemplate('ranking.result.index');
+		$tmpl = new etemplate_new('ranking.result.index');
 
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
@@ -1512,8 +1513,6 @@ class ranking_result_ui extends ranking_result_bo
 		// should we show the result offical footer?
 		$content['nm']['result_official'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL;
 
-		$GLOBALS['egw']->js->validate_file('.','ranking','ranking',false);
-
 		// create a nice header
 		$content['nm']['route_name'] = $GLOBALS['egw_info']['flags']['app_header'] =
 			/*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') :
@@ -1533,6 +1532,13 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$content['start_order_label'] = lang('Start- order');
 		}
+		// fake call to get_rows()
+		if (!$content['no_list'])
+		{
+			$this->get_rows($content['nm'], $content['nm']['rows'], $readonlys);
+			array_unshift($content['nm']['rows'], false, false, false);	// 3 header rows
+		}
+		//_debug_array($content); exit;
 		return $tmpl->exec('ranking.ranking_result_ui.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
 	}
 
@@ -1617,7 +1623,7 @@ class ranking_result_ui extends ranking_result_bo
 			//_debug_array($request->preserv); exit;
 		}
 		$content = $content['exec'];
-		$tpl = new etemplate();	// process_show is NOT static
+		$tpl = new etemplate_new();	// process_show is NOT static
 		if (($errors = $tpl->process_show($content,$to_process,'exec')))
 		{
 			// validation errors

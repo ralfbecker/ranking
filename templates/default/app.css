@@ -1,19 +1,19 @@
 /**
- * eGroupWare digital ROCK Rankings - css
+ * EGroupware digital ROCK Rankings & ResultService - css
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
 .gray { color: gray; }
 .redItalic { color: red; font-style: italic; }
 .bold { font-weight: bold; }
-.place:after { content: "." }
+span.place:after { content: "." }
 .place { padding-left: 1em; }
 .small { font-size: 80%; padding: 0px; }
 .prequalified { color: gray; font-style: italic; }

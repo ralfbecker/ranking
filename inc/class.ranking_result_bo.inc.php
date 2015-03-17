@@ -132,13 +132,13 @@ class ranking_result_bo extends ranking_bo
 		$this->order_nums[-1] = lang('General result');
 
 		$this->plus_labels = array(
-			0 =>    '',
+			0 =>    ' ',	// eT2 ignores empty labels
 			1 =>    '+ '.lang('plus'),
 			'-1' => '- '.lang('minus'),
 			TOP_PLUS  => lang('Top'),
 		);
 		$this->plus = array(
-			0 =>    '',
+			0 =>    ' ',	// eT2 ignores empty labels
 			1 =>    '+',
 			'-1' => '-',
 			TOP_PLUS => lang('Top'),

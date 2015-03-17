@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -32,6 +32,15 @@ $old2new = array(
 	'ranking.uiresult.index' => 'ranking.ranking_result_ui.index',
 );
 if (isset($old2new[$view])) $view = $old2new[$view];
+
+// urls which should run top-level need a redirect
+if (in_array($view, array('ranking.ranking_result_ui.index')))
+{
+	egw::redirect_link('/index.php', array(
+		'menuaction' => $view,
+		'ajax' => 'true',
+	), 'ranking');
+}
 
 ExecMethod($view);
 

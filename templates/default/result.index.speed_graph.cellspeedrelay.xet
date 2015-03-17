@@ -3,7 +3,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.index.speed_graph.cellspeedrelay" template="" lang="" group="0" version="1.7.002">
-		<grid width="100%" class="speed_athlete">
+		<grid width="100%" class="speed_athlete" id="nm[rows]>
 			<columns>
 				<column/>
 				<column/>
