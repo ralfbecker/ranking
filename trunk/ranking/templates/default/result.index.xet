@@ -63,16 +63,16 @@
 		</styles>
 	</template>
 	<template id="ranking.result.index.rows_lead" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%">
+		<grid width="100%" id="nm[rows]" class="egwGridView_grid">
 			<columns>
 				<column width="5%"/>
 				<column/>
 				<column/>
 				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column disabled="@no_nation"/>
+				<column disabled="@no_verband"/>
+				<column disabled="@no_acl_fed"/>
+				<column disabled="@no_ort"/>
 				<column/>
 				<column width="50"/>
 				<column width="50"/>
@@ -117,9 +117,9 @@
 					<description align="center" id="{$row}[PerId]" no_lang="1"/>
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
-					<hbox align="center" options="0,0">
+					<hbox align="center">
 						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
-						<textbox id="set[$row_cont[PerId]][result_height]" onchange="handle_plus(this,form::name('set[$row_cont[PerId]][result_plus]'));" size="5" validator="&quot;/^-?[0-9]*[,.]?[0-9]*$/&quot;" class="$cont[rw_result]"/>
+						<textbox id="set[$row_cont[PerId]][result_height]" onchange="handle_plus(this,form::name('set[$row_cont[PerId]][result_plus]'));" size="5" validator="/^-?[0-9]*[,.]?[0-9]*$/" class="$cont[rw_result]"/>
 						<menulist>
 							<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1" class="$cont[rw_result] leftPad5"/>
 						</menulist>
@@ -138,7 +138,7 @@
 			</columns>
 			<rows>
 				<row class="noPrint" disabled="@no_compsel">
-					<hbox options="0,0">
+					<hbox>
 						<menulist>
 							<menupopup class="rightPad5" statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
 						</menulist>
@@ -148,19 +148,15 @@
 					</hbox>
 				</row>
 				<row class="noPrint" disabled="!@nm[comp]">
-					<hbox no_lang="1" onchange="1" options="0,0">
+					<hbox no_lang="1" onchange="1">
 						<menulist>
 							<menupopup class="bold" id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
 						</menulist>
 						<hidden id="comp[WetId]"/>
-						<hbox class="leftPad5" options="0,0">
-							<image src="ajax-loader" class="ajax-loader"/>
-							<description id="msg" no_lang="1" class="redItalic"/>
-						</hbox>
 					</hbox>
 				</row>
 				<row class="noPrint" disabled="@no_route_selection">
-					<hbox options="0,0">
+					<hbox>
 						<menulist span="all">
 							<menupopup class="header rightPad5" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
 						</menulist>
@@ -177,7 +173,7 @@
 					</hbox>
 				</row>
 				<row disabled="@no_list">
-					<nextmatch id="nm" template="ranking.result.index.rows_lead" span="all"/>
+					<template template="ranking.result.index.rows_lead" span="all"/>
 				</row>
 				<row class="noPrint" disabled="@no_list">
 					<button statustext="Apply the changes made" label="Update" id="button[apply]"/>
@@ -187,8 +183,7 @@
 				</row>
 			</rows>
 		</grid>
-		<styles>
-			.ajax-loader { display: none; }
-		</styles>
+		<hidden id="nm[sort]"/>
+		<hidden id="nm[order]"/>
 	</template>
 </overlay>

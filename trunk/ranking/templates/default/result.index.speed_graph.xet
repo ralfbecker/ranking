@@ -21,7 +21,7 @@
 		</grid>
 	</template>
 	<template id="ranking.result.index.speed_graph" template="" lang="" group="0" version="1.7.001">
-		<grid width="100%">
+		<grid width="100%" id="nm[rows]">
 			<columns>
 				<column width="20%" disabled="!@heat2"/>
 				<column width="20%" disabled="!@heat3"/>

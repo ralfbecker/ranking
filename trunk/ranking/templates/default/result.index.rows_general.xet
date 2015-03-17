@@ -64,7 +64,7 @@
 		</styles>
 	</template>
 	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.7.003">
-		<grid width="100%">
+		<grid width="100%" id="nm[rows]>
 			<columns>
 				<column width="5%"/>
 				<column/>

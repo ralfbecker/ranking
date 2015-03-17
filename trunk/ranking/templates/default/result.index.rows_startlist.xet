@@ -64,7 +64,7 @@
 		</styles>
 	</template>
 	<template id="ranking.result.index.rows_startlist" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%">
+		<grid width="100%" id="nm[rows]" class="egwGridView_grid">
 			<columns>
 				<column width="5%"/>
 				<column width="5%"/>
@@ -73,10 +73,10 @@
 				<column/>
 				<column/>
 				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column disabled="@no_nation"/>
+				<column disabled="@no_verband"/>
+				<column disabled="@no_acl_fed"/>
+				<column disabled="@no_ort"/>
 				<column/>
 				<column disabled="@no_ranking"/>
 				<column width="15%"/>
