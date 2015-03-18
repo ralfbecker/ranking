@@ -1230,7 +1230,11 @@ class ranking_bo extends ranking_so
 			}
 			$GLOBALS['egw']->session->appsession($type,'ranking',$data);
 		}
-		if ($_GET['menuaction']) $GLOBALS['egw']->session->appsession('menuaction','ranking',$_GET['menuaction']);
+		// only store our menuaction, specially not eTemplate2 home.etemplate_new.ajax_process_exec.etemplate!
+		if (strpos($_GET['menuaction'], 'ranking.') === 0)
+		{
+			$GLOBALS['egw']->session->appsession('menuaction','ranking',$_GET['menuaction']);
+		}
 	}
 
 	/**
