@@ -173,7 +173,7 @@
 					</hbox>
 				</row>
 				<row disabled="@no_list">
-					<template template="ranking.result.index.rows_lead" span="all"/>
+					<template template="@nm[template]" span="all"/>
 				</row>
 				<row class="noPrint" disabled="@no_list">
 					<button statustext="Apply the changes made" label="Update" id="button[apply]"/>
