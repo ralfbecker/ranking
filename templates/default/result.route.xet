@@ -3,7 +3,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.route.general" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%" height="280">
+		<grid width="100%">
 			<columns>
 				<column width="116"/>
 				<column/>
@@ -84,19 +84,19 @@
 		</grid>
 	</template>
 	<template id="ranking.result.route.comment" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="280">
+		<grid width="100%">
 			<columns>
 				<column/>
 			</columns>
 			<rows>
 				<row valign="top">
-					<textbox multiline="true" id="route_comments" rows="20" cols="95" span="all"/>
+					<textbox multiline="true" id="route_comments" height="270" width="100%" span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.result.route.measure" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="280">
+		<grid width="100%">
 			<columns>
 				<column width="120"/>
 				<column/>
@@ -162,7 +162,7 @@
 		</grid>
 	</template>
 	<template id="ranking.result.route.registration" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="280" id="athlete">
+		<grid width="100%" id="athlete">
 			<columns>
 				<column width="100"/>
 				<column width="200"/>
@@ -225,14 +225,10 @@
 				<column width="120"/>
 				<column/>
 				<column/>
+				<column/>
 			</columns>
 			<rows>
-				<row disabled="!@msg">
-					<description align="center" id="msg" no_lang="1" span="all" class="redItalic"/>
-					<description/>
-					<description/>
-				</row>
-				<row class="th" height="28">
+				<row class="dialogHeader">
 					<description value="Competition"/>
 					<menulist span="all">
 						<menupopup id="WetId" no_lang="1" onchange="1" readonly="true"/>
@@ -262,13 +258,13 @@
 						<menupopup align="right" id="route_type" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;" class="noWrap"/>
 					</menulist>
 				</row>
-				<row class="th">
+				<row class="dialogHeader2">
 					<description value="Name"/>
 					<textbox statustext="Qualification, 1/2-Final, ..." id="route_name" needed="1" size="64" maxlength="80" span="all" class="inputFullWidth"/>
 					<description/>
 				</row>
 				<row>
-					<tabbox id="tabs" span="all">
+					<tabbox id="tabs" span="all" tab_height="280">
 						<tabs>
 							<tab id="general" label="General"/>
 							<tab id="comment" label="Comment"/>
@@ -283,7 +279,7 @@
 						</tabpanels>
 					</tabbox>
 				</row>
-				<row>
+				<row class="dialogFooterToolbar">
 					<hbox span="2">
 						<button statustext="Saves the changes made" label="Save" id="button[save]"/>
 						<button statustext="Apply the changes made" label="Apply" id="button[apply]"/>

@@ -15,7 +15,7 @@
 .bold { font-weight: bold; }
 span.place:after { content: "." }
 .place { padding-left: 1em; }
-.small { font-size: 80%; padding: 0px; }
+button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 .prequalified { color: gray; font-style: italic; }
 .complimentary { font-style: italic; }
 .lastname { text-transform:  uppercase; }
