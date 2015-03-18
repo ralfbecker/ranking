@@ -84,3 +84,7 @@ table#exec\[score\]\[score\] {
 table#exec\[score\]\[score\] td {
 	padding: 5px;
 }
+/* Fix no space for button in hbox row*/
+#ranking-result-route_import_cat {
+	width:55%;
+}

@@ -17,7 +17,7 @@
 							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
 						</menulist>
 						<menulist>
-							<menupopup statustext="|Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat" class="selectboxFullWidth"/>
+							<menupopup statustext="|Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat"/>
 						</menulist>
 						<button statustext="Import the result into the ranking" label="Import into ranking" id="button[ranking]" class="leftPad5"/>
 					</hbox>
@@ -260,7 +260,7 @@
 				</row>
 				<row class="dialogHeader2">
 					<description value="Name"/>
-					<textbox statustext="Qualification, 1/2-Final, ..." id="route_name" needed="1" size="64" maxlength="80" span="all" class="inputFullWidth"/>
+					<textbox statustext="Qualification, 1/2-Final, ..." id="route_name" needed="1" size="64" maxlength="80" span="all" class="et2_fullWidth"/>
 					<description/>
 				</row>
 				<row>
