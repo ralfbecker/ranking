@@ -42,7 +42,7 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 		padding-bottom: 0px; margin-bottom: 0px;
 	}
 }
-.half_down { position: relative; top: 2.3em; }
+.half_down { position: relative; top: 1.3em; }
 .winner { font-weight: bold; }
 .selectboxFullWidth select { width: 100%; }
 .inputFullWidth input { width:100%; }

@@ -15,6 +15,7 @@
  *
  * @param height input-object
  * @param plus_sel_id id of the plus-select-box
+ * --> change to onkeypress="app.ranking.height_keypress"
  */
 function handle_plus(height,plus_sel_id)
 {
@@ -730,6 +731,7 @@ function boulder_next()
  *
  * @param dom _elem [apply] button or scorecard checkbox (boulder only)
  * @param int _perId
+ * --> change to onclick="app.ranking.update_result_row"
  */
 function update_row(_elem, _perId)
 {

@@ -2,7 +2,7 @@
 <!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.footer" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" class="extra_footer">
 			<columns>
 				<column/>
@@ -63,7 +63,7 @@
 			.extra_footer { margin-top: 10px; }
 		</styles>
 	</template>
-	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="1.7.003">
+	<template id="ranking.result.index.rows_general" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" id="nm[rows]" class="egwGridView_grid">
 			<columns>
 				<column width="5%"/>

@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.footer" template="" lang="" group="0" version="1.7.001">
@@ -63,7 +64,7 @@
 		</styles>
 	</template>
 	<template id="ranking.result.index.rows_relay_speed" template="" lang="" group="0" version="14.2.001">
-		<grid width="100%" id="nm[rows]">
+		<grid width="100%" id="nm[rows]" class="egwGridView_grid">
 			<columns>
 				<column width="5%"/>
 				<column/>

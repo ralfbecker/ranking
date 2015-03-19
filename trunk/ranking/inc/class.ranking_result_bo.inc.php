@@ -99,7 +99,7 @@ class ranking_result_bo extends ranking_bo
 		),
 	);
 	var $eliminated_labels = array(
-		''=> '',
+		''=> ' ',
 		1 => 'fall',
 		0 => 'wildcard',
 	);
