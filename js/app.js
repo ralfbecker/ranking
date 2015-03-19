@@ -117,5 +117,61 @@ app.classes.ranking = AppJS.extend(
 			this.et2.getWidgetById('nm[sort]').set_value(content.nm.sort);
 			this.et2._inst.submit();
 		}
-	}
+	},
+
+	/**
+	 * onKeypress handler for height fields propagating "+", "-" or "t" to plus-selectbox
+	 *
+	 * @param {jQuery.Event} _event
+	 * @param {et2_number} _widget
+	 * @returns {Boolean}
+	 */
+	height_keypress: function(_event, _widget)
+	{
+		var key2plus = {
+			116: '9999',	// t
+			84: '9999',		// T
+			43:	'1',		// +
+			45: '-1',		// -
+			32:	'0'			// space
+		};
+		var key = _event.keyCode || _event.which;
+		if (typeof key2plus[key] != 'undefined')
+		{
+			var plus_widget = _widget.getParent().getWidgetById(_widget.id.replace('result_height', 'result_plus'));
+			if (plus_widget) plus_widget.set_value(key2plus[key]);
+			if (key2plus[key] === '9999') _widget.set_value('');	// for top, remove height
+			return false;
+		}
+		// "0"-"9", "." or "," --> allow and remove "Top"
+		if (48 <= key && key <= 57 || key == 44 || key == 46)
+		{
+			var plus_widget = _widget.getParent().getWidgetById(_widget.id.replace('result_height', 'result_plus'));
+			if (plus_widget && plus_widget.get_value() == '9999') plus_widget.set_value('0');
+			return;
+		}
+		// ignore all other chars
+		return false;
+	},
+
+	/**
+	 * Update result of current row
+	 *
+	 * Not yet used as grid stuff is not commited and eT2 serverside does not validate partial submits correct.
+	 *
+	 * @param {jQuery.Event} _event
+	 * @param {et2_button|et2_checkbox} _widget
+	 */
+   update_result_row: function(_elem, _widget)
+   {
+		var parent = _widget.getParent();
+		while(parent && !parent.instanceOf(et2_grid))
+		{
+			parent = parent.getParent();
+		}
+		if (parent)
+		{
+			_widget.getInstanceManager().submit(null, false, false, parent.getRow(_widget));
+		}
+   }
 });

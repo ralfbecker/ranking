@@ -2,7 +2,7 @@
 <!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.index.speed_graph.cell" template="" lang="" group="0" version="1.3.001">
+	<template id="ranking.result.index.speed_graph.cell" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" class="speed_athlete">
 			<columns>
 				<column/>
@@ -20,7 +20,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.result.index.speed_graph" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.index.speed_graph" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" id="nm[rows]">
 			<columns>
 				<column width="20%" disabled="!@heat2"/>
@@ -31,115 +31,115 @@
 			</columns>
 			<rows>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[1]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[1]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[1]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[1]"/>
 					<description/>
 					<description/>
 					<description/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[2]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[2]"/>
 					<description/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat4[1]"/>
-					<description/>
-					<description/>
-				</row>
-				<row>
-					<template id="cell$cont[discipline]" content="heat2[3]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[2]"/>
-					<description/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat4[1]"/>
 					<description/>
 					<description/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[4]"/>
-					<description/>
-					<description/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat6[1]"/>
-					<description/>
-				</row>
-				<row>
-					<template id="cell$cont[discipline]" content="heat2[5]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[3]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[3]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[2]"/>
 					<description/>
 					<description/>
 					<description/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[6]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[4]"/>
 					<description/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat4[2]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat6[1]"/>
+					<description/>
+				</row>
+				<row>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[5]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[3]"/>
+					<description/>
 					<description/>
 					<description/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[7]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[4]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[6]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat4[2]"/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[7]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[4]"/>
 					<description/>
 					<description/>
 					<description value="1. place" align="center"/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[8]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[8]"/>
 					<description/>
 					<description/>
 					<description/>
 					<template content="winner1" class="half_down winner" id="cell$cont[discipline]"/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[9]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[5]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[9]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[5]"/>
 					<description/>
 					<description/>
 					<description align="center"/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[10]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[10]"/>
 					<description/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat4[3]"/>
-					<description/>
-					<description/>
-				</row>
-				<row>
-					<template id="cell$cont[discipline]" content="heat2[11]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[6]"/>
-					<description/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat4[3]"/>
 					<description/>
 					<description/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[12]"/>
-					<description/>
-					<description/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat6[2]"/>
-					<description/>
-				</row>
-				<row>
-					<template id="cell$cont[discipline]" content="heat2[13]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[7]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[11]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[6]"/>
 					<description/>
 					<description/>
 					<description/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[14]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[12]"/>
 					<description/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat4[4]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat6[2]"/>
+					<description/>
+				</row>
+				<row>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[13]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[7]"/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[14]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat4[4]"/>
 					<description value="Small final" class="leftPad5"/>
 					<description value="3. place" align="center"/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[15]"/>
-					<template id="cell$cont[discipline]" class="half_down" content="heat3[8]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[15]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[8]"/>
 					<description/>
-					<template id="cell$cont[discipline]" content="heat5[1]"/>
-					<template id="cell$cont[discipline]" class="half_down winner" content="winner3"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat5[1]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down winner" content="winner3"/>
 				</row>
 				<row>
-					<template id="cell$cont[discipline]" content="heat2[16]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[16]"/>
 					<description/>
 					<description/>
-					<template id="cell$cont[discipline]" content="heat5[2]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat5[2]"/>
 					<description/>
 				</row>
 			</rows>

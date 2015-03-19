@@ -1239,6 +1239,25 @@ class ranking_result_ui extends ranking_result_bo
 			list($id) = @each($content['nm']['rows']['delete']);
 			$button = 'delete';
 		}
+		// Apply button in a result-row pressed --> only update that row
+		if(!$button && isset($content['nm']['rows']['apply']))
+		{
+			list($PerId) = @each($content['nm']['rows']['apply']);
+			$content['nm']['rows']['set'] = array(
+				$PerId => $content['nm']['rows']['set'][$PerId],
+			);
+			// for speed only one lane got submitted
+			if ($content['nm']['discipline'] == 'speed')
+			{
+				foreach(is_array($content['nm']['rows']['apply'][$PerId]) ?	// right lane
+					array('result_time','eliminated') : array('result_time_r','eliminated_r') as $name)
+				{
+					unset($content['nm']['rows']['set'][$PerId][$name]);
+				}
+			}
+			unset($content['nm']['rows']['apply']);
+			$button = 'apply';
+		}
 		if ($button && $comp && $cat && is_numeric($content['nm']['route']))
 		{
 			//echo "<p align=right>$comp[rkey] ($comp[WetId]), $cat[rkey]/$cat[GrpId], {$content['nm']['route']}, button=$button</p>\n";
@@ -1500,10 +1519,8 @@ class ranking_result_ui extends ranking_result_bo
 			$content['nm']['sort'] = 'ASC';
 			$content['nm']['old_show'] = $content['nm']['show_result'];
 		}
-		if ($content['nm']['show_result'] || $tmpl->sitemgr || !$this->has_startlist($keys))
-		{
-			$tmpl->disable_cells('nm[ranking]');	// dont show ranking in result of via sitemgr
-		}
+		// dont show ranking in result of via sitemgr
+		$tmpl->disableElement('nm[ranking]', $content['nm']['show_result'] || $tmpl->sitemgr || !$this->has_startlist($keys));
 		// do we show the start- or result-list?
 		$content['no_list'] = (string)$content['nm']['route'] === '' || $content['nm']['show_result'] == 4;
 		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],$content['nm']['discipline']);
@@ -1532,6 +1549,9 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$content['start_order_label'] = lang('Start- order');
 		}
+		$preserv = array(
+			'nm' => $content['nm'],
+		);
 		// fake call to get_rows()
 		if (!$content['no_list'])
 		{
@@ -1539,7 +1559,7 @@ class ranking_result_ui extends ranking_result_bo
 			array_unshift($content['nm']['rows'], false, false, false);	// 3 header rows
 		}
 		//_debug_array($content); exit;
-		return $tmpl->exec('ranking.ranking_result_ui.index',$content,$sel_options,$readonlys,array('nm' => $content['nm']));
+		return $tmpl->exec('ranking.ranking_result_ui.index', $content, $sel_options, $readonlys, $preserv);
 	}
 
 	/**
@@ -1578,6 +1598,7 @@ class ranking_result_ui extends ranking_result_bo
 	 * @param string $request_id eTemplate request id
 	 * @param string|array $name can be repeated multiple time together with value, or a single array/object
 	 * @param string $value
+	 * @deprecated not used with eTemplate2
 	 * @return string
 	 */
 	function ajax_update($request_id,$name,$value=null)
