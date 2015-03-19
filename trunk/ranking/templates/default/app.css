@@ -27,6 +27,13 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 .displayNone { display: none; }
 .noWrap { white-space: nowrap; }
 .speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; height: 7ex; }
+/**
+ * Some fixes for ResultService not using a nextmatch
+ */
+#ranking-result-index span.nextmatch_sortheader {
+	padding-right: 0;
+	margin-right: 0;
+}
 @media print {
 	.speed_athlete { padding: 1mm; }
 	tr.row_on,tr.row_off{
