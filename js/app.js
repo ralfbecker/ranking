@@ -18,6 +18,11 @@ app.classes.ranking = AppJS.extend(
 	appname: 'ranking',
 
 	/**
+	 * eT2 content after call to et2_ready
+	 */
+	content: {},
+
+	/**
 	 * Constructor
 	 *
 	 * @memberOf app.ranking
@@ -50,6 +55,8 @@ app.classes.ranking = AppJS.extend(
 		// call parent
 		this._super.apply(this, arguments);
 
+		this.content = this.et2.getArrayMgr('content').data;
+
 		switch (name)
 		{
 			case 'ranking.result.index':
@@ -57,9 +64,17 @@ app.classes.ranking = AppJS.extend(
 				this.et2.iterateOver(function(_widget){
 					_widget.setNextmatch(self);
 				}, window, et2_nextmatch_sortheader);
-				var content = this.et2._inst.widgetContainer.getArrayMgr('content').data;
-				var sort_widget = this.et2.getWidgetById(content.nm.order);
-				if (sort_widget) sort_widget.setSortmode(content.nm.sort.toLowerCase());
+				var sort_widget = this.et2.getWidgetById(this.content.nm.order);
+				if (sort_widget) sort_widget.setSortmode(this.content.nm.sort.toLowerCase());
+				if (this.content.nm.show_result == 4)	// measurement
+				{
+					switch(this.content.nm.discipline)
+					{
+						case 'boulder':
+							this.init_boulder();
+							break;
+					}
+				}
 				break;
 		}
 	},
@@ -87,6 +102,10 @@ app.classes.ranking = AppJS.extend(
 			this.et2._inst.submit();
 		}
 	},
+
+	/***************************************************************************
+	 * Resultservice
+	 **************************************************************************/
 
 	/**
 	 * onClick handler for nextmatch sortheader
@@ -117,41 +136,6 @@ app.classes.ranking = AppJS.extend(
 			this.et2.getWidgetById('nm[sort]').set_value(content.nm.sort);
 			this.et2._inst.submit();
 		}
-	},
-
-	/**
-	 * onKeypress handler for height fields propagating "+", "-" or "t" to plus-selectbox
-	 *
-	 * @param {jQuery.Event} _event
-	 * @param {et2_number} _widget
-	 * @returns {Boolean}
-	 */
-	height_keypress: function(_event, _widget)
-	{
-		var key2plus = {
-			116: '9999',	// t
-			84: '9999',		// T
-			43:	'1',		// +
-			45: '-1',		// -
-			32:	'0'			// space
-		};
-		var key = _event.keyCode || _event.which;
-		if (typeof key2plus[key] != 'undefined')
-		{
-			var plus_widget = _widget.getParent().getWidgetById(_widget.id.replace('result_height', 'result_plus'));
-			if (plus_widget) plus_widget.set_value(key2plus[key]);
-			if (key2plus[key] === '9999') _widget.set_value('');	// for top, remove height
-			return false;
-		}
-		// "0"-"9", "." or "," --> allow and remove "Top"
-		if (48 <= key && key <= 57 || key == 44 || key == 46)
-		{
-			var plus_widget = _widget.getParent().getWidgetById(_widget.id.replace('result_height', 'result_plus'));
-			if (plus_widget && plus_widget.get_value() == '9999') plus_widget.set_value('0');
-			return;
-		}
-		// ignore all other chars
-		return false;
 	},
 
 	/**
@@ -195,6 +179,49 @@ app.classes.ranking = AppJS.extend(
 			_widget.getInstanceManager().submit(null, false, false, parent.getRow(_widget));
 		}
 	},
+
+	/***************************************************************************
+	 * Resultist lead
+	 **************************************************************************/
+
+	/**
+	 * onKeypress handler for height fields propagating "+", "-" or "t" to plus-selectbox
+	 *
+	 * @param {jQuery.Event} _event
+	 * @param {et2_number} _widget
+	 * @returns {Boolean}
+	 */
+	height_keypress: function(_event, _widget)
+	{
+		var key2plus = {
+			116: '9999',	// t
+			84: '9999',		// T
+			43:	'1',		// +
+			45: '-1',		// -
+			32:	'0'			// space
+		};
+		var key = _event.keyCode || _event.which;
+		if (typeof key2plus[key] != 'undefined')
+		{
+			var plus_widget = _widget.getParent().getWidgetById(_widget.id.replace('result_height', 'result_plus'));
+			if (plus_widget) plus_widget.set_value(key2plus[key]);
+			if (key2plus[key] === '9999') _widget.set_value('');	// for top, remove height
+			return false;
+		}
+		// "0"-"9", "." or "," --> allow and remove "Top"
+		if (48 <= key && key <= 57 || key == 44 || key == 46)
+		{
+			var plus_widget = _widget.getParent().getWidgetById(_widget.id.replace('result_height', 'result_plus'));
+			if (plus_widget && plus_widget.get_value() == '9999') plus_widget.set_value('0');
+			return;
+		}
+		// ignore all other chars
+		return false;
+	},
+
+	/***************************************************************************
+	 * Resultist boulder
+	 **************************************************************************/
 
 	/**
 	 * onChange of top: if bonus not set, set it to the same number of tries as top
@@ -316,6 +343,274 @@ alert('Not yet implemented :-('); return;
 				tries.value = bonus.value;
 			}, 10);
 		}
-	}
+	},
 
+	/***************************************************************************
+	 * Boulder measurement
+	 **************************************************************************/
+
+	resultlist: undefined,
+
+	/**
+	 * Init boulder measurement or update button state
+	 */
+	init_boulder: function()
+	{
+		var PerId = this.et2.getWidgetById('nm[PerId]').get_value();
+		var boulder_n = this.et2.getWidgetById('nm[boulder_n]');
+		var n = boulder_n ? boulder_n.get_value() : null;
+
+		jQuery('#ranking-result-index_button\\[update\\],#ranking-result-index_button\\[try\\],#ranking-result-index_button\\[bonus\\],#ranking-result-index_button\\[top\\]')
+			.attr('disabled', !PerId || !n);
+
+		if (!this.resultlist)
+		{
+			this.resultlist = new Resultlist('ranking-result-index_resultlist',egw_webserverUrl+'/ranking/json.php'+
+				'?comp='+this.content.comp.WetId+
+				'&cat='+this.et2.getWidgetById('nm[cat]').get_value()+
+				'&route='+this.et2.getWidgetById('nm[route]').get_value()+'&detail=2&toc=0');
+
+			// set methods for interaction with protocol
+			window.protocol.set_msg(jQuery.proxy(this.message, this));
+			window.protocol.get_athlete(jQuery.proxy(this.get_athlete, this));
+		}
+	},
+
+	/**
+	 * Get athlete name by PerId using options from athlete selectbox
+	 *
+	 * @param {int} _PerId
+	 * @returns {String}
+	 */
+	get_athlete: function(_PerId)
+	{
+		var select = this.et2.getWidgetById('nm[PerId]').getDOMNode();
+
+		if (select && select.options)
+		{
+			for(var i=1; i < select.options.length; ++i)
+			{
+				var option = select.options.item(i);
+				if (option.value == _PerId)
+				{
+					return jQuery(option).text();
+				}
+			}
+		}
+		return '#'+_PerId;
+	},
+
+	/**
+	 * Display message
+	 *
+	 * @param {string} _msg message to display
+	 */
+	message: function(_msg)
+	{
+		this.et2.getWidgetById('msg').set_value(_msg);
+	},
+
+	/**
+	 * Get current state
+	 *
+	 * @returns {object} with values for attributes try, bonus and top
+	 */
+	get_state: function()
+	{
+		return {
+			try: this.try_num(),
+			bonus: this.et2.getWidgetById('zone').get_value(),
+			top: this.et2.getWidgetById('top').get_value()
+		};
+	},
+
+	/**
+	 * [Try] button clicked --> update number
+	 *
+	 * @param input type="button" button
+	 */
+	try_clicked: function(button)
+	{
+		var state = this.get_state();
+		var num = this.try_num();
+		this.try_num(++num);
+
+		var bonus = this.et2.getWidgetById('zone');
+
+		// set bonus 'No'=0, for 1. try, if there's no bonus yet
+		if (num == 1 && bonus && bonus.get_value() === '')
+		{
+			bonus.set_value('0');
+		}
+		this.update_boulder('try', state);
+	},
+
+	/**
+	 * Set tries to given number
+	 *
+	 * @param n
+	 */
+	set_try: function(n)
+	{
+		this.try_num(n-1, true);
+
+		this.try_clicked(this.et2.getWidgetById('button[try]'));
+	},
+
+	/**
+	 * Get number of try from label of try button
+	 *
+	 * @param {int} set_value 0: reset, 1: set to 1, if not already higher
+	 * @param {boolean} set_anyway set, even if number is smaller
+	 * @returns int number of try
+	 */
+	try_num: function(set_value, set_anyway)
+	{
+		var try_button = this.et2.getWidgetById('button[try]');
+
+		var num = parseInt(jQuery(try_button.getDOMNode()).text());
+		if (isNaN(num)) num = 0;
+
+		if (typeof set_value != 'undefined')
+		{
+			if (set_value == 0 || num < set_value || set_anyway)
+			{
+				this.et2.getWidgetById('try').set_value(num = set_value);
+			}
+			try_button.set_label((num ? ''+num+'. ' : '')+try_button.options.label);
+		}
+		return num;
+	},
+
+	/**
+	 * Bonus button clicked
+	 *
+	 * @param button
+	 */
+	bonus_clicked: function(button)
+	{
+		var state = this.get_state();
+		var bonus = this.et2.getWidgetById('zone');
+		bonus.set_value(this.try_num(1));
+		this.check_bonus(bonus.getDOMNode(), bonus);
+
+		this.update_boulder('bonus', state);
+	},
+
+	/**
+	 * Bonus button clicked
+	 *
+	 * @param button
+	 */
+	top_clicked: function(button)
+	{
+		var state = this.get_state();
+		var bonus = this.et2.getWidgetById('zone');
+		var top = this.et2.getWidgetById('top');
+		var num = this.try_num(1);
+
+		if (!num.isNaN)
+		{
+			if(!bonus.get_value() || bonus.get_value() == '0') bonus.set_value(num);
+			top.set_value(num);
+			this.check_top(top.getDOMNode(), top);
+		}
+		this.update_boulder('top', state);
+	},
+
+	/**
+	 * Sending bonus and top for PerId to server
+	 */
+	update_boulder: function(clicked, state)
+	{
+		var WetId = this.et2.getWidgetById('comp[WetId]').get_value();
+		var n = this.et2.getWidgetById('nm[boulder_n]').get_value();
+		var PerId = this.et2.getWidgetById('nm[PerId]').get_value();
+		var GrpId = this.et2.getWidgetById('nm[cat]').get_value();
+		var route_order = this.et2.getWidgetById('nm[route]').get_value();
+
+		if (PerId && n)
+		{
+			var bonus = this.et2.getWidgetById('zone').get_value();
+			var top = this.et2.getWidgetById('top').get_value();
+
+			if (typeof window.protocol != 'undefined')
+			{
+				window.protocol.record({
+					WetId: WetId,
+					GrpId: GrpId,
+					route: route_order,
+					PerId: PerId,
+					boulder: n,
+					bonus: bonus,
+					top: top,
+					clicked: clicked,
+					try: clicked ? this.try_num() : null,
+					state: state
+				});
+			}
+			else	// old direct transmission, if no protocol object available
+			{
+				var update = {};
+				update['zone'+n] = bonus === '' ? 'empty' : bonus;	// egw_json_encode sends '' as null, which get not stored!
+				update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
+
+				this.egw.json('ranking_boulder_measurement::ajax_update_result',
+					[PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order}]).sendRequest();
+			}
+		}
+	},
+
+	/**
+	 * Boulder or athlete changed
+	 *
+	 * @param selectbox
+	 */
+	boulder_changed: function(selectbox)
+	{
+		var PerId = this.et2.getWidgetById('nm[PerId]').get_value();
+		var n = this.et2.getWidgetById('nm[boulder_n]').get_value();
+
+		// reset values (in case connection is lost)
+		this.et2.getWidgetById('zone').set_value('');
+		this.et2.getWidgetById('top').set_value('');
+		this.try_num(0);
+		this.init_boulder();
+
+		// loading values from server
+		if (PerId && n)
+		{
+			var WetId = this.et2.getWidgetById('comp[WetId]').get_value();
+			var GrpId = this.et2.getWidgetById('nm[cat]').get_value();
+			var route_order = this.et2.getWidgetById('nm[route]').get_value();
+
+			this.egw.json('ranking_boulder_measurement::ajax_load_athlete',
+				[PerId, {},	// {} = send data back
+				{'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order}],
+				function(_data)
+				{
+					this.et2.getWidgetById('zone').set_value(_data['zone'+n]);
+					this.et2.getWidgetById('top').set_value(_data['top'+n]);
+					this.try_num(0);
+					this.init_boulder();
+
+					this.message(_data.athlete);
+				},
+				null, false, this).sendRequest();
+		}
+	},
+
+	/**
+	 * Go to next athlete
+	 */
+	boulder_next: function()
+	{
+		var PerId = this.et2.getWidgetById('nm[PerId]');
+		var node = PerId.getDOMNode();
+
+		node.selectedIndex = node.selectedIndex + 1;	// ++ works NOT reliable ...
+
+		// need to call this manually, as changing selectedIndex does NOT trigger onchange
+		this.boulder_changed(PerId);
+	}
 });

@@ -1337,6 +1337,7 @@ class ranking_result_ui extends ranking_result_bo
 			) + ($comp['serie'] ? array(2 => 'display cup') : array()) + array(
 				4 => 'Show jurylist',
 			),
+			'try' => array(0 => ' '),
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
 
@@ -1344,7 +1345,10 @@ class ranking_result_ui extends ranking_result_bo
 		unset($sel_options['eliminated_r'][0]);
 		for($i=''; $i <= $route['route_num_problems']; ++$i)
 		{
-			$sel_options['zone'.$i] = array(lang('No'));
+			$sel_options['zone'.$i] = array(
+				''  => ' ',
+				'0' => lang('No'),
+			);
 		}
 		if (is_array($route)) $content += $route;
 		$content['nm']['route_data'] = $route;

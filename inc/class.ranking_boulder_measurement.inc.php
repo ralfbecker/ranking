@@ -66,8 +66,8 @@ class ranking_boulder_measurement
 	 *
 	 * @param int $PerId
 	 * @param array $update
-	 * @param int $set_current=1 make $PerId the current participant of the route
-	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
+	 * @param int $set_current =1 make $PerId the current participant of the route
+	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
 	 */
 	public static function ajax_update_result($PerId,$update,$set_current=1, $state=null)
 	{
@@ -204,8 +204,9 @@ class ranking_boulder_measurement
 	 *
 	 * @param int $PerId
 	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
-	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
-	 * @param array &$data=null on return athlete data for extending class
+	 *	or empty array to send data back
+	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
+	 * @param array &$data =null on return athlete data for extending class
 	 */
 	public static function ajax_load_athlete($PerId,array $update, array $state=null, array &$data=null)
 	{
@@ -230,13 +231,13 @@ class ranking_boulder_measurement
 		if ((list($data) = ranking_result_bo::$instance->route_result->search(array(),false,'','','',False,'AND',false,$keys)))
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
-			foreach($update as $id => $key)
+			foreach($update ? $update : array_keys($data) as $id => $key)
 			{
 				if ($key === 'result_plus' && (string)$data['result_plus'] === '')
 				{
 					$data['result_plus'] = '0';	// null or '' is NOT understood, must be '0'
 				}
-				$response->assign($id, 'value', (string)$data[$key]);
+				if ($update) $response->assign($id, 'value', (string)$data[$key]);
 				// for boulder
 				if (strpos($key,'zone') === 0)
 				{
@@ -245,7 +246,15 @@ class ranking_boulder_measurement
 			}
 			$query['PerId'] = $PerId;
 
-			$response->jquery('#msg', 'text', array(ranking_result_bo::athlete2string($data)));
+			if ($update)
+			{
+				$response->jquery('#msg', 'text', array(ranking_result_bo::athlete2string($data)));
+			}
+			else
+			{
+				$data['athlete'] = ranking_result_bo::athlete2string($data);
+				$response->data($data);
+			}
 		}
 	}
 
@@ -267,8 +276,8 @@ class ranking_boulder_measurement
 	/**
 	 * Get session data and check if user has judge or admin rights
 	 *
-	 * @param array &$comp=null on return competition array
-	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
+	 * @param array& $comp =null on return competition array
+	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
 	 * @throws egw_exception_wrong_parameter
 	 * @return array reference to ranking result session array
 	 */

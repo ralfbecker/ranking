@@ -3,7 +3,7 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2013-14 by RalfBecker@digitalROCK.de
+ * @copyright 2013-15 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
 
@@ -15,9 +15,11 @@
  * Protocol entries are send to server immediatly after recording and additionally periodically if transmissions fail.
  *
  * @param {string} _webserverUrl EGroupware url
+ * @param {function(_msg)} _set_msg function to set message
+ * @param {function(_PerId)} _get_athlete function to get name of athlete for a given PerId
  * @constructor
  */
-function boulderProtocol(_webserverUrl)
+function boulderProtocol(_webserverUrl, _set_msg, _get_athlete)
 {
 	this.columns = {
 		'boulder': '#',
@@ -30,8 +32,30 @@ function boulderProtocol(_webserverUrl)
 	this.resend = null;
 	this.resend_timeout = 1;
 	this.webserverUrl = _webserverUrl;
+	this.set_msg(_set_msg);
+	this.get_athlete(_get_athlete);
 
 }
+
+/**
+ * Set function to display a message
+ *
+ * @param {function(_msg)} _set_msg function to set message
+ */
+boulderProtocol.prototype.set_msg = function(_set_msg)
+{
+	this.msg = _set_msg || jQuery('#msg').text;
+};
+
+/**
+ * Set function to query athlete name by PerId
+ *
+ * @param {function(_PerId)} _get_athlete function to get name of athlete for a given PerId
+ */
+boulderProtocol.prototype.get_athlete = function(_get_athlete)
+{
+	this.athlete = _get_athlete || function(_PerId) { return '#'+_PerId; };
+};
 
 /**
  * Add or update a protocol entry
@@ -148,7 +172,7 @@ boulderProtocol.prototype.send = function(_filter, _clear_resend)
 					record.stored = typeof data.stored == 'undefined' ? true : data.stored;
 					this.set(record);
 					this.update(record);
-					jQuery('#msg').text(data.msg+(record.stored!==true?' ('+record.stored+')':''));
+					this.msg(data.msg+(record.stored!==true?' ('+record.stored+')':''));
 				}
 			}
 			// reset timeout to default of 1
@@ -156,7 +180,7 @@ boulderProtocol.prototype.send = function(_filter, _clear_resend)
 		},
 		error: function(_jqXHR, _type, _ex)
 		{
-			jQuery('#msg').text('communication with server failed: '+_type+' '+_ex);
+			this.msg('communication with server failed: '+_type+' '+_ex);
 			if (!this.resend)
 			{
 				this.resend = window.setTimeout(jQuery.proxy(this.send, this, _filter, true), 1000*this.resend_timeout);
@@ -164,7 +188,7 @@ boulderProtocol.prototype.send = function(_filter, _clear_resend)
 			}
 		}
 	});
-	jQuery('#msg').text(to_send.length+' pending');
+	this.msg(to_send.length+' pending');
 };
 
 /**
@@ -399,30 +423,6 @@ boulderProtocol.prototype.update = function(_data)
 		}
 		this.tbody.prepend(row);
 	}
-};
-
-/**
- * Get athlete name from athlete selecttion
- *
- * @param {number} PerId
- * @return string
- */
-boulderProtocol.prototype.athlete = function(PerId)
-{
-	var select = document.getElementById('exec[nm][PerId]');
-
-	if (select && select.options)
-	{
-		for(var i=1; i < select.options.length; ++i)
-		{
-			var option = select.options.item(i);
-			if (option.value == PerId)
-			{
-				return jQuery(option).text();
-			}
-		}
-	}
-	return PerId;
 };
 
 var protocol;
