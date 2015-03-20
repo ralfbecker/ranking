@@ -149,11 +149,12 @@
 					</hbox>
 				</row>
 				<row class="noPrint resultHeader" disabled="!@nm[comp]">
-					<hbox no_lang="1" onchange="1">
+					<hbox no_lang="1">
 						<menulist>
 							<menupopup class="bold" id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
 						</menulist>
 						<hidden id="comp[WetId]"/>
+						<description id="msg" class="message"/>
 					</hbox>
 				</row>
 				<row class="noPrint resultHeader" disabled="@no_route_selection">

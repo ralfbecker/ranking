@@ -33,6 +33,7 @@ function handle_plus(height,plus_sel_id)
  *  if top < bonus alert user and set top to bonus
  *
  * @param {DOMNode} top select box
+ * --> changed to app.ranking_check_top
  */
 function check_top(top)
 {
@@ -55,7 +56,8 @@ function check_top(top)
  *  if less tries then tops alert user and set tries to tops
  *
  * @param {DOMNode} top select box
- */
+ * --> changed to app.ranking_check_top2
+*/
 function check_tops(top)
 {
 	var bonus = document.getElementById(top.name.replace(/tops/g,'zones'));
@@ -87,6 +89,7 @@ function check_tops(top)
  * onChange of bonus: dont allow to set a bonus bigger then top or no bonus, but a top
  *
  * @param {DOMNode} bonus select box
+ * --> changed to app.ranking_check_bonus
  */
 function check_bonus(bonus)
 {
@@ -110,6 +113,7 @@ function check_bonus(bonus)
  * 	or if less tries then zones alert user and set tries to zones
  *
  * @param {DOMNode} bonus select box
+ * --> changed to app.ranking_check_boni
  */
 function check_zones(bonus)
 {

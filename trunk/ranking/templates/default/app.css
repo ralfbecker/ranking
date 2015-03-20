@@ -129,9 +129,7 @@ table.buttonBox {
 body #egw_fw_main #egw_fw_tabs {
 	background-color: white;
 }
-form select {
-  font-size: 150%;
-}
+
 #ranking-result-index_ranking-result-boulder_measurement {
 	background-color: white;
 	width: 100%;
@@ -184,5 +182,8 @@ input.nextButton {
 		height:32px;
 		width:32px;
 		vertical-align: bottom;
+	}
+	#ranking-result-index form select {
+		font-size: 150%;
 	}
 }
