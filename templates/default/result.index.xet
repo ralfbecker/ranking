@@ -127,7 +127,7 @@
 					</hbox>
 					<textbox type="float" align="center" id="set[$row_cont[PerId]][result_time]" class="$cont[lead_time_class]"/>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1"/>
-					<button align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result]"/>
+					<buttononly onclick="app.ranking.update_result_row" align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result]"/>
 				</row>
 			</rows>
 		</grid>
