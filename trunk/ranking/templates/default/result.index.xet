@@ -138,7 +138,7 @@
 				<column/>
 			</columns>
 			<rows>
-				<row class="noPrint" disabled="@no_compsel">
+				<row class="noPrint resultHeader" disabled="@no_compsel">
 					<hbox>
 						<menulist>
 							<menupopup class="rightPad5" statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
@@ -148,7 +148,7 @@
 						</menulist>
 					</hbox>
 				</row>
-				<row class="noPrint" disabled="!@nm[comp]">
+				<row class="noPrint resultHeader" disabled="!@nm[comp]">
 					<hbox no_lang="1" onchange="1">
 						<menulist>
 							<menupopup class="bold" id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
@@ -156,7 +156,7 @@
 						<hidden id="comp[WetId]"/>
 					</hbox>
 				</row>
-				<row class="noPrint" disabled="@no_route_selection">
+				<row class="noPrint resultHeader" disabled="@no_route_selection">
 					<hbox>
 						<menulist span="all">
 							<menupopup class="header rightPad5" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
@@ -164,10 +164,10 @@
 						<menulist>
 							<menupopup class="header" statustext="Select heat" id="nm[route]" no_lang="1" onchange="1"/>
 						</menulist>
-						<button label="Edit this heat" id="button[edit]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="edit" class="leftPad5 noPrint"/>
-						<button label="Add a new heat" id="button[new]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="new" class="leftPad5 noPrint"/>
-						<button label="Download" id="button[download]" image="filesave" class="leftPad5 noPrint"/>
-						<buttononly label="Result" id="result_popup" onclick="window.open(egw::link('/ranking/sitemgr/digitalrock/eliste.html','comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank'); return false;" options="view" class="leftPad5"/>
+						<button label="Edit this heat" id="button[edit]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="edit" class="leftPad5 noPrint et2_button_text"/>
+						<button label="Add a new heat" id="button[new]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="new" class="leftPad5 noPrint et2_button_text"/>
+						<button label="Download" id="button[download]" image="filesave" class="leftPad5 noPrint et2_button_text"/>
+						<buttononly label="Result" id="result_popup" onclick="window.open(egw::link('/ranking/sitemgr/digitalrock/eliste.html','comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank'); return false;" options="view" class="leftPad5 et2_button_text"/>
 						<menulist>
 							<menupopup class="noPrint leftPad5" id="nm[ranking]" onchange="1" options="display no ranking"/>
 						</menulist>

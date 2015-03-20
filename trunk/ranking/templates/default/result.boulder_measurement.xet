@@ -8,20 +8,20 @@
 				<column/>
 				<column/>
 				<column/>
+				<column with="10%"/>
 			</columns>
 			<rows>
-				<row height="60">
-					<description value="Boulder" for="PerId"/>
+				<row height="120">
 					<hbox>
 						<menulist>
-							<menupopup type="select-number" id="nm[boulder_n]" onchange="app.ranking.boulder_changed" min="1" max="{$cont[nm][num_problems]}"/>
+							 <menupopup label="Boulder" span="2" type="select-number" id="nm[boulder_n]" onchange="app.ranking.boulder_changed" options=",1,{$cont[nm][num_problems]}"/>
 						</menulist>
 					</hbox>
 					<menulist>
-						<menupopup label="Athlete" id="nm[PerId]" onchange="app.ranking.boulder_changed" options="Select one"/>
+						<menupopup label="Athlete" id="nm[PerId]" span="2" onchange="app.ranking.boulder_changed" options="Select one"/>
 					</menulist>
 				</row>
-				<row height="60">
+				<row height="120">
 					<menulist>
 						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="app.ranking.set_try" options=",1,25"/>
 					</menulist>
@@ -32,42 +32,21 @@
 						<menulist>
 							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="app.ranking.check_top" options="No,1,25"/>
 						</menulist>
-						<buttononly align="right" label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5"/>
+						
 					</hbox>
+					<buttononly align="right" label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5 bigButton"/>
 				</row>
 				<row>
-					<hbox span="all" class="buttonBox">
+					<hbox span="all" class="buttonBox dialogFooterToolbar">
 						<buttononly label="Try" id="button[try]" onclick="app.ranking.try_clicked" class="tryButton"/>
 						<buttononly label="Bonus" id="button[bonus]" onclick="app.ranking.bonus_clicked" class="bigButton"/>
 						<buttononly label="Top" id="button[top]" onclick="app.ranking.top_clicked" class="bigButton"/>
-						<buttononly label="&gt;&gt;" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton"/>
-						<buttononly align="right" label="Protocol" id="protocol" onclick="app.ranking.protocol.display"/>
+						<buttononly label="&gt;&gt;" align="right" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton nextButton"/>
+						<buttononly label="Protocol" id="protocol" onclick="protocol.display()"/>
 					</hbox>
-					<description/>
-					<description/>
 				</row>
 			</rows>
 		</grid>
-		<styles>
-			.bigButton button, .tryButton button, .bigButton input, .tryButton input {
-   font-size: 250%;
-   border-radius: 20px;
-   padding-left: 10px;
-   padding-right: 10px;
-}
-.tryButton button, .tryButton input {
-   width: 4em;
-}
-table.buttonBox {
-   padding-top: 10px;
-   padding-bottom: 10px;
-}
-#table h1 {
-  display: none;
-}
-select {
-  font-size: 150%;
-}
-		</styles>
+		<box id="resultlist"/>
 	</template>
 </overlay>
