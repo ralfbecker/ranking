@@ -40,6 +40,17 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 		padding-top: 0px; margin-top:0px;
 		padding-bottom: 0px; margin-bottom: 0px;
 	}
+	#egw_fw_footer, .egw_fw_ui_app_header_container div.egw_fw_ui_app_header{
+		display:none;
+	}
+	#ranking-result-index_comp_name {
+		font-size:large;
+		font-weight: bold;
+		text-align: center;
+	}
+	.fed_logo img{
+		height: 60px;
+	}
 }
 .half_down { position: relative; top: 1.3em; }
 .winner { font-weight: bold; }

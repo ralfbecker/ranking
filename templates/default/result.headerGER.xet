@@ -11,11 +11,13 @@
 			</columns>
 			<rows>
 				<row>
-					<image src="comp_logo"/>
+					<description id="comp_name" no_lang="1"/>
+				</row>
+				<row>
+					<image src="comp_logo" class="fed_logo"/>
 					<vbox rows="3" cols="1">
-						<description id="comp_name" no_lang="1"/>
-						<description id="comp_date" no_lang="1"/>
 						<description id="route_name" no_lang="1"/>
+						<description id="comp_date" no_lang="1"/>
 					</vbox>
 					<image align="right" class="fed_logo" src="dav.gif"/>
 				</row>
@@ -33,7 +35,7 @@
 }
 }
 
-#comp_name,#route_name,#comp_date {
+#ranking-result-index_route_name,#ranking-result-index_comp_date {
  font-size: 120%;
  font-weight: bold;
 }
@@ -42,9 +44,7 @@
  font-weight: normal;
 }
 
-.fed_logo img {
- height: 110px;
-}
+
 
 #comp_logo {
  margin-right: 10px;
