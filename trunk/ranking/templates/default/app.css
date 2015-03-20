@@ -33,6 +33,9 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 #ranking-result-index span.nextmatch_sortheader {
 	margin-right: 0;
 }
+/**
+ * Printing of start- and result-lists
+ */
 @media print {
 	.speed_athlete { padding: 1mm; }
 	tr.row_on,tr.row_off{
@@ -40,16 +43,37 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 		padding-top: 0px; margin-top:0px;
 		padding-bottom: 0px; margin-bottom: 0px;
 	}
-	#egw_fw_footer, .egw_fw_ui_app_header_container div.egw_fw_ui_app_header{
+	#egw_fw_footer, .egw_fw_ui_app_header_container div.egw_fw_ui_app_header,#divAppboxHeader {
 		display:none;
 	}
+	#divAppbox {
+		margin-top: 0px;
+	}
 	#ranking-result-index_comp_name {
-		font-size:large;
+		font-size: 135%;
 		font-weight: bold;
-		text-align: center;
 	}
 	.fed_logo img{
 		height: 60px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+	#ranking-result-index_route_name,#ranking-result-index_comp_date {
+		font-size: 120%;
+		font-weight: bold;
+	}
+
+	#ranking-result-index_comp_date {
+		font-weight: normal;
+		padding-top: 10px;
+		margin-left: 10px;
+	}
+
+	#ranking-result-index_comp_logo {
+		margin-right: 10px;
+	}
+	#ranking-result-index_sponsor_logos {
+
 	}
 }
 .half_down { position: relative; top: 1.3em; }
@@ -135,7 +159,7 @@ body #egw_fw_main #egw_fw_tabs {
 	width: 100%;
 	border: 1px solid gray;
 	border-top: 3px solid #679fd2;
-	
+
 }
 #ranking-result-index_ranking-result-boulder_measurement > table{
 	width:100% !important;
