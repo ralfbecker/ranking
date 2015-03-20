@@ -1089,7 +1089,7 @@ class ranking_result_ui extends ranking_result_bo
 	 * @param array $content=null
 	 * @param string $msg=''
 	 */
-	function index($content=null,$msg='',$pstambl='')
+	function index($content=null, $msg='', $pstambl='', $update_checked=false)
 	{
 		$tmpl = new etemplate_new('ranking.result.index');
 
@@ -1268,7 +1268,7 @@ class ranking_result_ui extends ranking_result_bo
 					if (is_array($content['nm']['rows']['set']) &&
 						$this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old,
 							$this->comp->quali_preselected($content['nm']['cat'], $comp['quali_preselected']),
-							false, $content['nm']['order'].' '.$content['nm']['sort']))
+							$update_checked, $content['nm']['order'].' '.$content['nm']['sort']))
 					{
 						$msg = lang('Heat updated');
 					}
@@ -1559,7 +1559,32 @@ class ranking_result_ui extends ranking_result_bo
 			array_unshift($content['nm']['rows'], false, false, false);	// 3 header rows
 		}
 		//_debug_array($content); exit;
-		return $tmpl->exec('ranking.ranking_result_ui.index', $content, $sel_options, $readonlys, $preserv);
+		return $tmpl->exec('ranking.ranking_result_ui.index', $content, $sel_options, $readonlys, $preserv, $update_checked ? 4 : 0);
+	}
+
+	/**
+	 * Uncheck a boulder result-row
+	 *
+	 * @param array $keys values for keys WetId, GrpId, route, PerId
+	 */
+	function ajax_uncheck_result(array $keys)
+	{
+		$this->index(array(
+			'nm' => array(
+				'comp' => $keys['WetId'],
+				'old_comp' => $keys['WetId'],
+				'cat' => $keys['GrpId'],
+				'old_cat' => $keys['GrpId'],
+				'route' => $keys['route'],
+				'rows' => array(
+					'apply' => array($keys['PerId'] => 'pressed'),
+					'set' => array(
+						$keys['PerId'] => array('checked' => false),
+					),
+				),
+				'show_result' => '1',
+			),
+		), '', '', true);
 	}
 
 	/**

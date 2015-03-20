@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
 <!-- $Id$ -->
 <overlay>
@@ -131,7 +131,7 @@
 						<menulist>
 							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated]"/>
 						</menulist>
-						<button statustext="update time" label="Update" id="apply[$row_cont[PerId]]" class="small noPrint"/>
+						<buttononly onclick="app.ranking.update_result_row" statustext="update time" label="Update" id="apply[$row_cont[PerId]]" class="small noPrint"/>
 					</hbox>
 					<description align="center" id="${row}[start_order2n]" no_lang="1" class="noPrint"/>
 					<hbox align="center">
@@ -140,7 +140,7 @@
 						<menulist>
 							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated_r]"/>
 						</menulist>
-						<button statustext="update time" label="Update" id="apply[$row_cont[PerId]][r]" class="small noPrint"/>
+						<buttononly onclick="app.ranking.update_result_row" statustext="update time" label="Update" id="apply[$row_cont[PerId]][r]" class="small noPrint"/>
 					</hbox>
 					<textbox type="float" align="center" id="${row}[ability_percent]" readonly="true"/>
 					<description align="center" id="set[$row_cont[PerId]][time_sum]"/>

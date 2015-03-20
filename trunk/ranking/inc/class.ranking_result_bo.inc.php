@@ -913,13 +913,14 @@ class ranking_result_bo extends ranking_bo
 			}
 
 			// do NOT allow to modify checked via update of all results
-			if (!$update_checked) unset($data['checked']);
+			//if (!$update_checked) unset($data['checked']);
 
 			foreach($data as $key => $val)
 			{
 				// something changed?
 				if ((!$old && (string)$val !== '' || $old && (string)$old[$key] != (string)$val) &&
-					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS))
+					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS) ||
+					$update_checked && $key == 'checked')
 				{
 					if (($key == 'start_number' || $key == 'start_number_1') && strchr($val,'+') !== false)
 					{
