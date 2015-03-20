@@ -2,7 +2,7 @@
 <!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.boulder_measurement" template="" lang="" group="0" version="1.9.002">
+	<template id="ranking.result.boulder_measurement" template="" lang="" group="0" version="14.2.001">
 		<grid width="x">
 			<columns>
 				<column/>
@@ -12,36 +12,36 @@
 			<rows>
 				<row height="60">
 					<description value="Boulder" for="PerId"/>
-					<hbox options="0,0">
+					<hbox>
 						<menulist>
-							<menupopup type="select-number" id="nm[boulder_n]" onchange="boulder_changed(this);" options=",1,{$cont[nm][num_problems]}"/>
+							<menupopup type="select-number" id="nm[boulder_n]" onchange="app.ranking.boulder_changed" min="1" max="{$cont[nm][num_problems]}"/>
 						</menulist>
 					</hbox>
 					<menulist>
-						<menupopup label="Athlete" id="nm[PerId]" onchange="boulder_changed(this);" options="Select one"/>
+						<menupopup label="Athlete" id="nm[PerId]" onchange="app.ranking.boulder_changed" options="Select one"/>
 					</menulist>
 				</row>
 				<row height="60">
 					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="set_try(this.value)" options=",1,25"/>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="app.ranking.set_try" options=",1,25"/>
 					</menulist>
 					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="check_bonus(this)" options=" ,1,25"/>
+						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="app.ranking.check_bonus" options=" ,1,25"/>
 					</menulist>
-					<hbox options="0,0">
+					<hbox>
 						<menulist>
-							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="check_top(this)" options="No,1,25"/>
+							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="app.ranking.check_top" options="No,1,25"/>
 						</menulist>
-						<buttononly align="right" label="Update" id="button[update]" onclick="update_boulder();" class="leftPad5"/>
+						<buttononly align="right" label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row>
 					<hbox span="all" class="buttonBox">
-						<buttononly label="Try" id="button[try]" onclick="try_clicked(this);" class="tryButton"/>
-						<buttononly label="Bonus" id="button[bonus]" onclick="bonus_clicked(this);" class="bigButton"/>
-						<buttononly label="Top" id="button[top]" onclick="top_clicked(this);" class="bigButton"/>
-						<buttononly label="&gt;&gt;" id="button[next]" onclick="boulder_next();" class="bigButton"/>
-						<buttononly align="right" label="Protocol" id="protocol" onclick="protocol.display();"/>
+						<buttononly label="Try" id="button[try]" onclick="app.ranking.try_clicked" class="tryButton"/>
+						<buttononly label="Bonus" id="button[bonus]" onclick="app.ranking.bonus_clicked" class="bigButton"/>
+						<buttononly label="Top" id="button[top]" onclick="app.ranking.top_clicked" class="bigButton"/>
+						<buttononly label="&gt;&gt;" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton"/>
+						<buttononly align="right" label="Protocol" id="protocol" onclick="app.ranking.protocol.display"/>
 					</hbox>
 					<description/>
 					<description/>
