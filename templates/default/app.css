@@ -94,3 +94,84 @@ table#exec\[score\]\[score\] td {
 #ranking-result-route_import_cat {
 	width:55%;
 }
+
+
+button.bigButton, button.tryButton, input.bigButton , input.tryButton {
+	font-size: 400%;
+	border-radius: 20px;
+	padding-left: 30px;
+	padding-right: 30px;
+	height: auto;
+	border: 1px solid gray;
+	margin-right: 1%;
+}
+button.tryButton , input.tryButton  {
+   width: 4em;
+}
+table.buttonBox {
+   padding-top: 10px;
+   padding-bottom: 10px;
+}
+#ranking-result-index_resultlist h1 {
+  display: none;
+}
+body #egw_fw_main #egw_fw_tabs {
+	background-color: white;
+}
+form select {
+  font-size: 150%;
+}
+#ranking-result-index_ranking-result-boulder_measurement {
+	background-color: white;
+	width: 100%;
+	border: 1px solid gray;
+	border-top: 3px solid #679fd2;
+	
+}
+#ranking-result-index_ranking-result-boulder_measurement > table{
+	width:100% !important;
+}
+#ranking-result-index_ranking-result-boulder_measurement > table label{
+	font-size:200%;
+	padding-left: 5px;
+}
+.dialogFooterToolbar button:hover{
+	height:auto;
+}
+#ranking-result-index_ranking-result-boulder_measurement et2_label select.et2_selectbox{
+	font-size: 100%;
+}
+#ranking-result-index_protocol {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	border: 1px solid gray;
+	font-size: 150%;
+	height:auto;
+}
+input.nextButton {
+	float:right;
+}
+#ranking-result-index_nm\[PerId\]{
+	width:85%;
+}
+#ranking-result-index {
+	position: relative;
+}
+
+@media only screen and (max-device-width : 1024px) {
+	#ranking-result-index tr.resultHeader {
+		border-left:1px solid gray;
+		border-right: 1px solid gray;
+		background-image: url(../images/appbox-header-background.png);
+		background-repeat: repeat-x;
+	}
+	#ranking-result-index tr.resultHeader select {
+		font-size:200%;
+	}
+	#ranking-result-index tr.resultHeader img.et2_button {
+		height:32px;
+		width:32px;
+		vertical-align: bottom;
+	}
+}
