@@ -78,6 +78,7 @@
 				<column width="50"/>
 				<column width="50"/>
 				<column disabled="!@num_problems"/>
+				<column width="50"/>
 				<column disabled="@num_problems"/>
 				<column disabled="!@num_problems"/>
 				<column disabled="!@num_problems=/[2345678]/"/>
@@ -108,6 +109,10 @@
 					<nextmatch-sortheader align="center" label="Start- order" id="start_order" class="noPrint"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
+					<vbox id="top_bonus">
+						<description value="Top"/>
+						<description value="Bonus"/>
+					</vbox>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
 					<description align="center" value="1" class="place"/>
 					<description value="2" class="place"/>
@@ -136,32 +141,36 @@
 					<description align="center" id="{$row}[PerId]" no_lang="1"/>
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
-					<description align="center" id="{$row}[result]" no_lang="1"/>
+					<description align="center" id="{$row}[result]" no_lang="1" class="noWrap"/>
+					<vbox>
+						<description value="Top"/>
+						<description value="Bonus"/>
+					</vbox>
 					<vbox>
 						<hbox align="right" class="noPrint">
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: total number or no" label="Top" id="set[$row_cont[PerId]][tops]" onchange="app.ranking.check_tops" options=" ,1,25"/>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: total number or no" id="set[$row_cont[PerId]][tops]" onchange="app.ranking.check_tops" options="No,1,25"/>
 							</menulist>
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries" label="Tries" id="set[$row_cont[PerId]][top_tries]" onchange="app.ranking.check_top" options="No,1,50"/>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries" label="/" id="set[$row_cont[PerId]][top_tries]" onchange="app.ranking.check_top" options="No,1,50"/>
 							</menulist>
 						</hbox>
 						<hbox align="right" class="noPrint">
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: total number or no" label="Bonus" id="set[$row_cont[PerId]][zones]" onchange="app.ranking.check_boni" options=" ,1,25"/>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: total number or no" id="set[$row_cont[PerId]][zones]" onchange="app.ranking.check_boni" options="No,1,25"/>
 							</menulist>
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: number of tries" label="Tries" id="set[$row_cont[PerId]][zone_tries]" onchange="app.ranking.check_bonus" options="No,1,50"/>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: number of tries" label="/" id="set[$row_cont[PerId]][zone_tries]" onchange="app.ranking.check_bonus" options="No,1,50"/>
 							</menulist>
 						</hbox>
 						<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
 					</vbox>
 					<vbox>
 						<menulist class="noPrint">
-							<menupopup type="select-number" align="right" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="set[$row_cont[PerId]][top1]" onchange="app.ranking.check_top" options="No,1,25"/>
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top1]" onchange="app.ranking.check_top" options="No,1,25"/>
 						</menulist>
 						<menulist class="noPrint">
-							<menupopup type="select-number" align="right" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="set[$row_cont[PerId]][zone1]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone1]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
 						</menulist>
 						<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
 					</vbox>
@@ -234,9 +243,9 @@
 						<buttononly onclick="app.ranking.update_result_row" align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result]"/>
 					</vbox>
 					<vbox class="noPrint">
-						<date-time id="${row}[result_modified]" readonly="true"/>
+						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>
 						<menulist>
-							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true"/>
+							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true" class="noWrap"/>
 						</menulist>
 					</vbox>
 				</row>

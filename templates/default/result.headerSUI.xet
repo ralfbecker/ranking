@@ -15,7 +15,7 @@
 				</row>
 				<row>
 					<image src="comp_logo" class="fed_logo"/>
-					<vbox rows="3" cols="1">
+					<vbox>
 						<description id="route_name" no_lang="1"/>
 						<description id="comp_date" no_lang="1"/>
 					</vbox>
@@ -23,37 +23,5 @@
 				</row>
 			</rows>
 		</grid>
-		<styles>
-			@media print
-{
-#divAppboxHeader {
- display:none;
-}
-
-#divAppbox {
- margin-top: 0px;
-}
-}
-
-#ranking-result-index_route_name,#ranking-result-index_comp_date {
- font-size: 120%;
- font-weight: bold;
-}
-
-#comp_date {
- font-weight: normal;
-}
-
-
-
-#comp_logo {
- margin-right: 10px;
-}
-
-#sponsor_logos {
-
-}
-
-		</styles>
 	</template>
 </overlay>
