@@ -165,10 +165,10 @@
 						<menulist>
 							<menupopup class="header" statustext="Select heat" id="nm[route]" no_lang="1" onchange="1"/>
 						</menulist>
-						<button label="Edit this heat" id="button[edit]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="edit" class="leftPad5 noPrint et2_button_text"/>
-						<button label="Add a new heat" id="button[new]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}'),'result_route','dependent=yes,width=650,height=500,scrollbars=yes,status=yes'); return false;" image="new" class="leftPad5 noPrint et2_button_text"/>
-						<button label="Download" id="button[download]" image="filesave" class="leftPad5 noPrint et2_button_text"/>
-						<buttononly label="Result" id="result_popup" onclick="window.open(egw::link('/ranking/sitemgr/digitalrock/eliste.html','comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}'),'_blank'); return false;" options="view" class="leftPad5 et2_button_text"/>
+						<buttononly label="Edit this heat" id="button[edit]" onclick="egw.open_link('ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','result_route','700x500','ranking')" image="edit" class="leftPad5 noPrint"/>
+						<buttononly label="Add a new heat" id="button[new]" onclick="egw.open_link('ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}','result_route','700x500','ranking')" image="new" class="leftPad5 noPrint"/>
+						<buttononly label="Download" id="button[download]" onclick="widget.getInstanceManager().postSubmit()" image="filesave" class="leftPad5 noPrint"/>
+						<buttononly label="Result" id="result_popup" onclick="egw.open_link('/ranking/sitemgr/digitalrock/eliste.html?comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','_blank')" options="view" class="leftPad5"/>
 						<menulist>
 							<menupopup class="noPrint leftPad5" id="nm[ranking]" onchange="1" options="display no ranking"/>
 						</menulist>
