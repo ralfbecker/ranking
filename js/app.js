@@ -97,9 +97,9 @@ app.classes.ranking = AppJS.extend(
 	 */
 	observer: function(_msg, _app, _id, _type, _msg_type, _links)
 	{
-		if (_app == 'ranking' && !_id && this.et2)
+		if (_app == 'ranking' && _id && typeof _id == 'object')
 		{
-			this.et2._inst.submit();
+			this.egw.open_link(this.egw.link('/index.php', _id), 'ranking');
 		}
 	},
 
