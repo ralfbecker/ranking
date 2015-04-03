@@ -26,19 +26,13 @@
 					<description value="Startlist"/>
 					<hbox span="all">
 						<button label="Generate Startlist" id="button[startlist]"/>
-						<menulist>
-							<menupopup type="select-number" id="max_compl" options="All complimentary,0,10" class="leftPad5 selectboxFullWidth"/>
-						</menulist>
-						<menulist>
-							<menupopup statustext="|Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat" class="leftPad5 selectboxFullWidth"/>
-						</menulist>
-						<menulist>
-							<menupopup statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order" class="leftPad5 selectboxFullWidth"/>
-						</menulist>
+						<select type="select-number" id="max_compl" options="All complimentary,0,10" class="max_compl"/>
+						<select statustext="|Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat"/>
+						<select statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order"/>
 					</hbox>
 				</row>
 				<row class="row" disabled="@route_order=-1">
-					<description value="Isolation" font_style="route_iso_open"/>
+					<description value="Isolation" for="route_iso_open"/>
 					<hbox span="all">
 						<textbox blur="opens" id="route_iso_open" size="20" maxlength="40"/>
 						<textbox blur="closes" label="-" id="route_iso_close" size="20" maxlength="40"/>
@@ -216,7 +210,6 @@
 				<column width="120"/>
 				<column/>
 				<column/>
-				<column/>
 			</columns>
 			<rows>
 				<row class="dialogHeader">
@@ -230,9 +223,9 @@
 					<menulist>
 						<menupopup id="GrpId" no_lang="1" readonly="true"/>
 					</menulist>
-					<hbox align="right" onchange="1">
+					<hbox align="right">
 						<menulist>
-							<menupopup id="discipline"/>
+							<menupopup id="discipline" onchange="1"/>
 						</menulist>
 						<menulist>
 							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,8,1" class="leftPad5"/>
@@ -245,8 +238,8 @@
 					<menulist>
 						<menupopup id="route_order" no_lang="1" readonly="true"/>
 					</menulist>
-					<menulist>
-						<menupopup align="right" id="route_type" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;" class="noWrap"/>
+					<menulist align="right">
+						<menupopup id="route_type" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;" class="noWrap"/>
 					</menulist>
 				</row>
 				<row class="dialogHeader2">
