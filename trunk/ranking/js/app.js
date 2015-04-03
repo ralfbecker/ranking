@@ -71,6 +71,7 @@ app.classes.ranking = AppJS.extend(
 					switch(this.content.nm.discipline)
 					{
 						case 'boulder':
+							delete this.resultlist;	// delete resultlist, to get init_boulder to initialise it again
 							this.init_boulder();
 							break;
 					}

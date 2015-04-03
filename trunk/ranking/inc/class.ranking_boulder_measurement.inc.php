@@ -30,9 +30,20 @@ class ranking_boulder_measurement
 		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
 			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
 
-		egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
-		egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
-
+		// egw_framework::validate_file|includeCSS does not work if template was submitted
+		if (egw_json_response::isJSONResponse())
+		{
+			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/js/boulder.js');
+			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_api.js');
+			egw_json_response::get()->includeCSS($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_list.css');
+		}
+		else
+		{
+			// init protocol
+			egw_framework::validate_file('/ranking/js/boulder.js');
+			egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
+			egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
+		}
 		$keys = self::query2keys($content['nm']);
 		// if we have a startlist, add participants to sel_options
 		if (ranking_result_bo::$instance->has_startlist($keys) && $content['nm']['route_status'] != STATUS_RESULT_OFFICIAL &&
@@ -57,8 +68,6 @@ class ranking_boulder_measurement
 				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
 			}
 		}
-		// init protocol
-		egw_framework::validate_file('/ranking/js/boulder.js');
 	}
 
 	/**
