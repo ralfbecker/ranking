@@ -222,7 +222,7 @@ class ranking_result_ui extends ranking_result_bo
 						$param['msg'] = $msg = lang('Error: route already has a result!!!');
 						$param['show_result'] = 1;
 					}
-					elseif (!$content['file']['tmp_name'] || !is_uploaded_file($content['file']['tmp_name']))
+					elseif (!$content['file']['tmp_name'])
 					{
 						$param['msg'] = ($msg .= lang('Error: no file to upload selected'));
 					}
