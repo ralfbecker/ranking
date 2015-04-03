@@ -101,7 +101,6 @@ class ranking_result_ui extends ranking_result_bo
 				'comp'  => $content['WetId'],
 				'cat'   => $content['GrpId'],
 				'route' => $content['route_order'],
-				'msg'   => $msg,
 			);
 			if ($content['new_route'] || $button == 'startlist')
 			{
@@ -134,7 +133,7 @@ class ranking_result_ui extends ranking_result_bo
 						$refresh = false;
 						break;
 					}
-					$param['msg'] = $msg = lang('Heat saved');
+					$msg = lang('Heat saved');
 					if ($content['topo_upload'])
 					{
 						$topo_path = null;
@@ -153,14 +152,14 @@ class ranking_result_ui extends ranking_result_bo
 					//_debug_array($content);
 					if ($this->has_results($content))
 					{
-						$param['msg'] = ($msg .= lang('Error: heat already has a result!!!'));
+						$msg .= lang('Error: heat already has a result!!!');
 						$param['show_result'] = 1;
 					}
 					elseif (is_numeric($content['route_order']) &&
 						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'],
 							$content['max_compl']!=='' ? $content['max_compl'] : 999,$content['slist_order'],$content['add_cat'])))
 					{
-						$param['msg'] = ($msg .= lang('Startlist generated'));
+						$msg .= lang('Startlist generated');
 
 						$to_set = array();
 						$to_set['route_status'] = $content['route_status'] = STATUS_STARTLIST;	// set status to startlist
@@ -175,7 +174,7 @@ class ranking_result_ui extends ranking_result_bo
 					}
 					else
 					{
-						$param['msg'] = ($msg .= lang('Error: generating startlist!!!'));
+						$msg .= lang('Error: generating startlist!!!');
 					}
 					$refresh = true;
 					break;
@@ -193,7 +192,7 @@ class ranking_result_ui extends ranking_result_bo
 						'GrpId' => $content['GrpId'],
 						'route_order' => $content['route_order'])))
 					{
-						$param['msg'] = lang('Heat deleted');
+						$msg = lang('Heat deleted');
 						$refresh = true;
 					}
 					else
@@ -214,17 +213,17 @@ class ranking_result_ui extends ranking_result_bo
 							$refresh = false;
 							break;
 						}
-						$param['msg'] = $msg = lang('Heat saved').', ';
+						$msg = lang('Heat saved').', ';
 						unset($content['new_route']);
 					}
 					if (!($content['upload_options'] & 1) && $this->has_results($content))
 					{
-						$param['msg'] = $msg = lang('Error: route already has a result!!!');
+						$msg = lang('Error: route already has a result!!!');
 						$param['show_result'] = 1;
 					}
 					elseif (!$content['file']['tmp_name'])
 					{
-						$param['msg'] = ($msg .= lang('Error: no file to upload selected'));
+						$msg .= lang('Error: no file to upload selected');
 					}
 					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'],
 						$content['upload_options'] & 2,$content['upload_options'] & 4)))
@@ -258,13 +257,13 @@ class ranking_result_ui extends ranking_result_bo
 							$refresh = false;
 							break;
 						}
-						$param['msg'] = ($msg .= lang('%1 participants imported',$imported));
+						$msg .= lang('%1 participants imported',$imported);
 						$param['show_result'] = 1;
 						$refresh = true;
 					}
 					else
 					{
-						$param['msg'] = ($msg .= $imported);
+						$msg .= $imported;
 					}
 					break;
 
@@ -286,7 +285,7 @@ class ranking_result_ui extends ranking_result_bo
 					break;
 
 				case 'ranking':
-					$param['msg'] = $msg = $this->import_ranking($content, $content['import_cat'] === '0' ? null :
+					$msg = $this->import_ranking($content, $content['import_cat'] === '0' ? null :
 						($comp['fed_id'] ? $comp['fed_id'] : ($comp['nation'] != 'NULL' ? $comp['nation'] : null)),
 						$content['import_cat']);
 					break;
@@ -379,13 +378,12 @@ class ranking_result_ui extends ranking_result_bo
 						}
 					}
 					$content['athlete'] = array('password_email' => $content['athlete']['password_email']);
-					$param['msg'] = $msg;
 					$refresh = true;
 					break;
 			}
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent
 			{
-				egw_framework::refresh_opener($msg, 'ranking');
+				egw_framework::refresh_opener($msg, 'ranking', $param);
 				egw_framework::window_close();
 			}
 		}
@@ -400,10 +398,8 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$tmpl->disable_cells('selfscore_mode');
 		}
-		$content += array(
-			'msg' => $msg,
-		);
-		if ($refresh) egw_framework::refresh_opener ($msg, 'ranking');
+		if ($refresh) egw_framework::refresh_opener ($msg, 'ranking', $param);
+		if ($msg) egw_framework::message($msg);
 
 		$readonlys['button[delete]'] = $content['new_route'] || $view;
 		$readonlys['route_type'] = !!$content['route_order'];	// can only be set in the first route/quali
