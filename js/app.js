@@ -111,7 +111,8 @@ app.classes.ranking = AppJS.extend(
 	/**
 	 * onClick handler for nextmatch sortheader
 	 *
-	 * @returns {undefined}
+	 * @param {string} _order
+	 * @param {string} _sort
 	 */
 	sortBy: function(_order, _sort)
 	{
@@ -258,29 +259,28 @@ app.classes.ranking = AppJS.extend(
 	 */
 	check_tops: function(node, top)
 	{
-alert('Not yet implemented :-('); return;
-		var bonus = document.getElementById(top.name.replace(/tops/g,'zones'));
+		var bonus = this.et2.getWidgetById(top.id.replace(/tops/g, 'zones'));
 
-		if (bonus && !bonus.value && parseInt(top.value) > 0) bonus.value = top.value;
+		if (bonus && !bonus.get_value() && parseInt(top.get_value()) > 0) bonus.set_value(top.get_value());
 
-		if (bonus && parseInt(top.value) > 0 && parseInt(top.value) > parseInt(bonus.value))
+		if (bonus && parseInt(top.get_value()) > 0 && parseInt(top.get_value()) > parseInt(bonus.get_value()))
 		{
-			window.setTimeout(function(){	// work around iOS bug crashing Safari
+			//window.setTimeout(function(){	// work around iOS bug crashing Safari
 				alert('Top > Bonus!');
-				bonus.value = top.value;
-			}, 10);
+				bonus.set_value(top.get_value());
+			//}, 10);
 		}
 
-		var tries = document.getElementById(top.name.replace(/tops/g,'top_tries'));
+		var tries = this.et2.getWidgetById(top.id.replace(/tops/g, 'top_tries'));
 
-		if (tries && !tries.value && parseInt(top.value) > 0) tries.value = top.value;
+		if (tries && !tries.get_value() && parseInt(top.get_value()) > 0) tries.set_value(top.get_value());
 
-		if (tries && parseInt(top.value) > 0 && parseInt(top.value) > parseInt(tries.value))
+		if (tries && parseInt(top.get_value()) > 0 && parseInt(top.get_value()) > parseInt(tries.get_value()))
 		{
-			window.setTimeout(function(){	// work around iOS bug crashing Safari
+			//window.setTimeout(function(){	// work around iOS bug crashing Safari
 				alert('Top > Tries!');
-				tries.value = top.value;
-			}, 10);
+				tries.set_value(top.get_value());
+			//}, 10);
 		}
 	},
 
@@ -318,31 +318,30 @@ alert('Not yet implemented :-('); return;
 	 */
 	check_boni: function(node, bonus)
 	{
-alert('Not yet implemented :-('); return;
-		var top = document.getElementById(bonus.name.replace(/zones/g,'tops'));
+		var top = this.et2.getWidgetById(bonus.id.replace(/zones/g,'tops'));
 
-		if (top && parseInt(top.value) > 0 && parseInt(bonus.value) < parseInt(top.value))
+		if (top && parseInt(top.get_value()) > 0 && parseInt(bonus.get_value()) < parseInt(top.get_value()))
 		{
-			window.setTimeout(function(){	// work around iOS bug crashing Safari
+			//window.setTimeout(function(){	// work around iOS bug crashing Safari
 				alert('Bonus < Top!');
-				top.value = bonus.value;
-			}, 10);
+				top.set_value(bonus.get_value());
+			//}, 10);
 		}
-		if (top && parseInt(top.value) > 0 && !bonus.value)
+		if (top && parseInt(top.get_value()) > 0 && !bonus.get_value())
 		{
-			top.value = bonus.value;
+			top.set_value(bonus.get_value());
 		}
 
-		var tries = document.getElementById(bonus.name.replace(/zones/g,'zone_tries'));
+		var tries = this.et2.getWidgetById(bonus.id.replace(/zones/g,'zone_tries'));
 
-		if (tries && !tries.value && parseInt(bonus.value) > 0) tries.value = bonus.value;
+		if (tries && !tries.get_value() && parseInt(bonus.get_value()) > 0) tries.set_value(bonus.get_value());
 
-		if (tries && parseInt(bonus.value) > 0 && parseInt(bonus.value) > parseInt(tries.value))
+		if (tries && parseInt(bonus.get_value()) > 0 && parseInt(bonus.get_value()) > parseInt(tries.get_value()))
 		{
-			window.setTimeout(function(){	// work around iOS bug crashing Safari
+			//window.setTimeout(function(){	// work around iOS bug crashing Safari
 				alert('Bonus > Tries!');
-				tries.value = bonus.value;
-			}, 10);
+				tries.set_value(bonus.get_value());
+			//}, 10);
 		}
 	},
 
@@ -428,7 +427,7 @@ alert('Not yet implemented :-('); return;
 	/**
 	 * [Try] button clicked --> update number
 	 *
-	 * @param input type="button" button
+	 * @param button
 	 */
 	try_clicked: function(button)
 	{
@@ -521,6 +520,9 @@ alert('Not yet implemented :-('); return;
 
 	/**
 	 * Sending bonus and top for PerId to server
+	 *
+	 * @param {string} clicked
+	 * @param {object} state
 	 */
 	update_boulder: function(clicked, state)
 	{
