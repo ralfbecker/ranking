@@ -933,9 +933,8 @@ class ranking_route_result extends so_sql
 			}
 		}
 		// saving the boulder results, if there are any
-		if (isset($data['top1']) || isset($data['top2']) || isset($data['top3']) || isset($data['top4']) ||
-			isset($data['top5']) || isset($data['top6']) || isset($data['top7']) || isset($data['top8']) ||
-			isset($data['checked']))
+		if (isset($data['zone1']) || isset($data['zone2']) || isset($data['zone3']) || isset($data['zone4']) ||
+			isset($data['zone5']) || isset($data['zone6']) || isset($data['zone7']) || isset($data['zone8']))
 		{
 			$data['result_top'] = $data['result_zone'] = $data['result_detail'] = null;
 			for($i = 1; $i <= self::MAX_BOULDERS; ++$i)
