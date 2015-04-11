@@ -129,7 +129,7 @@
 						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
 						<textbox type="float" id="set[$row_cont[PerId]][result_time]" precision="2" size="4" class="$cont[rw_result]"/>
 						<menulist>
-							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated]"/>
+							<menupopup class="noPrint $cont[rw_result]" id="set[$row_cont[PerId]][eliminated]"/>
 						</menulist>
 						<buttononly onclick="app.ranking.update_result_row" statustext="update time" label="Update" id="apply[$row_cont[PerId]]" class="small noPrint"/>
 					</hbox>
@@ -138,7 +138,7 @@
 						<description id="{$row}[result_r]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
 						<textbox type="float" id="set[$row_cont[PerId]][result_time_r]" precision="2" size="4" class="$cont[rw_result]"/>
 						<menulist>
-							<menupopup class="noPrint" id="set[$row_cont[PerId]][eliminated_r]"/>
+							<menupopup class="noPrint $cont[rw_result]" id="set[$row_cont[PerId]][eliminated_r]"/>
 						</menulist>
 						<buttononly onclick="app.ranking.update_result_row" statustext="update time" label="Update" id="apply[$row_cont[PerId]][r]" class="small noPrint"/>
 					</hbox>
