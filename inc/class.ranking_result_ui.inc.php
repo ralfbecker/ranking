@@ -98,6 +98,8 @@ class ranking_result_ui extends ranking_result_bo
 			// reload the parent window
 			$param = array(
 				'menuaction' => 'ranking.ranking_result_ui.index',
+				'ajax'  => 'true',		// avoid iframe
+				'refresh' => time(),	// force a refresh (content-browser does not refresh same url)
 				'comp'  => $content['WetId'],
 				'cat'   => $content['GrpId'],
 				'route' => $content['route_order'],
