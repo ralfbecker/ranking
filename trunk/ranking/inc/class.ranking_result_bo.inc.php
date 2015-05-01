@@ -896,7 +896,7 @@ class ranking_result_bo extends ranking_bo
 			}
 			//error_log(__METHOD__."() #$id: data=".array2string($data));
 
-			if (isset($data['tops']))	// boulder result with just the sums
+			if (isset($data['tops']) && $discipline != 'selfscore')	// boulder result with just the sums
 			{
 				// todo: validation
 				if ($data['tops'] && (int)$data['tops'] > (int)$data['zones'])

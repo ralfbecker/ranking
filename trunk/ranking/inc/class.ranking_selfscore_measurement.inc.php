@@ -139,7 +139,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		$to_update = array(
 			'tops' => $num_tops,
 			'zones' => $num_tops,
-			'top_tries' => $num_tops,
+			'top_tries' => 0,
 			'zone_tries' => $num_tops,
 			'score' => $score,
 		);
