@@ -1081,10 +1081,14 @@ class ranking_result_ui extends ranking_result_bo
 	/**
 	 * Show a result / startlist
 	 *
-	 * @param array $content=null
-	 * @param string $msg=''
+	 * @param array $content =null
+	 * @param string $msg =''
+	 * @param string $pstambl
+	 * @param int $output_mode =0 2: popup, 4: ajax response, see etemplate_new::exec()
+	 * @param boolean $update_checked =false
+	 * @return type
 	 */
-	function index($content=null, $msg='', $pstambl='', $update_checked=false)
+	function index($content=null, $msg='', $pstambl='', $output_mode=0, $update_checked=false)
 	{
 		$tmpl = new etemplate_new('ranking.result.index');
 
@@ -1568,7 +1572,7 @@ class ranking_result_ui extends ranking_result_bo
 			array_unshift($content['nm']['rows'], false, false, false);	// 3 header rows
 		}
 		//_debug_array($content); exit;
-		return $tmpl->exec('ranking.ranking_result_ui.index', $content, $sel_options, $readonlys, $preserv, $update_checked ? 4 : 0);
+		return $tmpl->exec('ranking.ranking_result_ui.index', $content, $sel_options, $readonlys, $preserv, $output_mode);
 	}
 
 	/**
@@ -1593,7 +1597,7 @@ class ranking_result_ui extends ranking_result_bo
 				),
 				'show_result' => '1',
 			),
-		), '', '', true);
+		), '', '', 4, true);
 	}
 
 	/**

@@ -34,6 +34,7 @@ class ranking_selfservice extends ranking_bo
 		egw_framework::validate_file('.', 'selfservice', 'ranking');
 		egw_framework::includeCSS('ranking', 'selfservice', false);
 		egw_framework::$navbar_done = true;	// do NOT display navbar
+		$_GET['cd'] = 'no';	// suppress framework
 		if (substr($_GET['action'], 0, 10) != 'scorecard-') echo $GLOBALS['egw']->framework->header();
 
 		$athlete = array();
@@ -118,7 +119,8 @@ class ranking_selfservice extends ranking_bo
 			'athlete' => $athlete['PerId'],
 			'show_result' => 4,
 		);
-		ExecMethod('ranking.ranking_result_ui.index');
+		$result_ui = new ranking_result_ui();
+		$result_ui->index(null, '', '', 2);
 	}
 
 	/**
