@@ -396,10 +396,8 @@ class ranking_result_ui extends ranking_result_bo
 			// first call for selfscore: check password-email
 			if ($_SERVER['REQUEST_METHOD'] == 'GET') $content['athlete']['password_email'] = true;
 		}
-		else
-		{
-			$tmpl->disable_cells('selfscore_mode');
-		}
+		$tmpl->disableElement('selfscore_mode', $discipline != 'selfscore');
+
 		if ($refresh) egw_framework::refresh_opener ($msg, 'ranking', $param);
 		if ($msg) egw_framework::message($msg);
 
@@ -421,10 +419,8 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$readonlys['tabs']['measure'] = true;	// measurement tab only for judges
 		}
-		if ($discipline != 'boulder')
-		{
-			$tmpl->disable_cells('route_num_problems');
-		}
+		$tmpl->disableElement('route_num_problems', $discipline != 'boulder');
+
 		$readonlys['discipline'] = !!$content['route_order'];	// for no only allow to set discipline in 1. quali
 
 		foreach(array('new_route','route_type','route_order','dsp_id','frm_id','dsp_id2','frm_id2','selfscore_mode','route_judges') as $name)
@@ -543,19 +539,21 @@ class ranking_result_ui extends ranking_result_bo
 		$readonlys['button[startlist]'] = $readonlys['button[delete]'] =
 			$content['route_order'] == -1 || $content['new_route'] || $content['route_status'] == STATUS_RESULT_OFFICIAL;
 		// disable max. complimentary selection if no quali.
+		$disable_compl = false;
 		if ($content['route_order'] > (int)($content['route_type']==TWO_QUALI_HALF) || $content['route_order'] < 0)
 		{
-			$tmpl->disable_cells('max_compl');
-			$tmpl->disable_cells('slist_order');
+			$disable_compl = true;
 			if ($readonlys['button[startlist]']) $content['no_startlist'] = true;	// disable empty startlist row
 		}
 		// hack for speedrelay to use startlist button for randomizing
 		if ($discipline == 'speedrelay' && !$content['route_order'])
 		{
+			$disable_compl = true;
 			$tmpl->set_cell_attribute('button[startlist]','label','Randomize startlist');
-			$tmpl->disable_cells('max_compl');
-			$tmpl->disable_cells('slist_order');
 		}
+		$tmpl->disableElement('max_compl', $disable_compl);
+		$tmpl->disableElement('slist_order', $disable_compl);
+
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
@@ -1143,15 +1141,16 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		if($content['nm']['comp']) $comp = $this->comp->read($content['nm']['comp']);
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name]</p>\n";
+		$disable_calendar = false;
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
 			$readonlys['nm[calendar]'] = $readonlys['nm[comp]'] = true;
-			$tmpl->disable_cells('nm[calendar]');
+			$disable_calendar = true;
 		}
 		if ($this->only_nation)
 		{
 			$calendar = $this->only_nation;
-			$tmpl->disable_cells('nm[calendar]');
+			$disable_calendar = true;
 		}
 		elseif ($comp && (!$content['nm']['calendar'] || isset($_GET['comp'])))
 		{
@@ -1165,6 +1164,7 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			list($calendar) = each($this->ranking_nations);
 		}
+		$tmpl->disableElement('nm[calendar]', $disable_calendar);
 		if (!$comp || ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
 		{
 			//echo "<p>calendar changed to '$calendar', comp is '$comp[nation]' not fitting --> reset </p>\n";

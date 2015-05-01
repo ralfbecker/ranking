@@ -17,7 +17,7 @@
 							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
 						</menulist>
 						<menulist>
-							<menupopup statustext="|Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat"/>
+							<menupopup statustext="Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat"/>
 						</menulist>
 						<button statustext="Import the result into the ranking" label="Import into ranking" id="button[ranking]" class="leftPad5"/>
 					</hbox>
@@ -27,7 +27,7 @@
 					<hbox span="all">
 						<button label="Generate Startlist" id="button[startlist]"/>
 						<select type="select-number" id="max_compl" options="All complimentary,0,10" class="max_compl"/>
-						<select statustext="|Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat"/>
+						<select statustext="Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat"/>
 						<select statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order"/>
 					</hbox>
 				</row>
@@ -230,7 +230,7 @@
 						<menulist>
 							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,8,1" class="leftPad5"/>
 						</menulist>
-						<textbox blur="num[/row][:points]" statustext="|num[/row][:points] optional points per boulder (distributed on all tops) or 1 point per top" id="selfscore_mode" validator="/^([0-9]+)(\/[0-9]+)?(:[0-9]+)?$/"/>
+						<textbox blur="num[/row][:points]" statustext="num[/row][:points] optional points per boulder (distributed on all tops) or 1 point per top" id="selfscore_mode" validator="/^([0-9]+)(\/[0-9]+)?(:[0-9]+)?$/"/>
 					</hbox>
 				</row>
 				<row class="row">
