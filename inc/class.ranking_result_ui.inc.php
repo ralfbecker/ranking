@@ -744,17 +744,20 @@ class ranking_result_ui extends ranking_result_bo
 			$query['order'] = 'result_rank';
 			$query['sort']  = 'ASC';
 		}
-		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
-		$extra_cols = $query['csv_export'] ? array('strasse','email') : array();
-		$total = $this->route_result->get_rows($query,$rows,$readonlys,$join='',false,false,$extra_cols);
-		//echo $total; _debug_array($rows);
-
 		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
 		if($query['route'] == -2 && substr($query['discipline'],0,5) == 'speed' && strstr($query['template'],'speed_graph'))
 		{
-			$skip = count($rows)-1 >= 16 ? 0 : (count($rows)-1 >= 8 ? 1 : 2);	// -1 for the route_names
+			$num_first_final = $this->route_result->get_count(array('route_order' => 2, 'WetId' => $query['comp'],'GrpId' => $query['cat']));
+			$skip = $num_first_final >= 16 ? 0 : 1+($num_first_final < 8);
 			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
+			$query['num_rows'] = $num_first_final;	// dont need further quali-participants
 		}
+		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
+		$extra_cols = $query['csv_export'] ? array('strasse','email') : array();
+		$total = $this->route_result->get_rows($query,$rows,$readonlys,$join='',false,false,$extra_cols);
+		error_log(__METHOD__."() num_first_final=$num_first_final, skip=$skip, count(rows)=".count($rows));
+		//echo $total; _debug_array($rows);
+
 		if (($query['ranking'] & 3) && strstr($query['template'],'startlist') &&
 			($cat = $this->cats->read($query['cat'])))
 		{
@@ -852,6 +855,9 @@ class ranking_result_ui extends ranking_result_bo
 						}
 					}
 				}
+				// we dont need original rows for speed-graph, in fact they confuse autorepeating in et2
+				unset($rows[$k]);
+				continue;
 			}
 			if ($query['pstambl'])
 			{

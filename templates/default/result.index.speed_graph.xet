@@ -84,7 +84,7 @@
 					<description/>
 					<description/>
 					<description/>
-					<template content="winner1" class="half_down winner" id="cell$cont[discipline]"/>
+					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="winner1" class="half_down winner" />
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[9]"/>
