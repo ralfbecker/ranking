@@ -4,18 +4,37 @@
 <overlay>
 	<template id="ranking.result.selfscore_measurement" template="" lang="" group="0" version="1.9.001">
 		<menulist>
-			<menupopup label="Scorecard" id="nm[PerId]" onchange="scorecard_changed(this);" options="Select one"/>
+			<menupopup label="Scorecard" id="nm[PerId]" onchange="app.ranking.scorecard_changed" options="Select one"/>
 		</menulist>
-		<grid border="1" id="score">
+		<grid id="score">
 			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
 				<column/>
 			</columns>
 			<rows>
-				<row>
-					<checkbox align="right" label="@$row{$col}[num]" id="$row{$col}[top]"/>
+				<row disabled="!@0@">
+					<checkbox align="right" label="@${row}@[num]" id="${row}@[top]"/>
+					<checkbox align="right" label="@${row}A[num]" id="${row}A[top]"/>
+					<checkbox align="right" label="@${row}B[num]" id="${row}B[top]"/>
+					<checkbox align="right" label="@${row}C[num]" id="${row}C[top]"/>
+					<checkbox align="right" label="@${row}D[num]" id="${row}D[top]"/>
+					<checkbox align="right" label="@${row}E[num]" id="${row}E[top]"/>
+					<checkbox align="right" label="@${row}F[num]" id="${row}F[top]"/>
+					<checkbox align="right" label="@${row}G[num]" id="${row}G[top]"/>
+					<checkbox align="right" label="@${row}H[num]" id="${row}H[top]"/>
+					<checkbox align="right" label="@${row}I[num]" id="${row}I[top]"/>
 				</row>
 			</rows>
 		</grid>
-		<buttononly label="Update" id="button[apply]" onclick="update_scorecard(); return false;"/>
+		<buttononly label="Update" id="button[apply]" onclick="app.ranking.update_scorecard"/>
+		<box id="resultlist"/>
 	</template>
 </overlay>

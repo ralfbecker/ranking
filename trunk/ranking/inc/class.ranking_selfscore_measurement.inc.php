@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2014 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2014-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id4$
  */
 
@@ -25,8 +25,22 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 */
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
 	{
-		egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
-		egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
+		//error_log(__METHOD__."() user_agent=".html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
+		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
+			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
+
+		// egw_framework::validate_file|includeCSS does not work if template was submitted
+		if (egw_json_response::isJSONResponse())
+		{
+			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_api.js');
+			egw_json_response::get()->includeCSS($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_list.css');
+		}
+		else
+		{
+			// init protocol
+			egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
+			egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
+		}
 
 		if ($_SERVER['REQUEST_METHOD'] == 'GET' && (int)$_GET['athlete'] > 0)
 		{
@@ -87,7 +101,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 *
 	 * @param int $PerId
 	 * @param array $update
-	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
+	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
 	 */
 	public static function ajax_update_result($PerId,$update,$state=null)
 	{
@@ -118,8 +132,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 
 				if (0 < $n && $n <= $num_problems)
 				{
-					$score[$n] = (int)(bool)$value;
-					++$num_tops;
+					if (($score[$n] = (int)(bool)$value['top'])) ++$num_tops;
 				}
 			}
 		}
@@ -131,7 +144,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 			'score' => $score,
 		);
 
-		//error_log(__METHOD__."($PerId, ".array2string($update).", $set_current)");
+		//error_log(__METHOD__."($PerId, ".array2string($update).", ".array2string($state).")");
 		if (ranking_result_bo::$instance->save_result($keys,array($PerId => $to_update),$query['route_type'],$query['discipline']))
 		{
 			// search filter needs route_type to not give SQL error
@@ -156,8 +169,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 			$msg = '';
 		}
 		//$response->alert(__METHOD__."($PerId, $height, '$plus', $set_current) $msg");
-		$response->jquery('#msg', 'text', array($msg));
-		$response->script('if (typeof resultlist != "undefined") resultlist.update();');
+		$response->data($msg);
 	}
 
 	/**
@@ -170,6 +182,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 */
 	public static function ajax_load_athlete($PerId, array $state=null, array &$data=null)
 	{
+		$comp = null;
 		$query =& self::get_check_session($comp,$state);
 
 		$response = egw_json_response::get();
@@ -187,27 +200,38 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
 		}
 
-		if (list($data) = ranking_result_bo::$instance->route_result->search(array(),false,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$keys))
+		if ((list($data) = ranking_result_bo::$instance->route_result->search(array(), false, '','', '', False, 'AND', false, $keys)))
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			$num_problems = $route['route_num_problems'];
 			$num_cols = $route['selfscore_num'];
-			$score = array();
+			$update_allowed = self::update_allowed($comp, $route, $PerId);
+			$score = $readonlys = array();
 			for($n=$r=0; $r*$num_cols < $num_problems; ++$r)
 			{
 				for($c=0; $c < $num_cols; ++$c)
 				{
 					$col = boetemplate::num2chrs($c-1);
-					if ($n++ < $num_problems && $data['score'][$n])
+					if ($n++ < $num_problems)
 					{
-						$score[$r.$col] = (int)$data['score'][$n];
+						$score[$r.$col] = array(
+							'num' => $n.': %s',
+							'top' => (int)$data['score'][$n],
+						);
+						$readonlys[$r.$col] = !$update_allowed;
 					}
 				}
 			}
-			$response->call('set_scorecard', $score, self::update_allowed($comp, $route, $PerId));
+			$response->data(array(
+				'msg'   => ranking_result_bo::athlete2string($data),
+				'content' => $score,
+				'readonlys' => $readonlys,
+			));
 			$query['PerId'] = $PerId;
-
-			$response->jquery('#msg', 'text', array(ranking_result_bo::athlete2string($data)));
+		}
+		else
+		{
+			$response->data(array('msg' => ''));
 		}
 	}
 
@@ -259,7 +283,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 				// check cats intersect with selfscore cats
 				if (!($cats = array_intersect_key($cats, array_flip(array_keys($WetIds[$comp['WetId']]))))) continue;
 				// check if athlete registered for comp and cat
-				foreach($cats as $cat => $name)
+				foreach(array_keys($cats) as $cat)
 				{
 					if (ranking_result_bo::$instance->result->has_registration($keys=array(
 						'WetId' => $comp['WetId'],
