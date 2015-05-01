@@ -60,6 +60,12 @@ app.classes.ranking = AppJS.extend(
 		switch (name)
 		{
 			case 'ranking.result.index':
+				if (this.resultlist && this.resultlist.update_handle)
+				{
+					window.clearInterval(this.resultlist.update_handle);
+					delete this.resultlist.update_handle;
+				}
+				delete this.resultlist;
 				var self = this;
 				this.et2.iterateOver(function(_widget){
 					_widget.setNextmatch(self);
@@ -71,7 +77,7 @@ app.classes.ranking = AppJS.extend(
 					switch(this.content.nm.discipline)
 					{
 						case 'boulder':
-							delete this.resultlist;	// delete resultlist, to get init_boulder to initialise it again
+						case 'selfscore':
 							this.init_boulder();
 							break;
 					}
@@ -371,8 +377,11 @@ app.classes.ranking = AppJS.extend(
 				'&route='+this.et2.getWidgetById('nm[route]').get_value()+'&detail=2&toc=0');
 
 			// set methods for interaction with protocol
-			window.protocol.set_msg(jQuery.proxy(this.message, this));
-			window.protocol.get_athlete(jQuery.proxy(this.get_athlete, this));
+			if (window.protocol)
+			{
+				window.protocol.set_msg(jQuery.proxy(this.message, this));
+				window.protocol.get_athlete(jQuery.proxy(this.get_athlete, this));
+			}
 		}
 	},
 
@@ -615,5 +624,64 @@ app.classes.ranking = AppJS.extend(
 
 		// need to call this manually, as changing selectedIndex does NOT trigger onchange
 		this.boulder_changed(PerId);
+	},
+
+	/**************************************************************************
+	 * Selfscore boulder measurement
+	 **************************************************************************/
+
+	/**
+	 * Update selfscore scorecard
+	 *
+	 * @param {jQuery.Event} _event
+	 * @param {et2_button} _widget
+	 */
+	update_scorecard: function(_event, _widget)
+	{
+		var values = _widget.getInstanceManager().getValues(this.et2);
+
+		this.egw.json('ranking_selfscore_measurement::ajax_update_result',
+			[values.nm.PerId, values.score,
+			{'WetId': values.comp.WetId, 'GrpId': values.nm.cat, 'route_order': values.nm.route}],
+				function(_msg)
+				{
+					this.message(_msg);
+					this.resultlist.update();
+				},
+				null, false, this).sendRequest();
+	},
+
+	/**
+	 * Boulder or athlete changed
+	 *
+	 * @param {jQuery.Event} _event
+	 * @param {et2_selectbox} _widget
+	 */
+	scorecard_changed: function(_event, _widget)
+	{
+		var PerId = this.et2.getWidgetById('nm[PerId]').get_value();
+
+		if (PerId)
+		{
+			var WetId = this.et2.getWidgetById('comp[WetId]').get_value();
+			var GrpId = this.et2.getWidgetById('nm[cat]').get_value();
+			var route_order = this.et2.getWidgetById('nm[route]').get_value();
+
+			this.egw.json('ranking_selfscore_measurement::ajax_load_athlete',
+				[PerId, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order}],
+				function(_data)
+				{
+					this.message(_data.msg);
+					delete _data.msg;
+
+					this.et2.getWidgetById('score').set_value(_data);
+				},
+				null, false, this).sendRequest();
+		}
+		else
+		{
+			this.message('');
+			this.et2.getWidgetById('score').set_value({content: {}});
+		}
 	}
 });
