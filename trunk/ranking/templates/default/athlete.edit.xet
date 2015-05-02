@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.athlete.edit.contact" template="" lang="" group="0" version="1.9.002">
+	<template id="ranking.athlete.edit.contact" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" height="210">
 			<columns>
 				<column width="100"/>
@@ -12,35 +11,33 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Email" for="email"/>
-					<url-email statustext="use access control to deny display on the website" id="email" options="30,60"/>
-					<description value="Homepage" for="homepage"/>
-					<url statustext="URL to own homepage, eg. http://domain.com" id="homepage" options="40,60"/>
+					<description for="email" value="Email"/>
+					<url-email statustext="use access control to deny display on the website" id="email" options="30,60" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Phone" for="tel"/>
+					<description for="tel" value="Phone"/>
 					<url-phone statustext="use access control to deny display on the website" id="tel" options="20,20"/>
-					<description value="Fax" for="fax"/>
+					<description for="fax" value="Fax"/>
 					<url-phone statustext="use access control to deny display on the website" id="fax" options="20,20"/>
 				</row>
 				<row class="row">
-					<description value="Cellphone" for="mobil"/>
+					<description for="mobil" value="Cellphone"/>
 					<url-phone statustext="use access control to deny display on the website" id="mobil" options="20,20" span="all"/>
 				</row>
 				<row class="row">
-					<description value="City" for="ort"/>
+					<description for="ort" value="City"/>
 					<textbox statustext="use access control to deny display on the website" id="ort" size="30" maxlength="60"/>
-					<description value="Postalcode" for="plz"/>
+					<description for="plz" value="Postalcode"/>
 					<textbox statustext="incl. nation-code" id="plz" size="8" maxlength="8"/>
 				</row>
 				<row class="row">
-					<description value="Street" for="strasse"/>
+					<description for="strasse" value="Street"/>
 					<textbox statustext="use access control to deny display on the website" id="strasse" size="30" maxlength="60"/>
-					<description statustext="use access control to deny display on the website" value="Title" for="anrede"/>
+					<description for="anrede" statustext="use access control to deny display on the website" value="Title"/>
 					<textbox id="anrede" size="40" maxlength="40"/>
 				</row>
 				<row class="row" valign="top">
-					<description value="Notice" for="notiz"/>
+					<description for="notiz" value="Notice"/>
 					<textbox multiline="true" statustext="For internal use, not shown on the website." id="bemerkung" rows="2" cols="80" span="3"/>
 				</row>
 			</rows>
@@ -54,34 +51,68 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Weight (kg)" for="gewicht"/>
+					<description for="gewicht" value="Weight (kg)"/>
 					<textbox type="integer" statustext="weight in kilogram" id="gewicht"/>
 				</row>
 				<row class="row">
-					<description value="Size (cm)" for="groesse"/>
+					<description for="groesse" value="Size (cm)"/>
 					<textbox type="integer" statustext="body height in centimeter" id="groesse"/>
 				</row>
 				<row class="row">
-					<description value="climbing since (years)" for="practice"/>
+					<description for="practice" value="climbing since (years)"/>
 					<textbox type="integer" statustext="since how many years is the athlete climbing (not only competing)" id="practice" min="1" max="99"/>
 				</row>
 				<row class="row">
-					<description value="Professional" for="profi"/>
+					<description for="profi" value="Professional"/>
 					<textbox statustext="use &quot;yes&quot; or &quot;no, prefession&quot;" id="profi" maxlength="40" span="all"/>
 				</row>
 				<row class="row">
-					<description value="other sports" for="sport"/>
+					<description for="sport" value="other sports"/>
 					<textbox statustext="other sports practiced" id="sport" size="60" maxlength="60" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Hobbies" for="hobby"/>
+					<description for="hobby" value="Hobbies"/>
 					<textbox id="hobby" size="60" maxlength="60" span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
+	<template id="ranking.athlete.edit.links" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%" height="210">
+			<columns>
+				<column width="100"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Website" for="homepage"/>
+					<url statustext="URL to own homepage, eg. http://domain.com" id="homepage" options="64,60"/>
+				</row>
+				<row class="row">
+					<description value="Facebook" for="facebook"/>
+					<url id="facebook" options="64,64"/>
+				</row>
+				<row class="row">
+					<description value="Twitter" for="twitter"/>
+					<url id="twitter" options="64,64"/>
+				</row>
+				<row class="row">
+					<description value="Instagram" for="instagram"/>
+					<url id="instagram" options="64,64" span="all"/>
+				</row>
+				<row class="row">
+					<description value="YouTube" for="youtube"/>
+					<url id="youtube" options="64,64" span="all"/>
+				</row>
+				<row class="row">
+					<description value="Video iframe" for="video_iframe"/>
+					<url id="video_iframe" options="64,128" span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.9.001">
-		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="120px" width="100%" expand_toolbar="true"/>
+		<htmlarea expand_toolbar="true" height="120px" statustext="This text will be shown in the profil on the website." mode="extended" id="freetext" width="100%"/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -94,18 +125,18 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description value="deny public access to" for="acl"/>
+					<description for="acl" value="deny public access to"/>
 					<listbox statustext="deny public display of the checked information" id="acl" no_lang="1" rows="7" span="all"/>
 				</row>
 				<row class="row" disabled="!@is_admin">
-					<description value="Key" for="rkey"/>
+					<description for="rkey" value="Key"/>
 					<textbox statustext="internal key, leave it empty to have it automaticaly generated" id="rkey" size="8" maxlength="8"/>
 					<textbox statustext="not used at the moment" label="License number" id="lizenz" size="6" maxlength="6"/>
 					<passwd label="Password" id="password"/>
 					<passwd id="password2"/>
 				</row>
 				<row class="row">
-					<description value="Squad" for="kader"/>
+					<description for="kader" value="Squad"/>
 					<textbox statustext="not used at the moment" id="kader" size="5" maxlength="5" span="all"/>
 				</row>
 			</rows>
@@ -210,8 +241,9 @@
 				<row>
 					<tabbox id="tabs" span="all">
 						<tabs>
-							<tab id="contact" label="Contact" statustext="telephone, email, homepage, city, ..."/>
+							<tab id="contact" label="Contact" statustext="telephone, email, city, ..."/>
 							<tab id="profile" label="Profile" statustext="Weight, size, hobbies, ..."/>
+							<tab id="links" label="Social links" statustext="Homepage, Facebook, ..."/>
 							<tab id="freetext" label="Free text" statustext="This text will be shown in the profil on the website."/>
 							<tab id="other" label="Access" statustext="access control, key"/>
 							<tab id="pictures" label="Picture" statustext="Picture"/>
@@ -220,6 +252,7 @@
 						<tabpanels>
 							<template id="ranking.athlete.edit.contact"/>
 							<template id="ranking.athlete.edit.profile"/>
+							<template id="ranking.athlete.edit.links"/>
 							<template id="ranking.athlete.edit.freetext"/>
 							<template id="ranking.athlete.edit.other"/>
 							<template id="ranking.athlete.edit.pictures"/>

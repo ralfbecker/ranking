@@ -307,7 +307,8 @@ Data includes usual athlete data:
 - practice: practices climbing since "N years, since YYYY"
 - other_sports: other sports practiced
 - professional: professional climber or if not profession
-- city, postcode, street: address data, usually on city is available
+- city, postcode, street: address data, usually only city is available
+- URLs: homepage, facebook, twitter, instagram, youtube, video_iframe
 - last_comp: date in YYYY-mm-dd format of last competition
 If category given:
 - GrpId: nummerical id of category

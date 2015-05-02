@@ -1734,3 +1734,30 @@ WHERE lic2015.lic_year=2015 AND lic2014.lic_until>=2015 AND lic2015.nation='GER'
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '1.9.019';
 }
+
+function ranking_upgrade1_9_019()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','facebook',array(
+		'type' => 'varchar',
+		'precision' => '64'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','twitter',array(
+		'type' => 'varchar',
+		'precision' => '64'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','instagram',array(
+		'type' => 'varchar',
+		'precision' => '64'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','youtube',array(
+		'type' => 'varchar',
+		'precision' => '64'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','video_iframe',array(
+		'type' => 'varchar',
+		'precision' => '128'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.001';
+}
+

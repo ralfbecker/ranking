@@ -218,7 +218,12 @@ $phpgw_baseline = array(
 			'recover_pw_hash' => array('type' => 'varchar','precision' => '32'),
 			'recover_pw_time' => array('type' => 'timestamp'),
 			'last_login' => array('type' => 'timestamp'),
-			'login_failed' => array('type' => 'int','precision' => '4','nullable' => False,'default' => '0')
+			'login_failed' => array('type' => 'int','precision' => '4','nullable' => False,'default' => '0'),
+			'facebook' => array('type' => 'varchar','precision' => '64'),
+			'twitter' => array('type' => 'varchar','precision' => '64'),
+			'instagram' => array('type' => 'varchar','precision' => '64'),
+			'youtube' => array('type' => 'varchar','precision' => '64'),
+			'video_iframe' => array('type' => 'varchar','precision' => '128')
 		),
 		'pk' => array('PerId'),
 		'fk' => array(),
