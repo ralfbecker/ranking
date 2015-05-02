@@ -89,8 +89,12 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 						}
 					}
 				}
-				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
+				list($bip, $sel_options['PerId'][$row['PerId']]) = explode(' ', ranking_result_bo::athlete2string($row, false), 2);
+				$sel_options['PerId'][$row['PerId']] .= ' ('.$bip.')';
 			}
+			// sort athletes alphabetic
+			$de_collator = new Collator('de_DE');
+			$de_collator->asort($sel_options['PerId']);
 		}
 		if (!self::update_allowed($content['comp'], $content['nm']['route_data'], $content['nm']['PerId']))
 		{
@@ -144,7 +148,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 			}
 		}
 		$to_update = array(
-			'tops' => $num_tops,
+			'tops' => $num_tops+.0001,	// hack to allow to save 0 tops
 			'zones' => $num_tops,
 			'top_tries' => 0,
 			'zone_tries' => $num_tops,
