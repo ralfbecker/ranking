@@ -13,8 +13,6 @@
 
 /**
  * Measurement plugin for selfscore boulder competitions
- *
- * @todo $route[selfscore_num] (number of columns) is currently hardcoded to 10, as et2 does not autorepeat columns
  */
 class ranking_selfscore_measurement extends ranking_boulder_measurement
 {
@@ -69,7 +67,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 				if ($content['nm']['PerId'] == $row['PerId'])
 				{
 					$num_problems = $content['nm']['route_data']['route_num_problems'];
-					$num_cols = 10;	//$content['nm']['route_data']['selfscore_num'];
+					$num_cols = $content['nm']['route_data']['selfscore_num'];
 					for($n=$r=0; $r*$num_cols < $num_problems; ++$r)
 					{
 						for($c=0; $c < $num_cols; ++$c)
@@ -132,7 +130,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 
 		$score = array();
 		$num_problems = $route['route_num_problems'];
-		$num_cols = 10;	//$route['selfscore_num'];
+		$num_cols = $route['selfscore_num'];
 		$num_tops = 0;
 		foreach((array)$update as $row_col => $value)
 		{
@@ -215,7 +213,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			$num_problems = $route['route_num_problems'];
-			$num_cols = 10;	//$route['selfscore_num'];
+			$num_cols = $route['selfscore_num'];
 			$score = array();
 			for($n=$r=0; $r*$num_cols < $num_problems; ++$r)
 			{
