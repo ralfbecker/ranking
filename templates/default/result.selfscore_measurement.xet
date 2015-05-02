@@ -14,10 +14,12 @@
 				<column/>
 				<column/>
 				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column disabled="!@0F"/>
+				<column disabled="!@0G"/>
+				<column disabled="!@0H"/>
+				<column disabled="!@0I"/>
+				<column disabled="!@0J"/>
+				<column disabled="!@0K"/>
 			</columns>
 			<rows>
 				<row disabled="!@0@">
@@ -31,6 +33,8 @@
 					<checkbox align="right" label="@${row}G[num]" id="${row}G[top]"/>
 					<checkbox align="right" label="@${row}H[num]" id="${row}H[top]"/>
 					<checkbox align="right" label="@${row}I[num]" id="${row}I[top]"/>
+					<checkbox align="right" label="@${row}J[num]" id="${row}J[top]"/>
+					<checkbox align="right" label="@${row}K[num]" id="${row}K[top]"/>
 				</row>
 			</rows>
 		</grid>
