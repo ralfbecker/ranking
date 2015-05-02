@@ -12,28 +12,13 @@
 			</columns>
 			<rows>
 				<row height="120">
-					<hbox>
-						<menulist>
-							 <menupopup label="Boulder" span="2" type="select-number" id="nm[boulder_n]" onchange="app.ranking.boulder_changed" options=",1,{$cont[nm][num_problems]}"/>
-						</menulist>
-					</hbox>
-					<menulist>
-						<menupopup label="Athlete" id="nm[PerId]" span="2" onchange="app.ranking.boulder_changed" options="Select one"/>
-					</menulist>
+					<select-number label="Boulder" span="2" type="select-number" id="nm[boulder_n]" onchange="app.ranking.boulder_changed" options=",1,${cont[nm][num_problems]}"/>
+					<select label="Athlete" id="nm[PerId]" span="2" onchange="app.ranking.boulder_changed" options="Select one"/>
 				</row>
 				<row height="120">
-					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="app.ranking.set_try" options=",1,25"/>
-					</menulist>
-					<menulist>
-						<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-					</menulist>
-					<hbox>
-						<menulist>
-							<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						
-					</hbox>
+					<select-number class="noPrint noWrap" statustext="Try: number of tries or no" label="Try" id="try" onchange="app.ranking.set_try" options=",1,25"/>
+					<select-number class="noPrint noWrap" statustext="Bonus: Number of tries or no" label="Bonus" id="zone" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+					<select-number class="noPrint noWrap" statustext="Top: number of tries or no" label="Top" id="top" onchange="app.ranking.check_top" options="No,1,25"/>
 					<buttononly align="right" label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5 bigButton"/>
 				</row>
 				<row>
