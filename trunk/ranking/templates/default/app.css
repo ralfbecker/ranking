@@ -139,7 +139,7 @@ table#ranking-result-index_score input[type=checkbox] {
 	-o-transform: scale(2);
 	margin-left: 5px;
 }
-button#ranking-result-index_button\[apply\] {
+button.scorecard_button {
 	font-size: 150%;
 	position: absolute;
 	top: 280px;

@@ -1459,6 +1459,7 @@ class ranking_result_ui extends ranking_result_bo
 			}
 			$GLOBALS['egw_info']['flags']['include_xajax'] = true;
 		}
+		$tmpl->setElementAttribute('button[apply]', 'class', '');
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
 		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)
@@ -1480,6 +1481,7 @@ class ranking_result_ui extends ranking_result_bo
 					break;
 				case 'selfscore':
 					ranking_selfscore_measurement::measurement($content, $sel_options, $readonlys, $tmpl);
+					$tmpl->setElementAttribute('button[apply]', 'class', 'scorecard_button');
 					$content['measurement_template'] = 'ranking.result.selfscore_measurement';
 					break;
 				case 'boulder':
