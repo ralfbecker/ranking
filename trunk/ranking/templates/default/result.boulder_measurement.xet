@@ -12,7 +12,7 @@
 			</columns>
 			<rows>
 				<row height="120">
-					<select-number label="Boulder" span="2" type="select-number" id="nm[boulder_n]" onchange="app.ranking.boulder_changed" options=",1,${cont[nm][num_problems]}"/>
+					<select-number label="Boulder" span="2" type="select-number" id="nm[boulder_n]" onchange="app.ranking.boulder_changed" options=",1,{$cont[nm][num_problems]}"/>
 					<select label="Athlete" id="nm[PerId]" span="2" onchange="app.ranking.boulder_changed" options="Select one"/>
 				</row>
 				<row height="120">
