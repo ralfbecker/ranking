@@ -144,14 +144,14 @@
 							<menupopup class="rightPad5" statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
 						</menulist>
 						<menulist>
-							<menupopup id="nm[comp]" no_lang="1" onchange="1" options="Select competition"/>
+							<menupopup id="nm[comp]" no_lang="1" onchange="1" empty_label="Select competition"/>
 						</menulist>
 					</hbox>
 				</row>
 				<row class="noPrint resultHeader catSelectionMsg" disabled="!@nm[comp]">
 					<hbox>
 						<menulist>
-							<menupopup class="bold" id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
+							<menupopup class="bold" id="nm[cat]" no_lang="1" onchange="1" empty_label="Select category"/>
 						</menulist>
 						<hidden id="comp[WetId]"/>
 						<description id="msg" class="message"/>

@@ -8,11 +8,13 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2014-15 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id4$
+ * @version $Id$
  */
 
 /**
  * Measurement plugin for selfscore boulder competitions
+ *
+ * @todo $route[selfscore_num] (number of columns) is currently hardcoded to 10, as et2 does not autorepeat columns
  */
 class ranking_selfscore_measurement extends ranking_boulder_measurement
 {
@@ -23,7 +25,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 * @param array &$sel_options
 	 * @param array %$readonlys
 	 */
-	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
+	public static function measurement(array &$content, array &$sel_options, array &$readonlys, etemplate_new $tmpl)
 	{
 		//error_log(__METHOD__."() user_agent=".html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
 		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
@@ -67,7 +69,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 				if ($content['nm']['PerId'] == $row['PerId'])
 				{
 					$num_problems = $content['nm']['route_data']['route_num_problems'];
-					$num_cols = $content['nm']['route_data']['selfscore_num'];
+					$num_cols = 10;	//$content['nm']['route_data']['selfscore_num'];
 					for($n=$r=0; $r*$num_cols < $num_problems; ++$r)
 					{
 						for($c=0; $c < $num_cols; ++$c)
@@ -93,6 +95,11 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		if (!self::update_allowed($content['comp'], $content['nm']['route_data'], $content['nm']['PerId']))
 		{
 			egw_framework::set_extra('ranking', 'readonly', true);
+		}
+		// do not allow to select no category for athlets
+		if ($GLOBALS['egw_info']['user']['account_lid'] == 'anonymous')
+		{
+			$tmpl->setElementAttribute('nm[cat]', 'empty_label', '');
 		}
 	}
 
@@ -121,7 +128,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 
 		$score = array();
 		$num_problems = $route['route_num_problems'];
-		$num_cols = $route['selfscore_num'];
+		$num_cols = 10;	//$route['selfscore_num'];
 		$num_tops = 0;
 		foreach((array)$update as $row_col => $value)
 		{
@@ -204,9 +211,8 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
 			$num_problems = $route['route_num_problems'];
-			$num_cols = $route['selfscore_num'];
-			$update_allowed = self::update_allowed($comp, $route, $PerId);
-			$score = $readonlys = array();
+			$num_cols = 10;	//$route['selfscore_num'];
+			$score = array();
 			for($n=$r=0; $r*$num_cols < $num_problems; ++$r)
 			{
 				for($c=0; $c < $num_cols; ++$c)
@@ -218,14 +224,13 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 							'num' => $n.': %s',
 							'top' => (int)$data['score'][$n],
 						);
-						$readonlys[$r.$col] = !$update_allowed;
 					}
 				}
 			}
 			$response->data(array(
 				'msg'   => ranking_result_bo::athlete2string($data),
+				'update_allowed' => self::update_allowed($comp, $route, $PerId),
 				'content' => $score,
-				'readonlys' => $readonlys,
 			));
 			$query['PerId'] = $PerId;
 		}

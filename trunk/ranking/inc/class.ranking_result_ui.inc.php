@@ -1479,7 +1479,7 @@ class ranking_result_ui extends ranking_result_bo
 					$content['measurement_template'] = 'ranking.result.measurement';
 					break;
 				case 'selfscore':
-					ranking_selfscore_measurement::measurement($content, $sel_options, $readonlys);
+					ranking_selfscore_measurement::measurement($content, $sel_options, $readonlys, $tmpl);
 					$content['measurement_template'] = 'ranking.result.selfscore_measurement';
 					break;
 				case 'boulder':
