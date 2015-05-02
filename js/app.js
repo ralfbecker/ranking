@@ -674,7 +674,17 @@ app.classes.ranking = AppJS.extend(
 					this.message(_data.msg);
 					delete _data.msg;
 
+					var readonly = !_data.update_allowed;
+					delete _data.update_allowed;
+
 					this.et2.getWidgetById('score').set_value(_data);
+
+					// enable/disable checkboxes and apply button depending on update_allowed
+					this.et2.getWidgetById('score').iterateOver(function(_widget)
+					{
+						_widget.set_readonly(readonly);
+					}, this, et2_checkbox);
+					this.et2.getWidgetById('button[apply]').set_disabled(readonly);
 				},
 				null, false, this).sendRequest();
 		}
