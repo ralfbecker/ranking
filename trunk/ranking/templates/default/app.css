@@ -117,22 +117,40 @@ div#table table.DrTable td.city, div#table table.DrTable th.city {
 	display: none;
 }
 
-/* selfscore styling */
-table#exec\[score\]\[score\] {
+/**
+ * Formatting for scorecard
+ */
+/* disable route- and category-selection, as they lead out of self-service */
+table#ranking-result-index_score {
 	border: 2px solid black;
 	border-collapse: collapse;
 	margin-top: 5px;
 	margin-bottom: 5px;
+	display: inline-block;
 }
-table#exec\[score\]\[score\] td {
-	padding: 5px;
+table#ranking-result-index_score td {
+	padding: 13px 13px 15px 5px;
+	border: 1px solid black;
 }
-/* Fix no space for button in hbox row*/
-#ranking-result-route_import_cat {
-	width:55%;
+table#ranking-result-index_score input[type=checkbox] {
+	-ms-transform: scale(2);
+	-moz-transform: scale(2);
+	-webkit-transform: scale(2);
+	-o-transform: scale(2);
+	margin-left: 5px;
+}
+button#ranking-result-index_button\[apply\] {
+	font-size: 150%;
+	position: absolute;
+	top: 280px;
+	right: 30px;
+	border: 3px solid black;
+	border-radius: 3px;
 }
 
-
+/*
+ * Boulder measurement
+ */
 button.bigButton, button.tryButton, input.bigButton , input.tryButton {
 	font-size: 400%;
 	border-radius: 20px;

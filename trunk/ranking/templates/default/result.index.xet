@@ -148,8 +148,8 @@
 						</menulist>
 					</hbox>
 				</row>
-				<row class="noPrint resultHeader" disabled="!@nm[comp]">
-					<hbox no_lang="1">
+				<row class="noPrint resultHeader catSelectionMsg" disabled="!@nm[comp]">
+					<hbox>
 						<menulist>
 							<menupopup class="bold" id="nm[cat]" no_lang="1" onchange="1" options="Select category"/>
 						</menulist>

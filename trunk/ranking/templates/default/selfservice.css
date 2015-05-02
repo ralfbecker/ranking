@@ -13,7 +13,7 @@
 body {
 	margin: 10px !important;
 }
-p, td, body {
+p, td, select, body, button {
 	font-size: 14px !important;
 }
 p.error {
@@ -26,27 +26,12 @@ form.form_1button {
 /**
  * Formatting for scorecard
  */
-h1#action-scorecard {
-	padding-top: 50px;
-}
-.compHeader {
-	position: fixed;
-	top: 10px;
-	background-color: silver;
-}
-#exec\[button\]\[download\], #exec\[result_popup\] {
-	display: none;
-}
 /* disable route- and category-selection, as they lead out of self-service */
-tr.noPrint {
+#popupMainDiv tr.noPrint {
 	display: none;
 }
-table#exec\[score\]\[score\] {
-	border: 2px solid black;
-	border-collapse: collapse;
-	margin-top: 5px;
-	margin-bottom: 5px;
-}
-table#exec\[score\]\[score\] td {
-	padding: 5px;
+
+tr.noPrint.catSelectionMsg {
+	display: block !important;
+	border: none !important;
 }
