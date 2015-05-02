@@ -24,7 +24,7 @@ class ranking_export extends ranking_result_bo
 	 * @var array
 	 */
 	public static $ignore_caching_hosts = array(
-		'boulder.outdoor-training.de', 'ralfsmacbook.local', 'localhost','test.dev'
+		'boulder.outdoor-training.de', 'ralfsmacbook.local','ralfsmac.local', 'localhost'
 	);
 
 	/**
@@ -1793,6 +1793,11 @@ class ranking_export extends ranking_result_bo
 		// commented usually disabled fields, to never export them
 		//'email' => 'email',
 		'homepage' => 'homepage',
+		'facebook' => 'facebook',
+		'twitter'  => 'twitter',
+		'instagram'=> 'instagram',
+		'youtube'  => 'youtube',
+		'video_iframe' => 'video_iframe',
 		//'strasse' => 'street',
 		//'plz' => 'postcode',
 		'ort' => 'city',
