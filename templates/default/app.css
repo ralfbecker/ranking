@@ -28,7 +28,6 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 .noWrap { white-space: nowrap; }
 .speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; height: 7ex; }
 .max_compl { width: 45px; white-space: nowrap !important; }
-#ranking-result-index_nm\[boulder_n\] { width: 2em; }
 /**
  * Some fixes for ResultService not using a nextmatch
  */
@@ -161,7 +160,11 @@ button.bigButton, button.tryButton, input.bigButton , input.tryButton {
 	margin-right: 1%;
 }
 button.tryButton , input.tryButton  {
-   width: 4em;
+	width: 4em;
+	white-space: nowrap;
+}
+#ranking-result-index_nm\[boulder_n\] {
+	width: 3em;
 }
 table.buttonBox {
    padding-top: 10px;
