@@ -457,13 +457,12 @@ app.classes.ranking = AppJS.extend(
 	/**
 	 * Set tries to given number
 	 *
-	 * @param n
+	 * @param {DOMNode} _node
+	 * @param {et2_selectbox} _widget
 	 */
-	set_try: function(n)
+	set_try: function(_node, _widget)
 	{
-		this.try_num(n-1, true);
-
-		this.try_clicked(this.et2.getWidgetById('button[try]'));
+		this.try_num(_widget.get_value(), true);
 	},
 
 	/**
