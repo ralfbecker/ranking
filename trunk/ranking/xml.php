@@ -54,7 +54,8 @@ $xml = new XMLWriter();
 if (!isset($_GET['debug']) || !$_GET['debug'])
 {
 	header('Content-Type: application/xml; charset='.$encoding);
-	if (isset($result['expires'])) egw_session::cache_control($result['expires']);
+	egw_session::cache_control(isset($result['expires']) ? $result['expires'] : ranking_export::EXPORT_DEFAULT_EXPIRES);
+
 	if (isset($result['etag']))
 	{
 		if ($result['etag'][0] != '"') $result['etag'] = '"'.$result['etag'].'"';
@@ -75,8 +76,15 @@ else
 $xml->setIndent(true);
 $xml->setIndentString("\t");
 $xml->startDocument('1.0',$encoding);
-$xml->startElement($root_tag);
 
+if (isset($result[0]))
+{
+	$result = array($root_tag => $result);
+}
+else
+{
+	$xml->startElement($root_tag);
+}
 foreach($result as $name => &$value)
 {
 	if (!is_array($value))
@@ -116,7 +124,7 @@ foreach($result as $name => &$value)
 		$xml->endElement();
 	}
 }
-$xml->endElement();
+if (!isset($result[$root_tag])) $xml->endElement();
 
 function write_array($xml,$arr)
 {

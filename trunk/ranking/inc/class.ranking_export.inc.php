@@ -19,6 +19,11 @@ class ranking_export extends ranking_result_bo
 	const EXPIRES_404_NOT_FOUND = 900;
 
 	/**
+	 * Default expires time if nothing is explicitly set
+	 */
+	const EXPORT_DEFAULT_EXPIRES = 7200;
+
+	/**
 	 * Disable caching for following development systems
 	 *
 	 * @var array
@@ -56,6 +61,12 @@ class ranking_export extends ranking_result_bo
 				$export = new ranking_export();
 				$result = $export->export_aggregated($_GET['type'], $_GET['date'], $_GET['comp'], $_GET['cup'], $_GET['cat']);
 				$root_tag = 'aggregated';
+			}
+			elseif (isset($_GET['term']))
+			{
+				$export = new ranking_export();
+				$result = $export->export_athlete_search($_GET['term']);
+				$root_tag = 'athletes';
 			}
 			elseif (isset($_GET['nation']) || !isset($_GET['comp']))
 			{
@@ -1955,6 +1966,30 @@ class ranking_export extends ranking_result_bo
 
 		//_debug_array($data); exit;
 		return $data;
+	}
+
+	/**
+	 * Search athlettes by name for autocomplete
+	 *
+	 * @param string $pattern
+	 * @return array of array with keys "value" and "label"
+	 */
+	public function export_athlete_search($pattern)
+	{
+		$found = array();
+		foreach($this->athlete->search(array(
+				'nachname' => $pattern.'*',
+				'vorname'  => $pattern.'*',
+			),
+			array('PerId', 'vorname', 'nachname', ranking_athlete::FEDERATIONS_TABLE.'.nation'),
+			'nachname, vorname', '', '', false, 'OR', array(0, 50)) as $row)
+		{
+			$found[] = array(
+				'value' => (int)$row['PerId'],
+				'label' => mb_strtoupper($row['nachname']).' '.$row['vorname'].' ('.$row['nation'].')',
+			);
+		}
+		return $found;
 	}
 
 	/**
