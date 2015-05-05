@@ -332,6 +332,16 @@ Recorded results of athlete as array with following data per result:
 Javascript Profile widget supports HTML template to render the profile, see above example.
 It also displays by default only N best results, with the option to show all results.
 
+Search for athletes via XML / JSON
+==================================
+
+Example for searching atheletes with first or last name starting with "ralf":
+- XML:  http://egw.ifsc-climbing.org/egw/ranking/xml.php?term=ralf
+- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?term=ralf
+
+Returns array of objects with attributes "value" (PerId) and "label" like "BECKER Ralf (GER)".
+Can be used directly with jQueryUI autocomplete.
+
 If you have questions please ask.
 
 Ralf
