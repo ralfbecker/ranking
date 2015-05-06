@@ -191,6 +191,9 @@ td.profilePractice, td.profileOtherSports, td.profileProfessional, td.profileHei
 .profileResult td, h1, h3, td.profileRanglist {
 	font-style: normal;
 }
+td.profileRanglist {
+	white-space: nowrap;
+}
 .profileResultHidden {
 	display: none;
 }
