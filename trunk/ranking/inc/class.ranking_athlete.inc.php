@@ -234,28 +234,6 @@ class ranking_athlete extends so_sql
 	}
 
 	/**
-	 * merges in new values from the given new data-array
-	 *
-	 * Reimplemented to hash password
-	 *
-	 * @param array $new in form col => new_value with values to set
-	 */
-	function data_merge($new)
-	{
-		if (!is_array($new) || !count($new))
-		{
-			return;
-		}
-		if (isset($new['password']) && stripos($new['password'], '{crypt}$') !== 0)
-		{
-			$new['password'] = auth::encrypt_ldap($new['password'], 'blowfish_crypt');
-			$new['recover_pw_hash'] = $new['recover_pw_time'] = null;
-			$new['login_failed'] = 0;
-		}
-		return parent::data_merge($new);
-	}
-
-	/**
 	 * changes the data from our work-format to the db-format
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
@@ -285,6 +263,14 @@ class ranking_athlete extends so_sql
 		if ($data['practice'] && $data['practice'] < 100)
 		{
 			$data['practice'] = date('Y') - $data['practice'];
+		}
+		// hash password and reset recovery hash, time and failed login count
+		if (!empty($data['password']) && stripos($data['password'], '{crypt}$') !== 0)
+		{
+			$data['password'] = auth::encrypt_ldap($data['password'], 'blowfish_crypt');
+			$data['recover_pw_hash'] = $data['recover_pw_time'] = null;
+			$data['login_failed'] = 0;
+			error_log(__METHOD__."() password hashed ".array2string($data));
 		}
 		if (count($data) && $this->source_charset)
 		{

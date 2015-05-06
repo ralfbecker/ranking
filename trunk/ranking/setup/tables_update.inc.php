@@ -1761,3 +1761,23 @@ function ranking_upgrade1_9_019()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.001';
 }
 
+/**
+ * Fix unhashed passwords
+ *
+ * @return string
+ */
+function ranking_upgrade14_2_001()
+{
+	foreach($GLOBALS['egw_setup']->db->query("SELECT PerId,password FROM Personen WHERE password IS NOT NULL AND password NOT LIKE '{crypt}$%'",
+		__LINE__, __FILE__) as $row)
+	{
+		$GLOBALS['egw_setup']->db->update('Personen', array(
+			'password' => auth::encrypt_ldap($row['password'], 'blowfish_crypt'),
+			'recover_pw_hash' => null,
+			'recover_pw_time' => null,
+			'login_failed' => 0,
+		), array('PerId' => $row['PerId']), __LINE__, __FILE__, 'ranking');
+	}
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.002';
+}
