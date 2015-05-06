@@ -6,12 +6,12 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2002-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2002-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-error_reporting(E_ALL & ~E_NOTICE);
-ini_set('mbstring.internal_encoding','utf-8');
+error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
+ini_set(version_compare(PHP_VERSION, '5.6', '<') ? 'mbstring.internal_encoding' : 'default_charset', 'utf-8');
 if (!headers_sent()) header('Content-type: text/html; charset=utf-8');
 
 if (!function_exists('array2string'))
