@@ -1879,6 +1879,42 @@ class ranking_export extends ranking_result_bo
 					preg_replace('|^https?://[^/]+|', '', $data['photo']));
 			}
 
+			$last_modified = egw_time::to($athlete['modified'], 'ts');
+			// fetch results and calculate their weight, to allow clients to easyly show N best competitions
+			if (($results = $this->result->read(array(
+				'PerId' => $athlete['PerId'],
+				'platz > 0',
+			))))
+			{
+				$year = (int)date('Y');
+				foreach($results as $result)
+				{
+					if ($last_modified < ($ts = egw_time::to($result['modified'], 'ts')))
+					{
+						$last_modified = $ts;
+					}
+					$data['results'][] = array(
+						'rank' => $result['platz'],
+						'date' => $result['datum'],
+						'name' => $result['name'],
+						'url' => self::result_url($result['WetId'], $result['GrpId']),
+						'nation' => $result['nation'],
+						'WetId' => $result['WetId'],
+						'cat_name' => $result['cat_name'],
+						'GrpId' => $result['GrpId'],
+					);
+					$data['categorys'][$result['GrpId']] = array(
+						'GrpId' => (int)$result['GrpId'],
+						'name' => $result['cat_name'],
+					);
+					if (empty($cat)) $cat = $result['GrpId'];
+				}
+				$data['categorys'] = array_values($data['categorys']);
+			}
+
+			unset($data['last_modified']);
+			$data['last_modified'] = $last_modified;
+
 			// if category given fetch ranking
 			if ($cat && ($cat = $this->cats->read($cat)))
 			{
@@ -1924,36 +1960,6 @@ class ranking_export extends ranking_result_bo
 
 				}
 			}
-
-			$last_modified = egw_time::to($athlete['modified'], 'ts');
-			// fetch results and calculate their weight, to allow clients to easyly show N best competitions
-			if (($results = $this->result->read(array(
-				'PerId' => $athlete['PerId'],
-				'platz > 0',
-			))))
-			{
-				$year = (int)date('Y');
-				foreach($results as $result)
-				{
-					if ($last_modified < ($ts = egw_time::to($result['modified'], 'ts')))
-					{
-						$last_modified = $ts;
-					}
-					$data['results'][] = array(
-						'rank' => $result['platz'],
-						'date' => $result['datum'],
-						'name' => $result['name'],
-						'url' => self::result_url($result['WetId'], $result['GrpId']),
-						'nation' => $result['nation'],
-						'WetId' => $result['WetId'],
-						'cat_name' => $result['cat_name'],
-						'GrpId' => $result['GrpId'],
-					);
-				}
-			}
-
-			unset($data['last_modified']);
-			$data['last_modified'] = $last_modified;
 		}
 		// historic profiles: athlete not in ranking and last modification more then 1 year ago
 		$data['expires'] = !$data['rankings'][0]['rank'] && time()-$data['last_modified'] > 365*86400 ?
@@ -1963,6 +1969,11 @@ class ranking_export extends ranking_result_bo
 		$data['etag'] = md5(serialize($data));
 
 		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+		// if cached without category, also cache with default category
+		if (substr($location, -1) == ':' && $cat)
+		{
+			egw_cache::setInstance('ranking', $location.$cat['GrpId'], $data, $data['expires']);
+		}
 
 		//_debug_array($data); exit;
 		return $data;

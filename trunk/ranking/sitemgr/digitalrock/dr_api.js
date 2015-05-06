@@ -1788,8 +1788,22 @@ var Profile = (function() {
 	{
 		// replace non-result data
 		var pattern = /\$\$([^$]+)\$\$/g;
+		var that = this;
 		var html = this.template.replace(pattern, function(match, placeholder)
 		{
+			switch(placeholder)
+			{
+				case 'categoryChooser':
+					window.chooseCategory = jQuery.proxy(that.chooseCategory, that);
+					var select = '<select onchange="javascript:chooseCategory(this.value);">\n';
+					for(var i=0; i < _data.categorys.length; ++i)
+					{
+						var cat = _data.categorys[i];
+						select += '<option value="'+cat.GrpId+'"'+(cat.GrpId==_data.GrpId?' selected':'')+'>'+cat.name+'</option>\n';
+					}
+					select += '</select>\n';
+					return select;
+			}
 			var parts = placeholder.split('/');
 			var data = _data;
 			for(var i=0; i < parts.length; ++i)
@@ -1897,6 +1911,26 @@ var Profile = (function() {
 		hidden_rows.css('display', display == 'none' ? 'table-row' : 'none');
 	};
 	/**
+	 * choose a given category for rankings
+	 *
+	 * @param {string} GrpId
+	 */
+	Profile.prototype.chooseCategory = function(GrpId)
+	{
+		var cat_regexp = /([#&])cat=([^&]+)/;
+		function replace_cat(str, GrpId)
+		{
+			if (str.match(cat_regexp))
+			{
+				return str.replace(cat_regexp, '$1cat='+GrpId);
+			}
+			return str+'&cat='+GrpId;
+		}
+		location.hash = replace_cat(location.hash, GrpId);
+		this.json_url = replace_cat(this.json_url, GrpId);
+		this.update();
+	};
+	/**
 	 * Default template for Profile widget
 	 */
 	Profile.prototype.template =
@@ -1957,6 +1991,9 @@ var Profile = (function() {
 		'		<td colspan="6" class="profileFreetext profileHideRowIfEmpty">$$freetext$$</td>\n'+
 		'	</tr>\n'+
 		'	<tr class="profileMarginTop">\n'+
+		'		<td colspan="6">Category: $$categoryChooser$$</td>\n'+
+		'	</tr>\n'+
+		'	<tr>\n'+
 		'		<td colspan="2" class="profileRanglist"><a href="$$rankings/0/url$$">$$rankings/0/name$$</a>:</td>\n'+
 		'		<td class="profileRank">$$rankings/0/rank$$</td>\n'+
 		'		<td colspan="2" class="profileRanglist"><a href="$$rankings/1/url$$">$$rankings/1/name$$</a>:</td>\n'+
