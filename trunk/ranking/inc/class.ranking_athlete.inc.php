@@ -579,26 +579,28 @@ class ranking_athlete extends so_sql
 	/**
 	 * get the path of the picture
 	 *
-	 * @param string $rkey=null rkey of the athlete or null to use this->data[rkey]
+	 * @param string $rkey =null rkey of the athlete or null to use this->data[rkey]
+	 * @param int $num =null 2 for action picture
 	 * @return string/boolean the path or false if the rkey is empty (NOT if the picture does NOT exist!)
 	 */
-	function picture_path($rkey=null)
+	function picture_path($rkey=null, $num=null)
 	{
 		if (is_null($rkey)) $rkey = $this->data['rkey'];
 
-		return $rkey ? $this->picture_path.'/'.$rkey.'.jpg' : false;
+		return $rkey ? $this->picture_path.'/'.$rkey.($num ? '-'.(int)$num : '').'.jpg' : false;
 	}
 
 	/**
 	 * attach a picture to the athlete
 	 *
 	 * @param string $fname filename of the picture to attach
-	 * @param string $rkey=null rkey of the athlete or null to use this->data[rkey]
+	 * @param string $rkey =null rkey of the athlete or null to use this->data[rkey]
+	 * @param int $num =null 2 for action picture
 	 * @return boolean true on success, flase otherwise
 	 */
-	function attach_picture($fname,$rkey=null)
+	function attach_picture($fname,$rkey=null, $num=null)
 	{
-		$path = $this->picture_path($rkey);
+		$path = $this->picture_path($rkey, $num);
 
 		if (!$path || !file_exists($fname) || !is_readable($fname) || !is_writeable($this->picture_path)) return false;
 
@@ -610,15 +612,16 @@ class ranking_athlete extends so_sql
 	/**
 	 * get the url of the picture
 	 *
-	 * @param string $rkey=null rkey of the athlete or null to use this->data[rkey]
+	 * @param string $rkey =null rkey of the athlete or null to use this->data[rkey]
+	 * @param int $num =null 2 for action picture
 	 * @return string/boolean the url or false if picture does not exist
 	 */
-	function picture_url($rkey = null)
+	function picture_url($rkey=null, $num=null)
 	{
 		if (is_null($rkey)) $rkey = $this->data['rkey'];
 
-		$url = $this->picture_url.'/'.$this->data['rkey'].'.jpg';
-		$path = $this->picture_path($rkey);
+		$url = $this->picture_url.'/'.$this->data['rkey'].($num ? '-'.(int)$num : '').'.jpg';
+		$path = $this->picture_path($rkey, $num);
 
 		return file_exists($path) && is_readable($path) ? $url.'?'.filemtime($path) : false;
 	}
@@ -626,11 +629,12 @@ class ranking_athlete extends so_sql
 	/**
 	 * delete the picture
 	 *
+	 * @param int $num =null 2 for action picture
 	 * @return boolean true on success, false otherwise
 	 */
-	function delete_picture()
+	function delete_picture($num=null)
 	{
-		return @delete($this->picture_path());
+		return @delete($this->picture_path(null, $num));
 	}
 
 	/**

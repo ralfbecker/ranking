@@ -1872,13 +1872,18 @@ class ranking_export extends ranking_result_bo
 		}
 		else
 		{
-			$data['photo'] = $this->athlete->picture_url();
-			if ($data['photo'][0] == '/' || parse_url($data['photo'], PHP_URL_HOST) == $_SERVER['HTTP_HOST'])
+			foreach(array(
+				'photo' => null,
+				'photo2' => 2,
+			) as $pic => $postfix)
 			{
-				$data['photo'] = self::base_url(true).($data['photo'][0] == '/' ? $data['photo'] :
-					preg_replace('|^https?://[^/]+|', '', $data['photo']));
+				$data[$pic] = $this->athlete->picture_url(null, $postfix);
+				if ($data[$pic][0] == '/' || parse_url($data[$pic], PHP_URL_HOST) == $_SERVER['HTTP_HOST'])
+				{
+					$data[$pic] = self::base_url(true).($data[$pic][0] == '/' ? $data[$pic] :
+						preg_replace('|^https?://[^/]+|', '', $data[$pic]));
+				}
 			}
-
 			$last_modified = egw_time::to($athlete['modified'], 'ts');
 			// fetch results and calculate their weight, to allow clients to easyly show N best competitions
 			if (($results = $this->result->read(array(

@@ -308,6 +308,7 @@ Data includes usual athlete data:
 - other_sports: other sports practiced
 - professional: professional climber or if not profession
 - city, postcode, street: address data, usually only city is available
+- photo, photo2: URL to portrait and action picture
 - URLs: homepage, facebook, twitter, instagram, youtube, video_iframe
 - last_comp: date in YYYY-mm-dd format of last competition
 If category given:
