@@ -240,32 +240,37 @@ class ranking_athlete_ui extends ranking_bo
 						{
 							$msg .= "\n".lang('License should be removed when federation was changed!');
 						}
-
-						if (is_array($content['foto']) && $content['foto']['tmp_name'] && $content['foto']['name'] && is_uploaded_file($content['foto']['tmp_name']))
+						foreach(array(
+							'foto' => null,
+							'foto2' => 2,
+						) as $pic => $postfix)
 						{
-							//_debug_array($content['foto']);
-							list($width,$height,$type) = getimagesize($content['foto']['tmp_name']);
-							if ($type != 2)
+							if (is_array($content[$pic]) && $content[$pic]['tmp_name'] && $content[$pic]['name'] && is_uploaded_file($content[$pic]['tmp_name']))
 							{
-								$msg .= ($msg ? ', ' : '') . lang('Uploaded picture is no JPEG !!!');
-							}
-							else
-							{
-								if ($height > 250 && ($src = @imagecreatefromjpeg($content['foto']['tmp_name'])))	// we need to scale the picture down
+								//_debug_array($content[$pic]);
+								list($width,$height,$type) = getimagesize($content[$pic]['tmp_name']);
+								if ($type != 2)
 								{
-									$dst_w = (int) round(250.0 * $width / $height);
-									//echo "<p>{$content['foto']['name']}: $width x $height ==> $dst_w x 250</p>\n";
-									$dst = imagecreatetruecolor($dst_w,250);
-									if (imagecopyresampled($dst,$src,0,0,0,0,$dst_w,250,$width,$height))
-									{
-										imagejpeg($dst,$content['foto']['tmp_name']);
-										$msg .= ($msg ? ', ' : '') . lang('Picture resized to %1 pixel',$dst_w.' x 250');
-									}
-									imagedestroy($src);
-									imagedestroy($dst);
+									$msg .= ($msg ? ', ' : '') . lang('Uploaded picture is no JPEG !!!');
 								}
-								$msg .= ($msg ? ', ' : '') . ($this->athlete->attach_picture($content['foto']['tmp_name']) ?
-									lang('Picture attached') : lang('Error attaching the picture'));
+								else
+								{
+									if ($height > 250 && ($src = @imagecreatefromjpeg($content[$pic]['tmp_name'])))	// we need to scale the picture down
+									{
+										$dst_w = (int) round(250.0 * $width / $height);
+										//echo "<p>{$content[$pic]['name']}: $width x $height ==> $dst_w x 250</p>\n";
+										$dst = imagecreatetruecolor($dst_w,250);
+										if (imagecopyresampled($dst,$src,0,0,0,0,$dst_w,250,$width,$height))
+										{
+											imagejpeg($dst,$content[$pic]['tmp_name']);
+											$msg .= ($msg ? ', ' : '') . lang('Picture resized to %1 pixel',$dst_w.' x 250');
+										}
+										imagedestroy($src);
+										imagedestroy($dst);
+									}
+									$msg .= ($msg ? ', ' : '') . ($this->athlete->attach_picture($content[$pic]['tmp_name'], null, $postfix) ?
+										lang('Picture attached') : lang('Error attaching the picture'));
+								}
 							}
 						}
 						if ($content['apply_license'])
@@ -419,6 +424,7 @@ class ranking_athlete_ui extends ranking_bo
 			'is_admin' => $this->is_admin,
 			'tabs' => $content['tabs'],
 			'foto' => $this->athlete->picture_url().'?'.time(),
+			'foto2' => $this->athlete->picture_url(null, 2).'?'.time(),
 			'license_year' => $content['license_year'],
 			'license_nation' => $content['license_nation'],
 			'license_cat' => $content['license_cat'],
@@ -500,7 +506,8 @@ Continuer';
 			{
 				$readonlys[$name] = true;
 			}
-			$readonlys['acl_fed_id[fed_id]'] = $readonlys['foto'] = $readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
+			$readonlys['acl_fed_id[fed_id]'] = $readonlys['foto'] = $readonlys['foto2'] =
+				$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
 		}
 		else
 		{

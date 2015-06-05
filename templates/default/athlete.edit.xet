@@ -51,27 +51,27 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description for="gewicht" value="Weight (kg)"/>
+					<description value="Weight (kg)" for="gewicht"/>
 					<textbox type="integer" statustext="weight in kilogram" id="gewicht"/>
 				</row>
 				<row class="row">
-					<description for="groesse" value="Size (cm)"/>
+					<description value="Size (cm)" for="groesse"/>
 					<textbox type="integer" statustext="body height in centimeter" id="groesse"/>
 				</row>
 				<row class="row">
-					<description for="practice" value="climbing since (years)"/>
+					<description value="climbing since (years)" for="practice"/>
 					<textbox type="integer" statustext="since how many years is the athlete climbing (not only competing)" id="practice" min="1" max="99"/>
 				</row>
 				<row class="row">
-					<description for="profi" value="Professional"/>
+					<description value="Professional" for="profi"/>
 					<textbox statustext="use &quot;yes&quot; or &quot;no, prefession&quot;" id="profi" maxlength="40" span="all"/>
 				</row>
 				<row class="row">
-					<description for="sport" value="other sports"/>
+					<description value="other sports" for="sport"/>
 					<textbox statustext="other sports practiced" id="sport" size="60" maxlength="60" span="all"/>
 				</row>
 				<row class="row">
-					<description for="hobby" value="Hobbies"/>
+					<description value="Hobbies" for="hobby"/>
 					<textbox id="hobby" size="60" maxlength="60" span="all"/>
 				</row>
 			</rows>
@@ -112,7 +112,7 @@
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.9.001">
-		<htmlarea expand_toolbar="true" height="120px" statustext="This text will be shown in the profil on the website." mode="extended" id="freetext" width="100%"/>
+		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="120px" width="100%" expand_toolbar="true"/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -125,25 +125,25 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description for="acl" value="deny public access to"/>
+					<description value="deny public access to" for="acl"/>
 					<listbox statustext="deny public display of the checked information" id="acl" no_lang="1" rows="7" span="all"/>
 				</row>
 				<row class="row" disabled="!@is_admin">
-					<description for="rkey" value="Key"/>
+					<description value="Key" for="rkey"/>
 					<textbox statustext="internal key, leave it empty to have it automaticaly generated" id="rkey" size="8" maxlength="8"/>
 					<textbox statustext="not used at the moment" label="License number" id="lizenz" size="6" maxlength="6"/>
 					<passwd label="Password" id="password"/>
 					<passwd id="password2"/>
 				</row>
 				<row class="row">
-					<description for="kader" value="Squad"/>
+					<description value="Squad" for="kader"/>
 					<textbox statustext="not used at the moment" id="kader" size="5" maxlength="5" span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.athlete.edit.pictures" template="" lang="" group="0" version="1.0.0.001">
-		<grid width="100%" height="210">
+	<template id="ranking.athlete.edit.pictures" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%" height="210" overflow="auto">
 			<columns>
 				<column width="100"/>
 				<column width="100"/>
@@ -151,9 +151,14 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description value="Picture"/>
+					<description value="Portrait"/>
 					<image src="foto"/>
 					<file statustext="Upload a portrait picture for the profile" id="foto"/>
+				</row>
+				<row valign="top">
+					<description value="Action picture"/>
+					<image src="foto2"/>
+					<file statustext="Upload a portrait picture for the profile" id="foto2"/>
 				</row>
 			</rows>
 		</grid>
