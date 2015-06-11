@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.headerNULL" template="" lang="" group="0" version="1.7.001">
+	<template id="ranking.result.headerNULL" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
 				<column disabled="!@comp_logo"/>
@@ -11,17 +10,48 @@
 			</columns>
 			<rows>
 				<row>
-					<description id="comp_name" no_lang="1"/>
-				</row>
-				<row>
-					<image src="comp_logo" class="fed_logo"/>
+					<image src="comp_logo"/>
 					<vbox>
-						<description id="route_name" no_lang="1"/>
+						<description id="comp_name" no_lang="1"/>
 						<description id="comp_date" no_lang="1"/>
+						<description id="route_name" no_lang="1"/>
 					</vbox>
-					<image align="right" class="fed_logo" src="ifsc.gif"/>
+					<image align="right" src="ifsc" class="fed_logo"/>
 				</row>
 			</rows>
 		</grid>
+		<styles>
+			@media print
+{
+#divAppboxHeader {
+ display:none;
+}
+
+#divAppbox {
+ margin-top: 0px;
+}
+}
+
+#comp_name,#route_name,#comp_date {
+ font-size: 120%;
+ font-weight: bold;
+}
+
+#comp_date {
+ font-weight: normal;
+}
+
+.fed_logo img {
+ 
+}
+
+#comp_logo {
+ margin-right: 10px;
+}
+
+#sponsor_logos {
+
+}
+		</styles>
 	</template>
 </overlay>
