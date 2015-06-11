@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -38,6 +38,12 @@ class ranking_athlete_ui extends ranking_bo
 	 * @var int
 	 */
 	const MINIMUM_AGE = 3;
+
+	/**
+	 * Maximum height to resize portrait or action picture to
+	 */
+	const MAX_PORTRAIT_HEIGHT = 250;
+	const MAX_ACTION_HEIGHT = 417;
 
 	function __construct()
 	{
@@ -149,6 +155,7 @@ class ranking_athlete_ui extends ranking_bo
 			{
 				$view = true;
 			}
+			$matches = null;
 			$content['referer'] = preg_match('/menuaction=([^&]+)/',$_SERVER['HTTP_REFERER'],$matches) ?
 				$matches[1] : 'ranking.ranking_athlete_ui.index';
 
@@ -206,6 +213,7 @@ class ranking_athlete_ui extends ranking_bo
 					{
 						$this->athlete->data['password'] = $content['athlete_data']['password'];
 					}
+					$fed_changed = null;
 					if ($this->is_admin && $content['password'] && $content['password'] != $content['password2'])
 					{
 						$msg .= lang('Both password do NOT match!');
@@ -245,6 +253,7 @@ class ranking_athlete_ui extends ranking_bo
 							'foto2' => 2,
 						) as $pic => $postfix)
 						{
+							$max_height = $pic == 'foto' ? self::MAX_PORTRAIT_HEIGHT : self::MAX_ACTION_HEIGHT;
 							if (is_array($content[$pic]) && $content[$pic]['tmp_name'] && $content[$pic]['name'] && is_uploaded_file($content[$pic]['tmp_name']))
 							{
 								//_debug_array($content[$pic]);
@@ -255,15 +264,15 @@ class ranking_athlete_ui extends ranking_bo
 								}
 								else
 								{
-									if ($height > 250 && ($src = @imagecreatefromjpeg($content[$pic]['tmp_name'])))	// we need to scale the picture down
+									if ($height > $max_height && ($src = @imagecreatefromjpeg($content[$pic]['tmp_name'])))	// we need to scale the picture down
 									{
-										$dst_w = (int) round(250.0 * $width / $height);
-										//echo "<p>{$content[$pic]['name']}: $width x $height ==> $dst_w x 250</p>\n";
-										$dst = imagecreatetruecolor($dst_w,250);
-										if (imagecopyresampled($dst,$src,0,0,0,0,$dst_w,250,$width,$height))
+										$dst_w = (int) round((float)$max_height * $width / $height);
+										//echo "<p>{$content[$pic]['name']}: $width x $height ==> $dst_w x $max_height</p>\n";
+										$dst = imagecreatetruecolor($dst_w,$max_height);
+										if (imagecopyresampled($dst,$src,0,0,0,0,$dst_w,$max_height,$width,$height))
 										{
 											imagejpeg($dst,$content[$pic]['tmp_name']);
-											$msg .= ($msg ? ', ' : '') . lang('Picture resized to %1 pixel',$dst_w.' x 250');
+											$msg .= ($msg ? ', ' : '') . lang('Picture resized to %1 pixel',$dst_w.' x '.$max_height);
 										}
 										imagedestroy($src);
 										imagedestroy($dst);
@@ -419,7 +428,7 @@ class ranking_athlete_ui extends ranking_bo
 				}
 			}
 		}
-		$content = $this->athlete->data + array(
+		if (true) $content = $this->athlete->data + array(
 			'msg' => $msg,
 			'is_admin' => $this->is_admin,
 			'tabs' => $content['tabs'],
@@ -502,7 +511,7 @@ Continuer';
 		}
 		if ($view)
 		{
-			foreach($this->athlete->data as $name => $val)
+			foreach(array_keys($this->athlete->data) as $name)
 			{
 				$readonlys[$name] = true;
 			}
@@ -682,16 +691,16 @@ Continuer';
 	/**
 	 * List existing Athletes
 	 *
-	 * @param array $content
-	 * @param string $msg
+	 * @param array $_content =null
+	 * @param string $msg =''
 	 */
-	function index($content=null,$msg='')
+	function index($_content=null,$msg='')
 	{
-		if ($_GET['delete'] || is_array($content['nm']['rows']['delete']))
+		if ($_GET['delete'] || is_array($_content['nm']['rows']['delete']))
 		{
-			if (is_array($content['nm']['rows']['delete']))
+			if (is_array($_content['nm']['rows']['delete']))
 			{
-				list($id) = each($content['nm']['rows']['delete']);
+				list($id) = each($_content['nm']['rows']['delete']);
 			}
 			else
 			{
@@ -761,7 +770,7 @@ Continuer';
 		}
 		if (($readonlys['nm[rows][edit][0]'] = !count($this->athlete_rights)) && ($grants = $this->federation->get_user_grants()))
 		{
-			foreach($grants as $fed_id => $rights)
+			foreach($grants as $rights)
 			{
 				if ($rights & EGW_ACL_ATHLETE)
 				{
@@ -785,9 +794,9 @@ Continuer';
 	/**
 	 * Get the name of the license form, depending on nation and year
 	 *
-	 * @param string $nation=null
-	 * @param int $year=null defaults to $this->license_year
-	 * @param int $GrpId=null category to apply for
+	 * @param string $nation =null
+	 * @param int $year =null defaults to $this->license_year
+	 * @param int $GrpId =null category to apply for
 	 * @return string path on server
 	 */
 	function license_form_name($nation=null, $year=null, $GrpId=null)
@@ -806,9 +815,9 @@ Continuer';
 	/**
 	 * Download the personaliced application form
 	 *
-	 * @param string $nation=null
-	 * @param int $year=null defaults to $this->license_year
-	 * @param int $GrpId=null category to apply for
+	 * @param string $nation =null
+	 * @param int $year =null defaults to $this->license_year
+	 * @param int $GrpId =null category to apply for
 	 */
 	function licenseform($nation=null,$year=null,$GrpId=null)
 	{
