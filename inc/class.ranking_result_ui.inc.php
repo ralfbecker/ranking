@@ -1553,11 +1553,11 @@ class ranking_result_ui extends ranking_result_bo
 
 		// create a nice header
 		$content['nm']['route_name'] = $GLOBALS['egw_info']['flags']['app_header'] =
-			/*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') :
+			trim(/*lang('Ranking').' - '.*/(!$comp || !$cat ? lang('Resultservice') :
 			($content['nm']['show_result'] == '0' && $route['route_status'] == STATUS_UNPUBLISHED ||
 			 $content['nm']['show_result'] != '0' && $route['route_status'] != STATUS_RESULT_OFFICIAL ? lang('provisional').' ' : '').
 			(isset($sel_options['show_result'][(int)$content['nm']['show_result']]) ? $sel_options['show_result'][(int)$content['nm']['show_result']].' ' : '').
-			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : ''));
+			($cat ? (isset($sel_options['route'][$content['nm']['route']]) ? $sel_options['route'][$content['nm']['route']].' ' : '').$cat['name'] : '')));
 
 		// for speed with two qualification rename "Startorder" to "Lane A"
 		if (!$route['route_order'] && $content['nm']['discipline'] == 'speed' &&
