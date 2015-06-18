@@ -182,7 +182,8 @@ class ranking_export extends ranking_result_bo
 			$base = self::base_url();
 			if ($base == 'http://www.ifsc-climbing.org')
 			{
-				$base .= self::IFSC_BASE_PAGE.'#!person=';
+				//$base .= self::IFSC_BASE_PAGE.'#!person=';
+				$base .= '/index.php?option=com_ifsc&view=athlete&id=';
 			}
 			else
 			{

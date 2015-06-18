@@ -501,7 +501,7 @@ var DrTable = (function() {
 				var a = document.createElement('a');
 				a.href = url;
 				a.target = 'pstambl';
-				if (this.navigateTo) jQuery(a).click(this.navigateTo);
+				if (this.navigateTo && url.indexOf('#') != -1) jQuery(a).click(this.navigateTo);
 				jQuery(tag).append(a);
 				tag = a;
 			}
