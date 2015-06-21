@@ -227,7 +227,7 @@ class ranking_export extends ranking_result_bo
 	}
 
 	/**
-	 * Expires header time for proxys/cdn if there's not yet a startlist
+	 * Expires header time for proxys/cdn if there's not yet a startlist or general result
 	 *
 	 * We cant invalidate proxys
 	 *
@@ -358,6 +358,7 @@ class ranking_export extends ranking_result_bo
 						!$data['participants'])
 					{
 						$data = $instance->_export_route($comp, $cat, 0);
+						$no_general_result_yet = true;
 					}
 				}
 				catch(Exception $e) {
@@ -377,6 +378,14 @@ class ranking_export extends ranking_result_bo
 				(!isset($data['route_result']) ? self::EXPORT_ROUTE_RUNNING_EXPIRES :
 				(time()-$data['last_modified'] > self::EXPORT_ROUTE_RECENT_TIMEOUT ?
 					self::EXPORT_ROUTE_OFFICAL_EXPIRES : self::EXPORT_ROUTE_RECENT_OFFICAL_EXPIRES));
+
+			// if general result was requested, but we have only a single quali currently
+			// we need to limit expires to EXPORT_ROUTE_NO_STARTLIST=300, to get next startlist
+			// even if current quali is official!
+			if ($no_general_result_yet && $data['expires'] > self::EXPORT_ROUTE_NO_STARTLIST)
+			{
+				$data['expires'] = self::EXPORT_ROUTE_NO_STARTLIST;
+			}
 
 			egw_cache::setInstance('ranking', $location, $data, self::EXPORT_ROUTE_TTL);
 
