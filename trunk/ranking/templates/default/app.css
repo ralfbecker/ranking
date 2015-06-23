@@ -211,6 +211,7 @@ input.nextButton {
 }
 #ranking-result-index {
 	position: relative;
+	overflow-y: auto;
 }
 
 @media only screen and (max-device-width : 1024px) {
@@ -230,5 +231,12 @@ input.nextButton {
 	}
 	#ranking-result-index form select {
 		font-size: 150%;
+	}
+}
+
+@media print {
+	#ranking-result-index {
+		overflow-y: visible;
+		height: auto !important;
 	}
 }
