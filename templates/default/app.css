@@ -206,7 +206,7 @@ body #egw_fw_main #egw_fw_tabs {
 input.nextButton {
 	float:right;
 }
-#ranking-result-index_nm\[PerId\]{
+#ranking-result-index_ranking-result-boulder_measurement #ranking-result-index_nm\[PerId\]{
 	width:85%;
 }
 #ranking-result-index {
@@ -239,4 +239,55 @@ input.nextButton {
 		overflow-y: visible;
 		height: auto !important;
 	}
+}
+
+/**
+ * Lead measurement
+ */
+div.topoContainer {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 500px;
+}
+#ranking-result-index_topo {
+   width: 100%;
+   position: relative;
+}
+div.topoHandhold {
+   position: absolute;
+   cursor: pointer;
+}
+div.topoHandhold img {
+   position: relative;
+   top: -8px;
+   left: -8px;
+   z-index: 10;
+   width: 16px;
+}
+div.topoHandhold span {
+   position: relative;
+   top: -12px;
+   left: -5px;
+   z-index: 20;
+}
+
+div.action_popup {
+	position: fixed;
+	top: 300px;
+	left: 450px;
+	z-index: 20000;
+	display: none;
+	border: 2px ridge black;
+	border-radius: 10px;
+	box-shadow: 8px 8px 8px black;
+	padding: 5px;
+	background-color: white;
+}
+
+div.action_popup > div.et2_hbox {
+	padding-top: 8px;
+}
+#ranking-result-index_button\[renumber\] {
+	margin-top: -2px;
 }

@@ -9,20 +9,20 @@
 			</columns>
 			<rows>
 				<row class="noPrint">
-					<hbox options="0,0">
+					<hbox>
 						<menulist>
-							<menupopup id="nm[topo]" onchange="load_topo(this.value);"/>
+							<menupopup id="nm[topo]" onchange="app.ranking.load_topo"/>
 						</menulist>
 						<menulist>
-							<menupopup id="nm[PerId]" onchange="change_athlete(this);" options="Edit topo" class="leftPad5"/>
+							<menupopup id="nm[PerId]" onchange="app.ranking.change_athlete" options="Edit topo" class="leftPad5"/>
 						</menulist>
-						<textbox type="float" blur="height" id="result_height" onchange="handle_plus(this,form::name('result_plus'));" size="5" precision="%4.2lf" class="leftPad5"/>
+						<textbox type="float" blur="height" id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1" class="leftPad5"/>
 						<menulist>
 							<menupopup id="result_plus" class="leftPad5"/>
 						</menulist>
 						<textbox type="float" id="result_time" class="leftPad5"/>
-						<buttononly label="Update" id="button[update]" onclick="update_athlete();" class="leftPad5"/>
-						<buttononly label="Print" onclick="print_topo(); return false;" options="print" class="leftPad5"/>
+						<buttononly label="Update" id="button[update]" onclick="app.ranking.update_athlete" class="leftPad5"/>
+						<buttononly label="Print" onclick="app.ranking.print_topo" options="print" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row>
@@ -34,59 +34,17 @@
 					<box id="hold_popup" class="action_popup">
 						<hbox>
 							<textbox type="float" label="Height" id="hold_height"/>
-							<checkbox label="Top" id="hold_top" onchange="var height=document.getElementById(form::name('hold_height')); if (this.checked) height.value=''; height.disabled = this.checked;  if (!this.checked) height.focus();"/>
-							<buttononly align="right" label="Renumber" id="button[renumber]" onclick="hold_popup_submit(this);"/>
+							<checkbox label="Top" id="hold_top" onchange="app.ranking.hold_top_changed"/>
+							<buttononly align="right" label="Renumber" id="button[renumber]" onclick="app.ranking.hold_popup_submit"/>
 						</hbox>
 						<hbox>
-							<buttononly label="Save" id="button[save]" onclick="hold_popup_submit(this);"/>
-							<buttononly label="Cancel" id="button[cancel]" onclick="hold_popup_close();"/>
-							<buttononly label="Delete" id="button[delete]" onclick="hold_popup_submit(this);"/>
+							<buttononly label="Save" id="button[save]" onclick="app.ranking.hold_popup_submit"/>
+							<buttononly label="Cancel" id="button[cancel]" onclick="app.ranking.hold_popup_close"/>
+							<buttononly label="Delete" id="button[delete]" onclick="app.ranking.hold_popup_submit"/>
 						</hbox>
 					</box>
 				</row>
 			</rows>
 		</grid>
-		<styles>
-			div.topoContainer {
-  position: relative;
-  overflow: auto;
-  height: 500px;
-}
-#topo {
-   width: 100%;
-   position: relative;
-}
-div.topoHandhold {
-   position: absolute;
-   cursor: pointer;
-}
-div.topoHandhold img {
-   position: relative;
-   top: -8px;
-   left: -8px;
-   z-index: 10;
-   width: 16px;
-}
-div.topoHandhold span {
-   position: relative;
-   top: -12px;
-   left: -5px;
-   z-index: 20;
-}
-
-.action_popup {
-	position: fixed;
-	top: 300px;
-	left: 450px;
-	z-index: 20000;
-	display: none;
-	border: 2px ridge black;
-	border-radius: 10px;
-	box-shadow: 8px 8px 8px black;
-	padding: 5px;
-	background-color: white;
-}
-
-		</styles>
 	</template>
 </overlay>
