@@ -25,8 +25,16 @@ class ranking_measurement extends ranking_boulder_measurement
 	 */
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
 	{
-		egw_framework::validate_file('/ranking/js/jquery.scrollIntoView.min.js');
-
+		// egw_framework::validate_file|includeCSS does not work if template was submitted
+		if (egw_json_response::isJSONResponse())
+		{
+			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].
+				'/ranking/js/jquery.scrollIntoView.min.js');
+		}
+		else
+		{
+			egw_framework::validate_file('/ranking/js/jquery.scrollIntoView.min.js');
+		}
 		//echo "<p>nm[topo]=".array2string($content['nm']['topo'])."</p>\n";
 		foreach(self::get_topos($content) as $n => $path)
 		{
