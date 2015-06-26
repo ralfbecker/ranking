@@ -1435,6 +1435,7 @@ class ranking_result_ui extends ranking_result_bo
 		$readonlys['button[download]'] = !($this->has_startlist($keys) || $keys['route_order'] == -1 && $this->has_startlist(array('route_order'=>0)+$keys));
 		$content['no_route_selection'] = !$cat; 	// no cat selected
 		$content['no_compsel'] = $cat && $content['nm']['show_result'] == 4;	// no competition selection in measurement, if a cat is selected
+		$onclick = "egw.open_link('ranking.ranking_result_ui.route&comp={$content['nm']['comp']}&cat={$content['nm']['cat']}','result_route','700x500','ranking')";
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
 		{
 			$readonlys['button[new]'] = true;
@@ -1453,12 +1454,12 @@ class ranking_result_ui extends ranking_result_bo
 			if (!$this->is_admin && !$this->has_results($last_heat) && ($last_heat['route_order'] >= 3 || !in_array($route['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI))))
 			{
 				$last_heat = $this->route->read($last_heat);
-				$tmpl->set_cell_attribute('button[new]','onclick',"alert('".
+				$onclick = "alert('".
 					addslashes(lang("You can only create a new heat, if the previous one '%1' has a result!",$last_heat['route_name'])).
-					"'); return false;");
+					"'); return false;";
 			}
-			$GLOBALS['egw_info']['flags']['include_xajax'] = true;
 		}
+		$tmpl->setElementAttribute('button[new]', 'onclick', $onclick);
 		$tmpl->setElementAttribute('button[apply]', 'class', '');
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
