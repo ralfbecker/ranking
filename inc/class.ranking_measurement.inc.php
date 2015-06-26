@@ -171,7 +171,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		$query['topo'] = $path;
 
 		$holds = self::get_holds(self::query2keys($query));
-		$response->script('show_handholds('.json_encode($holds).')');
+		$response->call('app.ranking.show_handholds', $holds);
 	}
 
 	/**

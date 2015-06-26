@@ -810,17 +810,19 @@ app.classes.ranking = AppJS.extend(
 	/**
 	 * Load topo
 	 *
-	 * @param {string} path
+	 * @param {DOMNode} _node
+	 * @param {et2_selct} _widget
 	 */
-	load_topo: function(path)
+	load_topo: function(_node, _widget)
 	{
-		var topo = document.getElementById('topo');
+		var topo = document.getElementById('ranking-result-index_topo');
+		var path = _widget.get_value();
 
-		remove_handholds();
+		this.remove_handholds();
 
 		topo.src = window.egw_webserverUrl+(path ? '/webdav.php'+path : '/phpgwapi/templates/default/images/transparent.png');
 
-		if (path) xajax_doXMLHTTP('ranking_measurement::ajax_load_topo',path);
+		if (path) this.egw.json('ranking_measurement::ajax_load_topo', [path]).sendRequest();
 	},
 
 	/**
