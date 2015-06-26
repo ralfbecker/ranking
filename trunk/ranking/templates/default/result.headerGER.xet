@@ -5,13 +5,13 @@
 	<template id="ranking.result.headerGER" template="" lang="" group="0" version="1.7.001">
 		<grid width="100%">
 			<columns>
-				<column disabled="!@comp_logo"/>
+				<column/>
 				<column/>
 				<column/>
 			</columns>
 			<rows>
 				<row>
-					<description id="comp_name" no_lang="1"/>
+					<description id="comp_name" no_lang="1" span="all"/>
 				</row>
 				<row>
 					<image src="comp_logo" class="fed_logo"/>
