@@ -80,6 +80,12 @@ class ranking_hooks
 					'menuaction' => 'ranking.ranking_display_ui.display',
 				),false)."','display$dsp_id',640,480,'yes')";
 			}
+			// show SVN changelog under display
+			$file[] = array(
+				'text'   => 'Changelog',
+				'link'   => 'https://svn.stylite.de/.svnlog/ranking.html',
+				'target' => 'changelog',
+			);
 			display_sidebox($appname,lang('Displays'),$file);
 		}
 
