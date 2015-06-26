@@ -8,7 +8,7 @@
 				<column/>
 			</columns>
 			<rows>
-				<row class="noPrint">
+				<row class="noPrint resultHeader">
 					<hbox>
 						<menulist>
 							<menupopup id="nm[topo]" onchange="app.ranking.load_topo"/>
@@ -16,11 +16,11 @@
 						<menulist>
 							<menupopup id="nm[PerId]" onchange="app.ranking.change_athlete" options="Edit topo" class="leftPad5"/>
 						</menulist>
-						<textbox type="float" blur="height" id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1" class="leftPad5"/>
+						<textbox type="float" blur="height" id="result_height" onkeypress="app.ranking.height_keypress" size="3" min="1" class="leftPad5"/>
 						<menulist>
 							<menupopup id="result_plus" class="leftPad5"/>
 						</menulist>
-						<textbox type="float" id="result_time" class="leftPad5"/>
+						<textbox type="float" id="result_time" class="leftPad5" size="3"/>
 						<buttononly label="Update" id="button[update]" onclick="app.ranking.update_athlete" class="leftPad5"/>
 						<buttononly label="Print" onclick="app.ranking.print_topo" options="print" class="leftPad5"/>
 					</hbox>
