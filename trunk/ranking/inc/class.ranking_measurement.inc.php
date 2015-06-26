@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -77,36 +77,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		if ($content['nm']['topo'])
 		{
 			$content['transparent'] = egw::link(egw_vfs::download_url($content['nm']['topo']));
-			$holds = self::get_holds(self::query2keys($content['nm']));
-			$GLOBALS['egw_info']['flags']['java_script'] .= "<script type=\"text/javascript\">
-\$j(document).ready(function(){
-	init_topo(".json_encode($holds).");
-});
-</script>\n";
-		}
-	}
-
-	/**
-	 * Load data of a given athlete
-	 *
-	 * Extended to mark the hold
-	 *
-	 * @param int $PerId
-	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
-	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
-	 */
-	public static function ajax_load_athlete($PerId,array $update, array $state=null)
-	{
-		parent::ajax_load_athlete($PerId, $update, $state, $data);
-
-		if ($data)
-		{
-			$response = egw_json_response::get();
-
-			$response->script($s='var holds=getHoldsByHeight('.
-				($data['result_plus'] == TOP_PLUS ? 'TOP_HEIGHT' : ($data['result_height'] ? $data['result_height'] : 1))
-				.'); if (holds.length) { holds[0].scrollIntoView(false);'.
-				($data['result_height'] || $data['result_plus'] == TOP_PLUS ? 'mark_holds(holds);' : '').'}');
+			$content['holds'] = self::get_holds(self::query2keys($content['nm']));
 		}
 	}
 
@@ -128,7 +99,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		}
 		else
 		{
-			$response->call('add_handhold', $hold);
+			$response->call('app.ranking.add_handhold', $hold);
 		}
 	}
 
@@ -157,7 +128,7 @@ class ranking_measurement extends ranking_boulder_measurement
 					$response->alert(lang('Error storing handhold!'));
 					break;
 				}
-				$response->call('add_handhold', $h);
+				$response->call('app.ranking.add_handhold', $h);
 			}
 		}
 	}
@@ -214,19 +185,19 @@ class ranking_measurement extends ranking_boulder_measurement
 	/**
 	 * Store a hold in the DB
 	 *
-	 * @param array $hold values for keys WetId, GrpId, route_order, topo or hold_id, plus data xpercent, ypercent, hold_height
+	 * @param array $_hold values for keys WetId, GrpId, route_order, topo or hold_id, plus data xpercent, ypercent, hold_height
 	 * @return array|boolean
 	 */
-	public static function save_hold($hold)
+	public static function save_hold($_hold)
 	{
-		$log = __METHOD__.'('.array2string($hold).')';
+		$log = __METHOD__.'('.array2string($_hold).')';
 
 		foreach(array('xpercent','ypercent','height') as $name)
 		{
-			if (isset($hold[$name])) $hold['hold_'.$name] = round(100.0*$hold[$name]);	// we store 100th % or cm
+			if (isset($_hold[$name])) $_hold['hold_'.$name] = round(100.0*$_hold[$name]);	// we store 100th % or cm
 		}
 		$table_def = ranking_result_bo::$instance->db->get_table_definitions('ranking',self::HOLDS_TABLE);
-		$hold = array_intersect_key($hold,$table_def['fd']);
+		$hold = array_intersect_key($_hold,$table_def['fd']);
 
 		if ($hold['hold_id'] > 0)
 		{
@@ -241,10 +212,10 @@ class ranking_measurement extends ranking_boulder_measurement
 			ranking_result_bo::$instance->db->insert(self::HOLDS_TABLE, $hold, false, __LINE__, __FILE__, 'ranking');
 			$hold['hold_id'] = ranking_result_bo::$instance->db->get_last_insert_id(self::HOLDS_TABLE, 'hold_id');
 		}
-		$hold = self::db2hold($hold);
+		$holdout = self::db2hold($hold);
 
-		error_log($log.' returning '.array2string($hold['hold_id'] ? $hold : false));
-		return $hold['hold_id'] ? $hold : false;
+		error_log($log.' returning '.array2string($holdout['hold_id'] ? $holdout : false));
+		return $holdout['hold_id'] ? $holdout : false;
 	}
 
 	/**
@@ -313,15 +284,15 @@ class ranking_measurement extends ranking_boulder_measurement
 		}
 		$file = $dir.'/'.(int)$route['route_order'].$num.'_'.$name;
 
-		return egw_vfs::copy_uploaded($topo, $file, null, true);
+		return egw_vfs::copy_uploaded($topo, $file, null, false);
 	}
 
 	/**
 	 * Get topo directory for a given route AND create it if it does not yet exist and $create==true
 	 *
 	 * @param array $route
-	 * @param boolean $create=true true create directory, if it does not exist
-	 * @param boolean $check_perms=true check if user has necessary permissions to upload/delete topo - is a judge or admin
+	 * @param boolean $create =true true create directory, if it does not exist
+	 * @param boolean $check_perms =true check if user has necessary permissions to upload/delete topo - is a judge or admin
 	 * @param array &$comp=null on return competition array
 	 * @param array &$cat=null on return category array
 	 * @throws egw_exception_wrong_userinput
@@ -364,7 +335,7 @@ class ranking_measurement extends ranking_boulder_measurement
 	 * Get all uploaded topos of a given route
 	 *
 	 * @param array $route values for keys 'WetId', 'GrpId', 'route_order'
-	 * @param boolean $check_perms=true check if user has necessary permissions to upload/delete topo - is a judge or admin
+	 * @param boolean $check_perms =true check if user has necessary permissions to upload/delete topo - is a judge or admin
 	 * @param array &$comp=null on return competition array
 	 * @param array &$cat=null on return category array
 	 * @return array of vfs pathes

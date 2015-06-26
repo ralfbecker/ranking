@@ -138,8 +138,8 @@ class ranking_boulder_measurement
 			$display->activate($frm_id,$id,$dsp_id,$keys['GrpId'],$keys['route_order']);
 		}
 		//$response->alert(__METHOD__."($PerId, $height, '$plus', $set_current) $msg");
-		$response->jquery('#msg', 'text', array($msg));
-		$response->script('if (typeof resultlist != "undefined") resultlist.update();');
+		$response->call('app.ranking.message', $msg);
+		//$response->script('if (typeof resultlist != "undefined") resultlist.update();');
 	}
 
 	/**
