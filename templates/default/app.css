@@ -222,8 +222,13 @@ input.nextButton {
 		background-image: url(../images/appbox-header-background.png);
 		background-repeat: repeat-x;
 	}
-	#ranking-result-index tr.resultHeader select {
+	#ranking-result-index tr.resultHeader select,
+	#ranking-result-index tr.resultHeader input,
+	#ranking-result-index tr.resultHeader button {
 		font-size:200%;
+	}
+	#ranking-result-index tr.resultHeader select#ranking-result-index_nm\[PerId\] {
+		max-width: 50%;
 	}
 	#ranking-result-index tr.resultHeader img.et2_button {
 		height:32px;
