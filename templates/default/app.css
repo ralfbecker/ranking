@@ -51,6 +51,7 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 		margin-top: 0px;
 	}
 	#ranking-result-index_comp_name {
+		padding: 5px 0 0 3px;
 		font-size: 135%;
 		font-weight: bold;
 	}
@@ -65,7 +66,7 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 
 	#ranking-result-index_comp_date {
 		font-weight: normal;
-		padding: 10px;
+		padding: 10px 0 10px 0;
 	}
 
 	#ranking-result-index_comp_logo {
