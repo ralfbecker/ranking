@@ -79,8 +79,9 @@
 				<column disabled="@no_ort"/>
 				<column/>
 				<column disabled="@no_ranking"/>
-				<column width="15%" disabled="@no_jury_result"/>
-				<column width="30%" disabled="@no_remark"/>
+				<column width="10%" disabled="@no_jury_result"/>
+				<column width="10%" disabled="@no_jury_time"/>
+				<column width="20%" disabled="@no_remark"/>
 				<column width="50" disabled="!@show_ability"/>
 				<column disabled="@readonly"/>
 			</columns>
@@ -103,6 +104,7 @@
 					<nextmatch-header align="center" label="License" id="PerId"/>
 					<description align="center" value="Ranking"/>
 					<nextmatch-header label="Result" id="jury_result"/>
+					<nextmatch-header label="Time" id="jury_time"/>
 					<nextmatch-header label="Remark" id="remark"/>
 					<nextmatch-header label="Ability" id="ability_percent" class="leftPad5"/>
 					<description align="center" value="Delete" class="noPrint"/>
@@ -127,6 +129,7 @@
 						<description id="${row}[ranking_place]" no_lang="1" class="place"/>
 						<description align="right" id="${row}[ranking_points]" no_lang="1"/>
 					</hbox>
+					<description/>
 					<description/>
 					<description/>
 					<textbox type="float" id="set[$row_cont[PerId]][ability_percent]"/>

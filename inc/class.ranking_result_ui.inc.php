@@ -1000,7 +1000,7 @@ class ranking_result_ui extends ranking_result_bo
 				break;
 		}
 		// jury list --> switch extra columns on and all federation columns off
-		$rows['no_jury_result'] = $rows['no_remark'] = $query['ranking'] != 4;
+		$rows['no_jury_result'] = $rows['no_jury_time'] = $rows['no_remark'] = $query['ranking'] != 4;
 		if ($query['ranking'] == 4)
 		{
 			$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
