@@ -83,7 +83,7 @@ class ranking_hooks
 			// show SVN changelog under display
 			$file[] = array(
 				'text'   => 'Changelog',
-				'link'   => 'https://svn.stylite.de/.svnlog/ranking.html',
+				'link'   => 'https://github.com/ralfbecker/ranking/commits/master',
 				'target' => 'changelog',
 			);
 			display_sidebox($appname,lang('Displays'),$file);
