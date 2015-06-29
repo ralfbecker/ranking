@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -33,10 +33,10 @@ class ranking_cup_ui extends ranking_bo
 	/**
 	 * Edit a cup
 	 *
-	 * @param array $content
+	 * @param array $_content
 	 * @param string $msg
 	 */
-	function edit($content=null,$msg='',$view=false)
+	function edit($_content=null,$msg='',$view=false)
 	{
 		$tmpl = new etemplate('ranking.cup.edit');
 
@@ -45,7 +45,7 @@ class ranking_cup_ui extends ranking_bo
 			$msg .= lang('Entry not found !!!');
 		}
 		// set and enforce nation ACL
-		if (!is_array($content))	// new call
+		if (!is_array($_content))	// new call
 		{
 			if (!$_GET['SerId'] && !$_GET['rkey'])
 			{
@@ -59,32 +59,32 @@ class ranking_cup_ui extends ranking_bo
 		}
 		else
 		{
-			$view = $content['view'] && !($content['edit'] && $this->acl_check_comp($this->cup->data));
+			$view = $_content['view'] && !($_content['edit'] && $this->acl_check_comp($this->cup->data));
 
 			if (!$view && $this->only_nation_edit)
 			{
 				$this->check_set_nation_fed_id($this->cup->data);
 			}
 
-			if (!$view && is_array($content['max_per']))
+			if (!$view && is_array($_content['max_per']))
 			{
-				$content['max_per_cat'] = array();
-				foreach($content['max_per'] as $row => $max)
+				$_content['max_per_cat'] = array();
+				foreach($_content['max_per'] as $row => $max)
 				{
-					if ((int)$max > 0 && !empty($content['per_cat'][$row]))
+					if ((int)$max >= -1 && !empty($_content['per_cat'][$row]))
 					{
-						$content['max_per_cat'][$content['per_cat'][$row]] = (int)$max;
+						$_content['max_per_cat'][$_content['per_cat'][$row]] = (int)$max;
 					}
 				}
 			}
-			//echo "<br>ranking_cup_ui::edit: content ="; _debug_array($content);
-			$this->cup->data = $content['cup_data'];
-			unset($content['cup_data']);
-			$this->cup->data_merge($content);
+			//echo "<br>ranking_cup_ui::edit: content ="; _debug_array($_content);
+			$this->cup->data = $_content['cup_data'];
+			unset($_content['cup_data']);
+			$this->cup->data_merge($_content);
 
 			//echo "<br>ranking_cup_ui::edit: cup->data ="; _debug_array($this->cup->data);
 
-			if (!$view && ($content['save'] || $content['apply']) && $this->acl_check_comp($this->cup->data))
+			if (!$view && ($_content['save'] || $_content['apply']) && $this->acl_check_comp($this->cup->data))
 			{
 				if (!$this->cup->data['rkey'])
 				{
@@ -102,7 +102,7 @@ class ranking_cup_ui extends ranking_bo
 				{
 					$msg .= lang('%1 saved',lang('Cup'));
 
-					if ($content['save']) $content['cancel'] = true;	// leave dialog now
+					if ($_content['save']) $_content['cancel'] = true;	// leave dialog now
 				}
 				$link = egw::link('/index.php',array(
 					'menuaction' => 'ranking.ranking_cup_ui.index',
@@ -110,7 +110,7 @@ class ranking_cup_ui extends ranking_bo
 				));
 				$js = "window.opener.location='$link';";
 			}
-			if ($content['delete'] && $this->acl_check_comp($this->cup->data))
+			if ($_content['delete'] && $this->acl_check_comp($this->cup->data))
 			{
 				$link = egw::link('/index.php',array(
 					'menuaction' => 'ranking.ranking_cup_ui.index',
@@ -118,13 +118,13 @@ class ranking_cup_ui extends ranking_bo
 				));
 				$js = "window.opener.location='$link';";
 			}
-			if ($content['copy'])
+			if ($_content['copy'])
 			{
 				unset($this->cup->data['SerId']);
 				unset($this->cup->data['rkey']);
 				$msg .= lang('Entry copied - edit and save the copy now.');
 			}
-			if ($content['save'] || $content['delete'])
+			if ($_content['save'] || $_content['delete'])
 			{
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
 				common::egw_exit();
@@ -133,7 +133,7 @@ class ranking_cup_ui extends ranking_bo
 		}
 		$content = $this->cup->data + array(
 			'msg' => $msg,
-			'tabs' => $content['tabs'],
+			'tabs' => $_content['tabs'],
 		);
 		$sel_options = array(
 			'pkte'      => $this->pkt_names,
@@ -236,22 +236,22 @@ class ranking_cup_ui extends ranking_bo
 	/**
 	 * List existing cups
 	 *
-	 * @param array $content
+	 * @param array $_content
 	 * @param string $msg
 	 */
-	function index($content=null,$msg='')
+	function index($_content=null,$msg='')
 	{
 		$tmpl = new etemplate('ranking.cup.list');
 
-		$content = $content['nm']['rows'];
+		$cont = $_content['nm']['rows'];
 
-		if ($content['view'] || $content['edit'] || $content['delete'])
+		if ($cont['view'] || $cont['edit'] || $cont['delete'])
 		{
 			foreach(array('view','edit','delete') as $action)
 			{
-				if ($content[$action])
+				if ($cont[$action])
 				{
-					list($id) = each($content[$action]);
+					list($id) = each($cont[$action]);
 					break;
 				}
 			}

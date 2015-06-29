@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -82,9 +82,9 @@ class ranking_cup extends so_sql
 			{
 				if (strstr($cat_str,'='))
 				{
-					list($cat,$params) = explode('=',$cat_str,2);
-					$cat = strtoupper(($c = in_array($cat,$this->cats->cat2old)) ? $c : $cat);
-					$params = explode('+',$params);
+					list($cat2,$params2) = explode('=',$cat_str,2);
+					$cat = strtoupper(($c = in_array($cat2, $this->cats->cat2old)) ? $c : $cat2);
+					$params = explode('+',$params2);
 
 					if ($params[0]) $data['nat_team_quota'][$cat] = $params[0];
 					if ($params[1]) $data['max_per_cat'][$cat] = $params[1];
@@ -97,6 +97,7 @@ class ranking_cup extends so_sql
 
 		if (isset($data['presets']) && isset($data['presets']['quali_preselected']))
 		{
+			$num = null;
 			foreach(explode(',', $data['presets']['quali_preselected']) as $n => $pre)
 			{
 				if ($n === 0) $data['presets']['quali_preselected'] = array();
@@ -270,7 +271,7 @@ class ranking_cup extends so_sql
 	 *
 	 * @param mixed $keys array with keys, or WetId or rkey
 	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
+	 * @param string $join ='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
 	 * @return array/boolean array with competition or false on error (eg. not found)
 	 */
 	function read($keys,$extra_cols='',$join='')
@@ -287,8 +288,8 @@ class ranking_cup extends so_sql
 	 *
 	 * Reimplemented to automatic update modifier and modified time
 	 *
-	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
-	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function save($keys=null,$extra_where=null)
