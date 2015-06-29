@@ -1794,8 +1794,7 @@ var Profile = (function() {
 			switch(placeholder)
 			{
 				case 'categoryChooser':
-					window.chooseCategory = jQuery.proxy(that.chooseCategory, that);
-					var select = '<select onchange="javascript:chooseCategory(this.value);">\n';
+					var select = '<select class="chooseCategory">\n';
 					for(var i=0; i < _data.categorys.length; ++i)
 					{
 						var cat = _data.categorys[i];
@@ -1900,6 +1899,14 @@ var Profile = (function() {
 		});
 		// install click handler from DrWidget
 		if (this.navigateTo) this.container.find('.profileData a:not(a[href^="javascript:"])').click(this.navigateTo);
+		// bind chooseCategory handler (works with multiple templates)
+		var that = this;
+		this.container.find('select.chooseCategory').change(function(e)
+		{
+			that.chooseCategory.call(that, this.value);
+			e.stopImmediatePropagation();
+			return false;
+		});
 	};
 	/**
 	 * toggle between best results and all results
