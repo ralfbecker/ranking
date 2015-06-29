@@ -4,7 +4,7 @@
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
  * @copyright 2010-14 by RalfBecker@digitalROCK.de
- * @version $Id$
+ * @version $Id: dr_api.js 1250 2015-06-18 06:49:01Z ralfbecker $
  */
 
 /**
@@ -2208,7 +2208,7 @@ var Competitions = (function() {
 			comp_div.append(jQuery(document.createElement('div')).addClass('date').text(competition.date_span));
 			var cats_ul = jQuery(document.createElement('ul')).addClass('cats');
 			var have_cats = false;
-			var links = { 'homepage': 'Event Website', 'info': 'Information', 'info2': '2. Information', 'startlist': 'Startlist', 'result': 'Result' };
+			var links = { 'homepage': 'Event Website', 'info': 'Regulation', 'info2': 'Info Sheet', 'startlist': 'Startlist', 'result': 'Result' };
 			if (typeof competition.cats == 'undefined') competition.cats = [];
 			for(var c=0; c < competition.cats.length; ++c)
 			{
