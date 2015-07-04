@@ -254,45 +254,8 @@ app.classes.ranking = AppJS.extend(
 
 		if (bonus && parseInt(top_value) > 0 && parseInt(top_value) < parseInt(bonus_value))
 		{
-			//window.setTimeout(function(){	// work around iOS bug crashing Safari
-				alert('Top < Bonus!');
-				bonus.set_value(top_value);
-			//}, 10);
-		}
-	},
-
-	/**
-	 * onChange of tops: if bonus not set, set it to the same number of tops
-	 *  if tops > zones alert user and set tops to zones or
-	 *  if less tries then tops alert user and set tries to tops
-	 *
-	 * @param {DOMNode} node
-	 * @param {et2_selectbox} top select box
-	 */
-	check_tops: function(node, top)
-	{
-		var bonus = this.et2.getWidgetById(top.id.replace(/tops/g, 'zones'));
-
-		if (bonus && !bonus.get_value() && parseInt(top.get_value()) > 0) bonus.set_value(top.get_value());
-
-		if (bonus && parseInt(top.get_value()) > 0 && parseInt(top.get_value()) > parseInt(bonus.get_value()))
-		{
-			//window.setTimeout(function(){	// work around iOS bug crashing Safari
-				alert('Top > Bonus!');
-				bonus.set_value(top.get_value());
-			//}, 10);
-		}
-
-		var tries = this.et2.getWidgetById(top.id.replace(/tops/g, 'top_tries'));
-
-		if (tries && !tries.get_value() && parseInt(top.get_value()) > 0) tries.set_value(top.get_value());
-
-		if (tries && parseInt(top.get_value()) > 0 && parseInt(top.get_value()) > parseInt(tries.get_value()))
-		{
-			//window.setTimeout(function(){	// work around iOS bug crashing Safari
-				alert('Top > Tries!');
-				tries.set_value(top.get_value());
-			//}, 10);
+			alert('Top < Bonus!');
+			bonus.set_value(top_value);
 		}
 	},
 
@@ -322,26 +285,72 @@ app.classes.ranking = AppJS.extend(
 	},
 
 	/**
-	 * onChange of zones: dont allow to set a zones bigger then tops or no zones, but a top
-	 * 	or if less tries then zones alert user and set tries to zones
+	 * onChange of tops: if bonus not set, set it to the same number of tops
+	 *  if tops > zones alert user and set tops to zones or
+	 *  if less tries then tops alert user and set tries to tops
+	 *
+	 * @param {DOMNode} node
+	 * @param {et2_selectbox} tops select box
+	 */
+	check_tops: function(node, tops)
+	{
+		var bonus = this.et2.getWidgetById(tops.id.replace(/tops/g, 'zones'));
+
+		if (bonus && !bonus.get_value() && parseInt(tops.get_value()) > 0) bonus.set_value(tops.get_value());
+
+		if (bonus && parseInt(tops.get_value()) > 0 && parseInt(tops.get_value()) > parseInt(bonus.get_value()))
+		{
+			alert('Top > Bonus!');
+			bonus.set_value(tops.get_value());
+		}
+
+		var tries = this.et2.getWidgetById(tops.id.replace(/tops/g, 'top_tries'));
+
+		if (tries && !tries.get_value() && parseInt(tops.get_value()) > 0) tries.set_value(tops.get_value());
+
+		if (tries && parseInt(tops.get_value()) > 0 && parseInt(tops.get_value()) > parseInt(tries.get_value()))
+		{
+			alert('Top > Tries!');
+			tries.set_value(tops.get_value());
+		}
+	},
+
+	/**
+	 * onChange of top_tries: if number of tops > top_tries, set tops to tries
+	 *
+	 * @param {DOMNode} node
+	 * @param {et2_selectbox} tries select box
+	 */
+	check_top_tries: function(node, tries)
+	{
+		var tops = this.et2.getWidgetById(tries.id.replace(/top_tries/g, 'tops'));
+
+		if (tops && parseInt(tops.get_value()) > 0 && parseInt(tops.get_value()) > parseInt(tries.get_value()))
+		{
+			alert('Top > Tries!');
+			tops.set_value(top_tries.get_value());
+		}
+	},
+
+	/**
+	 * onChange of bonus sum: dont allow to set a boni bigger then tops or no bonus, but a top
+	 * 	or if less tries then boni alert user and set tries to boni
 	 *
 	 * @param {DOMNode} node
 	 * @param {DOMNode} bonus select box
 	 */
 	check_boni: function(node, bonus)
 	{
-		var top = this.et2.getWidgetById(bonus.id.replace(/zones/g,'tops'));
+		var tops = this.et2.getWidgetById(bonus.id.replace(/zones/g,'tops'));
 
-		if (top && parseInt(top.get_value()) > 0 && parseInt(bonus.get_value()) < parseInt(top.get_value()))
+		if (tops && parseInt(tops.get_value()) > 0 && parseInt(bonus.get_value()) < parseInt(tops.get_value()))
 		{
-			//window.setTimeout(function(){	// work around iOS bug crashing Safari
-				alert('Bonus < Top!');
-				top.set_value(bonus.get_value());
-			//}, 10);
+			alert('Bonus < Top!');
+			tops.set_value(bonus.get_value());
 		}
-		if (top && parseInt(top.get_value()) > 0 && !bonus.get_value())
+		if (tops && parseInt(tops.get_value()) > 0 && !bonus.get_value())
 		{
-			top.set_value(bonus.get_value());
+			tops.set_value(bonus.get_value());
 		}
 
 		var tries = this.et2.getWidgetById(bonus.id.replace(/zones/g,'zone_tries'));
@@ -350,11 +359,27 @@ app.classes.ranking = AppJS.extend(
 
 		if (tries && parseInt(bonus.get_value()) > 0 && parseInt(bonus.get_value()) > parseInt(tries.get_value()))
 		{
-			//window.setTimeout(function(){	// work around iOS bug crashing Safari
-				alert('Bonus > Tries!');
-				tries.set_value(bonus.get_value());
-			//}, 10);
+			alert('Bonus > Tries!');
+			tries.set_value(bonus.get_value());
 		}
+	},
+
+	/**
+	 * onChange of bonus tries: dont allow to set less tries then bonus
+	 *
+	 * @param {DOMNode} node
+	 * @param {DOMNode} tries select box
+	 */
+	check_bonus_tries: function(node, tries)
+	{
+		var bonus = this.et2.getWidgetById(tries.id.replace(/zone_tries/g,'zones'));
+
+		if (bonus && parseInt(bonus.get_value()) > 0 && parseInt(bonus.get_value()) > parseInt(tries.get_value()))
+		{
+			alert('Bonus > Tries!');
+			bonus.set_value(tries.get_value());
+		}
+
 	},
 
 	/***************************************************************************
