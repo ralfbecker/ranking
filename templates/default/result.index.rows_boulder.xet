@@ -152,7 +152,7 @@
 								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: total number or no" id="set[$row_cont[PerId]][tops]" onchange="app.ranking.check_tops" options="No,1,25"/>
 							</menulist>
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries" label="/" id="set[$row_cont[PerId]][top_tries]" onchange="app.ranking.check_top" options="No,1,50"/>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries" label="/" id="set[$row_cont[PerId]][top_tries]" onchange="app.ranking.check_top_tries" options="No,1,50"/>
 							</menulist>
 						</hbox>
 						<hbox align="right" class="noPrint">
@@ -160,7 +160,7 @@
 								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: total number or no" id="set[$row_cont[PerId]][zones]" onchange="app.ranking.check_boni" options="No,1,25"/>
 							</menulist>
 							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: number of tries" label="/" id="set[$row_cont[PerId]][zone_tries]" onchange="app.ranking.check_bonus" options="No,1,50"/>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: number of tries" label="/" id="set[$row_cont[PerId]][zone_tries]" onchange="app.ranking.check_bonus_tries" options="No,1,50"/>
 							</menulist>
 						</hbox>
 						<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
