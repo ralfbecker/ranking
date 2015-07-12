@@ -146,6 +146,13 @@ button.scorecard_button {
 	border-radius: 3px;
 }
 
+/**
+ * Selfscore measurement
+ */
+div#ranking-result-index_ranking-result-selfscore_measurement > label:first-child {
+	display: block;
+}
+
 /*
  * Boulder measurement
  */
