@@ -4,7 +4,7 @@
 <overlay>
 	<template id="ranking.result.selfscore_measurement" template="" lang="" group="0" version="1.9.001">
 		<menulist>
-			<menupopup label="Scorecard" id="nm[PerId]" onchange="app.ranking.scorecard_changed" empty_label="Select one"/>
+			<menupopup label="Scorecard" id="nm[PerId]" onchange="app.ranking.scorecard_changed" empty_label="Select one" class="header"/>
 		</menulist>
 		<grid id="score">
 			<columns>

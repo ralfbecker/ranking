@@ -636,7 +636,8 @@ class ranking_route_result extends so_sql
 			case 'selfscore':
 				$data['result'] = count($data['score']);
 				// selfscore with fixed number of points per boulder distributed to all reaching top
-				if ($data['result_top'] != 100*$data['result']-$data['result'])
+				// comment as it will not allow to have 99/100 boulders
+				//if ($data['result_top'] != 100*$data['result']-$data['result'])
 				{
 					$data['result'] = number_format($data['result_top']/100, 2, '.', '').'/'.$data['result'];
 				}
