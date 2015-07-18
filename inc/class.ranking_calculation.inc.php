@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2013-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2013-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -17,6 +17,8 @@
  * - cup ranking
  * - national team ranking
  * - sektionenwertung
+ *
+ * @property-read array $european_nations 3-digit nation codes of european nations
  */
 class ranking_calculation
 {
@@ -28,8 +30,8 @@ class ranking_calculation
 	protected $bo;
 
 	/**
-	 * @var array $european_nations 3-digit nation codes of nation in europe
-	 */
+	 * @var array $european_nations 3-digit nation codes of european nations
+	 *
 	var $european_nations = array(
 		'ALB','AND','ARM','AUT','AZE','BLR','BEL','BIH','BUL',
 		'CRO','CYP','CZE','DEN','EST','ESP','FIN','FRA','GBR',
@@ -38,6 +40,7 @@ class ranking_calculation
 		'POL','POR','ROU','RUS','SRB','SLO','SMR','SUI','SVK',
 		'SWE','TUR','UKR'
 	);
+	 */
 
 	/**
 	 * Echo diverse diagnositics about ranking calculation
@@ -49,6 +52,27 @@ class ranking_calculation
 	public function __construct(ranking_bo $bo=null)
 	{
 		$this->bo = $bo ? $bo : new ranking_bo();
+	}
+
+	/**
+	 * Magic getter returning only european_nations for now
+	 *
+	 * @param string $name
+	 * @return mixed
+	 */
+	public function __get($name)
+	{
+		switch($name)
+		{
+			case 'european_nations':
+				$european_nations = ranking_bo::getInstance()->federation->continent_nations(ranking_federation::EUROPE);
+				/*if ((($extra=array_diff($european_nations, $this->old_european_nations)) ||
+					($missing=array_diff($this->old_european_nations, $european_nations))))
+				{
+					error_log(__METHOD__."($name) extra=".array2string($extra).', missing='.array2string($missing));
+				}*/
+				return $european_nations;
+		}
 	}
 
 	/**
@@ -189,10 +213,10 @@ class ranking_calculation
 				unset($valid[$key]);
 			}
 		}
-		$cats = implode(',', $valid);
+		$cats2 = implode(',', $valid);
 		$cat_names = implode(', ', $cat_names);
 
-		$quota = $wettk['quota'];
+		$quota = $comp['quota'];
 		// force quota for youth to 1, to allow to use a higher quota for registration, it still need to be set!
 		if (substr($name,0,5) == 'youth')
 		{
@@ -238,7 +262,7 @@ class ranking_calculation
 		foreach($valid_cats as $name => $vcats)
 		{
 			$vcats_str = implode(',',$vcats);
-			if ($cats != $vcats_str && ($name != 'overall' || count(explode(',',$cats)) <= 2))
+			if ($cats2 != $vcats_str && ($name != 'overall' || count(explode(',',$cats2)) <= 2))
 			{
 				$ret['params']['see_also'][] = array(
 					'name' => $ret['params']['name'].' '.($cup ? $cup['name'] : $comp['name']).': '.$name,
@@ -254,14 +278,14 @@ class ranking_calculation
 	 * Calculate an aggregated ranking eg. national team ranking or sektionen wertung
 	 *
 	 * @param string|int $date date of ranking, "." for current date or WetId or rkey of competition
-	 * @param array $filter=array() to filter results by GrpId or WetId
-	 * @param int $best_results=null use N best results per category and competition
-	 * @param string $by='nation' 'nation', 'fed_id', 'fed_parent' or 3-letter nation code
-	 * @param boolean $use_cup_points=true
-	 * @param int $min_cats=null required minimum number of cats, eg. 2 for overall
-	 * @param int $max_comps=null used max. number of comps for national team ranking of a cup
+	 * @param array $filter =array() to filter results by GrpId or WetId
+	 * @param int $best_results =null use N best results per category and competition
+	 * @param string $by ='nation' 'nation', 'fed_id', 'fed_parent' or 3-letter nation code
+	 * @param boolean $use_cup_points =true
+	 * @param int $min_cats =null required minimum number of cats, eg. 2 for overall
+	 * @param int $max_comps =null used max. number of comps for national team ranking of a cup
 	 * @param array &$date_comp=null on return data of last competition in ranking
-	 * @param int $window=12 number of month in ranking
+	 * @param int $window =12 number of month in ranking
 	 * @return array of array with values 'rank', 'name', 'points', 'counting', 'comps' (array)
 	 * 	plus categorys and competitions arrays
 	 */
@@ -380,8 +404,8 @@ class ranking_calculation
 			}
 			$extra_cols .= ','.$pkte.'*100 AS pkt';
 		}
-		$ranking = $competions = $categorys = array();
-		$last_aggr = $last_comp = $last_cat = null;
+		$ranking = $competitions = $categorys = array();
+		$last_aggr = $last_comp = $last_cat = $rzs = null;
 		$used = 0;
 		foreach($this->bo->result->aggregated_results($filter, $extra_cols, $join, $append) as $result)
 		{
@@ -535,7 +559,7 @@ class ranking_calculation
 	 * @param array &$rls on return: RankingSystem used for the calculation of the ranking
 	 * @param array &$ex_aquo on return: array with place => number of ex_aqous per place pairs
 	 * @param array &$not_counting on return: array PerId => string off all not valued WetId's pairs
-	 * @param mixed $cup='' rkey,SerId or array of cup or '' for a ranking
+	 * @param mixed $cup ='' rkey,SerId or array of cup or '' for a ranking
 	 * @param array &$comps=null if array on return WetId => comp array
 	 * @param &$max_comp=null on return max. number of competitions counting
 	 * @return array sorted by ranking place
@@ -600,7 +624,7 @@ class ranking_calculation
 			if ($this->bo->cats->cat2old[$cat['rkey']]) $cats[] = $this->bo->cats->cat2old[$cat['rkey']];
 			if (isset($cat['mgroups'])) $cats = $cat['mgroups'];
 
-			if (!$this->bo->comp->next_comp_this_year($comp['datum'],$cats,$cat['nation'],$cup['SerId']))
+			if (!$this->bo->comp->next_comp_this_year($comp['datum'], $cats, $cat['nation'], $cup ? $cup['SerId'] : null))
 			{
 				$stand = (int)$comp['datum'] . '-12-31';	// no further comp. -> stand 31.12.
 			}
@@ -671,6 +695,7 @@ class ranking_calculation
 		}
 		else
 		{
+			$from_year = $to_year = null;
 			if (!$rls || !($rls['window_type'] != 'wettk_athlet' && $rls['end_pflicht_tol'] &&
 				$this->bo->cats->age_group($cat,$stand,$from_year,$to_year)))
 			{
@@ -813,7 +838,7 @@ class ranking_calculation
 				case 'all':
 				case 'only_counting':
 					$max_platz = 0;
-					foreach($this->platz as $pl => $ids)
+					foreach(array_keys($this->platz) as $pl)
 					{
 						if ($pl > $max_platz)
 						{
@@ -862,8 +887,8 @@ class ranking_calculation
 	 * Add or remove result counting for ranking
 	 *
 	 * @param array $result
-	 * @param boolean $overall=false true: overall ranking
-	 * @param boolean $add=true true: add, false: remove
+	 * @param boolean $overall =false true: overall ranking
+	 * @param boolean $add =true true: add, false: remove
 	 */
 	private function _counting(array $result, $overall=false, $add=true)
 	{
@@ -903,9 +928,9 @@ class ranking_calculation
 	 * Add result not-counting to ranking
 	 *
 	 * @param array $result
-	 * @param array $cup=null
-	 * @param boolean $overall=false true: overall ranking
-	 * @param boolean $add=true true: add, false: remove
+	 * @param array $cup =null
+	 * @param boolean $overall =false true: overall ranking
+	 * @param boolean $add =true true: add, false: remove
 	 */
 	private function _not_counting(array $result, $cup=null, $overall=false, $add=true)
 	{

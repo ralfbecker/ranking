@@ -304,3 +304,10 @@ div.action_popup > div.et2_hbox {
 #ranking-result-index_button\[renumber\] {
 	margin-top: -2px;
 }
+
+/**
+ * Edit route popup
+ */
+select#ranking-result-route_import_cat {
+	width: 50%;
+}

@@ -151,10 +151,8 @@ class ranking_bo extends ranking_so
 
 	/**
 	 * Constructor
-	 *
-	 * @param array $extra_classes=array()
 	 */
-	function __construct(array $extra_classes=array())
+	function __construct()
 	{
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de')
@@ -171,7 +169,7 @@ class ranking_bo extends ranking_so
 				translation::$lang_arr['Time'] = 'Zeit';
 			}
 		}
-		parent::__construct($extra_classes);	// calling the parent constructor
+		parent::__construct();	// calling the parent constructor
 
 		$this->pkt_names = $this->pkte->names();
 		$this->cat_names = $this->cats->names();
@@ -226,7 +224,7 @@ class ranking_bo extends ranking_so
 		$this->ranking_nations = array('NULL'=>lang('international'))+$this->comp->nations();
 		if (!$this->is_admin)
 		{
-			foreach($this->ranking_nations as $key => $label)
+			foreach(array_keys($this->ranking_nations) as $key)
 			{
 				if (!in_array($key,$this->read_rights)) unset($this->ranking_nations[$key]);
 			}
@@ -287,9 +285,9 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international
 	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER|RESULT}
-	 * @param array|int $comp=null competition array or id, default null
-	 * @param boolean $allow_before=false grant judge-rights unlimited time before the competition
-	 * @param array $route=null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
+	 * @param array|int $comp =null competition array or id, default null
+	 * @param boolean $allow_before =false grant judge-rights unlimited time before the competition
+	 * @param array $route =null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
 	 * 	if route judges should be checked too, default null=no route judges
 	 * @param boolean $use_no_judge =false true: do NOT use judge-rights for athletes eg. confirming licenses
 	 * @return boolean true if access is granted, false otherwise
@@ -333,14 +331,14 @@ class ranking_bo extends ranking_so
 	 * Check athlete ACL, which uses the nation ACL above, or the federation (and it's parents)
 	 *
 	 * @param array|int $athlete athlete id or data, or array with values for keys 'nation' and 'fed_id'
-	 * @param int $required=EGW_ACL_ATHLETE EGW_ACL_{ATHLETE|REGISTER|RESULT}
-	 * @param array|int $comp=null competition array or id, default null
-	 * @param string $license=null nation for which a license should be applied for, default null=no license (NULL for international)
+	 * @param int $required =EGW_ACL_ATHLETE EGW_ACL_{ATHLETE|REGISTER|RESULT}
+	 * @param array|int $comp =null competition array or id, default null
+	 * @param string $license =null nation for which a license should be applied for, default null=no license (NULL for international)
 	 * @return boolean true if access is granted, false otherwise
 	 */
 	function acl_check_athlete($athlete,$required=EGW_ACL_ATHLETE,$comp=null,$license=null)
 	{
-		static $fed_grants;
+		static $fed_grants = null;
 
 		if ($this->is_admin)
 		{
@@ -430,7 +428,7 @@ class ranking_bo extends ranking_so
 	/**
 	 * Check or set if we do athlete selfservice
 	 *
-	 * @param int $set=null
+	 * @param int $set =null
 	 * @return int PerId of logged in athlete
 	 */
 	function is_selfservice($set=null)
@@ -506,8 +504,8 @@ class ranking_bo extends ranking_so
 	 * Allways returns true for admins or if user has result rights for competition federation!
 	 *
 	 * @param array|int $comp competitiion array or id
-	 * @param boolean $allow_before=false grant judge-rights unlimited time before the competition
-	 * @param array $route=null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
+	 * @param boolean $allow_before =false grant judge-rights unlimited time before the competition
+	 * @param array $route =null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
 	 * 	if route judges should be checked too, default null=no route judges
 	 * @return boolean
 	 */
@@ -594,7 +592,7 @@ class ranking_bo extends ranking_so
 	 * Check if user is allowed to register athlets for $comp and $nation
 	 *
 	 * @param int/array $comp WetId or complete competition array
-	 * @param string $nation='' nation of the athlets to register, if empty do a general check independent of nation
+	 * @param string $nation ='' nation of the athlets to register, if empty do a general check independent of nation
 	 * @param int GrpId=null if set check only for a given cat
 	 */
 	function registration_check($comp,$nation='',$cat=null)
@@ -645,6 +643,7 @@ class ranking_bo extends ranking_so
 		{
 			return array();	// no category --> noone prequalified
 		}
+		$prequalified = null;
 		foreach($do_cat ? array($do_cat) : $comp['gruppen'] as $cat)
 		{
 			//echo __METHOD__."($comp[rkey],$do_cat) cat='$cat($cat[rkey])'<br>\n";
@@ -688,6 +687,7 @@ class ranking_bo extends ranking_so
 					// german youth does NOT use ranking, but cup result since 2008!
 					if (in_array($cat_id,array(48,49,50,11,12,13)))
 					{
+						$nul = null;
 						if (!($ranking = $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,
 							$comp['serie'] ? $comp['serie'] : sprintf('%02d_JC',date('y')))))
 						{
@@ -733,10 +733,9 @@ class ranking_bo extends ranking_so
 		$all_cats = $nat_prequals = array();
 		foreach($prequalified as $cat => $prequals)
 		{
-			$all_cats = array_merge($all_cats, array_keys($prequals));
+			$all_cats = array_unique(array_merge($all_cats, array_keys($prequals)));
 			$nat_prequals[$cat] = array();
 		}
-		$all_cats = array_unique($all_cats);
 
 		if (count($all_cats))
 		{
@@ -787,7 +786,7 @@ class ranking_bo extends ranking_so
 	 * @param int $comp WetId
 	 * @param int $cat GrpId
 	 * @param int|array $athlete PerId or complete athlete array
-	 * @param int $mode=0  0: register (quota or supplimentary), 1: register prequalified, 2: remove registration
+	 * @param int $mode =0  0: register (quota or supplimentary), 1: register prequalified, 2: remove registration
 	 * @throws egw_exception_wrong_userinput with error message
 	 * @return boolean true of everythings ok, false on error
 	 */
@@ -847,12 +846,12 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param int|string $birthdate birthdate Y-m-d or birthyear
 	 * @param int|array $cat GrpId or category array
-	 * @param int|array $comp=null competition which date to use or default NULL to use the current year
+	 * @param int|array $comp =null competition which date to use or default NULL to use the current year
 	 * @return boolean true if $birthdate is in the agegroup or category does NOT use age-groups
 	 */
 	function in_agegroup($birthdate,$cat,$comp=null)
 	{
-		static $comps;	// some caching
+		static $comps = null;	// some caching
 
 		if (is_null($comp))
 		{
@@ -905,19 +904,19 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param int/array $comp WetId or complete comp array
 	 * @param int/array $cat GrpId or complete cat array
-	 * @param int $num_routes=1 number of routes, default 1
-	 * @param int $max_compl=999 maximum number of climbers from the complimentary list
-	 * @param int $order=0 int with bitfield of, default random
+	 * @param int $num_routes =1 number of routes, default 1
+	 * @param int $max_compl =999 maximum number of climbers from the complimentary list
+	 * @param int $order =0 int with bitfield of, default random
 	 * 	&1  use ranking for order, unranked are random behind last ranked
 	 *  &2  use cup for order, unranked are random behind last ranked
 	 *  &4  reverse ranking or cup (--> unranked first)
 	 *  &8  use ranking/cup for distribution only, order is random
-	 * @param int $use_ranking=0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first,
+	 * @param int $use_ranking =0 0: randomize all athlets, 1: use reversed ranking, 2: use reversed cup ranking first,
 	 * 	new random order but distribution on multiple routes by 3: ranking or 4: cup
-	 * @param boolean $stagger=false insert starters of other route behind
-	 * @param array $old_startlist=null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
-	 * @param int $quali_preselected=null number of preselected from cup or ranking, returned last, rest is randomized
-	 * @param int $add_cat=null additional category to add registered atheletes from
+	 * @param boolean $stagger =false insert starters of other route behind
+	 * @param array $old_startlist =null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
+	 * @param int $quali_preselected =null number of preselected from cup or ranking, returned last, rest is randomized
+	 * @param int $add_cat =null additional category to add registered atheletes from
 	 * @return boolean/array true or array with starters (if is_array($old_startlist)) if the startlist has been successful generated AND saved, false otherwise
 	 */
 	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$order=0,$stagger=false,$old_startlist=null,$quali_preselected=null,$add_cat=null)
@@ -985,13 +984,12 @@ class ranking_bo extends ranking_so
 			}
 		}
 		// index starters with their PerId
-		$starters2 = array();
-		foreach($starters as $k => $athlete)
+		foreach($starters as $k => &$athlete)
 		{
-			$starters[$k]['GrpId'] = $cat['GrpId'];	// could be $add_cat
-			$starters2[$athlete['PerId']] =& $starters[$k];
+			$athlete['GrpId'] = $cat['GrpId'];	// could be $add_cat
+			unset($starters[$k]);
+			$starters[$athlete['PerId']] =& $athlete;
 		}
-		$starters =& $starters2; unset($starters2);
 
 		$reset_data = 1;
 		$ranked = array();
@@ -999,6 +997,7 @@ class ranking_bo extends ranking_so
 		if ($use_ranking)
 		{
 			$stand = $comp['datum'];
+			$nul = null;
 		 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul,$use_cup ? $comp['serie'] : '');
 
 			// check if it might be the first comp of the year
@@ -1187,8 +1186,8 @@ class ranking_bo extends ranking_so
 	 * @param string $k key into source list of athlete to move
 	 * @param array &$startlist destination lists, indexed by route=1|2, athletes added at the end
 	 * @param int $num_routes number of routes to use 1, 2, ...
-	 * @param int $reset_data=null set internal counter $route to $reset_data, if given and > 0
-	 * @param int $line=0 line number of caller for debug purpose
+	 * @param int $reset_data =null set internal counter $route to $reset_data, if given and > 0
+	 * @param int $line =0 line number of caller for debug purpose
 	 */
 	function move_to_startlist(&$starters,$k,&$startlist,$num_routes,$reset_data=null,$line=0)
 	{
@@ -1196,8 +1195,7 @@ class ranking_bo extends ranking_so
 		static $last_route = 1;
 		if ($reset_data)  $route = $reset_data;
 		//echo "<p>$line: ".__METHOD__."(,$k,,$num_routes,$reset_data,$line) route=$route, athlete=".$starters[$k]['nachname'].', '.$starters[$k]['vorname']."</p>\n";
-
-		$athlete =& $starters[$k];
+		unset($line);
 
 		$startlist[$route][] =& $starters[$k];
 		unset($starters[$k]);
@@ -1207,7 +1205,7 @@ class ranking_bo extends ranking_so
 
 		// new mode: 1, 2, 2, 1, 1, 2, 2, ...
 		$last = $last_route;
-		$last_route = $route;
+		if (true) $last_route = $route;
 		if ($last == $route && $num_routes == 2) $route = $route == 1 ? 2 : 1;
 	}
 
@@ -1216,7 +1214,7 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param string $calendar
 	 * @param int $comp
-	 * @param int $cat=null
+	 * @param int $cat =null
 	 */
 	function set_ui_state($calendar=null,$comp=null,$cat=null)
 	{
@@ -1235,6 +1233,7 @@ class ranking_bo extends ranking_so
 		{
 			$GLOBALS['egw']->session->appsession('menuaction','ranking',$_GET['menuaction']);
 		}
+		unset($calendar, $comp, $cat);	// used as $$name above, quitens IDE warnings
 	}
 
 	/**
@@ -1258,8 +1257,9 @@ class ranking_bo extends ranking_so
 		if (!$has_feldfakt) return (double)$comp['faktor'];
 
 		// we have to use the ranking of the day before the competition starts
-		$stand = explode('-',$comp['datum']);
-		$stand = date('Y-m-d',mktime(0,0,0,$stand[1],$stand[2]-1,$stand[0]));
+		$stands = explode('-',$comp['datum']);
+		$stand = date('Y-m-d',mktime(0,0,0,$stands[1],$stands[2]-1,$stands[0]));
+		$start = $nul = $ranglist = $pkte = null;
 		if (!$this->ranking($cat,$stand,$start,$nul,$ranglist,$rls,$nul,$nul))
 		{
 			return 'no ranking';//1.0;
@@ -1275,9 +1275,9 @@ class ranking_bo extends ranking_so
 				$feldfakt += $pkte[$ranglist[$PerId]['platz']];
 			}
 		}
-		$feldfakt = round($feldfakt / $max_pkte,2);
-		//echo "<p>".__METHOD__."('$comp[rkey]','$cat[rkey]')==$feldfakt (has_feldfakt=$has_feldfakt)</p>\n";
-		return $feldfakt;
+		$ret = round($feldfakt / $max_pkte,2);
+		//echo "<p>".__METHOD__."('$comp[rkey]','$cat[rkey]')==$ret (has_feldfakt=$has_feldfakt)</p>\n";
+		return $ret;
 	}
 
 	/**
@@ -1308,6 +1308,7 @@ class ranking_bo extends ranking_so
 			'GrpId' => $keys['GrpId'],
 			'datum' => $comp['datum'],	// has to be the date of the competition, NOT the actual date!
 		));
+		$pkte = $cup_pkte = null;
 		$this->pkte->get_pkte($comp['pkte'],$pkte);
 
 		if ($cup)
@@ -1315,9 +1316,15 @@ class ranking_bo extends ranking_so
 			// 2006+ EYS counts only european nations
 			if ((int)$comp['datum'] >= 2006 && preg_match('/_(EYC|EYS)$/',$cup['rkey']))
 			{
-				$allowed_nations = $this->calc->european_nations;
+				$allowed_nations = $this->federation->continent_nations(ranking_federation::EUROPE);
 			}
 			$this->pkte->get_pkte($cup['pkte'],$cup_pkte);
+		}
+		// only import ceratain continets nations
+		if ($cup && $cup['continent'] || $comp['continent'])
+		{
+			$allowed_nations = $this->federation->continent_nations($comp['continent'] ?
+				$comp['continent'] : $cup['continent']);
 		}
 		// 2009+ int. competitions use only average points for ex aquos
 		if (empty($comp['nation']) && (int)$comp['datum'] >= 2009)
@@ -1335,9 +1342,12 @@ class ranking_bo extends ranking_so
 				++$ex_aquos[$place];
 
 				// 2006+ EYS counts only european nations
-				if ($cup && $allowed_nations)
+				if ($allowed_nations)
 				{
-					if (!in_array($nation,$allowed_nations)) continue;	// ignore wrong nation
+					if (!in_array($nation,$allowed_nations))
+					{
+						continue;	// ignore wrong nation
+					}
 					$result[$PerId]['cup_place'] = $ex_place = $last_place == $place ? $ex_place : $abs_place;
 					++$cup_ex_aquos[$ex_place];
 					$last_place = $place;
@@ -1350,9 +1360,7 @@ class ranking_bo extends ranking_so
 			}
 		}
 		// reverse array to store 1. place last, as it is used to determine in calc_rang if competition has a result
-		$result = array_reverse($result, true);
-
-		foreach($result as $PerId => $place)
+		foreach(array_reverse($result, true) as $PerId => $place)
 		{
 			$nation = $cup_place = $cup_pkt = null;
 			if (is_array($place))
@@ -1393,9 +1401,14 @@ class ranking_bo extends ranking_so
 				}
 				$cup_pkt = round(100.0 * $cup['faktor'] * $cup_pkt);
 			}
+			if (!$cup && $allowed_nations && !in_array($nation, $allowed_nations))
+			{
+				unset($result[$PerId]);
+				continue;
+			}
 			$this->result->save(array(
 				'PerId' => $PerId,
-				'platz' => $place,
+				'platz' => $allowed_nations && !$cup ? $cup_place : $place,
 				'pkt'   => round(100.0 * $feldfactor * $pkt),
 				'cup_platz' => $cup_place,
 				'cup_pkt'   => $cup_pkt,
@@ -1415,8 +1428,8 @@ class ranking_bo extends ranking_so
 	 * @param array $keys WetId, GrpId, route_order
 	 * @param string|FILE $file uploaded file name or handle
 	 * @param boolean $result_only true = only results allowed, false = startlists too
-	 * @param boolean $add_athletes=false add not existing athletes, default bail out with an error
-	 * @param boolean|int $ignore_comp_heat=false ignore WetId and route_order, default do NOT, or integer WetId to check against
+	 * @param boolean $add_athletes =false add not existing athletes, default bail out with an error
+	 * @param boolean|int $ignore_comp_heat =false ignore WetId and route_order, default do NOT, or integer WetId to check against
 	 * @return string/array error message or result lines
 	 */
 	function parse_csv($keys,$file,$result_only=false,$add_athletes=false,$ignore_comp_heat=false)
@@ -1444,13 +1457,14 @@ class ranking_bo extends ranking_so
 		}
 
 		$n = 1;
-		while (($line = fgetcsv($fp,null,';')))
+		$cat_warning = null;
+		while (($values = fgetcsv($fp,null,';')))
 		{
-			if (count($line) != count($labels))
+			if (count($values) != count($labels))
 			{
-				return lang('Error: dataline %1 contains %2 instead of %3 columns !!!',$n,count($line),count($labels));
+				return lang('Error: dataline %1 contains %2 instead of %3 columns !!!', $n, count($values), count($labels));
 			}
-			$line = array_combine($labels,$line);
+			$line = array_combine($labels, $values);
 
 			if ((!$ignore_comp_heat || !is_bool($ignore_comp_heat)) && in_array('comp',$labels) &&
 				$line['comp'] != (!$ignore_comp_heat ? $keys['WetId'] : $ignore_comp_heat))
@@ -1553,6 +1567,7 @@ class ranking_bo extends ranking_so
 				else
 				{
 					// try fixing broken EYC results from ifsc-climbing.org containing place and points without space inbetween
+					$matches = null;
 					if (preg_match('/^([0-9.]+[+-]?)'.(int)$arr['place'].'\.([0-9]+\.[0-9]{2})?$/',$str,$matches))
 					{
 						$str = $matches[1];

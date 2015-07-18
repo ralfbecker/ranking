@@ -1781,3 +1781,35 @@ function ranking_upgrade14_2_001()
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.002';
 }
+
+function ranking_upgrade14_2_002()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','continent',array(
+		'type' => 'int',
+		'precision' => '1',
+		'comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.003';
+}
+
+
+function ranking_upgrade14_2_003()
+{
+	$GLOBALS['egw_setup']->oProc->CreateIndex('Federations', array('fed_continent'));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.004';
+}
+
+
+function ranking_upgrade14_2_004()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','continent',array(
+		'type' => 'int',
+		'precision' => '1',
+		'comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.005';
+}
+

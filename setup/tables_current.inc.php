@@ -51,7 +51,8 @@ $phpgw_baseline = array(
 			'selfregister' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=no, 1=fed.to confirm, 2=register'),
 			'open_comp' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=No, 1=national, 2=DACH, 3=int.'),
 			'quali_preselected' => array('type' => 'varchar','precision' => '64','nullable' => False,'default' => '0','comment' => 'GrpId: number of preselected athletes, not climbing qualification'),
-			'prequal_type' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=comp. date, 1=1.1.')
+			'prequal_type' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=comp. date, 1=1.1.'),
+			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),
@@ -75,7 +76,8 @@ $phpgw_baseline = array(
 			'modifier' => array('type' => 'int','precision' => '4'),
 			'fed_id' => array('type' => 'int','precision' => '4'),
 			'min_disciplines' => array('type' => 'int','precision' => '2'),
-			'drop_equally' => array('type' => 'bool')
+			'drop_equally' => array('type' => 'bool'),
+			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania')
 		),
 		'pk' => array('SerId'),
 		'fk' => array(),
@@ -396,7 +398,7 @@ $phpgw_baseline = array(
 		),
 		'pk' => array('fed_id'),
 		'fk' => array(),
-		'ix' => array('nation'),
+		'ix' => array('nation','fed_continent'),
 		'uc' => array()
 	),
 	'Athlete2Fed' => array(

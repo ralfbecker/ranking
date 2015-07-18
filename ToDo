@@ -1,3 +1,9 @@
+German State Championship Rheinlandpfalz Lead 2015:
+--------------------------------------------------
+- allow to copy topo and handholds from an other category/route
+- allow to copy result-service results from an other category filtered by current categories age-group
+- add a no topo lead measurement mode: showing bigger manual entry fields and readonly result below
+
 Error Arco 2013:
 ---------------
 - FF/Chrome beamer does not scroll automatic
@@ -12,7 +18,7 @@ Observations World Cup Kitzbühl 2013:
 --> automatic import it, when general result set to official
 - cache expiration not always working:
   + latest result should have short time, 'til latest comp is official and imported
-  + better would be that making general result official activly invalidates cache & cdn, so it become available immediatly 
+  + better would be that making general result official activly invalidates cache & cdn, so it become available immediatly
   + general result on ifsc-climbing.org did NOT show final, thought it was official on ifsc.egroupware.net
 --> activly invalidating caches&cdn would work a lot better
     (requires normalized url parameters or invalidating complete cat eg. "json.php?*cat=N*", if that's possible

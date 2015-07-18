@@ -13,12 +13,8 @@
 				<row class="row">
 					<description value="Status"/>
 					<hbox span="all">
-						<menulist>
-							<menupopup id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
-						</menulist>
-						<menulist>
-							<menupopup statustext="Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat"/>
-						</menulist>
+						<select id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}"/>
+						<select statustext="Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat" class="et2_fullWidth"/>
 						<button statustext="Import the result into the ranking" label="Import into ranking" id="button[ranking]" class="leftPad5"/>
 					</hbox>
 				</row>
