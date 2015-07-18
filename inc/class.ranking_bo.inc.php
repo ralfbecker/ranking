@@ -1333,6 +1333,12 @@ class ranking_bo extends ranking_so
 			$abs_place = $ex_place = $last_place = 1;
 			foreach($result as $PerId => $place)
 			{
+				if ($allowed_nations && (!is_array($place) || empty($place['nation'])) &&
+					($athlete = $this->athlete->read($PerId)))
+				{
+					$place = $result[$PerId] = array_merge($athlete,
+						is_array($place) ? $place : array('result_rank' => $place));
+				}
 				$nation = '';
 				if (is_array($place))
 				{
