@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -23,32 +23,32 @@ class uiranking extends ranking_bo
 	/**
 	 * Show a ranking
 	 *
-	 * @param array $content
+	 * @param array $_content
 	 * @param string $msg
 	 */
-	function index($content=null,$msg='')
+	function index($_content=null,$msg='')
 	{
 		$tmpl = new etemplate('ranking.ranking');
 
-		if (!is_array($content))
+		if (!is_array($_content))
 		{
-			$content = array(
+			$_content = array(
 				'nation'   => $_GET['nation'],
 				'cup'      => $_GET['cup'],
 				'cat'      => $_GET['cat'],
 				'stand'    => $_GET['stand'],
 			);
 		}
-		//_debug_array($content);
+		//_debug_array($_content);
 
-		$nation = $this->only_nation ? $this->only_nation : $content['nation'];
+		$nation = $this->only_nation ? $this->only_nation : $_content['nation'];
 		if (!$nation)
 		{
 			list($nation) = each($this->ranking_nations);	// use the first nation
 		}
 		if ($this->only_nation) $tmpl->set_cell_attribute('nation','readonly',true);
 
-		$cup = $content['cup'] ? $this->cup->read($content['cup']) : '';
+		$cup = $_content['cup'] ? $this->cup->read($_content['cup']) : null;
 
 		$select_options = array(
 			'nation' => $this->ranking_nations,
@@ -61,12 +61,12 @@ class uiranking extends ranking_bo
 			),1),
 			'stand_rkey' => $this->comp->names(array(
 				'nation' => $nation,
-				'serie'  => $cup['SerId'],
+				'serie'  => $cup ? $cup['SerId'] : null,
 				'datum <= '.$this->db->quote(date('Y-m-d',time()+7*24*3600)),
 				'datum > '.$this->db->quote((date('Y')-1).'-01-01'),
 			),1),
 		);
-		$cat = $content['cat'] ? $this->cats->read($content['cat']) : '';
+		$cat = $_content['cat'] ? $this->cats->read($_content['cat']) : '';
 		// if no cat selected or cat invalid for the choosen nation and cup ==> use first cat from list
 		if (!$cat || $nation != ($cat['nation'] ? $cat['nation'] : 'NULL') ||
 			$cup && !in_array($cat['rkey'],$cup['gruppen']))
@@ -75,16 +75,16 @@ class uiranking extends ranking_bo
 			if ($cat) $cat = $this->cats->read($cat);
 		}
 		// reset the stand, if nation or cup changed
-		if ($content['old_nation'] != $nation || $content['old_cup'] != $cup['SerId'])
+		if ($_content['old_nation'] != $nation || $_content['old_cup'] != $cup['SerId'])
 		{
-			$content['stand'] = $content['stand_rkey'] = '';
+			$_content['stand'] = $_content['stand_rkey'] = '';
 		}
 		$content = $preserv = array(
 			'nation' => $nation,
 			'cup'    => $cup ? $cup['SerId'] : '',
 			'cat'    => $cat ? $cat['rkey'] : '',
-			'stand_rkey' => $content['stand_rkey'],
-			'stand'  => $cat && $content['stand_rkey'] ? $content['stand_rkey'] : $content['stand'],
+			'stand_rkey' => $_content['stand_rkey'],
+			'stand'  => $cat && $_content['stand_rkey'] ? $_content['stand_rkey'] : $_content['stand'],
 		);
 		$preserv += array(
 			'old_nation' => $content['nation'],
@@ -112,7 +112,7 @@ class uiranking extends ranking_bo
 		}
 		//_debug_array($content);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').($cup ? ': '.$cup['name'] : '').
-			($cat ? ': '.$cat['name'].($stand ? ': '.$stand : '') : '');
-		$tmpl->exec('ranking.uiranking.index',$content,$select_options,$readonly,$preserv);
+			($cat ? ': '.$cat['name'].($content['stand'] ? ': '.$content['stand'] : '') : '');
+		$tmpl->exec('ranking.uiranking.index', $content, $select_options, array(), $preserv);
 	}
 }

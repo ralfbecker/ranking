@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2008-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -46,7 +46,7 @@ class ranking_federation extends so_sql
 	 */
 	function __construct($source_charset='',$db=null)
 	{
-		$this->so_sql(self::APPLICATION,self::FEDERATIONS_TABLE,$db);   // call constructor of derived class
+		parent::__construct(self::APPLICATION,self::FEDERATIONS_TABLE,$db);   // call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
@@ -74,8 +74,8 @@ class ranking_federation extends so_sql
 	/**
 	 * Return a list of federation names indexed by fed_id, evtl. of a given nation only
 	 *
-	 * @param string $nation=null string to limit result to a given nation
-	 * @param bool $only_direct_children=false true to return only direct children of given nation federation(s)
+	 * @param string $nation =null string to limit result to a given nation
+	 * @param bool $only_direct_children =false true to return only direct children of given nation federation(s)
 	 * @return array
 	 */
 	function federations($nation=null,$only_direct_children=false)
@@ -110,18 +110,18 @@ class ranking_federation extends so_sql
 	 * For a union-query you call search for each query with $start=='UNION' and one more with only $order_by and $start set to run the union-query.
 	 *
 	 * @param array/string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
-	 * @param boolean/string/array $only_keys=true True returns only keys, False returns all cols. or
+	 * @param boolean/string/array $only_keys =true True returns only keys, False returns all cols. or
 	 *	comma seperated list or array of columns to return
-	 * @param string $order_by='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
-	 * @param string/array $extra_cols='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $wildcard='' appended befor and after each criteria
-	 * @param boolean $empty=false False=empty criteria are ignored in query, True=empty have to be empty in row
-	 * @param string $op='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
-	 * @param mixed $start=false if != false, return only maxmatch rows begining with start, or array($start,$num), or 'UNION' for a part of a union query
-	 * @param array $filter=null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
-	 * @param string $join='' sql to do a join, added as is after the table-name, eg. "JOIN table2 ON x=y" or
+	 * @param string $order_by ='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
+	 * @param string/array $extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $wildcard ='' appended befor and after each criteria
+	 * @param boolean $empty =false False=empty criteria are ignored in query, True=empty have to be empty in row
+	 * @param string $op ='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
+	 * @param mixed $start =false if != false, return only maxmatch rows begining with start, or array($start,$num), or 'UNION' for a part of a union query
+	 * @param array $filter =null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
+	 * @param string $join ='' sql to do a join, added as is after the table-name, eg. "JOIN table2 ON x=y" or
 	 *	"LEFT JOIN table2 ON (x=y AND z=o)", Note: there's no quoting done on $join, you are responsible for it!!!
-	 * @param boolean $need_full_no_count=false If true an unlimited query is run to determine the total number of rows, default false
+	 * @param boolean $need_full_no_count =false If true an unlimited query is run to determine the total number of rows, default false
 	 * @return boolean/array of matching rows (the row is an array of the cols) or False
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
@@ -235,8 +235,8 @@ class ranking_federation extends so_sql
 	 * Return id or all fields of a federation specified by name and optional nation
 	 *
 	 * @param string $name
-	 * @param string $nation=null
-	 * @param boolean $id_only=false return only the integer id
+	 * @param string $nation =null
+	 * @param boolean $id_only =false return only the integer id
 	 * @return int|array|boolean integer id, array with all data or false if no federation is found
 	 */
 	function get_federation($name,$nation=null,$id_only=false)
@@ -270,7 +270,7 @@ class ranking_federation extends so_sql
 	/**
 	 * Read ACL grants of a federation
 	 *
-	 * @param int|string $fed_id=null default use fed_id (or nation, if no parent) of this object
+	 * @param int|string $fed_id =null default use fed_id (or nation, if no parent) of this object
 	 * @return array
 	 */
 	function get_grants($fed_id=null)
@@ -292,7 +292,7 @@ class ranking_federation extends so_sql
 	/**
 	 * Delete ACL grants of a federation
 	 *
-	 * @param int|string $fed_id=null default use fed_id (or nation, if no parent) of this object
+	 * @param int|string $fed_id =null default use fed_id (or nation, if no parent) of this object
 	 */
 	function delete_grants($fed_id=null)
 	{
@@ -310,7 +310,7 @@ class ranking_federation extends so_sql
 	 * Set ACL grants of a federation
 	 *
 	 * @param array $grants
-	 * @param int|string $fed_id=null default use fed_id (or nation, if no parent) of this object
+	 * @param int|string $fed_id =null default use fed_id (or nation, if no parent) of this object
 	 */
 	function set_grants(array $grants,$fed_id=null)
 	{
@@ -350,25 +350,26 @@ class ranking_federation extends so_sql
 	 */
 	function get_user_grants()
 	{
-		static $grants;
+		static $grants = null;
 
-		if (!is_null($grants)) return $grants;
-
-		$grants = array();
-		foreach($GLOBALS['egw']->acl->read() as $data)	// uses the users account and it's memberships
+		if (!isset($grants))
 		{
-			if ($data['appname'] != 'ranking' || $data['location'][0] != ranking_federation::ACL_LOCATION_PREFIX)
+			$grants = array();
+			foreach($GLOBALS['egw']->acl->read() as $data)	// uses the users account and it's memberships
 			{
-				continue;
+				if ($data['appname'] != 'ranking' || $data['location'][0] != ranking_federation::ACL_LOCATION_PREFIX)
+				{
+					continue;
+				}
+				$grants[(int)substr($data['location'],1)] = $data['rights'];
 			}
-			$grants[(int)substr($data['location'],1)] = $data['rights'];
-		}
-		// now include the direkt children (eg. sektionen from the landesverbände)
-		if ($grants && ($children = $this->search(array('fed_parent' => array_keys($grants)),'fed_id,fed_parent')))
-		{
-			foreach($children as $child)
+			// now include the direkt children (eg. sektionen from the landesverbände)
+			if ($grants && ($children = $this->search(array('fed_parent' => array_keys($grants)),'fed_id,fed_parent')))
 			{
-				$grants[$child['fed_id']] = $grants[$child['fed_parent']];
+				foreach($children as $child)
+				{
+					$grants[$child['fed_id']] = $grants[$child['fed_parent']];
+				}
 			}
 		}
 		return $grants;
@@ -380,18 +381,19 @@ class ranking_federation extends so_sql
 	 */
 	function get_user_nations()
 	{
-		static $nations;
+		static $nations = null;
 
-		if (!is_null($nations)) return $nations;
-
-		$nations = array();
-		if (!($grants = $this->get_user_grants()))
+		if (!isset($nations))
 		{
-			return $nations;
-		}
-		foreach($this->db->select(self::FEDERATIONS_TABLE,'DISTINCT nation',array('fed_id' => array_keys($grants)),__LINE__,__FILE__) as $row)
-		{
-			$nations[] = $row['nation'];
+			$nations = array();
+			if (!($grants = $this->get_user_grants()))
+			{
+				return $nations;
+			}
+			foreach($this->db->select(self::FEDERATIONS_TABLE,'DISTINCT nation',array('fed_id' => array_keys($grants)),__LINE__,__FILE__) as $row)
+			{
+				$nations[] = $row['nation'];
+			}
 		}
 		return $nations;
 	}
@@ -404,13 +406,13 @@ class ranking_federation extends so_sql
 	 * PLUS the nations after them, to allow judges to register international participants
 	 *
 	 * @param string $nation 3-char nation code, null or NULL for international
-	 * @param array $register_rights=null register_rights (array with 3-char nation codes) of current user
+	 * @param array $register_rights =null register_rights (array with 3-char nation codes) of current user
 	 * 	to limit returned array to nations/federations the user as registration rights for, or null for all
 	 * @return array with value => label pairs for a selectbox
 	 */
 	function get_competition_federations($nation,array $register_rights=null)
 	{
-		static $comp_feds;
+		static $comp_feds = null;
 		//echo "<p>get_competition_federations($nation,".array2string($register_rights).")</p>\n";
 		if ($nation == 'NULL') $nation = null;
 		if (is_null($comp_feds) && !($comp_feds = $GLOBALS['egw']->session->appsession('comp_feds','ranking'))) $comp_feds = array();
@@ -461,7 +463,7 @@ class ranking_federation extends so_sql
 	 * Get federation-contact information for a given athlete or fed_id's
 	 *
 	 * @param array $athlete_or_fed_ids athlete array (fed_id, fed_acl_id, fed_parent) or given array of fed_id's
-	 * @param string $type='athletes'
+	 * @param string $type ='athletes'
 	 * @return string html with comma-separated contact-names with mailto-links
 	 */
 	function get_contacts(array $athlete_or_fed_ids, $type='athletes')
@@ -507,8 +509,9 @@ class ranking_federation extends so_sql
 	 */
 	function get_nationname($nation)
 	{
-		static $nations;
-		if (is_null($nations))
+		static $nations = null;
+
+		if (!isset($nations))
 		{
 			foreach($this->db->select($this->table_name, 'DISTINCT nation,fed_nationname', 'fed_parent IS NULL', __LINE__, __FILE__, false, '', 'ranking') as $row)
 			{
@@ -520,5 +523,27 @@ class ranking_federation extends so_sql
 		}
 		//_debug_array($nations); exit;
 		return $nations[$nation];
+	}
+
+	/**
+	 * Get nations for a given continent
+	 *
+	 * @param ing $continent ranking_federation::(AFRIKA|AMERICA|ASIA|EUROPE|OCEANIA)
+	 */
+	function continent_nations($continent)
+	{
+		static $nations = array();
+
+		if (!isset($nations[$continent]))
+		{
+			$nations[$continent] = array();
+			foreach($this->db->select(self::FEDERATIONS_TABLE, 'DISTINCT nation', array(
+				'fed_continent' => $continent,
+			), __LINE__, __FILE__, 0, 'ORDER BY nation', 'ranking') as $row)
+			{
+				$nations[$continent][] = $row['nation'];
+			}
+		}
+		return $nations[$continent];
 	}
 }

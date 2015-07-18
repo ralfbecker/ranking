@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.cup.edit.general" template="" lang="" group="0" version="1.9.001">
@@ -10,7 +9,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top" height="115">
-					<description for="gruppen" value="Categories"/>
+					<description value="Categories" for="gruppen"/>
 					<listbox id="gruppen" no_lang="1" rows="9"/>
 				</row>
 			</rows>
@@ -124,7 +123,7 @@
 					<description value="Presets for competitions" span="all"/>
 				</row>
 				<row class="row">
-					<description for="presets[name]" value="Competition name"/>
+					<description value="Competition name" for="presets[name]"/>
 					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
 				</row>
 				<row class="row">
@@ -134,31 +133,30 @@
 					</menulist>
 				</row>
 				<row>
-					<template content="presets" id="ranking.comp.edit.ranking" span="all"/>
+					<template id="ranking.comp.edit.ranking" content="presets" span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.cup.edit" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.cup.edit" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" height="170">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
 				<column width="100"/>
-				<column/>
-				<column/>
 			</columns>
 			<rows>
 				<row>
 					<description id="msg" no_lang="1" span="all" class="redItalic"/>
 					<description/>
 					<description/>
-					<description/>
-					<description/>
 				</row>
 				<row class="th">
 					<description for="name" value="Name"/>
-					<textbox statustext="full cup name (must not be empty)" id="name" needed="1" size="64" maxlength="64" span="all"/>
+					<hbox span="all">
+						<textbox statustext="full cup name (must not be empty)" id="name" needed="1" size="64" maxlength="64" span="all"/>
+						<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" label="Key" id="rkey" size="10" maxlength="8"/>
+					</hbox>
 				</row>
 				<row class="row">
 					<description for="nation" value="Nation"/>
@@ -175,15 +173,17 @@
 					<menulist>
 						<menupopup type="select-cat" id="presets[cat_id]" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
 					</menulist>
-					<description value="Key"/>
-					<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" id="rkey" size="10" maxlength="8"/>
+					<description value="Continent" for="continent"/>
+					<menulist>
+						<menupopup id="continent" options="All"/>
+					</menulist>
 				</row>
 				<row>
-					<tabbox id="ranking.cup.edit.general|ranking.cup.edit.ranking|ranking.cup.edit.presets" span="all">
+					<tabbox id="tabs" span="all">
 						<tabs>
-							<tab id="ranking.cup.edit.general" label="Categories"/>
-							<tab id="ranking.cup.edit.ranking" label="Ranking"/>
-							<tab id="ranking.cup.edit.presets" label="Presets"/>
+							<tab id="general" label="Categories"/>
+							<tab id="ranking" label="Ranking"/>
+							<tab id="presets" label="Presets"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.cup.edit.general"/>
@@ -199,7 +199,7 @@
 						<button statustext="apply the changes made" label="Apply" id="apply"/>
 						<button statustext="aborts without saving changes" label="Cancel" id="cancel" onclick="window.close();"/>
 					</hbox>
-					<button label="Copy" id="copy"/>
+					<button align="right" label="Copy" id="copy"/>
 					<button align="right" statustext="deletes this cup" label="Delete" id="delete" onclick="return confirm('deletes this cup');"/>
 				</row>
 			</rows>

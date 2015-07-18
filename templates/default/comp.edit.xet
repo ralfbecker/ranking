@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.comp.edit.general" template="" lang="" group="0" version="1.9.001">
@@ -82,7 +81,7 @@
 				<row class="row">
 					<description value="Host quota" for="host_quota"/>
 					<menulist>
-						<menupopup type="select-number" id="host_quota" options="None,1,12,1"/>
+						<menupopup type="select-number" id="host_quota" options="None,1,20,1"/>
 					</menulist>
 					<menulist>
 						<menupopup label="Host nation" id="host_nation" no_lang="1" options="Select one"/>
@@ -306,14 +305,20 @@
 					</menulist>
 					<description value="Federation"/>
 					<menulist span="all">
-						<menupopup id="fed_id" options="national federation"/>
+						<menupopup id="fed_id" options="national federation" class="selectboxFullWidth"/>
 					</menulist>
+					<description/>
 				</row>
 				<row class="row">
 					<description for="cat_id" value="Category"/>
-					<menulist span="all">
-						<menupopup type="select-cat" id="cat_id" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
+					<menulist>
+						<menupopup type="select-cat" id="cat_id" options="$cont[cat_parent_name],,,,$cont[cat_parent]" class="selectboxFullWidth"/>
 					</menulist>
+					<description value="Continent" for="continent"/>
+					<menulist>
+						<menupopup id="continent" options="All"/>
+					</menulist>
+					<description/>
 				</row>
 				<row>
 					<tabbox id="general|registration|startlist|ranking|files|judges" span="all">
@@ -342,7 +347,7 @@
 						<button statustext="saves the changes made" label="Apply" id="apply"/>
 						<button statustext="aborts without saving changes" label="Cancel" id="cancel" onclick="window.close();"/>
 					</hbox>
-					<button label="Copy" id="copy"/>
+					<button align="right" label="Copy" id="copy"/>
 					<description onclick="return confirm('Delete this competition');"/>
 					<button align="right" statustext="Delete this competition" label="Delete" id="delete" onclick="return confirm('Delete this competition');"/>
 				</row>

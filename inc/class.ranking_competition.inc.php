@@ -279,7 +279,7 @@ class ranking_competition extends so_sql
 	 * Get the number of athlets prequalified from the ranking, depending on the cat
 	 *
 	 * @param int $cat integer GrpId
-	 * @param array $comp=null competition data, default use $this->data
+	 * @param array $comp =null competition data, default use $this->data
 	 * @return integer
 	 */
 	function prequal_ranking($cat=null,array $comp=null)
@@ -303,7 +303,7 @@ class ranking_competition extends so_sql
 	 *
 	 * @param int|string $fed integer fed_id or string 3-char nation
 	 * @param int $cat integer GrpId
-	 * @param array $comp=null competition data, default use $this->data
+	 * @param array $comp =null competition data, default use $this->data
 	 * @return integer
 	 */
 	function quota($fed=null,$cat=null,array $comp=null)
@@ -339,7 +339,7 @@ class ranking_competition extends so_sql
 	 * Get the maximum quota for a federation
 	 *
 	 * @param int|string $fed integer fed_id or string 3-char nation
-	 * @param array $comp=null competition data, default use $this->data
+	 * @param array $comp =null competition data, default use $this->data
 	 * @return int
 	 */
 	function max_quota($fed=null,array $comp=null)
@@ -368,7 +368,7 @@ class ranking_competition extends so_sql
 	 *
 	 * @param mixed $keys array with keys, or WetId or rkey
 	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
+	 * @param string $join ='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
 	 * @return array/boolean array with competition or false on error (eg. not found)
 	 */
 	function read($keys,$extra_cols='',$join='')
@@ -417,8 +417,8 @@ class ranking_competition extends so_sql
 	 * @param string $date in 'Y-m-d' format
 	 * @param array/int $cats (array of) cat-id's (GrpId)
 	 * @param string $nation of the competition (calendar)
-	 * @param int $cup=0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
-	 * @param int $num=1 how many competitions back are searched, default 1 = last competition
+	 * @param int $cup =0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
+	 * @param int $num =1 how many competitions back are searched, default 1 = last competition
 	 * @return array/boolean array with competition or false on error (eg. none found)
 	 */
 	function last_comp($date,$cats,$nation,$cup=0,$num=1)
@@ -455,8 +455,8 @@ class ranking_competition extends so_sql
 	 * @param string $date in 'Y-m-d' format
 	 * @param array|string $cats (array of) cat-rkey's
 	 * @param string $nation of the competition (calendar)
-	 * @param int $cup=0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
-	 * @param boolean $ignore_factor_0=true true competition with a factor of 0 are ignored, false all comp. are returned
+	 * @param int $cup =0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
+	 * @param boolean $ignore_factor_0 =true true competition with a factor of 0 are ignored, false all comp. are returned
 	 * @return array|boolean array with competition or false on error (eg. none found)
 	 */
 	function next_comp($date,$cats,$nation,$cup=0,$ignore_factor_0=true,$limit_this_year=false)
@@ -494,7 +494,7 @@ class ranking_competition extends so_sql
 	 * @param string $date in 'Y-m-d' format
 	 * @param array|string $cats (array of) cat-rkey's
 	 * @param string $nation of the competition (calendar)
-	 * @param int $cup=0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
+	 * @param int $cup =0 id (SerId) of cup or 0 for no cup (then comp.faktor has to be > 0)
 	 * @return array|boolean array with competition or false on error (eg. none found)
 	 */
 	function next_comp_this_year($date,$cats,$nation,$cup=0)
@@ -527,8 +527,8 @@ class ranking_competition extends so_sql
 	 * get the names of all or certain competitions, eg. to use in a selectbox
 	 *
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
-	 * @param int $rkeys=0 0: WetId=>name, 1: rkey=>name, 2: rkey=>rkey: name
-	 * @param string $sort='datum DESC'
+	 * @param int $rkeys =0 0: WetId=>name, 1: rkey=>name, 2: rkey=>rkey: name
+	 * @param string $sort ='datum DESC'
 	 * @return array with comp-names as specified in $rkeys
 	 */
 	function names($keys=array(),$rkeys=0,$sort='datum DESC')
@@ -566,7 +566,7 @@ class ranking_competition extends so_sql
 	 * checks if a competition already has results recorded
 	 *
 	 * @param int/array $keys WetId or array with keys of competition to check
-	 * @param int $GrpId=null optional GrpId to only check for a certain category
+	 * @param int $GrpId =null optional GrpId to only check for a certain category
 	 * @return boolean
 	 */
 	function has_results($keys,$GrpId=null)
@@ -609,7 +609,7 @@ class ranking_competition extends so_sql
 	 * Check if (uploaded) file contains an image (for web display)
 	 *
 	 * @param string $filename
-	 * @param string $mime=null mime-type
+	 * @param string $mime =null mime-type
 	 * @return boolean|string false or default extension (incl. leading '.')
 	 */
 	static function is_image($filename,$mime=null)
@@ -634,7 +634,7 @@ class ranking_competition extends so_sql
 	 * @param string $type 'info', 'startlist', 'result'
 	 * @param array $data competition
 	 * @param string $rkey rkey to use, default ''=use the one from our internal data
-	 * @param string $extension=null extension of the file
+	 * @param string $extension =null extension of the file
 	 * @return string the path
 	 */
 	function attachment_path($type,$data=null,$rkey='',$extension=null)
@@ -660,7 +660,7 @@ class ranking_competition extends so_sql
 		}
 		elseif (!$extension)
 		{
-			foreach(self::$image_types as $mime => $ext_regexp)
+			foreach(self::$image_types as $ext_regexp)
 			{
 				$ext = str_replace(array('\\','?','$'),'',$ext_regexp);
 
@@ -679,18 +679,19 @@ class ranking_competition extends so_sql
 	 * Checks and returns links to the attached files
 	 *
 	 * @param array $data a given competition, default use the already read one
-	 * @param boolean $return_link=false return links or arrays with vars for the link-function, default false=array
-	 * @param boolean $only_pdf=true return only pdfs (default) or the logos too
-	 * @param boolean|string $add_host=false true: return attachment links including a host, not just a path, default not
+	 * @param boolean $return_link =false not used anymore
+	 * @param boolean $only_pdf =true return only pdfs (default) or the logos too
+	 * @param boolean|string $add_host =false true: return attachment links including a host, not just a path, default not
 	 * 	or string with url to prefix it, eg. http://example.com (without trailing slash!)
 	 * @return boolean/array links for the keys: info, startlist, result or false on error
 	 */
 	function attachments($data=null,$return_link=false,$only_pdf=true,$add_host=false)
 	{
+		unset($return_link);
 		if (!$data) $data =& $this->data;
 
 		$attachments = false;
-		foreach($this->attachment_prefixes as $type => $prefix)
+		foreach(array_keys($this->attachment_prefixes) as $type)
 		{
 			if ($only_pdf && ($type == 'logo' || $type == 'sponsors')) continue;
 
@@ -722,7 +723,7 @@ class ranking_competition extends so_sql
 	 * @param array $files full path to files for the keys info, startlist and result
 	 * @param string &$error_msg error-messaage if returning false
 	 * @param array $keys to read/use a given competitions, default use the already read one
-	 * @param string $extension='.pdf' extension of file to attach
+	 * @param string $extension ='.pdf' extension of file to attach
 	 * @return boolean true on success, false otherwise
 	 */
 	function attach_files($files,&$error_msg,$keys=null,$extension='.pdf')
@@ -796,7 +797,7 @@ class ranking_competition extends so_sql
 
 		$ok = true;
 		egw_vfs::$is_root = true;		// acl is based on edit rights for the competition and NOT the vfs rights
-		foreach($this->attachment_prefixes as $type => $prefix)
+		foreach(array_keys($this->attachment_prefixes) as $type)
 		{
 			$old_path = $this->attachment_path($type,null,$old_rkey);
 			$new_path = $this->attachment_path($type,null,null,self::is_image($old_path));
@@ -818,8 +819,8 @@ class ranking_competition extends so_sql
 	 *
 	 * Reimplemented to automatic update modifier and modified time
 	 *
-	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
-	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function save($keys=null,$extra_where=null)
@@ -835,7 +836,7 @@ class ranking_competition extends so_sql
 	/**
 	 * Format competition date-span using datum and duration fields and user-prefs for date-format
 	 *
-	 * @param array $comp=null default use internal data
+	 * @param array $comp =null default use internal data
 	 * @return string
 	 */
 	function datespan(array $comp=null)
@@ -888,7 +889,7 @@ class ranking_competition extends so_sql
 	 * Checks if given athlete is allowed to start, because of his federation and the open-ness of the comp
 	 *
 	 * @param array $athlete values for keys nation, fed_id, fed_parent, acl_fed_id
-	 * @param array $comp=null default use internal data
+	 * @param array $comp =null default use internal data
 	 * @return boolean true if athlete is allowed to register, false if not
 	 */
 	function open_comp_match(array $athlete, array $comp=null)
@@ -933,7 +934,7 @@ class ranking_competition extends so_sql
 	 * Return number of preselected for a given category
 	 *
 	 * @param int $cat
-	 * @param array $quali_preselected=null
+	 * @param array $quali_preselected =null
 	 * @return int
 	 */
 	function quali_preselected($cat, array $quali_preselected=null)

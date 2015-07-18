@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -56,10 +56,10 @@ class ranking_competition_ui extends ranking_bo
 	/**
 	 * Edit a competition
 	 *
-	 * @param array $content
-	 * @param string $msg
+	 * @param array $_content =null
+	 * @param string $msg =''
 	 */
-	function edit($content=null,$msg='',$view=false)
+	function edit($_content=null,$msg='',$view=false)
 	{
 		$tmpl = new etemplate('ranking.comp.edit');
 
@@ -68,7 +68,7 @@ class ranking_competition_ui extends ranking_bo
 			$msg .= lang('Entry not found !!!');
 		}
 		// set and enforce nation ACL
-		if (!is_array($content))	// new call
+		if (!is_array($_content))	// new call
 		{
 			if (!$_GET['WetId'] && !$_GET['rkey'])
 			{
@@ -82,33 +82,33 @@ class ranking_competition_ui extends ranking_bo
 		}
 		else
 		{
-			//echo "<br>ranking_competition_ui::edit: content ="; _debug_array($content);
-			$this->comp->data = $content['comp_data'];
-			$old_rkey = $content['comp_data']['rkey'];
-			unset($content['comp_data']);
+			//echo "<br>ranking_competition_ui::edit: content ="; _debug_array($_content);
+			$this->comp->data = $_content['comp_data'];
+			$old_rkey = $_content['comp_data']['rkey'];
+			unset($_content['comp_data']);
 
-			if (substr($content['homepage'], 0, 4) === 'www.') $content['homepage'] = 'http://'.$content['homepage'];
+			if (substr($_content['homepage'], 0, 4) === 'www.') $_content['homepage'] = 'http://'.$_content['homepage'];
 
-			$view = $content['view'] && !($content['edit'] && $this->acl_check_comp($this->comp->data));
+			$view = $_content['view'] && !($_content['edit'] && $this->acl_check_comp($this->comp->data));
 
 			if (!$view && $this->only_nation_edit)
 			{
 				$this->check_set_nation_fed_id($this->comp->data);
 			}
-			if (!$content['cat_id']) $content['cat_id'] = ranking_so::cat_rkey2id($content['nation']);
+			if (!$_content['cat_id']) $_content['cat_id'] = ranking_so::cat_rkey2id($_content['nation']);
 
-			if ($content['serie'] && $content['serie'] != $this->comp->data['serie'] &&
-				$this->cup->read(array('SerId' => $content['serie'])))
+			if ($_content['serie'] && $_content['serie'] != $this->comp->data['serie'] &&
+				$this->cup->read(array('SerId' => $_content['serie'])))
 			{
 				foreach((array)$this->cup->data['presets']+array('gruppen' => $this->cup->data['gruppen']) as $key => $val)
 				{
-					$content[$key] = $val;
+					$_content[$key] = $val;
 				}
 			}
-			$this->comp->data_merge($content);
+			$this->comp->data_merge($_content);
 			//echo "<br>ranking_competition_ui::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (!$view  && ($content['save'] || $content['apply']) && $this->acl_check_comp($this->comp->data))
+			if (!$view  && ($_content['save'] || $_content['apply']) && $this->acl_check_comp($this->comp->data))
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -149,7 +149,7 @@ class ranking_competition_ui extends ranking_bo
 					}
 					foreach(array_keys($this->comp->attachment_prefixes) as $type)
 					{
-						$file = $content['upload_'.$type];
+						$file = $_content['upload_'.$type];
 						if (is_array($file) && $file['tmp_name'] && $file['name'])
 						{
 							//echo $type; _debug_array($file);
@@ -175,16 +175,16 @@ class ranking_competition_ui extends ranking_bo
 							}
 						}
 					}
-					if ($content['save'] || $content['apply'])
+					if ($_content['save'] || $_content['apply'])
 					{
-						$link = egw::link($content['referer'],array(
+						$link = egw::link($_content['referer'],array(
 							'msg' => $msg,
 						));
 						$js = "window.opener.location='$link';";
 					}
 				}
 			}
-			if ($content['delete'])
+			if ($_content['delete'])
 			{
 				$link = egw::link('/index.php',array(
 					'menuaction' => 'ranking.ranking_competition_ui.index',
@@ -192,23 +192,23 @@ class ranking_competition_ui extends ranking_bo
 				));
 				$js = "window.opener.location='$link';";
 			}
-			if ($content['copy'])
+			if ($_content['copy'])
 			{
 				unset($this->comp->data['WetId']);
 				unset($this->comp->data['rkey']);
 				unset($this->comp->data['datum']);
 				$msg .= lang('Entry copied - edit and save the copy now.');
 			}
-			if ($content['save'] || $content['delete'])
+			if ($_content['save'] || $_content['delete'])
 			{
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
 				common::egw_exit();
 			}
 			if (!empty($js)) $GLOBALS['egw']->js->set_onload($js);
 
-			if ($content['remove'] && $this->acl_check_comp($this->comp->data))
+			if ($_content['remove'] && $this->acl_check_comp($this->comp->data))
 			{
-				list($type) = each($content['remove']);
+				list($type) = each($_content['remove']);
 
 				$msg .= $this->comp->remove_attachment($type) ?
 					lang('Removed the %1',$this->attachment_type[$type]) :
@@ -217,8 +217,8 @@ class ranking_competition_ui extends ranking_bo
 		}
 		$content = $this->comp->data + array(
 			'msg'  => $msg,
-			'tabs' => $content['tabs'],
-			'referer' => $content['referer'] ? $content['referer'] :
+			'tabs' => $_content['tabs'],
+			'referer' => $_content['referer'] ? $_content['referer'] :
 				common::get_referer('/index.php?menuaction=ranking.ranking_competition_ui.index'),
 		);
 		foreach((array) $this->comp->attachments(null,false,false) as $type => $linkdata)
@@ -256,6 +256,7 @@ class ranking_competition_ui extends ranking_bo
 			'selfregister' => $this->comp->selfregister_types,
 			'open_comp'    => $this->comp->open_comp_types,
 			'prequal_type' => $this->comp->prequal_types,
+			'continent'    => ranking_federation::$continents,
 		);
 		// select a category parent fitting to the nation
 		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
@@ -367,18 +368,18 @@ class ranking_competition_ui extends ranking_bo
 	/**
 	 * List existing competitions
 	 *
-	 * @param array $content
-	 * @param string $msg
+	 * @param array $_content =null
+	 * @param string $msg =''
 	 */
-	function index($content=null,$msg='')
+	function index($_content=null,$msg='')
 	{
 		$tmpl = new etemplate('ranking.comp.list');
 
-		if ($content['nm']['rows']['delete'] || $_GET['delete'] > 0)
+		if ($_content['nm']['rows']['delete'] || $_GET['delete'] > 0)
 		{
-			if ($content['nm']['rows']['delete'])
+			if ($_content['nm']['rows']['delete'])
 			{
-				list($id) = each($content['nm']['rows']['delete']);
+				list($id) = each($_content['nm']['rows']['delete']);
 			}
 			elseif($_GET['delete'] > 0)
 			{
@@ -400,7 +401,7 @@ class ranking_competition_ui extends ranking_bo
 		}
 		$content = array();
 
-		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','comp_state');
+		$content['nm'] = $GLOBALS['egw']->session->appsession('ranking','comp_state');
 
 		if (!is_array($content['nm']))
 		{

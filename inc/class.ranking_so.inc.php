@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -176,8 +176,8 @@ class ranking_so
 	 * Get category by it's rkey (symbolic shortcut)
 	 *
 	 * @param string $rkey
-	 * @param string $name='' name to create category if not found
-	 * @param int $parent=null parent for new categories, if not $global_parent
+	 * @param string $name ='' name to create category if not found
+	 * @param int $parent =null parent for new categories, if not $global_parent
 	 * @return int id or null if not found AND empty($name)
 	 */
 	public static function cat_rkey2id($rkey,$name='',$parent=null)
