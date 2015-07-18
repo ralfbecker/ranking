@@ -539,7 +539,7 @@ class ranking_federation extends so_sql
 			$nations[$continent] = array();
 			foreach($this->db->select(self::FEDERATIONS_TABLE, 'DISTINCT nation', array(
 				'fed_continent' => $continent,
-			), __LINE__, __FILE__, 0, 'ORDER BY nation', 'ranking') as $row)
+			), __LINE__, __FILE__, false, 'ORDER BY nation', 'ranking') as $row)
 			{
 				$nations[$continent][] = $row['nation'];
 			}
