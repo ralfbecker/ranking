@@ -948,7 +948,7 @@ class ranking_bo extends ranking_so
 		{
 			$startlist[$route] = array();
 		}
-		$prequalified = $this->prequalified($comp,$cat);
+		$prequalified = $this->result->prequalified($comp,$cat);
 
 		// first we need to remove all not-prequalified starters which are over quota+max_complimentary
 		if ($max_compl < 999)
@@ -984,11 +984,11 @@ class ranking_bo extends ranking_so
 			}
 		}
 		// index starters with their PerId
-		foreach($starters as $k => &$athlete)
+		foreach($starters as $k => $athlete)
 		{
 			$athlete['GrpId'] = $cat['GrpId'];	// could be $add_cat
 			unset($starters[$k]);
-			$starters[$athlete['PerId']] =& $athlete;
+			$starters[$athlete['PerId']] = $athlete;
 		}
 
 		$reset_data = 1;
