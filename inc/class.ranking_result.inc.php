@@ -280,11 +280,11 @@ class ranking_result extends so_sql
 	 */
 	function prequalified($comp,$cat)
 	{
+		$boranking = ranking_bo::getInstance();
 		if (!is_array($comp) || !isset($comp['prequal_comp']))
 		{
-			$comp = $this->read($comp);
+			$comp = $boranking->comp->read(is_array($comp) ? $comp['WetId'] : $comp);
 		}
-		$boranking = ranking_bo::getInstance();
 		if (!is_array($cat)) $cat = $boranking->cats->read($cat);
 
 		$prequals = array();
