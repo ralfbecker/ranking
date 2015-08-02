@@ -243,12 +243,12 @@ class ranking_selfservice extends ranking_bo
 	{
 		// Edit profile and logout buttons
 		echo "<p id='profile-logout-buttons'>".
-			html::form_1button('profile', lang('Edit Profile'), '', egw::link('/index.php',array(
+			html::form_1button('profile', lang('Edit Profile'), '', '/index.php', array(
 				'menuaction' => 'ranking.ranking_athlete_ui.edit',
 				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
-			)))."\n".
+			))."\n".
 			html::form_1button('logout', lang('Logout'), '',
-				egw::link('/ranking/athlete.php',array('action' => 'logout'))).
+				'/ranking/athlete.php', array('action' => 'logout')).
 			"</p>\n";
 	}
 
