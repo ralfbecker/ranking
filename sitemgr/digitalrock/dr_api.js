@@ -668,17 +668,18 @@ var Startlist = (function() {
 	{
 		//console.log(_data);
 		var detail = this.json_url.match(/detail=([^&]+)/);
+		if (detail) detail = detail[1];
 
 		switch(_data.discipline)
 		{
 			case 'speedrelay':
-				this.startlist_cols = !detail ? {	// default detail
+				this.startlist_cols = detail === null ? {	// default detail
 					'start_order': 'StartNr',
 					'team_name': 'Teamname',
 					'athletes/0/lastname': 'Athlete #1',
 					'athletes/1/lastname': 'Athlete #2',
 					'athletes/2/lastname': 'Athlete #3'
-				} : (detail[1] ? {	// detail=1
+				} : (detail ? {	// detail=1
 					'start_order': 'StartNr',
 					'team_name': 'Teamname',
 					//'team_nation': 'Nation',
@@ -776,7 +777,7 @@ var Startlist = (function() {
 		if (this.discipline && this.discipline != _data.discipline ||
 			this.sort && this.sort != sort ||
 			_data.route_order != this.route_order ||	// switching heats (they can have different columns)
-			detail != this.detail ||		// switching detail on/off
+			detail !== this.detail ||		// switching detail on/off
 			this.json_url != this.last_json_url)
 		{
 			jQuery(this.container).empty();
