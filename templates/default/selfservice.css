@@ -35,3 +35,7 @@ tr.noPrint.catSelectionMsg {
 	display: block !important;
 	border: none !important;
 }
+
+div#ranking-result-index_ranking-result-selfscore_measurement {
+	overflow-x: hidden;
+}
