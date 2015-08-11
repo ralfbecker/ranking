@@ -217,7 +217,7 @@ tr.profileMarginTop > td {
 }
 .Aggregated td.name, .Aggregated th.result, .Aggregated td.result {
 	line-height: 1.3;
-	white-space: pre;
+	white-space: pre-wrap;
 }
 .Aggregated td.calculationHidden, .Aggregated th.calculationHidden {
 	display: none;
