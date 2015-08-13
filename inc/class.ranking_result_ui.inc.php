@@ -595,7 +595,7 @@ class ranking_result_ui extends ranking_result_bo
 				$sel_options['add_cat'] += $this->cats->names(array('rkey' => $comp['gruppen'],'sex' => $cat['sex'],'GrpId!='.(int)$cat['GrpId']),0);
 			}
 			if ($content['route_status'] != STATUS_RESULT_OFFICIAL || $content['new_route'] ||
-				$content['route_order'] != -1 || $discipline == 'speedrelay')
+				$content['route_order'] != -1 && $discipline != 'selfscore' || $discipline == 'speedrelay')
 			{
 				$readonlys['button[ranking]'] = $readonlys['import_cat'] = true;	// only offical results can be commited into the ranking
 			}
