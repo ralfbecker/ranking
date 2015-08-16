@@ -122,6 +122,7 @@ climbingdata xml files can only set results, not create new participants!	rankin
 clone of	ranking	en	Clone of
 closes	ranking	en	closes
 columns	ranking	en	Columns
+comment is displayed in "see also" list below ranking	ranking	en	Comment is displayed in "See also" list below ranking
 comments	ranking	en	Comments
 comp. date	ranking	en	comp. date
 competition	ranking	en	Competition
@@ -437,6 +438,7 @@ ranglist	ranking	en	Ranglist
 rank	ranking	en	Rank
 ranking	common	en	Ranking
 ranking (unranked last)	ranking	en	ranking (unranked last)
+ranking comment	ranking	en	Ranking comment
 ranking database	admin	en	Ranking database
 rankings - categories	ranking	en	Rankings - Categories
 rankings - cathegories	ranking	en	Rankings - Cathegories

@@ -76,6 +76,10 @@
 			.nowrap { white-space: nowrap; }\r\n.gray { color: gray; }
 		</styles>
 	</template>
+	<template id="ranking.cup.edit.comment" template="" lang="" group="0" version="14.3.001">
+		<description value="Comment is displayed in &quot;See also&quot; list below ranking"/>
+		<textbox multiline="true" cols="100" id="comment" rows="14" class="fullWidth"/>
+	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="210" overflow="auto">
 			<columns>
@@ -138,7 +142,7 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.cup.edit" template="" lang="" group="0" version="14.2.001">
+	<template id="ranking.cup.edit" template="" lang="" group="0" version="14.3.001">
 		<grid width="100%" height="170">
 			<columns>
 				<column width="15%"/>
@@ -183,11 +187,13 @@
 						<tabs>
 							<tab id="general" label="Categories"/>
 							<tab id="ranking" label="Ranking"/>
+							<tab id="comment" label="Ranking comment"/>
 							<tab id="presets" label="Presets"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.cup.edit.general"/>
 							<template id="ranking.cup.edit.ranking"/>
+							<template id="ranking.cup.edit.comment"/>
 							<template id="ranking.cup.edit.presets"/>
 						</tabpanels>
 					</tabbox>
@@ -199,8 +205,10 @@
 						<button statustext="apply the changes made" label="Apply" id="apply"/>
 						<button statustext="aborts without saving changes" label="Cancel" id="cancel" onclick="window.close();"/>
 					</hbox>
-					<button align="right" label="Copy" id="copy"/>
-					<button align="right" statustext="deletes this cup" label="Delete" id="delete" onclick="return confirm('deletes this cup');"/>
+					<hbox span="2">
+						<button align="center" label="Copy" id="copy"/>
+						<button align="right" statustext="deletes this cup" label="Delete" id="delete" onclick="return confirm('deletes this cup');"/>
+					</hbox>
 				</row>
 			</rows>
 		</grid>

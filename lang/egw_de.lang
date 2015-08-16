@@ -625,3 +625,5 @@ you need to select some federations first!	ranking	de	Sie müssen zuerst einige 
 your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 zip code	ranking	de	Postleitzahl
+ranking comment	ranking	de	Ranglistenkommentar
+comment is displayed in "see also" list below ranking	ranking	de	Kommentar wird unter der Rangliste in der "Siehe auch" Liste angezeigt

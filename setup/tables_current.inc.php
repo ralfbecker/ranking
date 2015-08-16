@@ -77,7 +77,8 @@ $phpgw_baseline = array(
 			'fed_id' => array('type' => 'int','precision' => '4'),
 			'min_disciplines' => array('type' => 'int','precision' => '2'),
 			'drop_equally' => array('type' => 'bool'),
-			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania')
+			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania'),
+			'comment' => array('type' => 'varchar','precision' => '1024')
 		),
 		'pk' => array('SerId'),
 		'fk' => array(),
