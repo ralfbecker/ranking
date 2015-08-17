@@ -1158,6 +1158,7 @@ class ranking_export extends ranking_result_bo
 	 */
 	public function export_ranking($cat,$date=null,$cup=null,$force_cache=false)
 	{
+		//error_log(__METHOD__."(cat=".array2string($cat).", '$date', '$cup', $force_cache)");
 		if (empty($date)) $date = '.';
 		$location = self::export_ranking_location($cat, $date, $cup);
 		if (($force_cache || !in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts)) &&
@@ -1253,6 +1254,12 @@ class ranking_export extends ranking_result_bo
 		if ($cup)
 		{
 			$data['comp_name'] = $cup['name'];
+			if ($cup['comment'])
+			{
+				$data['see_also'][] = array(
+					'name' => $cup['comment'],
+				);
+			}
 		}
 		else
 		{

@@ -1813,3 +1813,14 @@ function ranking_upgrade14_2_004()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.2.005';
 }
 
+
+function ranking_upgrade14_2_005()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','comment',array(
+		'type' => 'varchar',
+		'precision' => '1024'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.001';
+}
+
