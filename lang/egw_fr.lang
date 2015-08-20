@@ -1,23 +1,83 @@
+%1 athletes imported.	ranking	fr	%1 athlète(s) importé(s).
 %1 deleted	ranking	fr	%1 supprimé(s).
+%1 federations added to parent federation.	ranking	fr	%1 fédérations fusionnées ajoutée à la fédération mère
+%1 federations merged.	ranking	fr	%1 fédérations fusionnées.
+%1 is an admin and has therefor all rights!	ranking	fr	%1 est administrateur et dispose donc de tous les droits !
+%1 lines read from file.	ranking	fr	%1 lignes lues du fichier
+%1 participants imported	ranking	fr	%1 participants importés
+%1 saved	ranking	fr	%1 enregistré
+%1, %2 deleted for category %3	ranking	fr	%1, %2 supprimés de la catégorie %3
+%1, %2 registered for category %3	ranking	fr	%1, %2 supprimés dans la catégorie %3
+%1. false start	ranking	fr	%1. Mauvais départ
+%1. heat	ranking	fr	%1. Tour
+%1. try	ranking	fr	%1. Essai
+'%1' does not exist or is not readable by the webserver !!!	ranking	fr	'%1' n'existe pas ou est non trouvé par le serveur web !!!
+1. display	ranking	fr	1. Afficha
+1. january	ranking	fr	1. Janvier
+1. place	ranking	fr	1. place
+2. display	ranking	fr	2. Affichage
+2. lane	ranking	fr	2. Ligne
+2. qualification	ranking	fr	2. Qualification
+2. time	ranking	fr	2. Temps
+3. place	ranking	fr	3. Place
 accounting	ranking	fr	Comptabilité
 actions	ranking	fr	Actions
+add a cup	ranking	fr	Ajouter une coupe
+add a new athlete	ranking	fr	Ajouter un nouvel athlète
+add a new category	ranking	fr	Ajouter une nouvelle catégorie
+add a new competition	ranking	fr	Ajouter une nouvelle compétition
+add a new cup	ranking	fr	Ajouter une nouvelle coupe
+add a new heat	ranking	fr	Ajouter un nouveau tour
+add athletes	ranking	fr	Ajouter des athlètes
+add heat	ranking	fr	Aouter un tour
+add new athlete with the given data	ranking	fr	Ajouter un nouvel athlète avec ces données
+admin rights required!	ranking	fr	Droits administrateur requis !
+administrated by: parent federation	ranking	fr	Administré par : la fédération mère
+athlete	ranking	fr	Athlète
+athlete %1 not found!	ranking	fr	Athlète %1 non trouvé !
+athlete 1	ranking	fr	Athlète 1
+athlete 2	ranking	fr	Athlète 2
+athlete 3	ranking	fr	Athlète 3
 before	ranking	fr	Avant
+birthdate	ranking	fr	Date de naisance
 birthday	ranking	fr	Anniversaire
+birthyear	ranking	fr	Année de naissance
+bonus	ranking	fr	Bonus
+cellphone	ranking	fr	Portable
 check all	ranking	fr	Vérifier tout
 children	ranking	fr	Enfants
 city	ranking	fr	Ville
 columns	ranking	fr	Colonnes
 comments	ranking	fr	Commentaires
+competition logo	ranking	fr	Logo de la compétiton
+competition name	ranking	fr	Nom de la compétition
+competitions	ranking	fr	Compétitions
 confirmed	ranking	fr	Confirmé
 contact	ranking	fr	Contact
+cup	ranking	fr	Coupe
+cups	ranking	fr	Coupes
 database	admin	fr	Base de données
+deadline	ranking	fr	Date limite
 delete this category	ranking	fr	Supprimer cette catégorie
 delimiter	ranking	fr	Délimiteur
+discipline	ranking	fr	Discipline
 display	ranking	fr	Afficher
 down	ranking	fr	Bas
 download	ranking	fr	Télécharger
+download all	ranking	fr	Tout télécharger
 edit %1	ranking	fr	Modifier %1
+edit athlete	ranking	fr	Modifier un athlète
+edit competition	ranking	fr	Modifier une compétition
+edit heat	ranking	fr	Modifier un tour
+edit profile	ranking	fr	Modifier un profil
+edit this athlete	ranking	fr	Modifier cet athlète
+edit this competition	ranking	fr	Modifier cette compétition
+edit this cup	ranking	fr	Modifier cette coupe
+edit this heat	ranking	fr	Modifier ce tour
+eliminated	ranking	fr	éliminé
+email address not found!	ranking	fr	Adresse email non trouvée !
 end	ranking	fr	Fin
+entry not found !!!	ranking	fr	Entrée non trouvée !!!
 error: while saving !!!	ranking	fr	Erreur: lors de l'enregistrement !!!
 fax	ranking	fr	Fax
 female	ranking	fr	Féminin
@@ -34,6 +94,9 @@ mail all participants	ranking	fr	envoyer un email à tous les participants
 male	ranking	fr	Masculin
 more	ranking	fr	Plus
 not allowed	ranking	fr	Pas autorisé
+or	ranking	fr	ou
+other sports	ranking	fr	autres sports
+other sports practiced	ranking	fr	autres sports pratiqués
 permission denied !!!	ranking	fr	Autorisation refusée !!!
 phone	ranking	fr	Appel téléphonique
 picture	ranking	fr	Image
@@ -50,6 +113,7 @@ sum	ranking	fr	Somme
 try	ranking	fr	Essayer
 unpublished	ranking	fr	non publié
 up	ranking	fr	Haut
+view this athlete	ranking	fr	Voir cet athlète
 website	ranking	fr	Site Web
 wrong admin-account or -password !!!	ranking	fr	Compte ou mot de passe admin incorrect !
 you need to select a file first!	ranking	fr	Sélectionner d'abord un fichier !
