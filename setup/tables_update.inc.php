@@ -1824,3 +1824,15 @@ function ranking_upgrade14_2_005()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.001';
 }
 
+
+function ranking_upgrade14_3_001()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Serien','max_disciplines',array(
+		'type' => 'varchar',
+		'precision' => '255',
+		'comment' => 'JSON:{disciplin:max,...}'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.002';
+}
+

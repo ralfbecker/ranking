@@ -9,13 +9,13 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top" height="115">
-					<description value="Categories" for="gruppen"/>
+					<description for="gruppen" value="Categories"/>
 					<listbox id="gruppen" no_lang="1" rows="9"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="1.9.002">
+	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="14.3.001">
 		<grid width="100%" height="200" overflow="auto">
 			<columns>
 				<column width="15%"/>
@@ -24,7 +24,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description value="competitions counting" for="max_serie" class="nowrap"/>
+					<description for="max_serie" value="competitions counting" class="nowrap"/>
 					<textbox type="integer" statustext="number of competitions counting for the cup (empty for all)" id="max_serie"/>
 					<grid padding="0">
 						<columns>
@@ -42,31 +42,45 @@
 					</grid>
 				</row>
 				<row class="row">
-					<description value="Minimum disciplines" for="min_disciplines"/>
+					<description for="min_disciplines" value="Minimum disciplines"/>
 					<textbox type="integer" id="min_disciplines"/>
 					<checkbox label="Require to drop results equally by discipline" id="drop_equally"/>
 				</row>
+				<row>
+					<description value="Per discipline"/>
+					<hbox span="all">
+						<menulist>
+							<menupopup type="select-number" label="Lead" id="max_disciplines[lead]" options="None,1,10"/>
+						</menulist>
+						<menulist>
+							<menupopup type="select-number" label="Boulder" id="max_disciplines[boulder]" options="None,1,10"/>
+						</menulist>
+						<menulist>
+							<menupopup type="select-number" label="Speed" id="max_disciplines[speed]" options="None,1,10"/>
+						</menulist>
+					</hbox>
+				</row>
 				<row class="row">
-					<description value="Pointalocation" for="pkte"/>
+					<description for="pkte" value="Pointalocation"/>
 					<menulist>
 						<menupopup statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Factor" for="faktor"/>
+					<description for="faktor" value="Factor"/>
 					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor"/>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Better result splits ties" for="split_by_places"/>
+					<description for="split_by_places" value="Better result splits ties"/>
 					<menulist>
 						<menupopup statustext="Use better result to break ties in the ranking" id="split_by_places"/>
 					</menulist>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="counting for rankings" for="max_rang"/>
+					<description for="max_rang" value="counting for rankings"/>
 					<textbox type="integer" statustext="maximum number of competition counting for the ranking (empty for all)" id="max_rang"/>
 					<description/>
 				</row>
@@ -78,7 +92,7 @@
 	</template>
 	<template id="ranking.cup.edit.comment" template="" lang="" group="0" version="14.3.001">
 		<description value="Comment is displayed in &quot;See also&quot; list below ranking"/>
-		<textbox multiline="true" cols="100" id="comment" rows="14" class="fullWidth"/>
+		<textbox multiline="true" id="comment" rows="14" cols="100" class="fullWidth"/>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="210" overflow="auto">
@@ -127,7 +141,7 @@
 					<description value="Presets for competitions" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Competition name" for="presets[name]"/>
+					<description for="presets[name]" value="Competition name"/>
 					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
 				</row>
 				<row class="row">
@@ -137,7 +151,7 @@
 					</menulist>
 				</row>
 				<row>
-					<template id="ranking.comp.edit.ranking" content="presets" span="all"/>
+					<template content="presets" id="ranking.comp.edit.ranking" span="all"/>
 				</row>
 			</rows>
 		</grid>
@@ -148,10 +162,12 @@
 				<column width="15%"/>
 				<column width="20%"/>
 				<column width="100"/>
+				<column/>
 			</columns>
 			<rows>
 				<row>
 					<description id="msg" no_lang="1" span="all" class="redItalic"/>
+					<description/>
 					<description/>
 					<description/>
 				</row>
@@ -177,18 +193,18 @@
 					<menulist>
 						<menupopup type="select-cat" id="presets[cat_id]" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
 					</menulist>
-					<description value="Continent" for="continent"/>
+					<description for="continent" value="Continent"/>
 					<menulist>
 						<menupopup id="continent" options="All"/>
 					</menulist>
 				</row>
 				<row>
-					<tabbox id="tabs" span="all">
+					<tabbox id="ranking.cup.edit.general|ranking.cup.edit.ranking|ranking.cup.edit.comment|ranking.cup.edit.presets" span="all">
 						<tabs>
-							<tab id="general" label="Categories"/>
-							<tab id="ranking" label="Ranking"/>
-							<tab id="comment" label="Ranking comment"/>
-							<tab id="presets" label="Presets"/>
+							<tab id="ranking.cup.edit.general" label="Categories"/>
+							<tab id="ranking.cup.edit.ranking" label="Ranking"/>
+							<tab id="ranking.cup.edit.comment" label="Ranking comment"/>
+							<tab id="ranking.cup.edit.presets" label="Presets"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.cup.edit.general"/>
