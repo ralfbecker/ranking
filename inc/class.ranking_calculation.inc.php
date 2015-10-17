@@ -647,6 +647,7 @@ class ranking_calculation
 			// use results with 0 points, as at least GER youth, counts that for disciplines
 			$use_0_point_results = (boolean)$min_disciplines;
 			$drop_equally = $cup['drop_equally'];
+			$max_disciplines = $cup['max_disciplines'];
 			//error_log(__METHOD__."(".array2string(func_get_args()).") max_comp=$max_comp, max_drop_per_discipline=$max_drop_per_disciline, min_disciplines=$min_disciplines");
 			if ((int) $stand >= 2000 && !in_array($cat['rkey'],(array)$cup['gruppen']))
 			{
@@ -752,12 +753,29 @@ class ranking_calculation
 				$this->pkte[$id] = 0;
 			}
 			if (!$result['PerId']) continue;	// ignore marker
+
+			// reset counter for max_disciplines
+			if ($id != $result['PerId']) $num_per_discipline = array();
+
 			$id = $result['PerId'];
 			$result_id = $result['WetId'].($overall?'_'.$result['GrpId']:'');
 			if (is_array($comps) && !isset($comps[$result_id]))
 			{
 				$comps[$result_id] = $this->bo->comp->read($result['WetId']);
 			}
+
+			// we only cound a fixed number of results per dicipline
+			if ($max_disciplines)
+			{
+				if ($num_per_discipline[$result['discipline']] >= $max_disciplines[$result['discipline']])
+				{
+					// --> further resutls are not counting
+					$this->_not_counting($result, $cup, $overall);
+					continue;
+				}
+				++$num_per_discipline[$result['discipline']];
+			}
+
 			//if (!isset($this->pers[$id])) error_log(__METHOD__."() *** $result[nachname] $result[vorname] ***");
 			$reserve_for_min_disciplines = $min_disciplines - count($this->disciplines[$id]);
 			if ($overall || $reserve_for_min_disciplines < 0 || !$min_disciplines) $reserve_for_min_disciplines = 0;

@@ -78,7 +78,8 @@ $phpgw_baseline = array(
 			'min_disciplines' => array('type' => 'int','precision' => '2'),
 			'drop_equally' => array('type' => 'bool'),
 			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania'),
-			'comment' => array('type' => 'varchar','precision' => '1024')
+			'comment' => array('type' => 'varchar','precision' => '1024'),
+			'max_disciplines' => array('type' => 'varchar','precision' => '255','comment' => 'JSON:{disciplin:max,...}')
 		),
 		'pk' => array('SerId'),
 		'fk' => array(),
