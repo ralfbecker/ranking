@@ -2,8 +2,8 @@
 
 /* $Id$ */
 
-$extra_header[2015] = '<font color=red>provisional</font>';
 $extra_header[2016] = '<font color=red>provisional</font>';
+$extra_header[2017] = '<font color=red>provisional</font>';
 
 // IFSC specific
 $results_since  = 1991;
@@ -66,11 +66,17 @@ $icc_combined = array(
 );
 $icc_youth = array(
 	'ICC_F_J' => 'female juniors',
+	'ICC_F_A' => 'female youth A (U18)',
+	'ICC_F_B' => 'female youth B (U16)',
+	'ICC_F_C' => 'female youth C (U14)',
+	'ICC_F_D' => 'female youth D (U12)',
+	'ICC_F_E' => 'female youth E (U10)',
 	'ICC_M_J' => 'male juniors',
-	'ICC_F_A' => 'female youth A',
-	'ICC_M_A' => 'male youth A',
-	'ICC_F_B' => 'female youth B',
-	'ICC_M_B' => 'male youth B',
+	'ICC_M_A' => 'male youth A (U18)',
+	'ICC_M_B' => 'male youth B (U16)',
+	'ICC_M_C' => 'male youth C (U14)',
+	'ICC_M_D' => 'male youth D (U12)',
+	'ICC_M_E' => 'male youth E (U10)',
 	'ICC_FBJ' => 'female juniors boulder',
 	'ICC_MBJ' => 'male juniors boulder',
 	'ICC_FBA' => 'female youth A boulder',
