@@ -1094,7 +1094,8 @@ app.classes.ranking = AppJS.extend(
 		jQuery('#ranking-result-index').css('overflow-y', 'hidden');	// otherwise we get a permanent scrollbar
 
 		// mark current athlets height
-		var height = parseFloat(this.et2.getWidgetById('result_height').get_value());
+		var result_height = this.et2.getWidgetById('result_height');
+		var height = parseFloat(result_height.get_value ? result_height.get_value() : result_height.value);
 		var plus = this.et2.getWidgetById('result_plus').get_value();
 		var current = this.getHoldsByHeight(plus == this.TOP_PLUS ? this.TOP_HEIGHT : (height ? height : 1));
 		if (current.length) {
