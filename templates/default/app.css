@@ -25,7 +25,7 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 .header { font-size: 110%; font-weight: bold; }
 .quota_line > td { border-top: 3px solid black; }
 .displayNone { display: none !important; }
-.noWrap { white-space: nowrap; }
+.noWrap { white-space: nowrap !important; }
 .speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; height: 7ex; }
 .max_compl { width: 45px; white-space: nowrap !important; }
 /**

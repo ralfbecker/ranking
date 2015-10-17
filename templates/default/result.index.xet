@@ -81,6 +81,7 @@
 				<column/>
 				<column disabled="@no_prev_heat"/>
 				<column disabled="@readonly"/>
+				<column/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">
@@ -102,6 +103,7 @@
 					<nextmatch-sortheader align="center" label="Time" id="result_time" class="$cont[lead_time_class]"/>
 					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
 					<description align="center" value="Actions" class="$cont[rw_result]"/>
+					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
 					<template id="ranking.result.footer" span="all"/>
@@ -128,6 +130,12 @@
 					<textbox type="float" align="center" id="set[$row_cont[PerId]][result_time]" class="$cont[lead_time_class]"/>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1"/>
 					<buttononly onclick="app.ranking.update_result_row" align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result]"/>
+					<vbox class="noPrint">
+						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>
+						<menulist>
+							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true" class="noWrap"/>
+						</menulist>
+					</vbox>
 				</row>
 			</rows>
 		</grid>
