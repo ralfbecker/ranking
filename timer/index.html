@@ -91,6 +91,7 @@
 				$('#final').change(function(){
 					if (this.checked) {
 						$('#stopOn0Span').show();
+						stopOn0 = $('#stopOn0Span').is(':checked');
 					} else {
 						$('#stopOn0Span').hide();
 						stopOn0 = false;
@@ -129,9 +130,9 @@
 			<label for="time"> min </label>
 			<input id="start" type="button" value="Start" />
 			<p><input id="final" type="checkbox" /><label for="final">use final timer (starts again at press of restart)</label><br/>
-			&nbsp; &nbsp; <span id="stopOn0Span" style="display: none"><input id="stopOn0" type="checkbox" /><label for="stopOn0" >stop timer on 0, otherwise count up again</label></span></p>
-			<p>Color <input id="color" type="color" value="#bbbbbb" size="7"/>
-			Background <input id="background" type="color" value="#333333" size="7"/>
+			&nbsp; &nbsp; <span id="stopOn0Span" style="display: none"><input id="stopOn0" type="checkbox" checked /><label for="stopOn0" >stop timer on 0, otherwise count up again</label></span></p>
+			<p>Color <input id="color" type="color" value="#ffffff" size="7"/>
+			Background <input id="background" type="color" value="#000000" size="7"/>
 			<input type="button" value="Apply" id="apply"/></p>
 		</div>
 
