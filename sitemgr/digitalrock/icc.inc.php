@@ -11,7 +11,7 @@ $results_since  = 1991;
 global $t_header_logo;	// make it availible in sitemgr too
 $t_footer_inc	= "icc_footer";
 $t_header_logo	= '<td width="150" class="onlyPrint" align="center"><a href="' . $url_icc_info .
-	'" target="_blank"><img src="ifsc-100.gif" border="0"></a><br /><font size="-1">International Federation<br />of Sport Climbing</font></td>';
+	'" target="_blank"><img src="ifsc.png" border="0"></a><br /><font size="-1">International Federation<br />of Sport Climbing</font></td>';
 $t_cuwr		= "<b>Worldranking</b>";
 $t_head_cuwr	= "WR";
 $t_nocuwr = 'no WR';
