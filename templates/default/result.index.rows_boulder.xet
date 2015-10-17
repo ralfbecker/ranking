@@ -81,13 +81,15 @@
 				<column width="50"/>
 				<column disabled="@num_problems"/>
 				<column disabled="!@num_problems"/>
-				<column disabled="!@num_problems=/[2345678]/"/>
-				<column disabled="!@num_problems=/[345678]/"/>
-				<column disabled="!@num_problems=/[45678]/"/>
-				<column disabled="!@num_problems=/[5678]/"/>
-				<column disabled="!@num_problems=/[678]/"/>
-				<column disabled="!@num_problems=/[78]/"/>
-				<column disabled="!@num_problems=8"/>
+				<column disabled="!@num_problems=/[234567890]/"/>
+				<column disabled="!@num_problems=/[34567890]/"/>
+				<column disabled="!@num_problems=/[4567890]/"/>
+				<column disabled="!@num_problems=/[567890]/"/>
+				<column disabled="!@num_problems=/[67890]/"/>
+				<column disabled="!@num_problems=/[7890]/"/>
+				<column disabled="!@num_problems=/[890]/"/>
+				<column disabled="!@num_problems=/[90]/"/>
+				<column disabled="!@num_problems=10"/>
 				<column disabled="@no_prev_heat"/>
 				<column/>
 				<column/>
@@ -122,6 +124,8 @@
 					<description value="6" class="place"/>
 					<description value="7" class="place"/>
 					<description value="8" class="place"/>
+					<description value="9" class="place"/>
+					<description value="10" class="place"/>
 					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
 					<image align="center" label="Scorecard checked" src="check" class="noPrint"/>
 					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint"/>
@@ -236,6 +240,24 @@
 							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone8]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
 						</menulist>
 						<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top9]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone9]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder9]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top10]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone10]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder10]" no_lang="1" class="onlyPrint"/>
 					</vbox>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
 					<vbox align="center" class="noPrint">
