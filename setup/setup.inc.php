@@ -8,8 +8,11 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @version $Id: setup.inc.php 1244 2015-05-06 17:25:40Z ralfbecker $
  */
+
+// RB: never install by default, only via setup
+$setup_info['ranking']['only_db'] = array('never');
 
 $setup_info['ranking']['name']      = 'ranking';
 $setup_info['ranking']['version']   = '14.3.002';

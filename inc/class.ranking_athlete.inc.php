@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @version $Id: class.ranking_athlete.inc.php 1245 2015-06-05 18:10:34Z ralfbecker $
  */
 
 /**
@@ -76,7 +76,7 @@ class ranking_athlete extends so_sql
 	 *
 	 * @var string
 	 */
-	var $picture_path = '../../../jpgs';
+	var $picture_path = '/var/lib/egroupware/ifsc-climbing.org/files/jpgs';
 	var $acl2clear = array(
 		self::ACL_DENY_BIRTHDAY  => array('geb_date'),
 		self::ACL_DENY_EMAIL     => array('email'),
@@ -602,6 +602,7 @@ class ranking_athlete extends so_sql
 	{
 		$path = $this->picture_path($rkey, $num);
 
+//error_log(__METHOD__."('$fname', '$rkey') path=$path, file_exists($fname)=".array2string(file_exists($fname)).", is_readable($fname)=".array2string(is_readable($fname)).", is_writable($this->picture_path)=".array2string(is_writable($this->picture_path)).")");
 		if (!$path || !file_exists($fname) || !is_readable($fname) || !is_writeable($this->picture_path)) return false;
 
 		if (file_exists($path)) @unlink($path);
