@@ -41,7 +41,7 @@ class ranking_route_result extends so_sql
 	 *
 	 * There have to be columns for each boulder in eTemplate "ranking.result.index.rows_boulder
 	 */
-	const MAX_BOULDERS = 8;
+	const MAX_BOULDERS = 10;
 
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 		'ranking',
@@ -935,7 +935,8 @@ class ranking_route_result extends so_sql
 		}
 		// saving the boulder results, if there are any
 		if (isset($data['zone1']) || isset($data['zone2']) || isset($data['zone3']) || isset($data['zone4']) ||
-			isset($data['zone5']) || isset($data['zone6']) || isset($data['zone7']) || isset($data['zone8']))
+			isset($data['zone5']) || isset($data['zone6']) || isset($data['zone7']) || isset($data['zone8']) ||
+			isset($data['zone9']) || isset($data['zone10']))
 		{
 			$data['result_top'] = $data['result_zone'] = $data['result_detail'] = null;
 			for($i = 1; $i <= self::MAX_BOULDERS; ++$i)

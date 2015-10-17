@@ -6,7 +6,7 @@ require_once ('open_db.inc.php');
 
 global $header_logos,$calendar_no_cats,$cats,$anz_year;
 
-$header_logos = defined('DR_PATH') ? '' : "<a href=\"$url_icc_info\" title=\"$t_icc_alt\"><IMG SRC=\"ifsc-100.gif\" border=0></a>";
+$header_logos = defined('DR_PATH') ? '' : "<a href=\"$url_icc_info\" title=\"$t_icc_alt\"><IMG SRC=\"ifsc.png\" border=0></a>";
 
 $calendar_no_cats = True;
 
