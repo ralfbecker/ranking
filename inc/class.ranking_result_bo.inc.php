@@ -160,6 +160,8 @@ class ranking_result_bo extends ranking_bo
 	 */
 	function plus_labels($year, $nation, $discipline='lead')
 	{
+		unset($nation);	// currently not used
+
 		if ($discipline == 'boulderheight')
 		{
 			$labels = array();
@@ -177,12 +179,13 @@ class ranking_result_bo extends ranking_bo
 		if (isset($this->license_nations['GER']) || isset($this->license_nations['SUI']))
 		{
 			// SUI and international/Regio Cup still has minus in 2012
-			if ($nation != 'GER' && $year == 2012) $minus_allowed = true;
+			if ($year == 2012) $minus_allowed = true;
 		}
 		if (!$minus_allowed)
 		{
 			unset($labels['-1']);
 		}
+		//error_log(__METHOD__."($year, '$nation', '$discipline') returning ".array2string($labels).' '.function_backtrace());
 		return $labels;
 	}
 

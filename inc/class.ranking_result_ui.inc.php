@@ -1332,7 +1332,7 @@ class ranking_result_ui extends ranking_result_bo
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
 			),'route_order DESC') : array(),
-			'result_plus' => $this->plus_labels($comp['year'], $comp['nation'], $content['nm']['discipline']),
+			'result_plus' => $this->plus_labels((int)$comp['datum'], $comp['nation'], $content['nm']['discipline']),
 			'show_result' => array(
 				0 => lang('Startlist'),
 				1 => lang('Resultlist'),
