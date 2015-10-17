@@ -1355,16 +1355,26 @@ var Resultlist = (function() {
 			tfoot.append(jQuery(document.createElement('tr')).append(th));
 			var cols=0; for(var c in this.result_cols) cols++;
 			th.attr('colspan', cols);
+			var max_disciplines = '';
+			if (_data.max_disciplines)
+			{
+				for(var discipline in _data.max_disciplines)
+				{
+					max_disciplines += (max_disciplines?', ':'')+discipline[0].toUpperCase()+discipline.slice(1)+': '+_data.max_disciplines[discipline]
+				}
+			}
 			if (_data.nation)
 			{
 				th.html('Für '+(_data.cup ? 'den '+_data.cup.name : 'die Rangliste')+' zählen die '+_data.max_comp+' besten Ergebnisse, nicht zählende Ergebnisse sind eingeklammert.'+
-						(_data.min_disciplines ? '<br/>Teilnahme an mindestens '+_data.min_disciplines+' Disziplinen ist erforderlich.' : '')+
-						(_data.drop_equally ? ' Streichresultate erfolgen in allen Disziplinen gleichmäßig.' : ''));
+					(_data.min_disciplines ? '<br/>Teilnahme an mindestens '+_data.min_disciplines+' Disziplinen ist erforderlich.' : '')+
+					(max_disciplines ? ' Maximal zählende Ergebnise pro Disziplin: '+max_disciplines : '')+
+					(_data.drop_equally ? ' Streichresultate erfolgen in allen Disziplinen gleichmäßig.' : ''));
 			}
 			else
 			{
 				th.html(_data.max_comp+' best competition results are counting for '+(_data.cup ? _data.cup.name : 'the ranking')+', not counting points are in brackets.'+
 					(_data.min_disciplines ? '<br/>Participation in at least '+_data.min_disciplines+' disciplines is required.' : '')+
+					(max_disciplines ? ' Maximum number of counting results per discipline: '+max_disciplines : '')+
 					(_data.drop_equally ? ' Not counting results are selected from all disciplines equally.' : ''));
 			}
 		}

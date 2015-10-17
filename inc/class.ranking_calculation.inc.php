@@ -897,6 +897,7 @@ class ranking_calculation
 		$not_counting = $this->not_counting;
 		$not_counting['min_disciplines'] = $min_disciplines;
 		$not_counting['drop_equally'] = $drop_equally;
+		$not_counting['max_disciplines'] = $max_disciplines;
 
 		return $rang;
 	}

@@ -1235,6 +1235,7 @@ class ranking_export extends ranking_result_bo
 			'max_comp' => $max_comp,
 			'min_disciplines' => $not_counting['min_disciplines'],
 			'drop_equally' => $not_counting['drop_equally'],
+			'max_disciplines' => $not_counting['max_disciplines'],
 			'nation' => $cat['nation'],
 			'participants' => $rows,
 			'route_name' => $comp ? $comp['name'].' ('.implode('.', array_reverse(explode('-', $comp['datum']))).')' : '',
