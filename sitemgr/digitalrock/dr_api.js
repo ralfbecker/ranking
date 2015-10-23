@@ -1775,12 +1775,18 @@ var Profile = (function() {
 	 * @param _container
 	 * @param _json_url url for data to load
 	 * @param _template optional string with html-template
+	 * @param _remove_leading_slash fix Joomla behavior of adding a slash to <a href="$$something$$"
 	 */
-	function Profile(_container,_json_url,_template)
+	function Profile(_container,_json_url,_template,_remove_leading_slash)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
 
 		if (_template) this.template = _template;
+
+		if (typeof _remove_leading_slash == 'undefined') _remove_leading_slash = false;
+		this.pattern = new RegExp((_remove_leading_slash?'/?':'')+'\\$\\$([^$]+)\\$\\$', 'g');
+		this.pattern_results = new RegExp((_remove_leading_slash?'/?':'')+'\\$\\$results\/N\/([^$]+)\\$\\$', 'g');
+
 		this.container.empty();
 
 		this.bestResults = 12;
@@ -1798,9 +1804,8 @@ var Profile = (function() {
 	Profile.prototype.handleResponse = function(_data)
 	{
 		// replace non-result data
-		var pattern = /\$\$([^$]+)\$\$/g;
 		var that = this;
-		var html = this.template.replace(pattern, function(match, placeholder)
+		var html = this.template.replace(this.pattern, function(match, placeholder)
 		{
 			switch(placeholder)
 			{
@@ -1841,7 +1846,6 @@ var Profile = (function() {
 		// replace result data
 		var bestResults = this.bestResults;
 		var that = this;
-		pattern = /\$\$results\/N\/([^$]+)\$\$/g;
 		html = html.replace(/[\s]*<tr[\s\S]*?<\/tr>\n?/g, function(match)
 		{
 			if (match.indexOf('$$results/N/') == -1) return match;
@@ -1878,7 +1882,7 @@ var Profile = (function() {
 				{
 					result.weightClass = 'profileResultHidden';
 				}
-				rows += match.replace(pattern, function(match, placeholder)
+				rows += match.replace(that.pattern_results, function(match, placeholder)
 				{
 					switch (placeholder)
 					{
