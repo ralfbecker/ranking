@@ -241,7 +241,7 @@ class ranking_cup extends so_sql
 		}
 		$max = $cup['max_per_cat'][$cat_rkey] ? (int) $cup['max_per_cat'][$cat_rkey] : $cup['max_serie'];
 
-		if ($max < 0)	// $max comps less then the total
+		if ($max <= 0)	// $max comps less then the total
 		{
 			if (!isset($GLOBALS['egw']->comp))
 			{
@@ -257,7 +257,7 @@ class ranking_cup extends so_sql
 			));
 			$anz_wettk = count($wettks);
 			//echo "<p>$sql: anz_wettk=$anz_wettk</p>\n";
-			return ($cup['max_serie'] + $anz_wettk)." (=$anz_wettk$cup[max_serie])";
+			return ($max + $anz_wettk).($max?" (=$anz_wettk$max)":'');
 		}
 		return $max;
 	}
