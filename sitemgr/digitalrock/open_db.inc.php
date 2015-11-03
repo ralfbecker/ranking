@@ -74,12 +74,12 @@ else
 		//'result'  => 'result.php?',
 		//'pstambl' => 'pstambl.php?',
 		'pstambl_target' => false,
-		'ranglist' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
-		'nat_team_ranking' => 'nat_team_ranking.php?',
-		'resultservice' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
-		'result' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#',
-		'startlist' => '/egroupware/ranking/sitemgr/digitalrock/starters.html#',
-		'pstambl' => '/egroupware/ranking/sitemgr/digitalrock/pstambl.html#',
+		'ranglist' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#!',
+		'nat_team_ranking' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#!type=nat_team_ranking&',
+		'resultservice' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#!',
+		'result' => '/egroupware/ranking/sitemgr/digitalrock/eliste.html#!',
+		'startlist' => '/egroupware/ranking/sitemgr/digitalrock/starters.html#!',
+		'pstambl' => '/egroupware/ranking/sitemgr/digitalrock/pstambl.html#!',
 	);
 }
 
