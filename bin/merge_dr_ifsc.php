@@ -29,14 +29,14 @@ $ifsc_db = 'egw_ifsc_egroupw';	// ifsc.egroupware.net
 $target  = 'egw_digitalrock_';	// digitalrock.egroupware.de
 
 // directories for pictures
-$dr_dir = '/var/www/servers/www.digitalrock.de/jpgs';
+$dr_dir = '/var/www/servers/digitalrock.de/jpgs';
 $ifsc_dir = '/var/www/servers/ifsc-climbing.org/jpgs';
-$target_dir = '/var/www/servers/www.digitalrock.de/new-jpgs';
+$target_dir = '/var/www/servers/digitalrock.de/new-jpgs';
 if (!file_exists($target_dir)) mkdir($target_dir, 0777);
 
 // commands
-$mysqldump = '/Users/ralf/bin/mysqldump --no-create-db';
-$mysql = '/Users/ralf/bin/mysql';
+$mysqldump = '/usr/bin/mysqldump --no-create-db';
+$mysql = '/usr/bin/mysql';
 
 // add credentials to mysql commands
 foreach(array('mysql', 'mysqldump') as $cmd)
@@ -110,6 +110,7 @@ function overwrite($table, $inital='dr', $overwrite_with='ifsc')
 		$error = null;
 		passthru($cmd, $error);
 		if ($error) die('Error running: '.$cmd);
+		sleep(1);	// give Galera cluster time to sync, to fix deadlock
 	}
 }
 
@@ -236,19 +237,22 @@ function copy_pictures($rkey, $dr_rkey, $ifsc_rkey)
 
 	foreach(array('', '-2') as $postfix)
 	{
-		$dr_path = $dr_dir.'/'.$dr_rkey.$postfix.'jpg';
-		$ifsc_path = $ifsc_dir.'/'.$ifsc_rkey.$postfix.'jpg';
-		$target_path = $target_dir.'/'.$rkey.$postfix.'jpg';
-		if (!file_exists($dr_path) && !file_exists($ifsc_path))
+		$dr_path = $dr_dir.'/'.$dr_rkey.$postfix.'.jpg';
+		$ifsc_path = $ifsc_dir.'/'.$ifsc_rkey.$postfix.'.jpg';
+		$target_path = $target_dir.'/'.$rkey.$postfix.'.jpg';
+		if ((empty($dr_rkey) || !file_exists($dr_path)) && (empty($ifsc_rkey) || !file_exists($ifsc_path)))
 		{
+			//error_log(__METHOD__."(target='$rkey', dr='$dr_rkey', ifsc='$ifsc_rkey') no picture found in $dr_path or $ifsc_path!");
 			continue;
 		}
-		elseif (!file_exists($ifsc_path) || file_exists($dr_path) && filemtime($dr_path) > filemtime($ifsc_path))
+		elseif (empty($ifsc_rkey) || !file_exists($ifsc_path) || file_exists($dr_path) && filemtime($dr_path) > filemtime($ifsc_path))
 		{
+			error_log(__METHOD__."(target='$rkey', dr='$dr_rkey', ifsc='$ifsc_rkey') copy($dr_path, $target_path)!");
 			copy($dr_path, $target_path);
 		}
 		else
 		{
+			error_log(__METHOD__."(target='$rkey', dr='$dr_rkey', ifsc='$ifsc_rkey') copy($ifsc_path, $target_path)!");
 			copy($ifsc_path, $target_path);
 		}
 	}
