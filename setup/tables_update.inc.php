@@ -1836,3 +1836,25 @@ function ranking_upgrade14_3_001()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.002';
 }
 
+/**
+ * Fix Athlete2Fed primary key to no longer contain start causing doublication while merging dR and IFSC db
+ *
+ * @return string
+ */
+function ranking_upgrade14_3_002()
+{
+	$GLOBALS['egw_setup']->oProc->RefreshTable('Athlete2Fed',array(
+		'fd' => array(
+			'PerId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'a2f_end' => array('type' => 'int','precision' => '2','nullable' => False,'default' => '9999'),
+			'a2f_start' => array('type' => 'int','precision' => '2','nullable' => False,'default' => '0'),
+			'fed_id' => array('type' => 'int','precision' => '4','nullable' => False)
+		),
+		'pk' => array('PerId','a2f_end'),
+		'fk' => array(),
+		'ix' => array('fed_id'),
+		'uc' => array()
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.003';
+}

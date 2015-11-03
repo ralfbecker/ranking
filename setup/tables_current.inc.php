@@ -410,7 +410,7 @@ $phpgw_baseline = array(
 			'a2f_start' => array('type' => 'int','precision' => '2','nullable' => False,'default' => '0'),
 			'fed_id' => array('type' => 'int','precision' => '4','nullable' => False)
 		),
-		'pk' => array('PerId','a2f_end','a2f_start'),
+		'pk' => array('PerId','a2f_end'),
 		'fk' => array(),
 		'ix' => array('fed_id'),
 		'uc' => array()
