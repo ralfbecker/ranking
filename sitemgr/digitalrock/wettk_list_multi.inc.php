@@ -42,10 +42,10 @@ if (!is_array($cats))
 
 function wettk_grps($wetid)	// check for which categories we have a result
 {
-	if ($res =my_query("SELECT g.rkey,MAX(r.platz) AS platz,MAX(r.pkt) as pkt".
+	if (($res =my_query("SELECT g.rkey,MAX(r.platz) AS platz,MAX(r.pkt) as pkt".
 	                   " FROM Gruppen g,Results r".
 	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
-	                   " GROUP BY g.rkey ORDER BY g.name"))
+	                   " GROUP BY g.rkey ORDER BY g.name")))
 	{
 		while ($row=mysql_fetch_object($res))
 		{
@@ -75,12 +75,12 @@ function wettk_grps($wetid)	// check for which categories we have a result
 	return ($rgrps);
 }
 
-function result($wettk,$grp,$rgrps,$grp_name,$no_result=True)		// Link auf Wettkampfergebnis
+function result($wettk,$grp,$rgrps,$_grp_name,$no_result=True)		// Link auf Wettkampfergebnis
 {
 	//echo "<p>result('$wettk->rkey','$grp',,'$grp_name','$no_result')</p>\n";
 	global $t_show_result, $t_no_result;
 
-	$grp_name = str_replace('<br />',' ',$grp_name);
+	$grp_name = str_replace('<br />',' ',$_grp_name);
 	if (isset($rgrps[0][$grp]) && $rgrps[0][$grp])
 	{
 		return '<a class="mini_link" href="'.$GLOBALS['dr_config']['resultservice'].'comp='.$wettk->WetId.'&amp;cat='.$grp.'" title="'.$t_show_result.'">'.$grp_name.'</a>';
@@ -140,7 +140,7 @@ function get_cats(&$wettk)
 			if ($grps)
 			{
 				$found = 0;
-				foreach($cat['grps'] as $grp => $gname)
+				foreach(array_keys($cat['grps']) as $grp)
 				{
 					if (!isset($group_found[$grp]))	// use each group only once
 					{
@@ -335,7 +335,7 @@ if ($mode != 2)
 					$first = True;
 					foreach($cat['grps'] as $grp => $gname)
 					{
-						if ($item = result ($wettk,$grp,$rgrps,$gname,!file_exists($file_prefix.$result)))
+						if (($item = result ($wettk,$grp,$rgrps,$gname,!file_exists($file_prefix.$result))))
 						{
 							$minis .= ($first ? "\n" : ",\n") . $item;
 							$first = False;
@@ -348,7 +348,7 @@ if ($mode != 2)
 						$have_starter = 0;
 						foreach($rgrps as $grp => $grp_has_starter)
 						{
-							if (!$grp) continue;
+							if (!$grp || $grp == 'ICC-TOF') continue;	// ignore team-officials, as they stay starters!
 							//$have_starter = $have_starter || $grp_has_starter;
 							$have_starter = max($have_starter,$grp_has_starter);
 						}
