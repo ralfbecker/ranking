@@ -257,7 +257,7 @@ function date_over($date,$today_is_over=false)
 	list($y,$m,$d) = explode('-',$date);
 	list($now_y,$now_m,$now_d) = explode('-',date('Y-m-d'));
 
-	$ret = $y_now > $y || $y_now == $y && ($m_now > $m || $m_now == $m && $d_now+(int)$today_is_over >= $d);
+	$ret = $now_y > $y || $now_y == $y && ($now_m > $m || $now_m == $m && $now_d+(int)$today_is_over >= $d);
 	//error_log(__METHOD__."('$date', $today_is_over) y=$y,m=$m,d=$d, now_y=$now_y,_m=$now_m,_d=$now_d returning $ret");
 	return $ret;
 }
