@@ -173,14 +173,17 @@ class ranking_cup extends so_sql
 		}
 		if (is_array($data['presets'])) $data['presets'] = json_encode($data['presets']);
 
-		if ($data['max_disciplines'] && ($data['max_disciplines']['lead'] > 0 ||
-			$data['max_disciplines']['boulder'] > 0 || $data['max_disciplines']['speed'] > 0))
+		if (isset($data['max_disciplines']))
 		{
-			$data['max_disciplines'] = json_encode($data['max_disciplines']);
-		}
-		else
-		{
-			$data['max_disciplines'] = null;
+			if ($data['max_disciplines'] && ($data['max_disciplines']['lead'] > 0 ||
+				$data['max_disciplines']['boulder'] > 0 || $data['max_disciplines']['speed'] > 0))
+			{
+				$data['max_disciplines'] = json_encode($data['max_disciplines']);
+			}
+			else
+			{
+				$data['max_disciplines'] = null;
+			}
 		}
 
 		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
@@ -223,6 +226,7 @@ class ranking_cup extends so_sql
 		{
 			$names[$data['SerId']] = $data['rkey'].($rkey_only ? '' : ': '.$data['name']);
 		}
+		error_log(__METHOD__.'('.array2string($keys).') returning '.array2string($names));
 		return $names;
 	}
 
