@@ -147,7 +147,7 @@ class ranking_bo extends ranking_so
 	 *
 	 * @var int
 	 */
-	var $judge_right_days = 7;
+	var $judge_right_days = 10;
 
 	/**
 	 * Constructor
