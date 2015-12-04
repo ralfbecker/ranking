@@ -249,12 +249,15 @@ class ranking_bo extends ranking_so
 		}
 		$this->license_year = (int) date('Y');
 		$this->license_nations = $this->ranking_nations;
-		// to test IFSC, uncomment the next line
-		//$this->license_nations = array('NULL' => $this->ranking_nations['NULL']);
-		// fix license nations to not contain international for digital ROCK site, but IFSC
-		if (isset($this->license_nations['GER']) || isset($this->license_nations['SUI']))
+		// fix license nations to not contain international for digital ROCK site and no other for IFSC
+		switch ($_SERVER['HOST_NAME'])
 		{
-			unset($this->license_nations['NULL']);
+			case 'www.digitalrock.de':
+				unset($this->license_nations['NULL']);
+				break;
+			case 'ifsc.egroupware.net':
+				$this->license_nations = array('NULL' => $this->ranking_nations['NULL']);
+				break;
 		}
 		// makeing the ranking_bo object availible for other objects
 		$GLOBALS['ranking_bo'] = $this;
