@@ -250,7 +250,7 @@ class ranking_bo extends ranking_so
 		$this->license_year = (int) date('Y');
 		$this->license_nations = $this->ranking_nations;
 		// fix license nations to not contain international for digital ROCK site and no other for IFSC
-		switch ($_SERVER['HOST_NAME'])
+		switch ($_SERVER['HTTP_HOST'])
 		{
 			case 'www.digitalrock.de':
 				unset($this->license_nations['NULL']);
