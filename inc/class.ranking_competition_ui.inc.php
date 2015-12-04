@@ -414,10 +414,12 @@ class ranking_competition_ui extends ranking_bo
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
 			);
-			if (count($this->read_rights) == 1)
+			// do not consider "XYZ" when setting a default filter
+			$read_rights = array_values(array_diff($this->read_rights, array('XYZ')));
+			if (count($read_rights) == 1)
 			{
-				$content['nm']['col_filter']['nation'] = $this->read_rights[0];
-				$content['nm']['cat_parent'] = ranking_so::cat_rkey2id($this->read_rights[0]);
+				$content['nm']['col_filter']['nation'] = $read_rights[0];
+				$content['nm']['cat_parent'] = ranking_so::cat_rkey2id($read_rights[0]);
 			}
 			else
 			{
