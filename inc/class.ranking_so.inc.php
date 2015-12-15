@@ -255,7 +255,8 @@ class ranking_so
 						break;
 
 					default:
-						$GLOBALS['egw']->$name = CreateObject('ranking.'.$class,$this->config['ranking_db_charset'],$this->db,$this->config['vfs_pdf_dir']);
+						$GLOBALS['egw']->$name = CreateObject('ranking.'.$class, $this->config['ranking_db_charset'], $this->db,
+							$this->config['vfs_pdf_dir'], $this->config['vfs_pdf_url']);
 						break;
 				}
 			}

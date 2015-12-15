@@ -38,6 +38,7 @@ class ranking_competition extends so_sql
 		'info2'     => 'i',
 	);
 	var $vfs_pdf_dir = '';
+	var $vfs_pdf_url = '';
 	var $result_table = 'Results';
 	/**
 	 * Values for display_athlete column
@@ -75,8 +76,13 @@ class ranking_competition extends so_sql
 
 	/**
 	 * constructor of the competition class
+	 *
+	 * @param string $source_charset
+	 * @param egw_db $db
+	 * @param string $vfs_pdf_dir
+	 * @param string $vfs_pdf_url
 	 */
-	function __construct($source_charset='',$db=null,$vfs_pdf_dir='')
+	function __construct($source_charset='',$db=null,$vfs_pdf_dir='',$vfs_pdf_url='')
 	{
 		//$this->debug = 1;
 		parent::__construct('ranking','Wettkaempfe',$db);	// call constructor of extended class
@@ -97,6 +103,7 @@ class ranking_competition extends so_sql
 			$this->$var = $GLOBALS['egw']->$egw_name;
 		}
 		if ($vfs_pdf_dir) $this->vfs_pdf_dir = $vfs_pdf_dir;
+		if ($vfs_pdf_url) $this->vfs_pdf_url = $vfs_pdf_url;
 	}
 
 	/**
@@ -710,7 +717,7 @@ class ranking_competition extends so_sql
 						$parsed = parse_url($attachments[$type]);
 						$attachments[$type] = $parsed['path'].($parsed['query'] ? '?'.$parsed['query'] : '');
 					}
-					$attachments[$type] = $add_host.$attachments[$type];
+					$attachments[$type] = $add_host.$this->vfs_pdf_url.$attachments[$type];
 				}
 			}
 		}
