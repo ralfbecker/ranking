@@ -29,6 +29,10 @@
      <input size="80" name="newsettings[picture_path]" value="{value_picture_path}">
     </td>
    </tr>
+   <tr class="row_on">
+    <td>{lang_Install-ID_of_instance_to_use_for_export_caching_(default_current_one)}</td>
+    <td><input name="newsettings[export_cache_level]" value="{value_vfs_topo_dir}"></td>
+   </tr>
 
    <tr class="th">
     <td colspan="2"><b>{lang_Ranking_database}</b> ({lang_only_fill_values_different_from_eGW}):</td>

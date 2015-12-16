@@ -11,6 +11,14 @@
  * @version $Id$
  */
 
+/**
+ * XML/JSON export logic
+ *
+ * @link http://www.digitalrock.de/egroupware/ranking/README
+ *
+ * Exported data is cached in a configurable cache specified by Install-ID in ranking configuration
+ * to allow two instances to share a ranking database.
+ */
 class ranking_export extends ranking_result_bo
 {
 	/**
@@ -271,6 +279,68 @@ class ranking_export extends ranking_result_bo
 	const EXPORT_ROUTE_OFFICAL_EXPIRES = 86400;
 
 	/**
+	 * Where to cache: egw_cache::Instance or Install-ID of instance to use
+	 *
+	 * @var string
+	 */
+	static public $cache_level;
+
+	/**
+	 * Read where to cache export data from ranking configuraton
+	 */
+	static protected function set_cache_level()
+	{
+		$config = config::read('ranking');
+
+		self::$cache_level = $config['export_cache_level'] ? $config['export_cache_level'] : egw_cache::INSTANCE;
+	}
+
+	/**
+	 * Set some data in the cache
+	 *
+	 * @param string $location location name for data
+	 * @param mixed $data
+	 * @param int $expiration =0 expiration time in seconds, default 0 = never
+	 * @return boolean true if data could be stored, false otherwise
+	 */
+	static public function setCache($location,$data,$expiration=0)
+	{
+		if (!isset(self::$cache_level)) self::set_cache_level();
+
+		return egw_cache::setCache(self::$cache_level, 'ranking', $location, $data, $expiration);
+	}
+
+	/**
+	 * Get some data from the cache
+	 *
+	 * @param string|array $location location(s) name for data
+	 * @param callback $callback =null callback to get/create the value, if it's not cache
+	 * @param array $callback_params =array() array with parameters for the callback
+	 * @param int $expiration =0 expiration time in seconds, default 0 = never
+	 * @return mixed NULL if data not found in cache (and no callback specified) or
+	 * 	if $location is an array: location => data pairs for existing location-data, non-existing is not returned
+	 */
+	static public function getCache($location,$callback=null,array $callback_params=array(),$expiration=0)
+	{
+		if (!isset(self::$cache_level)) self::set_cache_level();
+
+		return egw_cache::getCache(self::$cache_level, 'ranking', $location, $callback, $callback_params,$expiration);
+	}
+
+	/**
+	 * Unset some data in the cache
+	 *
+	 * @param string $location location name for data
+	 * @return boolean true if data was set, false if not (like isset())
+	 */
+	static public function unsetCache($location)
+	{
+		if (!isset(self::$cache_level)) self::set_cache_level();
+
+		return egw_cache::unsetCache(self::$cache_level, 'ranking', $location);
+	}
+
+	/**
 	 * Delete export route cache for given route and additionaly the general result
 	 *
 	 * @param int|array $comp WetId or array with values for WetId, GrpId and route_order
@@ -286,18 +356,18 @@ class ranking_export extends ranking_result_bo
 			$route_order = $comp['route_order'];
 			$comp = $comp['WetId'];
 		}
-		egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':'.$route_order);
+		self::unsetCache($loc='route:'.$comp.':'.$cat.':'.$route_order);
 		//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
-		egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':-1');
+		self::unsetCache($loc='route:'.$comp.':'.$cat.':-1');
 		//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
-		egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':');	// used if no route is specified!
+		self::unsetCache($loc='route:'.$comp.':'.$cat.':');	// used if no route is specified!
 		//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
 
 		if ($previous_heats)
 		{
 			while($route_order-- > 0)
 			{
-				egw_cache::unsetInstance('ranking', $loc='route:'.$comp.':'.$cat.':'.$route_order);
+				self::unsetCache($loc='route:'.$comp.':'.$cat.':'.$route_order);
 				//error_log(__METHOD__."($comp, $cat, $route_order, $previous_heats) unsetInstance('$loc')");
 			}
 		}
@@ -322,7 +392,7 @@ class ranking_export extends ranking_result_bo
 		if (!is_numeric($cat))
 		{
 			$rkey = strtolower($cat);
-			$cat_rkey2id = egw_cache::getInstance('ranking', 'cat_rkey2id');
+			$cat_rkey2id = self::getCache('cat_rkey2id');
 			if (!isset($cat_rkey2id[$rkey]))
 			{
 				if (!isset($instance)) $instance = new ranking_export();
@@ -331,7 +401,7 @@ class ranking_export extends ranking_result_bo
 					throw new Exception(lang('Category NOT found !!!'));
 				}
 				$cat_rkey2id[$rkey] = $cat_arr['GrpId'];
-				egw_cache::setInstance('ranking', 'cat_rkey2id', $cat_rkey2id);
+				self::setCache('cat_rkey2id', $cat_rkey2id);
 			}
 			$cat = $cat_rkey2id[$rkey];
 		}
@@ -341,7 +411,7 @@ class ranking_export extends ranking_result_bo
 		// because of permissions of /tmp/egw_cache only writable by webserver-user
 		// for all other purposes caching is ok and should be enabled
 		if (in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) ||
-			$update_cache || !($data = egw_cache::getInstance('ranking', $location)))
+			$update_cache || !($data = self::getCache($location)))
 		{
 			if (!isset($instance)) $instance = new ranking_export();
 
@@ -387,12 +457,12 @@ class ranking_export extends ranking_result_bo
 				$data['expires'] = self::EXPORT_ROUTE_NO_STARTLIST;
 			}
 
-			egw_cache::setInstance('ranking', $location, $data, self::EXPORT_ROUTE_TTL);
+			self::setCache($location, $data, self::EXPORT_ROUTE_TTL);
 
 			// update general result too?
 			if ($update_cache && $heat > 0)
 			{
-				egw_cache::setInstance('ranking', 'route:'.$comp.':'.$cat.':-1',
+				self::setCache('route:'.$comp.':'.$cat.':-1',
 					self::$instance->_export_route($comp, $cat, -1), self::EXPORT_ROUTE_TTL);
 			}
 		}
@@ -929,7 +999,7 @@ class ranking_export extends ranking_result_bo
 			'filter' => $filter,
 		));
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
-			($data = egw_cache::getInstance('ranking', $location)))
+			($data = self::getCache($location)))
 		{
 			return $data;
 		}
@@ -1058,7 +1128,7 @@ class ranking_export extends ranking_result_bo
 		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
-		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+		self::setCache($location, $data, $data['expires']);
 
 		return $data;
 	}
@@ -1162,7 +1232,7 @@ class ranking_export extends ranking_result_bo
 		if (empty($date)) $date = '.';
 		$location = self::export_ranking_location($cat, $date, $cup);
 		if (($force_cache || !in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts)) &&
-			($data = egw_cache::getInstance('ranking', $location)))
+			($data = self::getCache($location)))
 		{
 			return $data;
 		}
@@ -1303,7 +1373,7 @@ class ranking_export extends ranking_result_bo
 		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
-		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+		self::setCache($location, $data, $data['expires']);
 
 		return $data;
 	}
@@ -1331,19 +1401,19 @@ class ranking_export extends ranking_result_bo
 	{
 		// results feed is independent of category, because it contains all categories of the competition
 		$location = 'results:'.json_encode(array('.', null, null, null));
-		egw_cache::unsetInstance('ranking', $location);
+		self::unsetCache($location);
 		//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 
 		if ($comp['nation'])
 		{
 			$location = 'results:'.json_encode(array($comp['nation'], null, null, null));
-			egw_cache::unsetInstance('ranking', $location);
+			self::unsetCache($location);
 			//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 		}
 		if ($comp['fed_id'])
 		{
 			$location = 'results:'.json_encode(array($comp['nation'], null, null, array('fed_id' => $comp['fed_id'])));
-			egw_cache::unsetInstance('ranking', $location);
+			self::unsetCache($location);
 			//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 		}
 
@@ -1354,13 +1424,13 @@ class ranking_export extends ranking_result_bo
 			self::delete_route_cache($comp['WetId'], $cat);
 
 			// current ranking
-			egw_cache::unsetInstance('ranking', $location=self::export_ranking_location($cat, '.'));
+			self::unsetCache($location=self::export_ranking_location($cat, '.'));
 			//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 
 			if ($comp['serie'])
 			{
 				// current cup ranking
-				egw_cache::unsetInstance('ranking', $location=self::export_ranking_location($cat, '.', $comp['serie']));
+				self::unsetCache($location=self::export_ranking_location($cat, '.', $comp['serie']));
 				//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 			}
 			/* ToDo: aggregated ranking is from mulitple categories
@@ -1371,11 +1441,11 @@ class ranking_export extends ranking_result_bo
 				case 'SUI':	// regionalzentren wertung
 					break;
 				default:	// international: national team ranking
-					egw_cache::unsetInstance('ranking', $location=self::export_aggregated_location('nat_team_ranking', '.', $comp['WetId'], null, $cat));
+					self::unsetCache($location=self::export_aggregated_location('nat_team_ranking', '.', $comp['WetId'], null, $cat));
 					//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 					if ($comp['serie'])
 					{
-						egw_cache::unsetInstance('ranking', $location=self::export_aggregated_location('nat_team_ranking', '.', $comp['WetId'], $comp['serie'], $cat));
+						self::unsetCache($location=self::export_aggregated_location('nat_team_ranking', '.', $comp['WetId'], $comp['serie'], $cat));
 						//error_log(__METHOD__."(".array2string($comp).") unsetInstance('ranking', '$location')");
 					}
 			}*/
@@ -1395,7 +1465,7 @@ class ranking_export extends ranking_result_bo
 	{
 		$location = 'results:'.json_encode(func_get_args());
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
-			($data = egw_cache::getInstance('ranking', $location)))
+			($data = self::getCache($location)))
 		{
 			return $data;
 		}
@@ -1566,7 +1636,7 @@ class ranking_export extends ranking_result_bo
 		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
-		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+		self::setCache($location, $data, $data['expires']);
 
 		//_debug_array($ret); exit;
 		return $data;
@@ -1720,7 +1790,7 @@ class ranking_export extends ranking_result_bo
 	{
 		$location = 'starters:'.$comp;
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) && is_numeric($comp) &&
-			($data = egw_cache::getInstance('ranking', $location)))
+			($data = self::getCache($location)))
 		{
 			return $data;
 		}
@@ -1732,7 +1802,7 @@ class ranking_export extends ranking_result_bo
 		// try again with numeric id
 		$location = 'starters:'.$comp['WetId'];
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
-			($data = egw_cache::getInstance('ranking', $location)))
+			($data = self::getCache($location)))
 		{
 			return $data;
 		}
@@ -1785,7 +1855,7 @@ class ranking_export extends ranking_result_bo
 		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
-		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+		self::setCache($location, $data, $data['expires']);
 
 		//_debug_array($data); exit;
 		return $data;
@@ -1870,7 +1940,7 @@ class ranking_export extends ranking_result_bo
 	{
 		$location = 'profile:'.$athlete.':'.$cat;
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) && is_numeric($athlete) &&
-			($data = egw_cache::getInstance('ranking', $location)))
+			($data = self::getCache($location)))
 		{
 			return $data;
 		}
@@ -1991,11 +2061,11 @@ class ranking_export extends ranking_result_bo
 		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 
-		egw_cache::setInstance('ranking', $location, $data, $data['expires']);
+		self::setCache($location, $data, $data['expires']);
 		// if cached without category, also cache with default category
 		if (substr($location, -1) == ':' && $cat)
 		{
-			egw_cache::setInstance('ranking', $location.$cat['GrpId'], $data, $data['expires']);
+			self::setCache($location.$cat['GrpId'], $data, $data['expires']);
 		}
 
 		//_debug_array($data); exit;
@@ -2048,7 +2118,7 @@ class ranking_export extends ranking_result_bo
 		if ($cat) $filter['GrpId'] = array_map('intval', explode(',', $cat));
 
 		$location = 'aggregated:'.json_encode($filter+array('type' => $type, 'date' => $date));
-		error_log(__METHOD__."(".array2string(func_get_args()).") returning '$location'");
+		//error_log(__METHOD__."(".array2string(func_get_args()).") returning '$location'");
 		return $location;
 	}
 
@@ -2075,7 +2145,7 @@ class ranking_export extends ranking_result_bo
 		$filter = null;
 		$location = self::export_aggregated_location($type, $date, $comp, $cup, $cat, $filter);
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
-			($data = egw_cache::getInstance('ranking', $location)))
+			($data = self::getCache($location)))
 		{
 			return $data;
 		}
@@ -2186,7 +2256,7 @@ class ranking_export extends ranking_result_bo
 		unset($data['last_modified']);	// to NOT cause etag change by not contained data
 		$data['etag'] = md5(serialize($data));
 		//_debug_array($data); exit;
-		egw_cache::setInstance('ranking', $location, $data);
+		self::setCache($location, $data);
 
 		return $data;
 	}
