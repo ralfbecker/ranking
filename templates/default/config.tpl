@@ -31,7 +31,7 @@
    </tr>
    <tr class="row_on">
     <td>{lang_Install-ID_of_instance_to_use_for_export_caching_(default_current_one)}</td>
-    <td><input name="newsettings[export_cache_level]" value="{value_vfs_topo_dir}"></td>
+    <td><input name="newsettings[export_cache_level]" value="{value_export_cache_level}"></td>
    </tr>
 
    <tr class="th">
