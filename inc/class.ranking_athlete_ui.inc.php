@@ -794,6 +794,10 @@ Continuer';
 	/**
 	 * Get the name of the license form, depending on nation and year
 	 *
+	 * Licenseforms are in PDF directory under following names:
+	 * - $year/license_$year$nation_$catrkey.rtf (highest priority)
+	 * - $year/license_$year$nation.rtf
+	 *
 	 * @param string $nation =null
 	 * @param int $year =null defaults to $this->license_year
 	 * @param int $GrpId =null category to apply for
@@ -804,10 +808,12 @@ Continuer';
 		if (is_null($year)) $year = $this->license_year;
 		if ($nation == 'NULL') $nation = null;
 
+		$base = egw_vfs::PREFIX.$this->comp->vfs_pdf_dir;
+
 		if (!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
-			!file_exists($file = $_SERVER['DOCUMENT_ROOT'].'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'].'.rtf'))
+			!file_exists($file = $base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'].'.rtf'))
 		{
-			$file = $_SERVER['DOCUMENT_ROOT'].'/'.$year.'/license_'.$year.$nation.'.rtf';
+			$file = $base.'/'.$year.$nation.'.rtf';
 		}
 		return $file;
 	}
