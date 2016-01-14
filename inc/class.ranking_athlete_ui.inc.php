@@ -813,7 +813,7 @@ Continuer';
 		if (!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
 			!file_exists($file = $base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'].'.rtf'))
 		{
-			$file = $base.'/'.$year.$nation.'.rtf';
+			$file = $base.'/'.$year.'/license_'.$year.$nation.'.rtf';
 		}
 		return $file;
 	}
