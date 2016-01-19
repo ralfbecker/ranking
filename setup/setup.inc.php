@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id: setup.inc.php 1244 2015-05-06 17:25:40Z ralfbecker $
  */
 
@@ -15,7 +15,7 @@
 $setup_info['ranking']['only_db'] = array('never');
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '14.3.003';
+$setup_info['ranking']['version']   = '14.3.004';
 $setup_info['ranking']['app_order'] = 1;
 $setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','RelayResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses','RouteHolds');
 $setup_info['ranking']['only_db']   = array('none');	// do NOT install by default, was array('mysql','postgres');
@@ -66,11 +66,3 @@ $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
 	'versions' => Array('1.8','14.1')
 );
-
-
-
-
-
-
-
-

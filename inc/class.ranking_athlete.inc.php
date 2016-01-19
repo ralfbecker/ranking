@@ -815,7 +815,8 @@ class ranking_athlete extends so_sql
 				// for GER we need to check birthdate for license vality
 				if ($nation == 'GER' && ($athlete = $this->read($PerId)))
 				{
-					$data['lic_until'] = (int)$athlete['geb_date'] < 1996 ? 9999 : (int)$athlete['geb_date']+18;
+					// only older then 18, get an unlimited license, else it's valid only until 18
+					$data['lic_until'] = $year-(int)$athlete['geb_date'] > 18 ? 9999 : (int)$athlete['geb_date']+18;
 				}
 				$this->db->insert(self::LICENSE_TABLE,$data,false,__LINE__,__FILE__,'ranking');
 			}

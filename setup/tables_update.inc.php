@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -903,7 +903,7 @@ function ranking_upgrade1_5_005()
 			CASE pkt WHEN 1 THEN datum ELSE NULL END,
 			CASE pkt WHEN 2 THEN datum ELSE NULL END,
 			CASE pkt WHEN 3 THEN datum ELSE NULL END FROM Results WHERE GrpId=0",__LINE__,__FILE__);
-	$GLOBALS['egw_setup']->db->delete('Results',array('GrpId' => 0),__LINE__,__FILE__);
+	$GLOBALS['egw_setup']->db->delete('Results',array('GrpId' => 0),__LINE__,__FILE__, 'ranking');
 /*
 CREATE TABLE `Licenses` (
 `PerId`                  INTEGER NOT NULL,
@@ -1857,4 +1857,39 @@ function ranking_upgrade14_3_002()
 	));
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.003';
+}
+
+/**
+ * Fix wrong license-end-date for GER licenses:
+ * - athlets 18 and junger only get license valid until year they turn 18
+ * - athlets 19 and older
+ *
+ * @return string
+ */
+function ranking_upgrade14_3_003()
+{
+	$GLOBALS['egw_setup']->db->query("UPDATE Licenses
+JOIN Personen USING(PerId)
+SET lic_until=CASE WHEN lic_year-YEAR(geb_date)>18 THEN 9999 ELSE YEAR(geb_date)+18 END
+WHERE nation='GER' AND lic_year>=2014", __LINE__, __FILE__);
+
+	// delete accidently created licenses with identical end-date, keeping the earliest one
+	foreach($GLOBALS['egw_setup']->db->query("SELECT PerId,geb_date,lic_until,GROUP_CONCAT(lic_year) AS lic_years
+FROM Licenses
+JOIN Personen USING(PerId)
+WHERE nation='GER' AND lic_year>=2014
+GROUP BY PerId,lic_until
+HAVING COUNT(*) > 1", __LINE__, __FILE__) as $row)
+	{
+		$years = explode(',', $row['lic_years']);
+		sort($years);
+		array_shift($years);
+		$GLOBALS['egw_setup']->db->delete('Licenses', array(
+			'nation' => 'GER',
+			'PerId' => $row['PerId'],
+			'lic_year' => $years,
+		), __LINE__, __FILE__, 'ranking');
+	}
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.004';
 }
