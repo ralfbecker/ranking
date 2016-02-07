@@ -661,7 +661,7 @@ if (!function_exists('_debug_array'))
 global $mysql;
 foreach(explode(';', $hostname) as $host)
 {
-	if (($mysql = @mysql_connect($hostname,$username,$password))) break;
+	if (($mysql = @mysql_connect($host,$username,$password))) break;
 }
 if (!$mysql)
 {
