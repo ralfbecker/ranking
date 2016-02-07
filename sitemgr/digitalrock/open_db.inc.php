@@ -658,12 +658,16 @@ if (!function_exists('_debug_array'))
 	}
 }
 
-// mysql_pconnect tut seit 30.03.2003 nicht mehr auf www.digitalROCK.de
 global $mysql;
-$mysql = @mysql_connect($hostname,$username,$password) or
-   fail ("Couldn't open Database Connection !!!",
+foreach(explode(';', $hostname) as $host)
+{
+	if (($mysql = @mysql_connect($hostname,$username,$password))) break;
+}
+if (!$mysql)
+{
+	fail ("Couldn't open Database Connection !!!",
          $_SERVER['HTTP_HOST'] == 'localhost' ? mysql_error() : '');
-
+}
 @mysql_select_db ($db_name,$mysql) or
    fail ("Couldn't open Database !!!",
          $_SERVER['HTTP_HOST'] == 'localhost' ? mysql_error() : '');
