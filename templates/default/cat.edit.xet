@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.cat.edit" template="" lang="" group="0" version="1.9.001">
@@ -12,72 +11,72 @@
 			</columns>
 			<rows>
 				<row height="20">
-					<description span="all" class="redItalic" id="msg"/>
+					<description id="msg" span="all" class="redItalic"/>
 					<description/>
 					<description/>
 					<description/>
 				</row>
 				<row class="th">
-					<description value="Key" options=",,,rkey"/>
-					<textbox size="8" maxlength="8" id="rkey" statustext="unique (internal) key, in the form: 'NAT_{F|M}_??' NAT=nation, F|M=gender, ?? = A|B|J for juniors + S|B|D for disciplin" needed="1"/>
-					<description span="all" class="gray" value="GrpId" no_lang="1" align="right" id="GrpId"/>
+					<description value="Key" for="rkey"/>
+					<textbox statustext="unique (internal) key, in the form: 'NAT_{F|M}_??' NAT=nation, F|M=gender, ?? = A|B|J for juniors + S|B|D for disciplin" id="rkey" needed="1" size="8" maxlength="8"/>
+					<description align="right" value="GrpId" id="GrpId" no_lang="1" span="all" class="gray"/>
 					<description/>
 				</row>
 				<row class="row">
-					<description value="Nation" options=",,,nation"/>
+					<description value="Nation" for="nation"/>
 					<menulist span="all">
 						<menupopup id="nation"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Name" options=",,,name"/>
-					<textbox size="40" maxlength="40" span="all" id="name" statustext="full cathegory name (must not be empty)" needed="1"/>
+					<description value="Name" for="name"/>
+					<textbox statustext="full cathegory name (must not be empty)" id="name" needed="1" size="40" maxlength="40" span="all"/>
 				</row>
 				<row class="row">
-					<description class="nowrap" value="Gender"/>
+					<description value="Gender" class="nowrap"/>
 					<menulist span="all">
-						<menupopup id="sex" statustext="if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)"/>
+						<menupopup statustext="if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)" id="sex"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Birthyears from" options=",,,from_year"/>
-					<int id="from_year" statustext="which birthyear are allowd in this cathegory, if it is limited on this"/>
-					<description value="to year" options=",,,to_year"/>
-					<int id="to_year" statustext="which birthyear are allowd in this cathegory, if it is limited on this"/>
+					<description value="Birthyears from" for="from_year"/>
+					<textbox type="integer" statustext="which birthyear are allowd in this cathegory, if it is limited on this" label="%s (&lt;0 age to)" id="from_year"/>
+					<description value="to year" for="to_year"/>
+					<textbox type="integer" statustext="which birthyear are allowd in this cathegory, if it is limited on this" label="%s (&lt;0 age from)" id="to_year"/>
 				</row>
 				<row class="row">
-					<description options=",,,discipline" value="Discipline"/>
+					<description value="Discipline" for="discipline"/>
 					<menulist span="all">
-						<menupopup options="None" id="discipline"/>
+						<menupopup id="discipline" options="None"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Rankingsystem" options=",,,rls"/>
+					<description value="Rankingsystem" for="rls"/>
 					<menulist span="all">
-						<menupopup id="rls" statustext="select how the ranking should be calculated" needed="1" no_lang="1"/>
+						<menupopup statustext="select how the ranking should be calculated" id="rls" needed="1" no_lang="1"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="previous Rankingsystem" options=",,,vor_rls"/>
+					<description value="previous Rankingsystem" for="vor_rls"/>
 					<menulist>
-						<menupopup no_lang="1" id="vor_rls" statustext="which rankingsystem was used before, if any" options="None"/>
+						<menupopup statustext="which rankingsystem was used before, if any" id="vor_rls" no_lang="1" options="None"/>
 					</menulist>
-					<description value="before" options=",,,vor"/>
+					<description value="before" for="vor"/>
 					<menulist>
-						<menupopup type="select-number" id="vor" statustext="before which year the old system was used (first year of new system)" options="None,1990,2020"/>
+						<menupopup type="select-number" statustext="before which year the old system was used (first year of new system)" id="vor" options="None,1990,2020"/>
 					</menulist>
 				</row>
 				<row class="row">
-					<description value="Cuppattern" options=",,,serien_pat"/>
-					<textbox size="8" maxlength="8" id="serien_pat" statustext="how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year" span="all"/>
+					<description value="Cuppattern" for="serien_pat"/>
+					<textbox statustext="how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year" id="serien_pat" size="8" maxlength="8" span="all"/>
 				</row>
 				<row>
 					<hbox span="3">
-						<button label="Save" id="button[save]" statustext="Saves the changes made"/>
-						<button label="Apply" id="button[apply]" statustext="Applies the changes made"/>
-						<button label="Cancel" id="button[cancel]" statustext="exists without saving the changes" onclick="window.close();"/>
+						<button statustext="Saves the changes made" label="Save" id="button[save]"/>
+						<button statustext="Applies the changes made" label="Apply" id="button[apply]"/>
+						<button statustext="exists without saving the changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
-					<button label="Delete" id="button[delete]" statustext="Delete this category" onclick="return confirm('Delete this category');" align="right"/>
+					<button align="right" statustext="Delete this category" label="Delete" id="button[delete]" onclick="return confirm('Delete this category');"/>
 				</row>
 			</rows>
 		</grid>

@@ -12,6 +12,8 @@
 %1. heat	ranking	de	%1. Runde
 %1. topo	ranking	de	%1. Topo
 %1. try	ranking	de	%1. Try
+%s (<0 age from)	ranking	de	%s (<0 Alter von)
+%s (<0 age to)	ranking	de	%s (<0 Alter bis)
 %s quota has to be 0 for lead final, otherwise time is not used!	ranking	de	%s Quota muss 0 sein für Lead Finale, sonst wird Zeit NICHT gewertet!
 '%1' does not exist or is not readable by the webserver !!!	ranking	de	'%1' existiert nicht oder ist nicht lesbar durch den Webserver !!!
 (%1 athletes not from %2 skipped)	ranking	de	(%1 Athleten nicht aus %2 überlesen)
@@ -118,6 +120,7 @@ climbingdata xml files can only set results, not create new participants!	rankin
 clone of	ranking	de	Klone von
 closes	ranking	de	schließt
 columns	ranking	de	Spalten
+comment is displayed in "see also" list below ranking	ranking	de	Kommentar wird unter der Rangliste in der "Siehe auch" Liste angezeigt
 comments	ranking	de	Kommentare
 comp. date	ranking	de	Wettk. Datum
 competition	ranking	de	Wettkampf
@@ -433,6 +436,7 @@ ranglist	ranking	de	Rangliste
 rank	ranking	de	Rang
 ranking	common	de	Ranglisten
 ranking (unranked last)	ranking	de	Rangliste (nicht gelistet zuletzt)
+ranking comment	ranking	de	Ranglistenkommentar
 ranking database	admin	de	Ranglisten Datenbank
 rankings - categories	ranking	de	Ranglisten - Kategorien
 rankings - cathegories	ranking	de	Ranglisten - Kategorien
@@ -625,5 +629,3 @@ you need to select some federations first!	ranking	de	Sie müssen zuerst einige 
 your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 zip code	ranking	de	Postleitzahl
-ranking comment	ranking	de	Ranglistenkommentar
-comment is displayed in "see also" list below ranking	ranking	de	Kommentar wird unter der Rangliste in der "Siehe auch" Liste angezeigt

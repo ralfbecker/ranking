@@ -12,6 +12,8 @@
 %1. heat	ranking	en	%1. Round
 %1. topo	ranking	en	%1. topo
 %1. try	ranking	en	%1. try
+%s (<0 age from)	ranking	en	%s (<0 age from)
+%s (<0 age to)	ranking	en	%s (<0 age to)
 %s quota has to be 0 for lead final, otherwise time is not used!	ranking	en	%s Quota has to be 0 for lead final, otherwise time is NOT used!
 '%1' does not exist or is not readable by the webserver !!!	ranking	en	'%1' does not exist or is not readable by the webserver !!!
 (%1 athletes not from %2 skipped)	ranking	en	(%1 athletes not from %2 skipped)
