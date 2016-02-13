@@ -1893,3 +1893,15 @@ HAVING COUNT(*) > 1", __LINE__, __FILE__) as $row)
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.004';
 }
+
+function ranking_upgrade14_3_004()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Routes','selfscore_use',array(
+		'type' => 'varchar',
+		'precision' => '8',
+		'comment' => 'what checkboxes to display: btf, bt, tf or default t'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.005';
+}
+

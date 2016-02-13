@@ -730,7 +730,10 @@ class ranking_export extends ranking_result_bo
 					case 'selfscore':
 						for($i = 1; $i <= $route['route_num_problems']; $i++)
 						{
-							if ($row['score'][$i]) ++$statistics[$i]['top'];
+							foreach(ranking_selfscore_measurement::score2btf($row['score'][$i], $route['selfscore_use']) as $key => $val)
+							{
+								if ($val) ++$statistics[$i][$key == 'zone' ? 'bonus' : $key];
+							}
 						}
 						break;
 					case 'boulder':
@@ -855,6 +858,7 @@ class ranking_export extends ranking_result_bo
 					}
 			}
 			$ret['statistics'] = $statistics;
+			$ret['dr_statistic'] = filemtime(EGW_SERVER_ROOT.'/ranking/js/dr_statistics.js');
 		}
 
 		// for official results add ranking and cup links

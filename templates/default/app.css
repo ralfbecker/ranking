@@ -127,7 +127,7 @@ table#ranking-result-index_score {
 	display: inline-block;
 }
 table#ranking-result-index_score td {
-	padding: 13px 13px 15px 5px;
+	padding: 13px 0px 11px 5px;
 	border: 1px solid black;
 }
 table#ranking-result-index_score input[type=checkbox] {
@@ -135,7 +135,30 @@ table#ranking-result-index_score input[type=checkbox] {
 	-moz-transform: scale(2);
 	-webkit-transform: scale(2);
 	-o-transform: scale(2);
-	margin-left: 5px;
+	margin-right: 15px;
+	position: relative;
+	margin-left: 10px;
+}
+table#ranking-result-index_score input[type=checkbox][name*=zone]:after {
+	content: "B";
+	position: absolute;
+	top: 0;
+	left: 2px;
+	font-size: 75%;
+}
+table#ranking-result-index_score input[type=checkbox][name*=top]:after {
+	content: "T";
+	position: absolute;
+	top: 0;
+	left: 2px;
+	font-size: 75%;
+}
+table#ranking-result-index_score input[type=checkbox][name*=flash]:after {
+	content: "F";
+	position: absolute;
+	top: 0;
+	left: 2px;
+	font-size: 75%;
 }
 button.scorecard_button {
 	font-size: 150%;
@@ -310,4 +333,9 @@ div.action_popup > div.et2_hbox {
  */
 select#ranking-result-route_import_cat {
 	width: 50%;
+}
+
+span#ranking-result-index_msg {
+	color: red;
+	font-style: italic;
 }

@@ -1389,8 +1389,10 @@ var Resultlist = (function() {
 					type: 'text/css'
 				}).appendTo('head');
 				var load = [ranking_url+'../phpgwapi/js/jquery/jqplot/jquery.jqplot.js',
+					// not sure why bar-renderer does not work :(
+					//ranking_url+'../phpgwapi/js/jquery/jqplot/plugins/jqplot.barRenderer.js',
 					ranking_url+'../phpgwapi/js/jquery/jqplot/plugins/jqplot.highlighter.js',
-					ranking_url+'js/dr_statistics.js'];
+					ranking_url+'js/dr_statistics.js?'+_data.dr_statistics];
 				for(var i=0; i < load.length; ++i)
 				{
 					load[i] = jQuery.ajax({
@@ -1403,7 +1405,7 @@ var Resultlist = (function() {
 				jQuery.when.apply(jQuery, load).done(function(){
 					dr_statistics(container, _data);
 				});
-				// dono why, but abobe done is not always executed, if files are already cached
+				// dono why, but above done is not always executed, if files are already cached
 				window.setTimeout(function(){
 					typeof window.dr_statistics != 'undefined' && dr_statistics(container, _data);
 				}, 100);

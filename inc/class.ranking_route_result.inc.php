@@ -639,7 +639,7 @@ class ranking_route_result extends so_sql
 				// comment as it will not allow to have 99/100 boulders
 				//if ($data['result_top'] != 100*$data['result']-$data['result'])
 				{
-					$data['result'] = number_format($data['result_top']/100, 2, '.', '').'/'.$data['result'];
+					$data['result'] = number_format($data['result_top']/100, 2, '.', '');
 				}
 				// fall through, as final for selfscore is always boulder
 			case 'boulder':
@@ -1222,6 +1222,7 @@ class ranking_route_result extends so_sql
 	 *
 	 * @param array& $result
 	 * @param int $selfscore_points points to distribute per boulder eg. 1000
+	 * @ToDo support bonus/top/flash with given number of points each, currently only top is supported
 	 */
 	protected static function calc_selfscore_points(array &$result, $selfscore_points)
 	{

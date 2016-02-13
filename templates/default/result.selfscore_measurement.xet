@@ -13,7 +13,7 @@
 				<column/>
 				<column/>
 				<column/>
-				<column/>
+				<column disabled="!@0E"/>
 				<column disabled="!@0F"/>
 				<column disabled="!@0G"/>
 				<column disabled="!@0H"/>
@@ -23,18 +23,78 @@
 			</columns>
 			<rows>
 				<row disabled="!@0@">
-					<checkbox align="right" label="@${row}@[num]" id="${row}@[top]"/>
-					<checkbox align="right" label="@${row}A[num]" id="${row}A[top]"/>
-					<checkbox align="right" label="@${row}B[num]" id="${row}B[top]"/>
-					<checkbox align="right" label="@${row}C[num]" id="${row}C[top]"/>
-					<checkbox align="right" label="@${row}D[num]" id="${row}D[top]"/>
-					<checkbox align="right" label="@${row}E[num]" id="${row}E[top]"/>
-					<checkbox align="right" label="@${row}F[num]" id="${row}F[top]"/>
-					<checkbox align="right" label="@${row}G[num]" id="${row}G[top]"/>
-					<checkbox align="right" label="@${row}H[num]" id="${row}H[top]"/>
-					<checkbox align="right" label="@${row}I[num]" id="${row}I[top]"/>
-					<checkbox align="right" label="@${row}J[num]" id="${row}J[top]"/>
-					<checkbox align="right" label="@${row}K[num]" id="${row}K[top]"/>
+					<hbox>
+						<label align="left" value="@${row}@[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}@[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}@[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}@[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}A[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}A[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}A[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}A[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}B[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}B[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}B[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}B[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}C[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}C[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}C[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}C[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}D[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}D[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}D[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}D[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}E[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}E[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}E[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}E[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}F[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}F[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}F[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}F[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}G[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}G[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}G[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}G[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}H[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}H[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}H[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}H[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}I[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}I[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}I[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}I[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}J[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}J[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}J[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}J[flash]"/>
+					</hbox>
+					<hbox>
+						<label align="left" value="@${row}K[n]"/>
+						<checkbox align="right" statustext="Bonus" id="${row}K[zone]"/>
+						<checkbox align="right" statustext="Top" id="${row}K[top]"/>
+						<checkbox align="right" statustext="Flash" id="${row}K[flash]"/>
+					</hbox>
 				</row>
 			</rows>
 		</grid>

@@ -6,7 +6,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -400,6 +400,48 @@ app.classes.ranking = AppJS.extend(
 		jQuery('#ranking-result-index_button\\[update\\],#ranking-result-index_button\\[try\\],#ranking-result-index_button\\[bonus\\],#ranking-result-index_button\\[top\\]')
 			.attr('disabled', !PerId || !n);
 
+		// for selfscore install some behavior on bonus/top/flash checkboxes to
+		// only allow valid combinations and ease use eg. click flash checks bonus&top
+		if(this.content.nm.discipline == 'selfscore')
+		{
+			jQuery('#ranking-result-index_ranking-result-selfscore_measurement input[type=checkbox][name*=zone]').on('change', function(){
+				if (!this.checked)
+				{
+					jQuery(this.parentNode).find('input[type=checkbox]').prop('checked', false);
+				}
+			});
+			jQuery('#ranking-result-index_ranking-result-selfscore_measurement input[type=checkbox][name*=top]').on('change', function(){
+				if (!this.checked)
+				{
+					jQuery(this.parentNode).find('input[type=checkbox][name*=flash]').prop('checked', false);
+				}
+				else
+				{
+					jQuery(this.parentNode).find('input[type=checkbox][name*=zone]').prop('checked', true);
+				}
+			});
+			jQuery('#ranking-result-index_ranking-result-selfscore_measurement input[type=checkbox][name*=flash]').on('change', function(){
+				if (this.checked)
+				{
+					jQuery(this.parentNode).find('input[type=checkbox]').prop('checked', true);
+				}
+			});
+			// hide not used bonus/top/flash checkboxes
+			var use = this.content.selfscore_use || 't';
+			if(use.indexOf('b') < 0)
+			{
+				jQuery('#ranking-result-index_ranking-result-selfscore_measurement input[type=checkbox][name*=zone]').css('display','none');
+			}
+			if(use.indexOf('t') < 0)
+			{
+				jQuery('#ranking-result-index_ranking-result-selfscore_measurement input[type=checkbox][name*=top]').css('display','none');
+			}
+			if(use.indexOf('f') < 0)
+			{
+				jQuery('#ranking-result-index_ranking-result-selfscore_measurement input[type=checkbox][name*=flash]').css('display','none');
+			}
+		}
+
 		if (!this.resultlist)
 		{
 			this.resultlist = new Resultlist('ranking-result-index_resultlist',egw_webserverUrl+'/ranking/json.php'+
@@ -708,6 +750,9 @@ app.classes.ranking = AppJS.extend(
 					delete _data.update_allowed;
 
 					this.et2.getWidgetById('score').set_value(_data);
+
+					// necessary to hide scorecard bonus/top/flash checkboxes and add behavior
+					this.init_boulder();
 
 					// enable/disable checkboxes and apply button depending on update_allowed
 					this.et2.getWidgetById('score').iterateOver(function(_widget)

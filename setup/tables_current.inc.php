@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -282,7 +282,8 @@ $phpgw_baseline = array(
 			'route_judges' => array('type' => 'varchar','precision' => '255','comment' => 'judges for just that route'),
 			'discipline' => array('type' => 'varchar','precision' => '16','comment' => 'lead, speed, boulder or NULL to use from category or competition'),
 			'selfscore_num' => array('type' => 'int','precision' => '2','comment' => 'number or boulders per rows on scorecard'),
-			'selfscore_points' => array('type' => 'int','precision' => '2','comment' => 'points per boulder distributed on all tops')
+			'selfscore_points' => array('type' => 'int','precision' => '2','comment' => 'points per boulder distributed on all tops'),
+			'selfscore_use' => array('type' => 'varchar','precision' => '8','comment' => 'what checkboxes to display: btf, bt, tf or default t')
 		),
 		'pk' => array('WetId','GrpId','route_order'),
 		'fk' => array(),

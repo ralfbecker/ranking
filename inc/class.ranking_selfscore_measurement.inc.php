@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2014-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2014-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -76,13 +76,14 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 							if ($n++ < $num_problems)
 							{
 								$score[$r.$col] = array(
-									'num' => $n.': %s',
-									'top' => (int)$row['score'][$n],
-								);
+									'n'     => $n.':',
+								)+self::score2btf($row['score'][$n], $content['nm']['route_data']['selfscore_use']);
 							}
-							else	// surplus checkbox in last row
+							else	// surplus checkbox(es) in last row
 							{
-								$readonlys['score'][$r.$col.'[top]'] = true;
+								$readonlys['score'][$r.$col.'[bonus]'] =
+									$readonlys['score'][$r.$col.'[top]'] =
+									$readonlys['score'][$r.$col.'[flash]'] = true;
 							}
 						}
 					}
@@ -103,6 +104,45 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		{
 			$tmpl->setElementAttribute('nm[cat]', 'empty_label', '');
 		}
+	}
+
+	/**
+	 * Convert a nummeric score to separate bonus/top/flash values for checkboxes
+	 *
+	 * @param int $score
+	 * @param string $mode =null
+	 * @return array values for keys 'zone', 'top' and 'flash'
+	 */
+	static function score2btf($score, $mode=null)
+	{
+		if (empty($mode)) $mode='t';
+		$no_top = (int)($mode[0] == 'b');
+		$no_flash = ($mode[0] == 'b')+(bool)strstr($mode,'t');
+
+		return array(
+			'zone'  => (int)($score > 0),
+			'top'   => (int)($score > $no_top),
+			'flash' => (int)($score > $no_flash),
+		);
+	}
+
+	/**
+	 * Convert separate bonus/top/flash values of checkboxes to a nummeric score
+	 *
+	 * @param array $btf values for keys 'zone', 'top' and 'flash'
+	 * @param string $mode =null
+	 * @return int
+	 */
+	static function btf2score($btf, $mode=null)
+	{
+		if (empty($mode)) $mode='t';
+
+		$score = 0;
+		if ($btf['zone'] && $mode[0] == 'b') ++$score;
+		if ($btf['top'] && strstr($mode, 't')) ++$score;
+		if ($btf['flash'] && strstr($mode, 'f')) ++$score;
+
+		return $score;
 	}
 
 	/**
@@ -141,7 +181,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 
 				if (0 < $n && $n <= $num_problems)
 				{
-					if (($score[$n] = (int)(bool)$value['top'])) ++$num_tops;
+					$num_tops += $score[$n] = self::btf2score($value, $route['selfscore_use']);
 				}
 			}
 		}
@@ -223,9 +263,8 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 					if ($n++ < $num_problems)
 					{
 						$score[$r.$col] = array(
-							'num' => $n.': %s',
-							'top' => (int)$data['score'][$n],
-						);
+							'n'     => $n.':',
+						)+self::score2btf($data['score'][$n], $route['selfscore_use']);
 					}
 				}
 			}

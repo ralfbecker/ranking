@@ -226,7 +226,7 @@
 						<menulist>
 							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,10,1" class="leftPad5"/>
 						</menulist>
-						<textbox blur="num[/row][:points]" statustext="num[/row][:points] optional points per boulder (distributed on all tops) or 1 point per top" id="selfscore_mode" validator="/^([0-9]+)(\/[0-9]+)?(:[0-9]+)?$/"/>
+						<textbox blur="num[/row][:points][btf]" statustext="num[/row][:points][btf] optional points per boulder (distributed on all tops) or 1 point per top, btf: what checkboxes to display" id="selfscore_mode" validator="/^([0-9]+)(\/[0-9]+)?(:[0-9]+)?(b?t?f?)$/"/>
 					</hbox>
 				</row>
 				<row class="row">

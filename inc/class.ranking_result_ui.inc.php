@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -42,7 +42,7 @@ class ranking_result_ui extends ranking_result_bo
 		elseif ($content['discipline'] == 'selfscore')
 		{
 			$matches = null;
-			if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:([0-9]+))?$/', $content['selfscore_mode'], $matches) ||
+			if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:([0-9]+))?(b?t?f?)?$/', $content['selfscore_mode'], $matches) ||
 				!($matches[1] > 0))
 			{
 				etemplate::set_validation_error('selfscore_mode', 'Wrong format!');
@@ -52,7 +52,8 @@ class ranking_result_ui extends ranking_result_bo
 			{
 				$content['route_num_problems'] = (int)$matches[1];
 				$content['selfscore_num'] = $matches[3] > 0 ? (int)$matches[3] : 10;
-				$content['selfscore_points'] = $matches[5] > 0 ? (int)$matches[5] : null;
+				$content['selfscore_points'] = !empty($matches[5]) ? (int)$matches[5] : null;
+				$content['selfscore_use'] = $matches[6];
 			}
 		}
 		// read $comp, $cat, $discipline and check the permissions
@@ -392,7 +393,7 @@ class ranking_result_ui extends ranking_result_bo
 		if ($discipline == 'selfscore')
 		{
 			$content['selfscore_mode'] = $content['route_num_problems'].'/'.$content['selfscore_num'].
-				($content['selfscore_points'] ? ':'.$content['selfscore_points'] : '');
+				($content['selfscore_points'] ? ':'.$content['selfscore_points'] : '').$content['selfscore_use'];
 			// first call for selfscore: check password-email
 			if ($_SERVER['REQUEST_METHOD'] == 'GET') $content['athlete']['password_email'] = true;
 		}
