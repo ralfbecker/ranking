@@ -117,7 +117,7 @@ class ranking_category extends so_sql
 	/**
 	 * deletes row representing keys in internal data or the supplied $keys if != null
 	 *
-	 * @param array|int $keys=null if given array with col => value pairs to characterise the rows to delete, or integer autoinc id
+	 * @param array|int $keys =null if given array with col => value pairs to characterise the rows to delete, or integer autoinc id
 	 * @return int|boolean affected rows, should be 1 if ok, 0 if an error, false if not found or category has results
 	 */
 	function delete($keys=null)
@@ -234,8 +234,8 @@ class ranking_category extends so_sql
 	 * read a category, reimplemented to use the cache
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
-	 * @param string|array $extra_cols='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $join='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
+	 * @param string|array $extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $join ='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
 	 * @return array|boolean data if row could be retrived else False
 	 */
 	function read($keys,$extra_cols='',$join='')
@@ -308,8 +308,8 @@ class ranking_category extends so_sql
 	 * get the names of all or certain categories, eg. to use in a selectbox
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
 	 * @param int $rkeys -1: GrpId=>rkey:name 0: GrpId=>name, 1: rkey=>name, 2: rkey=>rkey:name, default 2
-	 * @param string $sort='rkey'
-	 * @param boolean $check_sort=true false: not running $sort throught preg, only to be used for constants!
+	 * @param string $sort ='rkey'
+	 * @param boolean $check_sort =true false: not running $sort throught preg, only to be used for constants!
 	 * @returns array with all Cups in the from specified in $rkeys
 	 */
 	function &names($keys=array(),$rkeys=2,$sort='',$check_sort=true)
@@ -373,22 +373,22 @@ class ranking_category extends so_sql
 	/**
 	 * converts a regular expression or comma-separated rkey-list, into an array of rkeys
 	 *
-	 * @param string $rexp eg. 'SUI_M,SUI_F', 'SUI_[MF]', ...
-	 * @param string/boolean $nation nation to limit the categories too
+	 * @param string $_rexp eg. 'SUI_M,SUI_F', 'SUI_[MF]', ...
+	 * @param string|boolean $nation nation to limit the categories too
 	 * @return array of rkey's
 	 */
-	function cat_rexp2rkeys($rexp)
+	function cat_rexp2rkeys($_rexp)
 	{
-		if (empty($rexp)) return array();
+		if (empty($_rexp)) return array();
 
-		$rexp = preg_replace('/=[^,]*/','',$rexp);	// removes cat specific counts
+		$rexp = preg_replace('/=[^,]*/','',$_rexp);	// removes cat specific counts
 
 		if (!$this->all_names)
 		{
 			$this->all_names = $this->names();
 		}
 		$cats = array();
-		foreach((array) $this->all_names as $rkey => $name)
+		foreach(array_keys((array) $this->all_names) as $rkey)
 		{
 			if (stristr( ",".$rexp.",",",".$rkey."," ) || $rexp && preg_match( '/^'.$rexp.'$/i',$rkey ) ||
 				 		(isset($this->cat2old[$rkey]) && (stristr( ",".$rexp.",",",".$this->cat2old[$rkey]."," ) ||
@@ -420,7 +420,7 @@ class ranking_category extends so_sql
 		{
 			$to_year += $stand;
 		}
-		if ($from_year > $to_year)
+		if ($to_year && $from_year > $to_year)
 		{
 			$y = $from_year; $from_year = $to_year; $to_year = $y;
 		}
@@ -433,7 +433,7 @@ class ranking_category extends so_sql
 	 *
 	 * @param int|string $birthdate birthdate Y-m-d or birthyear
 	 * @param int|array $cat GrpId or category array
-	 * @param int|string $year=null year or date to check, default current year
+	 * @param int|string $year =null year or date to check, default current year
 	 * @return boolean true if $birthdate is in the agegroup or category does NOT use age-groups
 	 */
 	function in_agegroup($birthdate,$cat,$year=null)
@@ -450,6 +450,7 @@ class ranking_category extends so_sql
 		}
 		if (is_null($year)) $year = (int)date('Y');
 
+		$from_year = $to_year = null;
 		if (!self::age_group($cat,$year,$from_year,$to_year))
 		{
 			$ret = true;
