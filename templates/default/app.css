@@ -339,3 +339,10 @@ span#ranking-result-index_msg {
 	color: red;
 	font-style: italic;
 }
+
+/**
+ * Overwriting some general et2/Pixelegg styles
+ */
+img.et2_button_icon {
+	background-color: transparent;
+}
