@@ -16,7 +16,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost' || substr($_SERVER['HTTP_HOST'], -6) ==
 }
 elseif (!isset($cache_dir))
 {
-	$cache_dir  = '/tmp/digitalrock-cache';
+	$cache_dir  = '/var/lib/egroupware/www.digitalrock.de/tmp/digitalrock-cache';
 	$cache_time = 15*60;
 	$cache_log = true;
 }
