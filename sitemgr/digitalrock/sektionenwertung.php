@@ -11,7 +11,7 @@
  */
 
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
-	!in_array($_SERVER['HTTP_HOST'],array('localhost','ralfsmacbook.local','boulder.outdoor-training.de')))
+	$_SERVER['HTTP_HOST'] != 'localhost' && substr($_SERVER['HTTP_HOST'], -6) != '.local')
 {
 	include_once('cache.php');
 	do_cache();
@@ -47,16 +47,16 @@ if (!$gruppe)	// Sektionenrangliste: bestes Ergebnis jeder Kategorie (Erwachsene
 	}
 	if (($res = my_query($sql="SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
 		" WHERE w.WetId=r.WetId AND w.nation='GER' AND w.serie IS NOT NULL AND w.fed_id IS NULL AND $stand".
-		" ORDER BY w.datum DESC LIMIT 1")) && mysql_num_rows($res))
+		" ORDER BY w.datum DESC LIMIT 1")) && mysqli_num_rows($res))
 	{
-		$wettk = mysql_fetch_object ($res);
+		$wettk = mysqli_fetch_object ($res);
 		$stand = $wettk->datum;
 
 		// check if $wettk is last comp in the year
 		if (($res = my_query($sql="SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
 			" WHERE w.WetId=r.WetId AND w.nation='GER' AND w.serie IS NOT NULL AND w.fed_id IS NULL AND w.datum>'$stand'".
-			" ORDER BY w.datum ASC LIMIT 1")) && mysql_num_rows($res) &&
-			($next_wettk = mysql_fetch_object($res)) && (int)$wettk->datum !== (int)$next_wettk->datum)
+			" ORDER BY w.datum ASC LIMIT 1")) && mysqli_num_rows($res) &&
+			($next_wettk = mysqli_fetch_object($res)) && (int)$wettk->datum !== (int)$next_wettk->datum)
 		{
 			$stand = (int)$wettk->datum.'-12-31';
 		}
@@ -107,9 +107,9 @@ else	// Sektionenwertung pro Kategorie
 	{
 		$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE rkey='$stand'");
 	}
-	if ($res > 0 && mysql_num_rows($res))
+	if ($res > 0 && mysqli_num_rows($res))
 	{
-		$wettk = mysql_fetch_object ($res);
+		$wettk = mysqli_fetch_object ($res);
 		$stand = $wettk->datum;
 
 		$sql = '';
@@ -130,7 +130,7 @@ else	// Sektionenwertung pro Kategorie
 			" AND datum>'$wettk->datum' AND datum<='".(0+$wettk->datum)."-12-31'".
 			" AND ($sql) ORDER BY datum ASC LIMIT 1");
 
-		if ($res > 0 && ($next_wettk = mysql_fetch_object($res)))
+		if ($res > 0 && ($next_wettk = mysqli_fetch_object($res)))
 		{
 			if ($debug) echo "<p>next wettk: $next_wettk->name, $next_wettk->datum, '$next_wettk->gruppen'</p>\n";
 		}
@@ -166,7 +166,7 @@ if ($debug) echo "<p>sql='$sql'</p>\n";
 
 $rang = array();
 $akt_verband = '';
-while ($row = mysql_fetch_object($res))
+while ($row = mysqli_fetch_object($res))
 {
 	if ($debug) echo "<pre>".print_r($row,true)."</pre>\n";
 

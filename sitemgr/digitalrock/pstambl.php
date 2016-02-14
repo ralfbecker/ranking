@@ -11,9 +11,9 @@ if (!$gruppe) 				// alten Schluessel aufloesen
 {
 	$res = my_query("SELECT g.rkey AS gkey,p.rkey AS pkey".
                     " FROM Gruppen2Personen g2p,Gruppen g,Personen p".
-		            " WHERE g2p.GrpId=g.GrpId AND g2p.PerId=p.PerId AND g2p.old_key='".mysql_escape_string(strtolower($pers))."'");
+		            " WHERE g2p.GrpId=g.GrpId AND g2p.PerId=p.PerId AND g2p.old_key='".mysqli_real_escape_string($mysql, strtolower($pers))."'");
 
-	if ($row = mysql_fetch_object ($res))
+	if ($row = mysqli_fetch_object ($res))
 	{
 		$pers = $row->pkey;
 		$gruppe = $row->gkey;
@@ -47,7 +47,7 @@ $res = my_query ("SELECT r.platz,r.pkt,w.*,g.rkey AS gkey,g.GrpId,g.name AS gnam
 		         " WHERE r.PerId=$pers->PerId AND r.WetId=w.WetId AND r.GrpId=g.GrpId AND r.platz > 0".
 	             " ORDER BY w.datum DESC");
 
-for ($anz_wk=0; $row = mysql_fetch_object($res); $anz_wk++)
+for ($anz_wk=0; $row = mysqli_fetch_object($res); $anz_wk++)
 {
 	//$gewicht = $row->platz * (1+($heute[0]-$row->datum)) * (5*($row->nation!="")+1);
 	// more weight for the date:

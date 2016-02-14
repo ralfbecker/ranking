@@ -1,7 +1,8 @@
 <?php
 /* $Id$ */
 
-if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
+	$_SERVER['HTTP_HOST'] != 'localhost' && substr($_SERVER['HTTP_HOST'], -6) != '.local')
 {
 	include_once('cache.php');
 	do_cache();
@@ -23,7 +24,7 @@ if (!$anz)
 	$res = my_query("SELECT DISTINCT count(g.rkey) AS anz FROM Gruppen g,Results r".
 	                " WHERE g.GrpId=r.GrpId AND r.WetId=".$wettk->WetId.
 			" AND r.platz=1");
-	$anz_grps = mysql_fetch_object($res);
+	$anz_grps = mysqli_fetch_object($res);
 	$anz = $anz_grps->anz > 3 ? 3 : 8;
 }
 
@@ -34,7 +35,7 @@ include ($grp_inc);
 //echo "<p>gruppe='$gruppe->rkey', grp_inc='$grp_inc', t_verband_del='$t_verband_del'</p>\n";
 
 $res = my_query("SELECT GrpId,name FROM Gruppen");
-while ($row = mysql_fetch_object ($res))
+while ($row = mysqli_fetch_object ($res))
 {
 	$grpname[$row->GrpId] = $row->name;
 }
@@ -43,7 +44,7 @@ while ($row = mysql_fetch_object ($res))
 if (isset($GLOBALS['dr_config']['resultservice']))
 {
 	$res = my_query("SELECT DISTINCT GrpId FROM RouteResults WHERE WetId=".(int)$wettk->WetId);
-	while ($row = mysql_fetch_object($res))
+	while ($row = mysqli_fetch_object($res))
 	{
 		$res_service[$row->GrpId] = true;
 	}
@@ -94,7 +95,7 @@ echo "\t\t<td><b>$t_rank</b></td>\n\t\t".'<td colspan="2" align="left"><b>'.$t_n
 
 $cats = array();
 for ($aktGrpId=0;			// noch keine Gruppe
-     $row = mysql_fetch_object($res);
+     $row = mysqli_fetch_object($res);
      $last_platz=$row->platz)
 {
    if ($row->GrpId != $aktGrpId) {	// neue Gruppe --> Gruppen-Header

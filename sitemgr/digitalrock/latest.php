@@ -1,7 +1,8 @@
 <?php
 /* $Id$ */
 
-if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) && $_SERVER['HTTP_HOST'] != 'localhost')
+if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
+	$_SERVER['HTTP_HOST'] != 'localhost' && substr($_SERVER['HTTP_HOST'], -6) != '.local')
 {
 	include_once('cache.php');
 	do_cache();
@@ -44,7 +45,7 @@ $res = my_query("SELECT DISTINCT w.* FROM Wettkaempfe w,Results r".
 		($nation ? "w.nation='$nation'" : "ISNULL(w.nation)").
 		" AND r.platz=1 ORDER BY w.datum DESC LIMIT 20");
 
-$wettk = $w = mysql_fetch_object($res);
+$wettk = $w = mysqli_fetch_object($res);
 
 if ($w_rkey == '')
 {
@@ -67,7 +68,7 @@ do
 		echo "\t\t".'<option value="'.$w->rkey.'">'.$w->name."</option>\n";
 	}
 }
-while ($w = mysql_fetch_object($res));
+while ($w = mysqli_fetch_object($res));
 
 echo "\t</select>\n";
 echo "\t<input type=\"submit\" value=\"Go\">\n";

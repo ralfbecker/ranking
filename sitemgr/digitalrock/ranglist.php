@@ -11,7 +11,7 @@
  */
 
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
-	!in_array($_SERVER['HTTP_HOST'], array('localhost','ralfsmacbook.local','boulder.outdoor-training.de')))
+	$_SERVER['HTTP_HOST'] != 'localhost' && substr($_SERVER['HTTP_HOST'], -6) != '.local')
 {
 	include_once('cache.php');
 	do_cache();
@@ -107,7 +107,7 @@ if ($rang && $show_calc)		// Liste enthaltene Wettk. erzeugen
 		($serie ? "w.serie=$serie->SerId" : "'$anfang'<=w.datum")." AND w.datum<='$stand'";
 
 	$res = my_query($query .=" ORDER BY w.datum DESC");
-	while (($row = mysql_fetch_object($res)))
+	while (($row = mysqli_fetch_object($res)))
 	{
 		$GrpIds = $row->GrpIds ? explode(',',$row->GrpIds) : array($row->GrpId);
 		sort($GrpIds);
@@ -128,7 +128,7 @@ if ($rang && $show_calc)		// Liste enthaltene Wettk. erzeugen
 		($serie ? '' : " AND '$anfang'<=datum").	// MySQL 5.5 gives an error for '' <= datum
 		" AND datum<='$stand' ORDER BY r.WetId,r.platz");
 
-	while ($row = mysql_fetch_object($res))
+	while ($row = mysqli_fetch_object($res))
 	{
 		$result[$row->WetId][$row->PerId][$row->GrpId] = $row;
 	}

@@ -318,7 +318,7 @@ function get_max_wettk($serie,$gruppe)
 		$sql = check_group_sql($gruppe);
 		$res = my_query($sql="SELECT count(*) FROM Wettkaempfe WHERE ".
 			($gruppe->nation ? "nation='$gruppe->nation'" : "ISNULL(nation)")." AND serie=$serie->SerId AND ($sql)");
-		$anz_wettk = (int)mysql_result($res,0,0);
+		$anz_wettk = (int)mysqli_result($res,0,0);
 		//echo "<p>$sql: anz_wettk=$anz_wettk</p>\n";
 		return ($serie->max_serie + $anz_wettk)." (=$anz_wettk$serie->max_serie)";
 	}
@@ -379,7 +379,7 @@ function read_pers(&$pers,$do_fail=True)
 
 		$res = my_query ("SELECT * FROM Personen ".fed_join().' WHERE '.(is_numeric($pers) ? "Personen.PerId=$pers" : "rkey='$pers'"),__FILE__,__LINE__);
 
-		$pers = $res ? mysql_fetch_object($res) : False;
+		$pers = $res ? mysqli_fetch_object($res) : False;
 	}
 	if ($do_fail && !is_object ($pers))
 	{
@@ -397,7 +397,7 @@ function read_wettk(&$wettk,$do_fail=True)
 
 		$res = my_query ("SELECT * FROM Wettkaempfe WHERE ".(is_numeric($wettk) ? "WetId=$wettk" : "rkey='$wettk' OR name='$wettk'"),__FILE__,__LINE__);
 
-		$wettk = $res ? mysql_fetch_object($res) : False;
+		$wettk = $res ? mysqli_fetch_object($res) : False;
 	}
 	if ($do_fail && !is_object ($wettk))
 	{
@@ -415,7 +415,7 @@ function read_serie(&$serie,$do_fail=True)
 
 		$res = my_query ("SELECT * FROM Serien WHERE ".(is_numeric($serie) ? "SerId=$serie" : "rkey='$serie'"),__FILE__,__LINE__);
 
-		$serie = $res ? mysql_fetch_object($res) : False;
+		$serie = $res ? mysqli_fetch_object($res) : False;
 	}
 	if ($do_fail && !is_object ($serie))
 	{
@@ -437,7 +437,7 @@ function read_gruppe(&$gruppe,$do_fail=True)
 			(($newId = array_search($gruppe,$grp2old)) !== False ?  "OR rkey='$newId' " : '').
 			"OR name='$gruppe'"),__FILE__,__LINE__);
 
-		$gruppe = $res ? mysql_fetch_object ($res) : False;
+		$gruppe = $res ? mysqli_fetch_object ($res) : False;
 	}
 	if ($do_fail && !is_object ($gruppe))
 	{
@@ -541,12 +541,12 @@ function get_pkte ($PktId,&$pkte)
 	$PktId = addslashes($PktId);
 
 	if (!intval($PktId) && ($res = my_query("SELECT PktId FROM PktSysteme WHERE rkey='$PktId'",__FILE__,__LINE__)) &&
-	    $row = mysql_fetch_object($res))
+	    $row = mysqli_fetch_object($res))
 	{
 		$PktId = $row->PktId;
 	}
 	$res = my_query($sql="SELECT platz,pkt FROM PktSystemPkte WHERE PktId='$PktId'",__FILE__,__LINE__);
-	while ($row = mysql_fetch_object($res))
+	while ($row = mysqli_fetch_object($res))
 	{
 		$max_pkte += ($pkte[$row->platz] = $row->pkt);
 	}
@@ -585,6 +585,8 @@ function fail ($error,$more = '')
 
 function prepare_var($name,$hows,$from,$default='')
 {
+	global $mysql;
+
 	$var = get_param($name,$from,$default);
 
 	if (!is_array($hows))
@@ -599,7 +601,7 @@ function prepare_var($name,$hows,$from,$default='')
 				$var = (int) $var;
 				break;
 			case 'slashes': case 'addslashes':
-				$var = mysql_real_escape_string($var);
+				$var = mysqli_real_escape_string($mysql, $var);
 				break;
 			case 'upper': case 'strtoupper':
 				$var = strtoupper($var);
@@ -662,23 +664,23 @@ global $mysql;
 ini_set('mysql.connect_timeout', 1);
 foreach(explode(';', $hostname) as $host)
 {
-	if (($mysql = @mysql_connect($host,$username,$password))) break;
+	if (($mysql = mysqli_connect($host,$username,$password))) break;
 }
 if (!$mysql)
 {
 	fail ("Couldn't open Database Connection !!!",
-         $_SERVER['HTTP_HOST'] == 'localhost' ? mysql_error() : '');
+         $_SERVER['HTTP_HOST'] == 'localhost' || substr($_SERVER['HTTP_HOST'], -6) == '.local' ? mysqli_error($mysql) : '');
 }
-@mysql_select_db ($db_name,$mysql) or
+@mysqli_select_db ($mysql, $db_name) or
    fail ("Couldn't open Database !!!",
-         $_SERVER['HTTP_HOST'] == 'localhost' ? mysql_error() : '');
+         $_SERVER['HTTP_HOST'] == 'localhost' || substr($_SERVER['HTTP_HOST'], -6) == '.local' ? mysqli_error($mysql) : '');
 my_query("SET NAMES 'utf8'");
 
 function my_query ($query,$file='',$line='')
 {
 	global $mysql;
 
-	$res = mysql_query($query,$mysql);
+	$res = mysqli_query($mysql, $query);
 	if (!$res)
 	{
 		if (!$file)
@@ -687,7 +689,7 @@ function my_query ($query,$file='',$line='')
 			$file = $trace[0]['file'];
 			$line = $trace[0]['line'];
 		}
-		fail ('Error querying the Database !!!',mysql_error()."<p><table><tr><td><b>Query</b>:</td><td>$query</td></tr>\n".
+		fail ('Error querying the Database !!!',mysqli_error($mysql)."<p><table><tr><td><b>Query</b>:</td><td>$query</td></tr>\n".
 			($file || $line ? "<tr><td><b>File</b>:</td><td>$file</td></tr>\n<tr><td><b>Line</b>:</td><td>$line</td></tr>":'')."</table>\n");
 	}
 	return $res;

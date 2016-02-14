@@ -10,7 +10,7 @@
  * @version $Id$
  */
 
-if (in_array($_SERVER['HTTP_HOST'], array('localhost','ralfsmacbook.local')))
+if ($_SERVER['HTTP_HOST'] == 'localhost' || substr($_SERVER['HTTP_HOST'], -6) == '.local')
 {
 	$cache_time = false;	// no caching
 }
@@ -142,9 +142,9 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 	if (!$use_last && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $stand))
 	{
 		$res = my_query($sql="SELECT * FROM Wettkaempfe WHERE rkey='$stand' OR WetId='$stand'");
-		if ($res > 0 && mysql_num_rows($res))
+		if ($res > 0 && mysqli_num_rows($res))
 		{
-			$wk = mysql_fetch_object($res);
+			$wk = mysqli_fetch_object($res);
 			$stand = $wk->datum;
 		}
 		elseif ($combined && !$serie)
@@ -162,9 +162,9 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 	      " AND (r.platz=1 OR r.cup_platz=1)".
 	      " ORDER BY w.datum DESC LIMIT 1");
 
-	if ($res > 0 && mysql_num_rows($res))
+	if ($res > 0 && mysqli_num_rows($res))
 	{
-		$wettk = mysql_fetch_object ($res);
+		$wettk = mysqli_fetch_object ($res);
 		if ($use_last) $stand = $wettk->datum;
 
 		if (!$combined || $serie)
@@ -177,7 +177,7 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 				" AND datum>'$wettk->datum' AND datum<='".(0+$wettk->datum)."-12-31'".
 				" AND ($sql) ORDER BY datum ASC LIMIT 1");
 
-			if ($res > 0 && ($next_wettk = mysql_fetch_object($res)))
+			if ($res > 0 && ($next_wettk = mysqli_fetch_object($res)))
 			{
 				if ($debug) echo "<p>next wettk: $next_wettk->name, $next_wettk->datum, '$next_wettk->gruppen'</p>\n";
 			}
@@ -207,7 +207,7 @@ function _calc_rangliste(&$gruppe,&$stand,&$anfang,&$wettk,&$ret_pers,&$rls,&$re
 	$res = my_query($sql);
 
 	$pers = $pkte = $anz = $platz = array();
-	while ($row = mysql_fetch_object ($res))
+	while ($row = mysqli_fetch_object ($res))
 	{
 		$id = $row->PerId;
 		$cat = $row->GrpId;
@@ -331,7 +331,7 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 		if (!$rls) return false; 		// keine Rangliste definiert
 
 		$res = my_query("SELECT * FROM RangListenSysteme WHERE RlsId='$rls'");
-		$rls = mysql_fetch_object ($res);
+		$rls = mysqli_fetch_object ($res);
 		$max_wettk = $rls->best_wettk;
 
 		switch ($rls->window_type)
@@ -350,7 +350,7 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 						" AND w.faktor>0.0 AND w.datum<='$stand'".
 						" ORDER BY w.datum DESC LIMIT ".
 						($rls->window_anz-1).",1");
-				$row = mysql_fetch_object ($res);
+				$row = mysqli_fetch_object ($res);
 				$anfang = $row->datum;
 				break;
 			case "wettk_nat":
@@ -359,7 +359,7 @@ function get_ranking_sql($gruppe,$wettk,$serie,&$max_wettk,&$anfang,$stand,&$rls
 						" AND faktor>0.0 AND datum<='$stand'".
 						" ORDER BY datum DESC LIMIT ".
 						($rls->window_anz-1).",1");
-				$row = mysql_fetch_object ($res);
+				$row = mysqli_fetch_object ($res);
 				$anfang = $row->datum;
 				break;
 		}

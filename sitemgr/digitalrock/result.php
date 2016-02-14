@@ -11,7 +11,7 @@
  */
 
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
-	!in_array($_SERVER['HTTP_HOST'], array('localhost','ralfsmacbook.local','boulder.outdoor-training.de')))
+	$_SERVER['HTTP_HOST'] != 'localhost' && substr($_SERVER['HTTP_HOST'], -6) != '.local')
 {
 	include_once('cache.php');
 	do_cache();
@@ -63,7 +63,7 @@ if ($feldfakt)
 }
 echo "\t</tr>\n";
 
-while(($row = mysql_fetch_object($res)))
+while(($row = mysqli_fetch_object($res)))
 {
 	$rows[] = clone($row);
 }
@@ -126,7 +126,7 @@ if ($gruppe->rkey == "MEN")		// nach Open suchen
 			 " FROM Results r,Gruppen g" .
 			 " WHERE r.GrpId=g.GrpId AND r.WetId=$wettk->WetId".
 			 " AND g.rkey='OMEN'");
-	if ($res && mysql_fetch_object( $res ))
+	if ($res && mysqli_fetch_object( $res ))
 	{
 		see_also ('<li><a href="'.$GLOBALS['dr_config']['result'].'comp='.$wettk->rkey.'&amp;cat='.OMEN.'" target="_self">OPEN '.$wettk->name."</a>.</li>\n");
 	}
@@ -157,7 +157,7 @@ if (!$wettk->nation && (int)$wettk->datum >= 2005 && $wettk->quota && preg_match
 {
 	$cats = array();
 	$res = my_query("SELECT DISTINCT GrpId FROM Results WHERE WetId=$wettk->WetId AND platz > 0 ORDER BY WetId");
-	while ($res && ($row = mysql_fetch_object($res)))
+	while ($res && ($row = mysqli_fetch_object($res)))
 	{
 		$cats[] = $row->GrpId;
 	}

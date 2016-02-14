@@ -47,7 +47,7 @@ function wettk_grps($wetid)	// check for which categories we have a result
 	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
 	                   " GROUP BY g.rkey ORDER BY g.name")))
 	{
-		while ($row=mysql_fetch_object($res))
+		while ($row=mysqli_fetch_object($res))
 		{
 			// 0=result, 3=startlist, 4=starters
 			$rgrps[$row->rkey] = $row->platz ? 0 : ($row->pkt > 64 ? 3 : 4);
@@ -64,7 +64,7 @@ function wettk_grps($wetid)	// check for which categories we have a result
 	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
 	                   " GROUP BY g.rkey ORDER BY g.name)")))
 	{
-		while ($row=mysql_fetch_object($res))
+		while ($row=mysqli_fetch_object($res))
 		{
 			// resultservice: 1=result, 2=startlist
 			if (!isset($rgrps[$row->rkey]) || $rgrps[$row->rkey] > 2) $rgrps[$row->rkey] = $row->platz ? 1 : 2;
@@ -187,7 +187,7 @@ $years = array();
 $_years = my_query($sql="SELECT DISTINCT DATE_FORMAT(datum,'%Y') AS year FROM Wettkaempfe".
                    " WHERE $wettks ORDER BY datum DESC");
 //echo "<p>years='$sql'</p>\n";
-while($row = mysql_fetch_object($_years))
+while($row = mysqli_fetch_object($_years))
 {
 	if ($mode != 2 || !strstr($extra_header[(int)$row->year],'provisional'))
 	{
@@ -202,7 +202,7 @@ $wettks = my_query($sql="SELECT *,DATE_FORMAT(datum,'%d.%m.%y') AS fdatum" .
                    " AND ABS(YEAR(datum) - $year) <= $anz_year" .
                    " ORDER BY datum ASC");
 //echo "<p>wettk='$sql'</p>\n";
-$wettk = mysql_fetch_object($wettks);
+$wettk = mysqli_fetch_object($wettks);
 
 if ($serien)
 {
@@ -211,7 +211,7 @@ if ($serien)
 	                   " AND ABS(IF(0+rkey<70,2000,1900)+rkey - $year) <= $anz_year" .
 	                   " ORDER BY year ASC");
 
-	while ($serie = mysql_fetch_object($serien))
+	while ($serie = mysqli_fetch_object($serien))
 	{
 		//echo "<p>Serie $serie->rkey - $serie->name: ";
 		foreach($cats as $c => $cat)
@@ -283,7 +283,7 @@ if ($mode != 2)
 			$s_year += 100;
 
 		if ($s_year && $s_year >= 0+$wettk->datum) { // erst alle Serien ausgeben
-			$serie = mysql_fetch_object($serien);
+			$serie = mysqli_fetch_object($serien);
 		}
 		else
 		{				    // dann die Wettk�mpfe
@@ -411,7 +411,7 @@ if ($mode != 2)
 				}
 			}
 
-			$wettk = mysql_fetch_object($wettks);
+			$wettk = mysqli_fetch_object($wettks);
 		}
 	}
 	echo "</table>\n";
