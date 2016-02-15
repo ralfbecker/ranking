@@ -73,7 +73,7 @@ class ranking_result_ui extends ranking_result_bo
 		// check if user has NO edit rights
 		if (($view = !$this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp, false,
 			// allow register button for selfscore and route-judges
-			$discipline == 'selfscore' && $content['athlete']['register'] ? $content : null)))
+			$discipline == 'selfscore' ? $content : null)))
 		{
 			$readonlys['__ALL__'] = true;
 			$readonlys['button[cancel]'] = false;
@@ -558,7 +558,7 @@ class ranking_result_ui extends ranking_result_bo
 		// no judge rights --> make everything readonly and disable all buttons but cancel
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
-			$readonlys = array('__ALL__' => true);
+			$readonlys = array('__ALL__' => true, 'tabs' => $readonlys['tabs']);
 			$readonlys['button[cancel]'] = false;
 			$content['no_upload'] = true;
 
@@ -568,8 +568,6 @@ class ranking_result_ui extends ranking_result_bo
 			{
 				$readonlys['athlete'] = array(
 					'PerId' => false,
-					'PerId[id]' => false,
-					'PerId[query]' => false,
 					'vorname' => false,
 					'nachname' => false,
 					'email' => false,
@@ -579,8 +577,9 @@ class ranking_result_ui extends ranking_result_bo
 					'nation' => false,
 					'password_email' => false,
 					'sex' => false,
+					'register' => false,
 				);
-				$readonlys['register'] = false;
+				$content['tabs'] = 'registration';
 			}
 			else error_log(__METHOD__.': '.__LINE__.' no rights!');
 		}
