@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -17,28 +17,6 @@
  */
 class ranking_pktsystem extends so_sql
 {
-	/* var $public_functions = array(
-		'init'	=> True,
-		'read'	=> True,
-		'save'	=> True,
-		'delete'	=> True,
-		'search'	=> True,
-	) */	// set in so_sql
-/* set by so_sql('ranking','rang.PktSysteme'):
-	var $table_name = 'rang.PktSysteme';
-	var $autoinc_id = 'PktId';
-	var $db_key_cols = array('PktId' => 'PktId');
-	var $db_data_cols = array(
-		'rkey' => 'rkey', 'name' => 'name', 'anz_pkt' => 'anz_pkt'
-	);
-*/
-/* not needed so far
-	var $db_name_pkte = 'rang.PktSystemPkte';
-	var $db_data_cols_pkte = array(
-		'platz' => 'platz','pkt' => 'pkt'
-	);
-	var $pkte;
-*/
 	var $pkte_table = 'PktSystemPkte';
 
 	/**
@@ -47,15 +25,9 @@ class ranking_pktsystem extends so_sql
 	 */
 	function __construct($source_charset='',$db=null)
 	{
-		parent::__construct('ranking','PktSysteme',$db);	// call constructor of derived class
+		unset($source_charset);	// not used, but required by function signature
 
-/*    not needed so far
-		$this->pkte = new so_sql;
-		$this->pkte->db_name = $this->db_name_pkte;
-		$this->pkte->db_key_cols = $this->db_key_cols;
-		$this->pkte->db_data_cols = $this->db_data_cols_pkte;
-		$this->pkte->so_sql(); // call constructor again manually after setting up fields
-*/
+		parent::__construct('ranking','PktSysteme',$db);	// call constructor of derived class
 	}
 
 	/**
@@ -97,4 +69,4 @@ class ranking_pktsystem extends so_sql
 		//echo "<p>pktsystem::get_pkte($PktId,) = $max_pkte</p>\n";
 		return $max_pkte;
 	}
-};
+}

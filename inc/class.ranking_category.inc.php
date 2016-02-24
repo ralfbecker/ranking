@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-13 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -100,7 +100,7 @@ class ranking_category extends so_sql
 	 */
 	function __construct($source_charset='',$db=null)
 	{
-		$this->so_sql('ranking','Gruppen',$db);	// call constructor of derived class
+		parent::__construct('ranking','Gruppen',$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
