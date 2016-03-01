@@ -116,7 +116,7 @@ class uiregistration extends ranking_bo
 		$show_all = $content['show_all'];
 
 		if (!($comp = $this->comp->read($comp)) || 			// unknown competition
-			!$this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER,$comp) || // no rights for that nation/federation
+			!$this->registration_check($comp, $nation) ||	// no rights to register for that competition or nation
 			!($cat  = $this->cats->read($cat ? $cat : $comp['gruppen'][0])) ||	// unknown category
 			(!in_array($cat['rkey'],$comp['gruppen'])))		// cat not in this competition
 		{
