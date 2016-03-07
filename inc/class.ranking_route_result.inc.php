@@ -963,8 +963,9 @@ class ranking_route_result extends so_sql
 			}
 		}
 		// boulder result with just the sums (route_num_problems=0)
-		elseif (isset($data['tops']))
+		elseif (isset($data['tops']) || array_key_exists('score', $data))
 		{
+			$data['result_zone'] = $data['result_top'] = null;
 			if (is_numeric($data['zones']))
 			{
 				$data['result_zone'] = 100 * $data['zones'] - $data['zone_tries'];
@@ -1009,7 +1010,7 @@ class ranking_route_result extends so_sql
 		}
 		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent','checked','score','false_start') as $name)
 		{
-			if (isset($new[$name])) $this->data[$name] = $new[$name];
+			if (array_key_exists($name, $new)) $this->data[$name] = $new[$name];
 		}
 	}
 

@@ -185,14 +185,26 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 				}
 			}
 		}
-		$to_update = array(
-			'tops' => $num_tops+.0001,	// hack to allow to save 0 tops
-			'zones' => $num_tops,
-			'top_tries' => 0,
-			'zone_tries' => $num_tops,
-			'score' => $score,
-		);
-
+		if ($num_tops > 0)
+		{
+			$to_update = array(
+				'tops' => $num_tops+.0001,	// hack to allow to save 0 tops
+				'zones' => $num_tops,
+				'top_tries' => 0,
+				'zone_tries' => $num_tops,
+				'score' => $score,
+			);
+		}
+		else	// allow to reset athlete to not climbed and ranked, eg. to delete him from startlist
+		{
+			$to_update = array(
+				'tops' => null,
+				'zones' => null,
+				'top_tries' => null,
+				'zone_tries' => null,
+				'score' => null,
+			);
+		}
 		//error_log(__METHOD__."($PerId, ".array2string($update).", ".array2string($state).")");
 		if (ranking_result_bo::$instance->save_result($keys,array($PerId => $to_update),$query['route_type'],$query['discipline']))
 		{
