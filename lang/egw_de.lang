@@ -2,10 +2,13 @@
 %1 deleted	ranking	de	%1 gelöscht
 %1 federations added to parent federation.	ranking	de	%1 Verbände zu übergeordnetem hinzugefügt.
 %1 federations merged.	ranking	de	%1 Verbände zusammengeführt.
+%1 is already registered!	ranking	de	%1 ist bereits registriert!
 %1 is an admin and has therefor all rights!	ranking	de	%1 ist ein Administrator und hat daher alle Rechte!
 %1 lines read from file.	ranking	de	%1 Zeilen von der Datei gelesen.
 %1 participants imported	ranking	de	%1 Teilnehmer importiert
+%1 registered.	ranking	de	%1 registriert.
 %1 saved	ranking	de	%1 gespeichert
+%1 years, since %2	ranking	de	%1 Jahre, seit %2
 %1, %2 deleted for category %3	ranking	de	%1, %2 gelöscht für Kategorie %3
 %1, %2 registered for category %3	ranking	de	%1, %2 registriert für Kategorie %3
 %1. false start	ranking	de	%1. Fehlstart
@@ -43,6 +46,7 @@ add to parent federation opened for editing	ranking	de	Hinzufügen zu zum Bearbe
 additional category	ranking	de	Zusätzliche Kategorie
 admin rights required!	ranking	de	Administrator Rechte erforderlich!
 administrated by: parent federation	ranking	de	Verwaltet von: übergeordnetem Verband
+age	ranking	de	Alter
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
@@ -62,11 +66,14 @@ are you sure you want to make an exception?	ranking	de	Sind Sie sicher, dass Sie
 as of	ranking	de	Stand
 athlete	ranking	de	Athlet
 athlete %1 not found!	ranking	de	Athlet %1 nicht gefunden!
+athlete does not meet registration requirements: %1!	ranking	de	Athlete erfüllt NICHT die Vorrausetzung für eine Registrierung: %1!
 athlete has no license! use regular registration to apply for a license first.	ranking	de	Athlet hat keine Lizenz! Benutzen Sie die reguläre Registrierung um eine zu beantragen.
 athlete including %1 results merged.	ranking	de	Athlet einschließlich %1 Ergebnisse vereinigt.
 athlete is not in agegroup of selected license category!	ranking	de	Athlet is NICHT in der Altersklasse der ausgewählten Lizenzkategorie!
 athlete is not in the age-group of that category	ranking	de	Athlet hat NICHT den erforderlichen Jahrgang für diese Kategorie
 athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
+athlete not found !!!	ranking	de	Athlet NICHT gefunden !!!
+athlete scorecard already checked, update denied!	ranking	de	Die Scorecard des Athleten wurde bereits geprüft, update verweigert!
 athletes	ranking	de	Athleten
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	de	Athleten müssen mindestens %1 Jahre alt sein! Eventuell falsches Datumsformat.
 attention: merging can not be undone! really want to merge?	ranking	de	ACHTUNG: Vereinigen kann NICHT rückgänig gemacht werden! Wollen Sie die beiden Athleten wirklich vereinigen?
@@ -137,6 +144,7 @@ competition results	ranking	de	Wettkampfergebnisse
 competitions	ranking	de	Wettkämpfe
 competitions counting	ranking	de	zählende Wettkämpfe
 complete profile	ranking	de	komplettes Profil
+complete result	ranking	de	komplettes Ergebnis
 complimentary	ranking	de	Zusätzlich
 confirmed	ranking	de	bestätigt
 contact	ranking	de	Kontakt
@@ -146,6 +154,7 @@ counting for rankings	ranking	de	zählend für die Rangliste
 create new federation: %1 (%2)	ranking	de	Lege neuen Verband an: %1 (%2)
 cup	ranking	de	Cup
 cup (unranked last)	ranking	de	Cup (nicht gelistet zuletzt)
+cup not found!!!	ranking	de	Cup nicht gefunden!!!
 cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
 database	admin	de	Datenbank
@@ -199,6 +208,7 @@ edit this heat	ranking	de	Diese Runde bearbeiten
 edit topo	ranking	de	Topo bearbeiten
 eliminated	ranking	de	eliminiert
 email address not found!	ranking	de	EMail Adresse NICHT gefunden!
+email required to send password email!	ranking	de	EMail Adresse erforderlich um eine Passwort EMail zu senden!
 encoding	ranking	de	Zeichensatz
 end	ranking	de	Ende
 entry copied - edit and save the copy now.	ranking	de	Eintrag kopiert - Sie können die Kopie nun bearbeiten und speichern.
@@ -243,6 +253,7 @@ fax	ranking	de	Fax
 federation	ranking	de	Verband
 federation deleted.	ranking	de	Verband gelöscht.
 federation needs to confirm	ranking	de	Verband muss bestätigen
+federation or nationality	ranking	de	Verband oder Nationalität
 federation saved.	ranking	de	Verband gespeichert.
 federations	ranking	de	Verbände
 fees	ranking	de	Gebühren
@@ -252,6 +263,7 @@ file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	de	Datei %1 nich
 file '%1' successful attached as %2	ranking	de	Datei '%1' erfolgreich als %2 angehangen
 file is not a pdf	ranking	de	Die Datei ist kein PDF
 file is not an image (%1)	ranking	de	Datei ist kein Bild (%1)
+filesystem path for upload of athlete pictures	admin	de	Dateisystempfad für das Hochladen von Bildern von Athleten
 final	ranking	de	Finale
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Vorname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 for internal use, not shown on the website.	ranking	de	Zur internen Benutzung, wird nicht auf der Webseite angezeigt.
@@ -276,6 +288,7 @@ generate all startlists together	ranking	de	Erzeugt alle Startlisten  auf ein ma
 generate startlist	ranking	de	Startliste erzeugen
 go	ranking	de	Go
 grpid	ranking	de	GrpId
+has already a result!	ranking	de	Hat bereits ein Ergebnis!
 header	ranking	de	Spaltenköpfe
 heat	ranking	de	Runde
 heat deleted	ranking	de	Runde gelöscht
@@ -322,6 +335,7 @@ key of the person	ranking	de	Schlüssel des Athleten
 last competition	ranking	de	Letzter Wettkampf
 lead	ranking	de	Schwierigkeit
 license number	ranking	de	Lizenznummer
+license should be removed when federation was changed!	ranking	de	Lizenz sollte entfernt werden, wenn der Verband geändert wurde!
 line	ranking	de	Zeile
 login suspended, too many unsuccessful tries!	ranking	de	Login ausgesetzt, zu viele erfolglosen Versuche!
 mail all participants	ranking	de	Alle Teilnehmer anmailen
@@ -354,6 +368,8 @@ national team ranking	ranking	de	Nationen-Team-Rangliste
 nationname	ranking	de	Name des Landes
 nations and federations	ranking	de	Nationen und Verbände
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
+no birthdate	ranking	de	kein Geburtsdatum
+no categories defined!	ranking	de	Keine Kategorien definiert!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	de	Kein Wettkampf (&comp=XYZ) und kein Cup (&cup=XYZ) über die URL ausgewählt!
 no complimentary list (over quota)	ranking	de	Keine Komplimentärliste (über die Quote hinaus)
 no federation selected to edit!	ranking	de	Kein Verband zum bearbeiten ausgewählt!
@@ -361,7 +377,10 @@ no participant with startnumber "%1"!	ranking	de	Kein Teilnehmer mit Startnummer
 no participants yet!	ranking	de	Noch keine Teilnehmer!
 no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Runde angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
+no result imported, need to select all athletes first!	ranking	de	Keine Ergebnisse importiert, ALLE Athleten müssen ausgewählt werden!
+no result yet !!!	ranking	de	Noch kein Ergebnis !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
+no starters yet !!!	ranking	de	Noch keine Starter !!!
 no startlist or result yet!	ranking	de	Bisher keine Startliste oder Ergebnis!
 not allowed	ranking	de	Nicht erlaubt
 not used at the moment	ranking	de	im Moment nicht benutzt
@@ -376,6 +395,7 @@ on how many routes is the first round	ranking	de	Auf wievielen Routen findet die
 one qualification	ranking	de	eine Qualifikation
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
 open comp.	ranking	de	Offener Wettk.
+open scorecards:	ranking	de	Offene Scorekarten:
 opens	ranking	de	öffnet
 or	ranking	de	oder
 other sports	ranking	de	Andere Sportarten
@@ -491,6 +511,7 @@ select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 selfregister	ranking	de	Selbstregistrierung
 send email to set password to athlete	ranking	de	Sendet Athleten EMail um Passwort zu setzen
 serid	ranking	de	SerId
+set "%1" to %2.	ranking	de	Setze "%1" auf %2.
 set by category	ranking	de	nach der Kategorie
 set license to	ranking	de	Setze Lizenz als
 set password	ranking	de	Passwort setzen
@@ -505,6 +526,7 @@ size (cm)	ranking	de	Größe (cm)
 small final	ranking	de	Kleines Finale
 someone already applied for a %1 license!	ranking	de	Jemand hat bereits die %1 Lizenz beantragt!
 sorry, an error happend sending your email (%1), please try again later or %2contact us%3.	ranking	de	Entschuldigung, es gab eine Fehler beim Sender Deiner EMail (%1), bitte versuch es später nochmal oder %2benachrichtige uns%3.
+sorry, the climber requested not to show his profile!	ranking	de	Entschuldigung, der Athlete hat gebeten sein Profil nicht mehr anzuzeigen!
 speed	ranking	de	Geschwindigkeit
 speedrelay	ranking	de	Speedrelay
 sponsor logos	ranking	de	Sponsorenlogo(s)
@@ -553,7 +575,7 @@ top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein
 top: total number or no	ranking	de	Top: Gesamtanzahl oder Nein
 topo deleted.	ranking	de	Topo gelöscht.
 topo uploaded as %1.	ranking	de	Topo hochgeladen als %1.
-total of %s athlets registered in all categories.	ranking	de	Insgesamt %s Athleten in allen Kategorien registriert.
+total of %1 athlets registered in all categories.	ranking	de	Insgesamt %1 Athleten in allen Kategorien registriert.
 tries	ranking	de	Versuche
 try	ranking	de	Try
 try again after %1 minutes.	ranking	de	Bitte nach %1 Minuten nochmal versuchen.
@@ -573,6 +595,7 @@ unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
 unknown category or not a category of this competition	ranking	de	Unbekannte Kategorie oder nicht eine Kategorie dieses Wettkampfes
 unknown mode="%1"!	ranking	de	Unbekannter Modus="%1"!
+unknown type	ranking	de	Unbekannter Typ
 unpublished	ranking	de	unveröffentlicht
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt
 up	ranking	de	Nach oben
@@ -580,6 +603,7 @@ update time	ranking	de	Zeit aktualisieren
 upload a portrait picture for the profile	ranking	de	Ein Protrait Bild für das Profil hochladen
 upload topo	ranking	de	Topo hochladen
 uploaded picture is no jpeg !!!	ranking	de	Hochgeladenes Bild ist kein JPEG !!!
+url for pdf files (excluding the year)	admin	de	URL für PDF Dateien (ohne das Jahr)
 url to own homepage, eg. http://domain.com	ranking	de	URL zu eigener Homepage, zB. http://climbing.de
 use "yes" or "no, prefession"	ranking	de	benützen Sie "yes" oder "no, Beruf"
 use access control to deny display on the website	ranking	de	benützen Sie die Zugangskontrolle um die Anzeige auf der Webseite zu verhindern
@@ -608,6 +632,7 @@ which pointalocation should be used to calculate the fieldfactor, usualy cuwr or
 which rankingsystem was used before, if any	ranking	de	Welches Ranglistensystem wurde zuvor benützt, wenn überhaupt
 which view do you want to see, when you start the ranking app?	ranking	de	Welche Ansicht soll angezeigt werden, wenn sie die Ranglistenanwendung starten?
 wildcard	ranking	de	Wildcard
+without excluding non-members	ranking	de	ohne Nichtmitglieder auszuschließen
 wrong admin-account or -password !!!	ranking	de	Falsches Admin-Konto oder -Passwort !!!
 wrong mode="%1" for discipline "%2"!	ranking	de	Falscher Modus="%1" für Disziplin "%2"!
 wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	de	Falscher Modus="%1" für diese Runde (Qualifikation - Finale passen nicht zusammen)
@@ -619,6 +644,7 @@ you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizen
 you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	de	Sie können jetzt %1Ihr Profil bearbeiten%2 oder sich im Kalender für einen Wettkampf registrieren.
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
+you either need to search an athlete or enter required fields to add him!	ranking	de	Sie müssen entweder einen Athleten suchen oder die erforderlichen Felder ausfüllen um ihn hinzu zu fügen!
 you have not yet a password set!	ranking	de	Du hast noch kein Passwort gesetzt!
 you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	de	Du musst den Anweisungen innerhalb der nächsten %1 Stunden folgen, oder %2eine neue Mail anfordern%3.
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!

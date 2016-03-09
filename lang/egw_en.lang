@@ -2,10 +2,13 @@
 %1 deleted	ranking	en	%1 deleted
 %1 federations added to parent federation.	ranking	en	%1 federations added to parent federation.
 %1 federations merged.	ranking	en	%1 federations merged.
+%1 is already registered!	ranking	en	%1 is already registered!
 %1 is an admin and has therefor all rights!	ranking	en	%1 is an admin and has therefor all rights!
 %1 lines read from file.	ranking	en	%1 lines read from file.
 %1 participants imported	ranking	en	%1 participants imported
+%1 registered.	ranking	en	%1 registered.
 %1 saved	ranking	en	%1 saved
+%1 years, since %2	ranking	en	%1 years, since %2
 %1, %2 deleted for category %3	ranking	en	%1, %2 deleted for category %3
 %1, %2 registered for category %3	ranking	en	%1, %2 registered for category %3
 %1. false start	ranking	en	%1. false start
@@ -44,6 +47,7 @@ add to parent federation opened for editing	ranking	en	Add to parent federation 
 additional category	ranking	en	Additional category
 admin rights required!	ranking	en	Admin rights required!
 administrated by: parent federation	ranking	en	Administrated by: parent federation
+age	ranking	en	Age
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
@@ -66,11 +70,14 @@ athlete %1 not found!	ranking	en	Athlete %1 not found!
 athlete 1	ranking	en	Athlete 1
 athlete 2	ranking	en	Athlete 2
 athlete 3	ranking	en	Athlete 3
+athlete does not meet registration requirements: %1!	ranking	en	Athlete does NOT meet registration requirements: %1!
 athlete has no license! use regular registration to apply for a license first.	ranking	en	Athlete has no license! Use regular registration to apply for a license first.
 athlete including %1 results merged.	ranking	en	Athlete including %1 results merged.
 athlete is not in agegroup of selected license category!	ranking	en	Athlete is NOT in agegroup of selected license category!
 athlete is not in the age-group of that category	ranking	en	Athlete is NOT in the age-group of that category
 athlete is suspended !!!	ranking	en	Athlete is suspended !!!
+athlete not found !!!	ranking	en	Athlete NOT found !!!
+athlete scorecard already checked, update denied!	ranking	en	Athlete scorecard already checked, update denied!
 athletes	ranking	en	Athletes
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	en	Athlets need to be at least %1 years old! Maybe wrong date format.
 attention: merging can not be undone! really want to merge?	ranking	en	ATTENTION: merging can NOT be undone! Really want to merge?
@@ -141,6 +148,7 @@ competition results	ranking	en	Competition results
 competitions	ranking	en	Competitions
 competitions counting	ranking	en	Competitions counting
 complete profile	ranking	en	complete profile
+complete result	ranking	en	complete result
 complimentary	ranking	en	Complimentary
 confirmed	ranking	en	confirmed
 contact	ranking	en	Contact
@@ -150,6 +158,7 @@ counting for rankings	ranking	en	counting for rankings
 create new federation: %1 (%2)	ranking	en	Create new federation: %1 (%2)
 cup	ranking	en	Cup
 cup (unranked last)	ranking	en	cup (unranked last)
+cup not found!!!	ranking	en	Cup not found!!!
 cuppattern	ranking	en	Cuppattern
 cups	ranking	en	Cups
 database	admin	en	Database
@@ -203,6 +212,7 @@ edit this heat	ranking	en	Edit this round
 edit topo	ranking	en	Edit topo
 eliminated	ranking	en	eliminated
 email address not found!	ranking	en	EMail address NOT found!
+email required to send password email!	ranking	en	EMail required to send password email!
 encoding	ranking	en	Encoding
 end	ranking	en	End
 entry copied - edit and save the copy now.	ranking	en	Entry copied - edit and save the copy now.
@@ -247,6 +257,7 @@ fax	ranking	en	Fax
 federation	ranking	en	Federation
 federation deleted.	ranking	en	Federation deleted.
 federation needs to confirm	ranking	en	Federation needs to confirm
+federation or nationality	ranking	en	federation or nationality
 federation saved.	ranking	en	Federation saved.
 federations	ranking	en	Federations
 fees	ranking	en	Fees
@@ -256,6 +267,7 @@ file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	en	File %1 not f
 file '%1' successful attached as %2	ranking	en	File '%1' successful attached as %2
 file is not a pdf	ranking	en	File is not a PDF
 file is not an image (%1)	ranking	en	File is not an image (%1)
+filesystem path for upload of athlete pictures	admin	en	Filesystem path for upload of athlete pictures
 final	ranking	en	Final
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	en	First name of the athlete in Latin chars! Accents and umlauts are ok
 for internal use, not shown on the website.	ranking	en	For internal use, not shown on the website.
@@ -280,6 +292,7 @@ generate all startlists together	ranking	en	Generate all startlists together
 generate startlist	ranking	en	Generate startlist
 go	ranking	en	Go
 grpid	ranking	en	GrpId
+has already a result!	ranking	en	Has already a result!
 header	ranking	en	Header
 heat	ranking	en	Round
 heat deleted	ranking	en	Round deleted
@@ -310,6 +323,7 @@ import the result into the ranking	ranking	en	Import the result into the ranking
 in kilogram	ranking	en	in kilogram
 incl. nation-code	ranking	en	incl. nation-code
 information pdf	ranking	en	Information PDF
+install-id of instance to use for export caching (default current one)	admin	en	Install-ID of instance to use for export caching (default current one)
 internal key, leave it empty to have it automaticaly generated	ranking	en	internal key, leave it empty to have it automaticaly generated
 into current category	ranking	en	Into current category
 isolation	ranking	en	Isolation
@@ -323,9 +337,12 @@ key of the category	ranking	en	Key of the category
 key of the competition	ranking	en	Key of the competition
 key of the cup	ranking	en	Key of the cup
 key of the person	ranking	en	Key of the Person
+landesverband	ranking	en	Landesverband
+lane a	ranking	en	Lane A
 last competition	ranking	en	Last competition
 lead	ranking	en	lead
 license number	ranking	en	License number
+license should be removed when federation was changed!	ranking	en	License should be removed when federation was changed!
 line	ranking	en	Line
 login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too many unsuccessful tries!
 mail all participants	ranking	en	Mail all participants
@@ -358,6 +375,8 @@ national team ranking	ranking	en	National team ranking
 nationname	ranking	en	Nationname
 nations and federations	ranking	en	Nations and Federations
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	en	No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!
+no birthdate	ranking	en	no Birthdate
+no categories defined!	ranking	en	No categories defined!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	en	No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!
 no complimentary list (over quota)	ranking	en	No complimentary list (over quota)
 no federation selected to edit!	ranking	en	No federation selected to edit!
@@ -365,7 +384,10 @@ no participant with startnumber "%1"!	ranking	en	No participant with startnumber
 no participants yet!	ranking	en	No participants yet!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous round!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
+no result imported, need to select all athletes first!	ranking	en	No result imported, need to select ALL athletes first!
+no result yet !!!	ranking	en	No result yet !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	en	No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!
+no starters yet !!!	ranking	en	No starters yet !!!
 no startlist or result yet!	ranking	en	No startlist or result yet!
 not allowed	ranking	en	Not allowed
 not used at the moment	ranking	en	not used at the moment
@@ -380,6 +402,7 @@ on how many routes is the first round	ranking	en	On how many routes is the first
 one qualification	ranking	en	one Qualification
 only fill values different from egw	admin	en	only fill values different from eGW
 open comp.	ranking	en	Open comp.
+open scorecards:	ranking	en	Open scorecards:
 opens	ranking	en	opens
 or	ranking	en	or
 other sports	ranking	en	other sports
@@ -446,6 +469,7 @@ rankings - categories	ranking	en	Rankings - Categories
 rankings - cathegories	ranking	en	Rankings - Cathegories
 rankingsystem	ranking	en	Rankingsystem
 read competition	ranking	en	Read competition
+regionalzentrum	ranking	en	Regionalzentrum
 register	ranking	en	Register
 register athlets for this competition	ranking	en	Register athlets for this competition
 register this athlete for the selected category	ranking	en	Register this athlete for the selected category
@@ -479,6 +503,7 @@ routejudges	ranking	en	Routejudges
 routes	ranking	en	Routes
 rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
+sektion	ranking	en	Sektion
 select a category to additionally add to startlist (eg. juniors to men)	ranking	en	Select a category to additionally add to startlist (eg. juniors to men)
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
 select a nation first	ranking	en	Select a nation first
@@ -495,6 +520,7 @@ select type of list to show	ranking	en	Select type of list to show
 selfregister	ranking	en	Selfregister
 send email to set password to athlete	ranking	en	Send EMail to set password to athlete
 serid	ranking	en	SerId
+set "%1" to %2.	ranking	en	Set "%1" to %2.
 set by category	ranking	en	set by category
 set license to	ranking	en	Set license to
 set password	ranking	en	Set password
@@ -509,6 +535,7 @@ size (cm)	ranking	en	Size (cm)
 small final	ranking	en	Small final
 someone already applied for a %1 license!	ranking	en	Someone already applied for a %1 license!
 sorry, an error happend sending your email (%1), please try again later or %2contact us%3.	ranking	en	Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.
+sorry, the climber requested not to show his profile!	ranking	en	Sorry, the climber requested not to show his profile!
 speed	ranking	en	speed
 speedrelay	ranking	en	speedrelay
 sponsor logos	ranking	en	Sponsor logos
@@ -557,7 +584,7 @@ top: number of tries or no	ranking	en	Top: number of tries or no
 top: total number or no	ranking	en	Top: total number or no
 topo deleted.	ranking	en	Topo deleted.
 topo uploaded as %1.	ranking	en	Topo uploaded as %1.
-total of %s athlets registered in all categories.	ranking	en	Total of %s Athlets registered in all Categories.
+total of %1 athlets registered in all categories.	ranking	en	Total of %1 athlets registered in all categories.
 tries	ranking	en	Tries
 try	ranking	en	Try
 try again after %1 minutes.	ranking	en	Try again after %1 minutes.
@@ -577,6 +604,7 @@ unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
 unknown mode="%1"!	ranking	en	Unknown Mode="%1"!
+unknown type	ranking	en	Unknown type
 unpublished	ranking	en	unpublished
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
 up	ranking	en	Up
@@ -584,6 +612,7 @@ update time	ranking	en	update time
 upload a portrait picture for the profile	ranking	en	Upload a portrait picture for the profile
 upload topo	ranking	en	Upload topo
 uploaded picture is no jpeg !!!	ranking	en	Uploaded picture is no JPEG !!!
+url for pdf files (excluding the year)	admin	en	URL for pdf files (excluding the year)
 url to own homepage, eg. http://domain.com	ranking	en	URL to own homepage, eg. http://domain.com
 use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"
 use access control to deny display on the website	ranking	en	use access control to deny display on the website
@@ -612,6 +641,7 @@ which pointalocation should be used to calculate the fieldfactor, usualy cuwr or
 which rankingsystem was used before, if any	ranking	en	which rankingsystem was used before, if any
 which view do you want to see, when you start the ranking app?	ranking	en	Which view do you want to see, when you start the ranking app?
 wildcard	ranking	en	Wildcard
+without excluding non-members	ranking	en	without excluding non-members
 wrong admin-account or -password !!!	ranking	en	Wrong admin-account or -password !!!
 wrong mode="%1" for discipline "%2"!	ranking	en	Wrong Mode="%1" for discipline "%2"!
 wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	en	Wrong Mode="%1" for this heat (qualification - final mismatch)!
@@ -623,6 +653,7 @@ you are not permitted to apply for a license!	ranking	en	You are not permitted t
 you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	en	You can now %1edit your profile%2 or register for a competition in the calendar.
 you can only create a new heat, if the previous one '%1' has a result!	ranking	en	You can only create a new round, if the previous one '%1' has a result!
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last round, not one in between!
+you either need to search an athlete or enter required fields to add him!	ranking	en	You either need to search an athlete or enter required fields to add him!
 you have not yet a password set!	ranking	en	You have not yet a password set!
 you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	en	You have to act on the instructions in the next %1 hours, or %2request a new mail%3.
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!

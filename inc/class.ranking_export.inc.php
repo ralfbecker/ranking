@@ -1246,7 +1246,7 @@ class ranking_export extends ranking_result_bo
 		}
 		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
-			throw new Exception(lang('Category not found!!!'));
+			throw new Exception(lang('Category NOT found !!!'));
 		}
 		$overall = count($cat['GrpIds']) > 1;
 

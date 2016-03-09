@@ -458,7 +458,9 @@ class ranking_category extends so_sql
 		}
 		elseif (!$birthdate)
 		{
-			$ret = false;
+			// consider no birthdate as an adult of 20 years,
+			// to allow registration into adults categories requiring 16+ age
+			$ret = $this->in_agegroup($year-20, $cat, $year);
 		}
 		else
 		{

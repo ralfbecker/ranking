@@ -323,12 +323,30 @@ class ranking_result_ui extends ranking_result_bo
 						$msg .= lang('Athlete is suspended !!!');
 						break;
 					}
-					if (!($cat = $this->cats->read($keys['GrpId'])) ||
-						$cat['sex'] && $cat['sex'] != $athlete['sex'] ||
-						!$this->cats->in_agegroup($athlete['geb_date'], $cat, (int)$comp['datum']) ||
-						!$this->comp->open_comp_match($athlete))
+					// check registration requirements
+					if (!($cat = $this->cats->read($keys['GrpId'])))
 					{
-						$msg .= lang('Athlete does NOT meet registration requirements (age, gender, federation)!');
+						$msg .= lang('Category NOT found !!!');
+						break;
+					}
+					$wrong = array();
+					if ($cat['sex'] && $cat['sex'] != $athlete['sex'])
+					{
+						$wrong['sex'] = lang('Gender');
+					}
+					if (!$this->cats->in_agegroup($athlete['geb_date'], $cat, (int)$comp['datum']))
+					{
+						$wrong['age'] = lang('Athlete is NOT in the age-group of that category').
+							(!$athlete['geb_date'] ? ': '.lang('no birthdate') : '');
+					}
+					if (!$this->comp->open_comp_match($athlete))
+					{
+						$wrong['fed'] = lang('federation or nationality');
+					}
+					if ($wrong)
+					{
+						$msg .= lang('Athlete does NOT meet registration requirements: %1!',
+							implode(', ', $wrong));
 						break;
 					}
 					// temporary reset all ACL but deny-profile, so save does NOT remove birthdate, email and city data
@@ -400,7 +418,7 @@ class ranking_result_ui extends ranking_result_bo
 		$tmpl->disableElement('selfscore_mode', $discipline != 'selfscore');
 
 		if ($refresh) egw_framework::refresh_opener ($msg, 'ranking', $param);
-		if ($msg) egw_framework::message($msg);
+		if ($msg) egw_framework::message($msg, strpos($msg, '!') ? 'error' : null);
 
 		$readonlys['button[delete]'] = $content['new_route'] || $view;
 		$readonlys['route_type'] = !!$content['route_order'];	// can only be set in the first route/quali
