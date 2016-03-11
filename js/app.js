@@ -79,6 +79,7 @@ app.classes.ranking = AppJS.extend(
 					{
 						case 'boulder':
 							if (this.content.try) this.try_num(this.content.try);
+							if (this.sorted_by != 'startorder') this.sort_athletes();
 							// fall through
 						case 'selfscore':
 							this.init_boulder();
@@ -716,6 +717,58 @@ app.classes.ranking = AppJS.extend(
 
 		// need to call this manually, as changing selectedIndex does NOT trigger onchange
 		this.boulder_changed(PerId);
+	},
+
+	/**
+	 * Current order of athletes to be sorted: "order", "number" or "name"
+	 */
+	sorted_by: 'startorder',
+
+	/**
+	 * Sort options of athlete selectbox
+	 *
+	 * @param {jQuery.Event} _event
+	 * @param {et2_widget} _widget
+	 * @param {DOMNode} _node
+	 */
+	sort_athletes: function(_event, _widget, _node)
+	{
+		if (_event)
+		{
+			switch(this.sorted_by)
+			{
+				case 'startorder':
+					this.sorted_by = 'startnumber'; break;
+				case 'startnumber':
+					this.sorted_by = 'name'; break;
+				default:
+					this.sorted_by = 'startorder'; break;
+			}
+		}
+		var select = this.et2.getWidgetById('nm[PerId]');
+		var options = select.options.select_options;
+		var by = this.sorted_by;
+		var regexp = /(\d+) \((\d+)\) (.*)/;
+		options.sort(function(_a, _b)
+		{
+			var a = regexp.exec(_a.label);
+			var b = regexp.exec(_b.label);
+			switch(by)
+			{
+				case 'name':
+					return a[3].localeCompare(b[3]);
+				case 'startorder':
+					return a[1]-b[1];
+				case 'startnumber':
+					return a[2]-b[2];
+			}
+		});
+		select.set_select_options(options);
+
+		if (_event)
+		{
+			this.egw.message(this.egw.lang('Sorted athletes by %1', this.egw.lang(this.sorted_by)));
+		}
 	},
 
 	/**************************************************************************

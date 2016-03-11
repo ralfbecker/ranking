@@ -216,7 +216,8 @@ body #egw_fw_main #egw_fw_tabs {
 #ranking-result-index_ranking-result-boulder_measurement > table{
 	width:100% !important;
 }
-#ranking-result-index_ranking-result-boulder_measurement > table label{
+#ranking-result-index_ranking-result-boulder_measurement > table label,
+#ranking-result-index_ranking-result-boulder_measurement > table select#ranking-result-index_nm\[PerId\]{
 	font-size:200%;
 	padding-left: 5px;
 }
