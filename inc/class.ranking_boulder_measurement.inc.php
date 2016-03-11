@@ -30,19 +30,24 @@ class ranking_boulder_measurement
 		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
 			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
 
-		// egw_framework::validate_file|includeCSS does not work if template was submitted
-		if (egw_json_response::isJSONResponse())
+		foreach(array(
+			'/ranking/js/boulder.js',	// init protocol
+			'/ranking/sitemgr/digitalrock/dr_api.js',
+			'/ranking/sitemgr/digitalrock/dr_list.css'
+		) as $file)
 		{
-			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/js/boulder.js');
-			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_api.js');
-			egw_json_response::get()->includeCSS($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_list.css');
-		}
-		else
-		{
-			// init protocol
-			egw_framework::validate_file('/ranking/js/boulder.js');
-			egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
-			egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
+			$cache_buster = '?'.filemtime(EGW_SERVER_ROOT.$file);
+			// egw_framework::validate_file|includeCSS does not work if template was submitted
+			if (egw_json_response::isJSONResponse())
+			{
+				$method = substr($file, -3) == '.js' ? 'includeScript' : 'includeCSS';
+				egw_json_response::get()->$method($GLOBALS['egw_info']['server']['webserver_url'].$file.$cache_buster);
+			}
+			else
+			{
+				$method = substr($file, -3) == '.js' ? 'validate_file' : 'includeCSS';
+				egw_framework::$method($file.$cache_buster);
+			}
 		}
 		$keys = self::query2keys($content['nm']);
 		// if we have a startlist, add participants to sel_options
