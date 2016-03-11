@@ -3,7 +3,7 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2013-15 by RalfBecker@digitalROCK.de
+ * @copyright 2013-16 by RalfBecker@digitalROCK.de
  * @version $Id$
  */
 
@@ -93,6 +93,7 @@ boulderProtocol.prototype.record = function(r)
 			store.history += r.clicked ? r.clicked[0] : (r.bonus ? 'b'+(r.top ? 't' : '') : '');
 		}
 	}
+	store.try = r.try;
 	store.top = r.top;
 	store.bonus = r.bonus;
 	store.updated = new Date;
@@ -104,8 +105,8 @@ boulderProtocol.prototype.record = function(r)
 	// display data
 	this.update(store);
 
-	// sending pending results to server (not neccessary if only tries changed)
-	if (!r.state || r.top != r.state.top || r.bonus != r.state.bonus || r.try == 1)
+	// sending pending results to server
+	if (!r.state || r.top != r.state.top || r.bonus != r.state.bonus || r.try != r.state.try)
 	{
 		this.send({
 			'WetId': r.WetId,

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -62,8 +62,9 @@ class ranking_boulder_measurement
 				if ($content['nm']['PerId'] == $row['PerId'])
 				{
 					if (!$content['nm']['boulder_n']) $content['nm']['boulder_n'] = 1;
-					$content['top'] = (string)$row['top'.$content['nm']['boulder_n']];
+					$content['try'] = (string)$row['try'.$content['nm']['boulder_n']];
 					$content['zone'] = (string)$row['zone'.$content['nm']['boulder_n']];
+					$content['top'] = (string)$row['top'.$content['nm']['boulder_n']];
 				}
 				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
 			}
@@ -174,8 +175,9 @@ class ranking_boulder_measurement
 
 			$update = array(
 				$record['PerId'] => array(
+					'try'.$record['boulder'] => (int)$record['try'],
 					'top'.$record['boulder'] => (int)$record['top'],
-					'zone'.$record['boulder'] => $record['bonus'],
+					'zone'.$record['boulder'] => (int)$record['bonus'],
 				),
 			);
 			if (ranking_result_bo::$instance->save_result($keys, $update, $query['route_type'], $query['discipline']))
@@ -190,7 +192,9 @@ class ranking_boulder_measurement
 				$msg = ranking_result_bo::athlete2string($new_result,true);
 				if ($query['discipline'] == 'boulder')
 				{
-					$msg = ($record['top'] ? 't'.$record['top'].' ' : '').'b'.$record['bonus'].': '.$msg;
+					$msg = ($record['try'] ? $record['try'].': ' : '').
+						($record['top'] ? 't'.$record['top'].' ' : '').
+						'b'.$record['bonus'].': '.$msg;
 				}
 			}
 			else

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -960,6 +960,10 @@ class ranking_route_result extends so_sql
 					}
 					$data['result_detail']['zone'.$i] = $data['zone'.$i];
 				}
+				if (!empty($data['try'.$i]))
+				{
+					$data['result_detail']['try'.$i] = $data['try'.$i];
+				}
 			}
 		}
 		// boulder result with just the sums (route_num_problems=0)
@@ -1005,8 +1009,9 @@ class ranking_route_result extends so_sql
 
 		for($i = 1; $i <= self::MAX_BOULDERS; ++$i)
 		{
-			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
+			if (isset($new['try'.$i])) $this->data['try'.$i] = $new['try'.$i];
 			if (isset($new['zone'.$i])) $this->data['zone'.$i] = $new['zone'.$i];
+			if (isset($new['top'.$i])) $this->data['top'.$i] = $new['top'.$i];
 		}
 		foreach(array('eliminated','result_time_r','eliminated_r','tops','top_tries','zones','zone_tries','ability_percent','checked','score','false_start') as $name)
 		{

@@ -78,6 +78,8 @@ app.classes.ranking = AppJS.extend(
 					switch(this.content.nm.discipline)
 					{
 						case 'boulder':
+							if (this.content.try) this.try_num(this.content.try);
+							// fall through
 						case 'selfscore':
 							this.init_boulder();
 							break;
@@ -626,16 +628,17 @@ app.classes.ranking = AppJS.extend(
 					route: route_order,
 					PerId: PerId,
 					boulder: n,
+					try: this.try_num(),
 					bonus: bonus,
 					top: top,
 					clicked: clicked,
-					try: clicked ? this.try_num() : null,
 					state: state
 				});
 			}
 			else	// old direct transmission, if no protocol object available
 			{
 				var update = {};
+				update['try'+n] = this.try_num();
 				update['zone'+n] = bonus === '' ? 'empty' : bonus;	// egw_json_encode sends '' as null, which get not stored!
 				update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
 
@@ -654,28 +657,40 @@ app.classes.ranking = AppJS.extend(
 	{
 		var PerId = this.et2.getWidgetById('nm[PerId]').get_value();
 		var n = this.et2.getWidgetById('nm[boulder_n]').get_value();
+		var WetId = this.et2.getWidgetById('comp[WetId]').get_value();
+		var GrpId = this.et2.getWidgetById('nm[cat]').get_value();
+		var route_order = this.et2.getWidgetById('nm[route]').get_value();
+		var keys = {WetId: WetId, GrpId: GrpId, route_order: route_order};
 
-		// reset values (in case connection is lost)
+		// reset values
 		this.et2.getWidgetById('zone').set_value('');
 		this.et2.getWidgetById('top').set_value('');
 		this.try_num(0);
+
+		// try restore values from local protocol, in case we have lost contact to server
+		if (PerId && n && window.protocol)
+		{
+			var local =  window.protocol.get(jQuery.extend({PerId: PerId, boulder: n, route: route_order}, keys));
+			if (local)
+			{
+				if (local.try) this.try_num(local.try);
+				if (local.bonus) this.et2.getWidgetById('zone').set_value(local.bonus);
+				if (local.top) this.et2.getWidgetById('top').set_value(local.top);
+			}
+		}
 		this.init_boulder();
 
 		// loading values from server
 		if (PerId && n)
 		{
-			var WetId = this.et2.getWidgetById('comp[WetId]').get_value();
-			var GrpId = this.et2.getWidgetById('nm[cat]').get_value();
-			var route_order = this.et2.getWidgetById('nm[route]').get_value();
-
 			this.egw.json('ranking_boulder_measurement::ajax_load_athlete',
 				[PerId, {},	// {} = send data back
-				{'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order}],
+				keys],
 				function(_data)
 				{
 					this.et2.getWidgetById('zone').set_value(_data['zone'+n]);
 					this.et2.getWidgetById('top').set_value(_data['top'+n]);
-					this.try_num(0);
+					this.try_num(_data['try'+n]);
 					this.init_boulder();
 
 					this.message(_data.athlete);

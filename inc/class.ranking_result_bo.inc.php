@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -883,10 +883,13 @@ class ranking_result_bo extends ranking_bo
 			for ($i=1; $i <= ranking_route_result::MAX_BOULDERS && isset($data['top'.$i]); ++$i)
 			{
 				// if no change in a single boulder compared to old result, use current result, not old one for storing
-				if ($old && $old['top'.$i] == $data['top'.$i] && $old['zone'.$i] == $data['zone'.$i])
+				if ($old && $old['top'.$i] == $data['top'.$i] &&
+					$old['zone'.$i] == $data['zone'.$i] &&
+					$old['try'.$i] == $data['try'.$i])
 				{
 					$data['zone'.$i] = $current['zone'.$i];
 					$data['top'.$i] = $current['top'.$i];
+					$data['try'.$i] = $current['try'.$i];
 					//error_log(__METHOD__."() #$id: $i. boulder unchanged use current result top=".array2string($current['top'.$i]).", zone=".array2string($current['zone'.$i]));
 					continue;
 				}
@@ -944,7 +947,7 @@ class ranking_result_bo extends ranking_bo
 					$data['result_modifier'] = $this->user;
 
 					//error_log(__METHOD__."() old: route_result->data=".array2string($this->route_result->data));
-					$this->route_result->save($data);
+					$this ->route_result->save($data);
 					//error_log(__METHOD__."() new: route_result->data=".array2string($this->route_result->data));
 					++$modified;
 					break;
