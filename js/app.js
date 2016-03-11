@@ -574,7 +574,12 @@ app.classes.ranking = AppJS.extend(
 	{
 		var state = this.get_state();
 		var bonus = this.et2.getWidgetById('zone');
-		bonus.set_value(this.try_num(1));
+
+		// only update bonus, if there is no bonus yet
+		if (!state.bonus || state.bonus == '0')
+		{
+			bonus.set_value(this.try_num(1));
+		}
 		this.check_bonus(bonus.getDOMNode(), bonus);
 
 		this.update_boulder('bonus', state);
