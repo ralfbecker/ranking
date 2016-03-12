@@ -166,7 +166,8 @@ class ranking_export extends ranking_result_bo
 			}
 			else
 			{
-				$base .= egw::link('/ranking/sitemgr/digitalrock/eliste.html#comp=');
+				$link = egw::link('/ranking/sitemgr/digitalrock/eliste.html#comp=');
+				$base = ($link[0] == '/' ? $base : '').$link;
 			}
 		}
 		return $base.$comp.'&cat='.$cat;
@@ -195,7 +196,8 @@ class ranking_export extends ranking_result_bo
 			}
 			else
 			{
-				$base .= egw::link('/ranking/sitemgr/digitalrock/pstambl.html#person=');
+				$link = egw::link('/ranking/sitemgr/digitalrock/pstambl.html#person=');
+				$base = ($link[0] == '/' ? $base : '').$link;
 			}
 		}
 		return $base.$athlete['PerId'].($cat ? '&cat='.$cat : '');
