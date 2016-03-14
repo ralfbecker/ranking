@@ -773,7 +773,7 @@ class ranking_result_ui extends ranking_result_bo
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 		$extra_cols = $query['csv_export'] ? array('strasse','email') : array();
 		$total = $this->route_result->get_rows($query,$rows,$readonlys,$join='',false,false,$extra_cols);
-		error_log(__METHOD__."() num_first_final=$num_first_final, skip=$skip, count(rows)=".count($rows));
+		//error_log(__METHOD__."() num_first_final=$num_first_final, skip=$skip, count(rows)=".count($rows));
 		//echo $total; _debug_array($rows);
 
 		if (($query['ranking'] & 3) && strstr($query['template'],'startlist') &&
@@ -804,16 +804,19 @@ class ranking_result_ui extends ranking_result_bo
 		$need_start_number = false;
 		$need_lead_time_column = false;
 		$quota_line = false;
-		$unranked = array();
+		//$unranked = array();
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
 
 			if ($row['result_time'] && $query['discipline'] == 'lead') $need_lead_time_column = true;
 
+			if ($row['result_rank']) $rows[$k]['class'] .= ' noDelete';
+
 			// results for setting on regular routes (no general result)
 			if($query['route'] >= 0)
 			{
+				$rows[$k]['id'] = $row[$this->route_result->id_col];
 				$rows['set'][$row[$this->route_result->id_col]] = $row;
 				// disable input in for checked results
 				if ($row['checked'])
@@ -844,6 +847,7 @@ class ranking_result_ui extends ranking_result_bo
 				$rows[$k]['ranking_place'] = $ranking[$row['PerId']]['platz'];
 				$rows[$k]['ranking_points'] = $ranking[$row['PerId']]['pkt'];
 			}
+			/* no more row_on/off
 			if (!isset($rows[$k]['class'])) $rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on';
 			if (substr($query['discipline'],0,5) == 'speed' && $query['route'] >= 2 &&
 				(strstr($query['template'],'startlist') && $query['order'] == 'start_order' ||
@@ -855,7 +859,7 @@ class ranking_result_ui extends ranking_result_bo
 					$unranked[2*!($k & 2)] = $rows[$k]['class'] == 'row_off' ? 'row_on' : 'row_off';
 				}
 				$rows[$k]['class'] = $unranked[$k & 2];
-			}
+			}*/
 			// for the speed graphic, we have to make the athlets availible by the startnumber of each heat
 			if($query['route'] == -2 && substr($query['discipline'],0,5) == 'speed' && strstr($query['template'],'speed_graph'))
 			{
@@ -1103,6 +1107,31 @@ class ranking_result_ui extends ranking_result_bo
 	}
 
 	/**
+	 * Return actions for start-/result-lists
+	 *
+	 * @return array
+	 */
+	static function get_actions()
+	{
+		$actions =array(
+			'edit' => array(
+				'caption' => 'Measurement',
+				'default' => true,
+				'onExecute' => 'javaScript:app.ranking.action_measure',
+                'disableClass' => 'th',
+				'allowOnMultiple' => false,
+			),
+			'delete' => array(
+				'caption' => 'Delete',
+				'onExecute' => 'javaScript:app.ranking.action_delete',
+                'disableClass' => 'noDelete',
+				'allowOnMultiple' => false,
+			),
+		);
+		return $actions;
+	}
+
+	/**
 	 * Show a result / startlist
 	 *
 	 * @param array $content =null
@@ -1263,6 +1292,11 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			list($id) = @each($content['nm']['rows']['delete']);
 			$button = 'delete';
+		}
+		if (!$button && $content['nm']['action'] && $content['nm']['selected'])
+		{
+			$button = $content['nm']['action']; unset($content['nm']['action']);
+			$id = $content['nm']['selected']; unset($content['nm']['selected']);
 		}
 		// Apply button in a result-row pressed --> only update that row
 		if(!$button && isset($content['nm']['rows']['apply']))
@@ -1442,6 +1476,7 @@ class ranking_result_ui extends ranking_result_bo
 			$content['nm']['route'] != -1 && in_array($content['nm']['discipline'], array('lead','boulder','selfscore')))
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
+			$tmpl->setElementAttribute('nm[rows]', 'actions', self::get_actions());
 		}
 		elseif($content['nm']['show_result'] == 4)
 		{

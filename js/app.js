@@ -43,6 +43,11 @@ app.classes.ranking = AppJS.extend(
 	},
 
 	/**
+	 * Athlete to select when entering measurement
+	 */
+	select_athlete: undefined,
+
+	/**
 	 * This function is called when the etemplate2 object is loaded
 	 * and ready.  If you must store a reference to the et2 object,
 	 * make sure to clean it up in destroy().
@@ -80,6 +85,11 @@ app.classes.ranking = AppJS.extend(
 						case 'boulder':
 							if (this.content.try) this.try_num(this.content.try);
 							if (this.sorted_by != 'startorder') this.sort_athletes();
+							if (this.select_athlete)
+							{
+								this.et2.getWidgetById('nm[PerId]').set_value(this.select_athlete);
+								delete this.select_athlete;
+							}
 							// fall through
 						case 'selfscore':
 							this.init_boulder();
@@ -153,6 +163,42 @@ app.classes.ranking = AppJS.extend(
 			this.et2.getWidgetById('nm[sort]').set_value(content.nm.sort);
 			this.et2._inst.submit();
 		}
+	},
+
+	/**
+	 * Action to measure a selected athlet
+	 *
+	 * @param {egw_action} _action
+	 * @param {Array} _selected
+	 */
+	action_measure: function(_action, _selected)
+	{
+		this.select_athlete = _selected[0].id;
+		this.et2.getWidgetById('nm[show_result]').set_value('4');
+	},
+
+	/**
+	 * Action to delete selected athlet(s)
+	 *
+	 * @param {egw_action} _action
+	 * @param {Array} _selected
+	 */
+	action_delete: function(_action, _selected)
+	{
+		var self = this;
+		var data = _selected[0].data;
+		var msg = data.nachname+', '+data.vorname+', '+data.nation+' ('+data.start_number+')'+"\n\n"+
+			this.egw.lang('Delete this participant (can NOT be undone)')+'?';
+
+		et2_dialog.show_dialog(function(_button)
+		{
+			if (_button == et2_dialog.YES_BUTTON)
+			{
+				self.et2.getWidgetById('nm[action]').set_value('delete');
+				self.et2.getWidgetById('nm[selected]').set_value([data.PerId]);
+				self.et2._inst.submit();
+			}
+		}, msg, this.egw.lang('Delete'));
 	},
 
 	/**

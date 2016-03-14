@@ -107,7 +107,6 @@
 					<nextmatch-header label="Time" id="jury_time"/>
 					<nextmatch-header label="Remark" id="remark"/>
 					<nextmatch-header label="Ability" id="ability_percent" class="leftPad5"/>
-					<description align="center" value="Delete" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
 					<template id="ranking.result.footer" span="all"/>
@@ -133,7 +132,6 @@
 					<description/>
 					<description/>
 					<textbox type="float" id="set[$row_cont[PerId]][ability_percent]"/>
-					<button align="center" label="Delete" id="delete[$row_cont[PerId]]" onclick="return confirm('$row_cont[vorname] $row_cont[nachname]:\\n'+egw::lang('Delete this participant (can NOT be undone)') );" image="delete" class="noPrint"/>
 				</row>
 			</rows>
 		</grid>

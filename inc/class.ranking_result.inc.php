@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-12 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -31,6 +31,7 @@ class ranking_result extends so_sql
 	 */
 	function __construct($source_charset='',$db=null,$vfs_pdf_dir='')
 	{
+		unset($vfs_pdf_dir);	// not used, but required by function signature
 		//$this->debug = 1;
 		parent::__construct('ranking',$this->result_table,$db);	// call constructor of extended class
 
@@ -63,8 +64,8 @@ class ranking_result extends so_sql
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
 	 * @param string/array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string/boolean $join=true true for the default join or sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
-	 * @param string $order='' order clause or '' for the default order depending on the keys given
+	 * @param string/boolean $join =true true for the default join or sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
+	 * @param string $order ='' order clause or '' for the default order depending on the keys given
 	 * @return array/boolean data if row could be retrived else False
 	 */
 	function &read($keys,$extra_cols='',$join=true,$order='')
@@ -319,12 +320,13 @@ class ranking_result extends so_sql
 	 * @param array $cup
 	 * @param array $cats array of integer cat-id's (GrpId)
 	 * @param string $stand date as 'Y-m-d'
-	 * @param array $allowed_nations=null array with 3-digit nation-codes to limit the nations to return, default all
-	 * @param boolean $use_0_point_results=false should we return results with 0 points (place > 30)
+	 * @param array $allowed_nations =null array with 3-digit nation-codes to limit the nations to return, default all
+	 * @param boolean $use_0_point_results =false should we return results with 0 points (place > 30)
 	 * @return array ordered by PerId and number of points of arrays with full athlete-data, platz, pkt, WetId, GrpId
 	 */
 	function &cup_results(array $cup,$cats,$stand,$allowed_nations,$use_0_point_results=false)
 	{
+		unset($allowed_nations);	// not used, but required by function signature
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,".
 			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline".
@@ -348,8 +350,8 @@ class ranking_result extends so_sql
 	 * @param array $cats array of integer cat-id's (GrpId)
 	 * @param string $stand date as 'Y-m-d'
 	 * @param string $start date as 'Y-m-d'
-	 * @param int $from_year=0 start-year of age-group, default 0 = no age-group
-	 * @param int $to_year=0 end-year of age-group, default 0 = no age-group
+	 * @param int $from_year =0 start-year of age-group, default 0 = no age-group
+	 * @param int $to_year =0 end-year of age-group, default 0 = no age-group
 	 * @return array ordered by PerId and number of points of arrays with full athlete-data, platz, pkt, WetId, GrpId
 	 */
 	function &ranking_results($cats,$stand,$start,$from_year=0,$to_year=0)
@@ -377,7 +379,7 @@ class ranking_result extends so_sql
 	 * @param array $filter
 	 * @param string $extra_cols
 	 * @param string $join
-	 * @param string $append='' eg. ORDER BY ...
+	 * @param string $append ='' eg. ORDER BY ...
 	 * @return array
 	 */
 	function &aggregated_results(array $filter, $extra_cols, $join, $append)
@@ -387,10 +389,12 @@ class ranking_result extends so_sql
 			false, $append, 'ranking', 0, $join) as $row)
 		{
 			$result = $this->athlete_db2data($row);
+			$name = null;
 			foreach(explode(',', $extra_cols) as $col)
 			{
-				$name = $col;
+				unset($name);
 				list($col,$name) = explode(' AS ', $col);
+				if (empty($name)) $name = $col;
 				if (!isset($result[$name]) && isset($row[$name])) $result[$name] = $row[$name];
 			}
 			$results[] = $result;
@@ -446,7 +450,7 @@ class ranking_result extends so_sql
 	 *
 	 * reimplemented to set a modifier (modified timestamp is set automatically by the database anyway)
 	 *
-	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
+	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function save($keys=null)
