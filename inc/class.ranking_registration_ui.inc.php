@@ -7,11 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-class uiregistration extends ranking_bo
+class ranking_registration_ui extends ranking_bo
 {
 	/**
 	 * functions callable via menuaction
@@ -79,10 +79,6 @@ class uiregistration extends ranking_bo
 		$rows['license_year'] = $query['col_filter']['license_year'];
 		$rows['license_nation'] = $query['col_filter']['license_nation'];
 
-		if ($this->debug)
-		{
-			echo "<p>uiregistration::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
-		}
 		return $total;
 	}
 
@@ -106,7 +102,7 @@ class uiregistration extends ranking_bo
 			}
 			else
 			{
-				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
+				$content = egw_cache::getSession('ranking', 'registration');
 			}
 			if ($_GET['msg']) $msg = $_GET['msg'];
 		}
@@ -122,11 +118,11 @@ class uiregistration extends ranking_bo
 		{
 			$msg = lang('Permission denied !!!');
 		}
-		$content = $preserv = array(
+		$cont = $preserv = array(
 			'comp'     => $comp['WetId'],
 			'nation'   => $nation,
 			'nm'       => $content['nm'] ? $content['nm'] : array(
-				'get_rows'       =>	'ranking.uiregistration.get_rows',
+				'get_rows'       =>	'ranking.ranking_registration_ui.get_rows',
 				'no_filter'      => True,// I  disable the 1. filter
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 				'no_cat'         => True,// I  disable the cat-selectbox
@@ -142,7 +138,7 @@ class uiregistration extends ranking_bo
 		);
 		if ($nation && !is_numeric($nation))
 		{
-			$content['nm']['col_filter']['nation'] = $nation;
+			$cont['nm']['col_filter']['nation'] = $nation;
 			if (!$show_all && $_GET['nation'] && $cat['nation'] && $_GET['nation'] != $cat['nation'])
 			{
 				$show_all = true;	// automatic show all cat's if cat has a nation and the given one does not match
@@ -150,35 +146,34 @@ class uiregistration extends ranking_bo
 		}
 		elseif (is_numeric($nation))
 		{
-			$content['nm']['col_filter']['fed_id'] = (int)$nation;
+			$cont['nm']['col_filter']['fed_id'] = (int)$nation;
 		}
-		$content += array(
+		$cont += array(
 			'comp_name' => $comp ? $comp['name'] : '',
 			'cat'       => $cat['GrpId'],
 			'show_all'  => $show_all,
 			'msg'       => $msg,
 		);
 		// make (maybe changed) category infos avalible for nextmatch
-		$content['nm']['cat'] = $cat['GrpId'];
+		$cont['nm']['cat'] = $cat['GrpId'];
 		if ($cat['sex'])
 		{
-			$content['nm']['col_filter']['sex'] = $cat['sex'];
+			$cont['nm']['col_filter']['sex'] = $cat['sex'];
 		}
 		else
 		{
-			unset($content['nm']['col_filter']['sex']);
+			unset($cont['nm']['col_filter']['sex']);
 		}
-		$content['nm']['show_all'] = $show_all;
+		$cont['nm']['show_all'] = $show_all;
 
 		$select_options = array(
 			'cat' => $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
 			'license' => $this->license_labels,
 		);
-		//_debug_array($content);
+		//_debug_array($cont);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Register');
-		$GLOBALS['egw_info']['flags']['java_script'] .= '<script>window.focus();</script>';
 		$tmpl = new etemplate('ranking.register.add');
-		$tmpl->exec('ranking.uiregistration.add',$content,$select_options,$readonly,$preserv,2);
+		$tmpl->exec('ranking.ranking_registration_ui.add',$cont,$select_options,null,$preserv,2);
 	}
 
 	/**
@@ -208,11 +203,11 @@ class uiregistration extends ranking_bo
 					$nation = $content['nation'] = $comp['nation'] && $comp['nation'] == $athlete['nation'] && $athlete['fed_parent'] ?
 						$athlete['fed_parent'] : $athlete['nation'];
 				}
-				$GLOBALS['egw']->session->appsession('registration','ranking',$content);
+				egw_cache::setSession('ranking', 'registration', $content);
 			}
 			else
 			{
-				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
+				$content = egw_cache::getSession('ranking', 'registration');
 			}
 		}
 		if($content['comp'] && !isset($comp))
@@ -293,7 +288,7 @@ class uiregistration extends ranking_bo
 					$readonlys['download['.$cat['GrpId'].']'] = true;
 				}
 			}
-			$readonlys['download'] = true;
+			$readonlys['download_all'] = true;
 
 			if ($nation)	// read prequalified athlets
 			{
@@ -323,9 +318,9 @@ class uiregistration extends ranking_bo
 				}
 				else
 				{
-					list($athlete) = $content['register'] ? each($content['register']) : each($content['delete']);
-					list($cat,$athlete) = explode('/',$athlete);
-					$athlete = $this->athlete->read($athlete,'',$this->license_year,$comp['nation']);
+					list($ids) = $content['register'] ? each($content['register']) : each($content['delete']);
+					list($cat,$id) = explode('/', $ids);
+					$athlete = $this->athlete->read($id, '', $this->license_year,$comp['nation']);
 				}
 				if (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen']) ||
 					$cat['sex'] && $athlete['sex'] != $cat['sex'])
@@ -403,7 +398,7 @@ class uiregistration extends ranking_bo
 					$msg = lang('Error: generating startlist!!!');
 				}
 			}
-			elseif ($content['download'])
+			elseif ($content['download'] || $content['download_all'])
 			{
 				list($cat) = @each($content['download']);
 				return $this->lists(array(
@@ -498,6 +493,7 @@ class uiregistration extends ranking_bo
 			// show the regular registered (not prequalified) starters
 			$rows = array(false,false);	// we need 2 to be the index of the first row
 			$starters[] = array('nation'=>'');	// to get the last line out
+			$max_quota = 0;
 			foreach((array)$starters as $starter)
 			{
 				// download button only if there's a startlist (platz==0 && pkt>64)
@@ -505,7 +501,7 @@ class uiregistration extends ranking_bo
 				if ($starter['GrpId'] && (!isset($readonlys[$download]) || $readonlys[$download] || $starter['platz']))
 				{
 					// outside SiteMgr we always offer the download
-					$readonlys['download'] = $readonlys[$download] = $tmpl->sitemgr && !$starter['platz'] && $starter['pkt'] < 64;
+					$readonlys['download_all'] = $readonlys[$download] = $tmpl->sitemgr && !$starter['platz'] && $starter['pkt'] < 64;
 				}
 				// new nation and data for the previous nation ==> write that data
 				$starter_nat_fed = !$comp['nation'] || $starter['nation'] != $comp['nation'] ||
@@ -543,7 +539,7 @@ class uiregistration extends ranking_bo
 				}
 				$col = $cat2col[$starter['GrpId']];
 				// find first free line to add that starter
-				for ($i = 0; isset($nat_starters[$i][$col]) || $i >= $quota && $i < $max_quota; ++$i) ;
+				for ($i = 0; isset($nat_starters[$i][$col]) || $i >= $quota && $i < $max_quota; ++$i) {}
 				// check if newly registered athlete is over quota AND we have no complimentary list
 				if ($check_athlete_over_quota && $starter['PerId'] == $check_athlete_over_quota && $i >= $quota)
 				{
@@ -581,14 +577,14 @@ class uiregistration extends ranking_bo
 		{
 			$readonlys['register'] = true;
 		}
-		$content = $preserv = array(
+		$cont = $preserv = array(
 			'calendar' => $calendar,
 			'comp'     => $comp ? $comp['WetId'] : null,
 			'nation'   => $nation,
 			'no_mail'  => !isset($content['no_mail']) || $content['no_mail'],
 			'mail'     => $content['mail'],
 		);
-		$content += array(
+		$cont += array(
 			// dont show registration line if no comp, in sitemgr or no registration rights
 			'registration' => $comp && !$tmpl->sitemgr ? $this->registration_check($comp) : false,
 			'rows'     => &$rows,
@@ -601,7 +597,7 @@ class uiregistration extends ranking_bo
 		{
 			foreach($cats as $col => $cat)
 			{
-				$content['startlist'][$col] = array(
+				$cont['startlist'][$col] = array(
 					'num_routes' => 'num_routes['.$cat['GrpId'].']',
 					'max_compl'  => 'max_compl['.$cat['GrpId'].']',
 					'button'     => 'startlist['.$cat['GrpId'].']',
@@ -613,16 +609,16 @@ class uiregistration extends ranking_bo
 		// disabling all old starlist options, as we have the resultservice now
 		//if (!$comp || $tmpl->sitemgr || count($starters) <= 1 || $nation && $nation != $comp['nation'] || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
-			$content['startlist'] =  false;
+			$cont['startlist'] =  false;
 		}
 		// save calendar, competition & nation between calls in the session
-		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
+		egw_cache::setSession('ranking', 'registration', $preserv);
 		$this->set_ui_state($preserv['calendar'],$preserv['comp'],$preserv['cat']);
-		//_debug_array($content);
+		//_debug_array($cont);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
 			(!$nation || $nation == 'NULL' ? '' : (': '.
 			(is_numeric($nation) && ($fed || ($fed = $this->federation->read($nation))) ? $fed['verband'] : $nation)));
-		return $tmpl->exec('ranking.uiregistration.index',$content,$select_options,$readonlys,$preserv);
+		return $tmpl->exec('ranking.ranking_registration_ui.index',$cont,$select_options,$readonlys,$preserv);
 	}
 
 	/**
@@ -736,15 +732,13 @@ class uiregistration extends ranking_bo
 	 * Show/download the startlist or result of a competition for one or all categories
 	 *
 	 * @param array $content
-	 * @param string $msg
-	 * @param string $show='' 'startlist','result' or '' for whatever is availible
+	 * @param string $msg =''
+	 * @param string $show ='' 'startlist','result' or '' for whatever is availible
 	 *
 	 * @return string
 	 */
 	function lists($content=null,$msg='',$show='')
 	{
-		//echo "uiregistration::lists(,'$msg','$show') content="; _debug_array($content);
-
 		$tmpl = new etemplate('ranking.register.lists');
 
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
@@ -762,7 +756,7 @@ class uiregistration extends ranking_bo
 			}
 			else
 			{
-				$content = $GLOBALS['egw']->session->appsession('registration','ranking');
+				$content = egw_cache::getSession('ranking', 'registration');
 			}
 		}
 		if ($content['comp']) $comp = $this->comp->read($content['comp']);
@@ -849,6 +843,7 @@ class uiregistration extends ranking_bo
 						$c = $this->cats->read($athlete['GrpId']);
 
 						$stand = $comp['datum'];
+						$nul = $test = $ranking = null;
 		 				$this->ranking($c,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
 					}
 					$values = array();
@@ -934,19 +929,19 @@ class uiregistration extends ranking_bo
 				//_debug_array($rows);
 			}
 		}
-		$content = $preserv = array(
+		$cont = $preserv = array(
 			'calendar' => $calendar,
 			'comp'     => $comp['WetId'],
 			'cat'      => $cat ? $cat['GrpId'] : '',
 		);
-		$content += array(
+		$cont += array(
 			'rows'     => $rows,
 			'msg'      => $msg,
 			'result'   => $athlete['platz'] > 0,
 			'no_upload' => !$comp || !$cat || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp),
 		);
 		// save calendar, competition & cat between calls in the session
-		$GLOBALS['egw']->session->appsession('registration','ranking',$preserv);
+		egw_cache::setSession('ranking', 'registration', $preserv);
 		$this->set_ui_state($preserv['calendar'],$preserv['comp'],$preserv['cat']);
 
 		$select_options = array(
@@ -977,7 +972,7 @@ class uiregistration extends ranking_bo
 				$comp['WetId']	=> $comp['name']
 			)+$select_options['comp'];
 		}
-		return $tmpl->exec('ranking.uiregistration.lists',$content,$select_options,$readonlys,$preserv);
+		return $tmpl->exec('ranking.ranking_registration_ui.lists',$cont,$select_options,$readonlys,$preserv);
 	}
 
 	/**

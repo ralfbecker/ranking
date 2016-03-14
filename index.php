@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -30,11 +30,13 @@ $old2new = array(
 	'ranking.uicups.index' => 'ranking.ranking_cup_ui.index',
 	'ranking.uiathletes.index' => 'ranking.ranking_athlete_ui.index',
 	'ranking.uiresult.index' => 'ranking.ranking_result_ui.index',
+	'ranking.uiregistration.index' => 'ranking.ranking_registration_ui.index',
+	'ranking.uiregistration.result' => 'ranking.ranking_registration_ui.result',
 );
 if (isset($old2new[$view])) $view = $old2new[$view];
 
 // urls which should run top-level need a redirect
-if (in_array($view, array('ranking.ranking_result_ui.index')))
+if (in_array($view, array('ranking.ranking_result_ui.index')))//, 'ranking.ranking_registration_ui.index')))
 {
 	egw::redirect_link('/index.php', array(
 		'menuaction' => $view,

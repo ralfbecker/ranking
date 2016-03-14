@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -33,9 +33,9 @@ class ranking_hooks
 				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index')),
 				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index')),
-				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.index')),
-				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index','ajax' => 'true')),
-				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.uiregistration.result')),
+				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index')),//'ajax' => 'true')),
+				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index')),//'ajax' => 'true')),
+				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.result')),
 				'Ranking'       => egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
 				'Accounting'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index')),
 			);

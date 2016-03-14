@@ -5,13 +5,13 @@
 	<template id="ranking.register.add.rows" template="" lang="" group="0" version="1.9.001">
 		<grid>
 			<columns>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column width="30%"/>
+				<column width="20%"/>
+				<column width="80"/>
+				<column width="20%"/>
+				<column width="80"/>
+				<column width="110"/>
+				<column width="60"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -20,7 +20,7 @@
 					<nextmatch-sortheader label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader label="Last competition" id="last_comp"/>
-					<vbox options="0,0">
+					<vbox>
 						<description id="license_nation"/>
 						<description value="License" id="license_year"/>
 					</vbox>
@@ -32,15 +32,11 @@
 					<date align="center" id="${row}[geb_date]" readonly="true" options="Y-m-d"/>
 					<description id="${row}[ort]" no_lang="1"/>
 					<date align="center" id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
-					<hbox options="0,0">
-						<menulist>
-							<menupopup id="${row}[license]" readonly="true"/>
-						</menulist>
-						<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" class="small"/>
+					<hbox>
+						<select id="${row}[license]" readonly="true"/>
+						<buttononly statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" class="small"/>
 					</hbox>
-					<hbox options="0,0">
-						<button statustext="Register this athlete for the selected category" label="Register" id="register[$row_cont[PerId]]" onclick="$row_cont[confirm]opener.location.href=egw::link('/index.php','menuaction=ranking.uiregistration.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;" class="small"/>
-					</hbox>
+					<buttononly statustext="Register this athlete for the selected category" label="Register" id="register[$row_cont[PerId]]" onclick="$row_cont[confirm]opener.location.href=egw::link('/index.php','menuaction=ranking.ranking_registration_ui.index&amp;comp=$cont[comp]&amp;cat=$cont[cat]&amp;athlete=$row_cont[PerId]'); return false;" class="small"/>
 				</row>
 			</rows>
 		</grid>
@@ -53,29 +49,17 @@
 				<column/>
 			</columns>
 			<rows>
-				<row disabled="!@msg">
-					<description align="center" id="msg" no_lang="1" span="all" class="redItalic"/>
-					<description/>
-					<description/>
-				</row>
 				<row class="th">
 					<description value="Competition" for="comp"/>
 					<textbox id="comp_name" no_lang="1" onchange="1" readonly="true" size="Select one" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Category" for="cat"/>
-					<menulist>
-						<menupopup id="cat" no_lang="1" onchange="1"/>
-					</menulist>
+					<select id="cat" no_lang="1" onchange="1"/>
 					<checkbox label="show athlets from all categories" id="show_all" onchange="1"/>
 				</row>
 				<row disabled="!@cat">
 					<nextmatch id="nm" options="ranking.register.add.rows" span="all"/>
-				</row>
-				<row valign="top">
-					<button label="Close" onclick="window.close()"/>
-					<description/>
-					<description/>
 				</row>
 			</rows>
 		</grid>

@@ -159,7 +159,7 @@ class ranking_athlete_ui extends ranking_bo
 			$content['referer'] = preg_match('/menuaction=([^&]+)/',$_SERVER['HTTP_REFERER'],$matches) ?
 				$matches[1] : 'ranking.ranking_athlete_ui.index';
 
-			if ($content['referer'] == 'ranking.uiregistration.add' || $_GET['apply_license'])
+			if ($content['referer'] == 'ranking.ranking_registration_ui.add' || $_GET['apply_license'])
 			{
 				$js = "document.getElementById('exec[apply_license]').click();";
 			}

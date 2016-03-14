@@ -42,7 +42,7 @@ if (isset($_POST['exec']))
 }
 $GLOBALS['Common_BO'] = new stdClass;
 
-echo ExecMethod('ranking.uiregistration.index');
+echo ExecMethod('ranking.ranking_registration_ui.index');
 
 echo "</body>\n</html>\n";
 $GLOBALS['egw']->common->egw_exit();
