@@ -1,0 +1,82 @@
+/**
+ * Ranking app
+ *
+ * Please do NOT change css-files directly, instead change less-files and compile them!
+ *
+ * @link http://www.egroupware.org
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @author Hadi Nategh <hn@stylite.de>
+ * @package Ranking
+ * @version $Id$
+ */
+@import (reference) '../../../pixelegg/mobile/fw_mobile.less';
+//@import (less) '../default/app.css';
+@media all {
+
+	body {
+		#ranking-result-index {}
+		div {-webkit-overflow-scroll:touch;}
+		.dialogHeadbar {
+			position: relative;
+			padding-left:65px;
+			padding-top:3px;
+		}
+		form {
+			.popupMainDiv {
+				padding-top: 0px !important;
+				#ranking-result-index_protocol {
+					position:absolute;
+					top: 4px;
+					z-index: 1;
+					right: 10px;
+					background: transparent;
+					border: none;
+					color: white;
+					font-weight: bold;
+					min-width: 0;
+					.mob-fontsize-n;
+					height:46px;
+				}
+			}
+		}
+		.selectHeader {
+			display: none;
+			position: absolute;
+			background: white;
+			box-shadow: 1px 3px 6px gray;
+			width: 100%;
+			z-index: 2;
+		}
+		tbody > * {
+			.mob-fontsize-n;
+			font-family: verdana;
+		}
+		input[id^="ranking-result-index_"][id$="start_number]"] {
+			.mob-fontsize-n;
+			font-family: verdana;
+			padding-top: 0px !important;
+			margin: 0 5px 0 5px;
+		}
+		.compHeader, .resultDate, .listHeader {
+			display: none;
+		}
+		#ranking-result-index_resultlist {
+			table.DrTable {
+				th, tr, td {
+					.mob-fontsize-s;
+				}
+			}
+		}
+		#ranking-result-index {
+			position: initial;
+			overflow: initial !important;
+		}
+	}
+
+}
+
+@media @smartphones {
+	.hideOnMobile{
+		display: none !important;
+	}
+}

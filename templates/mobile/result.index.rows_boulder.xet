@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.footer" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%" class="extra_footer">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@comp_sponsors">
+					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+				</row>
+				<row disabled="!@show_result=0">
+					<groupbox class="extra_startlist">
+						<caption label="Isolation zone and starting time"/>
+						<grid padding="5">
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description value="Isolation zone"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Starting time"/>
+									<description id="route_data[route_start]" no_lang="1" span="all"/>
+								</row>
+								<row>
+									<description value="Observation time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row disabled="!@result_official">
+					<groupbox class="extra_result">
+						<caption label="Result official"/>
+						<grid>
+							<columns>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description id="route_data[route_result]" no_lang="1"/>
+								</row>
+								<row>
+									<description id="route_data[route_judge]" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.extra_footer { margin-top: 10px; }
+		</styles>
+	</template>
+	<template id="ranking.result.index.rows_boulder" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%" id="nm[rows]" class="egwGridView_grid">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+				<column/>
+				<column disabled="@no_nation"/>
+				<column disabled="@no_verband"/>
+				<column disabled="1"/><!-- disabled="@no_acl_fed" -->
+				<column disabled="@no_ort"/>
+				<column/>
+				<column width="50"/>
+				<column width="50"/>
+				<column disabled="!@num_problems"/>
+				<column width="50"/>
+				<column disabled="@num_problems"/>
+				<column disabled="!@num_problems"/>
+				<column disabled="!@num_problems=/[234567890]/"/>
+				<column disabled="!@num_problems=/[34567890]/"/>
+				<column disabled="!@num_problems=/[4567890]/"/>
+				<column disabled="!@num_problems=/[567890]/"/>
+				<column disabled="!@num_problems=/[67890]/"/>
+				<column disabled="!@num_problems=/[7890]/"/>
+				<column disabled="!@num_problems=/[890]/"/>
+				<column disabled="!@num_problems=/[90]/"/>
+				<column disabled="!@num_problems=10"/>
+				<column disabled="@no_prev_heat"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="onlyPrint" part="header">
+					<template class="onlyPrint" id="ranking.result.header$cont[calendar]" span="all"/>
+				</row>
+				<row class="th" part="header">
+					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
+					<nextmatch-sortheader label="Lastname" id="nachname" />
+					<nextmatch-sortheader label="Firstname" id="vorname" />
+					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date" class="hideOnMobile"/>
+					<nextmatch-sortheader label="Nation" id="nation"/>
+					<nextmatch-header label="Sektion" id="verband" class="hideOnMobile"/>
+					<nextmatch-header label="Regionalzentrum" id="acl_fed" class="hideOnMobile"/>
+					<nextmatch-sortheader label="City" id="ort" class="hideOnMobile"/>
+					<nextmatch-header align="center" label="License" id="PerId" class="hideOnMobile"/>
+					<nextmatch-sortheader align="center" label="Order" id="start_order" class="noPrint"/>
+					<nextmatch-sortheader align="center" label="Bib" id="start_order"/>
+					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
+					<vbox id="top_bonus" class="hideOnMobile">
+						<description value="Top"/>
+						<description value="Bonus"/>
+					</vbox>
+					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
+					<description align="center" value="1" class="place hideOnMobile" />
+					<description value="2" class="place hideOnMobile" />
+					<description value="3" class="place hideOnMobile" />
+					<description value="4" class="place hideOnMobile" />
+					<description value="5" class="place hideOnMobile" />
+					<description value="6" class="place hideOnMobile" />
+					<description value="7" class="place hideOnMobile"/>
+					<description value="8" class="place hideOnMobile"/>
+					<description value="9" class="place hideOnMobile"/>
+					<description value="10" class="place hideOnMobile"/>
+					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
+					<image align="center" label="Scorecard checked" src="check" class="noPrint"/>
+					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint hideOnMobile" />
+				</row>
+				<row class="onlyPrint" part="footer">
+					<template class="onlyPrint" id="ranking.result.footer" span="all"/>
+				</row>
+				<row class="row $row_cont[quota_class]">
+					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
+					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname"/>
+					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1" class="hideOnMobile"/>
+					<description id="${row}[nation]" no_lang="1"/>
+					<description id="${row}[verband]" class="hideOnMobile"/>
+					<description id="${row}[acl_fed]" class="hideOnMobile"/>
+					<description value="$row_cont[plz]" id="${row}[ort]" class="hideOnMobile"/>
+					<description align="center" id="{$row}[PerId]" no_lang="1" class="hideOnMobile"/>
+					<description align="center" id="${row}[start_order]" class="noPrint"/>
+					<description align="center" id="{$row}[start_number]" no_lang="1"/>
+					<description align="center" id="{$row}[result]" no_lang="1" class="noWrap"/>
+					<vbox class="hideOnMobile">
+						<description value="Top"/>
+						<description value="Bonus"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<hbox align="right" class="noPrint">
+							<menulist>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: total number or no" id="set[$row_cont[PerId]][tops]" onchange="app.ranking.check_tops" options="No,1,25"/>
+							</menulist>
+							<menulist>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries" label="/" id="set[$row_cont[PerId]][top_tries]" onchange="app.ranking.check_top_tries" options="No,1,50"/>
+							</menulist>
+						</hbox>
+						<hbox align="right" class="noPrint">
+							<menulist>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: total number or no" id="set[$row_cont[PerId]][zones]" onchange="app.ranking.check_boni" options="No,1,25"/>
+							</menulist>
+							<menulist>
+								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: number of tries" label="/" id="set[$row_cont[PerId]][zone_tries]" onchange="app.ranking.check_bonus_tries" options="No,1,50"/>
+							</menulist>
+						</hbox>
+						<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top1]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone1]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top2]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone2]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder2]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top3]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone3]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder3]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top4]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone4]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder4]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top5]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone5]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder5]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top6]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone6]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder6]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top7]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone7]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder7]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top8]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone8]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top9]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone9]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder9]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<vbox class="hideOnMobile">
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top10]" onchange="app.ranking.check_top" options="No,1,25"/>
+						</menulist>
+						<menulist class="noPrint">
+							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone10]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						</menulist>
+						<description id="{$row}[boulder10]" no_lang="1" class="onlyPrint"/>
+					</vbox>
+					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
+					<vbox align="center" class="noPrint">
+						<checkbox align="center" statustext="|Scorecard checked" id="set[$row_cont[PerId]][checked]" onchange="app.ranking.update_result_row" class="noPrint"/>
+						<buttononly onclick="app.ranking.update_result_row" align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result] hideOnMobile"/>
+					</vbox>
+					<vbox class="noPrint hideOnMobile">
+						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>
+						<menulist>
+							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true" class="noWrap"/>
+						</menulist>
+					</vbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

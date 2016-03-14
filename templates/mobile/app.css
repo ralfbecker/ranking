@@ -1,0 +1,74 @@
+/**
+ * Ranking app
+ *
+ * Please do NOT change css-files directly, instead change less-files and compile them!
+ *
+ * @link http://www.egroupware.org
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @author Hadi Nategh <hn@stylite.de>
+ * @package Ranking
+ * @version $Id$
+ */
+@media all {
+  body div {
+    -webkit-overflow-scroll: touch;
+  }
+  body .dialogHeadbar {
+    position: relative;
+    padding-left: 65px;
+    padding-top: 3px;
+  }
+  body form .popupMainDiv {
+    padding-top: 0px !important;
+  }
+  body form .popupMainDiv #ranking-result-index_protocol {
+    position: absolute;
+    top: 4px;
+    z-index: 1;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+    min-width: 0;
+    font-size: 10pt;
+    height: 46px;
+  }
+  body .selectHeader {
+    display: none;
+    position: absolute;
+    background: white;
+    box-shadow: 1px 3px 6px gray;
+    width: 100%;
+    z-index: 2;
+  }
+  body tbody > * {
+    font-size: 10pt;
+    font-family: verdana;
+  }
+  body input[id^="ranking-result-index_"][id$="start_number]"] {
+    font-size: 10pt;
+    font-family: verdana;
+    padding-top: 0px !important;
+    margin: 0 5px 0 5px;
+  }
+  body .compHeader,
+  body .resultDate,
+  body .listHeader {
+    display: none;
+  }
+  body #ranking-result-index_resultlist table.DrTable th,
+  body #ranking-result-index_resultlist table.DrTable tr,
+  body #ranking-result-index_resultlist table.DrTable td {
+    font-size: 9pt;
+  }
+  body #ranking-result-index {
+    position: initial;
+    overflow: initial !important;
+  }
+}
+@media only screen and (max-device-width: 736px) and (min-width: 300px) {
+  .hideOnMobile {
+    display: none !important;
+  }
+}
