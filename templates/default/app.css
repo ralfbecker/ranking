@@ -326,3 +326,12 @@ span#ranking-result-index_msg {
 img.et2_button_icon {
 	background-color: transparent;
 }
+
+#result-boulder-view-xet {
+	width:100%;
+}
+#result-boulder-view-xet #_nachname::after {
+	content:',';
+}
+#result-boulder-view-xet tr.row td {padding-bottom: 8px;}
+#result-boulder-view-xet .name td{padding-bottom: 8px;}

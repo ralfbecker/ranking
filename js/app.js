@@ -1275,5 +1275,67 @@ app.classes.ranking = AppJS.extend(
 	_button_vibrate: function()
 	{
 		if (egwIsMobile()) framework.vibrate(50);
+	},
+
+	/**
+	 * Function to create edit dialog for athlete from the result list
+	 *
+	 * @param {object} _action egw action object
+	 * @param {object} _selected selected action from the grid
+	 */
+	action_edit: function (_action,_selected)
+	{
+		var PerId = _selected[0].id;
+		var template = egw.webserverUrl+'/ranking/templates/'+(egwIsMobile()?'mobile':'default')+'/result.boulder.view.xet';
+		var content = this.et2.getArrayMgr('content');
+		var self = this;
+		if (content) var nm = content.getEntry('nm');
+
+		var nm_locate = function(_nm,_PerId)
+		{
+			for (var row in _nm)
+			{
+				if (_nm[row]['PerId'] == PerId) return jQuery.extend(_nm[row],{nm:_nm});
+			}
+		}
+		if (nm) {
+			var entry = nm_locate (nm.rows,PerId);
+		}
+		var dialog = function(_content, _callback,_egw_or_appname)
+		{
+		   return et2_createWidget("dialog", {
+					id: 'update-result',
+					callback: function(_button_id, _value) {
+						if (typeof callback == "function")
+						{
+							callback.call(this, _button_id, _value.value);
+						}
+					},
+					title: egw.lang('Update Result'),
+					buttons: [
+						{"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', "default":true},
+						{"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true},
+						{"button_id": 'next',"text": 'Next', id: 'next', image: 'continue', "default":true},
+						{"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true},
+					],
+					value: {
+						content: _content
+					},
+					template: template,
+					class: "update_result"
+				},_egw_or_appname);
+		}
+		var callback = function(_button_id){
+			switch (_button_id)
+			{
+				case 'close':
+					return false;
+
+				default:
+					self.update_result_row(_button_id);
+			}
+		}
+		// Call the edit dialog
+		dialog(entry||{}, callback);
 	}
 });

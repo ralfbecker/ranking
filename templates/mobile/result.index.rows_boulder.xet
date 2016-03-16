@@ -111,23 +111,22 @@
 					<nextmatch-sortheader align="center" label="Order" id="start_order" class="noPrint"/>
 					<nextmatch-sortheader align="center" label="Bib" id="start_order"/>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
-					<vbox id="top_bonus" class="hideOnMobile">
+					<vbox id="top_bonus" class="hideOnMobile onlyPrint">
 						<description value="Top"/>
 						<description value="Bonus"/>
 					</vbox>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
-					<description align="center" value="1" class="place hideOnMobile" />
-					<description value="2" class="place hideOnMobile" />
-					<description value="3" class="place hideOnMobile" />
-					<description value="4" class="place hideOnMobile" />
-					<description value="5" class="place hideOnMobile" />
-					<description value="6" class="place hideOnMobile" />
-					<description value="7" class="place hideOnMobile"/>
-					<description value="8" class="place hideOnMobile"/>
-					<description value="9" class="place hideOnMobile"/>
-					<description value="10" class="place hideOnMobile"/>
+					<description align="center" value="1" class="place hideOnMobile onlyPrint" />
+					<description value="2" class="place hideOnMobile onlyPrint" />
+					<description value="3" class="place hideOnMobile onlyPrint" />
+					<description value="4" class="place hideOnMobile onlyPrint" />
+					<description value="5" class="place hideOnMobile onlyPrint" />
+					<description value="6" class="place hideOnMobile onlyPrint" />
+					<description value="7" class="place hideOnMobile onlyPrint"/>
+					<description value="8" class="place hideOnMobile onlyPrint"/>
+					<description value="9" class="place hideOnMobile onlyPrint"/>
+					<description value="10" class="place hideOnMobile onlyPrint"/>
 					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
-					<image align="center" label="Scorecard checked" src="check" class="noPrint"/>
 					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint hideOnMobile" />
 				</row>
 				<row class="onlyPrint" part="footer">
@@ -146,124 +145,22 @@
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
 					<description align="center" id="{$row}[result]" no_lang="1" class="noWrap"/>
-					<vbox class="hideOnMobile">
+					<vbox class="hideOnMobile onlyPrint">
 						<description value="Top"/>
 						<description value="Bonus"/>
 					</vbox>
-					<vbox class="hideOnMobile">
-						<hbox align="right" class="noPrint">
-							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: total number or no" id="set[$row_cont[PerId]][tops]" onchange="app.ranking.check_tops" options="No,1,25"/>
-							</menulist>
-							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Top: number of tries" label="/" id="set[$row_cont[PerId]][top_tries]" onchange="app.ranking.check_top_tries" options="No,1,50"/>
-							</menulist>
-						</hbox>
-						<hbox align="right" class="noPrint">
-							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: total number or no" id="set[$row_cont[PerId]][zones]" onchange="app.ranking.check_boni" options="No,1,25"/>
-							</menulist>
-							<menulist>
-								<menupopup type="select-number" class="noPrint noWrap" statustext="Bonus: number of tries" label="/" id="set[$row_cont[PerId]][zone_tries]" onchange="app.ranking.check_bonus_tries" options="No,1,50"/>
-							</menulist>
-						</hbox>
-						<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top1]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone1]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top2]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone2]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder2]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top3]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone3]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder3]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top4]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone4]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder4]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top5]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone5]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder5]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top6]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone6]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder6]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top7]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone7]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder7]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top8]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone8]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top9]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone9]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder9]" no_lang="1" class="onlyPrint"/>
-					</vbox>
-					<vbox class="hideOnMobile">
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Top: number of tries or no" id="set[$row_cont[PerId]][top10]" onchange="app.ranking.check_top" options="No,1,25"/>
-						</menulist>
-						<menulist class="noPrint">
-							<menupopup type="select-number" class="noPrint" statustext="Bonus: Number of tries or no" id="set[$row_cont[PerId]][zone10]" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						</menulist>
-						<description id="{$row}[boulder10]" no_lang="1" class="onlyPrint"/>
-					</vbox>
+					<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
+					<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder2]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder3]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder4]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder5]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder6]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder7]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder9]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder10]" no_lang="1" class="onlyPrint"/>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
-					<vbox align="center" class="noPrint">
-						<checkbox align="center" statustext="|Scorecard checked" id="set[$row_cont[PerId]][checked]" onchange="app.ranking.update_result_row" class="noPrint"/>
-						<buttononly onclick="app.ranking.update_result_row" align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result] hideOnMobile"/>
-					</vbox>
 					<vbox class="noPrint hideOnMobile">
 						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>
 						<menulist>

@@ -10,6 +10,9 @@
  * @version $Id$
  */
 @media all {
+  body #result-boulder-view-xet {
+    width: 100%;
+  }
   body #ranking-result-index .scrollArea {
     height: calc(100% - 50px);
   }

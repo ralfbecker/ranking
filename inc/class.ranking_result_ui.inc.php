@@ -1115,6 +1115,13 @@ class ranking_result_ui extends ranking_result_bo
 	{
 		$actions =array(
 			'edit' => array(
+				'caption' => 'Edit',
+				'default' => true,
+				'onExecute' => 'javaScript:app.ranking.action_edit',
+                'disableClass' => 'th',
+				'allowOnMultiple' => false,
+			),
+			'measurement' => array(
 				'caption' => 'Measurement',
 				'default' => true,
 				'onExecute' => 'javaScript:app.ranking.action_measure',
