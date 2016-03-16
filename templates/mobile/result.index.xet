@@ -161,7 +161,6 @@
 						<menupopup  disabled="!@nm[comp]" id="nm[cat]" no_lang="1" onchange="1" empty_label="Select category"/>
 					</menulist>
 					<hidden id="comp[WetId]"/>
-					<description id="msg"  disabled="!@nm[comp]" class="message"/>
 				</hbox>
 				<menulist span="all">
 					<menupopup class="rightPad5" disabled="@no_route_selection" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
@@ -173,8 +172,9 @@
 					<menupopup class="noPrint leftPad5" disabled="@no_route_selection" id="nm[ranking]" onchange="1" options="display no ranking"/>
 				</menulist>
 			</vbox>
+			<description id="msg"  disabled="!@nm[comp]" class="message"/>
 		</vbox>
-		<box height="94%" overflow="scroll">
+		<box class="scrollArea" overflow="scroll">
 			<grid width="100%" class="et2_nextmatch">
 				<columns>
 					<column/>

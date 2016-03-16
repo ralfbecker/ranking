@@ -264,6 +264,9 @@ class ranking_boulder_measurement
 			}
 			$query['PerId'] = $PerId;
 
+			$athlete = ranking_result_bo::$instance->athlete->read($PerId);
+			$data['profile_url'] = ($_SERVER['HTTPS']?'https://':'http://').$_SERVER['HTTP_HOST'].ranking_result_bo::$instance->athlete->picture_url($athlete->rkey);
+			
 			if ($update)
 			{
 				$response->jquery('#msg', 'text', array(ranking_result_bo::athlete2string($data)));
