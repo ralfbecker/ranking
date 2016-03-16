@@ -1,0 +1,142 @@
+/**
+ * Ranking app
+ *
+ * Please do NOT change css-files directly, instead change less-files and compile them!
+ *
+ * @link http://www.egroupware.org
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @author Hadi Nategh <hn@stylite.de>
+ * @package Ranking
+ * @version $Id$
+ */
+@media all {
+  body #ranking-result-index .scrollArea {
+    height: calc(100% - 50px);
+  }
+  body #ranking-result-index #ranking-result-index_msg {
+    font-size: 10pt;
+    padding-top: 10px;
+    text-align: center;
+  }
+  body #ranking-result-index .avatar {
+    width: 100px;
+    height: 100px;
+    margin-top: 8px;
+    float: right;
+  }
+  body #ranking-result-index div {
+    -webkit-overflow-scroll: touch;
+  }
+  body #ranking-result-index .dialogHeadbar {
+    position: initial;
+    padding-left: 65px;
+    padding-top: 3px;
+    width: calc(100% - 65px) !important;
+  }
+  body #ranking-result-index .popupMainDiv {
+    padding-top: 0px !important;
+  }
+  body #ranking-result-index .selectHeader {
+    display: none;
+    position: absolute;
+    background: white;
+    box-shadow: 1px 3px 6px gray;
+    width: 100%;
+    z-index: 2;
+  }
+  body #ranking-result-index tbody > * {
+    font-size: 10pt;
+    font-family: verdana;
+  }
+  body #ranking-result-index input[id^="ranking-result-index_"][id$="start_number]"] {
+    font-size: 10pt;
+    font-family: verdana;
+    padding-top: 0px !important;
+    margin: 0 5px 0 5px;
+  }
+  body #ranking-result-index .compHeader,
+  body #ranking-result-index .resultDate,
+  body #ranking-result-index .listHeader {
+    display: none;
+  }
+  body #ranking-result-index #ranking-result-index_resultlist table.DrTable th,
+  body #ranking-result-index #ranking-result-index_resultlist table.DrTable tr,
+  body #ranking-result-index #ranking-result-index_resultlist table.DrTable td {
+    font-size: 9pt;
+  }
+  body #ranking-result-index #ranking-result-index {
+    position: initial;
+    overflow: initial !important;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv {
+    padding-right: 10px;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv input,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv span,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv select,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv label {
+    font-size: 20pt;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button.bigButton {
+    height: 80px;
+    width: 200px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 0px 0px #5A4C4C;
+    background-color: #36809B;
+    color: white;
+    filter: none;
+    border: 1px solid black;
+    transform: none;
+    background-image: none;
+    font-weight: bold;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button.bigButton:active {
+    box-shadow: none;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv td.bigButton {
+    padding: 10px 0px 0px 0px;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_nm\[boulder_n\],
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_try,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_zone,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_top {
+    width: 150px;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv .bottomRow button {
+    margin-bottom: 15px;
+    margin-right: 10px;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv .bottomRow td:first-child {
+    padding-left: 8px;
+  }
+  body #ranking-result-index #ranking-result-index_msg {
+    position: absolute;
+    top: 53px;
+    left: 33%;
+    right: 33%;
+    background: transparent;
+  }
+}
+@media only screen and (max-device-width: 736px) and (min-width: 300px) {
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv input,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv span,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv select,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv label {
+    font-size: 12pt;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button.bigButton {
+    height: 50px;
+    width: 80px;
+  }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_nm\[boulder_n\],
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_try,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_zone,
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_top {
+    width: 80px;
+  }
+  body .hideOnMobile {
+    display: none !important;
+  }
+}

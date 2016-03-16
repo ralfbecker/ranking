@@ -247,28 +247,7 @@ input.nextButton {
 }
 
 @media only screen and (max-device-width : 1024px) {
-	#ranking-result-index tr.resultHeader {
-		border-left:1px solid gray;
-		border-right: 1px solid gray;
-		background-image: url(../images/appbox-header-background.png);
-		background-repeat: repeat-x;
-	}
-	#ranking-result-index tr.resultHeader select,
-	#ranking-result-index tr.resultHeader input,
-	#ranking-result-index tr.resultHeader button {
-		font-size:200%;
-	}
-	#ranking-result-index tr.resultHeader select#ranking-result-index_nm\[PerId\] {
-		max-width: 50%;
-	}
-	#ranking-result-index tr.resultHeader img.et2_button {
-		height:32px;
-		width:32px;
-		vertical-align: bottom;
-	}
-	#ranking-result-index form select {
-		font-size: 150%;
-	}
+	
 }
 
 @media print {

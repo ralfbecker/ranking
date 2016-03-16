@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.footer" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%" class="extra_footer">
+			<columns>
+				<column/>
+			</columns>
+			<rows>
+				<row disabled="!@comp_sponsors">
+					<image align="center" src="comp_sponsors" class="comp_sponsors"/>
+				</row>
+				<row disabled="!@show_result=0">
+					<groupbox class="extra_startlist">
+						<caption label="Isolation zone and starting time"/>
+						<grid padding="5">
+							<columns>
+								<column/>
+								<column/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description value="Isolation zone"/>
+									<description value="opens" id="route_data[route_iso_open]" no_lang="1"/>
+									<description value="closes" id="route_data[route_iso_close]" no_lang="1"/>
+								</row>
+								<row>
+									<description value="Starting time"/>
+									<description id="route_data[route_start]" no_lang="1" span="all"/>
+								</row>
+								<row>
+									<description value="Observation time"/>
+									<description id="route_data[route_observation_time]" no_lang="1"/>
+									<description value="Climbing time" id="route_data[route_climbing_time]" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+				<row disabled="!@result_official">
+					<groupbox class="extra_result">
+						<caption label="Result official"/>
+						<grid>
+							<columns>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<description id="route_data[route_result]" no_lang="1"/>
+								</row>
+								<row>
+									<description id="route_data[route_judge]" no_lang="1"/>
+								</row>
+							</rows>
+						</grid>
+					</groupbox>
+				</row>
+			</rows>
+		</grid>
+		<styles>
+			.extra_footer { margin-top: 10px; }
+		</styles>
+	</template>
+	<template id="ranking.result.index.rows_lead" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%" id="nm[rows]" class="egwGridView_grid">
+			<columns>
+				<column width="5%"/>
+				<column/>
+				<column/>
+				<column/>
+				<column disabled="@no_nation"/>
+				<column disabled="@no_verband"/>
+				<column disabled="@no_acl_fed"/>
+				<column disabled="@no_ort"/>
+				<column/>
+				<column width="50"/>
+				<column width="50"/>
+				<column width="15%"/>
+				<column/>
+				<column disabled="@no_prev_heat"/>
+				<column disabled="@readonly"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="onlyPrint" part="header">
+					<template id="ranking.result.header$cont[calendar]" span="all"/>
+				</row>
+				<row class="th" part="header">
+					<nextmatch-sortheader align="center" label="Rank" id="result_rank"/>
+					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
+					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
+					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
+					<nextmatch-sortheader align="center" label="Nation" id="nation"/>
+					<nextmatch-header label="Sektion" id="verband"/>
+					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-header align="center" label="License" id="PerId"/>
+					<nextmatch-sortheader align="center" label="Start- order" id="start_order" class="noPrint"/>
+					<nextmatch-sortheader align="center" label="Start- number" id="start_number"/>
+					<nextmatch-sortheader align="center" label="Height" id="result_height"/>
+					<nextmatch-sortheader align="center" label="Time" id="result_time" class="$cont[lead_time_class]"/>
+					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
+					<description align="center" value="Actions" class="$cont[rw_result]"/>
+					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint"/>
+				</row>
+				<row class="onlyPrint" part="footer">
+					<template id="ranking.result.footer" span="all"/>
+				</row>
+				<row class="row $row_cont[quota_class]">
+					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
+					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
+					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
+					<description align="center" id="{$row}[nation]" no_lang="1"/>
+					<description id="${row}[verband]"/>
+					<description id="${row}[acl_fed]"/>
+					<description value="$row_cont[plz]" id="${row}[ort]"/>
+					<description align="center" id="{$row}[PerId]" no_lang="1"/>
+					<description align="center" id="${row}[start_order]" class="noPrint"/>
+					<description align="center" id="{$row}[start_number]" no_lang="1"/>
+					<hbox align="center">
+						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
+						<float id="set[$row_cont[PerId]][result_height]" onkeypress="app.ranking.height_keypress" size="5" class="$cont[rw_result]" min="1"/>
+						<menulist>
+							<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1" class="$cont[rw_result] leftPad5"/>
+						</menulist>
+					</hbox>
+					<textbox type="float" align="center" id="set[$row_cont[PerId]][result_time]" class="$cont[lead_time_class]"/>
+					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1"/>
+					<buttononly onclick="app.ranking.update_result_row" align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result]"/>
+					<vbox class="noPrint">
+						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>
+						<menulist>
+							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true" class="noWrap"/>
+						</menulist>
+					</vbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index" template="" lang="" group="0" version="14.2.001">
+		<vbox class="et2_nextmatch">
+			<hbox width="100%" class="dialogHeadbar">
+				<buttononly id="button[new]" disabled="@no_route_selection" background_image="1" onclick="" image="add" class="noPrint"/>
+				<buttononly id="button[edit]" disabled="@no_route_selection" background_image="1" onclick="egw.open_link('ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','result_route','700x500','ranking')" image="edit" class="noPrint"/>
+				<buttononly background_image="1" image="menu_list" onclick="jQuery('.selectHeader').toggle();"/>
+				<buttononly id="result_popup" disabled="@no_route_selection" background_image="1" onclick="egw.open_link('/ranking/sitemgr/digitalrock/eliste.html?comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','_blank')" options="search" class=""/>
+				<button disabled="@no_list" statustext="Apply the changes made"  id="button[apply]"/>
+			</hbox>
+			<vbox  class="noPrint resultHeader selectHeader nextmatch_header_row">
+				<menulist>
+					<menupopup class="rightPad5" disabled="@no_compsel" statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
+				</menulist>
+				<menulist>
+					<menupopup id="nm[comp]" disabled="@no_compsel" no_lang="1" onchange="1" empty_label="Select competition"/>
+				</menulist>
+				<hbox class="catSelectionMsg">
+					<menulist>
+						<menupopup  disabled="!@nm[comp]" id="nm[cat]" no_lang="1" onchange="1" empty_label="Select category"/>
+					</menulist>
+					<hidden id="comp[WetId]"/>
+				</hbox>
+				<menulist span="all">
+					<menupopup class="rightPad5" disabled="@no_route_selection" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
+				</menulist>
+				<menulist>
+					<menupopup  disabled="@no_route_selection" statustext="Select heat" id="nm[route]" no_lang="1" onchange="1"/>
+				</menulist>
+				<menulist>
+					<menupopup class="noPrint leftPad5" disabled="@no_route_selection" id="nm[ranking]" onchange="1" options="display no ranking"/>
+				</menulist>
+			</vbox>
+			<description id="msg"  disabled="!@nm[comp]" class="message"/>
+		</vbox>
+		<box class="scrollArea" overflow="scroll">
+			<grid width="100%" class="et2_nextmatch">
+				<columns>
+					<column/>
+					<column width="10"/>
+				</columns>
+				<rows>
+					<row disabled="@no_list">
+						<template template="@nm[template]" span="all"/>
+					</row>
+					<row disabled="!@nm[show_result]=4">
+						<template id="@measurement_template"/>
+					</row>
+				</rows>
+			</grid>
+		</box>
+
+		<hidden id="nm[sort]"/>
+		<hidden id="nm[order]"/>
+	</template>
+</overlay>

@@ -562,6 +562,7 @@ app.classes.ranking = AppJS.extend(
 	 */
 	try_clicked: function(button)
 	{
+		this._button_vibrate();
 		var state = this.get_state();
 		var num = this.try_num();
 		this.try_num(++num);
@@ -619,6 +620,7 @@ app.classes.ranking = AppJS.extend(
 	 */
 	bonus_clicked: function(button)
 	{
+		this._button_vibrate();
 		var state = this.get_state();
 		var bonus = this.et2.getWidgetById('zone');
 
@@ -639,6 +641,7 @@ app.classes.ranking = AppJS.extend(
 	 */
 	top_clicked: function(button)
 	{
+		this._button_vibrate();
 		var state = this.get_state();
 		var bonus = this.et2.getWidgetById('zone');
 		var top = this.et2.getWidgetById('top');
@@ -742,6 +745,7 @@ app.classes.ranking = AppJS.extend(
 				{
 					this.et2.getWidgetById('zone').set_value(_data['zone'+n]);
 					this.et2.getWidgetById('top').set_value(_data['top'+n]);
+					this.et2.getWidgetById('avatar').set_src(_data['profile_url']);
 					this.try_num(_data['try'+n]);
 					this.init_boulder();
 
@@ -1266,5 +1270,10 @@ app.classes.ranking = AppJS.extend(
 			current[0].scrollIntoView(false);
 			if (height || plus == this.TOP_PLUS) this.mark_holds(current);
 		}
+	},
+
+	_button_vibrate: function()
+	{
+		if (egwIsMobile()) framework.vibrate(50);
 	}
 });
