@@ -1297,7 +1297,7 @@ app.classes.ranking = AppJS.extend(
 			{
 				if (_nm[row]['PerId'] == PerId) return jQuery.extend(_nm[row],{nm:_nm});
 			}
-		}
+		};
 		if (nm) {
 			var entry = nm_locate (nm.rows,PerId);
 		}
@@ -1316,7 +1316,7 @@ app.classes.ranking = AppJS.extend(
 						{"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', "default":true},
 						{"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true},
 						{"button_id": 'next',"text": 'Next', id: 'next', image: 'continue', "default":true},
-						{"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true},
+						{"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true}
 					],
 					value: {
 						content: _content
@@ -1324,7 +1324,7 @@ app.classes.ranking = AppJS.extend(
 					template: template,
 					class: "update_result"
 				},_egw_or_appname);
-		}
+		};
 		var callback = function(_button_id){
 			switch (_button_id)
 			{
@@ -1334,7 +1334,7 @@ app.classes.ranking = AppJS.extend(
 				default:
 					self.update_result_row(_button_id);
 			}
-		}
+		};
 		// Call the edit dialog
 		dialog(entry||{}, callback);
 	}
