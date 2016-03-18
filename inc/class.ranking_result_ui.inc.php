@@ -1450,7 +1450,7 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			if ($type == 'logo' || $type == 'sponsors')
 			{
-				$content['nm']['comp_'.$type] = egw::link($linkdata);
+				$content['nm']['comp_'.$type] = substr($linkdata, 0, 4) == 'http' ? $linkdata : egw::link($linkdata);
 				// check if images are directly reachable from the docroot --> use them direct
 				if (file_exists($_SERVER['DOCUMENT_ROOT'].$docroot_base_path.basename($linkdata)))
 				{
