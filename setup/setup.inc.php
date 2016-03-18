@@ -15,9 +15,9 @@
 $setup_info['ranking']['only_db'] = array('never');
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '14.3.005';
+$setup_info['ranking']['version']   = '14.3.006';
 $setup_info['ranking']['app_order'] = 1;
-$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','RelayResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses','RouteHolds');
+$setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','RelayResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses','RouteHolds','Registration');
 $setup_info['ranking']['only_db']   = array('none');	// do NOT install by default, was array('mysql','postgres');
 $setup_info['ranking']['enable']    = 1;
 
@@ -60,10 +60,9 @@ $setup_info['ranking']['hooks']['calendar_search_union']  = 'ranking_calendar_in
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
 	 'appname' => 'phpgwapi',
-	 'versions' => Array('1.9','14.1')
+	 'versions' => Array('14.1')
 );
 $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
 	'versions' => Array('1.8','14.1')
 );
-

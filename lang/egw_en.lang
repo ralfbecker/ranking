@@ -54,6 +54,7 @@ all points gets multiplicated with this factor, eg. for different competition ty
 allow athletes to register themself for this competition	ranking	en	Allow athletes to register themself for this competition
 allowed without extra confirmation	ranking	en	Allowed without extra confirmation
 allows athletes to register themself for this competition	ranking	en	Allows athletes to register themself for this competition
+already registered	ranking	en	Already registered
 an email with instructions how to (re-)set the password has been sent.	ranking	en	An EMail with instructions how to (re-)set the password has been sent.
 an error happend, while storing your password!	ranking	en	An error happend, while storing your password!
 applied	ranking	en	applied
@@ -101,6 +102,7 @@ bonus: total number or no	ranking	en	Bonus: total number or no
 both password do not match!	ranking	en	Both password do NOT match!
 boulder	ranking	en	boulder
 boulder: height, tries	ranking	en	boulder: height, tries
+by	ranking	en	by
 can not be higher than top!	ranking	en	Can NOT be higher than top!
 can not be higher than tries!	ranking	en	Can NOT be higher than tries!
 can not be lower than tops!	ranking	en	Can NOT be lower than tops!
@@ -178,6 +180,7 @@ delete this cup	ranking	en	Delete this cup
 delete this federation	ranking	en	Delete this federation
 delete this heat including all results	ranking	en	Delete this round including all results
 delete this participant (can not be undone)	ranking	en	Delete this participant (can NOT be undone)
+deleted	ranking	en	deleted
 deletes this cup	ranking	en	deletes this cup
 delimiter	ranking	en	Delimiter
 deny public access to	ranking	en	deny public access to
@@ -326,6 +329,7 @@ information pdf	ranking	en	Information PDF
 install-id of instance to use for export caching (default current one)	admin	en	Install-ID of instance to use for export caching (default current one)
 internal key, leave it empty to have it automaticaly generated	ranking	en	internal key, leave it empty to have it automaticaly generated
 into current category	ranking	en	Into current category
+invalid age for age-group of category	ranking	en	Invalid age for age-group of category
 isolation	ranking	en	Isolation
 isolation zone	ranking	en	Isolation zone
 isolation zone and starting time	ranking	en	Isolation zone and starting time
@@ -362,6 +366,7 @@ minimum disciplines	ranking	en	Minimum disciplines
 minus	ranking	en	minus
 more	ranking	en	More
 name(s)	ranking	en	name(s)
+narrow your search	ranking	en	Narrow your search
 nation	ranking	en	Nation
 nation acl	common	en	Nation ACL
 nation if national competition or internatinal	ranking	en	nation if national competition or internatinal
@@ -390,6 +395,7 @@ no rights to any nations, admin needs to give read-rights for the competitions o
 no starters yet !!!	ranking	en	No starters yet !!!
 no startlist or result yet!	ranking	en	No startlist or result yet!
 not allowed	ranking	en	Not allowed
+not deleted	ranking	en	Not deleted
 not used at the moment	ranking	en	not used at the moment
 nothing to apply!	ranking	en	Nothing to apply!
 nothing to update	ranking	en	Nothing to update
@@ -400,6 +406,7 @@ number of problems	ranking	en	Number of problems
 observation time	ranking	en	Observation time
 on how many routes is the first round	ranking	en	On how many routes is the first round
 one qualification	ranking	en	one Qualification
+only %1 of %2 entries displayed!	ranking	en	Only %1 of %2 entries displayed!
 only fill values different from egw	admin	en	only fill values different from eGW
 open comp.	ranking	en	Open comp.
 open scorecards:	ranking	en	Open scorecards:
@@ -442,8 +449,9 @@ points	ranking	en	Points
 port	admin	en	Port
 postalcode	ranking	en	Postalcode
 prefix for the following page names (default none)	ranking	en	Prefix for the following page names (default none)
-prequalified	ranking	en	Prequalified
+prequalified	ranking	en	prequalified
 prequalified competitiors	ranking	en	Prequalified competitiors
+prequalify	ranking	en	Prequalify
 presets	ranking	en	Presets
 presets for competitions	ranking	en	Presets for competitions
 previous heat	ranking	en	previous round
@@ -472,7 +480,9 @@ read competition	ranking	en	Read competition
 regionalzentrum	ranking	en	Regionalzentrum
 register	ranking	en	Register
 register athlets for this competition	ranking	en	Register athlets for this competition
+register for	ranking	en	Register for
 register this athlete for the selected category	ranking	en	Register this athlete for the selected category
+registered	ranking	en	registered
 registration	ranking	en	Registration
 registration deadline	ranking	en	Registration deadline
 registration for this competition is over!	ranking	en	Registration for this competition is over!
@@ -517,6 +527,7 @@ select multiple federations for a further action	ranking	en	Select multiple fede
 select order for qualification startlist or use default	ranking	en	Select order for qualification startlist or use default
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
+selected category	ranking	en	Selected category
 selfregister	ranking	en	Selfregister
 send email to set password to athlete	ranking	en	Send EMail to set password to athlete
 serid	ranking	en	SerId
@@ -578,6 +589,7 @@ til place	ranking	en	til place
 time	ranking	en	Time
 time measured	ranking	en	Time measured
 time measurement	ranking	en	Time measurement
+to confirm	ranking	en	To confirm
 to year	ranking	en	to year
 top	ranking	en	Top
 top: number of tries	ranking	en	Top: number of tries
@@ -644,8 +656,10 @@ which view do you want to see, when you start the ranking app?	ranking	en	Which 
 wildcard	ranking	en	Wildcard
 without excluding non-members	ranking	en	without excluding non-members
 wrong admin-account or -password !!!	ranking	en	Wrong admin-account or -password !!!
+wrong gender	ranking	en	Wrong gender
 wrong mode="%1" for discipline "%2"!	ranking	en	Wrong Mode="%1" for discipline "%2"!
 wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	en	Wrong Mode="%1" for this heat (qualification - final mismatch)!
+wrong nationality	ranking	en	Wrong Nationality
 wrong or not configured vfs directory	ranking	en	Wrong or NOT configured VFS directory
 xml file uses unknown schema (format)!	ranking	en	XML file uses unknown schema (format)!
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
@@ -659,8 +673,10 @@ you have not yet a password set!	ranking	en	You have not yet a password set!
 you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	en	You have to act on the instructions in the next %1 hours, or %2request a new mail%3.
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	en	You need to mail the downloaded AND signed form to the office! Please check if you filled out ALL fields (you may hide some via ACL from public viewing). Continue
+you need to select a competition first!	ranking	en	You need to select a competition first!
 you need to select a file first!	ranking	en	You need to select a file first!
 you need to select an other athlete first!	ranking	en	You need to select an other athlete first!
+you need to select one or more athletes first!	ranking	en	You need to select one or more athletes first!
 you need to select some federations first!	ranking	en	You need to select some federations first!
 your new password is now active.	ranking	en	Your new password is now active.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	en	Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.

@@ -33,7 +33,7 @@ class ranking_hooks
 				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index')),
 				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index')),
-				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index')),//'ajax' => 'true')),
+				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index','ajax' => 'true')),
 				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index','ajax' => 'true')),
 				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.result')),
 				'Ranking'       => egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),

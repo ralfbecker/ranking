@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.registration.rows" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%">
+			<columns>
+				<column width="15%"/>
+				<column width="10%"/>
+				<column width="40"/>
+				<column width="50"/>
+				<column width="60"/>
+				<column width="80"/>
+				<column width="10%"/>
+				<column width="30%"/>
+				<column width="15%"/>
+				<column width="95"/>
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-sortheader label="Last name" id="nachname"/>
+					<nextmatch-sortheader label="First name" id="vorname"/>
+					<nextmatch-sortheader label="Nation" id="nation"/>
+					<nextmatch-sortheader label="License" id="PerId"/>
+					<nextmatch-filterheader align="center" id="sex" empty_label="Gender"/>
+					<nextmatch-sortheader align="center" label="Birthdate" id="geb_date"/>
+					<nextmatch-sortheader label="City" id="ort"/>
+					<nextmatch-sortheader label="Federation" id="verband"/>
+					<nextmatch-filterheader id="GrpId" empty_label="All categories"/>
+					<nextmatch-filterheader id="state"/>
+				</row>
+				<row class="row $row_cont[class]">
+					<description id="${row}[nachname]" no_lang="1" class="lastname"/>
+					<description id="${row}[vorname]" no_lang="1"/>
+					<description align="center" id="${row}[nation]" no_lang="1"/>
+					<description id="${row}[PerId]" no_lang="1"/>
+					<select id="${row}[sex]" readonly="true"/>
+					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
+					<description id="${row}[ort]" no_lang="1"/>
+					<description id="${row}[verband]" no_lang="1"/>
+					<select id="${row}[GrpId]" readonly="true"/>
+					<description id="${row}[state]" statustext="$row_cont[state_changed]"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.registration.header" template="" lang="" group="0" version="1.9.001">
+		<buttononly id="add" label="Register" onclick="app.ranking.register" statustext="Register athlets for this competition"/>
+		<select id="calendar"/>
+		<select id="comp" empty_label="Select a competition"/>
+		<select id="nation" empty_label="Select a federation"/>
+	</template>
+	<template id="ranking.registration.buttons" template="" lang="" group="0" version="1.9.001">
+		<buttononly id="download" statustext="Download" onclick="widget.getInstanceManager().postSubmit()" image="download" background_image="true"/>
+		<buttononly id="mail" onclick="app.ranking.mail" statustext="Mail all participants" image="mail/navbar" background_image="true"/>
+	</template>
+	<template id="ranking.registration" template="" lang="" group="0" version="1.9.001">
+		<nextmatch id="nm" template="ranking.registration.rows" header_left="ranking.registration.header" header_right="ranking.registration.buttons"/>
+	</template>
+	<template id="ranking.registration.add" template="" lang="" group="0" version="1.9.001">
+		<taglist autocomplete_url="ranking.ranking_registration_ui.ajax_search" id="PerId" minChars="0" allowFreeEntries="0" empty_label="Search" groupBy="group"/>
+		<select label="Register for" id="GrpId" onchange="app.ranking.register_cat_changed"/>
+	</template>
+</overlay>

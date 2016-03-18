@@ -452,5 +452,25 @@ $phpgw_baseline = array(
 		'fk' => array(),
 		'ix' => array(array('WetId','GrpId','route_order','hold_topo')),
 		'uc' => array()
+	),
+	'Registration' => array(
+		'fd' => array(
+			'reg_id' => array('type' => 'auto','nullable' => False,'comment' => 'also order of registration'),
+			'PerId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'WetId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'GrpId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'reg_prequalified' => array('type' => 'timestamp','comment' => 'athlete marked as prequalified or NULL, if not prequalified'),
+			'reg_prequalified_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who set athlete as prequalified'),
+			'reg_registered' => array('type' => 'timestamp','comment' => 'timestamp of registration'),
+			'reg_registered_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who registered athlete'),
+			'reg_confirmed' => array('type' => 'timestamp','comment' => 'when was registration confirmed, if necessary'),
+			'reg_confirmed_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who confirmed'),
+			'reg_deleted' => array('type' => 'timestamp','comment' => 'when was registration deleted'),
+			'reg_deleted_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who deleted registration')
+		),
+		'pk' => array('reg_id'),
+		'fk' => array(),
+		'ix' => array(array('PerId','WetId','GrpId'),array('WetId','GrpId')),
+		'uc' => array()
 	)
 );

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -658,7 +658,7 @@ class ranking_bo extends ranking_so
 
 			if (!is_array($prequalified))
 			{
-				list($prequal_comp,$prequalified) = $GLOBALS['egw']->session->appsession('prequalified','ranking');
+				list($prequal_comp,$prequalified) = egw_cache::getSession('ranking', 'prequalified');
 
 				if (!$prequal_comp || $prequal_comp !== $comp)	// no cached object or $comp changed
 				{
@@ -714,7 +714,7 @@ class ranking_bo extends ranking_so
 						}
 					}
 				}
-				$GLOBALS['egw']->session->appsession('prequalified','ranking',array($comp,$prequalified));
+				egw_cache::setSession('ranking', 'prequalified', array($comp,$prequalified));
 			}
 		}
 		//echo "prequalifed($comp[rkey],$do_cat$do_cat[rkey]) ="; _debug_array($prequalified);
@@ -779,69 +779,161 @@ class ranking_bo extends ranking_so
 	}
 
 	/**
-	 * (de-)register an athlete for a competition and category
+	 * Check if given athlete can register for a category and (optional) competition
 	 *
-	 * start/registration-numbers are saved as points in a result with place=0, the points contain:
-	 * - registration number in the last 6 bit (< 32 prequalified, >= 32 quota or supplimentary) ($pkt & 63)
-	 * - startnumber in the next 7 bits (($pkt >> 6) & 255))
-	 * - route in the other bits ($pkt >> 14)
+	 * @param int|array $athlete
+	 * @param int|array $cat
+	 * @param int|array $comp =null
+	 * @param boolean $register =true true: user tries to register, false: other operation
+	 * @throws egw_exception_wrong_parameter if $athlete, $cat or $comp are not found
+	 * @return string translated error-message or null
+	 */
+	function error_register($athlete, $cat, $comp=null, $register=true)
+	{
+		if (!is_array($athlete) && !($athlete = $this->athlete->read($athlete)))
+		{
+			throw new egw_exception_wrong_parameter(lang('Athlete NOT found !!!'));
+		}
+		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
+		{
+			throw new egw_exception_wrong_parameter(lang('Category NOT found !!!'));
+		}
+		if ($comp && !is_array($comp) && !($comp = $this->comp->read($comp)))
+		{
+			throw new egw_exception_wrong_parameter(lang('Competition NOT found !!!'));
+		}
+		$error = null;
+		if (!$this->registration_check($comp, $athlete['nation'], $cat) &&
+			!$this->registration_check($comp, $athlete['fed_parent'], $cat))
+		{
+			$error = lang('Permission denied!');
+		}
+		elseif ($register && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
+		{
+			$error = lang('This athlete has NO license!');
+		}
+		elseif ($register && $athlete['license'] == 's')
+		{
+			$error = lang('Athlete is suspended !!!');
+		}
+		elseif ($cat['nation'] && $cat['nation'] != $athlete['nation'])
+		{
+			$error = lang('Wrong nationality');
+		}
+		elseif ($cat['sex'] && $cat['sex'] != $athlete['sex'])
+		{
+			$error = lang('Wrong gender');
+		}
+		elseif(!$this->in_agegroup($athlete['geb_date'], $cat, $comp))
+		{
+			$error = lang('Invalid age for age-group of category');
+		}
+		// todo check license incl. suspended
+		return $error;
+	}
+
+	/**
+	 * (de-)register an athlete for a competition and category
 	 *
 	 * @param int $comp WetId
 	 * @param int $cat GrpId
 	 * @param int|array $athlete PerId or complete athlete array
-	 * @param int $mode =0  0: register (quota or supplimentary), 1: register prequalified, 2: remove registration
-	 * @throws egw_exception_wrong_userinput with error message
+	 * @param int $mode =ranking_registration::REGISTERED ::DELETED, ::PREQUALIFIED, ::CONFIRMED
+	 * @param string& $msg =null on return over quota message for admins or jury
+	 * @throws egw_exception_wrong_userinput with error message for not matching agegroup or over quota
+	 * @throws egw_exception_wrong_parameter for other errors
 	 * @return boolean true of everythings ok, false on error
 	 */
-	function register($comp,$cat,$athlete,$mode=0)
+	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null)
 	{
-		if ($this->debug) echo "<p>".__METHOD__."($comp,$cat,".(is_array($athlete)?$athlete['PerId']:$athlete).",$mode)</p>\n";
-		if (is_array($comp)) $comp = $comp['WetId'];
+		if (!is_array($athlete)) $athlete = $this->athlete->read($athlete);
+		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!$comp || !$cat || !$athlete) return false;
 
-		if ((int)$mode == 2)	// de-register
-		{
-			return !!$this->result->delete(array(
-				'WetId' => $comp,
-				'GrpId' => $cat,
-				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
-				'platz = 0',	// precausion to not delete a result
-			));
-		}
-		if (!is_array($athlete)) $athlete = $this->athlete->read($athlete);
-
-		if (!$this->in_agegroup($athlete['geb_date'],$cat,$comp))
-		{
-			throw new egw_exception_wrong_userinput(lang('Athlete is NOT in the age-group of that category'));
-		}
-		// get next registration-number, to have registered athletes ordered
-		// registration number are from 1 to 63 in that 6 lowest bit (&63) of the points
-		$num = $this->result->read(array(
-			'GrpId'  => $cat,
-			'WetId'  => $comp,
-			'nation' => $athlete['nation'],
-			'(pkt & 63) '.($mode ? '< 32' : '>= 32'),	// prequalified athlets get a number < 32
-		),'MAX(pkt & 63) AS pkt');
-
-		if ($num && ($num = $num[0]['pkt']))
-		{
-			if ($num != 31 && $num != 63)	// prefent overflow => use highest number
-			{
-				$num++;
-			}
-		}
-		else
-		{
-			$num = $mode ? 1 : 32;
-		}
-		return !$this->result->save(array(
+		$keys = array(
+			'WetId' => $comp['WetId'],
+			'GrpId' => is_array($cat) ? $cat['GrpId'] : $cat,
 			'PerId' => $athlete['PerId'],
-			'WetId' => $comp,
-			'GrpId' => $cat,
-			'platz' => 0,
-			'pkt'  => $num,
-			'datum' => date('Y-m-d'),
-		));
+			'reg_deleted IS NULL',
+		);
+		$data = $this->registration->read($keys);
+
+		// check if all conditions for registration are met
+		if (($error = $this->error_register($athlete, $cat, $comp, $mode == ranking_registration::REGISTERED)))
+		{
+			throw new egw_exception_wrong_userinput($error);
+		}
+
+		switch($mode)
+		{
+			case ranking_registration::DELETED:
+				if ($data && $data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED] &&
+					$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED.ranking_registration::ACCOUNT_POSTFIX])
+				{
+					unset($data['reg_id']);	// remove id to keep explicit prequalified entry
+				}
+				// fall through
+			case ranking_registration::CONFIRMED:
+				if (!$data) throw new egw_exception_wrong_parameter("Athlete is not registered!");
+				break;
+
+			case ranking_registration::REGISTERED:
+				$nat_fed = !$comp['nation'] || $athlete['nation'] != $comp['nation'] ||
+					!$athlete['fed_parent'] && !$athlete['acl_fed_id'] ?	// only use nation, if no RGZ set!
+					$athlete['nation'] : ($athlete['acl_fed_id'] ? $athlete['acl_fed_id'] : $athlete['fed_parent']);
+				$prequalified = $this->national_prequalified($comp, $nat_fed);
+				if (!$data)
+				{
+					$data = $keys;
+					// if not explicit prequalified, set prequalified timestamp, but no account
+					if (isset($prequalified[is_array($cat) ? $cat['GrpId'] : $cat][$athlete['PerId']]))
+					{
+						$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED] = $this->registration->now;
+					}
+				}
+				// check quota, if athlete is not prequalified and no complimentary list
+				if ($comp['no_complimentary'] &&
+					!isset($prequalified[is_array($cat) ? $cat['GrpId'] : $cat][$athlete['PerId']]) &&
+					!isset($data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]))
+				{
+					unset($keys['PerId']);
+					$keys[] = ranking_registration::PREFIX.ranking_registration::PREQUALIFIED.' IS NULL';
+					if (!is_numeric($nat_fed))
+					{
+						$keys['nation'] = $nat_fed;
+					}
+					else
+					{
+						$keys[!$athlete['acl_fed_id'] ? 'fed_parent' : 'acl_fed_id'] = $nat_fed;
+					}
+					$this->registration->search(array(), true, 'reg_id', 'COUNT(*) AS num', '', false, 'AND', false, $keys);
+					$max_quota = $this->comp->max_quota($nat_fed, $comp);
+					if ($max_quota <= $this->registration->total)
+					{
+						if ($this->is_admin || $this->is_judge($comp))
+						{
+							$msg = lang('No complimentary list (over quota)').'!';
+						}
+						else
+						{
+							throw new egw_exception_wrong_userinput(lang('No complimentary list (over quota)').' quota='.(int)$max_quota.'!');
+						}
+					}
+				}
+				break;
+
+			case ranking_registration::PREQUALIFIED:
+				if (!$data) $data = $keys;
+				break;
+
+			default:
+				throw new egw_exception_wrong_parameter(__METHOD__."($comp, $cat, , '$mode') unknown mode '$mode'!");
+		}
+
+		$data[ranking_registration::PREFIX.$mode] = $this->registration->now;
+		$data[ranking_registration::PREFIX.$mode.ranking_registration::ACCOUNT_POSTFIX] = $this->user;
+
+		return !$this->registration->save($data);
 	}
 
 	/**
@@ -1224,17 +1316,17 @@ class ranking_bo extends ranking_so
 		//echo "<p>".__METHOD__."(calendar='$calendar',comp=$comp,cat=$cat) menuaction=$_GET[menuaction]</p>\n";
 		foreach(array('registration','result','import') as $type)
 		{
-			$data = $GLOBALS['egw']->session->appsession($type,'ranking');
+			$data = egw_cache::getSession('ranking', $type);
 			foreach(array('calendar','comp','cat') as $name)
 			{
 				if (!is_null($$name)) $data[$name] = $$name;
 			}
-			$GLOBALS['egw']->session->appsession($type,'ranking',$data);
+			egw_cache::setSession('ranking', $type, $data);
 		}
 		// only store our menuaction, specially not eTemplate2 home.etemplate_new.ajax_process_exec.etemplate!
 		if (strpos($_GET['menuaction'], 'ranking.') === 0 && strpos($_GET['menuaction'], '.ajax_') === false)
 		{
-			$GLOBALS['egw']->session->appsession('menuaction','ranking',$_GET['menuaction']);
+			egw_cache::setSession('ranking', 'menuaction', $_GET['menuaction']);
 		}
 		unset($calendar, $comp, $cat);	// used as $$name above, quitens IDE warnings
 	}

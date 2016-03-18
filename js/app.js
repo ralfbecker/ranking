@@ -1337,5 +1337,147 @@ app.classes.ranking = AppJS.extend(
 		};
 		// Call the edit dialog
 		dialog(entry||{}, callback);
+	},
+
+	register_dialog: undefined,
+	register_nm: undefined,
+
+	/**
+	 * Registration dialog
+	 *
+	 * @param {jQuery.Event} _ev
+	 * @param {et2_widget} _widget
+	 * @param {DOMNode} _node
+	 */
+	register: function(_ev, _widget, _node)
+	{
+		var nm = app.ranking.register_nm = _widget.getRoot().getWidgetById('nm');
+		var filters = nm.getValue();
+		var egw = nm.egw();
+
+		if (!filters.comp)
+		{
+			et2_dialog.alert(egw.lang('You need to select a competition first!', egw.lang('Registration')));
+			return;
+		}
+		var cats = _widget.getParent().getArrayMgr('sel_options').getEntry('GrpId') ||
+			_widget.getRoot().getArrayMgr('sel_options').getEntry('GrpId');
+
+		var callback = jQuery.proxy(function(button_id, value, confirmed)
+		{
+			var athletes = value.PerId;
+			if (!athletes || !athletes.length)
+			{
+				et2_dialog.alert(egw.lang('You need to select one or more athletes first!', egw.lang('Registration')));
+				return;
+			}
+			var filter = this.register_nm.getValue();
+			this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+				WetId: filter.comp,
+				GrpId: value.GrpId,
+				PerId: athletes,
+				mode: button_id,
+				confirmed: confirmed
+			}], jQuery.proxy(function(_data)
+			{
+				var taglist = this.register_dialog.template.widgetContainer.getWidgetById('PerId');
+				if (_data.registered)
+				{
+					for (var i=0; i < _data.registered; i++) athletes.shift();
+					taglist.set_value(athletes);
+				}
+				if (_data.question)
+				{
+					et2_dialog.show_dialog(jQuery.proxy(function(_button)
+					{
+						if (_button == et2_dialog.NO_BUTTON)
+						{
+							athletes.shift();
+							taglist.set_value(athletes);
+						}
+						else
+						{
+							// resend request with confirmation to server
+							callback.call(this, button_id, {
+								PerId: athletes,
+								GrpId: value.GrpId
+							}, _data.PerId);
+						}
+					}, this), _data.question, _data.athlete, null, et2_dialog.BUTTON_YES_NO,
+					et2_dialog.QUESTION_MESSAGE, undefined, this.egw);
+				}
+			}, this)).sendRequest();
+
+			// keep dialog open by returning false
+			return false;
+		}, app.ranking);
+
+		var dialog = app.ranking.register_dialog = et2_createWidget("dialog", {
+			// If you use a template, the second parameter will be the value of the template, as if it were submitted.
+			callback: callback,
+			buttons: [
+				// These ones will use the callback, just like normal
+				{text: egw.lang("Register"),id:"register", class: "ui-priority-primary", default: true},
+				{text: egw.lang("Prequalify"),id:"prequalify"},
+				{text: egw.lang("Close"), id:"close", click: function() {
+					// If you override, 'this' will be the dialog DOMNode.
+					// Things get more complicated.
+					// Do what you like, but don't forget this line:
+					$j(this).dialog("close");
+				}}
+			],
+			title: egw.lang('Register athlets for this competition'),
+			template: "ranking.registration.add",
+			value: {
+				content: {
+					GrpId: filters.col_filter.GrpId || cats[0].value
+				},
+				sel_options: {
+					GrpId: cats
+				}
+			}
+		});
+		dialog.template.widgetContainer.getWidgetById('PerId').set_autocomplete_params({
+			GrpId: filters.col_filter.GrpId || cats[0].value,
+			nation: filters.nation,
+			sex: filters.col_filter.sex
+		});
+	},
+
+	/**
+	 * Registration dialog: category changed
+	 *
+	 * @param {jQuery.Event} _ev
+	 * @param {et2_widget} _widget
+	 * @param {DOMNode} _node
+	 */
+	register_cat_changed: function(_ev, _widget, _node)
+	{
+		var taglist = this.register_dialog.template.widgetContainer.getWidgetById('PerId');
+		var filters = this.register_nm.getValue();
+
+		taglist.set_autocomplete_params({
+			GrpId: _widget.get_value(),
+			nation: filters.nation,
+			sex: filters.col_filter.sex
+		});
+	},
+
+	/**
+	 * Execute action on registration list
+	 *
+	 * @param {egw_action} _action id: "delete" or "confirm"
+	 * @param {array} _selected eg. ["ranking::1638:5:1772"]
+	 */
+	register_action: function(_action, _selected)
+	{
+		var params = _selected[0].id.split(':');
+
+		this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+			WetId: params[2],
+			GrpId: params[3],
+			PerId: params[4],
+			mode: _action.id
+		}]).sendRequest();
 	}
 });

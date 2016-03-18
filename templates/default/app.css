@@ -28,6 +28,37 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 .noWrap { white-space: nowrap !important; }
 .speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; height: 7ex; }
 .max_compl { width: 45px; white-space: nowrap !important; }
+
+/**
+ * New registration using NM
+ */
+#ranking-registration_ranking-registration-header {
+	width: 85%;
+}
+#ranking-registration_comp, #ranking-registration_nation {
+	width: 35%;
+}
+#ranking-registration_search {
+	display: none;
+}
+#ranking-registration-add {
+	width: 100%;
+}
+#ranking-registration-add .et2_taglist {
+	margin-bottom: 15px;
+}
+#ranking-registration tr.isDeleted * {
+	text-decoration: line-through;
+	color: silver !important;
+}
+#ranking-registration tr.isPrequalified * {
+	font-style: italic;
+	color: silver !important;
+}
+#ranking-registration tr.isConfirmed * {
+	color: blue !important;
+}
+
 /**
  * Some fixes for ResultService not using a nextmatch
  */
@@ -247,7 +278,7 @@ input.nextButton {
 }
 
 @media only screen and (max-device-width : 1024px) {
-	
+
 }
 
 @media print {

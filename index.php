@@ -36,7 +36,7 @@ $old2new = array(
 if (isset($old2new[$view])) $view = $old2new[$view];
 
 // urls which should run top-level need a redirect
-if (in_array($view, array('ranking.ranking_result_ui.index')))//, 'ranking.ranking_registration_ui.index')))
+if (in_array($view, array('ranking.ranking_result_ui.index', 'ranking.ranking_registration_ui.index')))
 {
 	egw::redirect_link('/index.php', array(
 		'menuaction' => $view,

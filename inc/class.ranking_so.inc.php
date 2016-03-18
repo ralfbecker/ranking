@@ -26,6 +26,7 @@
  * @property-read ranking_competition $comp
  * @property-read ranking_athlete $athlete
  * @property-read ranking_result $result
+ * @property-read ranking_registration $registration
  * @property-read ranking_route $route
  * @property-read ranking_route_result $route_result
  * @property-read ranking_federation $federation;
@@ -76,6 +77,10 @@ class ranking_so
 	 */
 	private $result;
 	/**
+	 * @var ranking_registration
+	 */
+	private $registration;
+	/**
 	 * @var ranking_route
 	 */
 	private $route;
@@ -116,6 +121,7 @@ class ranking_so
 		'comp'    => 'ranking_competition',
 		'athlete' => 'ranking_athlete',
 		'result'  => 'ranking_result',
+		'registration' => 'ranking_registration',
 		'route'   => 'ranking_route',
 		'route_result'  => 'ranking_route_result',
 		'federation' => 'ranking_federation',

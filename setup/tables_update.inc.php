@@ -1905,3 +1905,46 @@ function ranking_upgrade14_3_004()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.005';
 }
 
+/**
+ * New registration table
+ *
+ * @return string
+ */
+function ranking_upgrade14_3_005()
+{
+	$GLOBALS['egw_setup']->oProc->CreateTable('Registration',array(
+		'fd' => array(
+			'reg_id' => array('type' => 'auto','nullable' => False,'comment' => 'also order of registration'),
+			'PerId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'WetId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'GrpId' => array('type' => 'int','precision' => '4','nullable' => False),
+			'reg_prequalified' => array('type' => 'timestamp','comment' => 'athlete marked as prequalified or NULL, if not prequalified'),
+			'reg_prequalified_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who set athlete as prequalified'),
+			'reg_registered' => array('type' => 'timestamp','comment' => 'timestamp of registration'),
+			'reg_registered_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who registered athlete'),
+			'reg_confirmed' => array('type' => 'timestamp','comment' => 'when was registration confirmed, if necessary'),
+			'reg_confirmed_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who confirmed'),
+			'reg_deleted' => array('type' => 'timestamp','comment' => 'when was registration deleted'),
+			'reg_deleted_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who deleted registration')
+		),
+		'pk' => array('reg_id'),
+		'fk' => array(),
+		'ix' => array(array('PerId','WetId','GrpId'),array('WetId','GrpId')),
+		'uc' => array()
+	));
+
+	// migrate registration data from results table
+	$GLOBALS['egw_setup']->db->query('INSERT INTO Registration (PerId,WetId,GrpId,reg_registered,reg_registered_by)
+SELECT PerId,WetId,GrpId,Results.modified,Results.modifier
+FROM Results
+JOIN Wettkaempfe USING(WetId)
+WHERE Wettkaempfe.datum > NOW() AND platz=0 AND pkt>0
+ORDER BY WetId,GrpId,pkt', __LINE__, __FILE__);
+
+	// delete registration data in result table
+	/*$GLOBALS['egw_setup']->db->query('DELETE FROM Results
+JOIN Wettkaempfe USING(WetId)
+WHERE Wettkaempfe.datum > NOW() AND platz=0 AND pkt>0', __LINE__, __FILE__);*/
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.006';
+}

@@ -1021,10 +1021,11 @@ class ranking_athlete extends so_sql
 	 *
 	 * Is called as hook to participate in the linking. The format is determined by the link_title preference.
 	 *
-	 * @param int/string/array $athlete int/string id or array with athlete
-	 * @return string/boolean string with the title, null if contact does not exitst, false if no perms to view it
+	 * @param int|string|array $athlete int/string id or array with athlete
+	 * @param boolean $return_array true: array with values for 'id', 'label', 'title'
+	 * @return string|boolean|array string with the title, null if contact does not exitst, false if no perms to view it
 	 */
-	function link_title($athlete)
+	function link_title($athlete, $return_array=false)
 	{
 		if (!is_array($athlete) && $athlete)
 		{
@@ -1034,7 +1035,16 @@ class ranking_athlete extends so_sql
 		{
 			return $athlete;
 		}
-		return $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].' '.$athlete['PerId'].')';
+		$label = $athlete['nachname'].', '.$athlete['vorname'].' ('.$athlete['nation'].' '.$athlete['PerId'].')';
+
+		return !$return_array ? $label : array(
+			'id' => $athlete['PerId'],
+			'label' => $label,
+			'title' => ($athlete['geb_year'] ? $geb.': ' : '').
+				($athlete['ort'] ? $athlete['ort'] : '').
+				($athlete['ort'] && $athlete['verband'] ? ', ' : '').
+				($athlete['verband'] ? $athlete['verband'] : ''),
+		);
 	}
 
 	/**
@@ -1072,11 +1082,25 @@ class ranking_athlete extends so_sql
 	 * Is called as hook to participate in the linking
 	 *
 	 * @param string $pattern pattern to search
+	 * @param array& $options =array() start, num_rows: limit search, on return total
+	 *	GrpId: nummeric id of a category: return "error" attribute if athlete does NOT fullfils requirements for given cat
 	 * @return array with id - title pairs of the matching entries
 	 */
-	function link_query($pattern)
+	function link_query($pattern, &$options=array())
 	{
-		$result = $criteria = array();
+		$result = $criteria = $filter = array();
+		foreach($options as $name => $value)
+		{
+			if (empty($value)) continue;
+			if (isset($this->db_cols[$name]))
+			{
+				$filter[$name] = $value;
+			}
+			elseif(in_array($name, array('nation', 'fed_parent')))
+			{
+				$filter[] = $this->db->expression(self::FEDERATIONS_TABLE, self::FEDERATIONS_TABLE.'.', array($name => $value));
+			}
+		}
 		if ($pattern)
 		{
 			// allow to prefix pattern with gender and nation, eg: "GER: Becker", "M: Becker" or "M: GER: Becker"
@@ -1106,7 +1130,11 @@ class ranking_athlete extends so_sql
 				$criteria[$col] = $pattern;
 			}
 		}
-		if (($athletes = $this->search($criteria,false,'nachname,vorname,nation','','%',false,'OR',false,$filter)))
+		// cat given to check registration requirements
+		if ((int)$options['GrpId'] > 0) $cat = $this->cats->read((int)$options['GrpId']);
+
+		$start = isset($options['num_rows']) ? array((int)$options['start'], (int)$options['num_rows']) : false;
+		if (($athletes = $this->search($criteria,false,'nachname,vorname,nation','','%',false,'OR',$start,$filter)))
 		{
 			foreach($athletes as $athlete)
 			{
@@ -1115,19 +1143,19 @@ class ranking_athlete extends so_sql
 					$geb = $athlete['geb_year'];
 					if ($athlete['geb_date'])
 					{
-						$geb = explode('-',$athlete['geb_date']);
-						$geb = $GLOBALS['egw']->common->dateformatorder($geb[0],$geb[1],$geb[2],true);
+						$geb = egw_time::to($athlete['geb_date'], true);
 					}
 				}
-				$result[$athlete['PerId']] = array(
-					'label' => $this->link_title($athlete),
-					'title' => ($athlete['geb_year'] ? $geb.': ' : '').
-						($athlete['ort'] ? $athlete['ort'] : '').
-						($athlete['ort'] && $athlete['verband'] ? ', ' : '').
-						($athlete['verband'] ? $athlete['verband'] : ''),
-				);
+				$result[$athlete['PerId']] = $this->link_title($athlete, true);
+
+				if ($cat)
+				{
+					$result[$athlete['PerId']]['error'] = ranking_bo::getInstance()->error_register($athlete, $cat);
+				}
 			}
 		}
+		$options['total'] = $this->total;
+		//error_log(__METHOD__."('$pattern', ".array2string($options).' returning '.count($result).' results');
 		return $result;
 	}
 }

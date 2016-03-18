@@ -53,6 +53,7 @@ all points gets multiplicated with this factor, eg. for different competition ty
 allow athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
 allowed without extra confirmation	ranking	de	Erlaubt ohne extra Bestätigung
 allows athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
+already registered	ranking	de	Bereits registriert
 an email with instructions how to (re-)set the password has been sent.	ranking	de	Eine EMail mit Anleitung, wie das Passwort (zurück) gesetzt wird, wurde versandt.
 an error happend, while storing your password!	ranking	de	Ein Fehler passierte, beim Speichern Deines Passwortes!
 applied	ranking	de	beantragt
@@ -97,6 +98,7 @@ bonus: total number or no	ranking	de	Bonus: Gesamtanzahl oder Nein
 both password do not match!	ranking	de	Beide Passwörter stimmen NICHT überein!
 boulder	ranking	de	Bouldern
 boulder: height, tries	ranking	de	Bouldern: Höhe, Versuche
+by	ranking	de	von
 can not be higher than top!	ranking	de	Darf nicht höher als Top sein!
 can not be higher than tries!	ranking	de	Darf nicht höher als Versuche sein!
 can not be lower than tops!	ranking	de	Darf nicht niedriger als Top sein!
@@ -174,6 +176,7 @@ delete this cup	ranking	de	Diesen Cup löschen
 delete this federation	ranking	de	Diesen Verband löschen
 delete this heat including all results	ranking	de	Löscht diese Runde einschließlich der Ergebnisse
 delete this participant (can not be undone)	ranking	de	Diesen Teilnehmer löschen (kann NICHT rückgänig gemacht werden)
+deleted	ranking	de	gelöscht
 deletes this cup	ranking	de	Löscht diesen Cup
 delimiter	ranking	de	Begrenzungszeichen
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
@@ -321,6 +324,7 @@ incl. nation-code	ranking	de	einschl. Länderkennung
 information pdf	ranking	de	Informations PDF
 internal key, leave it empty to have it automaticaly generated	ranking	de	interner Schlüssel, leer lassen um ihn automatisch zu generieren
 into current category	ranking	de	In aktuelle Kategorie
+invalid age for age-group of category	ranking	de	Ungültiges Alter für Altersklasse der Kategorie
 isolation	ranking	de	Isolation
 isolation zone	ranking	de	Isolation
 isolation zone and starting time	ranking	de	Isolation und Startzeit
@@ -355,6 +359,7 @@ minimum disciplines	ranking	de	Minimalzahl Diziplinen
 minus	ranking	de	minus
 more	ranking	de	Mehr
 name(s)	ranking	de	Namen
+narrow your search	ranking	de	Schränken Sie Ihre Suche weiter ein
 nation	ranking	de	Nation
 nation acl	common	de	Nationen ACL
 nation if national competition or internatinal	ranking	de	Nation für nationalen Wettkampf oder international
@@ -383,6 +388,7 @@ no rights to any nations, admin needs to give read-rights for the competitions o
 no starters yet !!!	ranking	de	Noch keine Starter !!!
 no startlist or result yet!	ranking	de	Bisher keine Startliste oder Ergebnis!
 not allowed	ranking	de	Nicht erlaubt
+not deleted	ranking	de	Nicht gelöscht
 not used at the moment	ranking	de	im Moment nicht benutzt
 nothing to apply!	ranking	de	Nichts anzuwenden!
 nothing to update	ranking	de	Nichts zu aktualisieren
@@ -393,6 +399,7 @@ number of problems	ranking	de	Anzahl Probleme
 observation time	ranking	de	Besichtigungszeit
 on how many routes is the first round	ranking	de	Auf wievielen Routen findet die erste Runde statt
 one qualification	ranking	de	eine Qualifikation
+only %1 of %2 entries displayed!	ranking	de	Nur %1 von %2 Einträgen angezeigt!
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
 open comp.	ranking	de	Offener Wettk.
 open scorecards:	ranking	de	Offene Scorekarten:
@@ -435,8 +442,9 @@ points	ranking	de	Punkte
 port	admin	de	Port
 postalcode	ranking	de	Postleitzahl
 prefix for the following page names (default none)	ranking	de	Prefix für die folgenden Seitennamen (Vorgabe keines)
-prequalified	ranking	de	Vorqualifiziert
+prequalified	ranking	de	vorqualifiziert
 prequalified competitiors	ranking	de	Vorqualifizierte Teilnehmer
+prequalify	ranking	de	Vorqualifizieren
 presets	ranking	de	Voreinstellungen
 presets for competitions	ranking	de	Voreinstellungen für die Wettkämpfe
 previous heat	ranking	de	Vorrunde
@@ -464,7 +472,9 @@ rankingsystem	ranking	de	Ranglistensystem
 read competition	ranking	de	Wettkampf lesen
 register	ranking	de	Registrieren
 register athlets for this competition	ranking	de	Athleten für diesen Wettkampf registrieren
+register for	ranking	de	Registrieren für
 register this athlete for the selected category	ranking	de	Diesen Athleten für die ausgewählte Kategorie registrieren
+registered	ranking	de	registriert
 registration	ranking	de	Registrierung
 registration deadline	ranking	de	Anmeldeschuss für die Registrierung
 registration for this competition is over!	ranking	de	Die Registrierung für diesen Wettkampf ist vorüber!
@@ -508,6 +518,7 @@ select multiple federations for a further action	ranking	de	Mehrere Verbände f�
 select order for qualification startlist or use default	ranking	de	Sortierung für Startliste der Qualifikation wählen oder Vorgabe verwenden
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
+selected category	ranking	de	Ausgwählte Kategorie
 selfregister	ranking	de	Selbstregistrierung
 send email to set password to athlete	ranking	de	Sendet Athleten EMail um Passwort zu setzen
 serid	ranking	de	SerId
@@ -569,6 +580,7 @@ til place	ranking	de	bis Platz
 time	ranking	de	Zeit
 time measured	ranking	de	Zeit gemessen
 time measurement	ranking	de	Zeitmessung
+to confirm	ranking	de	Zu bestätigen
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
 top: number of tries	ranking	de	Top: Anzahl Versuche
@@ -635,8 +647,10 @@ which view do you want to see, when you start the ranking app?	ranking	de	Welche
 wildcard	ranking	de	Wildcard
 without excluding non-members	ranking	de	ohne Nichtmitglieder auszuschließen
 wrong admin-account or -password !!!	ranking	de	Falsches Admin-Konto oder -Passwort !!!
+wrong gender	ranking	de	Falsches Geschlecht
 wrong mode="%1" for discipline "%2"!	ranking	de	Falscher Modus="%1" für Disziplin "%2"!
 wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	de	Falscher Modus="%1" für diese Runde (Qualifikation - Finale passen nicht zusammen)
+wrong nationality	ranking	de	Falsche Nationalität
 wrong or not configured vfs directory	ranking	de	Falsch oder NICHT konfiguriertes VFS Verzeichnis
 xml file uses unknown schema (format)!	ranking	de	XML Datei benutzt unbekanntes Schema (Format)!
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
@@ -650,8 +664,10 @@ you have not yet a password set!	ranking	de	Du hast noch kein Passwort gesetzt!
 you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	de	Du musst den Anweisungen innerhalb der nächsten %1 Stunden folgen, oder %2eine neue Mail anfordern%3.
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
 you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	de	Sie müssen das heruntergeladene UND unterschriebene Formular an das Büro senden!  Bitte überprüfen Sie, ob alle Felder ausgefüllt wurden (einige können für den öffentlichen Zugriff gesperrt werden). Fortfahren
+you need to select a competition first!	ranking	de	Sie müssen erst einen Wettkampf auswählen!
 you need to select a file first!	ranking	de	Sie müssen zuerst eine Datei auswählen!
 you need to select an other athlete first!	ranking	de	Sie müssen zuerst einen anderen Athleten auswählen!
+you need to select one or more athletes first!	ranking	de	Sie müssen zuerst einen oder mehrere Athleten auswählen!
 you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!
 your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.

@@ -19,23 +19,26 @@ class ranking_registration_ui extends ranking_bo
 	 * @var array
 	 */
 	var $public_functions = array(
-		'lists'     => true,
+		//'lists'     => true,
 		'result'    => true,
-		'startlist' => true,
+		//'startlist' => true,
 		'index'     => true,
-		'add'       => true,
+		//'add'       => true,
 	);
 
 	/**
-	 * query athlets for nextmatch in the athlets list
+	 * query registrations for nextmatch
 	 *
-	 * @param array $query
+	 * @param array &$query
 	 * @param array &$rows returned rows/cups
 	 * @param array &$readonlys eg. to disable buttons based on acl
 	 */
-	function get_rows($query,&$rows,&$readonlys)
+	function get_rows(&$query, &$rows, &$readonlys)
 	{
-		//echo "ranking_athlete_ui::get_rows() query="; _debug_array($query);
+		//error_log(__METHOD__."(".array2string($query).")");
+
+		/*$this->registration->read($where,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId' : 'nation,GrpId');
+		/*echo "ranking_athlete_ui::get_rows() query="; _debug_array($query);
 		foreach(array('vorname','nachname') as $name)
 		{
 			$filter = array('nation' => $query['col_filter']['nation']);
@@ -77,7 +80,60 @@ class ranking_registration_ui extends ranking_bo
 		$rows['comp'] = $query['comp'];
 		$rows['cat']  = $query['cat'];
 		$rows['license_year'] = $query['col_filter']['license_year'];
-		$rows['license_nation'] = $query['col_filter']['license_nation'];
+		$rows['license_nation'] = $query['col_filter']['license_nation'];*/
+
+		if ($query['comp']) $comp = $this->comp->read($query['comp']);
+
+		if (!$comp || ($comp['nation']?$comp['nation']:'NULL') != $query['calendar'])
+		{
+			$query['comp'] = '';
+		}
+		$query['col_filter']['WetId'] = $query['comp'];
+		$query['col_filter']['nation'] = $query['nation'];
+
+		egw_cache::setSession('ranking', 'registration', $state=array(
+			'calendar' => $query['calendar'],
+			'comp'     => $query['comp'],
+			'nation'   => $query['nation'],
+			'col_filter' => $query['col_filter'],
+		));
+		//error_log(__METHOD__."() Cache::setSession('ranking', 'registration', ".array2string($state).")");
+		$this->set_ui_state($query['calendar'], $query['comp'], $query['col_filter']['GrpId']);
+
+		$total = $this->registration->get_rows($query, $rows, $readonlys, true);
+
+		foreach($rows as &$row)
+		{
+			$row['id'] = $row['WetId'].':'.$row['GrpId'].':'.$row['PerId'];
+
+			// add one of "is(Deleted|Confirmed|Registered|Preregisted)" classes
+			foreach(ranking_registration::$states as $state)
+			{
+				if (!empty($row[ranking_registration::PREFIX.$state]))
+				{
+					if (!isset($row['state']))
+					{
+						$row['class'] .= ' is'.ucfirst($state);
+						$row['state'] = lang($state);
+					}
+					$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
+					$row['state_changed'] .= egw_time::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
+						($modifier ? lang('by').' '.common::grab_owner_name($modifier).' ' : '')."<br>\n";
+				}
+			}
+			//error_log(__METHOD__."() ".array2string($row));
+		}
+
+		$rows['sel_options'] = array(
+			'comp'     => $this->comp->names(array(
+				'nation' => $query['calendar'],
+				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
+				'gruppen IS NOT NULL',
+			),0,'datum ASC'),
+			'nation' => $this->federation->get_competition_federations($query['calendar'],
+				$query['allow_register_everyone'] ? null : $this->register_rights),
+			'GrpId' => $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
+		);
 
 		return $total;
 	}
@@ -177,42 +233,254 @@ class ranking_registration_ui extends ranking_bo
 	}
 
 	/**
+	 * Search for athletes to register
+	 */
+	public function ajax_search()
+	{
+		try {
+			$state = egw_cache::getSession('ranking', 'registration');
+
+			// show already registered first, then prequalified, then rest of category, then matches with error
+			$results = array(lang('Already registered') => array(), lang('Prequalified') => array(), '' => array());
+
+			// complile array of prequalified
+			$prequalified = $registered = array();
+			if ($state['comp'] && (int)$_REQUEST['GrpId'] > 0)
+			{
+				// add prequalified by competition result
+				$prequalified = $this->national_prequalified($state['comp'], $state['nation']);
+				foreach((array)$prequalified[(int)$_REQUEST['GrpId']] as $athlete)
+				{
+					error_log(__METHOD__."() prequalified athlete=".array2string($athlete));
+					$prequalified[$athlete['PerId']] = $this->athlete->link_title($athlete, true);
+				}
+
+				// add registered and explicit prequalified stored in registration
+				foreach($this->registration->read(array(
+						'WetId' => $state['comp'],
+						'GrpId' => $_REQUEST['GrpId'],
+						ranking_registration::PREFIX.ranking_registration::DELETED.' IS NULL',
+					)) as $athlete)
+				{
+					if ($athlete['reg_registered'])
+					{
+						$registered[$athlete['PerId']] = $this->athlete->link_title($athlete, true);
+						unset($prequalified[$athlete['PerId']]);	// just in case
+					}
+					elseif($athlete['reg_prequalified'])
+					{
+						$prequalified[$athlete['PerId']] = $this->athlete->link_title($athlete, true);
+					}
+				}
+				error_log(__METHOD__."(".array2string($_REQUEST).") registered=".count($registered).", prequalified=".count($prequalified));
+			}
+			$options = array(
+				'GrpId' => (int)$_REQUEST['GrpId'],
+				is_numeric($_REQUEST['nation']) ? 'fed_parent' : 'nation' => $_REQUEST['nation'],
+				'sex' => $_REQUEST['sex'],
+				'num_rows' => 100,
+			);
+			$links = egw_link::query('ranking', $_REQUEST['query'], $options);
+			foreach($links as $id => $label)
+			{
+				if (($sort = (string)$label['error']))
+				{
+					// keep error as grouping
+				}
+				elseif (isset($registered[$id]))
+				{
+					$sort = lang('Already registered');
+				}
+				elseif (isset($prequalified[$id]))
+				{
+					$sort = lang('Prequalified');
+				}
+				$results[(string)$sort][] = array(
+					'id' => $id,
+					'group' => $sort ? $sort : ((int)$_REQUEST['GrpId'] ? lang('Selected category') : null),
+					'label' => $label['label'],
+					'title' => $label['title'],
+				);
+			}
+			if (count($links) < $options['total'])
+			{
+				$results[] = array(array(
+					'id' => 'more',
+					'group' => lang('Only %1 of %2 entries displayed!', count($links), $options['total']),
+					'label' => lang('Narrow your search'),
+				));
+			}
+		}
+		catch(Exception $e)
+		{
+			$results = array(array(array(
+				'id' => 'err',
+				'group' => lang('An error happened'),
+				'label' => $e->getMessage(),
+			)));
+		}
+		 // switch regular JSON response handling off
+		egw_json_request::isJSONRequest(false);
+
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode(call_user_func_array('array_merge', $results));
+		common::egw_exit();
+	}
+
+	/**
+	 * Register athlete(s)
+	 *
+	 * @param array $params values for following keys:
+	 * - string    mode "register", "delete", "prequalify" or "confirmed"
+	 * - int|array PerId
+	 * @return array
+	 */
+	function ajax_register(array $params)
+	{
+		static $mode2ts = array(
+			'delete'     => ranking_registration::DELETED,
+			'register'   => ranking_registration::REGISTERED,
+			'prequalify' => ranking_registration::PREQUALIFIED,
+			'confirm'    => ranking_registration::CONFIRMED,
+		);
+		error_log(__METHOD__."(".array2string($params));
+
+		$registered = 0;
+
+		if (!isset($mode2ts[$params['mode']]))
+		{
+			$error = "Invalid mode '$params[mode]'!";
+		}
+		elseif (!($comp = $this->comp->read($params['WetId'])))
+		{
+			$error = lang('Competition NOT found !!!');
+		}
+		elseif (!($cat = $this->cats->read($params['GrpId'])))
+		{
+			$error = lang('Category NOT found !!!');
+		}
+		if (in_array($params['mode'], array('prequalify', 'confirm')) && !$this->acl_check_comp($comp))
+		{
+			$error = lang('Permission denied !!!');
+		}
+		else
+		{
+			$msg = '';
+			foreach((array)$params['PerId'] as $id)
+			{
+				if (!($athlete = $this->athlete->read($id, '', (int)$comp['datum'])))
+				{
+					$error = lang('Athlete NOT found !!!');
+					break;
+				}
+				if ($params['mode'] == 'register' && $athlete['license'] == 'n' &&
+					is_string($question = $this->allow_no_license_registration($comp)))
+				{
+					if (empty($params['confirmed']) || $params['confirmed'] != $athlete['PerId']) break;
+					unset($question);
+				}
+				// register the user
+				try {
+					if ($this->register($comp, $cat, $athlete, $mode2ts[$params['mode']], $msg))
+					{
+						$registered++;
+						if ($msg) break;	// stop, if over quota warning for admins/jury
+					}
+					else
+					{
+						$error = lang('Error: registration');
+						break;
+					}
+				}
+				catch(Exception $e) {
+					$error = $e->getMessage();
+					break;
+				}
+			}
+		}
+		$msg = ($registered == 1 && $athlete ? $this->athlete->link_title($athlete) : $registered).
+			' '.lang($mode2ts[$params['mode']]).'.'.($msg ? "\n$msg" : '');
+
+		if ($error)
+		{
+			if ($athlete)
+			{
+				$error = $this->athlete->link_title($athlete)."\n\n".$error.
+					($registered && $msg ? "\n\n".$msg : '');
+
+				// tell client-side how many successful registered and therefore to remove from selection
+				if ($registered) egw_json_response::get()->data(array(
+					'registered' => $registered,
+				));
+			}
+			egw_json_response::get()->call('egw.message', $error, 'error');
+		}
+		else
+		{
+			if ($registered) egw_json_response::get()->call('egw.refresh', $msg, 'ranking');
+
+			// tell client-side how many successful registered and therefore to remove from selection,
+			// plus evtl. question and concerned athlete
+			egw_json_response::get()->data(array(
+				'registered' => $registered,
+			)+(!isset($question) ? array() : array(
+				'question'  => $question,
+				'PerId'     => $athlete['PerId'],
+				'athlete'   => $this->athlete->link_title($athlete),
+			)));
+		}
+	}
+
+	/**
 	 * Show the registrations of a competition and allow to register for it
 	 *
-	 * @param array $content
-	 * @param string $msg
+	 * @param array $_content
 	 */
-	function index($content=null,$msg='')
+	function index($_content=null)
 	{
-		$tmpl = new etemplate('ranking.register.form');
+		$tmpl = new etemplate_new('ranking.registration');
 
-		if (!is_array($content))
+		if (!is_array($_content))
 		{
 			if ($_GET['calendar'] || $_GET['comp'])
 			{
-				$content = array(
+				$state = array(
 					'calendar' => $_GET['calendar'],
 					'comp'     => $_GET['comp'],
 					'nation'   => $_GET['nation'],
-					'cat'      => $_GET['cat'],
+					'col_filter' => array('GrpId' => $_GET['cat']),
 				);
-				if($content['comp']) $comp = $this->comp->read($content['comp']);
+				if($state['comp']) $comp = $this->comp->read($state['comp']);
 
-				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'],'',$this->license_year,$comp['nation'])))
+				if ($_GET['athlete'] && ($athlete = $this->athlete->read($_GET['athlete'],'',$this->license_year,$comp['nm']['nation'])))
 				{
-					$nation = $content['nation'] = $comp['nation'] && $comp['nation'] == $athlete['nation'] && $athlete['fed_parent'] ?
+					$nation = $state['nation'] = $comp['nation'] && $comp['nation'] == $athlete['nation'] && $athlete['fed_parent'] ?
 						$athlete['fed_parent'] : $athlete['nation'];
 				}
-				egw_cache::setSession('ranking', 'registration', $content);
 			}
 			else
 			{
-				$content = egw_cache::getSession('ranking', 'registration');
+				$state = (array)egw_cache::getSession('ranking', 'registration');
 			}
+			$state += array(
+				'get_rows'       =>	'ranking.ranking_registration_ui.get_rows',
+				'no_cat'         => true,
+				'no_filter'      => true,
+				'no_filter2'     => true,
+				'order'          =>	'nachname',// IO name of the column to sort after (optional for the sortheaders)
+				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
+				'row_id'         => 'id',
+				'actions'        => self::get_actions(),
+			);
 		}
-		if($content['comp'] && !isset($comp))
+		else
 		{
-			$comp = $this->comp->read($content['comp']);
+			$state = $_content['nm'];
+		}
+		error_log(__METHOD__."() state=".array2string($state));
+		if($state['comp'] && !isset($comp))
+		{
+			$comp = $this->comp->read($state['comp']);
 		}
 		if ($tmpl->sitemgr && $_GET['comp'] && $comp)	// no calendar and/or competition selection, if in sitemgr the comp is direct specified
 		{
@@ -227,9 +495,9 @@ class ranking_registration_ui extends ranking_bo
 		{
 			$calendar = $comp['nation'] ? $comp['nation'] : 'NULL';
 		}
-		elseif ($content['calendar'])
+		elseif ($state['calendar'])
 		{
-			$calendar = $content['calendar'];
+			$calendar = $state['calendar'];
 		}
 		else
 		{
@@ -237,7 +505,7 @@ class ranking_registration_ui extends ranking_bo
 		}
 		if (!isset($nation))
 		{
-			$nation = $content['nation'];
+			$nation = $state['nation'];
 		}
 		if (is_null($nation) && !$this->is_judge($comp))
 		{
@@ -258,11 +526,13 @@ class ranking_registration_ui extends ranking_bo
 				}
 			}
 		}
-		$allow_register_everyone = $this->is_admin || $this->is_judge($comp,true) ||		// limit non-judge to feds user has registration rights
+		// limit non-judge to feds user has registration rights
+		$allow_register_everyone = $state['allow_register_everyone'] = $this->is_admin || $this->is_judge($comp,true) ||
 			// national edit rights allow to register foreign athlets for national competition
 			in_array($comp['nation'],$this->register_rights) && in_array($comp['nation'],$this->edit_rights) ||
 			$comp && $this->acl_check_comp($comp);	// allow people with edit rights to a competition to register everyone
 		//error_log(__METHOD__."() allow_register_everyone=".array2string($allow_register_everyone).', is_judge='.array2string($this->is_judge($comp)));
+
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
@@ -271,6 +541,8 @@ class ranking_registration_ui extends ranking_bo
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 			'nation' => $this->federation->get_competition_federations($comp['nation'],$allow_register_everyone ? null : $this->register_rights),
+			'sex' => $this->genders,
+			'state' => ranking_registration::$state_filters,
 		);
 		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
 		{
@@ -279,17 +551,9 @@ class ranking_registration_ui extends ranking_bo
 		// check if a valid competition is selected
 		if ($comp)
 		{
-			//_debug_array($this->comp->data);
-			foreach((array) $this->comp->data['gruppen'] as $i => $rkey)
-			{
-				if (($cat = $this->cats->read(array('rkey'=>$rkey))))
-				{
-					$cat2col[$cat['GrpId']] = $tmpl->num2chrs($i);
-					$readonlys['download['.$cat['GrpId'].']'] = true;
-				}
-			}
 			$readonlys['download_all'] = true;
 
+			/*
 			if ($nation)	// read prequalified athlets
 			{
 				$prequalified = $this->national_prequalified($comp,$nation);
@@ -340,7 +604,7 @@ class ranking_registration_ui extends ranking_bo
 				}
 				elseif($content['delete'])
 				{
-					$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete['PerId'],2) ?
+					$msg = $this->register($comp['WetId'], $cat['GrpId'], $athlete, ranking_registration::DELETED) ?
 						lang('%1, %2 deleted for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
 						lang('Error: registration');
 				}
@@ -351,7 +615,8 @@ class ranking_registration_ui extends ranking_bo
 				else // register
 				{
 					try {
-						$msg = $this->register($comp['WetId'],$cat['GrpId'],$athlete,isset($prequalified[$cat['GrpId']][$athlete['PerId']])) ?
+						$msg = $this->register($comp['WetId'], $cat['GrpId'], $athlete, ranking_registration::REGISTERED,
+							isset($prequalified[$cat['GrpId']][$athlete['PerId']])) ?
 							lang('%1, %2 registered for category %3',strtoupper($athlete['nachname']), $athlete['vorname'], $cat['name']) :
 							lang('Error: registration');
 					}
@@ -366,7 +631,7 @@ class ranking_registration_ui extends ranking_bo
 					}
 				}
 			}
-			// generate a startlist
+			// generate a startlist is no longer used
 			elseif ($content['startlist'] && $this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 			{
 				$cats = false;
@@ -410,6 +675,8 @@ class ranking_registration_ui extends ranking_bo
 			$where = array(
 				'WetId'  => $comp['WetId'],
 				'GrpId'  => -1,
+				// only return non-deleted athletes
+				ranking_registration::PREFIX.ranking_registration::DELETED.' IS NULL',
 			);
 			if ($nation)	// filter by given nation/federation
 			{
@@ -430,7 +697,8 @@ class ranking_registration_ui extends ranking_bo
 					$where[] = 'nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
 				}
 			}
-			$starters =& $this->result->read($where,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
+			//$starters =& $this->result->read($where,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
+			$starters =& $this->registration->read($where,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId' : 'nation,GrpId');
 
 			// mail all participants
 			$mail_allowed = $starters && $allow_register_everyone;
@@ -533,7 +801,7 @@ class ranking_registration_ui extends ranking_bo
 					continue;	// prequalified athlets are in an own block
 				}
 				// set a new column for an unknown/new rkey/cat
-				if ($starter_nat_fed /*???*/ && !isset($cat2col[$starter['GrpId']]))
+				if ($starter_nat_fed && !isset($cat2col[$starter['GrpId']]))
 				{
 					$cat2col[$starter['GrpId']] = $tmpl->num2chrs(count($cat2col));
 				}
@@ -567,7 +835,7 @@ class ranking_registration_ui extends ranking_bo
 			foreach((array)$cat2col as $cat => $col)
 			{
 				$cats[$col] = $this->cats->read(array('GrpId' => $cat));
-			}
+			}*/
 		}
 		else
 		{
@@ -578,13 +846,15 @@ class ranking_registration_ui extends ranking_bo
 			$readonlys['register'] = true;
 		}
 		$cont = $preserv = array(
-			'calendar' => $calendar,
-			'comp'     => $comp ? $comp['WetId'] : null,
-			'nation'   => $nation,
-			'no_mail'  => !isset($content['no_mail']) || $content['no_mail'],
-			'mail'     => $content['mail'],
+			'nm'       => array_merge($state, array(
+				'calendar' => $calendar,
+				'comp'     => $comp ? $comp['WetId'] : null,
+				'nation'   => $nation,
+			)),
+			'no_mail'  => !isset($_content['no_mail']) || $_content['no_mail'],
+			'mail'     => $_content['mail'],
 		);
-		$cont += array(
+		/*$cont += array(
 			// dont show registration line if no comp, in sitemgr or no registration rights
 			'registration' => $comp && !$tmpl->sitemgr ? $this->registration_check($comp) : false,
 			'rows'     => &$rows,
@@ -610,15 +880,46 @@ class ranking_registration_ui extends ranking_bo
 		//if (!$comp || $tmpl->sitemgr || count($starters) <= 1 || $nation && $nation != $comp['nation'] || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
 		{
 			$cont['startlist'] =  false;
-		}
+		}*/
 		// save calendar, competition & nation between calls in the session
-		egw_cache::setSession('ranking', 'registration', $preserv);
-		$this->set_ui_state($preserv['calendar'],$preserv['comp'],$preserv['cat']);
 		//_debug_array($cont);
-		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Registration').
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('Registration').
 			(!$nation || $nation == 'NULL' ? '' : (': '.
 			(is_numeric($nation) && ($fed || ($fed = $this->federation->read($nation))) ? $fed['verband'] : $nation)));
-		return $tmpl->exec('ranking.ranking_registration_ui.index',$cont,$select_options,$readonlys,$preserv);
+
+		return $tmpl->exec('ranking.ranking_registration_ui.index', $cont, $select_options, $readonlys, $preserv);
+	}
+
+	/**
+	 * Return actions for start-/result-lists
+	 *
+	 * @return array
+	 */
+	static function get_actions()
+	{
+		$actions =array(
+			'mail' => array(
+				'caption' => 'Mail',
+				'icon' => 'mail/navbar',
+				//'onExecute' => 'javaScript:app.ranking.action_measure',
+                'disableClass' => 'th',
+				'allowOnMultiple' => true,
+			),
+			'confirm' => array(
+				'caption' => 'Confirm',
+				'icon' => 'check',
+				'onExecute' => 'javaScript:app.ranking.register_action',
+                'disableClass' => 'th',
+				'allowOnMultiple' => true,
+			),
+			'delete' => array(
+				'caption' => 'Delete',
+				'onExecute' => 'javaScript:app.ranking.register_action',
+                'disableClass' => 'noDelete',
+				'allowOnMultiple' => true,
+			),
+		);
+		return $actions;
 	}
 
 	/**
@@ -722,11 +1023,11 @@ class ranking_registration_ui extends ranking_bo
 	 * Show a start list (from the ranking NOT the result service!)
 	 *
 	 * @return string
-	 */
+	 *
 	function startlist()
 	{
 		return $this->lists(null,'','startlist');
-	}
+	}*/
 
 	/**
 	 * Show/download the startlist or result of a competition for one or all categories
@@ -800,20 +1101,22 @@ class ranking_registration_ui extends ranking_bo
 				$show = 'result';
 				$keys[] = 'platz > 0';
 				$order = 'GrpId,platz,nachname,vorname';
+				$starters =& $this->result->read($keys,'',true,$order);
 			}
-			// if we have a startlist (not just starters) sort by startnumber
+			/* if we have a startlist (not just starters) sort by startnumber
 			elseif ($show == 'startlist' || !$show && $this->result->has_startlist($keys))
 			{
 				$keys[] = 'platz=0 AND pkt > 64';
 				$show = 'startlist';
 				$order = 'GrpId,pkt,nachname,vorname';
-			}
+				$starters =& $this->result->read($keys,'',true,$order);
+			}*/
 			else	// sort by nation
 			{
 				$keys['platz'] = 0;
 				$order = 'GrpId,nation,pkt,nachname,vorname';
+				$starters =& $this->registration->read($keys,'',true,$order);
 			}
-			$starters =& $this->result->read($keys,'',true,$order);
 
 			if ($content['download'] && $starters && count($starters))
 			{
