@@ -45,7 +45,7 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 	width: 100%;
 }
 #ranking-registration-add .et2_taglist {
-	margin-bottom: 15px;
+	margin-top: 10px;
 }
 #ranking-registration tr.isDeleted * {
 	text-decoration: line-through;

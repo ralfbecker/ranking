@@ -1027,6 +1027,9 @@ class ranking_athlete extends so_sql
 	 */
 	function link_title($athlete, $return_array=false)
 	{
+		static $license_labels = null;
+		if (!isset($license_labels)) $license_labels = ranking_bo::getInstance()->license_labels;
+
 		if (!is_array($athlete) && $athlete)
 		{
 			$athlete = $this->read($athlete);
@@ -1040,10 +1043,11 @@ class ranking_athlete extends so_sql
 		return !$return_array ? $label : array(
 			'id' => $athlete['PerId'],
 			'label' => $label,
-			'title' => ($athlete['geb_year'] ? $geb.': ' : '').
+			'title' => ($athlete['geb_year'] ? (int)$athlete['geb_year'].': ' : '').
 				($athlete['ort'] ? $athlete['ort'] : '').
 				($athlete['ort'] && $athlete['verband'] ? ', ' : '').
-				($athlete['verband'] ? $athlete['verband'] : ''),
+				($athlete['verband'] ? $athlete['verband'] : '').
+				', '.lang('License').' '.lang($license_labels[$athlete['license']]),
 		);
 	}
 
@@ -1130,9 +1134,12 @@ class ranking_athlete extends so_sql
 				$criteria[$col] = $pattern;
 			}
 		}
-		// cat given to check registration requirements
-		if ((int)$options['GrpId'] > 0) $cat = $this->cats->read((int)$options['GrpId']);
-
+		// cat and comp given to check registration requirements
+		if ((int)$options['GrpId'] > 0 && (int)$options['WetId'] > 0)
+		{
+			$cat = $this->cats->read((int)$options['GrpId']);
+			$comp = ranking_bo::getInstance ()->comp->read((int)$options['WetId']);
+		}
 		$start = isset($options['num_rows']) ? array((int)$options['start'], (int)$options['num_rows']) : false;
 		if (($athletes = $this->search($criteria,false,'nachname,vorname,nation','','%',false,'OR',$start,$filter)))
 		{
@@ -1150,7 +1157,12 @@ class ranking_athlete extends so_sql
 
 				if ($cat)
 				{
-					$result[$athlete['PerId']]['error'] = ranking_bo::getInstance()->error_register($athlete, $cat);
+					$result[$athlete['PerId']]['error'] = ranking_bo::getInstance()->error_register($athlete, $cat, $comp);
+				}
+
+				if ($options['license_nation'])
+				{
+					$result[$athlete['PerId']]['license'] = $athlete['license'];
 				}
 			}
 		}

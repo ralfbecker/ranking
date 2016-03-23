@@ -527,8 +527,7 @@ class ranking_selfservice extends ranking_bo
 			$replace['$$'.$name.'$$'] = $value;
 		}
 
-		$mailer = new send();
-		$mailer->IsHTML($is_html);
+		$mailer = new egw_mailer();
 
 		$matches = null;
 		if (preg_match_all('/"?(.+)"?<(.+)>,?/',$email,$matches))
@@ -543,17 +542,26 @@ class ranking_selfservice extends ranking_bo
 		}
 		foreach($addresses as $n => $address)
 		{
-			$mailer->AddAddress($address,$names[$n]);
+			$mailer->AddAddress($address, $names[$n]);
 		}
-		$mailer->Subject = strtr($subject, $replace);
-		$mailer->Body = strtr($body, $replace);
+		$mailer->addHeader('Subject', strtr($subject, $replace));
 
-		$mailer->From = $from;
-		if (preg_match('/"?(.+)"?<(.+)>,?/',$from,$matches))
+		if ($is_html)
 		{
-			$mailer->FromName = $matches[1];
-			$mailer->From = $matches[2];
+			$mailer->setHtmlBody(strtr($body, $replace), null, false);
 		}
-		$mailer->Send();
+		else
+		{
+			$mailer->setBody(strtr($body, $replace));
+		}
+		if (preg_match('/^\s*([^<]+)\s*<([^>]+)>\s*$/', $from, $matches))
+		{
+			$mailer->setFrom($matches[2], $matches[1]);
+		}
+		else
+		{
+			$mailer->setFrom($from);
+		}
+		$mailer->send();
 	}
 }

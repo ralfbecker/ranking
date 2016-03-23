@@ -100,7 +100,6 @@ app.classes.ranking = AppJS.extend(
 							break;
 					}
 				}
-
 				break;
 		}
 	},
@@ -1339,6 +1338,30 @@ app.classes.ranking = AppJS.extend(
 		dialog(entry||{}, callback);
 	},
 
+	ACL_EDIT: 4,
+	ACL_REGISTER: 64,
+	ACL_JUDGE: 512,
+
+	_comp_rights: {},
+
+	/**
+	 * Set or query competition (edit-)rights
+	 *
+	 * @param {int} _comp
+	 * @param {int} _mask mask for check
+	 * @param {int} _rights to set, or undefined for check
+	 * @returns {boolean}
+	 */
+	competition_rights: function(_comp, _mask, _rights)
+	{
+		_comp = parseInt(_comp);
+		if (!_comp) return false;
+
+		if (typeof _rights != 'undefined') this._comp_rights[_comp] = _rights;
+
+		return !!(this._comp_rights[_comp] & _mask);
+	},
+
 	register_dialog: undefined,
 	register_nm: undefined,
 
@@ -1351,14 +1374,23 @@ app.classes.ranking = AppJS.extend(
 	 */
 	register: function(_ev, _widget, _node)
 	{
-		var nm = app.ranking.register_nm = _widget.getRoot().getWidgetById('nm');
+		app.ranking._register.call(app.ranking, _ev, _widget, _node);
+	},
+	_register: function(_ev, _widget, _node)
+	{
+		var nm = this.register_nm = _widget.getRoot().getWidgetById('nm');
 		var filters = nm.getValue();
-		var egw = nm.egw();
 
 		if (!filters.comp)
 		{
-			et2_dialog.alert(egw.lang('You need to select a competition first!', egw.lang('Registration')));
+			et2_dialog.alert(this.egw.lang('You need to select a competition first!', this.egw.lang('Registration')));
 			return;
+		}
+		if (!this.competition_rights(filters.comp, this.ACL_REGISTER))
+		{
+			et2_dialog.alert(this.egw.lang('Missing registration rights!', this.egw.lang('Registration')));
+			return;
+
 		}
 		var cats = _widget.getParent().getArrayMgr('sel_options').getEntry('GrpId') ||
 			_widget.getRoot().getArrayMgr('sel_options').getEntry('GrpId');
@@ -1368,7 +1400,7 @@ app.classes.ranking = AppJS.extend(
 			var athletes = value.PerId;
 			if (!athletes || !athletes.length)
 			{
-				et2_dialog.alert(egw.lang('You need to select one or more athletes first!', egw.lang('Registration')));
+				et2_dialog.alert(this.egw.lang('You need to select one or more athletes first!', this.egw.lang('Registration')));
 				return;
 			}
 			var filter = this.register_nm.getValue();
@@ -1378,55 +1410,29 @@ app.classes.ranking = AppJS.extend(
 				PerId: athletes,
 				mode: button_id,
 				confirmed: confirmed
-			}], jQuery.proxy(function(_data)
-			{
-				var taglist = this.register_dialog.template.widgetContainer.getWidgetById('PerId');
-				if (_data.registered)
-				{
-					for (var i=0; i < _data.registered; i++) athletes.shift();
-					taglist.set_value(athletes);
-				}
-				if (_data.question)
-				{
-					et2_dialog.show_dialog(jQuery.proxy(function(_button)
-					{
-						if (_button == et2_dialog.NO_BUTTON)
-						{
-							athletes.shift();
-							taglist.set_value(athletes);
-						}
-						else
-						{
-							// resend request with confirmation to server
-							callback.call(this, button_id, {
-								PerId: athletes,
-								GrpId: value.GrpId
-							}, _data.PerId);
-						}
-					}, this), _data.question, _data.athlete, null, et2_dialog.BUTTON_YES_NO,
-					et2_dialog.QUESTION_MESSAGE, undefined, this.egw);
-				}
-			}, this)).sendRequest();
+			}], this.register_callback, null, false, this).sendRequest();
 
 			// keep dialog open by returning false
 			return false;
-		}, app.ranking);
+		}, this);
 
-		var dialog = app.ranking.register_dialog = et2_createWidget("dialog", {
+		var buttons = [{text: this.egw.lang("Register"),id: "register", image: 'check', class: "ui-priority-primary", default: true}];
+		if (this.competition_rights(filters.comp, this.ACL_EDIT))
+		{
+			buttons.push({text: this.egw.lang("Prequalify"), id: 'prequalify', image: 'bullet'});
+		}
+		buttons.push({text: this.egw.lang("Close"), id: "close", click: function() {
+			// If you override, 'this' will be the dialog DOMNode.
+			// Things get more complicated.
+			// Do what you like, but don't forget this line:
+			$j(this).dialog("close");
+		}});
+
+		var dialog = this.register_dialog = et2_createWidget("dialog", {
 			// If you use a template, the second parameter will be the value of the template, as if it were submitted.
 			callback: callback,
-			buttons: [
-				// These ones will use the callback, just like normal
-				{text: egw.lang("Register"),id:"register", class: "ui-priority-primary", default: true},
-				{text: egw.lang("Prequalify"),id:"prequalify"},
-				{text: egw.lang("Close"), id:"close", click: function() {
-					// If you override, 'this' will be the dialog DOMNode.
-					// Things get more complicated.
-					// Do what you like, but don't forget this line:
-					$j(this).dialog("close");
-				}}
-			],
-			title: egw.lang('Register athlets for this competition'),
+			buttons: buttons,
+			title: this.egw.lang('Register athlets for this competition'),
 			template: "ranking.registration.add",
 			value: {
 				content: {
@@ -1442,6 +1448,59 @@ app.classes.ranking = AppJS.extend(
 			nation: filters.nation,
 			sex: filters.col_filter.sex
 		});
+	},
+
+	/**
+	 * Handle server response to registration request from either this.register or this.register_action
+	 *
+	 * @param {object} _data
+	 */
+	register_callback: function(_data)
+	{
+		var taglist = !this.register_dialog ? null : this.register_dialog.template.widgetContainer.getWidgetById('PerId');
+		var athletes = taglist ? taglist.getValue() : [];
+
+		if (_data.registered && taglist)
+		{
+			for (var i=0; i < _data.registered; i++) athletes.shift();
+			taglist.set_value(athletes);
+		}
+		if (_data.question)
+		{
+			et2_dialog.show_dialog(jQuery.proxy(function(_button)
+			{
+				if (_button == et2_dialog.NO_BUTTON)
+				{
+					if (taglist)
+					{
+						athletes.shift();
+						taglist.set_value(athletes);
+					}
+				}
+				else
+				{
+					// resend request with confirmation to server
+					this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+						WetId: _data.WetId,
+						GrpId: _data.GrpId,
+						PerId: _data.PerId,
+						mode: _data.mode,
+						confirmed: true
+					}], this.register_callback, null, false, this).sendRequest();
+				}
+			}, this), _data.question, _data.athlete, null, et2_dialog.BUTTON_YES_NO,
+			et2_dialog.QUESTION_MESSAGE, undefined, this.egw);
+		}
+	},
+
+	/**
+	 * Setter for register_allow_prequalify
+	 *
+	 * @param {boolan} _allow
+	 */
+	allow_prequalify: function(_allow)
+	{
+		this.register_allow_prequalify = _allow;
 	},
 
 	/**
@@ -1471,13 +1530,89 @@ app.classes.ranking = AppJS.extend(
 	 */
 	register_action: function(_action, _selected)
 	{
-		var params = _selected[0].id.split(':');
+		var data = this.egw.dataGetUIDdata(_selected[0].id);
 
 		this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
-			WetId: params[2],
-			GrpId: params[3],
-			PerId: params[4],
+			WetId: data.data.WetId,
+			GrpId: data.data.GrpId,
+			PerId: data.data.PerId,
 			mode: _action.id
-		}]).sendRequest();
+		}], this.register_callback, null, false, this).sendRequest();
+	},
+
+	/**
+	 * Registration mail
+	 *
+	 * @param {jQuery.Event} _ev
+	 * @param {et2_widget} _widget
+	 * @param {DOMNode} _node
+	 */
+	register_mail: function(_ev, _widget, _node)
+	{
+		app.ranking._register_mail.call(app.ranking, _ev, _widget, _node);
+	},
+	_register_mail: function(_ev, _widget, _node)
+	{
+		var nm = _widget.getRoot().getWidgetById('nm');
+		var filters = nm.getValue();
+
+		if (!this.competition_rights(filters.comp, this.ACL_EDIT|this.ACL_JUDGE))
+		{
+			et2_dialog.alert(this.egw.lang('Permission denied!', this.egw.lang('Mail')));
+			return;
+		}
+		if (!filters.comp)
+		{
+			et2_dialog.alert(this.egw.lang('You need to select a competition first!', this.egw.lang('Registration')));
+			return;
+		}
+		var cats = _widget.getParent().getArrayMgr('sel_options').getEntry('GrpId') ||
+			_widget.getRoot().getArrayMgr('sel_options').getEntry('GrpId');
+
+		var callback = jQuery.proxy(function(button_id, value, confirmed)
+		{
+			var athletes = value.PerId;
+			if (!athletes || !athletes.length)
+			{
+				et2_dialog.alert(this.egw.lang('You need to select one or more athletes first!', this.egw.lang('Registration')));
+				return;
+			}
+			var filter = this.register_nm.getValue();
+
+			// keep dialog open by returning false
+			return false;
+		}, this);
+
+		var buttons = [
+			{text: this.egw.lang("Selected participants"), id: "selected", image: 'check', class: "ui-priority-primary", default: true},
+			{text: this.egw.lang("All participants"), id: "all", image: 'check'},
+			{text: this.egw.lang("Participants without password"), id: "no_password", image: 'check'},
+			{text: this.egw.lang("Participants without password or recent reminder"), id: "no_password", image: 'check'},
+			{text: this.egw.lang("Close"), id: "close", click: function() {
+				// If you override, 'this' will be the dialog DOMNode.
+				// Things get more complicated.
+				// Do what you like, but don't forget this line:
+				$j(this).dialog("close");
+			}}
+		];
+		var selection = nm.getSelection();
+		// if no selection, remove that options
+		if (!selection.all && !selection.ids.length) {
+			buttons.shift();
+		}
+		var dialog = et2_createWidget("dialog", {
+			// If you use a template, the second parameter will be the value of the template, as if it were submitted.
+			callback: jQuery.proxy(function(_button, _values)
+			{
+				this.egw.json('ranking.ranking_registration_ui.ajax_mail',
+					[_values, _button, selection, filters], null, null, false, this).sendRequest();
+			}, this),
+			buttons: buttons,
+			title: this.egw.lang('Mail participants'),
+			template: "ranking.registration.mail",
+			value: {
+				content: this.et2.getArrayMgr('content').getEntry('mail')
+			}
+		});
 	}
 });

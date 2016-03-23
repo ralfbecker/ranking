@@ -49,6 +49,7 @@ administrated by: parent federation	ranking	de	Verwaltet von: übergeordnetem Ve
 age	ranking	de	Alter
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
+all participants	ranking	de	Alle Teilnehmer
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 allow athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
 allowed without extra confirmation	ranking	de	Erlaubt ohne extra Bestätigung
@@ -338,13 +339,12 @@ key of the cup	ranking	de	Schlüssel des Cups
 key of the person	ranking	de	Schlüssel des Athleten
 last competition	ranking	de	Letzter Wettkampf
 lead	ranking	de	Schwierigkeit
+license confirmed or applied for	ranking	de	Lizenz bestätigt oder beantragt
 license number	ranking	de	Lizenznummer
 license should be removed when federation was changed!	ranking	de	Lizenz sollte entfernt werden, wenn der Verband geändert wurde!
 line	ranking	de	Zeile
 login suspended, too many unsuccessful tries!	ranking	de	Login ausgesetzt, zu viele erfolglosen Versuche!
-mail all participants	ranking	de	Alle Teilnehmer anmailen
 mail participants	ranking	de	Teilnehmer anmailen
-mail participants without password	ranking	de	Teilnehmer ohne Passwort anmailen
 mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	de	Mail an %1 Teilnehmer gesendet, %2 hatten keine EMail Adresse, %3 sind fehlgeschlagen.
 male	ranking	de	männlich
 max	ranking	de	Max
@@ -357,6 +357,7 @@ merge selected federations with the one opened for editing	ranking	de	Vereinige 
 merges this entry into the selected one.	ranking	de	Vereinige diesen Eintrag mit und IN dem ausgewählten
 minimum disciplines	ranking	de	Minimalzahl Diziplinen
 minus	ranking	de	minus
+missing registration rights!	ranking	de	Fehlende Registrierungsrechte!
 more	ranking	de	Mehr
 name(s)	ranking	de	Namen
 narrow your search	ranking	de	Schränken Sie Ihre Suche weiter ein
@@ -414,6 +415,7 @@ pagename(,target) for athlete profiles	ranking	de	Seitenname(,Ziel) für die Ath
 pairing speed final	ranking	de	Paarungen Speed Finale
 parent federation	ranking	de	übergeordneter Verband
 participant deleted	ranking	de	Teilnehmer gelöscht
+participants without password	ranking	de	Teilnehmer ohne Passwort
 participants without password or recent reminder	ranking	de	Teilnehmer ohne Passwort oder aktuelle Erinnerung
 participants, at least on that place in the used ranking or cup, don't need to climb qualification	ranking	de	Teilnehmer die mindestens auf diesem Platz im verwendeten Ranking oder Cup platziert sind, müssen die Qualifikation nicht klettern
 password email	ranking	de	Passwort EMail
@@ -519,6 +521,7 @@ select order for qualification startlist or use default	ranking	de	Sortierung f�
 select participant for time measurment	ranking	de	Teilnehmer zur Zeitmessung auswählen
 select type of list to show	ranking	de	Typ der angezeigten Liste auswählen
 selected category	ranking	de	Ausgwählte Kategorie
+selected participants	ranking	de	Ausgewählte Teilnehmer
 selfregister	ranking	de	Selbstregistrierung
 send email to set password to athlete	ranking	de	Sendet Athleten EMail um Passwort zu setzen
 serid	ranking	de	SerId

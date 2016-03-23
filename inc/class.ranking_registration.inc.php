@@ -153,7 +153,7 @@ class ranking_registration extends so_sql
 					$extra_cols = '';
 				}
 			}
-			if ($this->GrpId < 0) unset($keys['GrpId']);	// return all cats
+			if ($this->GrpId < 0) unset($filter['GrpId']);	// return all cats
 
 			$ret = $athletes = $this->search(array(),$cols,$order ? $order : self::TABLE.'.GrpId,reg_id,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
 
@@ -298,7 +298,8 @@ class ranking_registration extends so_sql
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
 	{
-		if (empty($filter['WetId']))
+		// we require either a competition or reg_id's
+		if (empty($filter['WetId']) && empty($filter['reg_id']))
 		{
 			$this->total = 0;
 			return array();
@@ -333,17 +334,10 @@ class ranking_registration extends so_sql
 		{
 			$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
 
-			if (!$extra_cols)
-			{
-				$extra_cols = "nachname,vorname,sex,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
-					".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,".
-					ranking_athlete::ATHLETE_TABLE.".PerId AS PerId";
-			}
-			else
-			{
-				$only_keys = $extra_cols;
-				$extra_cols = '';
-			}
+			$extra_cols = array_merge($extra_cols ? explode(',', $extra_cols) : array(),
+				explode(',', "nachname,vorname,sex,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
+				".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,".
+				ranking_athlete::ATHLETE_TABLE.".PerId AS PerId"));
 
 			foreach($filter as $col => $val)
 			{

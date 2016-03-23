@@ -112,7 +112,7 @@ class ranking_competition extends so_sql
 	 * @param string $nation
 	 * @return string ranking_competition::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY) constants
 	 */
-	public function nation2display_athlete($nation, $intern=false)
+	public static function nation2display_athlete($nation, $intern=false)
 	{
 		switch($nation)
 		{
@@ -393,6 +393,10 @@ class ranking_competition extends so_sql
 				if ($keys === $this->data['rkey']) return $this->data;
 				$keys = array('rkey' => $keys);
 			}
+		}
+		if (!$keys)
+		{
+			return false;
 		}
 		return parent::read($keys,$extra_cols,$join);
 	}

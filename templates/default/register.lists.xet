@@ -9,13 +9,9 @@
 				<column/>
 			</columns>
 			<rows>
-				<row disabled="!@msg">
-					<description span="all" class="redItalic" no_lang="1" align="center" id="msg"/>
-					<description/>
-				</row>
 				<row class="th">
 					<description options=",,,comp" value="Competition"/>
-					<hbox options="0,0">
+					<hbox>
 						<menulist>
 							<menupopup id="calendar" onchange="1" no_lang="1"/>
 						</menulist>
@@ -26,16 +22,16 @@
 				</row>
 				<row class="th" disabled="!@comp">
 					<description value="Category" options=",,,cat"/>
-					<hbox options="0,0">
+					<hbox>
 						<menulist>
 							<menupopup id="cat" no_lang="1" onchange="1" options="All"/>
 						</menulist>
-						<button label="Download" id="download" class="leftPad5"/>
+						<button label="Download" id="download" onclick="widget.getInstanceManager().postSubmit()"/>
 					</hbox>
 				</row>
 				<row class="row" disabled="@no_upload">
 					<description value="Import file"/>
-					<hbox options="0,0">
+					<hbox>
 						<file id="file"/>
 						<button id="upload" label="Upload" class="leftPad5"/>
 					</hbox>

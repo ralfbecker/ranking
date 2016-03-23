@@ -50,6 +50,7 @@ administrated by: parent federation	ranking	en	Administrated by: parent federati
 age	ranking	en	Age
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
+all participants	ranking	en	All participants
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 allow athletes to register themself for this competition	ranking	en	Allow athletes to register themself for this competition
 allowed without extra confirmation	ranking	en	Allowed without extra confirmation
@@ -345,13 +346,12 @@ landesverband	ranking	en	Landesverband
 lane a	ranking	en	Lane A
 last competition	ranking	en	Last competition
 lead	ranking	en	lead
+license confirmed or applied for	ranking	en	License confirmed or applied for
 license number	ranking	en	License number
 license should be removed when federation was changed!	ranking	en	License should be removed when federation was changed!
 line	ranking	en	Line
 login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too many unsuccessful tries!
-mail all participants	ranking	en	Mail all participants
 mail participants	ranking	en	Mail participants
-mail participants without password	ranking	en	Mail participants without password
 mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	en	Mail to %1 participants send, %2 had no email-address, %3 failed.
 male	ranking	en	male
 max	ranking	en	Max
@@ -364,6 +364,7 @@ merge selected federations with the one opened for editing	ranking	en	Merge sele
 merges this entry into the selected one.	ranking	en	Merges this entry into the selected one.
 minimum disciplines	ranking	en	Minimum disciplines
 minus	ranking	en	minus
+missing registration rights!	ranking	en	Missing registration rights!
 more	ranking	en	More
 name(s)	ranking	en	name(s)
 narrow your search	ranking	en	Narrow your search
@@ -421,6 +422,7 @@ pagename(,target) for athlete profiles	ranking	en	Pagename(,target) for athlete 
 pairing speed final	ranking	en	Pairing speed final
 parent federation	ranking	en	Parent federation
 participant deleted	ranking	en	Participant deleted
+participants without password	ranking	en	Participants without password
 participants without password or recent reminder	ranking	en	Participants without password or recent reminder
 participants, at least on that place in the used ranking or cup, don't need to climb qualification	ranking	en	Participants, at least on that place in the used ranking or cup, don't need to climb qualification
 password email	ranking	en	Password EMail
@@ -528,6 +530,7 @@ select order for qualification startlist or use default	ranking	en	Select order 
 select participant for time measurment	ranking	en	select participant for time measurment
 select type of list to show	ranking	en	Select type of list to show
 selected category	ranking	en	Selected category
+selected participants	ranking	en	Selected participants
 selfregister	ranking	en	Selfregister
 send email to set password to athlete	ranking	en	Send EMail to set password to athlete
 serid	ranking	en	SerId

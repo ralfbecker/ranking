@@ -381,7 +381,7 @@ class ranking_bo extends ranking_so
 			$check = false;
 			$which = 'national sub-federation rights allow NOT to apply for an international license!';
 		}
-		elseif(is_null($license) && $this->is_selfservice() == $athlete['PerId'])
+		elseif(is_null($license) && $athlete['PerId'] && $this->is_selfservice() == $athlete['PerId'])
 		{
 			$check = true;
 			$which = 'athlete selfservice';
@@ -413,7 +413,7 @@ class ranking_bo extends ranking_so
 			}
 			$fed_rights = (int)$fed_grants[$athlete['fed_id']] | (int)$fed_grants[$athlete['acl_fed_id']];
 
-			$check = $fed_rights & $required;
+			$check = !!($fed_rights & $required);
 			$which = "fed_id=$athlete[fed_id], acl_fed_id=$athlete[acl_fed_id] --> rights=$fed_rights";
 		}
 		// do we have to check for a license, jury rights do NOT allow to apply for licenses
@@ -518,6 +518,8 @@ class ranking_bo extends ranking_so
 		{
 			return false;
 		}
+		if ($this->is_admin) return true;
+
 		list($y,$m,$d) = explode('-',$comp['datum']);
 		$distance = (mktime(0,0,0,$m,$d,$y)-time()) / (24*60*60);
 		//echo "<p>".__METHOD__."($comp[rkey]: $comp[name] ($comp[datum])) distance=$distance</p>\n";
@@ -607,7 +609,7 @@ class ranking_bo extends ranking_so
 		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
 			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
 				in_array($comp['nation'],$this->register_rights) ||	// user has national registration rights OR
-				((!$nation || $this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
+				((!$nation && $this->register_rights || $this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
 						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
@@ -803,10 +805,15 @@ class ranking_bo extends ranking_so
 			throw new egw_exception_wrong_parameter(lang('Competition NOT found !!!'));
 		}
 		$error = null;
-		if (!$this->registration_check($comp, $athlete['nation'], $cat) &&
+		if ($comp && !($this->is_admin || $this->is_judge($comp)) &&
+			($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum'])))
+		{
+			$error = lang('Registration for this competition is over!');
+		}
+		elseif (!$this->registration_check($comp, $athlete['nation'], $cat) &&
 			!$this->registration_check($comp, $athlete['fed_parent'], $cat))
 		{
-			$error = lang('Permission denied!');
+			$error = lang('Missing registration rights!');
 		}
 		elseif ($register && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
 		{
@@ -856,7 +863,14 @@ class ranking_bo extends ranking_so
 			'PerId' => $athlete['PerId'],
 			'reg_deleted IS NULL',
 		);
-		$data = $this->registration->read($keys);
+		list($data) = $this->registration->search(array(), false, '', '', '*', false, 'AND', false, $keys);
+		unset($keys[0]);	// reg_deleted IS NULL
+
+		// prequalify and confirm needs competition rights
+		if (in_array($mode, array('prequalify', 'confirm')) && !$this->acl_check_comp($comp))
+		{
+			throw new egw_exception_wrong_userinput(lang('Permission denied !!!'));
+		}
 
 		// check if all conditions for registration are met
 		if (($error = $this->error_register($athlete, $cat, $comp, $mode == ranking_registration::REGISTERED)))
@@ -867,10 +881,21 @@ class ranking_bo extends ranking_so
 		switch($mode)
 		{
 			case ranking_registration::DELETED:
-				if ($data && $data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED] &&
+				// if athlete is registed and was explicit prequalified
+				if ($data && $data[ranking_registration::PREFIX.ranking_registration::REGISTERED] &&
+					$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED] &&
 					$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED.ranking_registration::ACCOUNT_POSTFIX])
 				{
-					unset($data['reg_id']);	// remove id to keep explicit prequalified entry
+					// store current registration as just prequalified, but no longer registered or confirmed
+					$this->registration->save(array_merge($data, array(
+						ranking_registration::PREFIX.ranking_registration::REGISTERED => null,
+						ranking_registration::PREFIX.ranking_registration::REGISTERED.ranking_registration::ACCOUNT_POSTFIX => null,
+						ranking_registration::PREFIX.ranking_registration::CONFIRMED => null,
+						ranking_registration::PREFIX.ranking_registration::CONFIRMED.ranking_registration::ACCOUNT_POSTFIX => null,
+					)));
+					// remove id to create new deleted entry
+					unset($data['reg_id']);
+					$this->registration->init($data);
 				}
 				// fall through
 			case ranking_registration::CONFIRMED:
