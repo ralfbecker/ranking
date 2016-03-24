@@ -179,7 +179,8 @@ class ranking_selfservice extends ranking_bo
 				foreach(array_merge(array_diff((array)$_POST['GrpId'],$registered),array_diff($registered,(array)$_POST['GrpId'])) as $GrpId)
 				{
 					try {
-						if ($this->register($comp,(int)$GrpId,$athlete,$mode=in_array($GrpId,$registered)?2:0))
+						if ($this->register($comp, (int)$GrpId, $athlete, $mode=in_array($GrpId,$registered) ?
+							ranking_registration::DELETED : ranking_registration::REGISTERED))
 						{
 							echo "<p class='error'>".lang(!$mode?'%1, %2 registered for category %3':'%1, %2 deleted for category %3',
 								strtoupper($athlete['nachname']), $athlete['vorname'], $cats[$GrpId]);
