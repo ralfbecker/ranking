@@ -674,6 +674,7 @@ class ranking_athlete extends so_sql
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
 	 * @param string|array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
 	 * @param string $join numeric year, adds a license-column or sql to do a join, see so_sql::read()
+	 * @param string $nation =null nation for license-data
 	 * @return array/boolean data if row could be retrived else False
 	 */
 	function read($keys,$extra_cols='',$join='',$nation=null)
@@ -1096,7 +1097,8 @@ class ranking_athlete extends so_sql
 		foreach($options as $name => $value)
 		{
 			if (empty($value)) continue;
-			if (isset($this->db_cols[$name]))
+			if (isset($this->db_cols[$name]) ||
+				in_array($name, array('license_nation', 'license_year')))
 			{
 				$filter[$name] = $value;
 			}

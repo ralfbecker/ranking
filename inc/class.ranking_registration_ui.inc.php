@@ -265,7 +265,7 @@ class ranking_registration_ui extends ranking_bo
 		$msg = '';
 		foreach((array)$params['PerId'] as $id)
 		{
-			if (!($athlete = $this->athlete->read($id, '', (int)$comp['datum'])))
+			if (!($athlete = $this->athlete->read($id, '', (int)$comp['datum'], $comp['nation'])))
 			{
 				$error = lang('Athlete NOT found !!!');
 				break;
