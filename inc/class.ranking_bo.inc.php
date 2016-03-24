@@ -1057,10 +1057,10 @@ class ranking_bo extends ranking_so
 		$filter = array(
 			'WetId'  => $comp['WetId'],
 			'GrpId'  => $add_cat ? array($add_cat, $cat['GrpId']) : $cat['GrpId'],
+			// only use confirmed registrations or all
+			'state'  => (int)$comp['selfregister'] == 1 ? ranking_registration::CONFIRMED : ranking_registration::REGISTERED,
 		);
-		if (!is_array($old_startlist)) $filter[] = 'platz = 0';		// savegard against an already existing result
-
-		$starters = $this->result->read($filter,'',true,'nation,reg_nr');
+		$starters = $this->registration->read($filter,'',true,'nation,reg_id');
 
 		if (!is_array($starters) || !count($starters)) return false;	// no starters, or eg. already a result
 

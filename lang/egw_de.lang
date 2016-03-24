@@ -175,7 +175,7 @@ delete this category	ranking	de	Diese Kategorie löschen
 delete this competition	ranking	de	Diesen Wettkampf löschen
 delete this cup	ranking	de	Diesen Cup löschen
 delete this federation	ranking	de	Diesen Verband löschen
-delete this heat including all results	ranking	de	Löscht diese Runde einschließlich der Ergebnisse
+delete this heat including all results	ranking	de	Diese Runde einschließlich aller Ergebnisse löschen
 delete this participant (can not be undone)	ranking	de	Diesen Teilnehmer löschen (kann NICHT rückgänig gemacht werden)
 deleted	ranking	de	gelöscht
 deletes this cup	ranking	de	Löscht diesen Cup

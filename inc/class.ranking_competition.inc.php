@@ -52,8 +52,7 @@ class ranking_competition extends so_sql
 
 	var $selfregister_types = array(
 		0 => 'Not allowed',
-// disable it, as it is not yet implemented
-//		1 => 'Federation needs to confirm',
+		1 => 'Federation needs to confirm',
 		2 => 'Allowed without extra confirmation',
 	);
 	var $open_comp_types = array(
