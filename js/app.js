@@ -200,48 +200,6 @@ app.classes.ranking = AppJS.extend(
 		}, msg, this.egw.lang('Delete'));
 	},
 
-	/**
-	 * Update result of current row
-	 *
-	 * Not yet used as grid stuff is not commited and eT2 serverside does not validate partial submits correct.
-	 *
-	 * @param {jQuery.Event} _event
-	 * @param {et2_button|et2_checkbox} _widget
-	 */
-	update_result_row: function(_event, _widget)
-	{
-		if (!_widget) _widget = _event;	// click seems to only set button as 1. param
-		var parent = _widget.getParent();
-		// boulder "checked" checkbox
-		if (_widget.instanceOf(et2_checkbox) && parent._children.length == 2)
-		{
-			// readonly apply button --> use ajax call to uncheck
-			if (parent._children[1].options.readonly)
-			{
-				var content = _widget.getRoot().getArrayMgr('content').data;
-				this.egw.json('ranking.ranking_result_ui.ajax_uncheck_result', [{
-					WetId: content.WetId,
-					GrpId: content.GrpId,
-					route: content.route_order,
-					PerId: _widget.id.replace(/^set\[([0-9]+)\]\[checked\]$/, '$1')
-				}]).sendRequest();
-			}
-			else	// to check --> just click on apply
-			{
-				parent._children[1].click();
-			}
-			return;
-		}
-		while(parent && !parent.instanceOf(et2_grid))
-		{
-			parent = parent.getParent();
-		}
-		if (parent)
-		{
-			_widget.getInstanceManager().submit(null, false, false, parent.getRow(_widget));
-		}
-	},
-
 	/***************************************************************************
 	 * Resultist lead
 	 **************************************************************************/
@@ -295,7 +253,7 @@ app.classes.ranking = AppJS.extend(
 	check_top: function(node, top)
 	{
 		var top_value = top ? top.get_value() : undefined;
-		var bonus = this.et2.getWidgetById(top.id.replace(/top/g,'zone'));
+		var bonus = top.getRoot().getWidgetById(top.id.replace(/top/g,'zone'));
 		var bonus_value = bonus ? bonus.get_value() : undefined;
 
 		if (bonus && (!bonus_value || bonus_value == '0') && parseInt(top_value) > 0) bonus.set_value(bonus_value=top_value);
@@ -316,7 +274,7 @@ app.classes.ranking = AppJS.extend(
 	check_bonus: function(node, bonus)
 	{
 		var bonus_value = bonus ? bonus.get_value() : undefined;
-		var top = this.et2.getWidgetById(bonus.id.replace(/zone/g,'top'));
+		var top = bonus.getRoot().getWidgetById(bonus.id.replace(/zone/g,'top'));
 		var top_value = top ? top.get_value() : undefined;
 
 		if (top && parseInt(top_value) > 0 && parseInt(bonus_value) > parseInt(top_value))
@@ -342,7 +300,7 @@ app.classes.ranking = AppJS.extend(
 	 */
 	check_tops: function(node, tops)
 	{
-		var bonus = this.et2.getWidgetById(tops.id.replace(/tops/g, 'zones'));
+		var bonus = tops.getRoot().getWidgetById(tops.id.replace(/tops/g, 'zones'));
 
 		if (bonus && !bonus.get_value() && parseInt(tops.get_value()) > 0) bonus.set_value(tops.get_value());
 
@@ -352,7 +310,7 @@ app.classes.ranking = AppJS.extend(
 			bonus.set_value(tops.get_value());
 		}
 
-		var tries = this.et2.getWidgetById(tops.id.replace(/tops/g, 'top_tries'));
+		var tries = tops.getRoot().getWidgetById(tops.id.replace(/tops/g, 'top_tries'));
 
 		if (tries && !tries.get_value() && parseInt(tops.get_value()) > 0) tries.set_value(tops.get_value());
 
@@ -371,7 +329,7 @@ app.classes.ranking = AppJS.extend(
 	 */
 	check_top_tries: function(node, tries)
 	{
-		var tops = this.et2.getWidgetById(tries.id.replace(/top_tries/g, 'tops'));
+		var tops = tries.getRoot().getWidgetById(tries.id.replace(/top_tries/g, 'tops'));
 
 		if (tops && parseInt(tops.get_value()) > 0 && parseInt(tops.get_value()) > parseInt(tries.get_value()))
 		{
@@ -389,7 +347,7 @@ app.classes.ranking = AppJS.extend(
 	 */
 	check_boni: function(node, bonus)
 	{
-		var tops = this.et2.getWidgetById(bonus.id.replace(/zones/g,'tops'));
+		var tops = bonus.getRoot().getWidgetById(bonus.id.replace(/zones/g,'tops'));
 
 		if (tops && parseInt(tops.get_value()) > 0 && parseInt(bonus.get_value()) < parseInt(tops.get_value()))
 		{
@@ -401,7 +359,7 @@ app.classes.ranking = AppJS.extend(
 			tops.set_value(bonus.get_value());
 		}
 
-		var tries = this.et2.getWidgetById(bonus.id.replace(/zones/g,'zone_tries'));
+		var tries = bonus.getRoot().getWidgetById(bonus.id.replace(/zones/g,'zone_tries'));
 
 		if (tries && !tries.get_value() && parseInt(bonus.get_value()) > 0) tries.set_value(bonus.get_value());
 
@@ -420,7 +378,7 @@ app.classes.ranking = AppJS.extend(
 	 */
 	check_bonus_tries: function(node, tries)
 	{
-		var bonus = this.et2.getWidgetById(tries.id.replace(/zone_tries/g,'zones'));
+		var bonus = tries.getRoot().getWidgetById(tries.id.replace(/zone_tries/g,'zones'));
 
 		if (bonus && parseInt(bonus.get_value()) > 0 && parseInt(bonus.get_value()) > parseInt(tries.get_value()))
 		{
@@ -1297,45 +1255,93 @@ app.classes.ranking = AppJS.extend(
 				if (_nm[row]['PerId'] == PerId) return jQuery.extend(_nm[row],{nm:_nm});
 			}
 		};
-		if (nm) {
-			var entry = nm_locate (nm.rows,PerId);
-		}
-		var dialog = function(_content, _callback,_egw_or_appname)
+		if (nm)
 		{
-		   return et2_createWidget("dialog", {
-					id: 'update-result',
-					callback: function(_button_id, _value) {
-						if (typeof callback == "function")
-						{
-							callback.call(this, _button_id, _value.value);
-						}
-					},
-					title: egw.lang('Update Result'),
-					buttons: [
-						{"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', "default":true},
-						{"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true},
-						{"button_id": 'next',"text": 'Next', id: 'next', image: 'continue', "default":true},
-						{"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true}
-					],
-					value: {
-						content: _content
-					},
-					template: template,
-					class: "update_result"
-				},_egw_or_appname);
-		};
-		var callback = function(_button_id){
-			switch (_button_id)
+			var entry = nm_locate (nm.rows,PerId);
+			// remove not existing boulders, to not show autorepeated rows
+			for(var i=parseInt(nm.num_problems)+1; i <= 10; ++i)
 			{
-				case 'close':
-					return false;
-
-				default:
-					self.update_result_row(_button_id);
+				delete entry['boulder'+i];
 			}
-		};
-		// Call the edit dialog
-		dialog(entry||{}, callback);
+		}
+		var is_jury = true;	// todo
+		var buttons = [];
+		if (entry.checked)
+		{
+			if (is_jury) buttons.push({"button_id": 'uncheck',"text": 'Uncheck', id: 'uncheck', image: 'bullet', "default":true});
+		}
+		else
+		{
+			buttons.push({"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', "default":true});
+			if (is_jury) buttons.push({"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true});
+		}
+		buttons.push({"button_id": 'next',"text": 'Next', id: 'next', image: 'continue', "default":true});
+		buttons.push({"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true, click: function() {
+			// If you override, 'this' will be the dialog DOMNode.
+			// Things get more complicated.
+			// Do what you like, but don't forget this line:
+			$j(this).dialog("close");
+		}});
+
+		et2_createWidget("dialog",
+		{
+			id: 'update-result',
+			callback: function(_button, _values)
+			{
+				switch(_button)
+				{
+					case 'update':
+					case 'checked':
+					case 'uncheck':
+						self.update_result_row.call(self, _button, entry, _values);
+						break;
+					default:
+						alert('Not yet ;-)');
+				}
+			},
+			title: this.egw.lang('Update Result'),
+			buttons: buttons,
+			value: {
+				content: entry || {},
+				sel_options: {},
+				readonlys: entry.checked ? { __ALL__: true} : {}
+			},
+			template: template,
+			class: "update_result"
+		});
+	},
+
+	/**
+	 * Update result of current row
+	 *
+	 * Not yet used as grid stuff is not commited and eT2 serverside does not validate partial submits correct.
+	 *
+	 * @param {String} _button "update" or "checked"
+	 * @param {object} _entry changed entry, incl. old values
+	 * @param {object} _values new values
+	 */
+	update_result_row: function(_button, _entry, _values)
+	{
+		if (_button != 'update')
+		{
+			_values.checked = _button == "checked";
+		}
+		this.egw.json('ranking.ranking_result_ui.ajax_update', [{
+			WetId: _entry.WetId,
+			GrpId: _entry.GrpId,
+			route_order: _entry.route_order
+		}, _entry.PerId, _values, _button != 'update'], function(_data)
+		{
+			this.message(_data.msg);
+			delete _data.msg;
+
+			var nm = this.et2.getWidgetById('nm[rows]');
+			_data.sel_options = this.et2.getArrayMgr('sel_options').data;
+			if (nm) nm.set_value(_data);
+
+			// update content for next click
+			this.et2.getArrayMgr('content').data.nm.rows = _data.content;
+		}, null, false, this).sendRequest();
 	},
 
 	ACL_EDIT: 4,

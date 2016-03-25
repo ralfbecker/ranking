@@ -78,7 +78,7 @@ class ranking_route extends so_sql
 	 * Reimplemented to return a default general result, if it does not exist.
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
-	 * @param boolean $split_two_quali_all=false should the diverse TWO_QUALI_ALL* types be read as they are or all as TWO_QUALI_ALL
+	 * @param boolean $split_two_quali_all =false should the diverse TWO_QUALI_ALL* types be read as they are or all as TWO_QUALI_ALL
 	 * @return array/boolean data if row could be retrived else False
 	 */
 	function read($keys,$split_two_quali_all=false)
