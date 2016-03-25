@@ -95,13 +95,13 @@
 						<menulist>
 							<menupopup id="nm[calendar]" onchange="1"/>
 						</menulist>
-						<menulist class="noPrint">
-							<menupopup id="nm[comp]" onchange="1" options="Select competition"/>
+						<menulist>
+							<menupopup id="nm[comp]" onchange="1" options="Select competition" class="noPrint"/>
 						</menulist>
 					</hbox>
 				</row>
 				<row disabled="!@nm[comp]">
-					<nextmatch id="nm" options="ranking.accounting.index.rows" span="all"/>
+					<nextmatch id="nm" template="ranking.accounting.index.rows" span="all"/>
 				</row>
 				<row disabled="!@nm[comp]">
 					<groupbox align="center" class="fees">
@@ -136,15 +136,12 @@
 									<textbox type="float" align="center" id="entry_20plus"/>
 									<textbox type="float" align="center" id="fed_20plus"/>
 								</row>
-								<row class="noPrint" disabled="@no_save">
-									<description/>
-									<button label="Save" id="save"/>
-									<description/>
-									<description/>
-									<description/>
-								</row>
 							</rows>
 						</grid>
+						<hbox>
+							<checkbox label="use registration data, instead of participants" id="fees[use_registration]" span="3"/>
+							<button align="right" label="Save" id="save"/>
+						</hbox>
 					</groupbox>
 				</row>
 				<row>

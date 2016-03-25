@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2009-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2009-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -56,22 +56,37 @@ class ranking_accounting extends ranking_result_bo
 		{
 			unset($query['col_filter']['GrpId']);
 		}
-		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
-//		$total = $this->route_result->get_rows($query,$rows,$readonlys);
 		// we use ranking_athlete::get_rows, to also get the license data (joined with the results table)
 		$join = ' JOIN '.ranking_route_result::RESULT_TABLE.' ON '.ranking_athlete::ATHLETE_TABLE.'.PerId='.ranking_route_result::RESULT_TABLE. '.PerId AND '.
 			$this->db->expression(ranking_route_result::RESULT_TABLE,$query['col_filter']);
+
 		// col_filter is only for license-date, other filters are already used in the above join
 		$query['col_filter'] = array(
 			'license_nation' => $query['calendar'],
 			'license_year'   => (int)$comp['datum'],
 		);
 
-		$total = $this->athlete->get_rows($query,$rows,$readonlys,$join,false,false,'start_number,start_order,'.ranking_route_result::RESULT_TABLE.'.GrpId AS GrpId');
+		if ($query['fees']['use_registration'])
+		{
+			$query['col_filter']['WetId'] = $query['comp'];
+			$query['col_filter']['state'] = (int)$comp['selfregister'] == 1 ? ranking_registration::CONFIRMED : ranking_registration::REGISTERED;
+			if ($query_in['col_filter']['GrpId']) $query['col_filter']['GrpId'] = $query_in['col_filter']['GrpId'];
+
+			$query['order'] = strtr($query['order'], array(
+				ranking_route_result::RESULT_TABLE.'.GrpId' => ranking_registration::TABLE.'.GrpId',
+				'start_order' => 'nachname,vorname',
+			));
+			$total = $this->registration->get_rows($query, $rows, $readonlys, true, false, false,
+				ranking_registration::TABLE.'.GrpId AS GrpId,'.ranking_registration::TABLE.'.reg_id AS start_number');
+		}
+		else
+		{
+			$total = $this->athlete->get_rows($query,$rows,$readonlys,$join,false,false,'start_number,start_order,'.ranking_route_result::RESULT_TABLE.'.GrpId AS GrpId');
+		}
 		//echo $total; _debug_array($rows); //die('Stop');
 
 		$rows['total'] = $rows['fed'] = 0.0;
-		$feds = array();
+		$fed_ids = array();
 		foreach($rows as $k => &$row)
 		{
 			if (!is_int($k)) continue;
@@ -79,7 +94,7 @@ class ranking_accounting extends ranking_result_bo
 			// shorten DAV or SAC Sektion
 			$row['verband'] = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /','',$row['verband']);
 
-			$row['age'] = $comp['datum'] - $row['geb_date'];
+			if ($row['geb_date']) $row['age'] = $comp['datum'] - $row['geb_date'];
 			self::calc_fees($row,$row['total'],$row['fed'],$query['fees']);
 
 			if (count($rows)-2 == $total)	// dont show sum of a partial display
@@ -88,13 +103,13 @@ class ranking_accounting extends ranking_result_bo
 				$rows['fed'] += $row['fed'];
 			}
 			// for GER/DAV use fed_parent instead acl_fed_id
-			if ($row['fed_parent'] && !in_array($row['fed_parent'],$feds))
+			if ($row['fed_parent'] && !in_array($row['fed_parent'], $fed_ids))
 			{
-				$feds[] = $row['fed_parent'];
+				$fed_ids[] = $row['fed_parent'];
 			}
-			if ($row['acl_fed_id'] && !in_array($row['acl_fed_id'],$feds))
+			if ($row['acl_fed_id'] && !in_array($row['acl_fed_id'], $fed_ids))
 			{
-				$feds[] = $row['acl_fed_id'];
+				$fed_ids[] = $row['acl_fed_id'];
 			}
 			$row['total'] = etemplate::number_format($row['total'],2);
 			$row['fed'] = etemplate::number_format($row['fed'],2);
@@ -109,11 +124,13 @@ class ranking_accounting extends ranking_result_bo
 			);
 		}
 		$rows['license_year'] = (int)$comp['datum'];
-		$feds = $this->federation->query_list('verband','fed_id',array('fed_id' => $feds));
-		foreach($feds as $fed_id => &$name)
+		$feds = $this->federation->query_list('verband','fed_id',array('fed_id' => $fed_ids));
+		foreach($feds as &$name)
 		{
-			$name = preg_replace('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club|SAC-Regionalzentrum|Landes(fach)?verband( Bergsport und Klettern)?) /','',$name);
-			$name = preg_replace('/ (des DAV e.V.|für Sport- und Wettkampfklettern e.V.|Sektionenverband)$/','',$name);
+			$name = preg_replace(array(
+				'/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club|SAC-Regionalzentrum|Landes(fach)?verband( Bergsport und Klettern)?) /',
+				'/ (des DAV e.V.|für Sport- und Wettkampfklettern e.V.|Sektionenverband)$/',
+			), '', $name);
 		}
 		$rows['sel_options']['acl_fed_id'] = $rows['sel_options']['fed_parent'] = $feds;
 
@@ -131,6 +148,10 @@ class ranking_accounting extends ranking_result_bo
 				$rows['no_fed_parent'] = $rows['no_acl_fed_id'] = true;
 				break;
 		}
+		if ($query['fees']['use_registration'])
+		{
+			$rows['no_start_order'] = true;
+		}
 		//echo $total; _debug_array($rows); die('Stop');
 
 		return $total;
@@ -139,10 +160,9 @@ class ranking_accounting extends ranking_result_bo
 	/**
 	 * Show a result / startlist
 	 *
-	 * @param array $content=null
-	 * @param string $msg=''
+	 * @param array $content =null
 	 */
-	function index($content=null,$msg='',$pstambl='')
+	function index($content=null)
 	{
 		$tmpl = new etemplate('ranking.accounting.index');
 
@@ -183,10 +203,9 @@ class ranking_accounting extends ranking_result_bo
 				);
 			}
 		}
-		if (is_array($content['fees']) && $content['fees']['save'])
+		if ($content['save'])
 		{
-			unset($content['fees']['save']);
-			self::save_fees($content['fees'],$content['nm']['calendar']);
+			self::save_fees($content['fees'], $content['nm']['calendar']);
 		}
 		elseif ($content['nm']['calendar'])
 		{

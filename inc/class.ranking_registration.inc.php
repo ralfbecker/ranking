@@ -335,10 +335,17 @@ class ranking_registration extends so_sql
 			$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
 
 			$extra_cols = array_merge($extra_cols ? explode(',', $extra_cols) : array(),
-				explode(',', "nachname,vorname,sex,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
+				explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
 				".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,".
 				ranking_athlete::ATHLETE_TABLE.".PerId AS PerId"));
 
+			if (isset($filter['license_nation']))
+			{
+				$join .= ranking_bo::getInstance()->athlete->license_join($filter['license_nation'], $filter['license_year']);
+				$extra_cols[] = 'lic_status AS license';
+				$extra_cols[] = 'l.GrpId AS license_cat';
+				unset($filter['license_nation'], $filter['license_year']);
+			}
 			foreach($filter as $col => $val)
 			{
 				if (is_int($col)) continue;

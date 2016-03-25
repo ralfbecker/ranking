@@ -625,6 +625,7 @@ use "yes" or "no, prefession"	ranking	de	benützen Sie "yes" oder "no, Beruf"
 use access control to deny display on the website	ranking	de	benützen Sie die Zugangskontrolle um die Anzeige auf der Webseite zu verhindern
 use better result to break ties in the ranking	ranking	de	Benutze ein besseres Ergebnis um Gleichstände in der Rangliste aufzubrechen
 use default order	ranking	de	Vorgabe für Sortierung verwenden
+use registration data, instead of participants	ranking	de	benutze Registrierungsdaten, statt Teilnehmer
 use regular registration to apply for a license first.	ranking	de	Benutzen Sie zuerst die reguläre Registration um eine Lizenz zu beantragen.
 use the acl to hide the birthdate, you can't remove it !!!	ranking	de	Benutzen sie die Zugangscontrolle um das Geburtsdatum nicht anzuzeigen, Sie dürfen es nicht löschen !!!
 used to preset a link in rankings and competition-calendar	ranking	de	wird benutzt um einen Verweis in der Rangliste oder dem Wettkampfkalender anzuzeigen

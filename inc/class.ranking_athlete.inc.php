@@ -461,7 +461,7 @@ class ranking_athlete extends so_sql
 	 * @param int $license_year
 	 * @return string
 	 */
-	protected function license_join($license_nation, $license_year)
+	public function license_join($license_nation, $license_year)
 	{
 		return ' LEFT JOIN '.self::LICENSE_TABLE.' l ON l.PerId='.self::ATHLETE_TABLE.'.PerId AND '.
 				' l.nation='.$this->db->quote(!$license_nation || $license_nation == 'NULL' ? '' : $license_nation).' AND '.

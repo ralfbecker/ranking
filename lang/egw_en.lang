@@ -634,6 +634,7 @@ use "yes" or "no, prefession"	ranking	en	use "yes" or "no, prefession"
 use access control to deny display on the website	ranking	en	use access control to deny display on the website
 use better result to break ties in the ranking	ranking	en	Use better result to break ties in the ranking
 use default order	ranking	en	Use default order
+use registration data, instead of participants	ranking	en	use registration data, instead of participants
 use regular registration to apply for a license first.	ranking	en	Use regular registration to apply for a license first.
 use the acl to hide the birthdate, you can't remove it !!!	ranking	en	Use the ACL to hide the birthdate, you can't remove it !!!
 used to preset a link in rankings and competition-calendar	ranking	en	used to preset a link in rankings and competition-calendar
