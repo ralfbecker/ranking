@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id: class.ranking_athlete.inc.php 1245 2015-06-05 18:10:34Z ralfbecker $
  */
 
@@ -111,12 +111,9 @@ class ranking_athlete extends so_sql
 			self::FEDERATIONS_TABLE.'.nation AS nation',
 			self::FEDERATIONS_TABLE.'.verband AS verband',
 			self::FEDERATIONS_TABLE.'.fed_id AS fed_id',
-//			self::FEDERATIONS_TABLE.'.fed_parent AS fed_parent',
 			'CASE WHEN acl.fed_id IS NULL THEN '.self::FEDERATIONS_TABLE.'.fed_parent ELSE acl.fed_id END AS fed_parent',
 		);
 		self::$a2f_cols = array(
-//			self::ATHLETE2FED_TABLE.'.a2f_start AS a2f_start',
-//			self::ATHLETE2FED_TABLE.'.a2f_end AS a2f_end',
 			'a2f.a2f_start AS a2f_start',
 			'a2f.a2f_end AS a2f_end',
 			'acl.fed_id AS acl_fed_id',
@@ -126,7 +123,7 @@ class ranking_athlete extends so_sql
 	/**
 	 * constructor of the athlete class
 	 */
-	function __construct($source_charset='',$db=null)
+	function __construct($source_charset='',$db=null, $vfs_pdf_dir=null, $vfs_pdf_url=null)
 	{
 		if (is_null($db))
 		{
@@ -145,7 +142,7 @@ class ranking_athlete extends so_sql
 			$egw_name = /*'ranking_'.*/$class;
 			if (!isset($GLOBALS['egw']->$egw_name))
 			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir);
+				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir,$vfs_pdf_url);
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
@@ -297,15 +294,14 @@ class ranking_athlete extends so_sql
 	/**
 	 * Federation join with variable table names and columns
 	 *
-	 * @param string $per_table='Personen' table for athletes
-	 * @param int $year=null year or sql expression for year to use
-	 * @param string $f='Federations' table for federations
+	 * @param string $per_table ='Personen' table for athletes
+	 * @param int $year =null year or sql expression for year to use
+	 * @param string $f ='Federations' table for federations
 	 * @return string sql with join
 	 */
 	function fed_join($per_table='Personen',$year=null,$f='Federations')
 	{
-		$join = self::FEDERATIONS_JOIN;
-		$join = strtr($join, array(
+		$join = strtr(self::FEDERATIONS_JOIN, array(
 			'Personen' => $per_table,
 			'a2f.a2f_end=9999' => is_null($year) ? 'a2f.a2f_end=9999' : "a2f.a2f_end >= $year AND $year >= a2f.a2f_start",
 			'Federations' => $f ? $f : 'Federations',
@@ -319,20 +315,20 @@ class ranking_athlete extends so_sql
 	 *
 	 * '*' and '?' are replaced with sql-wildcards '%' and '_'
 	 *
-	 * @param array/string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
-	 * @param boolean $only_keys=true True returns only keys, False returns all cols
-	 * @param string $order_by='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
-	 * @param string/array $extra_cols='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $wildcard='' appended befor and after each criteria
-	 * @param boolean $empty=false False=empty criteria are ignored in query, True=empty have to be empty in row
-	 * @param string $op='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
-	 * @param mixed $start=false if != false, return only maxmatch rows begining with start, or array($start,$num)
-	 * @param array $filter=null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
-	 * @param mixed $join=true sql to do a join (as so_sql::search), default true = add join for latest result
+	 * @param array|string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
+	 * @param boolean $only_keys =true True returns only keys, False returns all cols
+	 * @param string $order_by ='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
+	 * @param string|array $_extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $wildcard ='' appended befor and after each criteria
+	 * @param boolean $empty =false False=empty criteria are ignored in query, True=empty have to be empty in row
+	 * @param string $op ='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
+	 * @param mixed $start =false if != false, return only maxmatch rows begining with start, or array($start,$num)
+	 * @param array $filter =null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
+	 * @param mixed $join =true sql to do a join (as so_sql::search), default true = add join for latest result
 	 *	if numeric a special join is added to only return athlets competed in the given category (GrpId).
 	 * @return array of matching rows (the row is an array of the cols) or False
 	 */
-	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
+	function &search($criteria,$only_keys=True,$order_by='',$_extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
 	{
 		//echo "<p>ranking_athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
@@ -343,12 +339,10 @@ class ranking_athlete extends so_sql
 			$cat = $join;
 			$join = '';
 		}
-		if ($extra_cols) $extra_cols = explode(',',$extra_cols);
-
 		// join in nation & federation
 		$join .= self::FEDERATIONS_JOIN;
-		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
-		$extra_cols = array_merge($extra_cols,self::$fed_cols,self::$a2f_cols);
+		if (!is_array($_extra_cols)) $_extra_cols = $_extra_cols ? explode(',', $_extra_cols) : array();
+		$extra_cols = array_merge($_extra_cols, self::$fed_cols, self::$a2f_cols);
 
 		// by default only show real athlets (nation and sex set)
 		if (!isset($filter['sex']) && !(isset($criteria['sex']) && $op == 'AND'))
@@ -400,6 +394,7 @@ class ranking_athlete extends so_sql
 				$join .= " JOIN $this->result_table ON $this->result_table.GrpId=$cat AND $this->table_name.PerId=$this->result_table.PerId";
 
 				// if cat uses an age-group only show athlets in that age-group
+				$from_year = $to_year = null;
 				if (($cat = $this->cats->read($cat)) && $this->cats->age_group($cat,date('Y-m-d'),$from_year,$to_year))
 				{
 					if ($from_year) $join .= " AND ".(int)$from_year." <= YEAR(geb_date)";
@@ -451,7 +446,7 @@ class ranking_athlete extends so_sql
 			}
 			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// LEFT JOIN'ed Results.PerId is NULL if there's no result
 		}
-		return so_sql::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
 
 	/**
@@ -490,7 +485,7 @@ class ranking_athlete extends so_sql
 	{
 		//echo "<p>ranking_athlete::distinct_list('$column',".print_r($keys,true),")</p>\n"; $start = microtime(true);
 
-		static $cache;
+		static $cache = array();
 		$cache_key = $column.'-'.serialize($keys);
 
 		if (isset($cache[$cache_key]))
@@ -555,7 +550,7 @@ class ranking_athlete extends so_sql
 	/**
 	 * checks if an athlete already has results or a result-service result recorded
 	 *
-	 * @param int/array $keys PerId or array with keys of the athlete to check, default null = use keys in data
+	 * @param int|array $keys PerId or array with keys of the athlete to check, default null = use keys in data
 	 * @return boolean
 	 */
 	function has_results($keys=null)
@@ -643,7 +638,7 @@ class ranking_athlete extends so_sql
 	 *
 	 * reimplemented to delete the picture too, works only if one athlete (specified by rkey or internal data) is deleted!
 	 *
-	 * @param array $keys=null see so_sql
+	 * @param array $keys =null see so_sql
 	 * @return int deleted rows or 0 on error
 	 */
 	function delete($keys=null)
@@ -672,12 +667,12 @@ class ranking_athlete extends so_sql
 	 * reads row matched by key and puts all cols in the data array
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
-	 * @param string|array $extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string|array $_extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
 	 * @param string $join numeric year, adds a license-column or sql to do a join, see so_sql::read()
 	 * @param string $nation =null nation for license-data
 	 * @return array/boolean data if row could be retrived else False
 	 */
-	function read($keys,$extra_cols='',$join='',$nation=null)
+	function read($keys,$_extra_cols='',$join='',$nation=null)
 	{
 		//echo "<p>".__METHOD__."(".array2string($keys).",$extra_cols,$join,$nation)</p>\n";
 		if (is_numeric($year = $join))
@@ -686,8 +681,8 @@ class ranking_athlete extends so_sql
 		}
 		// join in the federation information
 		$join .= self::FEDERATIONS_JOIN;
-		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
-		$extra_cols = array_merge($extra_cols,self::$fed_cols,self::$a2f_cols);
+		if (!is_array($_extra_cols)) $_extra_cols = $_extra_cols ? explode(',', $_extra_cols) : array();
+		$extra_cols = array_merge($_extra_cols, self::$fed_cols, self::$a2f_cols);
 
 		if (is_numeric($year))
 		{
@@ -708,7 +703,7 @@ class ranking_athlete extends so_sql
 	 *
 	 * @param int $year
 	 * @param string $nation nation for a national license, or null for an international one
-	 * @param int $PerId=null else use $this->data[PerId]
+	 * @param int $PerId =null else use $this->data[PerId]
 	 * @return string|boolean false on wrong parameter or string with license status ('n' for no license)
 	 */
 	function get_license($year,$nation,$PerId=null)
@@ -734,9 +729,9 @@ class ranking_athlete extends so_sql
 	 *
 	 * @param int $year
 	 * @param string $status 'n' = none, 'a' = applied, 'c' = confirmed, 's' = suspended
-	 * @param int $PerId=null else use $this->data[PerId]
-	 * @param string $nation=null nation for a national license, or null for an international one
-	 * @param int $GrpId=null category to apply for
+	 * @param int $PerId =null else use $this->data[PerId]
+	 * @param string $nation =null nation for a national license, or null for an international one
+	 * @param int $GrpId =null category to apply for
 	 * @return boolean|int false on wrong parameter or athlete not matching cat age-group, or number of affected rows
 	 */
 	function set_license($year,$status='c',$PerId=null,$nation=null,$GrpId=null)
@@ -897,8 +892,8 @@ class ranking_athlete extends so_sql
 	/**
 	 * Return a list of federation names indexed by fed_id, evtl. of a given nation only
 	 *
-	 * @param string $nation=null
-	 * @param boolean $only_national=false if true return only national federations (fed_parent=NULL)
+	 * @param string $nation =null
+	 * @param boolean $only_national =false if true return only national federations (fed_parent=NULL)
 	 * @return array
 	 */
 	function federations($nation=null,$only_national=false,$filter = array())
@@ -920,8 +915,8 @@ class ranking_athlete extends so_sql
 	 *
 	 * @param int $fed_id id of the federation
 	 * @param int &$a2f_start start year of (new) federation, only used if the federation changes, always returned
-	 * @param int $PerId=null default current athlete
-	 * @param int $fed_parent=null explicit fed_id of parent (0 deletes)
+	 * @param int $PerId =null default current athlete
+	 * @param int $fed_parent =null explicit fed_id of parent (0 deletes)
 	 * @return true if federation is set, null was already set, false on error
 	 */
 	function set_federation($fed_id,&$a2f_start,$PerId=null,$fed_parent=null)
@@ -993,12 +988,13 @@ class ranking_athlete extends so_sql
 	 * Reimplemented to save nation&federation ...
 	 *
 	 * @param array $keys if given $keys are copied to data before saveing => allows a save as
-	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
 	 * @param boolean &$set_fed =null on return true: fed changed, null: no change necessary, false: error setting fed
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function save($keys=null,$extra_where=null,&$set_fed=null)
 	{
+		unset($extra_where);	// not used, but required by function signature
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
 
 		// get fed_id from national federation, if fed_id is not given but nation
@@ -1110,32 +1106,31 @@ class ranking_athlete extends so_sql
 		if ($pattern)
 		{
 			// allow to prefix pattern with gender and nation, eg: "GER: Becker", "M: Becker" or "M: GER: Becker"
-			if (strpos($pattern,':') !== false)
+			$parts = null;
+			preg_match_all('/(([^ :]+):?) */', $pattern, $parts);
+			foreach($parts[2] as $n => $part)
 			{
-				$parts = preg_split('/: ?/',$pattern);
-				$pattern = array_pop($parts);
-				foreach($parts as $part)
+				if (substr($parts[1][$n], -1) != ':')
 				{
-					if ($part[0] == '!')	// NOT id/license number
-					{
-						$filter[] = self::ATHLETE_TABLE.'.PerId != '.(int)substr($part,1);
-					}
-					elseif (strlen($part) == 3)	// nation
-					{
-						$filter['nation'] = strtoupper($part);
-					}
-					else
-					{
-						$filter['sex'] = strtolower($part) == 'm' ? 'male' : 'female';
-					}
-					//error_log(__METHOD__."() pattern=$pattern, part=$part, filter=".array2string($filter));
+					$criteria = implode(' ', array_slice($parts[1], $n));
+					break;
 				}
-			}
-			foreach(array('vorname','nachname','ort','verband') as $col)
-			{
-				$criteria[$col] = $pattern;
+				if ($part[0] == '!')	// NOT id/license number
+				{
+					$filter[] = self::ATHLETE_TABLE.'.PerId != '.(int)substr($part,1);
+				}
+				elseif (strlen($part) == 3)	// nation
+				{
+					$filter['nation'] = strtoupper($part);
+				}
+				else
+				{
+					$filter['sex'] = strtolower($part) == 'm' ? 'male' : 'female';
+				}
+				//error_log(__METHOD__."() pattern=$pattern, part=$part, filter=".array2string($filter));
 			}
 		}
+		$this->columns_to_search = array('vorname', 'nachname', 'ort', 'verband', self::ATHLETE_TABLE.'.PerId');
 		// cat and comp given to check registration requirements
 		if ((int)$options['GrpId'] > 0 && (int)$options['WetId'] > 0)
 		{
@@ -1143,7 +1138,7 @@ class ranking_athlete extends so_sql
 			$comp = ranking_bo::getInstance ()->comp->read((int)$options['WetId']);
 		}
 		$start = isset($options['num_rows']) ? array((int)$options['start'], (int)$options['num_rows']) : false;
-		if (($athletes = $this->search($criteria,false,'nachname,vorname,nation','','%',false,'OR',$start,$filter)))
+		if (($athletes = $this->search($criteria,false,'nachname,vorname,nation','','%',false,'AND',$start,$filter)))
 		{
 			foreach($athletes as $athlete)
 			{
