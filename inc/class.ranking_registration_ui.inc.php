@@ -57,9 +57,23 @@ class ranking_registration_ui extends ranking_bo
 
 		$total = $this->registration->get_rows($query, $rows, $readonlys, true);
 
+		$matches = null;
 		foreach($rows as &$row)
 		{
 			$row['id'] = 'reg::'.$row['reg_id'];
+
+			// show only Sektion for national competitions and remove it for international
+			if ($query['calendar'] && $query['calendar'] != 'NULL')
+			{
+				$row['verband'] = preg_replace_callback('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /',function($matches)
+				{
+					return $matches[1] == 'Deutscher Alpenverein' ? 'DAV ' : 'SAC ';
+				},$row['verband']);
+			}
+			elseif (preg_match('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /', $row['verband'], $matches))
+			{
+				$row['verband'] = $matches[1];
+			}
 
 			// add one of "is(Deleted|Confirmed|Registered|Preregisted)" classes
 			foreach(ranking_registration::$states as $state)
@@ -77,7 +91,8 @@ class ranking_registration_ui extends ranking_bo
 				}
 			}
 			if ($comp_rights || $this->registration_check($comp, $row['nation']) ||
-				$comp['nation'] && $this->registration_check($comp, $row['fed_parent']))
+				$comp['nation'] && ($this->registration_check($comp, $row['fed_parent']) ||
+					$this->registration_check($comp, $row['acl_fed_id'])))
 			{
 				if ($row['state'] == ranking_registration::PREQUALIFIED)
 				{
@@ -101,7 +116,9 @@ class ranking_registration_ui extends ranking_bo
 		// let client-side know which rights current user has for selected competition
 		egw_json_response::get()->call('app.ranking.competition_rights', (int)$comp['WetId'], 0,
 			($comp_rights ? EGW_ACL_EDIT : 0) |
-			($comp_rights || $this->is_judge($comp, true) || $this->registration_check($comp, $query['nation']) ? EGW_ACL_REGISTER : 0) |
+			($comp_rights || $this->is_judge($comp, true) || $this->registration_check($comp, $query['nation']) ||
+			// if no nation/federation filter is given, check if current user has registration rights for anything
+			!$query['nation'] && ($this->register_rights || $this->federation->get_grants(null,EGW_ACL_REGISTER)) ? EGW_ACL_REGISTER : 0) |
 			($this->is_judge($comp, true) ? 512 : 0));
 
 		$rows['sel_options'] = array(
@@ -864,7 +881,7 @@ class ranking_registration_ui extends ranking_bo
 	 *
 	 * @param array $keys WetId, GrpId, route_order
 	 * @param string $file uploaded file
-	 * @param string/int error message or number of lines imported
+	 * @param string|int error message or number of lines imported
 	 */
 	function upload($keys,$file)
 	{

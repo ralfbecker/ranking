@@ -450,7 +450,7 @@ class ranking_bo extends ranking_so
 	 */
 	function acl_check_comp(array $comp)
 	{
-		return $this->acl_check($comp['nation'],EGW_ACL_EDIT) ||
+		return $this->is_admin || $this->acl_check($comp['nation'],EGW_ACL_EDIT) ||
 			$comp['fed_id'] && $this->acl_check($comp['fed_id'],EGW_ACL_EDIT);
 	}
 
@@ -596,8 +596,8 @@ class ranking_bo extends ranking_so
 	/**
 	 * Check if user is allowed to register athlets for $comp and $nation
 	 *
-	 * @param int/array $comp WetId or complete competition array
-	 * @param string $nation ='' nation of the athlets to register, if empty do a general check independent of nation
+	 * @param int|array $comp WetId or complete competition array
+	 * @param int|string $nation ='' nation of the athlets to register or (acl_)fed_id, if empty do a general check independent of nation
 	 * @param int GrpId=null if set check only for a given cat
 	 */
 	function registration_check($comp,$nation='',$cat=null)
@@ -609,7 +609,7 @@ class ranking_bo extends ranking_so
 		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
 			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
 				in_array($comp['nation'],$this->register_rights) ||	// user has national registration rights OR
-				((!$nation && $this->register_rights || $this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation),EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
+				(($this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation,'acl_fed_id'=>$nation),EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
 						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
@@ -1022,8 +1022,8 @@ class ranking_bo extends ranking_so
 	 * - startnumber in the next 8 bits (($pkt >> 6) & 255))
 	 * - route in the other bits ($pkt >> 14)
 	 *
-	 * @param int/array $comp WetId or complete comp array
-	 * @param int/array $cat GrpId or complete cat array
+	 * @param int|array $comp WetId or complete comp array
+	 * @param int|array $cat GrpId or complete cat array
 	 * @param int $num_routes =1 number of routes, default 1
 	 * @param int $max_compl =999 maximum number of climbers from the complimentary list
 	 * @param int $order =0 int with bitfield of, default random
@@ -1361,8 +1361,8 @@ class ranking_bo extends ranking_so
 	 *
 	 * For the fieldfactor the ranking of the day before the competition starts has to be used!
 	 *
-	 * @param int/array $comp competition id or array
-	 * @param int/array $cat category id or array
+	 * @param int|array $comp competition id or array
+	 * @param int|array $cat category id or array
 	 * @param array $starters with athltets (PerId's)
 	 * @return double 1.0 for no feldfactor!
 	 */

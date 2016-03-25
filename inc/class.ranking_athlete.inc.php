@@ -1100,7 +1100,13 @@ class ranking_athlete extends so_sql
 			}
 			elseif(in_array($name, array('nation', 'fed_parent')))
 			{
-				$filter[] = $this->db->expression(self::FEDERATIONS_TABLE, self::FEDERATIONS_TABLE.'.', array($name => $value));
+				$f = $this->db->expression(self::FEDERATIONS_TABLE, self::FEDERATIONS_TABLE.'.', array($name => $value));
+				// for numeric ids / state federations also check SUI Regionalzentrum acl.fed_id
+				if ($name == 'fed_parent' && is_numeric($value))
+				{
+					$f = '('.$f.' OR acl.fed_id='.(int)$value.')';
+				}
+				$filter[] = $f;
 			}
 		}
 		if ($pattern)

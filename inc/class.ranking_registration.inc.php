@@ -352,9 +352,17 @@ class ranking_registration extends so_sql
 
 				if ($col == 'nation')	// nation is from the joined Federations table
 				{
-					if ($val) $filter[] = $this->db->expression(ranking_athlete::FEDERATIONS_TABLE,array(
-						is_numeric($val) ? 'fed_parent' : 'nation' => $val,
-					));
+					if ($val)
+					{
+						$f = $this->db->expression(ranking_athlete::FEDERATIONS_TABLE,array(
+							!is_numeric($val) ? 'nation' : 'fed_parent' => $val,
+						));
+						// for numeric ids / state federations also check SUI Regionalzentrum acl.fed_id
+						if (is_numeric($val)) $f = '('.$f.$this->db->expression(ranking_athlete::FEDERATIONS_TABLE,' OR acl.',array(
+							'fed_id' => $val,
+						),')');
+						$filter[] = $f;
+					}
 					unset($filter['nation']);
 				}
 				elseif (!isset($this->db_cols[$col]))	// assume it's from joined Athletes table

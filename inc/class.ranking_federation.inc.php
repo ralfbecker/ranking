@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2008-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -109,11 +109,11 @@ class ranking_federation extends so_sql
 	 *
 	 * For a union-query you call search for each query with $start=='UNION' and one more with only $order_by and $start set to run the union-query.
 	 *
-	 * @param array/string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
-	 * @param boolean/string/array $only_keys =true True returns only keys, False returns all cols. or
+	 * @param array|string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
+	 * @param boolean|string/array $only_keys =true True returns only keys, False returns all cols. or
 	 *	comma seperated list or array of columns to return
 	 * @param string $order_by ='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
-	 * @param string/array $extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string|array $extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
 	 * @param string $wildcard ='' appended befor and after each criteria
 	 * @param boolean $empty =false False=empty criteria are ignored in query, True=empty have to be empty in row
 	 * @param string $op ='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
@@ -271,9 +271,10 @@ class ranking_federation extends so_sql
 	 * Read ACL grants of a federation
 	 *
 	 * @param int|string $fed_id =null default use fed_id (or nation, if no parent) of this object
+	 * @param int $filter =0 if != 0 only return grants with given rights
 	 * @return array
 	 */
-	function get_grants($fed_id=null)
+	function get_grants($fed_id=null, $filter=0)
 	{
 		if (is_null($fed_id))
 		{
@@ -283,7 +284,10 @@ class ranking_federation extends so_sql
 
 		foreach(self::$grant_types as $name => $right)
 		{
-			$grants[$name] = $GLOBALS['egw']->acl->get_ids_for_location($location,$right,self::APPLICATION);
+			if (!$filter || ($right & $filter))
+			{
+				$grants[$name] = $GLOBALS['egw']->acl->get_ids_for_location($location,$right,self::APPLICATION);
+			}
 		}
 		//error_log(__METHOD__."('$fed_id') returning ".array2string($grants));
 		return $grants;
