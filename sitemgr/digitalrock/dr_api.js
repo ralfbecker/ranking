@@ -3,7 +3,7 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2010-14 by RalfBecker@digitalROCK.de
+ * @copyright 2010-16 by RalfBecker@digitalROCK.de
  * @version $Id: dr_api.js 1250 2015-06-18 06:49:01Z ralfbecker $
  */
 
@@ -1360,7 +1360,7 @@ var Resultlist = (function() {
 			{
 				for(var discipline in _data.max_disciplines)
 				{
-					max_disciplines += (max_disciplines?', ':'')+discipline[0].toUpperCase()+discipline.slice(1)+': '+_data.max_disciplines[discipline]
+					max_disciplines += (max_disciplines?', ':'')+discipline[0].toUpperCase()+discipline.slice(1)+': '+_data.max_disciplines[discipline];
 				}
 			}
 			if (_data.nation)
@@ -2154,13 +2154,21 @@ var Competitions = (function() {
 	 *
 	 * @param _container
 	 * @param _json_url url for data to load
-	 * @param _filters object
+	 * @param _filters object with filters and optional _comp_url
+	 *		{string} _filters._comp_url url to use as link with added WetId for competition name
 	 */
 	function Competitions(_container,_json_url,_filters)
 	{
 		DrBaseWidget.prototype.constructor.call(this, _container, _json_url);
-
-		if (typeof _filters != 'undefined') this.filters = _filters;
+		if (typeof _filters != 'undefined')
+		{
+			this.filters = _filters;
+			if (typeof _filters._comp_url != 'undefined')
+			{
+				this.comp_url = _filters._comp_url;
+				delete this.filters._comp_url;
+			}
+		}
 		this.year_regexp = /([&?])year=(\d+)/;
 
 		this.update();
@@ -2200,7 +2208,7 @@ var Competitions = (function() {
 		select.attr('style', 'margin-right: 5px');
 		filter.append(select);
 
-		if (typeof this.filters != 'undefied')
+		if (typeof this.filters != 'undefied' && !jQuery.isEmptyObject(this.filters))
 		{
 			select = jQuery(document.createElement('select')).attr('name', 'filter');
 			for(var f in this.filters)
@@ -2228,7 +2236,12 @@ var Competitions = (function() {
 			var competition = _data.competitions[i];
 
 			var comp_div = jQuery(document.createElement('div')).addClass('competition');
-			comp_div.append(jQuery(document.createElement('div')).addClass('title').text(competition.name));
+			var title = jQuery(document.createElement('div')).addClass('title').text(competition.name);
+			if (this.comp_url)
+			{
+				title = jQuery(document.createElement('a')).attr({href: this.comp_url+competition.WetId}).append(title);
+			}
+			comp_div.append(title);
 			comp_div.append(jQuery(document.createElement('div')).addClass('date').text(competition.date_span));
 			var cats_ul = jQuery(document.createElement('ul')).addClass('cats');
 			var have_cats = false;
@@ -2287,7 +2300,7 @@ var Competitions = (function() {
 			if (have_cats) comp_div.append(cats_ul);
 			competitions.append(comp_div);
 
-			var dist = Math.abs(Date.parse(competition.date).getWeek() - week_to_display);
+			var dist = Math.abs((new Date(competition.date)).getWeek() - week_to_display);
 			if (typeof closest_dist == 'undefined' || dist < closest_dist)
 			{
 				closest_dist = dist;
@@ -2299,7 +2312,7 @@ var Competitions = (function() {
 			// need to delay scrolling a bit, layout seems to need some time
 			window.setTimeout(function() {
 				closest.scrollIntoView();		// scrolls competition div AND whole document to show closest
-				document.body.scrollTo(0,0);	// scrolls whole document back up
+				window.scrollTo(0,0);			// scrolls whole document back up
 			}, 100);
 		}
 	};
