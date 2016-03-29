@@ -1235,6 +1235,41 @@ app.classes.ranking = AppJS.extend(
 	},
 
 	/**
+	 * Find a row / array element which has a certain attribute value plus id of previous and next row
+	 *
+	 * @param {array} _rows
+	 * @param {mixed} _id value of attribute _row_id
+	 * @param {string} _row_id name of attribute, default "PerId"
+	 * @return {object} values for attributes:
+	 *	- data searched row
+	 *	- prev id of previous row
+	 *	- next id of next row
+	 */
+	getRowById: function(_rows, _id, _row_id)
+	{
+		if (typeof _row_id == 'undefined') _row_id='PerId';
+
+		var ret = {};
+		for (var row in _rows)
+		{
+			if (ret.data)
+			{
+				ret.next = _rows[row][_row_id];
+				break;
+			}
+			if (_rows[row][_row_id] == _id)
+			{
+				ret.data = _rows[row];
+			}
+			if (typeof ret.data == 'undefined')
+			{
+				ret.prev = _rows[row][_row_id];
+			}
+		}
+		return ret;
+	},
+
+	/**
 	 * Function to create edit dialog for athlete from the result list
 	 *
 	 * @param {object} _action egw action object
@@ -1248,16 +1283,13 @@ app.classes.ranking = AppJS.extend(
 		var self = this;
 		if (content) var nm = content.getEntry('nm');
 
-		var nm_locate = function(_nm,_PerId)
-		{
-			for (var row in _nm)
-			{
-				if (_nm[row]['PerId'] == PerId) return jQuery.extend(_nm[row],{nm:_nm});
-			}
-		};
 		if (nm)
 		{
-			var entry = nm_locate (nm.rows,PerId);
+			var template = nm.template+'.edit';
+			if (typeof this.et2._inst.templates[template] == 'undefined') return;	// no edit template found
+			var row = this.getRowById(nm.rows, PerId);
+			var entry = jQuery.extend(row.data, {nm: nm});
+
 			// remove not existing boulders, to not show autorepeated rows
 			for(var i=parseInt(nm.num_problems)+1; i <= 10; ++i)
 			{
@@ -1275,7 +1307,8 @@ app.classes.ranking = AppJS.extend(
 			buttons.push({"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', "default":true});
 			if (is_jury) buttons.push({"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true});
 		}
-		buttons.push({"button_id": 'next',"text": 'Next', id: 'next', image: 'continue', "default":true});
+		if (row.prev) buttons.push({"button_id": 'previous', text: 'Back', id: 'previous', image: 'back', "default":true});
+		if (row.next) buttons.push({"button_id": 'next', text: 'Next', id: 'next', image: 'continue', "default":true});
 		buttons.push({"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true, click: function() {
 			// If you override, 'this' will be the dialog DOMNode.
 			// Things get more complicated.
@@ -1283,7 +1316,7 @@ app.classes.ranking = AppJS.extend(
 			$j(this).dialog("close");
 		}});
 
-		et2_createWidget("dialog",
+		var dialog = et2_createWidget("dialog",
 		{
 			id: 'update-result',
 			callback: function(_button, _values)
@@ -1293,7 +1326,22 @@ app.classes.ranking = AppJS.extend(
 					case 'update':
 					case 'checked':
 					case 'uncheck':
-						self.update_result_row.call(self, _button, entry, _values);
+						self.update_result_row.call(self, _button, entry, _values, function(_data)
+						{
+							// reopen dialog with changed content
+							this.action_edit({},[{id: PerId}]);
+							// ToDo: update dialog with returned values and not reopen it
+							//var row = this.getRowById(_data.content, PerId);
+							//dialog.options.value = jQuery.extend(dialog.options.value, row.data);
+							//dialog.set_template(template);
+						}, self);
+						//return false;
+						break;
+					case 'next':
+						self.action_edit({},[{id: row.next}]);
+						break;
+					case 'previous':
+						self.action_edit({},[{id: row.prev}]);
 						break;
 					default:
 						alert('Not yet ;-)');
@@ -1319,8 +1367,10 @@ app.classes.ranking = AppJS.extend(
 	 * @param {String} _button "update" or "checked"
 	 * @param {object} _entry changed entry, incl. old values
 	 * @param {object} _values new values
+	 * @param {function} _callback
+	 * @param {object} _context
 	 */
-	update_result_row: function(_button, _entry, _values)
+	update_result_row: function(_button, _entry, _values, _callback, _context)
 	{
 		if (_button != 'update')
 		{
@@ -1341,6 +1391,8 @@ app.classes.ranking = AppJS.extend(
 
 			// update content for next click
 			this.et2.getArrayMgr('content').data.nm.rows = _data.content;
+
+			if (_callback) _callback.call(_context || this, _data);
 		}, null, false, this).sendRequest();
 	},
 

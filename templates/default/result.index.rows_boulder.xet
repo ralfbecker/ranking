@@ -80,6 +80,7 @@
 				<column disabled="!@num_problems"/>
 				<column width="50"/>
 				<column disabled="@num_problems"/>
+				<column width="15"/>
 				<column disabled="!@num_problems"/>
 				<column disabled="!@num_problems=/[234567890]/"/>
 				<column disabled="!@num_problems=/[34567890]/"/>
@@ -116,6 +117,7 @@
 						<description value="Bonus"/>
 					</vbox>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
+					<description value="✔" class="noPrint"/>
 					<description align="center" value="1" class="place onlyPrint"/>
 					<description value="2" class="place onlyPrint"/>
 					<description value="3" class="place onlyPrint"/>
@@ -150,6 +152,7 @@
 						<description value="Bonus"/>
 					</vbox>
 					<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
+					<checkbox readonly="1" id="{$row}[checked]" ro_true="✔" class="noPrint"/>
 					<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
 					<description id="{$row}[boulder2]" no_lang="1" class="onlyPrint"/>
 					<description id="{$row}[boulder3]" no_lang="1" class="onlyPrint"/>
@@ -163,10 +166,80 @@
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
 					<vbox class="noPrint">
 						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>
-						<menulist>
-							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true" class="noWrap"/>
-						</menulist>
+						<select-account id="${row}[result_modifier]" readonly="true" class="noWrap"/>
 					</vbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index.rows_boulder.edit" template="" lang="" group="0" version="1.9.004" class="ranking_view">
+		<grid width="100%">
+			<columns>
+				<column width="150"/>
+				<column/>
+				<column width="150"/>
+			</columns>
+			<rows>
+				<row>
+					<hbox align="center">
+						<image class="avatar" src="photo"/>
+					</hbox>
+				</row>
+				<row class="name row" height="50px">
+					<description align="left" id="start_order" label="%1 $row_cont[start_number]"/>
+					<hbox align="center">
+						<description id="nachname" no_lang="1"  class="lastname"/>
+						<description id="vorname" no_lang="1" />
+					</hbox>
+					<hbox align="right">
+						<description id="result"/>
+						<checkbox readonly="1" align="right" id="checked" ro_true="✔"/>
+					</hbox>
+				</row>
+				<row class="row" disabled="!@nm[num_problems]" >
+					<grid width="100%">
+						<columns>
+							<column width="15"/>
+							<column width = "100"/>
+							<column/>
+							<column/>
+						</columns>
+						<rows>
+							<row class="th" >
+								<description align="center" value="Boulder"/>
+								<description align="center" value="Bonus"/>
+								<description align="center" value="Top"/>
+								<description align="right" value="Sum"/>
+							</row>
+							<row>
+								<label align="center" value="$row"/>
+								<select-number align="center" class="noPrint" statustext="Bonus: Number of tries or no" id="zone{$row}" onchange="app.ranking.check_bonus" options="No,0,25"/>
+								<select-number align="center" statustext="Top: number of tries or no" id="top{$row}" onchange="app.ranking.check_top" options="No,1,25"/>
+								<description align="right" id="boulder{$row}" no_lang="1"/>
+							</row>
+						</rows>
+					</grid>
+				</row>
+				<row class="row" disabled="@nm[num_problems]">
+					<label value="Top total number"/>
+					<select-number class="noWrap"  statustext="Top: total number or no" id="set[PerId][tops]" onchange="app.ranking.check_tops" options="No,1,25"/>
+				</row>
+				<row class="row" disabled="@nm[num_problems]">
+					<label value="Top number of tries"/>
+					<select-number class="noWrap" statustext="Top: number of tries" id="set[PerId][top_tries]" onchange="app.ranking.check_top_tries" options="No,1,50"/>
+				</row>
+				<row  class="row" disabled="@nm[num_problems]">
+					<label value="Bonus total number"/>
+					<select-number class="noWrap"  statustext="Bonus: total number or no" id="set[PerId][zones]" onchange="app.ranking.check_boni" options="No,1,25"/>
+				</row>
+				<row class="row" disabled="@nm[num_problems]">
+					<label value="Bonus number of tries"/>
+					<select-number class="noWrap" statustext="Bonus: number of tries" id="set[PerId][zone_tries]" onchange="app.ranking.check_bonus_tries" options="No,1,50"/>
+				</row>
+				<row class="row">
+					<label value="Last modified"/>
+					<date-time id="result_modified" readonly="true" class="noWrap"/>
+					<select-account id="result_modifier" readonly="true" class="noWrap"/>
 				</row>
 			</rows>
 		</grid>

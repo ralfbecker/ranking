@@ -358,11 +358,16 @@ img.et2_button_icon {
 	background-color: transparent;
 }
 
-#result-boulder-view-xet {
+/**
+ * Boulder edit template
+ */
+#ranking-result-index-rows_boulder-edit {
 	width:100%;
 }
-#result-boulder-view-xet #_nachname::after {
+#ranking-result-index-rows_boulder-edit #_nachname::after {
 	content:',';
 }
-#result-boulder-view-xet tr.row td {padding-bottom: 8px;}
-#result-boulder-view-xet .name td{padding-bottom: 8px;}
+#ranking-result-index-rows_boulder-edit tr.row td,
+#ranking-result-index-rows_boulder-edit .name td {
+	padding-bottom: 8px;
+}

@@ -1123,9 +1123,9 @@ class ranking_result_ui extends ranking_result_bo
 			),
 			'measurement' => array(
 				'caption' => 'Measurement',
-				'default' => true,
 				'onExecute' => 'javaScript:app.ranking.action_measure',
                 'disableClass' => 'th',
+				'icon' => 'bullet',
 				'allowOnMultiple' => false,
 			),
 			'delete' => array(
