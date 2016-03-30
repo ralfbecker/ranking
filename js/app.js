@@ -1282,7 +1282,7 @@ app.classes.ranking = AppJS.extend(
 	action_edit: function (_action,_selected)
 	{
 		var PerId = _selected[0].id;
-		var template = egw.webserverUrl+'/ranking/templates/'+(egwIsMobile()?'mobile':'default')+'/result.boulder.view.xet';
+		var template = 'ranking.result.index.rows_boulder.edit';
 		var content = this.et2.getArrayMgr('content');
 		var self = this;
 		if (content) var nm = content.getEntry('nm');
@@ -1359,6 +1359,9 @@ app.classes.ranking = AppJS.extend(
 				readonlys: entry.checked || nm.result_official ? { __ALL__: true} : {}
 			},
 			template: template,
+			width:550,
+			minWidth:550,
+			minHeight:450,
 			class: "update_result"
 		});
 	},
