@@ -842,6 +842,9 @@ class ranking_result_bo extends ranking_bo
 		{
 			return $this->error = false;	// permission denied
 		}
+		// only allow full judges to (un)check boulder results
+		if ($update_checked && !$this->is_judge($comp)) $update_checked = false;
+
 		// setting discipline and route_type to allow using it in route_result->save()/->data2db
 		$this->route_result->discipline = $discipline;
 		$this->route_result->route_type = $route_type;
