@@ -1580,7 +1580,7 @@ class ranking_result_ui extends ranking_result_bo
 			$keys['route_order'] = $content['nm']['route'];
 			$route = $this->route->read($keys);
 		}
-		$content['nm']['is_judge'] = $this->is_judge($comp,false,$route);	// is a (full, not just route-)judge
+		$content['nm']['is_judge'] = $this->is_judge($comp);	// is a (full, not just route-)judge
 		$tmpl->setElementAttribute('nm[rows]', 'actions', $this->get_actions($comp, $route));
 
 		// no startlist, no rights at all or result offical -->disable all update possebilities
@@ -1728,6 +1728,10 @@ class ranking_result_ui extends ranking_result_bo
 			$filter = $keys+array('PerId' => $PerId,'route_type' => $route['route_type'], 'discipline' => $route['discipline']);
 			list($new_result) = $this->route_result->search(array(),false,'','','',false,'AND',false,$filter);
 			$msg = ranking_result_bo::athlete2string($new_result,true);
+		}
+		elseif ($this->error)
+		{
+			$msg = implode("\n - ", call_user_func_array('array_merge_recursive', $this->error));
 		}
 		else
 		{
