@@ -10,6 +10,10 @@
  * @version $Id$
  */
 @media all {
+  html * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+  }
   body #ranking-result-index-rows_boulder-edit {
     width: 99%;
   }
@@ -39,13 +43,25 @@
   body #ranking-result-index .popupMainDiv {
     padding-top: 0px !important;
   }
-  body #ranking-result-index .selectHeader {
+  body #ranking-result-index .selectHeader .nextmatch_header_row {
     display: none;
     position: absolute;
     background: white;
     box-shadow: 1px 3px 6px gray;
     width: 100%;
     z-index: 2;
+  }
+  body #ranking-result-index div[class*="et2_nextmatch"]:not([class*='selectHeader']) .headerToggle {
+    background-image: url("../../../pixelegg/images/cancelled.svg") !important;
+    -webkit-filter: none!important;
+    background-color: white !important;
+    background-position: center;
+  }
+  body #ranking-result-index .et2_nextmatch.selectHeader .headerToggle {
+    background-image: url("../../../pixelegg/images/menu_list.svg") !important;
+  }
+  body #ranking-result-index .et2_hbox.et2_box_widget.catSelectionMsg {
+    width: 100%;
   }
   body #ranking-result-index tbody > * {
     font-size: 10pt;

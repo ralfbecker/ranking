@@ -12,7 +12,10 @@
 @import (reference) '../../../pixelegg/mobile/fw_mobile.less';
 //@import (less) '../default/app.css';
 @media all {
-
+	html *{
+		-webkit-user-select: none;
+		-moz-user-select:none;
+	}
 	body {
 		#ranking-result-index-rows_boulder-edit
 		{
@@ -45,7 +48,7 @@
 			.popupMainDiv {
 				padding-top: 0px !important;
 			}
-			.selectHeader {
+			.selectHeader .nextmatch_header_row {
 				display: none;
 				position: absolute;
 				background: white;
@@ -53,6 +56,19 @@
 				width: 100%;
 				z-index: 2;
 			}
+			div[class*="et2_nextmatch"]:not([class*='selectHeader'])
+			{
+				.headerToggle {
+					background-image: url("../../../pixelegg/images/cancelled.svg") !important;
+					-webkit-filter: none!important;
+					background-color: white !important;
+					background-position: center;
+				}
+			}
+			.et2_nextmatch.selectHeader .headerToggle {
+				background-image: url("../../../pixelegg/images/menu_list.svg") !important;
+			}
+			.et2_hbox.et2_box_widget.catSelectionMsg {width: 100%;}
 			tbody > * {
 				.mob-fontsize-n;
 				font-family: verdana;
