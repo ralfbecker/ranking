@@ -815,7 +815,7 @@ class ranking_result_ui extends ranking_result_bo
 
 			if (!($rows[$k]['profile_url'] = $this->athlete->picture_url($row['rkey'])))
 			{
-				$rows[$k]['profile_url'] = common::image('ranking', 'photo');
+				$rows[$k]['profile_url'] = common::image('ranking', 'transparent');
 			}
 			// results for setting on regular routes (no general result)
 			if($query['route'] >= 0)

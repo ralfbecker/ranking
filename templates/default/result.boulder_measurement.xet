@@ -14,7 +14,7 @@
 					<row height="100">
 						<label value="Boulder"/>
 						<select-number  type="select-number" id="nm[boulder_n]" width= "150" onchange="app.ranking.boulder_changed" options=",1,{$cont[nm][num_problems]}"/>
-						<hbox >
+						<hbox align="center">
 							<image src="profile_url" class="avatar" id="avatar"/>
 						</hbox>
 					</row>

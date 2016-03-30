@@ -1364,7 +1364,9 @@ app.classes.ranking = AppJS.extend(
 				readonlys: entry.checked || nm.result_official ? { __ALL__: true} : {}
 			},
 			template: template,
-			class: "update_result"
+			class: "update_result",
+			minWidth: 480,
+			width: 480
 		});
 	},
 
@@ -1404,6 +1406,26 @@ app.classes.ranking = AppJS.extend(
 			if (_callback) _callback.call(_context || this, _data);
 		}, null, false, this).sendRequest();
 	},
+
+	/**
+	 * Eliminated changed
+	 *
+	 * @param {jQuery.Event} _ev
+	 * @param {et2_widget} _widget
+	 * @param {DOMNode} _node
+	 */
+	eliminated_changed: function(_ev, _widget, _node)
+	{
+		if (_widget.get_value())
+		{
+			var time = _widget.getParent().getWidgetById(_widget.id.replace(/eliminated/, 'result_time'));
+			if (time) time.set_value('');
+		}
+	},
+
+	/***************************************************************************
+	 * Registration
+	 **************************************************************************/
 
 	ACL_EDIT: 4,
 	ACL_REGISTER: 64,

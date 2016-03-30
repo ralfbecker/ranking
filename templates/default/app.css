@@ -14,7 +14,7 @@
 .redItalic { color: red; font-style: italic; }
 .bold { font-weight: bold; }
 span.place:after { content: "." }
-.place { padding-left: 1em; }
+/*.place { padding-left: 1em; }*/
 button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 .prequalified { color: gray; font-style: italic; }
 .complimentary { font-style: italic; }
@@ -210,19 +210,6 @@ div#ranking-result-index_ranking-result-selfscore_measurement > label:first-chil
 /*
  * Boulder measurement
  */
-button.bigButton, button.tryButton, input.bigButton , input.tryButton {
-	font-size: 400%;
-	border-radius: 20px;
-	padding-left: 30px;
-	padding-right: 30px;
-	height: auto;
-	border: 1px solid gray;
-	margin-right: 1%;
-}
-button.tryButton , input.tryButton  {
-	width: 4em;
-	white-space: nowrap;
-}
 #ranking-result-index_nm\[boulder_n\], #ranking-result-index_try, #ranking-result-index_top, #ranking-result-index_zone {
 	width: 5em;
 }
@@ -260,12 +247,16 @@ body #egw_fw_main #egw_fw_tabs {
 button.bigButton {
     border-radius: 0;
     font-size: 12pt;
-    width: 100px;
+    width: 120px;
 	height: 50px;
+	text-align: center;
 }
-.avatar {
-	width:100px;
+#ranking-result-index_avatar {
+	width: 100px;
 	height: 100px;
+	background-size: 70px 70px;
+	top: 20px;
+	position: relative;
 }
 .dialogFooterToolbar button:hover{
 	height:auto;

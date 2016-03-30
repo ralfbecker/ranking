@@ -78,7 +78,6 @@
 				<column width="50"/>
 				<column width="50"/>
 				<column disabled="!@num_problems"/>
-				<column width="50"/>
 				<column disabled="@num_problems"/>
 				<column width="15"/>
 				<column disabled="!@num_problems"/>
@@ -112,10 +111,6 @@
 					<nextmatch-sortheader align="center" label="Start- order" id="start_order" class="noPrint"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
-					<vbox id="top_bonus" class="onlyPrint">
-						<description value="Top"/>
-						<description value="Bonus"/>
-					</vbox>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
 					<description value="✔" class="noPrint"/>
 					<description align="center" value="1" class="place onlyPrint"/>
@@ -147,10 +142,6 @@
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
 					<description align="center" id="{$row}[result]" no_lang="1" class="noWrap"/>
-					<vbox class="onlyPrint">
-						<description value="Top"/>
-						<description value="Bonus"/>
-					</vbox>
 					<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
 					<checkbox readonly="1" id="{$row}[checked]" ro_true="✔" class="noPrint"/>
 					<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
@@ -186,10 +177,12 @@
 					</hbox>
 				</row>
 				<row class="name row" height="50px">
-					<description align="left" id="start_order" label="%1 $row_cont[start_number]"/>
+					<description align="left" id="result_rank" class="place"/>
 					<hbox align="center">
-						<description id="nachname" no_lang="1"  class="lastname"/>
+						<description id="nachname" no_lang="1" class="lastname"/>
 						<description id="vorname" no_lang="1" />
+						<description id="nation" no_lang="1" />
+						<description id="start_number" label="(%s)"/>
 					</hbox>
 					<hbox align="right">
 						<description id="result"/>

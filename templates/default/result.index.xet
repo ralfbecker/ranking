@@ -143,15 +143,14 @@
 					</hbox>
 				</row>
 				<row class="name row" height="50px">
-					<description align="left" id="start_order" label="%1 $row_cont[start_number]"/>
+					<description align="left" id="result_rank" class="place"/>
 					<hbox align="center">
-						<description id="nachname" no_lang="1"  class="lastname"/>
+						<description id="nachname" no_lang="1" class="lastname"/>
 						<description id="vorname" no_lang="1" />
+						<description id="nation" no_lang="1" />
+						<description id="start_number" label="(%s)"/>
 					</hbox>
-					<hbox align="right">
-						<description id="result"/>
-						<checkbox readonly="1" align="right" id="checked" ro_true="✔"/>
-					</hbox>
+					<description align="right" id="result"/>
 				</row>
 				<row class="row" height="50px">
 					<float label="Height" id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1"/>

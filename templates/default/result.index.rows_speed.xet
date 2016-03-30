@@ -124,27 +124,66 @@
 					<description align="center" id="${row}[PerId]" no_lang="1"/>
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
-					<textbox type="integer" align="center" id="set[$row_cont[PerId]][false_start]" min="0" size="3" step="1"/>
-					<hbox align="center">
-						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
-						<textbox type="float" id="set[$row_cont[PerId]][result_time]" precision="2" size="4" class="$cont[rw_result]"/>
-						<menulist>
-							<menupopup class="noPrint $cont[rw_result]" id="set[$row_cont[PerId]][eliminated]"/>
-						</menulist>
-						<buttononly onclick="app.ranking.update_result_row" statustext="update time" label="Update" id="apply[$row_cont[PerId]]" class="small noPrint"/>
-					</hbox>
+					<integer align="center" id="set[$row_cont[PerId]][false_start]" min="0" size="3" step="1" readonly="true"/>
+					<description align="center" id="{$row}[result]" no_lang="1"/>
 					<description align="center" id="${row}[start_order2n]" no_lang="1" class="noPrint"/>
-					<hbox align="center">
-						<description id="{$row}[result_r]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
-						<textbox type="float" id="set[$row_cont[PerId]][result_time_r]" precision="2" size="4" class="$cont[rw_result]"/>
-						<menulist>
-							<menupopup class="noPrint $cont[rw_result]" id="set[$row_cont[PerId]][eliminated_r]"/>
-						</menulist>
-						<buttononly onclick="app.ranking.update_result_row" statustext="update time" label="Update" id="apply[$row_cont[PerId]][r]" class="small noPrint"/>
-					</hbox>
-					<textbox type="float" align="center" id="${row}[ability_percent]" readonly="true"/>
+					<description align="center" id="{$row}[result_r]" no_lang="1"/>
+					<float align="center" id="${row}[ability_percent]" readonly="true"/>
 					<description align="center" id="set[$row_cont[PerId]][time_sum]"/>
 					<buttononly align="center" statustext="select participant for time measurment" label="Start" id="start_time_measurement" onclick="start_time_measurement(this,$row_cont[PerId]);" class="small noPrint"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index.rows_speed.edit" template="" lang="" group="0" version="1.9.004" class="ranking_view">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column/>
+				<column width="100"/>
+			</columns>
+			<rows>
+				<row>
+					<hbox align="center">
+						<image class="avatar" src="profile_url"/>
+					</hbox>
+				</row>
+				<row class="name row" height="50px">
+					<description align="left" id="result_rank" class="place"/>
+					<hbox align="center">
+						<description id="nachname" no_lang="1" class="lastname"/>
+						<description id="vorname" no_lang="1" />
+						<description id="nation" no_lang="1" />
+						<description id="start_number" label="(%s)"/>
+					</hbox>
+					<description align="right" id="time_sum"/>
+				</row>
+				<grid width="100%" span="all">
+					<columns>
+						<column/>
+						<column/>
+						<column/>
+						<column/>
+					</columns>
+					<rows>
+						<row class="row" height="50px">
+							<description label="Time"/>
+							<float id="result_time" precision="2" size="4"/>
+							<select align="center" id="eliminated" onchange="app.ranking.eliminated_changed"/>
+							<integer align="right" label="False start" id="false_start" min="0" size="3" step="1"/>
+						</row>
+						<row class="row" valign="top" height="40px" disabled="!@nm[rows][show_second_lane]">
+							<description label="Lane B"/>
+							<float id="result_time_r" precision="2" size="4"/>
+							<select align="center" id="eliminated_r" onchange="app.ranking.eliminated_changed"/>
+							<description/>
+						</row>
+					</rows>
+				</grid>
+				<row class="row">
+					<label value="Last modified"/>
+					<date-time align="center" id="result_modified" readonly="true" class="noWrap"/>
+					<select-account align="right" id="result_modifier" readonly="true" class="noWrap"/>
 				</row>
 			</rows>
 		</grid>
