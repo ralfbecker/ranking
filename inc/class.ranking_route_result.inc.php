@@ -174,7 +174,7 @@ class ranking_route_result extends so_sql
 					'vorname','nachname','Federations.nation AS nation','geb_date',
 					'Federations.verband AS verband','Federations.fed_url AS fed_url',
 					'Federations.fed_id AS fed_id','Federations.fed_parent AS fed_parent',
-					'ort','plz',
+					'ort','plz','rkey',
 				));
 
 				//if ($comp_nation == 'SUI')	// ToDo pass nation, so we dont need to do this join for other federations than SAC

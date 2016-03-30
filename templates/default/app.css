@@ -357,6 +357,10 @@ span#ranking-result-index_msg {
 img.et2_button_icon {
 	background-color: transparent;
 }
+img#foto, img#foto2 {
+	filter: none;
+	-webkit-filter: none;
+}
 
 /**
  * Boulder edit template

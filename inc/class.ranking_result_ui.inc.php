@@ -813,6 +813,10 @@ class ranking_result_ui extends ranking_result_bo
 
 			if ($row['result_rank']) $rows[$k]['class'] .= ' noDelete';
 
+			if (!($rows[$k]['profile_url'] = $this->athlete->picture_url($row['rkey'])))
+			{
+				$rows[$k]['profile_url'] = common::image('ranking', 'photo');
+			}
 			// results for setting on regular routes (no general result)
 			if($query['route'] >= 0)
 			{
@@ -955,7 +959,7 @@ class ranking_result_ui extends ranking_result_bo
 		$rows['no_start_number'] = !$need_start_number && $query['route_status'] == STATUS_RESULT_OFFICIAL;
 
 		// report the set-values at time of display back to index() for calling ranking_result_bo::save_result
-		$GLOBALS['egw']->session->appsession('set_'.$query['comp'].'_'.$query['cat'].'_'.$query['route'],'ranking',$rows['set']);
+		egw_cache::setSession('ranking', 'set_'.$query['comp'].'_'.$query['cat'].'_'.$query['route'], $rows['set']);
 
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
@@ -1109,10 +1113,20 @@ class ranking_result_ui extends ranking_result_bo
 	/**
 	 * Return actions for start-/result-lists
 	 *
+	 * @param int|array $comp
+	 * @param array $route
 	 * @return array
 	 */
-	static function get_actions()
+	function get_actions($comp, $route)
 	{
+		if (!$comp || !$route) return array();
+
+		$is_judge = $this->is_judge($comp, false, $route);	// incl. is_admin
+		$is_route_judge = $is_judge || $this->is_judge($comp, false, $route + array('route_judges' => true));
+
+		// we need to be at least a route-judge to do anything
+		if (!$is_route_judge) return array();
+
 		$actions =array(
 			'edit' => array(
 				'caption' => 'Edit',
@@ -1131,10 +1145,14 @@ class ranking_result_ui extends ranking_result_bo
 			'delete' => array(
 				'caption' => 'Delete',
 				'onExecute' => 'javaScript:app.ranking.action_delete',
-                'disableClass' => 'noDelete',
+                'disableClass' => 'noDelete',	// checks has result
 				'allowOnMultiple' => false,
 			),
 		);
+
+		// route-judges are not allowed to delete participants
+		if (!$is_judge) $actions['delete']['enabled'] = false;
+
 		return $actions;
 	}
 
@@ -1330,7 +1348,7 @@ class ranking_result_ui extends ranking_result_bo
 			switch($button)
 			{
 				case 'apply':
-					$old = $GLOBALS['egw']->session->appsession('set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route'],'ranking');
+					$old = egw_cache::getSession('ranking', 'set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route']);
 					if (is_array($content['nm']['rows']['set']) &&
 						$this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old,
 							$this->comp->quali_preselected($content['nm']['cat'], $comp['quali_preselected']),
@@ -1483,7 +1501,8 @@ class ranking_result_ui extends ranking_result_bo
 			$content['nm']['route'] != -1 && in_array($content['nm']['discipline'], array('lead','boulder','selfscore')))
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
-			$tmpl->setElementAttribute('nm[rows]', 'actions', self::get_actions());
+			$tmpl->setElementAttribute('nm[rows]', 'actions', $this->get_actions($comp, $route));
+			$content['nm']['is_judge'] = $this->is_judge($comp,false,$route);	// is a (full, not just route-)judge
 		}
 		elseif($content['nm']['show_result'] == 4)
 		{

@@ -403,6 +403,29 @@ app.classes.ranking = AppJS.extend(
 		var boulder_n = this.et2.getWidgetById('nm[boulder_n]');
 		var n = boulder_n ? boulder_n.get_value() : null;
 
+		// loading values from server
+		if (PerId && n)
+		{
+			var WetId = this.et2.getWidgetById('comp[WetId]').get_value();
+			var GrpId = this.et2.getWidgetById('nm[cat]').get_value();
+			var route_order = this.et2.getWidgetById('nm[route]').get_value();
+			var keys = {WetId: WetId, GrpId: GrpId, route_order: route_order};
+
+			this.egw.json('ranking_boulder_measurement::ajax_load_athlete',
+				[PerId, {},	// {} = send data back
+				keys],
+				function(_data)
+				{
+					this.et2.getWidgetById('zone').set_value(_data['zone'+n]);
+					this.et2.getWidgetById('top').set_value(_data['top'+n]);
+					this.et2.getWidgetById('avatar').set_src(_data['profile_url']);
+					this.try_num(_data['try'+n]);
+
+					this.message(_data.athlete);
+				},
+				null, false, this).sendRequest();
+		}
+
 		jQuery('#ranking-result-index_button\\[update\\],#ranking-result-index_button\\[try\\],#ranking-result-index_button\\[bonus\\],#ranking-result-index_button\\[top\\]')
 			.attr('disabled', !PerId || !n);
 
@@ -691,25 +714,6 @@ app.classes.ranking = AppJS.extend(
 			}
 		}
 		this.init_boulder();
-
-		// loading values from server
-		if (PerId && n)
-		{
-			this.egw.json('ranking_boulder_measurement::ajax_load_athlete',
-				[PerId, {},	// {} = send data back
-				keys],
-				function(_data)
-				{
-					this.et2.getWidgetById('zone').set_value(_data['zone'+n]);
-					this.et2.getWidgetById('top').set_value(_data['top'+n]);
-					this.et2.getWidgetById('avatar').set_src(_data['profile_url']);
-					this.try_num(_data['try'+n]);
-					this.init_boulder();
-
-					this.message(_data.athlete);
-				},
-				null, false, this).sendRequest();
-		}
 	},
 
 	/**
@@ -1296,23 +1300,23 @@ app.classes.ranking = AppJS.extend(
 				delete entry['boulder'+i];
 			}
 		}
-		var is_jury = true;	// todo
 		var buttons = [];
 		if (entry.checked)
 		{
-			if (is_jury) buttons.push({"button_id": 'uncheck',"text": 'Uncheck', id: 'uncheck', image: 'bullet', "default":true});
+			if (nm.is_judge && nm.discipline == 'boulder' && !nm.result_official)
+			{
+				buttons.push({"button_id": 'uncheck',"text": 'Uncheck', id: 'uncheck', image: 'bullet', "default":true});
+			}
 		}
-		else
+		else if (!nm.result_official)
 		{
 			buttons.push({"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', "default":true});
-			if (is_jury) buttons.push({"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true});
+			if (nm.is_judge && nm.discipline == 'boulder' ) buttons.push({"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true});
 		}
 		if (row.prev) buttons.push({"button_id": 'previous', text: 'Back', id: 'previous', image: 'back', "default":true});
 		if (row.next) buttons.push({"button_id": 'next', text: 'Next', id: 'next', image: 'continue', "default":true});
+
 		buttons.push({"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true, click: function() {
-			// If you override, 'this' will be the dialog DOMNode.
-			// Things get more complicated.
-			// Do what you like, but don't forget this line:
 			$j(this).dialog("close");
 		}});
 
@@ -1352,7 +1356,7 @@ app.classes.ranking = AppJS.extend(
 			value: {
 				content: entry || {},
 				sel_options: {},
-				readonlys: entry.checked ? { __ALL__: true} : {}
+				readonlys: entry.checked || nm.result_official ? { __ALL__: true} : {}
 			},
 			template: template,
 			class: "update_result"

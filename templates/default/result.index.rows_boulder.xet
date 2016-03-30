@@ -182,7 +182,7 @@
 			<rows>
 				<row>
 					<hbox align="center">
-						<image class="avatar" src="photo"/>
+						<image class="avatar" src="profile_url"/>
 					</hbox>
 				</row>
 				<row class="name row" height="50px">

@@ -616,7 +616,7 @@ class ranking_athlete extends so_sql
 	{
 		if (is_null($rkey)) $rkey = $this->data['rkey'];
 
-		$url = $this->picture_url.'/'.$this->data['rkey'].($num ? '-'.(int)$num : '').'.jpg';
+		$url = $this->picture_url.'/'.$rkey.($num ? '-'.(int)$num : '').'.jpg';
 		$path = $this->picture_path($rkey, $num);
 
 		return file_exists($path) && is_readable($path) ? $url.'?'.filemtime($path) : false;
