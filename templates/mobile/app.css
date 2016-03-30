@@ -20,6 +20,9 @@
   body #ranking-result-index .scrollArea {
     height: calc(100% - 50px);
   }
+  body #ranking-result-index #ranking-result-index_3\[result_modified\].et2_label {
+    padding-top: 0;
+  }
   body #ranking-result-index #ranking-result-index_msg {
     font-size: 10pt;
     padding-top: 10px;
