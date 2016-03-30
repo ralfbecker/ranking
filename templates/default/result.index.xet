@@ -165,7 +165,7 @@
 						<description id="msg" class="message"/>
 					</hbox>
 				</row>
-				<row class="noPrint resultHeader" disabled="@no_route_selection">
+				<row class="noPrint resultHeader resultHeaderBottom" disabled="@no_route_selection">
 					<hbox>
 						<menulist span="all">
 							<menupopup class="header rightPad5" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>

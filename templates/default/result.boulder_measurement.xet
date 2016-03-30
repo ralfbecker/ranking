@@ -39,8 +39,10 @@
 						<buttononly label="Top" id="button[top]"  onclick="app.ranking.top_clicked" class="bigButton"/>
 					</row>
 					<row height="70" class="bottomRow">
-						<buttononly label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5 bigButton"/>
-						<buttononly label="Protocol" id="protocol" onclick="protocol.display()"  class="bigButton"/>
+						<hbox span="2">
+							<buttononly label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5 bigButton"/>
+							<buttononly label="Protocol" id="protocol" onclick="protocol.display()"  class="bigButton"/>
+						</hbox>
 						<buttononly label="&gt;&gt;" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton nextButton"/>
 					</row>
 				</rows>

@@ -254,13 +254,13 @@ body #egw_fw_main #egw_fw_tabs {
 }
 #ranking-result-index_measurement_template .et2_selectbox {
     height: 50px;
-    font-size: 10pt;
+    font-size: 12pt;
     padding-left: 5px;
 }
 button.bigButton {
     border-radius: 0;
     font-size: 12pt;
-    width: 100%;
+    width: 100px;
 	height: 50px;
 }
 .avatar {
@@ -273,15 +273,7 @@ button.bigButton {
 #ranking-result-index_ranking-result-boulder_measurement et2_label select.et2_selectbox{
 	font-size: 100%;
 }
-#ranking-result-index_protocol {
-	position: absolute;
-	top: 8px;
-	right: 8px;
-	border: 1px solid gray;
-	font-size: 150%;
-	height:auto;
-	width:150px;
-}
+
 input.nextButton {
 	float:right;
 }
@@ -392,3 +384,21 @@ img#foto, img#foto2 {
 	padding-bottom: 8px;
 }
 
+#ranking-result-index_measurement_template, #ranking-result-index_measurement_template div.popupMainDiv, form#ranking-result-index {
+	background-color: #f0f0f0;
+}
+form#ranking-result-index .resultHeaderBottom {
+	border-bottom: 1px solid silver;
+}
+
+#ranking-result-index_measurement_template div.popupMainDiv {
+	background-color: white;
+    margin-left: 25%;
+    margin-right: 25%;
+    border-left: 1px solid silver;
+    border-right: 1px solid silver;
+    padding: 10px;
+}
+#ranking-result-index_measurement_template div.popupMainDiv .et2_label {
+	font-size: 12pt;
+}
