@@ -528,7 +528,9 @@ class ranking_bo extends ranking_so
 			// days before competition-start <= judge_right_days or $allow_before for infinit before
 			($distance >= 0 && ($allow_before || $distance <= $this->judge_right_days) ||
 			// days after competition-end (start+duration) <= judge_right_days
-			$distance < 0 && abs($distance) <= $this->judge_right_days+$comp['duration']);
+			$distance < 0 && abs($distance) <= $this->judge_right_days+$comp['duration']) ||
+			// treat national result-rights like being a judge of every competition
+			$this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp);
 
 		if (!$is_judge && $route && (is_array($route) && isset($route['route_judges']) ||
 			($route = $this->route->read($route))) && $route['route_judges'] &&
