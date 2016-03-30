@@ -20,7 +20,7 @@
   body #ranking-result-index .scrollArea {
     height: calc(100% - 50px);
   }
-  body #ranking-result-index #ranking-result-index_3\[result_modified\].et2_label {
+  body #ranking-result-index label[id^='ranking-result-index'][id$='result_modified]'].et2_label {
     padding-top: 0;
   }
   body #ranking-result-index #ranking-result-index_msg {
