@@ -77,10 +77,9 @@
 				<column/>
 				<column width="50"/>
 				<column width="50"/>
-				<column width="15%"/>
+				<column/>
 				<column/>
 				<column disabled="@no_prev_heat"/>
-				<column disabled="@readonly"/>
 				<column/>
 			</columns>
 			<rows>
@@ -102,7 +101,6 @@
 					<nextmatch-sortheader align="center" label="Height" id="result_height"/>
 					<nextmatch-sortheader align="center" label="Time" id="result_time" class="$cont[lead_time_class]"/>
 					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
-					<description align="center" value="Actions" class="$cont[rw_result]"/>
 					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
@@ -120,22 +118,50 @@
 					<description align="center" id="{$row}[PerId]" no_lang="1"/>
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
-					<hbox align="center">
-						<description id="{$row}[result]" no_lang="1" readonly="true" class="$cont[ro_result]"/>
-						<float id="set[$row_cont[PerId]][result_height]" onkeypress="app.ranking.height_keypress" size="5" class="$cont[rw_result]" min="1"/>
-						<menulist>
-							<menupopup id="set[$row_cont[PerId]][result_plus]" no_lang="1" class="$cont[rw_result] leftPad5"/>
-						</menulist>
-					</hbox>
-					<textbox type="float" align="center" id="set[$row_cont[PerId]][result_time]" class="$cont[lead_time_class]"/>
+					<description align="center" id="{$row}[result]" no_lang="1" readonly="true"/>
+					<float align="center" id="set[$row_cont[PerId]][result_time]" readonly="true"/>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1"/>
-					<buttononly onclick="app.ranking.update_result_row" align="center" statustext="Apply the changes of this athlete only" label="Update" id="apply[$row_cont[PerId]]" class="small $cont[rw_result]"/>
 					<vbox class="noPrint">
 						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>
-						<menulist>
-							<menupopup type="select-account" id="${row}[result_modifier]" readonly="true" class="noWrap"/>
-						</menulist>
+						<select-account id="${row}[result_modifier]" readonly="true" class="noWrap"/>
 					</vbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index.rows_lead.edit" template="" lang="" group="0" version="1.9.004" class="ranking_view">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column/>
+				<column width="100"/>
+			</columns>
+			<rows>
+				<row>
+					<hbox align="center">
+						<image class="avatar" src="profile_url"/>
+					</hbox>
+				</row>
+				<row class="name row" height="50px">
+					<description align="left" id="start_order" label="%1 $row_cont[start_number]"/>
+					<hbox align="center">
+						<description id="nachname" no_lang="1"  class="lastname"/>
+						<description id="vorname" no_lang="1" />
+					</hbox>
+					<hbox align="right">
+						<description id="result"/>
+						<checkbox readonly="1" align="right" id="checked" ro_true="✔"/>
+					</hbox>
+				</row>
+				<row class="row" height="50px">
+					<float label="Height" id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1"/>
+					<select align="center" id="result_plus" no_lang="1"/>
+					<float label="Time" id="result_time" align="right"/>
+				</row>
+				<row class="row">
+					<label value="Last modified"/>
+					<date-time align="center" id="result_modified" readonly="true" class="noWrap"/>
+					<select-account align="right" id="result_modifier" readonly="true" class="noWrap"/>
 				</row>
 			</rows>
 		</grid>

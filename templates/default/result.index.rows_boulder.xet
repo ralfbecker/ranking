@@ -197,12 +197,12 @@
 					</hbox>
 				</row>
 				<row class="row" disabled="!@nm[num_problems]" >
-					<grid width="100%">
+					<grid width="100%" span="all">
 						<columns>
-							<column width="15"/>
-							<column width = "100"/>
-							<column/>
-							<column/>
+							<column width="5%"/>
+							<column width="40%"/>
+							<column width="30%"/>
+							<column width="25%"/>
 						</columns>
 						<rows>
 							<row class="th" >
@@ -211,7 +211,7 @@
 								<description align="center" value="Top"/>
 								<description align="right" value="Sum"/>
 							</row>
-							<row>
+							<row height="28px">
 								<label align="center" value="$row"/>
 								<select-number align="center" class="noPrint" statustext="Bonus: Number of tries or no" id="zone{$row}" onchange="app.ranking.check_bonus" options="No,0,25"/>
 								<select-number align="center" statustext="Top: number of tries or no" id="top{$row}" onchange="app.ranking.check_top" options="No,1,25"/>
@@ -238,8 +238,8 @@
 				</row>
 				<row class="row">
 					<label value="Last modified"/>
-					<date-time id="result_modified" readonly="true" class="noWrap"/>
-					<select-account id="result_modifier" readonly="true" class="noWrap"/>
+					<date-time align="center" id="result_modified" readonly="true" class="noWrap"/>
+					<select-account align="right" id="result_modifier" readonly="true" class="noWrap"/>
 				</row>
 			</rows>
 		</grid>

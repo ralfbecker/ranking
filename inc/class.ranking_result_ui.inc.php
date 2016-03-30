@@ -1153,6 +1153,12 @@ class ranking_result_ui extends ranking_result_bo
 		// route-judges are not allowed to delete participants
 		if (!$is_judge) $actions['delete']['enabled'] = false;
 
+		// general result, does not allow edit or measurement
+		if ($route['route_order'] < 0)
+		{
+			$actions['edit']['enabled'] = $actions['measurement']['enabled'] = $actions['delete']['enabled'] = false;
+		}
+
 		return $actions;
 	}
 
@@ -1435,13 +1441,6 @@ class ranking_result_ui extends ranking_result_bo
 
 		if ($content['nm']['route'] < 2) unset($sel_options['eliminated'][0]);
 		unset($sel_options['eliminated_r'][0]);
-		for($i=''; $i <= $route['route_num_problems']; ++$i)
-		{
-			$sel_options['zone'.$i] = array(
-				''  => ' ',
-				'0' => lang('No'),
-			);
-		}
 		if (is_array($route)) $content += $route;
 		$content['nm']['route_data'] = $route;
 		$content['nm']['calendar'] = $calendar;
@@ -1501,8 +1500,6 @@ class ranking_result_ui extends ranking_result_bo
 			$content['nm']['route'] != -1 && in_array($content['nm']['discipline'], array('lead','boulder','selfscore')))
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
-			$tmpl->setElementAttribute('nm[rows]', 'actions', $this->get_actions($comp, $route));
-			$content['nm']['is_judge'] = $this->is_judge($comp,false,$route);	// is a (full, not just route-)judge
 		}
 		elseif($content['nm']['show_result'] == 4)
 		{
@@ -1576,6 +1573,16 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -1 ? 2 : 3) : 1;
 		}
+
+		// need to reload route, if eg. general result was selected by show_result=2
+		if (!$route || $route['route_order'] != $content['nm']['route'])
+		{
+			$keys['route_order'] = $content['nm']['route'];
+			$route = $this->route->read($keys);
+		}
+		$content['nm']['is_judge'] = $this->is_judge($comp,false,$route);	// is a (full, not just route-)judge
+		$tmpl->setElementAttribute('nm[rows]', 'actions', $this->get_actions($comp, $route));
+
 		// no startlist, no rights at all or result offical -->disable all update possebilities
 		if (($readonlys['button[apply]'] =
 			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||

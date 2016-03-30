@@ -1284,6 +1284,7 @@ app.classes.ranking = AppJS.extend(
 		var PerId = _selected[0].id;
 		var template = 'ranking.result.index.rows_boulder.edit';
 		var content = this.et2.getArrayMgr('content');
+		var sel_options = this.et2.getArrayMgr('sel_options');
 		var self = this;
 		if (content) var nm = content.getEntry('nm');
 
@@ -1301,22 +1302,26 @@ app.classes.ranking = AppJS.extend(
 			}
 		}
 		var buttons = [];
-		if (entry.checked)
+		if (!nm.result_official)
 		{
-			if (nm.is_judge && nm.discipline == 'boulder' && !nm.result_official)
+			buttons.push({"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', default: true, disabled: !!entry.checked});
+
+			if (nm.discipline == 'boulder' && nm.is_judge)
 			{
-				buttons.push({"button_id": 'uncheck',"text": 'Uncheck', id: 'uncheck', image: 'bullet', "default":true});
+				if (entry.checked)
+				{
+					buttons.push({"button_id": 'uncheck',"text": 'Uncheck', id: 'uncheck', image: 'bullet'});
+				}
+				else
+				{
+					if (nm.is_judge && nm.discipline == 'boulder' ) buttons.push({"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true});
+				}
 			}
 		}
-		else if (!nm.result_official)
-		{
-			buttons.push({"button_id": 'update',"text": 'Update', id: 'update', image: 'apply', "default":true});
-			if (nm.is_judge && nm.discipline == 'boulder' ) buttons.push({"button_id": 'checked',"text": 'Checked', id: 'checked', image: 'check', "default":true});
-		}
-		if (row.prev) buttons.push({"button_id": 'previous', text: 'Back', id: 'previous', image: 'back', "default":true});
-		if (row.next) buttons.push({"button_id": 'next', text: 'Next', id: 'next', image: 'continue', "default":true});
+		buttons.push({"button_id": 'previous', text: 'Back', id: 'previous', image: 'back', disabled: !row.prev});
+		buttons.push({"button_id": 'next', text: 'Next', id: 'next', image: 'continue', disabled: !row.next});
 
-		buttons.push({"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', "default":true, click: function() {
+		buttons.push({"button_id": 'close',"text": 'Close', id: 'close', image: 'cancel', click: function() {
 			$j(this).dialog("close");
 		}});
 
@@ -1355,13 +1360,10 @@ app.classes.ranking = AppJS.extend(
 			buttons: buttons,
 			value: {
 				content: entry || {},
-				sel_options: {},
+				sel_options: sel_options.data || {},
 				readonlys: entry.checked || nm.result_official ? { __ALL__: true} : {}
 			},
 			template: template,
-			width:550,
-			minWidth:550,
-			minHeight:450,
 			class: "update_result"
 		});
 	},

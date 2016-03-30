@@ -600,9 +600,9 @@ class ranking_route_result extends so_sql
 							unset($data['result_plus'.$suffix]);
 						}
 					}
-					if (in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK)))
+					// general result with quali on two routes for all --> add rank to result
+					if ($data['general_result'] && in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK)))
 					{
-						// quali on two routes for all --> add rank to result
 						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
 						{
 							if ($data['result'.$suffix] && $data['result_rank'.$suffix]) $data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
