@@ -139,11 +139,13 @@ competition already has a result for this category!	ranking	de	Der Wettkampf hat
 competition calendar	ranking	de	Wettkampfkalender
 competition does not allow self-registration!	ranking	de	Der Wettkampf erlaubt keine Selbstregistrierung!
 competition has no categories you are allowed to register for!	ranking	de	Der Wettkampf hat keine Kategorien in denen Du Dich registrieren darfst!
+competition has not yet a result	ranking	de	Wettkampf hat noch kein Ergebnis
 competition has not yet a startlist	ranking	de	Wettkampf hat noch keine Startliste
 competition is not open to your federation!	ranking	de	Der Wettkampf ist nicht offen für Deinen Verband!
 competition logo	ranking	de	Logo des Wettkampfes
 competition name	ranking	de	Wettkampfname
 competition not found !!!	ranking	de	Wettkampf NICHT gefunden !!!
+competition not found!	ranking	de	Wettkampf nicht gefunden!
 competition results	ranking	de	Wettkampfergebnisse
 competitions	ranking	de	Wettkämpfe
 competitions counting	ranking	de	zählende Wettkämpfe
@@ -510,7 +512,9 @@ routes	ranking	de	Routen
 rows	ranking	de	Zeilen
 saves the changes made	ranking	de	Speichert die vorgenommenen Änderungen
 select a category to additionally add to startlist (eg. juniors to men)	ranking	de	Zusätzliche Kategorie auswählen zum Generieren der Startliste (z.B. Junioren zu Herren)
+select a competition	ranking	de	Wettkampf auswählen
 select a cup for a cup-ranking	ranking	de	Einen Cup auswählen für eine Cup-Ranliste
+select a federation	ranking	de	Verband auswählen
 select a nation first	ranking	de	Zuerst Nation auswählen
 select an action	ranking	de	Einen Befehl auswählen
 select calendar	ranking	de	Kalender auswählen
@@ -618,6 +622,7 @@ unknown type	ranking	de	Unbekannter Typ
 unpublished	ranking	de	unveröffentlicht
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt
 up	ranking	de	Nach oben
+update result	ranking	de	Ergebnis aktualisieren
 update time	ranking	de	Zeit aktualisieren
 upload a portrait picture for the profile	ranking	de	Ein Protrait Bild für das Profil hochladen
 upload topo	ranking	de	Topo hochladen

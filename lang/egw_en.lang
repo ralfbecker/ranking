@@ -143,11 +143,13 @@ competition already has a result for this category!	ranking	en	Competition alrea
 competition calendar	ranking	en	Competition calendar
 competition does not allow self-registration!	ranking	en	Competition does NOT allow self-registration!
 competition has no categories you are allowed to register for!	ranking	en	Competition has no categories you are allowed to register for!
+competition has not yet a result	ranking	en	Competition has not yet a result
 competition has not yet a startlist	ranking	en	Competition has not yet a startlist
 competition is not open to your federation!	ranking	en	Competition is NOT open to your federation!
 competition logo	ranking	en	Competition logo
 competition name	ranking	en	Competition name
 competition not found !!!	ranking	en	Competition NOT found !!!
+competition not found!	ranking	en	Competition not found!
 competition results	ranking	en	Competition results
 competitions	ranking	en	Competitions
 competitions counting	ranking	en	Competitions counting
@@ -352,6 +354,7 @@ license number	ranking	en	License number
 license should be removed when federation was changed!	ranking	en	License should be removed when federation was changed!
 line	ranking	en	Line
 login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too many unsuccessful tries!
+mail	ranking	en	Mail
 mail participants	ranking	en	Mail participants
 mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	en	Mail to %1 participants send, %2 had no email-address, %3 failed.
 male	ranking	en	male
@@ -519,7 +522,9 @@ rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
 sektion	ranking	en	Sektion
 select a category to additionally add to startlist (eg. juniors to men)	ranking	en	Select a category to additionally add to startlist (eg. juniors to men)
+select a competition	ranking	en	Select a competition
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking
+select a federation	ranking	en	Select a federation
 select a nation first	ranking	en	Select a nation first
 select an action	ranking	en	Select an action
 select calendar	ranking	en	Select calendar
@@ -627,6 +632,7 @@ unknown type	ranking	en	Unknown type
 unpublished	ranking	en	unpublished
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
 up	ranking	en	Up
+update result	ranking	en	Update Result
 update time	ranking	en	update time
 upload a portrait picture for the profile	ranking	en	Upload a portrait picture for the profile
 upload topo	ranking	en	Upload topo

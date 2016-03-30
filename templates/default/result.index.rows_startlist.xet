@@ -128,7 +128,7 @@
 					<description/>
 					<description/>
 					<description/>
-					<textbox type="float" id="set[$row_cont[PerId]][ability_percent]"/>
+					<description id="${row}[ability_percent]" readonly="1"/>
 				</row>
 			</rows>
 		</grid>
@@ -161,6 +161,9 @@
 						<integer label="Startnumber" id="start_number" size="5" min="1"/>
 						<integer label="Next startnumber increment by" align="right" id="increment" size="5" min="1"/>
 					</hbox>
+				</row>
+				<row  disabled="!@nm[rows][show_ability]">
+					<float label="Ability" id="ability_percent" span="all"/>
 				</row>
 				<row class="row">
 					<label value="Last modified"/>
