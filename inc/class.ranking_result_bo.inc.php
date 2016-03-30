@@ -931,9 +931,18 @@ class ranking_result_bo extends ranking_bo
 					($key != 'result_plus' || $data['result_height'] || $val == TOP_PLUS || $old['result_plus'] == TOP_PLUS) ||
 					$update_checked && $key == 'checked')
 				{
-					if (($key == 'start_number' || $key == 'start_number_1') && strchr($val,'+') !== false)
+					// automatic increment all start-numbers
+					if (($key == 'start_number' || $key == 'start_number_1') && (strchr($val,'+') !== false || $data['increment']) ||
+						$key == 'increment' && $val && $data['start_number'])
 					{
-						$this->set_start_number($keys, $val, $order_by);
+						if ($key == 'start_number' && $data['increment'])
+						{
+							$this->set_start_number($keys, $data['increment'], $order_by, $val);
+						}
+						else
+						{
+							$this->set_start_number($keys, $val, $order_by, $data['start_number']);
+						}
 						++$modified;
 						continue;
 					}
@@ -991,14 +1000,18 @@ class ranking_result_bo extends ranking_bo
 	 * Set start-number of a given and the following participants
 	 *
 	 * @param array $keys 'WetId','GrpId', 'route_order', $this->route_result->id_col (PerId/team_id)
-	 * @param string $number [start]+increment
+	 * @param string $increment [start]+increment n+N or just N(=increment) and $start_number
 	 * @param string $order_by ='start_order ASC' ordering of list for setting start-numbers
+	 * @param int $start =null
 	 */
-	function set_start_number($keys, $number, $order_by='start_order ASC')
+	function set_start_number($keys, $increment, $order_by='start_order ASC', $start=null)
 	{
 		$id = $keys[$this->route_result->id_col];
 		unset($keys[$this->route_result->id_col]);
-		list($start,$increment) = explode('+',$number);
+		if (strpos($increment, '+') !== false)
+		{
+			list($start, $increment) = explode('+', $increment);
+		}
 		foreach($this->route_result->search($keys, false, $order_by) as $data)
 		{
 			if (!$id || $data[$this->route_result->id_col] == $id)

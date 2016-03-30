@@ -119,6 +119,7 @@ cathegories	ranking	de	Kategorien
 cellphone	ranking	de	Mobiltelefon
 changes applied to %1 federations.	ranking	de	Änderungen auf %1 Verbände angewandt.
 check all	ranking	de	Alle auswählen
+checked	ranking	de	Geprüft
 children	ranking	de	Kinder
 city	ranking	de	Stadt
 click here to have a mail send to your stored email address with instructions how to set your password, register for competitions and edit your profile.	ranking	de	Hier klicken, damit eine Mail an Deine gespeicherte EMail Adresse versendet wird. Diese enthält Anweisungen zum Setzen Deines Passworts. Damit kannst Du Dich für Wettkämpfe anmelden und Dein Profil bearbeiten.
@@ -373,6 +374,7 @@ national registration	ranking	de	Nationale Registrierung
 national team ranking	ranking	de	Nationen-Team-Rangliste
 nationname	ranking	de	Name des Landes
 nations and federations	ranking	de	Nationen und Verbände
+next startnumber increment by	ranking	de	Nächste Startnumber erhöhen um
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
 no birthdate	ranking	de	kein Geburtsdatum
 no categories defined!	ranking	de	Keine Kategorien definiert!
@@ -607,6 +609,7 @@ two qualification with height sum	ranking	de	zwei Qualifikationen für alle mit 
 two qualification, half quota	ranking	de	zwei Qualifikationen, halbe Quote
 type of display	ranking	de	Typ der Anzeige
 type of qualification: automatic	ranking	de	Art der Qualifikation: automatisch
+uncheck	ranking	de	Ungeprüft
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	de	eindeutiger (interner) Schlüssel, in der Form 'YY_CC' oder 'YYCCC' YY=Jahr, CCC=Cup, zB. '02_WC' oder '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	de	eindeutiger (interner) Schlüssel in der Form: 'YY_CC_LL' oder 'YYCCC_LL' YY=Jahr, CCC=Cup, LL=Veranstaltungsort
 unknown category or not a category of this competition	ranking	de	Unbekannte Kategorie oder nicht eine Kategorie dieses Wettkampfes

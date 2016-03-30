@@ -210,9 +210,6 @@
 				<row disabled="@no_list">
 					<template id="rows_template" template="@nm[template]" span="all"/>
 				</row>
-				<row class="noPrint" disabled="@no_list">
-					<button statustext="Apply the changes made" label="Update" id="button[apply]"/>
-				</row>
 				<row disabled="!@nm[show_result]=4">
 					<template id="measurement_template" template="@measurement_template"/>
 				</row>

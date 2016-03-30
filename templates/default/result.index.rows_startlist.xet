@@ -69,7 +69,6 @@
 				<column width="5%"/>
 				<column width="5%"/>
 				<column width="5%" disabled="!@show_second_lane"/>
-				<column width="5%"/>
 				<column/>
 				<column/>
 				<column/>
@@ -91,9 +90,8 @@
 				</row>
 				<row class="th" part="header">
 					<nextmatch-sortheader align="center" label="@@start_order_label" id="start_order"/>
-					<nextmatch-header align="center" label="Start- number" id="printnumber" class="onlyPrint"/>
+					<nextmatch-header align="center" label="Start- number" id="printnumber"/>
 					<nextmatch-sortheader label="Lane B" id="start_order2n"/>
-					<nextmatch-sortheader align="center" label="Start- number" id="start_number" class="noPrint"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
@@ -113,9 +111,8 @@
 				</row>
 				<row class="x $row_cont[class]">
 					<description align="center" id="{$row}[start_order]" no_lang="1"/>
-					<description align="center" id="{$row}[start_number]" no_lang="1" class="onlyPrint"/>
+					<description align="center" id="{$row}[start_number]" no_lang="1"/>
 					<description align="center" id="{$row}[start_order2n]" no_lang="1"/>
-					<textbox align="center" id="set[$row_cont[PerId]][start_number]" no_lang="1" size="5" validator="/^[0-9]*[+]?-?[0-9]*$/" class="noPrint"/>
 					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
 					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
@@ -132,6 +129,43 @@
 					<description/>
 					<description/>
 					<textbox type="float" id="set[$row_cont[PerId]][ability_percent]"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index.rows_startlist.edit" template="" lang="" group="0" version="1.9.004" class="ranking_view">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column/>
+				<column width="100"/>
+			</columns>
+			<rows>
+				<row>
+					<hbox align="center">
+						<image class="avatar" src="profile_url"/>
+					</hbox>
+				</row>
+				<row class="name row" height="50px">
+					<description align="left" id="start_order"/>
+					<hbox align="center">
+						<description id="nachname" no_lang="1" class="lastname"/>
+						<description id="vorname" no_lang="1" />
+						<description id="nation" no_lang="1" />
+						<description id="start_number" label="(%s)"/>
+					</hbox>
+					<description/>
+				</row>
+				<row class="row" height="50px">
+					<hbox span="all" width="100%" class="startnumbers">
+						<integer label="Startnumber" id="start_number" size="5" min="1"/>
+						<integer label="Next startnumber increment by" align="right" id="increment" size="5" min="1"/>
+					</hbox>
+				</row>
+				<row class="row">
+					<label value="Last modified"/>
+					<date-time align="center" id="result_modified" readonly="true" class="noWrap"/>
+					<select-account align="right" id="result_modifier" readonly="true" class="noWrap"/>
 				</row>
 			</rows>
 		</grid>

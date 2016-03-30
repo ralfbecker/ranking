@@ -817,10 +817,10 @@ class ranking_result_ui extends ranking_result_bo
 			{
 				$rows[$k]['profile_url'] = common::image('ranking', 'transparent');
 			}
-			// results for setting on regular routes (no general result)
+			$rows[$k]['id'] = $row[$this->route_result->id_col];
+			/* not used anymore: results for setting on regular routes (no general result)
 			if($query['route'] >= 0)
 			{
-				$rows[$k]['id'] = $row[$this->route_result->id_col];
 				$rows['set'][$row[$this->route_result->id_col]] = $row;
 				// disable input in for checked results
 				if ($row['checked'])
@@ -839,7 +839,7 @@ class ranking_result_ui extends ranking_result_bo
 					}
 					$readonlys['apply['.$row['PerId'].']'] = true;
 				}
-			}
+			}*/
 			if (!$quota_line && $query['route_quota'] && $query_in['order'] == 'result_rank' && $query_in['sort'] == 'ASC' &&
 				$row['result_rank'] > $query['route_quota'])	// only show quota line if sorted by rank ASC
 			{
@@ -851,19 +851,6 @@ class ranking_result_ui extends ranking_result_bo
 				$rows[$k]['ranking_place'] = $ranking[$row['PerId']]['platz'];
 				$rows[$k]['ranking_points'] = $ranking[$row['PerId']]['pkt'];
 			}
-			/* no more row_on/off
-			if (!isset($rows[$k]['class'])) $rows[$k]['class'] = $k & 1 ? 'row_off' : 'row_on';
-			if (substr($query['discipline'],0,5) == 'speed' && $query['route'] >= 2 &&
-				(strstr($query['template'],'startlist') && $query['order'] == 'start_order' ||
-				!strstr($query['template'],'startlist') && !$row['result_rank'] && $query['order'] == 'result_rank'))
-			{
-				if (!$unranked)
-				{
-					$unranked[$k & 2] = $rows[$k]['class'];
-					$unranked[2*!($k & 2)] = $rows[$k]['class'] == 'row_off' ? 'row_on' : 'row_off';
-				}
-				$rows[$k]['class'] = $unranked[$k & 2];
-			}*/
 			// for the speed graphic, we have to make the athlets availible by the startnumber of each heat
 			if($query['route'] == -2 && substr($query['discipline'],0,5) == 'speed' && strstr($query['template'],'speed_graph'))
 			{
@@ -1536,7 +1523,6 @@ class ranking_result_ui extends ranking_result_bo
 			}
 		}
 		$tmpl->setElementAttribute('button[new]', 'onclick', $onclick);
-		$tmpl->setElementAttribute('button[apply]', 'class', '');
 		// check if the type of the list to show changed: startlist, result or general result
 		// --> set template and default order
 		if ($content['nm']['show_result'] == 2 && $content['nm']['old_show'] != 2)

@@ -123,6 +123,7 @@ cathegories	ranking	en	Cathegories
 cellphone	ranking	en	Cellphone
 changes applied to %1 federations.	ranking	en	Changes applied to %1 federations.
 check all	ranking	en	Check all
+checked	ranking	en	Checked
 children	ranking	en	Children
 city	ranking	en	City
 click here to have a mail send to your stored email address with instructions how to set your password, register for competitions and edit your profile.	ranking	en	Click here to have a mail send to your stored EMail address with instructions how to set your password, register for competitions and edit your profile.
@@ -380,6 +381,7 @@ national registration	ranking	en	National registration
 national team ranking	ranking	en	National team ranking
 nationname	ranking	en	Nationname
 nations and federations	ranking	en	Nations and Federations
+next startnumber increment by	ranking	en	Next startnumber increment by
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	en	No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!
 no birthdate	ranking	en	no Birthdate
 no categories defined!	ranking	en	No categories defined!
@@ -616,6 +618,7 @@ two qualification with height sum	ranking	en	two Qualification with height sum
 two qualification, half quota	ranking	en	two Qualification, half quota
 type of display	ranking	en	Type of display
 type of qualification: automatic	ranking	en	Type of qualification: automatic
+uncheck	ranking	en	Uncheck
 unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	en	unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'
 unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	en	unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location
 unknown category or not a category of this competition	ranking	en	Unknown category or not a category of this competition
