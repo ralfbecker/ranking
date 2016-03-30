@@ -21,6 +21,7 @@
 					<row height="70">
 						<label value="Athlete" statustext="Sort athletes" onclick="app.ranking.sort_athletes" for="nm[PerId]"/>
 						<select id="nm[PerId]" onchange="app.ranking.boulder_changed" options="Select one" class="et2_fullWidth"/>
+						<description/>
 					</row>
 					<row height="70">
 						<label value="Try"/>

@@ -223,8 +223,8 @@ button.tryButton , input.tryButton  {
 	width: 4em;
 	white-space: nowrap;
 }
-#ranking-result-index_nm\[boulder_n\] {
-	width: 3em;
+#ranking-result-index_nm\[boulder_n\], #ranking-result-index_try, #ranking-result-index_top, #ranking-result-index_zone {
+	width: 5em;
 }
 table.buttonBox {
    padding-top: 10px;
@@ -252,6 +252,21 @@ body #egw_fw_main #egw_fw_tabs {
 	font-size:200%;
 	padding-left: 5px;
 }
+#ranking-result-index_measurement_template .et2_selectbox {
+    height: 50px;
+    font-size: 10pt;
+    padding-left: 5px;
+}
+button.bigButton {
+    border-radius: 0;
+    font-size: 12pt;
+    width: 100%;
+	height: 50px;
+}
+.avatar {
+	width:100px;
+	height: 100px;
+}
 .dialogFooterToolbar button:hover{
 	height:auto;
 }
@@ -265,6 +280,7 @@ body #egw_fw_main #egw_fw_tabs {
 	border: 1px solid gray;
 	font-size: 150%;
 	height:auto;
+	width:150px;
 }
 input.nextButton {
 	float:right;
@@ -375,3 +391,4 @@ img#foto, img#foto2 {
 #ranking-result-index-rows_boulder-edit .name td {
 	padding-bottom: 8px;
 }
+
