@@ -402,3 +402,10 @@ form#ranking-result-index .resultHeaderBottom {
 #ranking-result-index_measurement_template div.popupMainDiv .et2_label {
 	font-size: 12pt;
 }
+
+#ranking-result-index_measurement_template div.popupMainDiv label.et2_label.athleteSort.et2_clickable:after {
+    content: "\21C5";
+    padding-left: 5px;
+    color: #466C8F;
+    padding-right: 5px;
+}
