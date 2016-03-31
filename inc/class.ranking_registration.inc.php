@@ -335,7 +335,7 @@ class ranking_registration extends so_sql
 			$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
 
 			$extra_cols = array_merge($extra_cols ? explode(',', $extra_cols) : array(),
-				explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
+				explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
 				".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,".
 				ranking_athlete::ATHLETE_TABLE.".PerId AS PerId"));
 

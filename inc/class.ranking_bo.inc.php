@@ -787,12 +787,12 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param int|array $athlete
 	 * @param int|array $cat
-	 * @param int|array $comp =null
+	 * @param int|array $comp
 	 * @param boolean $register =true true: user tries to register, false: other operation
 	 * @throws egw_exception_wrong_parameter if $athlete, $cat or $comp are not found
 	 * @return string translated error-message or null
 	 */
-	function error_register($athlete, $cat, $comp=null, $register=true)
+	function error_register($athlete, $cat, $comp, $register=true)
 	{
 		if (!is_array($athlete) && !($athlete = $this->athlete->read($athlete)))
 		{
@@ -802,7 +802,7 @@ class ranking_bo extends ranking_so
 		{
 			throw new egw_exception_wrong_parameter(lang('Category NOT found !!!'));
 		}
-		if ($comp && !is_array($comp) && !($comp = $this->comp->read($comp)))
+		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
 			throw new egw_exception_wrong_parameter(lang('Competition NOT found !!!'));
 		}
@@ -825,7 +825,9 @@ class ranking_bo extends ranking_so
 		{
 			$error = lang('Athlete is suspended !!!');
 		}
-		elseif ($cat['nation'] && $cat['nation'] != $athlete['nation'])
+		elseif ($comp && $comp['nation'] && (
+			in_array((int)$comp['open_comp'], array(ranking_competition::OPEN_NOT, ranking_competition::OPEN_NATION)) && $athlete['nation'] != $comp['nation'] ||
+			$comp['open_comp'] == ranking_competition::OPEN_DACH && !in_array($athlete['nation'], array('GER','SUI','AUT'))))
 		{
 			$error = lang('Wrong nationality');
 		}

@@ -13,6 +13,7 @@
 				<column width="80"/>
 				<column width="10%"/>
 				<column width="30%"/>
+				<column width="20%"/>
 				<column width="15%"/>
 				<column width="95"/>
 			</columns>
@@ -26,6 +27,7 @@
 					<nextmatch-sortheader align="center" label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader label="Federation" id="verband"/>
+					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id"/>
 					<nextmatch-filterheader id="GrpId" empty_label="All categories"/>
 					<nextmatch-filterheader id="state"/>
 				</row>
@@ -38,6 +40,7 @@
 					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
 					<description id="${row}[ort]" no_lang="1"/>
 					<description id="${row}[verband]" no_lang="1"/>
+					<select id="${row}[acl_fed_id]" no_lang="1" readonly="true"/>
 					<select id="${row}[GrpId]" readonly="true"/>
 					<description id="${row}[state]" statustext="$row_cont[state_changed]"/>
 				</row>

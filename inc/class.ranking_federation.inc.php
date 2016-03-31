@@ -76,9 +76,10 @@ class ranking_federation extends so_sql
 	 *
 	 * @param string $nation =null string to limit result to a given nation
 	 * @param bool $only_direct_children =false true to return only direct children of given nation federation(s)
+	 * @param string $show ='verband' could also be 'fed_shortcut'
 	 * @return array
 	 */
-	function federations($nation=null,$only_direct_children=false)
+	function federations($nation=null,$only_direct_children=false,$show='verband')
 	{
 		$feds = array();
 		$where = $nation ? array('nation' => $nation) : array();
@@ -94,10 +95,16 @@ class ranking_federation extends so_sql
 				$where[] = "fed_parent IS NULL";
 			}
 		}
-		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$where,__LINE__,__FILE__,false,
+		$cols = array('fed_id', 'verband', 'nation');
+		if (!in_array($show, $cols))
+		{
+			$cols[] = $show;
+			$where[] = $show.' IS NOT NULL';
+		}
+		foreach($this->db->select(self::FEDERATIONS_TABLE, $cols, $where, __LINE__, __FILE__, false,
 			'ORDER BY nation ASC,verband ASC',self::APPLICATION) as $fed)
 		{
-			$feds[$fed['fed_id']] = (!$nation ? $fed['nation'].': ' : '').$fed['verband'];
+			$feds[$fed['fed_id']] = (!$nation ? $fed['nation'].': ' : '').$fed[$show];
 		}
 		return $feds;
 	}

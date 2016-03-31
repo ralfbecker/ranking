@@ -55,11 +55,23 @@ class ranking_competition extends so_sql
 		1 => 'Federation needs to confirm',
 		2 => 'Allowed without extra confirmation',
 	);
+	/**
+	 * Constants for column open_comp
+	 */
+	const OPEN_NOT = 0;
+	const OPEN_NATION = 1;
+	const OPEN_DACH = 2;
+	const OPEN_INT = 3;
+	/**
+	 * Labels for column open_comp
+	 *
+	 * @var array
+	 */
 	var $open_comp_types = array(
-		0 => 'No',
-		1 => 'National',
-		2 => 'D,A,CH',
-		3 => 'International',
+		self::OPEN_NOT    => 'No',
+		self::OPEN_NATION => 'National',
+		self::OPEN_DACH   => 'D,A,CH',
+		self::OPEN_INT    => 'International',
 	);
 	var $prequal_types = array(
 		0 => 'comp. date',

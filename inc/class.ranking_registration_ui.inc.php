@@ -387,6 +387,7 @@ class ranking_registration_ui extends ranking_bo
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 				'row_id'         => 'id',
 				'actions'        => self::get_actions(),
+				'default_cols'   => '!ort,acl_fed_id',
 			);
 		}
 		elseif($_content['nm']['download'])
@@ -468,6 +469,7 @@ class ranking_registration_ui extends ranking_bo
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 			'nation' => $this->federation->get_competition_federations($comp['nation'],$allow_register_everyone ? null : $this->register_rights),
+			'acl_fed_id' => $calendar == 'SUI' ? $this->federation->federations('SUI', true, 'fed_shortcut') : array(),
 			'sex' => $this->genders,
 			'state' => ranking_registration::$state_filters,
 		);

@@ -20,7 +20,7 @@ SELECT PerId,rkey,nachname,vorname,sex,ort,concat(year(geb_date),"-01-01"),acl
 FROM Personen
 EOF
 # dump all tables but Personen (incl. PersonenExport)
-$SSH mysqldump $DB Athlete2Fed Federations Feldfaktoren Gruppen Gruppen2Personen Licenses RelayResults Results RouteResults Routes Serien Wettkaempfe PersonenExport
+$SSH mysqldump $DB Athlete2Fed Federations Feldfaktoren Gruppen Gruppen2Personen Licenses RelayResults Results RouteResults Routes Serien Wettkaempfe Registration PersonenExport
 # rename PersonenExport to Personen
 echo 'DROP TABLE IF EXISTS Personen;
 RENAME TABLE PersonenExport TO Personen;'
