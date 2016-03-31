@@ -100,7 +100,54 @@ app.classes.ranking = AppJS.extend(
 							break;
 					}
 				}
+				else
+				{
+					this.show_hint(this.egw.lang("How to use Resultservice"),
+						this.egw.lang("There is a manual in left menu under preferences.")+"\n\n"+
+						this.egw.lang("Start- and result-lists no longer contain input fields or buttons:\ndouble-click on an athlete to enter his result, or right click for more options."),
+						'no_resultservice_hint');
+				}
 				break;
+
+			case 'ranking.registration':
+				this.show_hint(this.egw.lang("How to register athletes"),
+					this.egw.lang("1. select competition\n2. click on [+ Register]\n3. select category\n4. search for athletes to register")+"\n\n"+
+					this.egw.lang("To remove already registered athletes:\nright click on them in list and choose 'delete' from context menu"),
+					'no_registration_hint');
+				break;
+		}
+	},
+
+	/**
+	 * Show a hint to the user, unless he already confirmed it (and we stored a named preference for it)
+	 *
+	 * @param {string} _title title of hint
+	 * @param {string} _text text of hint
+	 * @param {string} _name name of implicit preference set if user confirms hint / dont want to see it anymore, eg. "no_xyz_hint"
+	 */
+	show_hint: function(_title, _text, _name)
+	{
+		if (this.egw.getSessionItem(this.appname, _name))
+		{
+			return;
+		}
+		var pref = this.egw.preference(_name, this.appname, function(_value)
+		{
+			this.show_hint(_title, _text, _name);
+		}, this);
+
+		if (typeof pref == 'undefined')	// true: user already confirmed, false: not yet loaded
+		{
+			var self = this;
+			var dialog = et2_dialog.show_dialog(function(_button)
+			{
+				if (_button == et2_dialog.NO_BUTTON)
+				{
+					self.egw.set_preference(self.appname, _name, true);
+				}
+				self.egw.setSessionItem(self.appname, _name);
+			}, _text+"\n\n"+
+			this.egw.lang("Display this message again next time?"), _title);
 		}
 	},
 

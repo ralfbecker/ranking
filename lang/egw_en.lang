@@ -23,6 +23,7 @@
 1. display	ranking	en	1. Display
 1. january	ranking	en	1. January
 1. place	ranking	en	1. place
+1. select competition\n2. click on [+ register]\n3. select category\n4. search for athletes to register	ranking	en	1. select competition\n2. click on [+ Register]\n3. select category\n4. search for athletes to register
 2. display	ranking	en	2. Display
 2. lane	ranking	en	2. Lane
 2. qualification	ranking	en	2. Qualification
@@ -199,6 +200,7 @@ display cup	ranking	en	display cup
 display no ranking	ranking	en	display no ranking
 display ranking	ranking	en	display ranking
 display saved	ranking	en	Display saved
+display this message again next time?	ranking	en	Display this message again next time?
 displays	ranking	en	Displays
 do you want to use a day-license?	ranking	en	Do you want to use a day-license?
 down	ranking	en	Down
@@ -316,6 +318,8 @@ how is the key for the default cup of this cathegory, eg. '??_wc' for the worldc
 how many athletes from the complimentary list of each nation should be used	ranking	en	How many athletes from the complimentary list of each nation should be used
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	en	how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	en	how many athlets of the field gets points, eg. 50% (defaults to all if empty)
+how to register athletes	ranking	en	How to register athletes
+how to use resultservice	ranking	en	How to use Resultservice
 id	ranking	en	ID
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
 if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	en	If you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.
@@ -565,6 +569,7 @@ squad	ranking	en	Squad
 start	ranking	en	Start
 start heat	ranking	en	Start round
 start order	ranking	en	Start order
+start- and result-lists no longer contain input fields or buttons:\ndouble-click on an athlete to enter his result, or right click for more options.	ranking	en	Start- and result-lists no longer contain input fields or buttons:\ndouble-click on an athlete to enter his result, or right click for more options.
 start- number	ranking	en	Bib- number
 start- order	ranking	en	Start- order
 startdate	ranking	en	Startdate
@@ -590,6 +595,7 @@ teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
 the link is expired, please have a %1new mail send to you%2.	ranking	en	The link is expired, please have a %1new mail send to you%2.
 the link you clicked or entered is not correct, maybe a typo!	ranking	en	The link you clicked or entered is NOT correct, maybe a typo!
+there is a manual in left menu under preferences.	ranking	en	There is a manual in left menu under preferences.
 this athlete has no license!	ranking	en	This athlete has NO license!
 this module displays calendar, results and rankings	ranking	en	This module displays calendar, results and rankings
 this module displays information from the ranking app.	ranking	en	This module displays information from the ranking app.
@@ -600,6 +606,7 @@ time	ranking	en	Time
 time measured	ranking	en	Time measured
 time measurement	ranking	en	Time measurement
 to confirm	ranking	en	To confirm
+to remove already registered athletes:\nright click on them in list and choose 'delete' from context menu	ranking	en	To remove already registered athletes:\nright click on them in list and choose 'delete' from context menu
 to year	ranking	en	to year
 top	ranking	en	Top
 top: number of tries	ranking	en	Top: number of tries

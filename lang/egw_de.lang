@@ -23,6 +23,7 @@
 1. display	ranking	de	1. Display
 1. january	ranking	de	1. Januar
 1. place	ranking	de	1. Platz
+1. select competition\n2. click on [+ register]\n3. select category\n4. search for athletes to register	ranking	de	1. Wettkampf auswählen\n2. auf [+ Registrieren] klicken\n3. Kategorie auswählen\n4. Athleten zum Registrieren suchen
 2. display	ranking	de	2. Display
 2. lane	ranking	de	2. Bahn
 2. qualification	ranking	de	2. Qualifikation
@@ -195,6 +196,7 @@ display cup	ranking	de	Cup anzeigen
 display no ranking	ranking	de	Rangliste nicht anzeigen
 display ranking	ranking	de	Rangliste anzeigen
 display saved	ranking	de	Anzeige gespeichert
+display this message again next time?	ranking	de	Diese Nachricht beim nächsten mal wieder anzeigen?
 displays	ranking	de	Anzeigen
 do you want to use a day-license?	ranking	de	Wollen Sie eine Tageslizenz verwenden?
 down	ranking	de	Nach unten
@@ -312,6 +314,8 @@ how is the key for the default cup of this cathegory, eg. '??_wc' for the worldc
 how many athletes from the complimentary list of each nation should be used	ranking	de	Wie viele Athleten der Komplimentärliste sollen von jeder Nation zugelassen werden
 how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	de	wie viele Athleten (prozentual) des Feldes werden benützt um den Feldfaktor zu berechnen, normalerweise alle = 100%
 how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	de	wie viele Athleten des Feldes bekommen Punkte, zB. 50% (leer bedeutet alle)
+how to register athletes	ranking	de	Wie man Athleten registriert
+how to use resultservice	ranking	de	Wie man den Ergebnisservice benutzt
 id	ranking	de	ID
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
 if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	de	Falls Sie noch kein Passwort haben oder es vergessen haben, geben sie einfach nur Ihre E-Mail Adresse an. Dann erhalten Sie eine E-Mail mit Anweisungen zum Setzen des Passworts.
@@ -555,6 +559,7 @@ squad	ranking	de	Kader
 start	ranking	de	Start
 start heat	ranking	de	Beginn Durchgang
 start order	ranking	de	Startreihenfolge
+start- and result-lists no longer contain input fields or buttons:\ndouble-click on an athlete to enter his result, or right click for more options.	ranking	de	Start- und Ergebnislisten enthalten keine Eingabefelder mehr oder Buttons:\nDoppelklick auf einen Athleten um das Ergebnis einzugeben, oder Rechtsklick für weitere Optionen.
 start- number	ranking	de	Start- nummer
 start- order	ranking	de	Start- folge
 startdate	ranking	de	Startdatum
@@ -580,6 +585,7 @@ teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
 the link is expired, please have a %1new mail send to you%2.	ranking	de	Der Link ist abgelaufen, bitte eine %1neue Mail anfordern%2.
 the link you clicked or entered is not correct, maybe a typo!	ranking	de	Der angeklickte oder eingegebenen Link ist NICHT korrekt, evtl. ein Tipfehler!
+there is a manual in left menu under preferences.	ranking	de	Es gibt ein (englisches) Handbuch links im Menü unter Einstellungen.
 this athlete has no license!	ranking	de	Dieser Athlete hat KEINE Lizenz!
 this module displays calendar, results and rankings	ranking	de	Dieses Module zeigt Kalender, Ergebnisse und Ranglisten an
 this module displays information from the ranking app.	ranking	de	Dieses Modul zeigt Informationen der Ranglisten Anwendung.
@@ -590,6 +596,7 @@ time	ranking	de	Zeit
 time measured	ranking	de	Zeit gemessen
 time measurement	ranking	de	Zeitmessung
 to confirm	ranking	de	Zu bestätigen
+to remove already registered athletes:\nright click on them in list and choose 'delete' from context menu	ranking	de	Um bereits registrierte Athleten zu löschen:\nklick rechts auf diese in der Liste und im Kontextmenü 'Löschen' auswählen
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
 top: number of tries	ranking	de	Top: Anzahl Versuche
