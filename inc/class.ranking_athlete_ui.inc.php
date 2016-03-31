@@ -123,7 +123,7 @@ class ranking_athlete_ui extends ranking_bo
 					$feds_with_grants = array();
 					foreach($grants as $fed_id => $rights)
 					{
-						if ($rights && EGW_ACL_ATHLETE)
+						if ($rights & EGW_ACL_ATHLETE)
 						{
 							$feds_with_grants[] = $fed_id;
 						}
@@ -150,8 +150,12 @@ class ranking_athlete_ui extends ranking_bo
 					}
 				}
 			}
+			if (!$nations)
+			{
+				egw_framework::window_close(lang('Permission denied'));
+			}
 			// we have no edit-rights for that nation
-			if (!$this->acl_check_athlete($this->athlete->data))
+			if (!empty($this->athlete->data['PerId']) && !$this->acl_check_athlete($this->athlete->data))
 			{
 				$view = true;
 			}
