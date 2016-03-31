@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<!-- $Id$ -->
+<overlay>
+	<template id="ranking.result.route.general" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%">
+			<columns>
+				<column width="116"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Status"/>
+					<vbox span="all">
+						<select id="route_status" onchange="if (this.value=='2') { var now=new Date(); document.getElementById(form::name('route_result')).value=now.toLocaleString();}" class="et2_fullWidth"/>
+						<select statustext="Select if you want to import into a different category (eg. import juniors from men result)" id="import_cat" class="et2_fullWidth"/>
+						<button statustext="Import the result into the ranking" label="Import into ranking" id="button[ranking]"/>
+					</vbox>
+				</row>
+				<row class="row" disabled="@no_startlist">
+					<description value="Startlist"/>
+					<vbox span="all">
+						<button label="Generate Startlist" id="button[startlist]"/>
+						<select type="select-number" id="max_compl" options="All complimentary,0,10" class="max_compl et2_fullWidth"/>
+						<select class="et2_fullWidth" statustext="Select a category to additionally add to startlist (eg. juniors to men)" id="add_cat"/>
+						<select class="et2_fullWidth" statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order"/>
+					</vbox>
+				</row>
+				<row class="row" disabled="@route_order=-1">
+					<description value="Isolation" for="route_iso_open"/>
+					<vbox span="all">
+						<textbox blur="opens" class="et2_fullWidth" id="route_iso_open" size="20" maxlength="40"/>
+						<textbox blur="closes" class="et2_fullWidth" label="-" id="route_iso_close" size="20" maxlength="40"/>
+					</vbox>
+				</row>
+				<row class="row" disabled="@route_order=-1">
+					<description value="Start heat" for="route_start"/>
+					<textbox blur="time" id="route_start" size="64" maxlength="64" span="all" class="et2_fullWidth"/>
+				</row>
+				<row class="row" disabled="@route_order=-1">
+					<description value="Observation time" for="route_observation_time"/>
+					<vbox span="all">
+						<textbox id="route_observation_time" size="20" maxlength="40" class="et2_fullWidth"/>
+						<textbox label="Climbing time" id="route_climbing_time" size="20" maxlength="40" class="et2_fullWidth"/>
+					</vbox>
+				</row>
+				<row class="row">
+					<description value="Quota" for="route_quota"/>
+					<textbox type="integer" label="%s Quota has to be 0 for lead final, otherwise time is NOT used!" id="route_quota" span="all" class="et2_fullWidth"/>
+				</row>
+				<row class="row">
+					<description value="Result official"/>
+					<textbox blur="time" id="route_result" size="64" maxlength="80" span="all" class="et2_fullWidth"/>
+				</row>
+				<row class="row">
+					<description value="Judge" for="route_judge"/>
+					<textbox blur="name(s)" id="route_judge" size="64" maxlength="80" span="all" class="et2_fullWidth"/>
+				</row>
+				<row class="row" disabled="@no_upload">
+					<description value="Import file"/>
+					<vbox span="all">
+						<file id="file"/>
+						<button label="Upload" id="button[upload]" />
+						<menulist>
+							<menupopup id="upload_options" options="Options" class="et2_fullWidth"/>
+						</menulist>
+					</vbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.route.comment" template="" lang="" group="0" version="14.2.001">
+		<textbox multiline="true" id="route_comments" height="270" width="100%" span="all" resize_ratio="0"/>
+	</template>
+	<template id="ranking.result.route.measure" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%">
+			<columns>
+				<column width="120"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row" disabled="@no_display">
+					<description value="Display"/>
+					<hbox span="all">
+						<menulist>
+							<menupopup label="1. Display" id="dsp_id" onchange="1" options="None"/>
+						</menulist>
+						<menulist>
+							<menupopup type="select-number" label="Line" id="frm_line" options=",1,$cont[max_line]" class="leftPad5"/>
+						</menulist>
+						<menulist>
+							<menupopup label="2. Display" id="dsp_id2" onchange="1" options="None" class="leftPad5"/>
+						</menulist>
+						<menulist>
+							<menupopup type="select-number" label="Line" id="frm_line2" options=",1,$cont[max_line2]" class="leftPad5"/>
+						</menulist>
+					</hbox>
+				</row>
+				<row class="row" disabled="!@discipline=speed">
+					<description value="Time measurement"/>
+					<hbox span="all">
+						<textbox blur="Host" statustext="Hostname or IP the Timy control program is running, eg. localhost" id="route_time_host"/>
+						<textbox type="integer" blur="Port" id="route_time_port" class="leftPad5"/>
+					</hbox>
+				</row>
+				<row class="row" valign="top">
+					<description value="Routejudges" for="route_judges"/>
+					<listbox type="select-account" id="route_judges" rows="5"/>
+					<description/>
+				</row>
+				<row class="row" disabled="@no_upload">
+					<description value="Upload topo" for="topo_upload"/>
+					<hbox>
+						<file id="topo_upload"/>
+						<button label="Upload" id="button[topo_upload]" class="leftPad5"/>
+					</hbox>
+					<description/>
+				</row>
+				<row valign="top" height="75">
+					<grid width="100%" id="topos">
+						<columns>
+							<column/>
+							<column/>
+							<column/>
+							<column width="16"/>
+						</columns>
+						<rows>
+							<row class="row" disabled="!@0">
+								<vfs-mime id="$row"/>
+								<vfs id="$row" readonly="true"/>
+								<vfs-size id="$row"/>
+								<button label="Delete" id="delete[$row_cont]" onclick="return confirm('Delete this topo');" image="delete"/>
+							</row>
+						</rows>
+					</grid>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.route.registration" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%" id="athlete">
+			<columns>
+				<column width="100"/>
+				<column width="200"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="row">
+					<description value="Search" for="PerId"/>
+					<link-entry blur="Name" id="PerId" onchange="1" options="ranking" class="et2_fullWidth"/>
+				</row>
+				<row>
+					<description value="Gender" for="sex"/>
+					<menulist>
+						<menupopup id="sex" class="inputRequired et2_fullWidth"/>
+					</menulist>
+				</row>
+				<row>
+					<description value="Lastname" for="nachname"/>
+					<textbox id="nachname" size="30" maxlength="40" class="inputRequired et2_fullWidth"/>
+				</row>
+				<row class="row">
+					<description value="Firstname" for="vorname"/>
+					<textbox id="vorname" size="30" maxlength="40" class="inputRequired et2_fullWidth"/>
+				</row>
+				<row>
+					<description value="Birthdate" for="geb_date"/>
+					<date id="geb_date" options="Y-m-d"/>
+				</row>
+				<row class="row">
+					<description value="EMail" for="email"/>
+					<url-email id="email" options="30,60" class="inputRequired et2_fullWidth"/>
+				</row>
+				<row>
+					<description value="Nation" for="nation"/>
+					<menulist>
+						<menupopup id="nation" onchange="1" class="inputRequired et2_fullWidth"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="City" for="ort"/>
+					<textbox id="ort" size="30" maxlength="60" class="et2_fullWidth"/>
+				</row>
+				<row class="row">
+					<description value="Federation" for="fed_id"/>
+					<menulist span="all">
+						<menupopup id="fed_id" class="inputRequired et2_fullWidth"/>
+					</menulist>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<button label="Register" id="register"/>
+					<checkbox label="Send EMail to set password to athlete" id="password_email" onchange="var email=jQuery('#exec\\[athlete\\]\\[email\\]').parent(); email[this.checked ? 'addClass' : 'removeClass'].call(email, 'inputRequired');" span="all"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.route" template="" lang="" group="0" version="14.2.001">
+		<grid width="100%">
+			<columns>
+				<column width="120"/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="dialogHeadbar">
+					<hbox>
+						<button statustext="Saves the changes made" id="button[save]"/>
+						<button statustext="Apply the changes made" id="button[apply]"/>
+						<button statustext="Cannel without saving" id="button[cancel]" onclick="window.close();"/>
+						<html id="js"/>
+						<button statustext="Delete this heat including all results" id="button[delete]" onclick="return confirm('Delete this heat including all results');"/>
+					</hbox>
+				</row>
+				<row class="dialogHeader">
+					<description value="Competition"/>
+					<menulist span="all">
+						<menupopup id="WetId" no_lang="1" onchange="1" readonly="true"/>
+					</menulist>
+				</row>
+				<row class="row">
+					<description value="Category"/>
+					<menulist>
+						<menupopup id="GrpId" no_lang="1" readonly="true"/>
+					</menulist>
+
+				</row>
+				<row>
+					<label value="Boulder"/>
+					<hbox>
+						<menulist>
+						<menupopup id="discipline" onchange="1"/>
+						</menulist>
+						<menulist>
+							<menupopup type="select-number" statustext="Number of problems" id="route_num_problems" options="None,3,10,1" class="leftPad5"/>
+						</menulist>
+						<textbox blur="num[/row][:points][btf]" statustext="num[/row][:points][btf] optional points per boulder (distributed on all tops) or 1 point per top, btf: what checkboxes to display" id="selfscore_mode" validator="/^([0-9]+)(\/[0-9]+)?(:[0-9]+)?(b?t?f?)$/"/>
+					</hbox>
+				</row>
+				<row class="row">
+					<description value="Heat"/>
+					<vbox>
+						<menulist>
+						<menupopup id="route_order" no_lang="1" readonly="true"/>
+						</menulist>
+						<menulist align="right">
+							<menupopup id="route_type" onchange="if (this.value=='1') document.getElementById(form::name('route_quota')).value /= 2;" class="noWrap"/>
+						</menulist>
+					</vbox>
+				</row>
+				<row class="dialogHeader2">
+					<description value="Name"/>
+					<textbox statustext="Qualification, 1/2-Final, ..." id="route_name" needed="1" size="64" maxlength="80" span="all" class="et2_fullWidth"/>
+					<description/>
+				</row>
+				<row>
+					<tabbox id="tabs" span="all" tab_height="280" align_tabs="v">
+						<tabs>
+							<tab id="general" label="General"/>
+							<tab id="comment" label="Comment"/>
+							<tab id="measure" label="Measurement"/>
+							<tab id="registration" label="Registration"/>
+						</tabs>
+						<tabpanels>
+							<template id="ranking.result.route.general"/>
+							<template id="ranking.result.route.comment"/>
+							<template id="ranking.result.route.measure"/>
+							<template id="ranking.result.route.registration"/>
+						</tabpanels>
+					</tabbox>
+				</row>
+
+			</rows>
+		</grid>
+	</template>
+</overlay>
