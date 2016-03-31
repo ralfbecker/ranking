@@ -455,4 +455,21 @@ class ranking_registration extends so_sql
 
 		return parent::save();
 	}*/
+
+	/**
+	 * Check the status / existance of (not deleted) registration for all categories of given competitions
+	 *
+	 * @param int|array $comps
+	 * @param array $status =array() evtl. set registration
+	 * @return array of WetId => GrpId => status: 4=starters / registration
+	 */
+	function registration_status($comps, $status=array())
+	{
+		foreach($this->db->select(self::TABLE,'WetId,GrpId',array('WetId' => $comps,'reg_registered IS NOT NULL AND reg_deleted IS NULL'),
+			__LINE__,__FILE__,false,'GROUP BY WetId,GrpId') as $row)
+		{
+			$status[$row['WetId']][$row['GrpId']] = 4;
+		}
+		return $status;
+	}
 }

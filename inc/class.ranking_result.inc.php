@@ -467,11 +467,11 @@ class ranking_result extends so_sql
 	 * Check the status / existance of start list or result for all categories of given competitions
 	 *
 	 * @param int|array $comps
+	 * @param array $status =array() evtl. set registration
 	 * @return array of WetId => GrpId => status: 0=result, 3=startlist, 4=starters
 	 */
-	function result_status($comps)
+	function result_status($comps, $status=array())
 	{
-		$status = array();
 		foreach($this->db->select($this->table_name,'WetId,GrpId,MAX(platz) AS platz,MAX(pkt) AS pkt',array('WetId' => $comps),
 			__LINE__,__FILE__,false,'GROUP BY WetId,GrpId') as $row)
 		{

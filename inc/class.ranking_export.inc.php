@@ -1064,7 +1064,7 @@ class ranking_export extends ranking_result_bo
 			//_debug_array($cups); die('STOP');
 		}
 		// query status (existence for start list or result)
-		$status = $this->route_result->result_status($ids, $this->result->result_status($ids));
+		$status = $this->route_result->result_status($ids, $this->result->result_status($ids, $this->registration->registration_status($ids)));
 		unset($cat);
 		//_debug_array($status); die('Stop');
 		foreach($competitions as &$comp)
@@ -1813,19 +1813,33 @@ class ranking_export extends ranking_result_bo
 			return $data;
 		}
 		//_debug_array($comps);
-		if (!($cats = $this->result->read(array('WetId' => $comp['WetId']), '', true, $this->result->table_name.'.GrpId')))
-		{
-			throw new Exception(lang('No starters yet !!!'));
-		}
-		$athletes = $federations = array();
+		$cats = $athletes = $federations = array();
 		$last_modified = null;
-		foreach($this->result->read(array(
+		foreach($this->registration->read(array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => -1,
-		), '', true, ($comp['nation'] ? 'acl_fed_id,fed_parent' : 'nation').',GrpId,pkt') as $result)
+			'state' => ranking_registration::ALL,
+		), '', true, ($comp['nation'] ? 'acl_fed_id,fed_parent' : 'nation').',GrpId,reg_id') as $result)
 		{
-			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
+			if (!empty($result['reg_deleted']))
+			{
+				$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['reg_deleted'], egw_time::$server_timezone);
+				if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
+				continue;	// use deleted only for timestamp/etag
+			}
+			if (empty($result['reg_registered'])) continue;	// dont list just prequalified
+
+			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['reg_registered'], egw_time::$server_timezone);
 			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
+
+			if (!isset($cats[$result['GrpId']]) && ($cat = $this->cats->read($result['GrpId'])))
+			{
+				$cats[$result['GrpId']] = array(
+					'GrpId' => $cat['GrpId'],
+					'name'  => $cat['name'],
+					'rkey'  => $cat['rkey'],
+				);
+			}
 
 			$fed_id = !$comp['nation'] ? $result['nation'] :
 				($result['acl_fed_id'] ? $result['acl_fed_id'] :
@@ -1835,14 +1849,18 @@ class ranking_export extends ranking_result_bo
 			$athletes[] = self::athlete_attributes($result, $comp['nation'], $result['GrpId'])+array(
 				'cat' => $result['GrpId'],
 				'reg_fed_id' => $fed_id,
-				'order' => $result['pkt'],
+				'order' => $result['reg_id'],
 			);
+		}
+		if (!$cats)
+		{
+			throw new Exception(lang('No starters yet !!!'));
 		}
 		unset($comp['gruppen']);
 
 		$data = self::rename_key($comp, self::$rename_comp)+array(
 			'nation' => $comp['nation'],
-			'categorys' => $cats,
+			'categorys' => array_values($cats),
 			'athletes' => $athletes,
 			'last_modified' => $last_modified,
 		);
