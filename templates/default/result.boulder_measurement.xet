@@ -28,24 +28,22 @@
 					<row height="70">
 						<label value="Try"/>
 						<select-number class="noPrint noWrap" width= "150" statustext="Try: number of tries or no" id="try" onchange="app.ranking.set_try" options=",1,25"/>
-						<buttononly   label="Try" id="button[try]" onclick="app.ranking.try_clicked" class="tryButton bigButton"/>
+						<buttononly align="center" label="Try" id="button[try]" onclick="app.ranking.try_clicked" class="tryButton bigButton"/>
 					</row>
 					<row height="70">
 						<label value="Bonus"/>
 						<select-number class="noPrint noWrap" width= "150" statustext="Bonus: Number of tries or no" id="zone" onchange="app.ranking.check_bonus" options=" ,1,25"/>
-						<buttononly  label="Bonus" id="button[bonus]" onclick="app.ranking.bonus_clicked" class="bigButton"/>
+						<buttononly align="center"  label="Bonus" id="button[bonus]" onclick="app.ranking.bonus_clicked" class="bigButton"/>
 					</row>
 					<row height="70">
 						<label value="Top"/>
 						<select-number  class="noPrint noWrap" width= "150" statustext="Top: number of tries or no"  id="top" onchange="app.ranking.check_top" options="No,1,25"/>
-						<buttononly label="Top" id="button[top]"  onclick="app.ranking.top_clicked" class="bigButton"/>
+						<buttononly align="center" label="Top" id="button[top]"  onclick="app.ranking.top_clicked" class="bigButton"/>
 					</row>
 					<row height="70" class="bottomRow">
-						<hbox span="2">
-							<buttononly label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5 bigButton"/>
-							<buttononly label="Protocol" id="protocol" onclick="protocol.display()"  class="bigButton"/>
-						</hbox>
-						<buttononly label="&gt;&gt;" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton nextButton"/>
+						<buttononly label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5 bigButton"/>
+						<buttononly label="Protocol" id="protocol" onclick="protocol.display()"  class="bigButton"/>
+						<buttononly align="center" label="&gt;&gt;" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton nextButton"/>
 					</row>
 				</rows>
 			</grid>

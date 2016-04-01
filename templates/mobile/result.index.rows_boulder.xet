@@ -239,8 +239,8 @@
 				</row>
 				<row class="row">
 					<label value="Last modified"/>
-					<date-time id="result_modified" readonly="true" class="noWrap"/>
-					<select-account id="result_modifier" readonly="true" class="noWrap"/>
+					<date-time id="result_modified" readonly="true" class="noWrap" align="center"/>
+					<select-account id="result_modifier" readonly="true" class="noWrap" align="right"/>
 				</row>
 			</rows>
 		</grid>
