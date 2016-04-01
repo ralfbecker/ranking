@@ -163,7 +163,7 @@ class ranking_selfservice extends ranking_bo
 			}
 			asort($cats);
 
-			$registered =& $this->result->read(array(
+			$registered =& $this->registration->read(array(
 				'WetId' => $WetId,
 				'PerId' => $athlete['PerId'],
 			));//,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');
@@ -179,7 +179,7 @@ class ranking_selfservice extends ranking_bo
 				foreach(array_merge(array_diff((array)$_POST['GrpId'],$registered),array_diff($registered,(array)$_POST['GrpId'])) as $GrpId)
 				{
 					try {
-						if ($this->register($comp, (int)$GrpId, $athlete, $mode=in_array($GrpId,$registered) ?
+						if ($this->register($comp, (int)$GrpId, $athlete, ($mode=in_array($GrpId,$registered)) ?
 							ranking_registration::DELETED : ranking_registration::REGISTERED))
 						{
 							echo "<p class='error'>".lang(!$mode?'%1, %2 registered for category %3':'%1, %2 deleted for category %3',

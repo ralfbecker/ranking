@@ -155,7 +155,7 @@ class ranking_registration extends so_sql
 			}
 			if ($this->GrpId < 0) unset($filter['GrpId']);	// return all cats
 
-			$ret = $athletes = $this->search(array(),$cols,$order ? $order : self::TABLE.'.GrpId,reg_id,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
+			$ret = $athletes = $this->search(array(),$cols,false,$extra_cols,'',false,'AND',false,$filter);
 
 			// return 2-dim array by category and athlete
 			if (!$this->GrpId)
@@ -167,6 +167,11 @@ class ranking_registration extends so_sql
 				}
 			}
 			return $ret;
+		}
+		elseif($this->WetId && $this->PerId && !$this->GrpId)
+		{
+			return $this->search(array(),$cols,$order ? $order : self::TABLE.'.GrpId,reg_id,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
+
 		}
 		// result of single person
 		return parent::read($keys,$extra_cols,$join !== true ? $join : '');

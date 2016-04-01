@@ -599,19 +599,23 @@ class ranking_bo extends ranking_so
 	 * Check if user is allowed to register athlets for $comp and $nation
 	 *
 	 * @param int|array $comp WetId or complete competition array
-	 * @param int|string $nation ='' nation of the athlets to register or (acl_)fed_id, if empty do a general check independent of nation
+	 * @param int|string|array $athlete ='' whole athlete array, nation of the athlets to register or (acl_)fed_id, if empty do a general check independent of nation
 	 * @param int GrpId=null if set check only for a given cat
 	 */
-	function registration_check($comp,$nation='',$cat=null)
+	function registration_check($comp,$athlete=null,$cat=null)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
 			return false;	// comp not found
 		}
+		if (!is_array($athlete))
+		{
+			$athlete = array('nation' => $athlete, 'fed_id' => $athlete, 'acl_fed_id' => $athlete);
+		}
 		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
 			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
 				in_array($comp['nation'],$this->register_rights) ||	// user has national registration rights OR
-				(($this->acl_check_athlete(array('nation'=>$nation,'fed_id'=>$nation,'acl_fed_id'=>$nation),EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
+				(($this->acl_check_athlete($athlete, EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
 						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
 
@@ -812,18 +816,9 @@ class ranking_bo extends ranking_so
 		{
 			$error = lang('Registration for this competition is over!');
 		}
-		elseif (!$this->registration_check($comp, $athlete['nation'], $cat) &&
-			!$this->registration_check($comp, $athlete['fed_parent'], $cat))
+		elseif (!$this->registration_check($comp, $athlete, $cat))
 		{
 			$error = lang('Missing registration rights!');
-		}
-		elseif ($register && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
-		{
-			$error = lang('This athlete has NO license!');
-		}
-		elseif ($register && $athlete['license'] == 's')
-		{
-			$error = lang('Athlete is suspended !!!');
 		}
 		elseif ($comp && $comp['nation'] && (
 			in_array((int)$comp['open_comp'], array(ranking_competition::OPEN_NOT, ranking_competition::OPEN_NATION)) && $athlete['nation'] != $comp['nation'] ||
@@ -839,7 +834,14 @@ class ranking_bo extends ranking_so
 		{
 			$error = lang('Invalid age for age-group of category');
 		}
-		// todo check license incl. suspended
+		elseif ($register && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
+		{
+			$error = lang('This athlete has NO license!');
+		}
+		elseif ($register && $athlete['license'] == 's')
+		{
+			$error = lang('Athlete is suspended !!!');
+		}
 		return $error;
 	}
 

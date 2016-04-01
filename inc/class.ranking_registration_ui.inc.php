@@ -131,6 +131,7 @@ class ranking_registration_ui extends ranking_bo
 				$query['allow_register_everyone'] ? null : $this->register_rights),
 			'GrpId' => $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
 		);
+		$GLOBALS['egw_info']['flags']['app_header'] = lang('Registration').($comp ? ' - '.$comp['name'] : '');
 
 		return $total;
 	}
@@ -148,6 +149,7 @@ class ranking_registration_ui extends ranking_bo
 				lang('Already registered') => array(),
 				lang('Prequalified') => array(),
 				lang('License confirmed or applied for') => array(),
+				lang('This athlete has NO license!') => array(),
 				'' => array(),
 			);
 
