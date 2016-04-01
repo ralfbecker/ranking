@@ -58,6 +58,13 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 #ranking-registration tr.isConfirmed * {
 	color: blue !important;
 }
+#ranking-registration_nm tr > td {
+	border-top: 1px solid #e6e6e6;
+	border-bottom: none;
+}
+#ranking-registration_nm tr.startRegFed:not(:first-child) > td {
+	border-top: 1px solid #999999;
+}
 
 /**
  * Some fixes for ResultService not using a nextmatch

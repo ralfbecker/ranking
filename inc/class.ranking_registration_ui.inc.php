@@ -42,6 +42,7 @@ class ranking_registration_ui extends ranking_bo
 		if (!$comp || ($comp['nation']?$comp['nation']:'NULL') != $query['calendar'])
 		{
 			$query['comp'] = '';
+			$comp = null;
 		}
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['nation'] = $query['nation'];
@@ -55,13 +56,57 @@ class ranking_registration_ui extends ranking_bo
 		//error_log(__METHOD__."() Cache::setSession('ranking', 'registration', ".array2string($state).")");
 		$this->set_ui_state($query['calendar'], $query['comp'], $query['col_filter']['GrpId']);
 
+		if ($query['order'] == 'reg_fed')
+		{
+			$query['order'] = $default_order = ($query['calendar'] == 'NULL' ? 'nation' : 'acl_fed_id,fed_parent').',GrpId,reg_id';
+		}
 		$total = $this->registration->get_rows($query, $rows, $readonlys, true);
+		if ($query['order'] == $default_order) $query['order'] = 'reg_fed';
+
+		$sel_options = array(
+			'comp'     => $this->comp->names(array(
+				'nation' => $query['calendar'],
+				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
+				'gruppen IS NOT NULL',
+			),0,'datum ASC'),
+			'nation' => $this->federation->get_competition_federations($query['calendar'],
+				$query['allow_register_everyone'] ? null : $this->register_rights),
+			'GrpId' => $comp && $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
+			'acl_fed_id' => $query['calendar'] == 'SUI' ? $this->federation->federations('SUI', true, 'fed_shortcut') : array(),
+			'fed_parent' => $query['calendar'] == 'GER' ? $this->federation->federations('GER', true, 'fed_shortcut') : array(),
+		);
 
 		$matches = null;
+		$last_reg_fed = $last_cat = null;
+		$reg_fed = !$comp || !$comp['nation'] ? 'nation' : ($comp['nation'] == 'SUI' ? 'acl_fed_id' : 'fed_parent');
 		foreach($rows as &$row)
 		{
 			$row['id'] = 'reg::'.$row['reg_id'];
 
+			$row['reg_fed'] = empty($row[$reg_fed]) || $reg_fed == 'nation' ? $row['nation'] :
+				$sel_options[$reg_fed][$row[$reg_fed]];
+
+			if ($query['order'] == 'reg_fed')
+			{
+				if ($last_reg_fed !== $row['reg_fed'])
+				{
+					$last_reg_fed = $row['reg_fed'];
+					$row['class'] .= 'startRegFed';
+					$last_cat = null;
+				}
+				else
+				{
+					$row['reg_fed'] = '';
+				}
+				if ($last_cat !== $row['GrpId'])
+				{
+					$last_cat = $row['GrpId'];
+				}
+				else
+				{
+					$row['GrpId'] = '';
+				}
+			}
 			// show only Sektion for national competitions and remove it for international
 			if ($query['calendar'] && $query['calendar'] != 'NULL')
 			{
@@ -110,6 +155,7 @@ class ranking_registration_ui extends ranking_bo
 			}
 			//error_log(__METHOD__."() ".array2string($row));
 		}
+		$rows['sel_options'] = $sel_options;
 
 		$query['actions'] = self::get_actions($comp_rights || $this->is_judge($comp, true));
 
@@ -121,16 +167,6 @@ class ranking_registration_ui extends ranking_bo
 			!$query['nation'] && ($this->register_rights || $this->federation->get_grants(null,EGW_ACL_REGISTER)) ? EGW_ACL_REGISTER : 0) |
 			($this->is_judge($comp, true) ? 512 : 0));
 
-		$rows['sel_options'] = array(
-			'comp'     => $this->comp->names(array(
-				'nation' => $query['calendar'],
-				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
-				'gruppen IS NOT NULL',
-			),0,'datum ASC'),
-			'nation' => $this->federation->get_competition_federations($query['calendar'],
-				$query['allow_register_everyone'] ? null : $this->register_rights),
-			'GrpId' => $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
-		);
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Registration').($comp ? ' - '.$comp['name'] : '');
 
 		return $total;
@@ -385,11 +421,11 @@ class ranking_registration_ui extends ranking_bo
 				'no_cat'         => true,
 				'no_filter'      => true,
 				'no_filter2'     => true,
-				'order'          =>	'nachname',// IO name of the column to sort after (optional for the sortheaders)
+				'order'          => 'reg_fed',
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 				'row_id'         => 'id',
 				'actions'        => self::get_actions(),
-				'default_cols'   => '!ort,acl_fed_id',
+				'default_cols'   => '!ort,nation,acl_fed_id,verband',
 			);
 		}
 		elseif($_content['nm']['download'])
@@ -471,7 +507,6 @@ class ranking_registration_ui extends ranking_bo
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
 			'nation' => $this->federation->get_competition_federations($comp['nation'],$allow_register_everyone ? null : $this->register_rights),
-			'acl_fed_id' => $calendar == 'SUI' ? $this->federation->federations('SUI', true, 'fed_shortcut') : array(),
 			'sex' => $this->genders,
 			'state' => ranking_registration::$state_filters,
 		);

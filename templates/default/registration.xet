@@ -5,44 +5,47 @@
 	<template id="ranking.registration.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
-				<column width="15%"/>
-				<column width="10%"/>
-				<column width="40"/>
+				<column width="80"/>
+				<column width="20%"/>
+				<column width="20%"/>
+				<column width="20%"/>
 				<column width="50"/>
 				<column width="60"/>
-				<column width="80"/>
+				<column width="70"/>
+				<column width="90"/>
 				<column width="10%"/>
-				<column width="30%"/>
+				<column width="25%"/>
 				<column width="20%"/>
-				<column width="15%"/>
-				<column width="95"/>
+				<column width="100"/>
 			</columns>
 			<rows>
 				<row class="th">
+					<nextmatch-sortheader label="Registered" id="reg_fed"/>
+					<nextmatch-filterheader id="GrpId" empty_label="All categories"/>
 					<nextmatch-sortheader label="Last name" id="nachname"/>
 					<nextmatch-sortheader label="First name" id="vorname"/>
 					<nextmatch-sortheader label="Nation" id="nation"/>
 					<nextmatch-sortheader label="License" id="PerId"/>
-					<nextmatch-filterheader align="center" id="sex" empty_label="Gender"/>
-					<nextmatch-sortheader align="center" label="Birthdate" id="geb_date"/>
-					<nextmatch-sortheader label="City" id="ort"/>
-					<nextmatch-sortheader label="Federation" id="verband"/>
-					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id"/>
-					<nextmatch-filterheader id="GrpId" empty_label="All categories"/>
-					<nextmatch-filterheader id="state"/>
+					<nextmatch-filterheader align="center" id="sex" empty_label="Gender" class="hideOnMobile"/>
+					<nextmatch-sortheader align="center" label="Birthdate" id="geb_date" class="hideOnMobile"/>
+					<nextmatch-sortheader label="City" id="ort" class="hideOnMobile"/>
+					<nextmatch-sortheader label="Federation" id="verband" class="hideOnMobile"/>
+					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id" class="hideOnMobile"/>
+					<nextmatch-filterheader id="state" class="hideOnMobile"/>
 				</row>
 				<row class="row $row_cont[class]">
+					<description id="${row}[reg_fed]" no_lang="1"/>
+					<select id="${row}[GrpId]" readonly="true"/>
 					<description id="${row}[nachname]" no_lang="1" class="lastname"/>
 					<description id="${row}[vorname]" no_lang="1"/>
 					<description align="center" id="${row}[nation]" no_lang="1"/>
 					<description id="${row}[PerId]" no_lang="1"/>
-					<select id="${row}[sex]" readonly="true"/>
-					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
-					<description id="${row}[ort]" no_lang="1"/>
-					<description id="${row}[verband]" no_lang="1"/>
-					<select id="${row}[acl_fed_id]" no_lang="1" readonly="true"/>
-					<select id="${row}[GrpId]" readonly="true"/>
-					<description id="${row}[state]" statustext="$row_cont[state_changed]"/>
+					<select id="${row}[sex]" readonly="true" class="hideOnMobile"/>
+					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d" class="hideOnMobile"/>
+					<description id="${row}[ort]" no_lang="1" class="hideOnMobile"/>
+					<description id="${row}[verband]" no_lang="1" class="hideOnMobile"/>
+					<select id="${row}[acl_fed_id]" no_lang="1" readonly="true" class="hideOnMobile"/>
+					<description id="${row}[state]" statustext="$row_cont[state_changed]" class="hideOnMobile"/>
 				</row>
 			</rows>
 		</grid>
