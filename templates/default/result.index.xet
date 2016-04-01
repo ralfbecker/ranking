@@ -138,7 +138,7 @@
 			</columns>
 			<rows>
 				<row>
-					<box>
+					<box align="center">
 						<hbox align="center" class="avatar">
 							<image src="profile_url"/>
 						</hbox>

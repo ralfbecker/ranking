@@ -180,11 +180,11 @@
 			</columns>
 			<rows>
 				<row>
-					<hbox>
+					<box align="center">
 						<box align="center" class="avatar">
 							<image src="photo"/>
 						</box>
-					</hbox>
+					</box>
 				</row>
 				<row class="name row" height="50px">
 					<description align="left" id="start_order" label="%1 $row_cont[start_number]"/>
