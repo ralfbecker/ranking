@@ -94,12 +94,12 @@
 					<nextmatch-sortheader label="Lane B" id="start_order2n"/>
 					<nextmatch-sortheader label="Lastname" id="nachname" class="leftPad5"/>
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
-					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
+					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date" class="hideOnMobile"/>
 					<nextmatch-sortheader align="center" label="Nation" id="nation"/>
-					<nextmatch-header label="Sektion" id="verband"/>
-					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
-					<nextmatch-sortheader label="City" id="ort"/>
-					<nextmatch-header align="center" label="License" id="PerId"/>
+					<nextmatch-header label="Sektion" id="verband" class="hideOnMobile"/>
+					<nextmatch-header label="Regionalzentrum" id="acl_fed" class="hideOnMobile"/>
+					<nextmatch-sortheader label="City" id="ort" class="hideOnMobile"/>
+					<nextmatch-header align="center" label="License" id="PerId" class="hideOnMobile"/>
 					<description align="center" value="Ranking"/>
 					<nextmatch-header label="Result" id="jury_result"/>
 					<nextmatch-header label="Time" id="jury_time"/>
@@ -115,12 +115,12 @@
 					<description align="center" id="{$row}[start_order2n]" no_lang="1"/>
 					<description id="{$row}[nachname]" no_lang="1" font_style="$row_cont[link]" class="lastname leftPad5"/>
 					<description id="{$row}[vorname]" no_lang="1" font_style="$row_cont[link]" class="leftPad5"/>
-					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
+					<description align="center" id="{$row}[birthyear]" no_lang="1" class="hideOnMobile"/>
 					<description align="center" id="{$row}[nation]" no_lang="1"/>
-					<description id="${row}[verband]"/>
-					<description id="${row}[acl_fed]"/>
-					<description value="$row_cont[plz]" id="${row}[ort]"/>
-					<description align="center" id="${row}[PerId]" no_lang="1"/>
+					<description id="${row}[verband]" class="hideOnMobile"/>
+					<description id="${row}[acl_fed]" class="hideOnMobile"/>
+					<description value="$row_cont[plz]" id="${row}[ort]" class="hideOnMobile"/>
+					<description align="center" id="${row}[PerId]" no_lang="1" class="hideOnMobile"/>
 					<hbox no_lang="1">
 						<description id="${row}[ranking_place]" no_lang="1" class="place"/>
 						<description align="right" id="${row}[ranking_points]" no_lang="1"/>
