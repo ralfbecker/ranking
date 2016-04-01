@@ -157,10 +157,10 @@
 					<description/>
 				</row>
 				<row class="row" height="50px">
-					<hbox span="all" width="100%" class="startnumbers">
-						<integer label="Startnumber" id="start_number" size="5" min="1"/>
-						<integer label="Next startnumber increment by" align="right" id="increment" size="5" min="1"/>
-					</hbox>
+					<integer label="Startnumber" id="start_number" size="5" min="1" span="all"/>
+				</row>
+				<row class="row" height="50px">
+					<integer label="Next startnumber increment by" id="increment" size="5" min="1" span="all"/>
 				</row>
 				<row  disabled="!@nm[rows][show_ability]">
 					<float label="Ability" id="ability_percent" span="all"/>
