@@ -80,6 +80,11 @@ class ranking_hooks
 					'menuaction' => 'ranking.ranking_display_ui.display',
 				),false)."','display$dsp_id',640,480,'yes')";
 			}
+			$file[] = array(
+				'text'   => 'Manual',
+				'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
+				'target' => 'docs'
+			);
 			// show SVN changelog under display
 			$file[] = array(
 				'text'   => 'Changelog',
@@ -87,29 +92,6 @@ class ranking_hooks
 				'target' => 'changelog',
 			);
 			display_sidebox($appname,lang('Displays'),$file);
-		}
-
-		if ($GLOBALS['egw_info']['user']['apps']['preferences'] && $location != 'admin')
-		{
-			$file = array(
-				'Preferences'     => egw::link('/index.php',array(
-					'menuaction' => 'preferences.uisettings.index',
-					'appname' => $appname,
-				)),
-			);
-			if ($location == 'preferences')
-			{
-				display_section($appname,$file);
-			}
-			else
-			{
-				$file[] = array(
-					'text'   => 'Manual',
-					'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
-					'target' => 'docs'
-				);
-				display_sidebox($appname,lang('Preferences'),$file);
-			}
 		}
 
 		if ($GLOBALS['egw_info']['user']['apps']['admin'] && $location != 'preferences')
