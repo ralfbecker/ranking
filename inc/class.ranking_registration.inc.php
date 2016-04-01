@@ -155,7 +155,7 @@ class ranking_registration extends so_sql
 			}
 			if ($this->GrpId < 0) unset($filter['GrpId']);	// return all cats
 
-			$ret = $athletes = $this->search(array(),$cols,false,$extra_cols,'',false,'AND',false,$filter);
+			$ret = $athletes = $this->search(array(),$cols,$order,$extra_cols,'',false,'AND',false,$filter);
 
 			// return 2-dim array by category and athlete
 			if (!$this->GrpId)

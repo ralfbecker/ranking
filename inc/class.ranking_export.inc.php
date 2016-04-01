@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -1856,6 +1856,13 @@ class ranking_export extends ranking_result_bo
 		{
 			throw new Exception(lang('No starters yet !!!'));
 		}
+
+		// we need to sort categories by GrpId (as the athletes) for starters display to work!
+		uasort($cats, function($a, $b)
+		{
+			return $a['GrpId'] - $b['GrpId'];
+		});
+
 		unset($comp['gruppen']);
 
 		$data = self::rename_key($comp, self::$rename_comp)+array(
