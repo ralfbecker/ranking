@@ -180,8 +180,10 @@
 			</columns>
 			<rows>
 				<row>
-					<hbox align="center">
-						<image class="avatar" src="photo"/>
+					<hbox>
+						<box align="center" class="avatar">
+							<image src="photo"/>
+						</box>
 					</hbox>
 				</row>
 				<row class="name row" height="50px">

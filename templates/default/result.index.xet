@@ -138,9 +138,11 @@
 			</columns>
 			<rows>
 				<row>
-					<hbox align="center">
-						<image class="avatar" src="profile_url"/>
-					</hbox>
+					<box>
+						<hbox align="center" class="avatar">
+							<image src="profile_url"/>
+						</hbox>
+					</box>
 				</row>
 				<row class="name row" height="50px">
 					<description align="left" id="result_rank" class="place"/>

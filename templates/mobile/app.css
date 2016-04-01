@@ -28,13 +28,6 @@
     padding-top: 10px;
     text-align: center;
   }
-  body #ranking-result-index .avatar {
-    width: 100px;
-    height: 100px;
-    background-size: 70px 70px;
-    top: 40px;
-    position: relative;
-  }
   body #ranking-result-index div {
     -webkit-overflow-scroll: touch;
   }

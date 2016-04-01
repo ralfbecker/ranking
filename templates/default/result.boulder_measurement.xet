@@ -14,9 +14,11 @@
 					<row height="100">
 						<label value="Boulder"/>
 						<select-number  type="select-number" id="nm[boulder_n]" width= "150" onchange="app.ranking.boulder_changed" options=",1,{$cont[nm][num_problems]}"/>
-						<hbox align="center">
-							<image src="profile_url" class="avatar" id="avatar"/>
-						</hbox>
+						<box>
+							<hbox align="center" class="avatar">
+								<image src="profile_url" id="avatar"/>
+							</hbox>
+						</box>
 					</row>
 					<row height="70">
 						<label value="Athlete" statustext="Sort athletes" class="athleteSort" onclick="app.ranking.sort_athletes" for="nm[PerId]"/>

@@ -251,13 +251,7 @@ button.bigButton {
 	height: 50px;
 	text-align: center;
 }
-#ranking-result-index_avatar {
-	width: 100px;
-	height: 100px;
-	background-size: 70px 70px;
-	top: 20px;
-	position: relative;
-}
+
 .dialogFooterToolbar button:hover{
 	height:auto;
 }
