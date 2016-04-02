@@ -573,12 +573,12 @@ class ranking_competition extends so_sql
 	 */
 	function nations()
 	{
-		$this->db->select($this->table_name,'DISTINCT nation','nation IS NOT NULL',__LINE__,__FILE__);
+
 
 		$nations = array();
-		while($this->db->next_record())
+		foreach($this->db->select($this->table_name,'DISTINCT nation','nation IS NOT NULL',__LINE__,__FILE__) as $row)
 		{
-			$nat = $this->db->f(0);
+			$nat = $row['nation'];
 			$nations[$nat] = $nat;
 		}
 		return $nations;

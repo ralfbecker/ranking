@@ -40,12 +40,12 @@ class ranking_route extends so_sql
 	 */
 	function get_max_order($comp,$cat)
 	{
-		$this->db->select($this->table_name,'MAX(route_order)',array(
+		$max = $this->db->select($this->table_name,'MAX(route_order)',array(
 			'WetId' => $comp,
 			'GrpId' => $cat,
-		),__LINE__,__FILE__);
+		),__LINE__,__FILE__)->fetchColumn();
 
-		return $this->db->next_record() ? $this->db->f(0) : null;
+		return $max !== false ? $max : null;
 	}
 
 	/**

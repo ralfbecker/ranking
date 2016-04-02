@@ -1347,9 +1347,9 @@ class ranking_route_result extends so_sql
 	 */
 	function get_max(array $keys,$col='route_order')
 	{
-		$this->db->select($this->table_name,'MAX('.$col.')',$keys,__LINE__,__FILE__);
+		$max = $this->db->select($this->table_name,'MAX('.$col.')',$keys,__LINE__,__FILE__)->fetchColumn();
 
-		return $this->db->next_record() ? $this->db->f(0) : null;
+		return $max !== false ? $max : null;
 	}
 
 	/**
@@ -1376,9 +1376,9 @@ class ranking_route_result extends so_sql
 	 */
 	function get_count(array $keys,$col='*')
 	{
-		$this->db->select($this->table_name,'COUNT('.$col.')',$keys,__LINE__,__FILE__);
+		$cnt = $this->db->select($this->table_name,'COUNT('.$col.')',$keys,__LINE__,__FILE__);
 
-		return $this->db->next_record() ? (int)$this->db->f(0) : null;
+		return $cnt !== false ? (int)$cnt : null;
 	}
 
 	/**

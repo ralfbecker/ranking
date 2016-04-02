@@ -618,9 +618,7 @@ class ranking_display_format extends so_sql2
 		);
 		if ((int)$frm['frm_id']) $where[] = 'frm_id!='.(int)$frm['frm_id'];
 
-		$this->db->select($this->table_name,'MAX(frm_line)',$where,__LINE__,__FILE__);
-
-		return $this->db->next_record() ? (int)$this->db->f(0) : 0;
+		return (int)$this->db->select($this->table_name,'MAX(frm_line)',$where,__LINE__,__FILE__)->fetchColumn();
 	}
 
 	/**
@@ -633,12 +631,12 @@ class ranking_display_format extends so_sql2
 	{
 		if (is_null($frm)) $frm =& $this->data;
 
-		$this->db->select($this->table_name,'MAX(frm_updated)',array(
+		$ts = $this->db->select($this->table_name,'MAX(frm_updated)',array(
 			'dsp_id' => $frm['dsp_id'],
 			'WetId'  => $frm['WetId'],
-		),__LINE__,__FILE__);
+		),__LINE__,__FILE__)->fetchColumn();
 
-		return $this->db->next_record() ? (int)$this->db->from_timestamp($this->db->f(0)) : 0;
+		return $ts ? (int)$this->db->from_timestamp($ts) : 0;
 	}
 
 	/**
