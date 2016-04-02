@@ -113,16 +113,16 @@
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
 					<nextmatch-sortheader align="center" label="Sum" id="result_top,result_zone"/>
 					<description value="✔" class="noPrint"/>
-					<description align="center" value="1" class="place onlyPrint"/>
-					<description value="2" class="place onlyPrint"/>
-					<description value="3" class="place onlyPrint"/>
-					<description value="4" class="place onlyPrint"/>
-					<description value="5" class="place onlyPrint"/>
-					<description value="6" class="place onlyPrint"/>
-					<description value="7" class="place onlyPrint"/>
-					<description value="8" class="place onlyPrint"/>
-					<description value="9" class="place onlyPrint"/>
-					<description value="10" class="place onlyPrint"/>
+					<description align="center" value="1" class="place"/>
+					<description value="2" class="place"/>
+					<description value="3" class="place"/>
+					<description value="4" class="place"/>
+					<description value="5" class="place"/>
+					<description value="6" class="place"/>
+					<description value="7" class="place"/>
+					<description value="8" class="place"/>
+					<description value="9" class="place"/>
+					<description value="10" class="place"/>
 					<nextmatch-sortheader align="center" label="previous heat" id="rank_prev_heat"/>
 					<nextmatch-sortheader label="Last modified" id="result_modified" class="noPrint"/>
 				</row>
@@ -144,16 +144,16 @@
 					<description align="center" id="{$row}[result]" no_lang="1" class="noWrap"/>
 					<description id="{$row}[result]" no_lang="1" class="onlyPrint noWrap"/>
 					<checkbox readonly="1" id="{$row}[checked]" ro_true="✔" class="noPrint"/>
-					<description id="{$row}[boulder1]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder2]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder3]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder4]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder5]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder6]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder7]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder8]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder9]" no_lang="1" class="onlyPrint"/>
-					<description id="{$row}[boulder10]" no_lang="1" class="onlyPrint"/>
+					<description id="{$row}[boulder1]" no_lang="1"/>
+					<description id="{$row}[boulder2]" no_lang="1"/>
+					<description id="{$row}[boulder3]" no_lang="1"/>
+					<description id="{$row}[boulder4]" no_lang="1"/>
+					<description id="{$row}[boulder5]" no_lang="1"/>
+					<description id="{$row}[boulder6]" no_lang="1"/>
+					<description id="{$row}[boulder7]" no_lang="1"/>
+					<description id="{$row}[boulder8]" no_lang="1"/>
+					<description id="{$row}[boulder9]" no_lang="1"/>
+					<description id="{$row}[boulder10]" no_lang="1"/>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1" class="place"/>
 					<vbox class="noPrint">
 						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>

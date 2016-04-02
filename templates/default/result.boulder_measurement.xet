@@ -32,7 +32,7 @@
 					</row>
 					<row height="70">
 						<label value="Bonus"/>
-						<select-number class="noPrint noWrap" width= "150" statustext="Bonus: Number of tries or no" id="zone" onchange="app.ranking.check_bonus" options=" ,1,25"/>
+						<select-number class="noPrint noWrap" width= "150" statustext="Bonus: Number of tries or no" id="zone" onchange="app.ranking.check_bonus" options="No,0,25"/>
 						<buttononly align="center"  label="Bonus" id="button[bonus]" onclick="app.ranking.bonus_clicked" class="bigButton"/>
 					</row>
 					<row height="70">

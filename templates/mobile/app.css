@@ -122,6 +122,7 @@
   }
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv .bottomRow button {
     margin-bottom: 15px;
+    margin-right: 10px;
   }
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv .bottomRow td:first-child {
     padding-left: 8px;
@@ -129,7 +130,8 @@
   body #ranking-result-index #ranking-result-index_msg {
     position: absolute;
     top: 53px;
-    width: 100%;
+    left: 33%;
+    right: 33%;
     background: transparent;
   }
 }
@@ -143,7 +145,7 @@
   }
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button.bigButton {
     height: 50px;
-    width: 100px;
+    width: 80px;
   }
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_nm\[boulder_n\],
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv #ranking-result-index_try,

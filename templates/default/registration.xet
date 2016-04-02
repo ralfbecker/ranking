@@ -31,7 +31,7 @@
 					<nextmatch-sortheader label="City" id="ort" class="hideOnMobile"/>
 					<nextmatch-sortheader label="Federation" id="verband" class="hideOnMobile"/>
 					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id" class="hideOnMobile"/>
-					<nextmatch-filterheader id="state" class="hideOnMobile"/>
+					<nextmatch-filterheader id="state"/>
 				</row>
 				<row class="row $row_cont[class]">
 					<description id="${row}[reg_fed]" no_lang="1"/>
@@ -45,7 +45,7 @@
 					<description id="${row}[ort]" no_lang="1" class="hideOnMobile"/>
 					<description id="${row}[verband]" no_lang="1" class="hideOnMobile"/>
 					<select id="${row}[acl_fed_id]" no_lang="1" readonly="true" class="hideOnMobile"/>
-					<description id="${row}[state]" statustext="$row_cont[state_changed]" class="hideOnMobile"/>
+					<description id="${row}[state]" statustext="$row_cont[state_changed]"/>
 				</row>
 			</rows>
 		</grid>
