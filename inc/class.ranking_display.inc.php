@@ -7,21 +7,23 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-class ranking_display extends so_sql2
+use EGroupware\Api;
+
+class ranking_display extends Api\Storage\Base2
 {
 	var $content;
 
 	/**
 	 * Constructor
 	 *
-	 * @param egw_db $db=null
+	 * @param Api\Db $db =null
 	 * @return display
 	 */
-	function __construct(egw_db $db=null)
+	function __construct(Api\Db $db=null)
 	{
 		if (is_null($db)) $db = $GLOBALS['ranking_bo']->db;
 
@@ -31,16 +33,16 @@ class ranking_display extends so_sql2
 	/**
 	 * Output a string to the display
 	 *
-	 * @param string $str=null
+	 * @param string $str =null
 	 * @return boolean true on success false on error
 	 */
 	function output($str=null)
 	{
-		static $dsp_format;
-		static $fdisplay;
-		static $egw_charset;
+		static $dsp_format=null;
+		static $fdisplay=null;
+		static $egw_charset=null;
 
-		if (is_null($egw_charset)) $egw_charset = $GLOBALS['egw']->translation->charset();
+		if (is_null($egw_charset)) $egw_charset = Api\Translation::charset();
 
 		if (is_null($dsp_format))			// evaluate the string to parse \033 or eg. \r
 		{
@@ -63,12 +65,12 @@ class ranking_display extends so_sql2
 			switch(strtolower($this->dsp_charset))
 			{
 				case 'cp437':	// not supported by mbstring
-					$str = str_replace(array('Á','È','ć','Š'),array('A','E','c','S'),$str);	// chars not in cp437
-					$str = iconv($egw_charset,$this->dsp_charset,$str);
+					$str = iconv($egw_charset, $this->dsp_charset,
+						str_replace(array('Á','È','ć','Š'), array('A','E','c','S'), $str));	// chars not in cp437);
 					break;
 
 				default:
-					$str = $GLOBALS['egw']->translation->convert($str,$egw_charset,$this->dsp_charset);
+					$str = Api\Translation::convert($str,$egw_charset,$this->dsp_charset);
 					break;
 			}
 		}
@@ -105,10 +107,10 @@ class ranking_display extends so_sql2
 	 * Activate a line and update the display with the current content, line and evtl. changed format lines
 	 *
 	 * @param int/array $frm_id id or keys of the format to activate
-	 * @param int $athlete=null athlete for the active line
-	 * @param int $dsp_id=null display id if not this display
-	 * @param int $GrpId=null default null = use category from format
-	 * @param int $route_order=null default null = use route from format
+	 * @param int $athlete =null athlete for the active line
+	 * @param int $dsp_id =null display id if not this display
+	 * @param int $GrpId =null default null = use category from format
+	 * @param int $route_order =null default null = use route from format
 	 */
 	function activate($frm_id,$athlete=null,$dsp_id=null,$GrpId=null,$route_order=null)
 	{
@@ -161,6 +163,7 @@ class ranking_display extends so_sql2
 			}
 			$this->dsp_athletes = $dsp['dsp_athletes'];
 		}
+		$showtime = null;
 		$dsp['dsp_current'] = $format->get_content($showtime,$line=0,false,$this->dsp_athletes[$format->GrpId][$format->route_order],
 			$GrpId,$route_order,$this->dsp_cols,$this->dsp_rows);
 		$dsp['dsp_timeout'] = microtime(true) + $showtime;
@@ -177,7 +180,7 @@ class ranking_display extends so_sql2
 	 * List the displays as user has access to
 	 *
 	 *
-	 * @param int $account_id=null user to check if not the current one
+	 * @param int $account_id =null user to check if not the current one
 	 * @return array dsp_id => dsp_name pairs
 	 */
 	function displays($account_id=null)
@@ -237,7 +240,7 @@ class ranking_display extends so_sql2
 	 */
 	function data2db(array $data=null)
 	{
-		if ($intern = !is_array($data))
+		if (($intern = !is_array($data)))
 		{
 			$data = &$this->data;
 		}
@@ -255,7 +258,7 @@ class ranking_display extends so_sql2
 	/**
 	 * Reimplemented to always increment a column 'dsp_etag' as modification counter
 	 *
-	 * @param array $keys=null
+	 * @param array $keys =null
 	 * @return int 0 on success, errno != 0 otherwise
 	 */
 	function save($keys=null)
@@ -272,7 +275,7 @@ class ranking_display extends so_sql2
 	 * Reimplemented to always increment a column 'dsp_etag' as modification counter
 	 *
 	 * @param array $fields
-	 * @param boolean $merge=true if true $fields will be merged with $this->data (after update!), otherwise $this->data will be just $fields
+	 * @param boolean $merge =true if true $fields will be merged with $this->data (after update!), otherwise $this->data will be just $fields
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function update($fields,$merge=true)
