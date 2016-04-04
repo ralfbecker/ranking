@@ -335,14 +335,29 @@ class ranking_registration extends so_sql
 		}
 		unset($filter['state']);
 
+		// remove "reg::" prefix from our artificial "id" column
+		if (isset($filter['id']))
+		{
+			$filter['reg_id'] = $filter['id'];
+			array_walk($filter['reg_id'], function(&$val)
+			{
+				list(,$val) = explode('::', $val);
+			});
+			unset($filter['id']);
+		}
+
 		if ($join === true)
 		{
 			$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
 
-			$extra_cols = array_merge($extra_cols ? explode(',', $extra_cols) : array(),
-				explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
-				".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,".
-				ranking_athlete::ATHLETE_TABLE.".PerId AS PerId"));
+			// use fed_id, if there is not fed_parent
+			$fed_parent = 'CASE WHEN fed_parent IS NULL THEN Federations.fed_id ELSE fed_parent END';
+			$extra_cols = str_replace('fed_parent', $fed_parent.' AS fed_parent',
+				array_merge($extra_cols ? explode(',', $extra_cols) : array(),
+					explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
+					".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,".
+					ranking_athlete::ATHLETE_TABLE.".PerId AS PerId")));
+			$order_by = str_replace('fed_parent', $fed_parent, $order_by);
 
 			if (isset($filter['license_nation']))
 			{
