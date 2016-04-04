@@ -7,9 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
+
+use EGroupware\Api;
 
 /**
  * cup object
@@ -35,7 +37,7 @@ class ranking_cup extends so_sql
 	 * constructor of the cup class
 	 *
 	 * @param string $source_charset
-	 * @param egw_db $db
+	 * @param Api\Db $db
 	 * @return cup
 	 */
 	function __construct($source_charset='',$db=null)

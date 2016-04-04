@@ -7,9 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
+
+use EGroupware\Api;
 
 /**
  * competition object
@@ -89,7 +91,7 @@ class ranking_competition extends so_sql
 	 * constructor of the competition class
 	 *
 	 * @param string $source_charset
-	 * @param egw_db $db
+	 * @param Api\Db $db
 	 * @param string $vfs_pdf_dir
 	 * @param string $vfs_pdf_url
 	 */

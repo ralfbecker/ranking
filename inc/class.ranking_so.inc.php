@@ -7,9 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
+
+use EGroupware\Api;
 
 /**
  * EGroupware digital ROCK Rankings - storage object
@@ -45,7 +47,7 @@ class ranking_so
 	/**
 	 * db-object with connection to ranking database, might be different from eGW database
 	 *
-	 * @var egw_db
+	 * @var Api\Db
 	 */
 	var $db;
 	/**
@@ -142,7 +144,7 @@ class ranking_so
 	 * Get a db object connected to the ranking database
 	 *
 	 * @param array &$config=null
-	 * @return egw_db
+	 * @return Api\Db
 	 */
 	public static function get_rang_db(&$config=null)
 	{
@@ -159,7 +161,7 @@ class ranking_so
 			{
 				if (!$config['ranking_db_'.$var]) $config['ranking_db_'.$var] = $defaults['db_'.$var];
 			}
-			$db = new egw_db();
+			$db = new Api\Db();
 			$db->connect($config['ranking_db_name'],$config['ranking_db_host'],
 				$config['ranking_db_port'],$config['ranking_db_user'],$config['ranking_db_pass']);
 

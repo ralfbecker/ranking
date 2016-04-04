@@ -7,9 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
+
+use EGroupware\Api;
 
 class ranking_display_format extends so_sql2
 {
@@ -29,10 +31,10 @@ class ranking_display_format extends so_sql2
 	/**
 	 * Constructor
 	 *
-	 * @param egw_db $db=null
+	 * @param Api\Db $db =null
 	 * @return ranking_display_format
 	 */
-	function __construct(egw_db $db=null)
+	function __construct(Api\Db $db=null)
 	{
 		$this->result = ranking_result_bo::getInstance();
 

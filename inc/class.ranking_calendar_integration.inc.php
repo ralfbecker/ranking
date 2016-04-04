@@ -5,9 +5,11 @@
  * @link http://www.digitalrock.de
  * @package ranking
  * @author Ralf Becker <RalfBecker-AT-outdoor-training.de>
- * @copyright (c) 2010-12 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
+ * @copyright (c) 2010-16 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
  * @version $Id$
  */
+
+use EGroupware\Api;
 
 /**
  * Ranking Calendar Integration
@@ -71,10 +73,10 @@ class ranking_calendar_integration
 		{
 			if(!is_array($data['query']))
 			{
-				$pattern = ' '.$GLOBALS['egw']->db->capabilities[egw_db::CAPABILITY_CASE_INSENSITIV_LIKE].' '.$GLOBALS['egw']->db->quote('%'.$data['query'].'%');
+				$pattern = ' '.$GLOBALS['egw']->db->capabilities[Api\Db::CAPABILITY_CASE_INSENSITIV_LIKE].' '.$GLOBALS['egw']->db->quote('%'.$data['query'].'%');
 				$columns = array('rkey','name','dru_bez','gruppen');
 
-				$where[] = '('.(is_numeric($query['search']) ? 'WetId='.(int)$data['query'].' OR ' : '').
+				$where[] = '('.(is_numeric($data['query']) ? 'WetId='.(int)$data['query'].' OR ' : '').
 					implode($pattern.' OR ',$columns).$pattern.') ';
 			}
 			else
@@ -116,7 +118,7 @@ class ranking_calendar_integration
 	 *
 	 * @param array $app_cols required name => own name pairs
 	 * @param string|array $required array or comma separated column names or table.*
-	 * @param string $required_app='calendar'
+	 * @param string $required_app ='calendar'
 	 * @return string cols for union query to match ones supplied in $required
 	 */
 	static private function union_cols(array $app_cols,$required,$required_app='calendar')
