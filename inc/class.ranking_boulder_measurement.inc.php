@@ -180,9 +180,9 @@ class ranking_boulder_measurement
 
 			$update = array(
 				$record['PerId'] => array(
-					'try'.$record['boulder'] => (int)$record['try'],
-					'top'.$record['boulder'] => (int)$record['top'],
-					'zone'.$record['boulder'] => (int)$record['bonus'],
+					'try'.$record['boulder'] => $record['try'] ? (int)$record['try'] : '',
+					'top'.$record['boulder'] => is_numeric($record['top']) ? (int)$record['top'] : '',
+					'zone'.$record['boulder'] => is_numeric($record['bonus']) ? (int)$record['bonus'] : '',
 				),
 			);
 			if (ranking_result_bo::$instance->save_result($keys, $update, $query['route_type'], $query['discipline']))
