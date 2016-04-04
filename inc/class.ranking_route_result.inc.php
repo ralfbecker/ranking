@@ -1376,7 +1376,7 @@ class ranking_route_result extends so_sql
 	 */
 	function get_count(array $keys,$col='*')
 	{
-		$cnt = $this->db->select($this->table_name,'COUNT('.$col.')',$keys,__LINE__,__FILE__);
+		$cnt = $this->db->select($this->table_name,'COUNT('.$col.')',$keys,__LINE__,__FILE__)->fetchColumn();
 
 		return $cnt !== false ? (int)$cnt : null;
 	}
