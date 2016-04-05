@@ -316,9 +316,9 @@ function get_max_wettk($serie,$gruppe)
 	if ($serie->max_serie < 0 && is_object($gruppe))	// $max_wettk less then the total
 	{
 		$sql = check_group_sql($gruppe);
-		$res = my_query($sql="SELECT count(*) FROM Wettkaempfe WHERE ".
+		$res = my_query($sql="SELECT count(*) as cnt FROM Wettkaempfe WHERE ".
 			($gruppe->nation ? "nation='$gruppe->nation'" : "ISNULL(nation)")." AND serie=$serie->SerId AND ($sql)");
-		$anz_wettk = (int)mysqli_result($res,0,0);
+		$anz_wettk = (int)  mysqli_fetch_object($res)->cnt;
 		//echo "<p>$sql: anz_wettk=$anz_wettk</p>\n";
 		return ($serie->max_serie + $anz_wettk)." (=$anz_wettk$serie->max_serie)";
 	}
