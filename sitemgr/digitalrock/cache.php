@@ -3,7 +3,7 @@
 
 $cache_dir  = '/var/lib/egroupware/digitalrock.de/tmp/digitalrock-cache';
 $cache_time = 15*60;
-$cache_log = true;
+$cache_log = false;
 
 /**
  * Check if the page is already cached: use that cache or create one
