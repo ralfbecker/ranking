@@ -65,6 +65,9 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 #ranking-registration_nm tr.startRegFed:not(:first-child) > td {
 	border-top: 1px solid #999999;
 }
+#ranking-registration_nm tr.hideCat span.catCol {
+	display: none;
+}
 
 /**
  * Some fixes for ResultService not using a nextmatch

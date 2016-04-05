@@ -35,7 +35,7 @@
 				</row>
 				<row class="row $row_cont[class]">
 					<description id="${row}[reg_fed]" no_lang="1"/>
-					<select id="${row}[GrpId]" readonly="true"/>
+					<select id="${row}[GrpId]" readonly="true" class="catCol"/>
 					<description id="${row}[nachname]" no_lang="1" class="lastname"/>
 					<description id="${row}[vorname]" no_lang="1"/>
 					<description align="center" id="${row}[nation]" no_lang="1"/>

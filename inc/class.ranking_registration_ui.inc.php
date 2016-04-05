@@ -88,10 +88,16 @@ class ranking_registration_ui extends ranking_bo
 
 			if ($query['order'] == 'reg_fed')
 			{
+				// first row in set is not necessary first row overall ($query[start])
+				if (!$last_reg_fed && $query['start'])	// not first row
+				{
+					$last_reg_fed = $row['reg_fed'];
+					$last_cat = $row['GrpId'];
+				}
 				if ($last_reg_fed !== $row['reg_fed'])
 				{
 					$last_reg_fed = $row['reg_fed'];
-					$row['class'] .= 'startRegFed';
+					$row['class'] .= ' startRegFed';
 					$last_cat = null;
 				}
 				else
@@ -104,7 +110,7 @@ class ranking_registration_ui extends ranking_bo
 				}
 				else
 				{
-					$row['GrpId'] = '';
+					$row['class'] .= ' hideCat';
 				}
 			}
 			// show only Sektion for national competitions and remove it for international
