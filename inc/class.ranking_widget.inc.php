@@ -1151,6 +1151,11 @@ function change_filter(form, value)
 		{
 			foreach($this->widget_params['Competitions'] as $label => $fragment)
 			{
+				if ($label == '_comp_url')
+				{
+					$comp_url = $fragment;
+					continue;
+				}
 				$options .= $this->tag('option', $label, array(
 					'value' => $fragment,
 				)/*+((string)$y === (string)$year ? array('selected' => '') : array())*/);
@@ -1167,7 +1172,12 @@ function change_filter(form, value)
 
 		foreach($data['competitions'] as $competition)
 		{
-			$comp = $this->tag('div', $competition['name'], array('class' => 'title'));
+			$title = $competition['name'];
+			if ($comp_url)
+			{
+				$title = $this->tag('a', $title, array('href' => $comp_url.$competition['WetId']));
+			}
+			$comp = $this->tag('div', $title, array('class' => 'title'));
 			$comp .= $this->tag('div', $competition['date_span'], array('class' => 'date'));
 			$cats = $links = '';
 			$links2labels = array(
