@@ -1385,13 +1385,13 @@ var Resultlist = (function() {
 				var ranking_url = this.json_url.replace(/json.php.*$/, '');
 				jQuery('<link/>', {
 					id: 'jqplot-css',
-					href: ranking_url+'../phpgwapi/js/jquery/jqplot/jquery.jqplot.css',
+					href: ranking_url+'../api/js/jquery/jqplot/jquery.jqplot.css',
 					type: 'text/css'
 				}).appendTo('head');
-				var load = [ranking_url+'../phpgwapi/js/jquery/jqplot/jquery.jqplot.js',
+				var load = [ranking_url+'../api/js/jquery/jqplot/jquery.jqplot.js',
 					// not sure why bar-renderer does not work :(
-					//ranking_url+'../phpgwapi/js/jquery/jqplot/plugins/jqplot.barRenderer.js',
-					ranking_url+'../phpgwapi/js/jquery/jqplot/plugins/jqplot.highlighter.js',
+					//ranking_url+'../api/js/jquery/jqplot/plugins/jqplot.barRenderer.js',
+					ranking_url+'../api/js/jquery/jqplot/plugins/jqplot.highlighter.js',
 					ranking_url+'js/dr_statistics.js?'+_data.dr_statistics];
 				for(var i=0; i < load.length; ++i)
 				{

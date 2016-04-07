@@ -562,7 +562,7 @@ Continuer';
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$this->tmpl->read('ranking.athlete.edit');
 		// until xajax_doXMLHTTP is no longer used in edit template (loaded implict by minifying!)
-		egw_framework::validate_file('/phpgwapi/js/egw_json.js');
+		egw_framework::validate_file('/api/js/egw_json.js');
 		$this->tmpl->exec('ranking.ranking_athlete_ui.edit',$content,
 			$sel_options,$readonlys,array(
 				'athlete_data' => $this->athlete->data,
