@@ -201,14 +201,15 @@ class ranking_bo extends ranking_so
 					$this->{$var}[] = $location;
 				}
 			}
+			//error_log(__METHOD__."() account_lid={$GLOBALS['egw_info']['user']['account_lid']}, acl=".array2string($data)." --> read_rights=".array2string($this->read_rights).", edit_rights=".array2string($this->edit_rights).", athlete_rights=".array2string($this->athlete_rights).", register_rights=".array2string($this->register_rights));
 		}
-		//foreach(array('read_rights','edit_rights','athlete_rights') as $right) echo "$right: ".print_r($this->$right,true)."<br>\n";
 
 		$this->is_admin = isset($GLOBALS['egw_info']['user']['apps']['admin']);
 		$this->user = $GLOBALS['egw_info']['user']['account_id'];
 
 		$this->athlete_rights_no_judge = $this->athlete_rights;
-		$this->athlete_rights = array_merge($this->athlete_rights,$this->judge_athlete_rights());
+		$this->athlete_rights = array_merge($this->athlete_rights, $jar=$this->judge_athlete_rights());
+		//error_log(__METHOD__."() account_lid={$GLOBALS['egw_info']['user']['account_lid']}, judge_athlete_rights()=".array2string($jar)." --> athlete_rights=".array2string($this->athlete_rights));
 		if (in_array('NULL',$this->athlete_rights) || $this->is_admin)
 		{
 			$this->athlete_rights = array_merge($this->athlete_rights,array_values($this->athlete->distinct_list('nation')));
@@ -237,7 +238,7 @@ class ranking_bo extends ranking_so
 				$this->only_nation_edit = $this->edit_rights[0];
 			}
 			// international ahtlete rights are for all nation's athletes
-			if (!in_array('NULL',$this->athlete_rights) && count($this->athlete_rights) == 1)
+			if (!in_array('NULL',$this->athlete_rights) && count($this->athlete_rights) == 1 && $this->athlete_rights[0] !== 'XYZ')
 			{
 				$this->only_nation_athlete = $this->athlete_rights[0];
 			}
@@ -245,7 +246,7 @@ class ranking_bo extends ranking_so
 			{
 				$this->only_nation_register = $this->register_rights[0];
 			}
-			//echo "<p>read_rights=".print_r($this->read_rights,true).", edit_rights=".print_r($this->edit_rights,true).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation', only_nation_athlete='$this->only_nation_athlete', athlete_rights=".print_r($this->athlete_rights,true)."</p>\n";
+			//error_log(__METHOD__."() account_lid={$GLOBALS['egw_info']['user']['account_lid']}, read_rights=".array2string($this->read_rights).", edit_rights=".array2string($this->edit_rights).", only_nation_edit='$this->only_nation_edit', only_nation='$this->only_nation', only_nation_athlete='$this->only_nation_athlete', athlete_rights=".array2string($this->athlete_rights));
 		}
 		$this->license_year = (int) date('Y');
 		$this->license_nations = $this->ranking_nations;
