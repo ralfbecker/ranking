@@ -2287,7 +2287,7 @@ var Competitions = (function() {
 			{
 				if (typeof competition[l] == 'undefined' || competition[l] === null) continue;
 				var a = jQuery(document.createElement('a'));
-				a.attr('href', competition[l]);
+				a.attr('href', competition[l]).addClass(l+'Link');
 				if (l != 'starters')
 					a.attr('target', '_blank');
 				else if (this.navigateTo)
