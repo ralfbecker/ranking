@@ -2287,13 +2287,13 @@ var Competitions = (function() {
 			{
 				if (typeof competition[l] == 'undefined' || competition[l] === null) continue;
 				var a = jQuery(document.createElement('a'));
-				a.attr('href', competition[l]).addClass(l+'Link');
+				a.attr('href', competition[l]);
 				if (l != 'starters')
 					a.attr('target', '_blank');
 				else if (this.navigateTo)
 					a.click(this.navigateTo);
 				a.text(links[l]);
-				links_ul.append(jQuery(document.createElement('li')).append(a));
+				links_ul.append(jQuery(document.createElement('li')).addClass(l+'Link').append(a));
 				have_links = true;
 			}
 			if (have_links) comp_div.append(links_ul);
