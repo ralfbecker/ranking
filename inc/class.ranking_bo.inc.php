@@ -613,9 +613,10 @@ class ranking_bo extends ranking_so
 		{
 			$athlete = array('nation' => $athlete, 'fed_id' => $athlete, 'acl_fed_id' => $athlete);
 		}
-		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&	// comp NOT already has a result for cat AND
-			($this->is_admin || $this->is_judge($comp) ||			// { user is an admin OR a judge of the comp OR
-				in_array($comp['nation'],$this->register_rights) ||	// user has national registration rights OR
+		$ret = (!$cat || !$this->comp->has_results($comp,$cat)) &&  // comp NOT already has a result for cat AND
+			($this->is_admin || $this->is_judge($comp, true) ||     // user is an admin OR a judge of the comp OR
+				$this->acl_check_comp($comp) ||                     // user has edit rights for the competition
+				in_array($comp['nation'],$this->register_rights) || // user has national registration rights OR
 				(($this->acl_check_athlete($athlete, EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
 						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
