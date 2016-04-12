@@ -132,9 +132,9 @@
 	<template id="ranking.result.index.rows_lead.edit" template="" lang="" group="0" version="1.9.004" class="ranking_view">
 		<grid width="100%">
 			<columns>
-				<column width="100"/>
+				<column width="150"/>
 				<column/>
-				<column width="100"/>
+				<column width="150"/>
 			</columns>
 			<rows>
 				<row>
@@ -154,12 +154,17 @@
 					</hbox>
 					<description align="right" id="result"/>
 				</row>
-				<row class="row" height="50px">
-					<float label="Height" id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1"/>
-					<select align="center" id="result_plus" no_lang="1"/>
-					<float label="Time" id="result_time" align="right"/>
+				<row class="th thb">
+					<label value="Height"/>
+					<label align="center" value="Extra"/>
+					<label align="right" value="Time"/>
 				</row>
-				<row class="row">
+				<row class="row" height="50px">
+					<float id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1"/>
+					<select align="center" id="result_plus" no_lang="1"/>
+					<float id="result_time" align="right"/>
+				</row>
+				<row class="row" height="50px" valign="bottom">
 					<label value="Last modified"/>
 					<date-time align="center" id="result_modified" readonly="true" class="noWrap"/>
 					<select-account align="right" id="result_modifier" readonly="true" class="noWrap"/>

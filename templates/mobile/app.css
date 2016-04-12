@@ -134,6 +134,9 @@
     right: 33%;
     background: transparent;
   }
+  body div#ranking-result-index-rows_lead-edit {
+    height: 100%;
+  }
 }
 @media only screen and (max-device-width: 736px) and (min-width: 300px) {
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv input,
