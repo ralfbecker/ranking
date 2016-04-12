@@ -2168,6 +2168,11 @@ var Competitions = (function() {
 				this.comp_url = _filters._comp_url;
 				delete this.filters._comp_url;
 			}
+			if (typeof _filters._comp_url_label != 'undefined')
+			{
+				this.comp_url_label = _filters._comp_url_label;
+				delete this.filters._comp_url_label;
+			}
 		}
 		this.year_regexp = /([&?])year=(\d+)/;
 
@@ -2246,6 +2251,12 @@ var Competitions = (function() {
 			var cats_ul = jQuery(document.createElement('ul')).addClass('cats');
 			var have_cats = false;
 			var links = { 'homepage': 'Event Website', 'info': 'Regulation', 'info2': 'Info Sheet', 'startlist': 'Startlist', 'result': 'Result' };
+			// add comp_url as first link with given label
+			if (this.comp_url && this.comp_url_label)
+			{
+				links = jQuery.extend({comp_url: this.comp_url_label}, links);
+				competition.comp_url = this.comp_url+competition.WetId;
+			}
 			if (typeof competition.cats == 'undefined') competition.cats = [];
 			for(var c=0; c < competition.cats.length; ++c)
 			{
@@ -2288,7 +2299,9 @@ var Competitions = (function() {
 				if (typeof competition[l] == 'undefined' || competition[l] === null) continue;
 				var a = jQuery(document.createElement('a'));
 				a.attr('href', competition[l]);
-				if (l != 'starters')
+				if (l == 'comp_url' && this.comp_url[0] == '/')
+					;
+				else if (l != 'starters')
 					a.attr('target', '_blank');
 				else if (this.navigateTo)
 					a.click(this.navigateTo);
