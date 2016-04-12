@@ -10,38 +10,28 @@
 			</columns>
 			<rows>
 				<row class="noPrint" disabled="@nm[cat]" part="header">
-					<hbox options="0,0" span="all">
-						<menulist>
-							<menupopup statustext="Select calendar" id="calendar" no_lang="1" onchange="1" class="rightPad5"/>
-						</menulist>
-						<menulist>
-							<menupopup id="comp" no_lang="1" onchange="1" options="Select competition"/>
-						</menulist>
+					<hbox span="all">
+						<select statustext="Select calendar" id="calendar" no_lang="1" onchange="1" class="rightPad5"/>
+						<select id="comp" no_lang="1" onchange="1" options="Select competition"/>
 					</hbox>
 				</row>
 				<row part="header">
-					<hbox options="0,0" span="all">
-						<menulist>
-							<menupopup id="detail" onchange="1" options="Default details"/>
-						</menulist>
+					<hbox span="all">
+						<select id="detail" onchange="1" options="Default details"/>
 						<checkbox label="Startlist" id="startlist" onchange="1" class="leftPad5"/>
 						<checkbox label="Beamer" id="beamer" onchange="1" class="leftPad5"/>
 						<textbox blur="top right bottom left px" label="Padding" id="padding" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row part="footer">
-					<hbox options="0,0" span="all">
+					<hbox span="all">
 						<textbox id="href" size="-100" span="all"/>
 						<button label="Go" id="go" onclick="document.location = document.getElementById(form::name('href')).value; return false;"/>
 					</hbox>
 				</row>
 				<row disabled="!@comp">
-					<menulist>
-						<menupopup id="cat[$row]" no_lang="1" onchange="1" options="Select category"/>
-					</menulist>
-					<menulist>
-						<menupopup statustext="Select heat" id="route[$row]" no_lang="1" onchange="1" options="Select heat"/>
-					</menulist>
+					<select id="cat[$row]" no_lang="1" onchange="1" options="Select category"/>
+					<select statustext="Select heat" id="route[$row]" no_lang="1" onchange="1" options="Select heat"/>
 				</row>
 			</rows>
 		</grid>

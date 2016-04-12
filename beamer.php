@@ -6,7 +6,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -17,6 +17,7 @@ $GLOBALS['egw_info'] = array(
 		'noheader'      => True,
 		'autocreate_session_callback' => 'check_anon_access',
 ));
+$_GET['cd'] = 'no';	// stop jdots framework
 include('../header.inc.php');
 
 /**

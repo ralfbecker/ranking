@@ -7,9 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
+
+use EGroupware\Api;
 
 /**
  * Beamer / videowall support
@@ -26,16 +28,15 @@ class ranking_beamer
 	/**
 	 * Configure beamer display
 	 *
-	 * @param array $content=null
-	 * @param string $msg=''
+	 * @param array $content =null
 	 */
-	public static function beamer(array $content=null, $msg='')
+	public static function beamer(array $content=null)
 	{
-		$tmpl = new etemplate('ranking.result.beamer');
+		$tmpl = new Api\Etemplate('ranking.result.beamer');
 
-		if (!is_array($content) && !($content = egw_cache::getSession('ranking', 'beamer')))
+		if (!is_array($content) && !($content = Api\Cache::getSession('ranking', 'beamer')))
 		{
-			$result_state = egw_cache::getSession('ranking','result');
+			$result_state = Api\Cache::getSession('ranking','result');
 			$content = array(
 				'calendar' => $result_state['calendar'],
 				'comp' => $result_state['comp'],
@@ -133,7 +134,7 @@ class ranking_beamer
 		$content['cat'] = $cats;
 		$content['route'] = $routes;
 
-		egw_cache::setSession('ranking', 'beamer', $content);
+		Api\Cache::setSession('ranking', 'beamer', $content);
 
 		$tmpl->exec('ranking.ranking_beamer.beamer',$content,$sel_options,$readonlys,$content,2);
 	}
