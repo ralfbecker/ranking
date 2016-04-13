@@ -42,6 +42,18 @@ if (!is_array($cats))
 
 function wettk_grps($wetid)	// check for which categories we have a result
 {
+	if (($res =my_query("SELECT g.rkey".
+	                   " FROM Gruppen g,Registration r".
+	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
+					   " AND r.reg_registered IS NOT NULL AND r.reg_deleted IS NULL".
+	                   " GROUP BY g.rkey ORDER BY g.name")))
+	{
+		while ($row=mysqli_fetch_object($res))
+		{
+			// 0=result, 3=startlist, 4=starters
+			$rgrps[$row->rkey] = 4;
+		}
+	}
 	if (($res =my_query("SELECT g.rkey,MAX(r.platz) AS platz,MAX(r.pkt) as pkt".
 	                   " FROM Gruppen g,Results r".
 	                   " WHERE r.GrpId=g.GrpId AND r.WetId=".(int) $wetid.
