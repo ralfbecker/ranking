@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -554,10 +554,6 @@ Continuer';
 				// 'til we have some kind of review mechanism
 				$readonlys['tabs']['pictures'] = true;
 			}
-		}
-		if ($js)
-		{
-			$GLOBALS['egw']->js->set_onload($js);
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$this->tmpl->read('ranking.athlete.edit');

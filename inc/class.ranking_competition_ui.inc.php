@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -204,7 +204,6 @@ class ranking_competition_ui extends ranking_bo
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
 				common::egw_exit();
 			}
-			if (!empty($js)) $GLOBALS['egw']->js->set_onload($js);
 
 			if ($_content['remove'] && $this->acl_check_comp($this->comp->data))
 			{
