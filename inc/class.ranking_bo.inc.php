@@ -652,9 +652,9 @@ class ranking_bo extends ranking_so
 		{
 			return false;
 		}
-		if (!$do_cat && !$comp['gruppen'])
+		if (!$do_cat && !$comp['gruppen'] || !$comp['prequal_ranking'] && !$comp['prequal_comp'])
 		{
-			return array();	// no category --> noone prequalified
+			return array();	// no category, or no prequalified used --> noone prequalified
 		}
 		$prequalified = null;
 		foreach($do_cat ? array($do_cat) : $comp['gruppen'] as $cat)
@@ -855,11 +855,12 @@ class ranking_bo extends ranking_so
 	 * @param int|array $athlete PerId or complete athlete array
 	 * @param int $mode =ranking_registration::REGISTERED ::DELETED, ::PREQUALIFIED, ::CONFIRMED
 	 * @param string& $msg =null on return over quota message for admins or jury
+	 * @param string $prequal_reason=null reason why athlete is prequalified
 	 * @throws egw_exception_wrong_userinput with error message for not matching agegroup or over quota
 	 * @throws egw_exception_wrong_parameter for other errors
 	 * @return boolean true of everythings ok, false on error
 	 */
-	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null)
+	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null, $prequal_reason=null)
 	{
 		if (!is_array($athlete)) $athlete = $this->athlete->read($athlete);
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
@@ -957,6 +958,7 @@ class ranking_bo extends ranking_so
 
 			case ranking_registration::PREQUALIFIED:
 				if (!$data) $data = $keys;
+				if ($prequal_reason) $data['reg_prequal_reason'] = $prequal_reason;
 				break;
 
 			default:

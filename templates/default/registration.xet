@@ -66,6 +66,7 @@
 	<template id="ranking.registration.add" template="" lang="" group="0" version="1.9.001">
 		<select label="Register for" id="GrpId" onchange="app.ranking.register_cat_changed"/>
 		<taglist autocomplete_url="ranking.ranking_registration_ui.ajax_search" id="PerId" minChars="0" allowFreeEntries="0" empty_label="Search" groupBy="group"/>
+		<textbox id="prequal_reason" blur="Reason" width="100%" disabled="true" rows="2"/>
 	</template>
 	<template id="ranking.registration.mail" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%">

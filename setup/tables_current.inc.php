@@ -466,7 +466,8 @@ $phpgw_baseline = array(
 			'reg_confirmed' => array('type' => 'timestamp','comment' => 'when was registration confirmed, if necessary'),
 			'reg_confirmed_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who confirmed'),
 			'reg_deleted' => array('type' => 'timestamp','comment' => 'when was registration deleted'),
-			'reg_deleted_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who deleted registration')
+			'reg_deleted_by' => array('type' => 'int','meta' => 'account','precision' => '4','comment' => 'who deleted registration'),
+			'reg_prequal_reason' => array('type' => 'varchar','precision' => '128','comment' => 'reason why athlete is prequalified')
 		),
 		'pk' => array('reg_id'),
 		'fk' => array(),

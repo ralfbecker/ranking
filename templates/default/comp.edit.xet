@@ -94,7 +94,8 @@
 					</menulist>
 				</row>
 				<row class="th">
-					<description value="Prequalified competitiors" span="all"/>
+					<description value="Prequalified competitiors" span="2"/>
+					<button align="right" statustext="Only necessary, if you change something, after registration started.&lt;br/&gt;Existing prequalified are NOT removed!" label="Add to registration" id="add_prequal"/>
 				</row>
 				<row class="row">
 					<menulist>
@@ -321,7 +322,7 @@
 					<description/>
 				</row>
 				<row>
-					<tabbox id="general|registration|startlist|ranking|files|judges" span="all">
+					<tabbox id="tabs" span="all">
 						<tabs>
 							<tab id="general" label="General"/>
 							<tab id="registration" label="Registration"/>

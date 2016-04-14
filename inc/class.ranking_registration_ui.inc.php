@@ -131,14 +131,15 @@ class ranking_registration_ui extends ranking_bo
 			{
 				if (!empty($row[ranking_registration::PREFIX.$state]))
 				{
-					if (!isset($row['state']))
+					if (!isset($row['state']) || $state == 'prequalified')
 					{
 						$row['class'] .= ' is'.ucfirst($state);
 						$row['state'] = $state;
 					}
 					$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
 					$row['state_changed'] .= egw_time::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
-						($modifier ? lang('by').' '.common::grab_owner_name($modifier).' ' : '')."<br>\n";
+						($modifier ? lang('by').' '.common::grab_owner_name($modifier).' ' : '')."<br>\n".
+						($state == 'prequalified' ? str_replace("\n", "<br>\n", $row['reg_prequal_reason']) : '');
 				}
 			}
 			if ($comp_rights || $this->registration_check($comp, $row['nation']) ||
@@ -199,15 +200,7 @@ class ranking_registration_ui extends ranking_bo
 			$prequalified = $registered = array();
 			if ($state['comp'] && (int)$_REQUEST['GrpId'] > 0)
 			{
-				// add prequalified by competition result
-				$prequalified = $this->national_prequalified($state['comp'], $state['nation']);
-				foreach((array)$prequalified[(int)$_REQUEST['GrpId']] as $athlete)
-				{
-					//error_log(__METHOD__."() prequalified athlete=".array2string($athlete));
-					$prequalified[$athlete['PerId']] = $this->athlete->link_title($athlete, true);
-				}
-
-				// add registered and explicit prequalified stored in registration
+				// add registered and all prequalified stored in registration
 				foreach($this->registration->read(array(
 						'WetId' => $state['comp'],
 						'GrpId' => $_REQUEST['GrpId'],
@@ -339,7 +332,7 @@ class ranking_registration_ui extends ranking_bo
 			}
 			// register the user
 			try {
-				if ($this->register($comp, $cat, $athlete, $mode2ts[$params['mode']], $msg))
+				if ($this->register($comp, $cat, $athlete, $mode2ts[$params['mode']], $msg, $params['reason']))
 				{
 					$registered++;
 					if ($msg) break;	// stop, if over quota warning for admins/jury
@@ -549,6 +542,7 @@ class ranking_registration_ui extends ranking_bo
                 'enableClass' => 'allowRegister',
 				'allowOnMultiple' => true,
 				'group' => $group,
+				'default' => true,
 			),
 			'confirm' => array(
 				'caption' => 'Confirm',

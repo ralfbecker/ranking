@@ -1539,7 +1539,17 @@ app.classes.ranking = AppJS.extend(
 			if (!athletes || !athletes.length)
 			{
 				et2_dialog.alert(this.egw.lang('You need to select one or more athletes first!', this.egw.lang('Registration')));
-				return;
+				return false;
+			}
+			var reason = this.register_dialog.template.widgetContainer.getWidgetById('prequal_reason');
+			if (button_id == 'prequalify' && reason.disabled)
+			{
+				reason.set_disabled(false);
+				return false;
+			}
+			else
+			{
+				reason.set_disabled(true);
 			}
 			var filter = this.register_nm.getValue();
 			this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
@@ -1547,6 +1557,7 @@ app.classes.ranking = AppJS.extend(
 				GrpId: value.GrpId,
 				PerId: athletes,
 				mode: button_id,
+				reason: value.prequal_reason,
 				confirmed: confirmed
 			}], this.register_callback, null, false, this).sendRequest();
 

@@ -176,34 +176,7 @@ class ranking_registration extends so_sql
 		// result of single person
 		return parent::read($keys,$extra_cols,$join !== true ? $join : '');
 	}
-/*
-	function &comps_with_startlist($keys=array(),$registration_too=true)
-	{
-		//echo "<p>result::comps_with_startlist(".print_r($keys,true).")</p>\n";
-		$keys['platz'] = 0;
 
-		if ($registration_too)
-		{
-			$keys[] = $this->comp_table.'.datum >= '.$this->db->quote(date('Y-m-d'));
-		}
-		else
-		{
-			$keys[] = 'pkt > 64';
-		}
-		// nation is from the joined comp_table, it cant be quoted automatic
-		if ($keys['nation'] == 'NULL') $keys['nation'] = null;
-		$keys[] = $this->db->expression($this->comp_table,array('nation' => $keys['nation']));
-		unset($keys['nation']);
-
-		$comps = array();
-		foreach ((array)$this->search(array(),"DISTINCT $this->table_name.WetId AS WetId",$this->comp_table.'.datum DESC','','',false,'AND',false,$keys,
-			", $this->comp_table WHERE $this->table_name.WetId=$this->comp_table.WetId") as $row)
-		{
-			$comps[] = $row['WetId'];
-		}
-		return $comps;
-	}
-*/
 	/**
 	 * changes the data from the db-format to our work-format
 	 *
@@ -243,44 +216,88 @@ class ranking_registration extends so_sql
 	}
 
 	/**
-	 * Checks if there are any results (platz > 0) for the given keys
-	 *
-	 * @param array $keys with index WetId, PerId and/or GrpId
-	 * @return boolean/int number of found results or false on error
-	 *
-	function has_results($keys)
-	{
-		$keys[] = 'platz > 0';
-
-		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
-
-		return $this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__)->fetchColumn();
-	}*/
-
-	/**
-	 * Checks if there are any startnumbers (platz == 0 && pkt > 64) for the given keys
-	 *
-	 * @param array $keys with index WetId, PerId and/or GrpId
-	 * @return boolean/int number of found results or false on error
-	 *
-	function has_startlist($keys)
-	{
-		$keys[] = 'platz = 0 AND pkt >= 64';
-
-		if ($keys['GrpId'] < 0) unset($keys['GrpId']);	// < 0 means all
-
-		return $this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__)->fetchColumn();
-	}*/
-
-	/**
 	 * Checks if there are any results incl. registrations or startlists for given keys
 	 *
 	 * @param array $keys with index WetId, PerId and/or GrpId
-	 * @return boolean/int number of found registrations or false on error
+	 * @return boolean|int number of found registrations or false on error
 	 */
 	function has_registration($keys)
 	{
-		return $this->db->select($this->table_name,'count(*)',$keys,__LINE__,__FILE__)->fetchColumn();
+		$keys[] = 'reg_registered IS NOT NULL AND reg_deleted IS NULL';
+
+		return $this->db->select($this->table_name, 'COUNT(*)', $keys,
+			__LINE__, __FILE__, false, '', 'ranking')->fetchColumn();
+	}
+
+	/**
+	 * Check if there are prequalified athletes for given competition
+	 *
+	 * @param int $WetId
+	 * @return int number of prequalified athletes or 1 for the marker from add_prequalified, if there are none
+	 */
+	function check_prequalified($WetId)
+	{
+		return $this->db->select($this->table_name, 'COUNT(*)', array(
+			'WetId' => $WetId,
+			'reg_prequalified IS NOT NULL AND reg_prequalified_by IS NULL'.
+			// for 2016 we need to ignore already registered AND prequalified athletes
+			(date('Y') == 2016 ? ' AND reg_registered IS NULL' : '')
+		), __LINE__, __FILE__, false, '', 'ranking')->fetchColumn();
+	}
+
+	/**
+	 * Add prequalified athletes for given competition
+	 *
+	 * If there are no prequalified athletes, we add a marker so check_prequalified finds something next time.
+	 *
+	 * @param int $WetId
+	 * @return int false if there are not prequalified, or number of prequalified added
+	 */
+	function add_prequalified($WetId)
+	{
+		if (!($prequalified = ranking_bo::getInstance()->prequalified($WetId)))
+		{
+			// set a marker to not try adding them again
+			$this->db->insert($this->table_name, array(
+				'WetId' => $WetId,
+				'GrpId' => 0,
+				'PerId' => 0,
+				'reg_prequalified' => time(),
+			), false, __LINE__, __FILE__, 'ranking');
+		}
+		else
+		{
+			//error_log(__METHOD__."($WetId) prequalified=".array2string($prequalified));
+			foreach($prequalified as $GrpId => $athletes)
+			{
+				foreach($athletes as $PerId => $reason)
+				{
+					// try updating first, in case is athlete is already registered or manually prequalified
+					$this->db->update($this->table_name, array(
+						'reg_prequalified' => time(),
+						'reg_prequalified_by' => null,
+						'reg_prequal_reason' => $reason,
+					), array(
+						'WetId' => $WetId,
+						'GrpId' => $GrpId,
+						'PerId' => $PerId,
+						'reg_deleted IS NULL',
+					), __LINE__, __FILE__, 'ranking');
+					// if no row affected, insert it
+					if (!$this->db->affected_rows())
+					{
+						$this->db->insert($this->table_name, array(
+							'WetId' => $WetId,
+							'GrpId' => $GrpId,
+							'PerId' => $PerId,
+							'reg_prequalified' => time(),
+							'reg_prequal_reason' => $reason,
+						), false, __LINE__, __FILE__, 'ranking');
+					}
+				}
+			}
+		}
+		return count(call_user_func_array('array_merge', $prequalified));
 	}
 
 	/**
@@ -332,6 +349,10 @@ class ranking_registration extends so_sql
 			default:
 				$filter[] = self::PREFIX.self::DELETED.' IS NULL';
 				break;
+		}
+		if ($filter['state'] != self::REGISTERED && !$this->check_prequalified($filter['WetId']))
+		{
+			$this->add_prequalified($filter['WetId']);
 		}
 		unset($filter['state']);
 
@@ -396,51 +417,6 @@ class ranking_registration extends so_sql
 	}
 
 	/**
-	 * Get competitiors prequalified for a given competition, because of a certain place in spec. competitions
-	 *
-	 * All categories with matching discipline and gender are used, not just categories from competition.
-	 * Eg. youth champions are counting for adult world-cups, if youth-championship is selected.
-	 *
-	 * @param int|array $comp WetId or complete competition array
-	 * @param int|array $cat GrpId or complete category array
-	 * @return array of PerId's
-	 */
-	/*function prequalified($comp,$cat)
-	{
-		$boranking = ranking_bo::getInstance();
-		if (!is_array($comp) || !isset($comp['prequal_comp']))
-		{
-			$comp = $boranking->comp->read(is_array($comp) ? $comp['WetId'] : $comp);
-		}
-		if (!is_array($cat)) $cat = $boranking->cats->read($cat);
-
-		$prequals = array();
-		if ($cat && $comp['WetId'] && $comp['prequal_comp'] > 0 && $comp['prequal_comps'])
-		{
-			$cats = array($cat['GrpId'] => true);
-			foreach((array)$this->search(array(),'PerId,GrpId,platz,Wettkaempfe.name AS comp,Gruppen.name AS cat','','','',false,'AND',false,array(
-				'WetId' => explode(',',$comp['prequal_comps']),
-				'platz <= '.(int)$comp['prequal_comp'],
-				'platz > 0',	// no registered
-			),'JOIN Wettkaempfe USING(WetId) JOIN Gruppen USING(GrpId)') as $athlet)
-			{
-				if (!isset($cats[$athlet['GrpId']]) && $cat['discipline'])
-				{
-					$reg_cat = $boranking->cats->read($athlet['GrpId']);
-					$cats[$athlet['GrpId']] = $reg_cat['discipline'] == $cat['discipline'] && $reg_cat['sex'] == $cat['sex'];
-				}
-				if ($cats[$athlet['GrpId']])
-				{
-					if (isset($prequals[$athlet['PerId']])) $prequals[$athlet['PerId']] .= "\n";
-					$prequals[$athlet['PerId']] .= $athlet['platz'].'. '.$athlet['comp'].' ('.$athlet['cat'].')';
-				}
-			}
-		}
-		//echo "<p>".__METHOD__."(comp=$comp[rkey], cat=$cat[rkey]/$cat[discipline]) prequal_comp=$comp[prequal_comp], prequal_comps=".array2string($comp['prequal_comps']); _debug_array($prequals);
-		return $prequals;
-	}*/
-
-	/**
 	 * Merge the registrations from athlete $from to athlete $to
 	 *
 	 * @param int $from
@@ -459,24 +435,6 @@ class ranking_registration extends so_sql
 	}
 
 	/**
-	 * saves the content of data to the db
-	 *
-	 * reimplemented to set a modifier (modified timestamp is set automatically by the database anyway)
-	 *
-	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
-	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
-	 */
-	/*function save($keys=null)
-	{
-		if (is_array($keys) && count($keys)) $this->data_merge($keys);
-
-		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
-		$this->data['modified'] = time();
-
-		return parent::save();
-	}*/
-
-	/**
 	 * Check the status / existance of (not deleted) registration for all categories of given competitions
 	 *
 	 * @param int|array $comps
@@ -486,7 +444,7 @@ class ranking_registration extends so_sql
 	function registration_status($comps, $status=array())
 	{
 		foreach($this->db->select(self::TABLE,'WetId,GrpId',array('WetId' => $comps,'reg_registered IS NOT NULL AND reg_deleted IS NULL'),
-			__LINE__,__FILE__,false,'GROUP BY WetId,GrpId') as $row)
+			__LINE__, __FILE__, false, 'GROUP BY WetId,GrpId', 'ranking') as $row)
 		{
 			$status[$row['WetId']][$row['GrpId']] = 4;
 		}

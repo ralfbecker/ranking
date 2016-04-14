@@ -108,7 +108,7 @@ class ranking_competition_ui extends ranking_bo
 			$this->comp->data_merge($_content);
 			//echo "<br>ranking_competition_ui::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (!$view  && ($_content['save'] || $_content['apply']) && $this->acl_check_comp($this->comp->data))
+			if (!$view  && ($_content['save'] || $_content['apply'] || $_content['add_prequal']) && $this->acl_check_comp($this->comp->data))
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -175,13 +175,15 @@ class ranking_competition_ui extends ranking_bo
 							}
 						}
 					}
-					if ($_content['save'] || $_content['apply'])
+					if ($_content['add_prequal'])
 					{
-						$link = egw::link($_content['referer'],array(
-							'msg' => $msg,
-						));
-						$js = "window.opener.location='$link';";
+						$msg .= "\n".lang('%1 prequalified athletes add to or updated in registration.',
+							$this->registration->add_prequalified($this->comp->data['WetId']));
 					}
+					$link = egw::link($_content['referer'],array(
+						'msg' => $msg,
+					));
+					$js = "window.opener.location='$link';";
 				}
 			}
 			if ($_content['delete'])

@@ -58,6 +58,9 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 #ranking-registration tr.isConfirmed * {
 	color: blue !important;
 }
+#ranking-registration tr.isRegistered * {
+	color: black !important;
+}
 #ranking-registration_nm tr > td {
 	border-top: 1px solid #e6e6e6;
 	border-bottom: none;

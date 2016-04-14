@@ -1948,3 +1948,20 @@ WHERE Wettkaempfe.datum > NOW() AND platz=0 AND pkt>0', __LINE__, __FILE__);*/
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.006';
 }
+
+/**
+ * Add req_prequal_reason column to indicate why athlete is prequalified
+ *
+ * @return string
+ */
+function ranking_upgrade14_3_006()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Registration', 'reg_prequal_reason', array(
+		'type' => 'varchar',
+		'precision' => '128',
+		'comment' => 'reason why athlete is prequalified'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.007';
+}
+
