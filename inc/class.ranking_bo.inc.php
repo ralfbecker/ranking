@@ -640,13 +640,17 @@ class ranking_bo extends ranking_so
 	/**
 	 * Calculate the prequalified athlets for a given competition
 	 *
-	 * for performance reasons the result is cached in the session
+	 * For performance reasons the result is cached in the session.
+	 *
+	 * Category/GrpId is the one the athlete had it's results, not necessary the one
+	 * he currently allowed to compete in!
+	 * Use prequalified with no nation, to get athlets by their current age group.
 	 *
 	 * @param mixed $comp complete competition array or WetId/rkey
 	 * @param int $do_cat complete category array or GrpId/rkey, or 0 for all cat's of $comp
-	 * @return array/boolean array of PerId's or false if $comp or $cat not found
+	 * @return boolean|array with GrpId => array(PerId => prequal-reason) or false if comp not found
 	 */
-	function prequalified($comp,$do_cat=0)
+	function prequalified_in($comp,$do_cat=0)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
@@ -732,16 +736,16 @@ class ranking_bo extends ranking_so
 	}
 
 	/**
-	 * get all prequalifed athlets of one nation for a given competition in all categories
+	 * Get all prequalifed athlets for a competition by their current age group, optional filtered by nation or federation
 	 *
 	 * @param mixed $comp complete competition array or WetId/rkey
-	 * @param string|int $nation 3-digit nat-code or integer fed_parent of athletes
-	 * @return array with GrpId => array(PerId => athlete-array)
+	 * @param string|int $nation =null 3-digit nat-code or integer fed_parent of athletes
+	 * @return boolean|array with GrpId => array(PerId => prequal-reason) or false if comp not found
 	 */
-	function national_prequalified($comp,$nation)
+	function prequalified($comp,$nation=null)
 	{
 		//echo "<p>".__METHOD__."(".array2string($comp).",$nation)</p>\n";
-		if (!($prequalified = $this->prequalified($comp))) return false;
+		if (!($prequalified = $this->prequalified_in($comp))) return false;
 
 		$all_cats = $nat_prequals = array();
 		foreach($prequalified as $cat => $prequals)
@@ -760,26 +764,17 @@ class ranking_bo extends ranking_so
 				$filter[] = 'fed_parent='.(int)$nation;
 				$filter['license_nation'] = $comp['nation'];	// otherwise we return international licenses
 			}
-			else
+			elseif($nation)
 			{
 				$filter['nation'] = $nation;
 			}
-			foreach((array)$this->athlete->search(array(),false,'nachname,vorname','','',false,'AND',false,$filter,false) as $athlete)
+			foreach((array)$this->athlete->search(array(),'geb_date,PerId','nachname,vorname','','',false,'AND',false,$filter,false) as $athlete)
 			{
 				foreach($prequalified as $cat => $prequals)
 				{
-					if (isset($prequals[$athlete['PerId']]))
+					if (isset($prequals[$athlete['PerId']]) && $this->in_agegroup($athlete['geb_date'],$cat,$comp))
 					{
-						if ($this->in_agegroup($athlete['geb_date'],$cat,$comp))
-						{
-							$athlete['prequal'] = $prequals[$athlete['PerId']];
-							$nat_prequals[$cat][$athlete['PerId']] = $athlete;
-						}
-						else
-						{
-							// not prequalified for that category, because athlete is now in a different age-group
-							// todo --> check rules if that prequalifies him in the next higher age-group
-						}
+						$nat_prequals[$cat][$athlete['PerId']] = $prequals[$athlete['PerId']];
 					}
 				}
 			}
