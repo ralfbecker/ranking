@@ -129,6 +129,7 @@ class ranking_cup_ui extends ranking_bo
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
 				common::egw_exit();
 			}
+			if (!empty($js)) egw_framework::set_onload($js);
 		}
 		$content = $this->cup->data + array(
 			'msg' => $msg,

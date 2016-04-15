@@ -206,6 +206,7 @@ class ranking_competition_ui extends ranking_bo
 				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
 				common::egw_exit();
 			}
+			if (!empty($js)) egw_framework::set_onload($js);
 
 			if ($_content['remove'] && $this->acl_check_comp($this->comp->data))
 			{

@@ -555,6 +555,10 @@ Continuer';
 				$readonlys['tabs']['pictures'] = true;
 			}
 		}
+		if ($js)
+		{		
+			egw_framework::set_onload($js);
+		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$this->tmpl->read('ranking.athlete.edit');
 		// until xajax_doXMLHTTP is no longer used in edit template (loaded implict by minifying!)
