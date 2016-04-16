@@ -228,7 +228,7 @@ class ranking_cup extends so_sql
 		{
 			$names[$data['SerId']] = $data['rkey'].($rkey_only ? '' : ': '.$data['name']);
 		}
-		error_log(__METHOD__.'('.array2string($keys).') returning '.array2string($names));
+		//error_log(__METHOD__.'('.array2string($keys).') returning '.array2string($names));
 		return $names;
 	}
 
