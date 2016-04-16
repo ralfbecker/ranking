@@ -910,7 +910,7 @@ class ranking_bo extends ranking_so
 				$nat_fed = !$comp['nation'] || $athlete['nation'] != $comp['nation'] ||
 					!$athlete['fed_parent'] && !$athlete['acl_fed_id'] ?	// only use nation, if no RGZ set!
 					$athlete['nation'] : ($athlete['acl_fed_id'] ? $athlete['acl_fed_id'] : $athlete['fed_parent']);
-				$prequalified = $this->national_prequalified($comp, $nat_fed);
+				$prequalified = $this->prequalified($comp, $nat_fed);
 				if (!$data)
 				{
 					$data = $keys;
