@@ -762,6 +762,7 @@ class ranking_registration_ui extends ranking_bo
 			else	// sort by nation
 			{
 				$order = 'GrpId,nation,reg_id,nachname,vorname';
+				$keys['state'] = ranking_registration::REGISTERED;
 				$starters =& $this->registration->read($keys,'',true,$order);
 			}
 
