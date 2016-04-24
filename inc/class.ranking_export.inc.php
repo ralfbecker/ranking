@@ -468,6 +468,14 @@ class ranking_export extends ranking_result_bo
 					self::$instance->_export_route($comp, $cat, -1), self::EXPORT_ROUTE_TTL);
 			}
 		}
+		if (!empty($_GET['upcaseNames']))
+		{
+			$strtoupper = function_exists('mb_strtoupper') ? 'mb_strtoupper' : 'strtoupper';
+			foreach($data['participants'] as &$athlete)
+			{
+				$athlete['lastname'] = $strtoupper($athlete['lastname']);
+			}
+		}
 		return $data;
 	}
 
