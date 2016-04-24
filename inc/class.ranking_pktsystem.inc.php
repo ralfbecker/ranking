@@ -61,8 +61,7 @@ class ranking_pktsystem extends so_sql
 		{
 			$PktId = $this->data['PktId'];
 		}
-		$this->db->select($this->pkte_table,'platz,pkt',array('PktId'=>$PktId),__LINE__,__FILE__,false,'ORDER BY platz');
-		while (($row = $this->db->row(true)))
+		foreach($this->db->select($this->pkte_table,'platz,pkt',array('PktId'=>$PktId),__LINE__,__FILE__,false,'ORDER BY platz') as $row)
 		{
 			$max_pkte += ($pkte[$row['platz']] = $row['pkt']);
 		}
