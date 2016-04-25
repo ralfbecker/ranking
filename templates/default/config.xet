@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//Stylite AG//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<!-- $Id: config2xet.php 55816 2016-04-24 14:04:14Z ralfbecker $ -->
+<overlay>
+	<template id="ranking.config" template="" lang="" group="0" version="16.1">
+		<grid width="100%" class="admin-config egwGridView_grid">
+			<columns>
+				<column width="60%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<description value="VFS directory for the pdf files (excluding the year)"/>
+					<textbox id="newsettings[vfs_pdf_dir]"/>
+				</row>
+				<row>
+					<description value="URL for pdf files (excluding the year)"/>
+					<textbox id="newsettings[vfs_pdf_url]"/>
+				</row>
+				<row>
+					<description value="VFS directory for topo files (excluding the year)"/>
+					<textbox id="newsettings[vfs_topo_dir]"/>
+				</row>
+				<row>
+					<vbox>
+						<description value="Filesystem path for upload of athlete pictures"/>
+						<description value="Default: $_SERVER[DOCUMENT_ROOT]/jpgs --> URL: /jpgs"/>
+					</vbox>
+					<textbox id="newsettings[picture_path]" size="80"/>
+				</row>
+				<row>
+					<description value="Install-ID of instance to use for export caching (default current one)"/>
+					<textbox id="newsettings[export_cache_level]"/>
+				</row>
+				<row>
+					<description value="Ranking database" class="subHeader"/>
+					<description value="only fill values different from eGW"/>
+				</row>
+				<row>
+					<description value="Encoding" label="%s:"/>
+					<textbox id="newsettings[ranking_db_charset]" size="8"/>
+				</row>
+				<row>
+					<description value="Host" label="%s:"/>
+					<textbox id="newsettings[ranking_db_host]"/>
+				</row>
+				<row>
+					<description value="Port" label="%s:"/>
+					<textbox id="newsettings[ranking_db_port]"/>
+				</row>
+				<row>
+					<description value="Database" label="%s:"/>
+					<textbox id="newsettings[ranking_db_name]"/>
+				</row>
+				<row>
+					<description value="User" label="%s:"/>
+					<textbox id="newsettings[ranking_db_user]"/>
+				</row>
+				<row>
+					<description value="Password" label="%s:"/>
+					<textbox id="newsettings[ranking_db_pass]" type="passwd"/>
+				</row>
+				<row>
+					<description value="Import from other ranking instances" span="all" class="subHeader"/>
+				</row>
+				<row>
+					<description value="Import URL" label="%s:"/>
+					<textbox id="newsettings[import_url]" size="80"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

@@ -56,9 +56,9 @@ class ranking_hooks
 				'target' => 'timer',
 			);
 
-			if (is_object($GLOBALS['uiresult']))	// we show the displays menu only if we are in the result-service
+			if (is_object($GLOBALS['ranking_result_ui']))	// we show the displays menu only if we are in the result-service
 			{
-				if (($displays = $GLOBALS['uiresult']->display->displays()) || $GLOBALS['egw_info']['user']['apps']['admin'])
+				if (($displays = $GLOBALS['ranking_result_ui']->display->displays()) || $GLOBALS['egw_info']['user']['apps']['admin'])
 				{
 					if (!is_array($displays)) $displays = array();
 					foreach($displays as $dsp_id => $dsp_name)
@@ -98,8 +98,9 @@ class ranking_hooks
 		{
 			$file = Array(
 				'Site configuration' => egw::link('/index.php',array(
-					'menuaction' => 'admin.uiconfig.index',
+					'menuaction' => 'admin.admin_config.index',
 					'appname'    => 'ranking',
+					'ajax'       => 'true',
 				 )),
 				'Nation ACL' => egw::link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
 				'Import' => egw::link('/index.php',array(
