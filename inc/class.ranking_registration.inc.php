@@ -130,7 +130,7 @@ class ranking_registration extends so_sql
 				if (!$extra_cols)
 				{
 					$extra_cols = "nachname,vorname,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
-						".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,reg_id,".
+						".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,acl,reg_id,".
 						ranking_athlete::ATHLETE_TABLE.".PerId AS PerId";
 				}
 				else
@@ -363,7 +363,7 @@ class ranking_registration extends so_sql
 			$extra_cols = str_replace('fed_parent', $fed_parent.' AS fed_parent',
 				array_merge($extra_cols ? explode(',', $extra_cols) : array(),
 					explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
-					".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,".
+					".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,acl,".
 					ranking_athlete::ATHLETE_TABLE.".PerId AS PerId")));
 			$order_by = str_replace('fed_parent', $fed_parent, $order_by);
 

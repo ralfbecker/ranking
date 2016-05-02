@@ -211,13 +211,13 @@ class ranking_athlete extends so_sql
 			// blank out the acl'ed fields, if user has no athletes rights
 			if (is_object($GLOBALS['ranking_bo']) && !$GLOBALS['ranking_bo']->acl_check_athlete($data))
 			{
-				foreach($this->acl2clear as $deny => $to_clear)
+			   	foreach($this->acl2clear as $deny => $to_clear)
 				{
 					if ($acl & $deny)
 					{
 						foreach($to_clear[0] == '!' ? array_diff(array_keys($data),$to_clear) : $to_clear as $name)
 						{
-							$data[$name] = $name == 'geb_date' && $data['geb_date'] ? (int)$data['geb_date'] : '';
+							$data[$name] = $name == 'geb_date' && $data['geb_date'] ? (int)$data['geb_date'].'-01-01' : '';
 						}
 					}
 				}
