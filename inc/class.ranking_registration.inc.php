@@ -82,20 +82,6 @@ class ranking_registration extends so_sql
 	}
 
 	/**
-	 * changes the data from the db-format to our work-format
-	 *
-	 * @param array $data if given works on that array and returns result, else works on internal data-array
-	 * @return array
-	 */
-	function athlete_db2data($data=null)
-	{
-		static $athlete=null;
-		if (!isset($athlete)) $athlete = ranking_bo::getInstance()->athlete;
-
-		return $athlete->db2data($data);
-	}
-
-	/**
 	 * reads row matched by keys and puts all cols in the data array
 	 *
 	 * a) only WetId: List of cats with results for the given comp.
@@ -180,20 +166,21 @@ class ranking_registration extends so_sql
 	/**
 	 * changes the data from the db-format to our work-format
 	 *
+	 * We use athlete' db2data to observe it's ACL, as we join in athlete table!
+	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 * @return array
 	 */
 	function db2data($data=null)
 	{
+		static $athlete=null;
+		if (!isset($athlete)) $athlete = ranking_bo::getInstance()->athlete;
+
 		if (!is_array($data))
 		{
 			$data =& $this->data;
 		}
-		if (count($data) && $this->source_charset)
-		{
-			$data = translation::convert($data,$this->source_charset);
-		}
-		return $data;
+		return $athlete->db2data($data);
 	}
 
 	/**
