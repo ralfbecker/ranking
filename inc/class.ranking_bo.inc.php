@@ -850,7 +850,7 @@ class ranking_bo extends ranking_so
 	 * @param int|array $athlete PerId or complete athlete array
 	 * @param int $mode =ranking_registration::REGISTERED ::DELETED, ::PREQUALIFIED, ::CONFIRMED
 	 * @param string& $msg =null on return over quota message for admins or jury
-	 * @param string $prequal_reason=null reason why athlete is prequalified
+	 * @param string $prequal_reason =null reason why athlete is prequalified
 	 * @throws egw_exception_wrong_userinput with error message for not matching agegroup or over quota
 	 * @throws egw_exception_wrong_parameter for other errors
 	 * @return boolean true of everythings ok, false on error
@@ -1539,7 +1539,7 @@ class ranking_bo extends ranking_so
 			}
 			$this->result->save(array(
 				'PerId' => $PerId,
-				'platz' => $allowed_nations && !$cup ? $cup_place : $place,
+				'platz' => isset($cup_place) && $allowed_nations && !$cup ? $cup_place : $place,
 				'pkt'   => round(100.0 * $feldfactor * $pkt),
 				'cup_platz' => $cup_place,
 				'cup_pkt'   => $cup_pkt,
