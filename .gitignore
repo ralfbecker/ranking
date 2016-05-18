@@ -1,0 +1,16 @@
+/sitemgr/digitalrock/calendar.html
+/ifsc-dump.php
+/inc/delete-prequalified.sql
+/obs-medias.php
+/setup/etemplates.old.inc.php
+/setup/setup.old.inc.php
+/setup/tables_current.old.inc.php
+/setup/tables_update.old.inc.php
+/sitemgr/digitalrock/.db_rang.php
+/templates/default/images/griff16.png
+/templates/default/images/griff32blau.png
+/templates/default/images/griff32transparent50.png
+/templates/default/result.header.xet
+*.old.xet
+*.old
+
