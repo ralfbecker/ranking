@@ -183,34 +183,27 @@ table#ranking-result-index_score input[type=checkbox] {
 	position: relative;
 	margin-left: 10px;
 }
-table#ranking-result-index_score input[type=checkbox][name*=zone]:after {
-	content: "B";
+table#ranking-result-index_score input[type=checkbox]:after {
 	position: absolute;
 	top: 0;
-	left: 2px;
+	left: 3px;
 	font-size: 75%;
+}
+table#ranking-result-index_score input[type=checkbox][name*=zone]:after {
+	content: "B";
 }
 table#ranking-result-index_score input[type=checkbox][name*=top]:after {
 	content: "T";
-	position: absolute;
-	top: 0;
-	left: 2px;
-	font-size: 75%;
 }
 table#ranking-result-index_score input[type=checkbox][name*=flash]:after {
 	content: "F";
-	position: absolute;
-	top: 0;
-	left: 2px;
-	font-size: 75%;
 }
 button.scorecard_button {
 	font-size: 150%;
 	position: absolute;
 	top: 280px;
 	right: 30px;
-	border: 3px solid black;
-	border-radius: 3px;
+	padding-top: 1px;
 }
 
 /**

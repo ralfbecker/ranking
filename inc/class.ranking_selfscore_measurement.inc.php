@@ -66,13 +66,20 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 				// set current result
 				if ($content['nm']['PerId'] == $row['PerId'])
 				{
+					static $use2name = array(
+						'b' => 'zone',
+						't' => 'top',
+						'f' => 'flash',
+					);
+					$use = $content['nm']['route_data']['selfscore_use'] ? explode('', $content['nm']['route_data']['selfscore_use']) : array('t');
+					$not_used = array_diff_key($use2name, array_flip($use));
 					$num_problems = $content['nm']['route_data']['route_num_problems'];
 					$num_cols = $content['nm']['route_data']['selfscore_num'];
 					for($n=$r=0; $r*$num_cols < $num_problems; ++$r)
 					{
 						for($c=0; $c < $num_cols; ++$c)
 						{
-							$col = boetemplate::num2chrs($c-1);
+							$col = etemplate_new::num2chrs($c-1);
 							if ($n++ < $num_problems)
 							{
 								$score[$r.$col] = array(
@@ -81,9 +88,14 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 							}
 							else	// surplus checkbox(es) in last row
 							{
-								$readonlys['score'][$r.$col.'[bonus]'] =
+								$not_used = $use2name;
+								/*$readonlys['score'][$r.$col.'[zone]'] =
 									$readonlys['score'][$r.$col.'[top]'] =
-									$readonlys['score'][$r.$col.'[flash]'] = true;
+									$readonlys['score'][$r.$col.'[flash]'] = true;*/
+							}
+							foreach($not_used as $name)
+							{
+								$readonlys['score'][$r.$col.'['.$name.']'] = true;
 							}
 						}
 					}
@@ -116,11 +128,12 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	static function score2btf($score, $mode=null)
 	{
 		if (empty($mode)) $mode='t';
+		$have_zone = strstr($mode, 'b') !== false;
 		$no_top = (int)($mode[0] == 'b');
 		$no_flash = ($mode[0] == 'b')+(bool)strstr($mode,'t');
 
 		return array(
-			'zone'  => (int)($score > 0),
+			'zone'  => (int)($have_zone && $score > 0),
 			'top'   => (int)($score > $no_top),
 			'flash' => (int)($score > $no_flash),
 		);

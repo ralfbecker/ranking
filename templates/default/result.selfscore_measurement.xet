@@ -3,9 +3,8 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.selfscore_measurement" template="" lang="" group="0" version="1.9.001">
-		<menulist>
-			<menupopup label="Scorecard" id="nm[PerId]" onchange="app.ranking.scorecard_changed" empty_label="Select one" class="header"/>
-		</menulist>
+		<vbox>
+		<select label="Scorecard" id="nm[PerId]" onchange="app.ranking.scorecard_changed" empty_label="Select one" class="header"/>
 		<grid id="score">
 			<columns>
 				<column/>
@@ -98,6 +97,7 @@
 				</row>
 			</rows>
 		</grid>
+		</vbox>
 		<buttononly label="Update" id="button[apply]" onclick="app.ranking.update_scorecard"/>
 		<box id="resultlist"/>
 	</template>
