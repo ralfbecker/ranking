@@ -16,6 +16,7 @@ $GLOBALS['egw_info'] = array(
 		'currentapp'	=> 'ranking',
 		'nonavbar'		=> True,
 		'noheader'      => true,
+		'deny_mobile'   => true,	// deny use of 16.1 mobile support
 		'autocreate_session_callback' => 'check_anon_access',
 ));
 include('../header.inc.php');

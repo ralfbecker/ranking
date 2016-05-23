@@ -27,7 +27,8 @@ form.form_1button {
  * Formatting for scorecard
  */
 /* disable route- and category-selection, as they lead out of self-service */
-#popupMainDiv tr.noPrint {
+#popupMainDiv div.dialogHeadbar, #popupMainDiv tr.noPrint,
+#ranking-result-index_nm\[calendar\], #ranking-result-index_nm\[show_result\], #ranking-result-index_nm\[route\] {
 	display: none;
 }
 

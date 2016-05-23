@@ -74,6 +74,11 @@ class ranking_athlete_ui extends ranking_bo
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
+		// selfservice needs old idots mobile support currently, so disable new 16.1 mobile support
+		if ($this->is_selfservice())
+		{
+			$GLOBALS['egw_info']['flags']['deny_mobile'] = true;
+		}
 		if ($_GET['rkey'] || $_GET['PerId'])
 		{
 			if (!in_array($license_nation = strip_tags($_GET['license_nation']),$this->license_nations))
@@ -556,7 +561,7 @@ Continuer';
 			}
 		}
 		if ($js)
-		{		
+		{
 			egw_framework::set_onload($js);
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
