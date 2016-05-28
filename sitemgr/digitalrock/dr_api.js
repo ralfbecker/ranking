@@ -139,7 +139,10 @@ var DrBaseWidget = (function() {
 					// need same handling as success
 					if (DrBaseWidget.jsonp_queue[0] === this) DrBaseWidget.jsonp_queue.shift();
 					if (DrBaseWidget.jsonp_queue.length) DrBaseWidget.jsonp_queue[0].update(true);
-					if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));		}
+					//if (_err != 'timeout') alert('Ajax request to '+this.json_url+' failed: '+_err+(_status?' ('+_status+')':''));
+					// schedule update again after 60sec
+					this.update_handle = window.setTimeout(jQuery.proxy(this.update, this, ignore_queue), 60000);
+				}
 			});
 		}
 	};
