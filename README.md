@@ -5,6 +5,8 @@ EGroupware ranking or result-service
 *ranking* is an EGroupware module allow sport federations to manage sub-federations, athletes, cups, competitions and rankings.
 result-service allows to interactiv enter results / judge competitions on desktop or mobile devices.
 
+Following documents content of public JSON and/or XML feeds.
+
 Please note:
 -----------
 - www.digitalrock.de uses "/egroupware", while http://egw.ifsc-climbing.org uses "/egw"!
