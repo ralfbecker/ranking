@@ -2,7 +2,7 @@ EGroupware ranking or result-service
 ====================================
 [![Build Status](https://travis-ci.org/ralfbecker/ranking.svg?branch=master)](https://travis-ci.org/ralfbecker/ranking)
 
-*ranking* is an EGroupware module allow sport federations to manage sub-federations, athletes, cups, competitions and rankings.
+**ranking** is an [EGroupware](http://www.egroupware.org/) module allowing sport federations to manage sub-federations, athletes, cups, competitions, results and rankings.
 result-service allows to interactiv enter results / judge competitions on desktop or mobile devices.
 
 Following documents content of public JSON and/or XML feeds.
