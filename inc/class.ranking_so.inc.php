@@ -203,7 +203,7 @@ class ranking_so
 					'description' => 'Do NOT change the name!',
 				));
 			}
-			$rkey2id =& egw_cache::getSession(__CLASS__,'rkey2id',create_function('','return array();'));
+			$rkey2id =& egw_cache::getSession(__CLASS__, 'rkey2id', function() { return array(); });
 		}
 		if ($rkey === 'parent')
 		{

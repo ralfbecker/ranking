@@ -182,7 +182,10 @@ class ranking_topo
 			if ($src == 2) imagerectangle($src_image, $x_min, $y_min, $x_max, $y_max, $color);
 
 			// function to scale hold coordinates
-			$getHoldXY = create_function('$hold', "return ranking_topo::getHoldXY(\$hold,$src_width,$src_height);");
+			$getHoldXY = function($hold) use ($src_width, $src_height)
+			{
+				return ranking_topo::getHoldXY($hold, $src_width, $src_height);
+			};
 
 			// draw holds on destination
 			self::showHolds($src_image, $getHoldXY, $icon);
@@ -200,7 +203,10 @@ class ranking_topo
 				throw new egw_exception_wrong_parameter("Could not imagecopyresampled($image, $src_image , 0, 0, $src_x , $src_y , $width , $height , $src_width , $src_height)!");
 			}
 			// function to scale hold coordinates
-			$getHoldXY = create_function('$hold', "return ranking_topo::getHoldXY(\$hold,$src_width,$src_height,$x_min,$y_min,$x_max,$y_max,$width,$height);");
+			$getHoldXY = function($hold) use ($src_width, $src_height, $x_min, $y_min, $x_max, $y_max, $width, $height)
+			{
+				return ranking_topo::getHoldXY($hold, $src_width, $src_height, $x_min, $y_min, $x_max, $y_max, $width, $height);
+			};
 
 			// draw holds on destination
 			self::showHolds($image, $getHoldXY, $icon);

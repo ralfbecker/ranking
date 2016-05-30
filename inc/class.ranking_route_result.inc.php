@@ -325,12 +325,12 @@ class ranking_route_result extends so_sql
 				if ($order != 'result_rank')
 				{
 					// sort the rows now by the user's criteria
-					usort($rows,create_function('$a,$b',$func='return '.($sort == 'DESC' ? '-' : '').
-						($this->table_def['fd'][$order] == 'varchar' || in_array($order,array('nachname','vorname','nation','ort')) ?
-						"strcasecmp(\$a['$order'],\$b['$order'])" :
-						"(\$a['$order']-\$b['$order'])").';'));
-						//"(\$a['$order'] ? \$a['$order']-\$b['$order'] : -99999999)").';'));
-					//echo "<p>order='$order', sort='$sort', func=$func</p>\n";
+					usort($rows, function($a, $b) use ($sort, $order)
+					{
+						return ($sort == 'DESC' ? -1 : 1)*
+							($this->table_def['fd'][$order] == 'varchar' || in_array($order, array('nachname','vorname','nation','ort')) ?
+								strcasecmp($a[$order], $b[$order]) : ($a[$order] - $b[$order]));
+					});
 				}
 				elseif($sort == 'DESC')
 				{
