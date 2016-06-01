@@ -7,8 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-10 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$ 
+ * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
  */
 
 class ranking_display_ui extends ranking_display_bo
@@ -23,27 +23,27 @@ class ranking_display_ui extends ranking_display_bo
 		'edit' => true,
 		'display' => true,
 	);
-	
+
 	/**
 	 * Controll for a display
 	 *
-	 * @param array $content=null
+	 * @param array $_content=null
 	 * @param string $msg
 	 */
-	function index($content=null,$msg='',$dsp_id=null)
+	function index($_content=null,$msg='',$dsp_id=null)
 	{
-		if (!is_array($content))
+		if (!is_array($_content))
 		{
 			if (!$dsp_id) $dsp_id = (int)$_GET['dsp_id'] > 0 ? (int)$_GET['dsp_id'] : ranking_display::defaultDisplay();
 			if (!$msg) $msg = $_GET['msg'];
 		}
 		else
 		{
-			$dsp_id = $content['display']['dsp_id'];
+			$dsp_id = $_content['display']['dsp_id'];
 
-			if (isset($content['rows']['action']))
+			if (isset($_content['rows']['action']))
 			{
-				list($action,$data) = each($content['rows']['action']);
+				list($action,$data) = each($_content['rows']['action']);
 				list($frm_id) = each($data);
 				//echo "<p>action='$action', frm_id=$frm_id</p>\n";
 				switch($action)
@@ -62,30 +62,30 @@ class ranking_display_ui extends ranking_display_bo
 							));
 						}
 						break;
-						
+
 					case 'delete':
 						if ($this->format->delete(array(
 							'frm_id' => $frm_id,
 						)))
 						{
-							$this->format->update_lines(null,null,$dsp_id,$content['display']['WetId']);
+							$this->format->update_lines(null,null,$dsp_id,$_content['display']['WetId']);
 							$msg = lang('Format deleted');
 						}
 						else
 						{
 							$msg = lang('Error deleting format!');
 						}
-						break;					
+						break;
 				}
 			}
-			if ($content['old_comp'] != $content['display']['WetId'])	// competition changed
+			if ($_content['old_comp'] != $_content['display']['WetId'])	// competition changed
 			{
 				if ($_GET['copy_formats'])
 				{
-					$this->format->copyall($content['display']['WetId'],$content['old_comp'],$dsp_id);
+					$this->format->copyall($_content['display']['WetId'],$_content['old_comp'],$dsp_id);
 				}
 				$this->display->update(array(
-					'WetId'  => $content['display']['WetId'],
+					'WetId'  => $_content['display']['WetId'],
 					'dsp_id' => $dsp_id,
 					'dsp_current' => 'www.digitalROCK.de',
 					'dsp_line' => 0,
@@ -103,19 +103,19 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		else
 		{
-			if (!is_array($content) && (int)$_GET['frm_id'])
+			if (!is_array($_content) && (int)$_GET['frm_id'])
 			{
 				if (!$this->display->activate($_GET['frm_id'],$_GET['athlete']))
 				{
 					$msg = lang('Format #%1 not found!',$_GET['frm_id']);
 				}
-			}			
+			}
 			$rows = $this->format->search(array(),false,'frm_line','','',false,'AND',false,$q=array(
 				'dsp_id' => $this->display->dsp_clone_of ? $this->display->dsp_clone_of : $dsp_id,
 				'WetId'  => $this->display->WetId,
 			));
 			if (!is_array($rows)) $rows = array();
-			
+
 			$id2line = array();
 			$last_update = 0;
 			foreach($rows as $row)
@@ -149,7 +149,7 @@ class ranking_display_ui extends ranking_display_bo
 		);
 		// we might be just a clone of an other display (get or formats from that display)
 		$content['dsp_id'] = $content['rows']['dsp_id'] = $this->display->dsp_clone_of ? $this->display->dsp_clone_of : $dsp_id;
-		
+
 		$preserv = array(
 			'old_comp'=> $this->display->WetId,
 		);
@@ -182,7 +182,7 @@ class ranking_display_ui extends ranking_display_bo
 		$tpl = new etemplate('ranking.display.index');
 		$tpl->exec('ranking.ranking_display_ui.index',$content,$sel_options,$readonlys,$preserv,2);
 	}
-	
+
 	/**
 	 * Calculate how long the display controler can sleep, before the next update is neccessary
 	 *
@@ -208,7 +208,7 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		//if (500 > $sleep) $sleep = 500;		// guard the webserver against too rapid requests (=1/2s)
 		if ($sleep > 7000) $sleep = 7000;	// in case an other user changes something
-			
+
 		return $sleep;
 	}
 
@@ -229,10 +229,8 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		$script .= 'document.eTemplate.submit();';
 
-		$response = new xajaxResponse();
+		$response = new egw_json_response();
 		$response->addScript($script);
-
-		return $response->getXML();
 	}
 
 	/**
@@ -240,13 +238,13 @@ class ranking_display_ui extends ranking_display_bo
 	 *
 	 * @param int $dsp_id
 	 * @param int $last_updated timestamp to check for newer updates, or false to ignore the check
-	 * @param ranking_display $display=null
+	 * @param ranking_display $display =null
 	 */
 	function ajax_update($dsp_id,$last_updated=false,ranking_display $display=null)
 	{
 		$GLOBALS['egw']->session->commit_session();		// stop this session from blocking other requests
 
-		$response = new xajaxResponse();
+		$response = new egw_json_response();
 
 		if (is_null($display) && ($display = $this->display) && !$display->read($dsp_id))
 		{
@@ -264,19 +262,18 @@ class ranking_display_ui extends ranking_display_bo
 					'menuaction' => 'ranking.ranking_display_ui.index',
 					'dsp_id' => $dsp_id,
 				))."';");
-				return $response->getXML();
+				return;
 			}
 			// calculate how long the javascript timeout can be (in ms)
-			$sleep = $this->_calc_sleep_time($display);			
+			$sleep = $this->_calc_sleep_time($display);
 			$line = $display->frm_id && $this->format->read($display->frm_id) ? $this->format->frm_line : '';
 			$response->addAssign('exec[display][frm_line]','value',$line);
 			$response->addAssign('exec[display][dsp_current]','value',$display->dsp_current);
 			$response->addScript("timeout=window.setTimeout('xajax_doXMLHTTP(\"ranking.ranking_display_ui.ajax_update\",$dsp_id,$lu);',$sleep);");
 		}
-		return $response->getXML();
 	}
-	
-	
+
+
 	/**
 	 * Activate a line and update the display with the current content, line and evtl. changed format lines
 	 *
@@ -289,9 +286,9 @@ class ranking_display_ui extends ranking_display_bo
 
 		if (!$this->display->read($dsp_id))
 		{
-			$response = new xajaxResponse();
+			$response = new egw_json_response();
 			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes(lang('Display #%1 not found!!!',$dsp_id))."';");
-			return $response->getXML();
+			return;
 		}
 		if (!$this->display->activate(array(
 			'dsp_id'   => $this->display->dsp_clone_of ? $this->display->dsp_clone_of : $dsp_id,
@@ -299,17 +296,17 @@ class ranking_display_ui extends ranking_display_bo
 			'frm_line' => $line,
 		)))
 		{
-			$response = new xajaxResponse();
+			$response = new egw_json_response();
 			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes(lang('Format #%1 not found!',$line))."';");
-			return $response->getXML();
+			return;
 		}
 		return $this->ajax_update($dsp_id,false,$this->display);
 	}
-	
+
 	/**
 	 * Edit one format line of a display
 	 *
-	 * @param array $content=null
+	 * @param array $content =null
 	 * @param string $msg
 	 */
 	function edit(array $content=null,$msg='')
@@ -390,7 +387,7 @@ class ranking_display_ui extends ranking_display_bo
 						$button = '';
 					}
 					break;
-					
+
 				case 'delete':
 					if ($this->format->delete($frm))
 					{
@@ -417,32 +414,32 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		if ($frm['frm_go_frm_id'] && ($go = $this->format->read($frm['frm_go_frm_id'])))
 		{
-			$frm['frm_go'] = $go['frm_line']; 
+			$frm['frm_go'] = $go['frm_line'];
 		}
 		$preserv = $content = $frm;
 		$preserv['old_line'] = $frm['frm_line'];
 		$content['msg'] = $msg;
 		$readonlys['button[delete]'] = !$this->format->frm_id;
-		
+
 		if ($script) $GLOBALS['egw_info']['flags']['java_script'] .= "<script>$script</script>\n";
-		
+
 		$GLOBALS['egw_info']['flags']['app_header'] = $this->display->dsp_name.
 			($this->display->ip ? ' ('.$this->display->ip.($this->display->dsp_port?':'.$this->display->dsp_port:'').')' : '');
 
 		$tpl = new etemplate('ranking.display.edit');
 		$tpl->exec('ranking.ranking_display_ui.edit',$content,array('frm_heat'=>$this->get_heats($frm['WetId'])),$readonlys,$preserv,2);
 	}
-	
+
 	/**
 	 * Add/edit a display
 	 *
-	 * @param array $content=null
+	 * @param array $_content =null
 	 */
-	function display($content=null)
+	function display($_content=null)
 	{
 		if (!$GLOBALS['egw_info']['user']['apps']['admin']) $this->popup_die();
 
-		if (!is_array($content))
+		if (!is_array($_content))
 		{
 			if ($_GET['dsp_id'] && !$this->display->read($_GET['dsp_id']))
 			{
@@ -451,14 +448,14 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		else
 		{
-			list($button) = @each($content['button']);
-			unset($content['button']);
-			
+			list($button) = @each($_content['button']);
+			unset($_content['button']);
+
 			switch($button)
 			{
 				case 'apply':
 				case 'save':
-					if (($err = $this->display->update($content)))
+					if (($err = $this->display->update($_content)))
 					{
 						$msg = lang('Error saving display!');
 						$button = '';
@@ -486,20 +483,20 @@ class ranking_display_ui extends ranking_display_bo
 		if ($this->display->dsp_id)
 		{
 			unset($sel_options['dsp_clone_of'][$this->display->dsp_id]);
-		
+
 			$GLOBALS['egw_info']['flags']['app_header'] = $this->display->dsp_name.
 				($this->display->ip ? ' ('.$this->display->ip.($this->display->dsp_port?':'.$this->display->dsp_port:'').')' : '');
 		}
 		$tpl = new etemplate('ranking.display.display');
-		$tpl->exec('ranking.ranking_display_ui.display',$content,$sel_options,$readonlys,array('dsp_id'=>$this->display->dsp_id),2);		
+		$tpl->exec('ranking.ranking_display_ui.display',$content,$sel_options,array(),array('dsp_id'=>$this->display->dsp_id),2);
 	}
-	
+
 	/**
 	 * Displays an alert with a message and closes the popup after the confirmation
-	 * 
+	 *
 	 * Does NOT return!
-	 * 
-	 * @param string $msg='Permission denied !!!'
+	 *
+	 * @param string $msg ='Permission denied !!!'
 	 */
 	function popup_die($msg='Permission denied !!!')
 	{
