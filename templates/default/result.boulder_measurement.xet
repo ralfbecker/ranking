@@ -3,7 +3,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.boulder_measurement" template="" lang="" group="0" version="14.2.001">
-		<box  class="popupMainDiv">
+		<box class="popupMainDiv">
 			<grid width="100%">
 				<columns>
 					<column width="120"/>
@@ -11,7 +11,10 @@
 					<column width="150"/>
 				</columns>
 				<rows>
-					<row height="100">
+					<row height="5" class="hideOnMobile">
+						<description span="all"/>
+					</row>
+					<row height="60">
 						<label value="Boulder"/>
 						<select-number  type="select-number" id="nm[boulder_n]" width= "150" onchange="app.ranking.boulder_changed" options=",1,{$cont[nm][num_problems]}"/>
 						<box align="center">
@@ -20,10 +23,16 @@
 							</hbox>
 						</box>
 					</row>
-					<row height="70">
+					<row height="5" class="hideOnMobile">
+						<description span="all"/>
+					</row>
+					<row height="60">
 						<label value="Athlete" statustext="Sort athletes" class="athleteSort" onclick="app.ranking.sort_athletes" for="nm[PerId]"/>
-						<select id="nm[PerId]" onchange="app.ranking.boulder_changed" options="Select one" class="et2_fullWidth"/>
+						<select id="nm[PerId]" onchange="app.ranking.boulder_changed" options="Select one" class="et2_fullWidth" span="all"/>
 						<description/>
+					</row>
+					<row height="5" class="hideOnMobile">
+						<description span="all"/>
 					</row>
 					<row height="70">
 						<label value="Try"/>
@@ -43,11 +52,11 @@
 					<row height="70" class="bottomRow">
 						<buttononly label="Update" id="button[update]" onclick="app.ranking.update_boulder" class="leftPad5 bigButton"/>
 						<buttononly label="Protocol" id="protocol" onclick="protocol.display()"  class="bigButton"/>
-						<buttononly align="center" label="&gt;&gt;" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton nextButton"/>
+						<buttononly align="center" label="&gt;&gt;" id="button[next]" onclick="app.ranking.boulder_next" class="bigButton nextButton" background_image="0"/>
 					</row>
 				</rows>
 			</grid>
 		</box>
-		<box id="resultlist"/>
+		<box id="resultlist" class="hideOnMobile"/>
 	</template>
 </overlay>

@@ -87,6 +87,9 @@
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv {
     padding-right: 10px;
   }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv > table {
+    margin-top: 15px;
+  }
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv input,
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button,
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv span,
@@ -127,11 +130,13 @@
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv .bottomRow td:first-child {
     padding-left: 8px;
   }
+  body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button#ranking-result-index_button\[next\].nextButton {
+    margin-right: 0;
+  }
   body #ranking-result-index #ranking-result-index_msg {
     position: absolute;
-    top: 53px;
-    left: 33%;
-    right: 33%;
+    top: 50px;
+    left: 18px;
     background: transparent;
   }
   body div#ranking-result-index-rows_lead-edit {

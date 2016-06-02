@@ -71,7 +71,7 @@ var DrBaseWidget = (function() {
 	{
 		this.json_url = _json_url;
 		this.container = jQuery(typeof _container == 'string' ? '#'+_container : _container);
-		this.container.attr('class', this.constructor.name);
+		this.container.addClass(this.constructor.name);
 	}
 	/**
 	 * Install update method as popstate or hashchange handler
