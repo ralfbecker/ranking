@@ -1497,7 +1497,6 @@ class ranking_result_ui extends ranking_result_bo
 		// enabling download for general result too (if we have at least a quali startlist)
 		$readonlys['button[download]'] = !($this->has_startlist($keys) || $keys['route_order'] == -1 && $this->has_startlist(array('route_order'=>0)+$keys));
 		$content['no_route_selection'] = !$cat; 	// no cat selected
-		$content['no_compsel'] = $cat && $content['nm']['show_result'] == 4;	// no competition selection in measurement, if a cat is selected
 		$onclick = "egw.open_link('ranking.ranking_result_ui.route&comp={$content['nm']['comp']}&cat={$content['nm']['cat']}','result_route','700x500','ranking')";
 		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
 		{

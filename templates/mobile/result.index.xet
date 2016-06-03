@@ -183,27 +183,15 @@
 				<button disabled="@no_list" statustext="Apply the changes made"  id="button[apply]"/>
 			</hbox>
 			<vbox  class="noPrint resultHeader nextmatch_header_row">
-				<menulist>
-					<menupopup class="rightPad5" disabled="@no_compsel" statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
-				</menulist>
-				<menulist>
-					<menupopup id="nm[comp]" disabled="@no_compsel" no_lang="1" onchange="1" empty_label="Select competition"/>
-				</menulist>
+				<select class="rightPad5" statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
+				<select id="nm[comp]" no_lang="1" onchange="1" empty_label="Select competition"/>
 				<hbox class="catSelectionMsg">
-					<menulist>
-						<menupopup  disabled="!@nm[comp]" id="nm[cat]" no_lang="1" onchange="1" empty_label="Select category"/>
-					</menulist>
+					<select  disabled="!@nm[comp]" id="nm[cat]" no_lang="1" onchange="1" empty_label="Select category"/>
 					<hidden id="comp[WetId]"/>
 				</hbox>
-				<menulist span="all">
-					<menupopup class="rightPad5" disabled="@no_route_selection" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
-				</menulist>
-				<menulist>
-					<menupopup  disabled="@no_route_selection" statustext="Select heat" id="nm[route]" no_lang="1" onchange="1"/>
-				</menulist>
-				<menulist>
-					<menupopup class="noPrint leftPad5" disabled="@no_route_selection" id="nm[ranking]" onchange="1" options="display no ranking"/>
-				</menulist>
+				<select class="rightPad5" disabled="@no_route_selection" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
+				<select disabled="@no_route_selection" statustext="Select heat" id="nm[route]" no_lang="1" onchange="1"/>
+				<select class="noPrint leftPad5" disabled="@no_route_selection" id="nm[ranking]" onchange="1" options="display no ranking"/>
 			</vbox>
 			<description id="msg"  disabled="!@nm[comp]" class="message"/>
 		</vbox>
