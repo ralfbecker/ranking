@@ -10,7 +10,7 @@
  * @version $Id$
  */
 @import (reference) '../../../pixelegg/mobile/fw_mobile.less';
-//@import (less) '../default/app.css';
+@import (less) '../default/app.css';
 @media all {
 	html *{
 		-webkit-user-select: none;
@@ -126,7 +126,7 @@
 
 			}
 			.bigButton {
-
+				min-width:auto;
 			}
 			#ranking-result-index_msg {
 				position: absolute;
@@ -136,6 +136,9 @@
 			}
 		}
 		div#ranking-result-index-rows_lead-edit {height: 100%;}
+	}
+	#ranking-result-index_measurement_template, #ranking-result-index_measurement_template div.popupMainDiv, form#ranking-result-index {
+		background-color: white;
 	}
 }
 

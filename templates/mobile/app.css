@@ -9,6 +9,471 @@
  * @package Ranking
  * @version $Id$
  */
+/**
+ * EGroupware digital ROCK Rankings & ResultService - css
+ *
+ * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
+ * @package ranking
+ * @link http://www.egroupware.org
+ * @link http://www.digitalROCK.de
+ * @author Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @version $Id$
+ */
+.gray {
+  color: gray;
+}
+.redItalic {
+  color: red;
+  font-style: italic;
+}
+.bold {
+  font-weight: bold;
+}
+span.place:after {
+  content: ".";
+}
+/*.place { padding-left: 1em; }*/
+button.small {
+  font-size: 80%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.prequalified {
+  color: gray;
+  font-style: italic;
+}
+.complimentary {
+  font-style: italic;
+}
+.lastname {
+  text-transform: uppercase;
+}
+.leftPad5 {
+  padding-left: 5px;
+}
+.rightPad5 {
+  padding-right: 5px;
+}
+.height {
+  text-align: right;
+}
+.header {
+  font-size: 110%;
+  font-weight: bold;
+}
+.quota_line > td {
+  border-top: 3px solid black;
+}
+.displayNone {
+  display: none !important;
+}
+.noWrap {
+  white-space: nowrap !important;
+}
+.speed_athlete {
+  border: 1px solid black;
+  margin: 3px;
+  background-color: silver;
+  height: 7ex;
+}
+.max_compl {
+  width: 45px;
+  white-space: nowrap !important;
+}
+/**
+ * New registration using NM
+ */
+#ranking-registration_ranking-registration-header {
+  width: 85%;
+}
+#ranking-registration_comp,
+#ranking-registration_nation {
+  width: 35%;
+}
+#ranking-registration_search {
+  display: none;
+}
+#ranking-registration-add {
+  width: 100%;
+}
+#ranking-registration-add .et2_taglist {
+  margin-top: 10px;
+}
+#ranking-registration tr.isDeleted * {
+  text-decoration: line-through;
+  color: silver !important;
+}
+#ranking-registration tr.isPrequalified * {
+  font-style: italic;
+  color: silver !important;
+}
+#ranking-registration tr.isConfirmed * {
+  color: blue !important;
+}
+#ranking-registration tr.isRegistered * {
+  color: black !important;
+}
+#ranking-registration_nm tr > td {
+  border-top: 1px solid #e6e6e6;
+  border-bottom: none;
+}
+#ranking-registration_nm tr.startRegFed:not(:first-child) > td {
+  border-top: 1px solid #999999;
+}
+#ranking-registration_nm tr.hideCat span.catCol {
+  display: none;
+}
+/**
+ * Some fixes for ResultService not using a nextmatch
+ */
+#ranking-result-index span.nextmatch_sortheader {
+  margin-right: 0;
+}
+/**
+ * Printing of start- and result-lists
+ */
+@media print {
+  .speed_athlete {
+    padding: 1mm;
+  }
+  tr.row_on,
+  tr.row_off {
+    border-bottom: thin gray dotted;
+    padding-top: 0px;
+    margin-top: 0px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+  }
+  #egw_fw_footer,
+  .egw_fw_ui_app_header_container div.egw_fw_ui_app_header,
+  #divAppboxHeader {
+    display: none;
+  }
+  #divAppbox {
+    margin-top: 0px;
+  }
+  #ranking-result-index_comp_name {
+    padding: 5px 0 0 3px;
+    font-size: 135%;
+    font-weight: bold;
+  }
+  .fed_logo img {
+    height: 60px;
+    margin: 10px;
+  }
+  #ranking-result-index_route_name,
+  #ranking-result-index_comp_date {
+    font-size: 120%;
+    font-weight: bold;
+  }
+  #ranking-result-index_comp_date {
+    font-weight: normal;
+    padding: 10px 0 10px 0;
+  }
+  #ranking-result-index_comp_logo {
+    margin-right: 10px;
+  }
+}
+.half_down {
+  position: relative;
+  top: 1.3em;
+}
+.winner {
+  font-weight: bold;
+}
+.selectboxFullWidth select {
+  width: 100%;
+}
+.inputFullWidth input {
+  width: 100%;
+}
+.checkAllArrow input {
+  padding-right: 10px;
+}
+.previewImage img {
+  max-width: 200px;
+  max-height: 100px;
+  border: 1px solid black;
+}
+/**
+ * Boulder protocol
+ */
+div#protocolDiv {
+  position: absolute;
+  overflow: auto;
+  z-index: 1000;
+  top: 2px;
+  left: 2px;
+  width: 90%;
+  height: 90%;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 5px;
+  margin: 0;
+}
+table#protocolTable {
+  width: 100%;
+}
+table#protocolTable th,
+table#protocolTable td {
+  text-align: left;
+}
+input#closeButton {
+  float: right;
+}
+/* disable federation or city column in boulder measurement */
+div#table table.DrTable td.federation,
+div#table table.DrTable th.federation,
+div#table table.DrTable td.city,
+div#table table.DrTable th.city {
+  display: none;
+}
+/**
+ * Formatting for scorecard
+ */
+/* disable route- and category-selection, as they lead out of self-service */
+table#ranking-result-index_score {
+  border: 2px solid black;
+  border-collapse: collapse;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+table#ranking-result-index_score td {
+  padding: 13px 0px 11px 5px;
+  border: 1px solid black;
+}
+table#ranking-result-index_score input[type=checkbox] {
+  -ms-transform: scale(2);
+  -moz-transform: scale(2);
+  -webkit-transform: scale(2);
+  -o-transform: scale(2);
+  margin-right: 15px;
+  position: relative;
+  margin-left: 10px;
+}
+table#ranking-result-index_score input[type=checkbox]:after {
+  position: absolute;
+  top: 0;
+  left: 3px;
+  font-size: 75%;
+}
+table#ranking-result-index_score input[type=checkbox][name*=zone]:after {
+  content: "B";
+}
+table#ranking-result-index_score input[type=checkbox][name*=top]:after {
+  content: "T";
+}
+table#ranking-result-index_score input[type=checkbox][name*=flash]:after {
+  content: "F";
+}
+button.scorecard_button {
+  font-size: 150%;
+  position: absolute;
+  top: 280px;
+  right: 30px;
+  padding-top: 1px;
+}
+/**
+ * Selfscore measurement
+ */
+div#ranking-result-index_ranking-result-selfscore_measurement > label:first-child {
+  display: block;
+}
+/*
+ * Boulder measurement
+ */
+#ranking-result-index_nm\[boulder_n\],
+#ranking-result-index_try,
+#ranking-result-index_top,
+#ranking-result-index_zone {
+  width: 5em;
+}
+table.buttonBox {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+#ranking-result-index_resultlist h1 {
+  display: none;
+}
+body #egw_fw_main #egw_fw_tabs {
+  background-color: white;
+}
+#ranking-result-index_ranking-result-boulder_measurement {
+  background-color: white;
+  width: 100%;
+  border: 1px solid gray;
+  border-top: 3px solid #679fd2;
+}
+#ranking-result-index_ranking-result-boulder_measurement > table {
+  width: 100% !important;
+}
+#ranking-result-index_ranking-result-boulder_measurement > table label,
+#ranking-result-index_ranking-result-boulder_measurement > table select#ranking-result-index_nm\[PerId\] {
+  font-size: 200%;
+  padding-left: 5px;
+}
+#ranking-result-index_measurement_template .et2_selectbox {
+  height: 50px;
+  font-size: 12pt;
+  padding-left: 5px;
+}
+button.bigButton {
+  border-radius: 0;
+  font-size: 12pt;
+  min-width: 120px;
+  height: 50px;
+  text-align: center;
+}
+.dialogFooterToolbar button:hover {
+  height: auto;
+}
+#ranking-result-index_ranking-result-boulder_measurement et2_label select.et2_selectbox {
+  font-size: 100%;
+}
+input.nextButton {
+  float: right;
+}
+#ranking-result-index_ranking-result-boulder_measurement #ranking-result-index_nm\[PerId\] {
+  width: 85%;
+}
+#ranking-result-index {
+  position: relative;
+  overflow-y: auto;
+}
+@media print {
+  #ranking-result-index {
+    overflow-y: visible;
+    height: auto !important;
+  }
+}
+/**
+ * Lead measurement
+ */
+div.topoContainer {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 500px;
+}
+#ranking-result-index_topo {
+  width: 100%;
+  position: relative;
+}
+div.topoHandhold {
+  position: absolute;
+  cursor: pointer;
+}
+div.topoHandhold img {
+  position: relative;
+  top: -8px;
+  left: -8px;
+  z-index: 10;
+  width: 16px;
+}
+div.topoHandhold span {
+  position: relative;
+  top: -12px;
+  left: -5px;
+  z-index: 20;
+}
+div.action_popup {
+  position: fixed;
+  top: 300px;
+  left: 450px;
+  z-index: 20000;
+  display: none;
+  border: 2px ridge black;
+  border-radius: 10px;
+  box-shadow: 8px 8px 8px black;
+  padding: 5px;
+  background-color: white;
+}
+div.action_popup > div.et2_hbox {
+  padding-top: 8px;
+}
+#ranking-result-index_button\[renumber\] {
+  margin-top: -2px;
+}
+.et2_hbox.et2_box_widget.topoHeader {
+  height: 50px;
+}
+.et2_hbox.et2_box_widget.topoHeader > * {
+  float: left;
+  margin-top: 5px;
+  height: 50px;
+}
+.et2_hbox.et2_box_widget.topoHeader > input {
+  height: 40px;
+  margin-right: 5px;
+}
+/**
+ * Edit route popup
+ */
+select#ranking-result-route_import_cat {
+  width: 50%;
+}
+span#ranking-result-index_msg {
+  color: red;
+  font-style: italic;
+}
+/**
+ * Overwriting some general et2/Pixelegg styles
+ */
+img.et2_button_icon {
+  background-color: transparent;
+}
+img#foto,
+img#foto2 {
+  filter: none;
+  -webkit-filter: none;
+}
+/**
+ * Boulder edit template
+ */
+#ranking-result-index-rows_boulder-edit {
+  width: 100%;
+}
+#ranking-result-index-rows_boulder-edit #_nachname::after {
+  content: ',';
+}
+#ranking-result-index-rows_boulder-edit tr.row td,
+#ranking-result-index-rows_boulder-edit .name td {
+  padding-bottom: 8px;
+}
+#ranking-result-index_measurement_template,
+#ranking-result-index_measurement_template div.popupMainDiv,
+form#ranking-result-index {
+  background-color: #f0f0f0;
+}
+form#ranking-result-index .resultHeaderBottom {
+  border-bottom: 1px solid silver;
+}
+#ranking-result-index_measurement_template div.popupMainDiv {
+  background-color: white;
+  margin-left: 25%;
+  margin-right: 25%;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver;
+  padding: 10px;
+}
+#ranking-result-index_measurement_template div.popupMainDiv .et2_label {
+  font-size: 12pt;
+}
+#ranking-result-index_measurement_template div.popupMainDiv label.et2_label.athleteSort.et2_clickable:after {
+  content: "\21C5";
+  padding-left: 5px;
+  color: #466C8F;
+  padding-right: 5px;
+}
+/**
+ * Startlist edit
+ */
+div._startnumbers div.et2_hbox_right {
+  padding-right: 0;
+}
 @media all {
   html * {
     -webkit-user-select: none;
@@ -133,6 +598,9 @@
   body #ranking-result-index #ranking-result-index_ranking-result-boulder_measurement .popupMainDiv button#ranking-result-index_button\[next\].nextButton {
     margin-right: 0;
   }
+  body #ranking-result-index .bigButton {
+    min-width: auto;
+  }
   body #ranking-result-index #ranking-result-index_msg {
     position: absolute;
     top: 50px;
@@ -141,6 +609,11 @@
   }
   body div#ranking-result-index-rows_lead-edit {
     height: 100%;
+  }
+  #ranking-result-index_measurement_template,
+  #ranking-result-index_measurement_template div.popupMainDiv,
+  form#ranking-result-index {
+    background-color: white;
   }
 }
 @media only screen and (max-device-width: 736px) and (min-width: 300px) {

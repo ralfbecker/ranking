@@ -9,7 +9,7 @@
 			</columns>
 			<rows>
 				<row class="noPrint resultHeader">
-					<hbox>
+					<hbox class="topoHeader">
 						<menulist>
 							<menupopup id="nm[topo]" onchange="app.ranking.load_topo"/>
 						</menulist>

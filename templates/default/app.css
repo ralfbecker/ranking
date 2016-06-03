@@ -337,6 +337,18 @@ div.action_popup > div.et2_hbox {
 #ranking-result-index_button\[renumber\] {
 	margin-top: -2px;
 }
+.et2_hbox.et2_box_widget.topoHeader {
+	height:50px;
+}
+.et2_hbox.et2_box_widget.topoHeader > *{
+	float:left;
+	margin-top:5px;
+	height: 50px;
+}
+.et2_hbox.et2_box_widget.topoHeader > input {
+    height: 40px;
+    margin-right: 5px;
+}
 
 /**
  * Edit route popup
