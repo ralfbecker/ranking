@@ -602,7 +602,6 @@ div._startnumbers div.et2_hbox_right {
     min-width: auto;
   }
   body #ranking-result-index #ranking-result-index_msg {
-    position: absolute;
     top: 50px;
     left: 18px;
     background: transparent;
