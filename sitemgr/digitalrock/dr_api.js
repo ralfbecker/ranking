@@ -1330,7 +1330,7 @@ var Resultlist = (function() {
 					'result': 'Result'
 				};
 				// for boulder heats use new display, but not for general result!
-				if (_data.discipline == 'boulder' && (!detail || detail[1] == 2) && _data.route_order != -1)
+				if (_data.discipline == 'boulder' && _data.route_order != -1)
 				{
 					delete this.result_cols.result;
 					var that = this;
