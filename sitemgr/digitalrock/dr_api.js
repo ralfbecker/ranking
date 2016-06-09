@@ -1386,15 +1386,16 @@ var Resultlist = (function() {
 			if (!jQuery('#jqplot-css').length)
 			{
 				var ranking_url = this.json_url.replace(/json.php.*$/, '');
+				var jqplot_url = this.json_url.replace(/ranking\/json.php.*$/, '')+'vendor/npm-asset/as-jqplot/dist/';
 				jQuery('<link/>', {
 					id: 'jqplot-css',
-					href: ranking_url+'../api/js/jquery/jqplot/jquery.jqplot.css',
+					href: jqplot_url+'jquery.jqplot.min.css',
 					type: 'text/css'
 				}).appendTo('head');
-				var load = [ranking_url+'../api/js/jquery/jqplot/jquery.jqplot.js',
+				var load = [jqplot_url+'jquery.jqplot.min.js',
 					// not sure why bar-renderer does not work :(
-					//ranking_url+'../api/js/jquery/jqplot/plugins/jqplot.barRenderer.js',
-					ranking_url+'../api/js/jquery/jqplot/plugins/jqplot.highlighter.js',
+					//jqplot_url+'plugins/jqplot.barRenderer.min.js',
+					jqplot_url+'plugins/jqplot.highlighter.min.js',
 					ranking_url+'js/dr_statistics.js?'+_data.dr_statistics];
 				for(var i=0; i < load.length; ++i)
 				{
