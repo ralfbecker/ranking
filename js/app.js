@@ -1308,11 +1308,11 @@ app.classes.ranking = AppJS.extend(
 				ret.next = _rows[row][_row_id];
 				break;
 			}
-			if (_rows[row][_row_id] == _id)
+			if (_rows[row] && _rows[row][_row_id] == _id)
 			{
 				ret.data = _rows[row];
 			}
-			if (typeof ret.data == 'undefined')
+			if (typeof ret.data == 'undefined' && _rows[row])
 			{
 				ret.prev = _rows[row][_row_id];
 			}
