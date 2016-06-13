@@ -1371,7 +1371,7 @@ app.classes.ranking = AppJS.extend(
 		buttons.push({button_id: 'next', text: this.egw.lang('Next'), id: 'next', image: 'continue', disabled: !row.next});
 
 		buttons.push({button_id: 'close', text: this.egw.lang('Close'), id: 'close', image: 'cancel', click: function() {
-			$j(this).dialog("close");
+			jQuery(this).dialog("close");
 		}});
 
 		var dialog = et2_createWidget("dialog",
@@ -1574,7 +1574,7 @@ app.classes.ranking = AppJS.extend(
 			// If you override, 'this' will be the dialog DOMNode.
 			// Things get more complicated.
 			// Do what you like, but don't forget this line:
-			$j(this).dialog("close");
+			jQuery(this).dialog("close");
 		}});
 
 		var dialog = this.register_dialog = et2_createWidget("dialog", {
@@ -1741,7 +1741,7 @@ app.classes.ranking = AppJS.extend(
 				// If you override, 'this' will be the dialog DOMNode.
 				// Things get more complicated.
 				// Do what you like, but don't forget this line:
-				$j(this).dialog("close");
+				jQuery(this).dialog("close");
 			}}
 		];
 		var selection = nm.getSelection();
