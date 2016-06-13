@@ -1303,7 +1303,7 @@ app.classes.ranking = AppJS.extend(
 		var ret = {};
 		for (var row in _rows)
 		{
-			if (ret.data && typeof _rows[row] == 'object')
+			if (ret.data && _rows[row])
 			{
 				ret.next = _rows[row][_row_id];
 				break;
