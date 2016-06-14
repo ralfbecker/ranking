@@ -476,7 +476,7 @@ div._startnumbers div.et2_hbox_right {
 }
 @media all {
   html * {
-    -webkit-user-select: none;
+    -webkit-user-select: text;
     -moz-user-select: none;
   }
   body #ranking-result-index-rows_boulder-edit {
