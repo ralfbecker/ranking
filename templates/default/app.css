@@ -344,6 +344,14 @@ div.action_popup > div.et2_hbox {
 	float:left;
 	margin-top:5px;
 	height: 50px;
+	text-align: center;
+	font-size: 150%;
+}
+.et2_hbox.et2_box_widget.topoHeader > #ranking-result-index_button\[print\] {
+	float: right;
+}
+.et2_hbox.et2_box_widget.topoHeader > #ranking-result-index_button\[next\] {
+	min-width: 50px;
 }
 .et2_hbox.et2_box_widget.topoHeader > input {
     height: 40px;

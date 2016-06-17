@@ -404,6 +404,14 @@ div.action_popup > div.et2_hbox {
   float: left;
   margin-top: 5px;
   height: 50px;
+  text-align: center;
+  font-size: 150%;
+}
+.et2_hbox.et2_box_widget.topoHeader > #ranking-result-index_button\[print\] {
+  float: right;
+}
+.et2_hbox.et2_box_widget.topoHeader > #ranking-result-index_button\[next\] {
+  min-width: 50px;
 }
 .et2_hbox.et2_box_widget.topoHeader > input {
   height: 40px;
@@ -608,6 +616,16 @@ div._startnumbers div.et2_hbox_right {
   }
   body div#ranking-result-index-rows_lead-edit {
     height: 100%;
+  }
+  body .et2_hbox.et2_box_widget.topoHeader > * {
+    font-size: 120%;
+  }
+  body #ranking-result-index_nm\[PerId\] {
+    max-width: calc(100% - 500px) !important;
+  }
+  body .et2_hbox.et2_box_widget.topoHeader > #ranking-result-index_button\[next\] {
+    background-image: none !important;
+    padding-left: 0;
   }
   #ranking-result-index_measurement_template,
   #ranking-result-index_measurement_template div.popupMainDiv,

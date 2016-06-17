@@ -274,13 +274,13 @@ app.classes.ranking = AppJS.extend(
 			if (plus_widget) plus_widget.set_value(key2plus[key]);
 			if (key2plus[key] === '9999') _widget.set_value('');	// for top, remove height
 			return false;
-		}
+		  }
 		// "0"-"9", "." or "," --> allow and remove "Top"
 		if (48 <= key && key <= 57 || key == 44 || key == 46)
 		{
 			var plus_widget = _widget.getParent().getWidgetById(_widget.id.replace('result_height', 'result_plus'));
 			if (plus_widget && plus_widget.get_value() == '9999') plus_widget.set_value('0');
-			return;
+			return true;
 		}
 		// ignore all other chars
 		return false;
@@ -945,6 +945,19 @@ app.classes.ranking = AppJS.extend(
 			this.et2.getWidgetById('result_plus').set_value('');
 			this.et2.getWidgetById('result_time').set_value('');
 		}
+	},
+
+	/**
+	 * Go to next athlete
+	 */
+	lead_next: function()
+	{
+		var PerId = this.et2.getWidgetById('nm[PerId]');
+		var node = PerId.getDOMNode();
+
+		node.selectedIndex = node.selectedIndex + 1;	// ++ works NOT reliable ...
+
+		this.change_athlete(node, PerId);
 	},
 
 	/**

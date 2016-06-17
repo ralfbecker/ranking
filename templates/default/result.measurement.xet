@@ -10,19 +10,14 @@
 			<rows>
 				<row class="noPrint resultHeader">
 					<hbox class="topoHeader">
-						<menulist>
-							<menupopup id="nm[topo]" onchange="app.ranking.load_topo"/>
-						</menulist>
-						<menulist>
-							<menupopup id="nm[PerId]" onchange="app.ranking.change_athlete" options="Edit topo" class="leftPad5"/>
-						</menulist>
-						<textbox type="float" blur="height" id="result_height" onkeypress="app.ranking.height_keypress" size="3" min="1" class="leftPad5"/>
-						<menulist>
-							<menupopup id="result_plus" class="leftPad5"/>
-						</menulist>
-						<textbox type="float" id="result_time" class="leftPad5" size="3"/>
+						<select id="nm[topo]" onchange="app.ranking.load_topo"/>
+						<select id="nm[PerId]" onchange="app.ranking.change_athlete" options="Edit topo" class="leftPad5"/>
+						<textbox type="float" blur="height" id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1" class="leftPad5"/>
+						<select id="result_plus" class="leftPad5"/>
+						<textbox type="float" blur="time" id="result_time" class="leftPad5" size="5"/>
 						<buttononly label="Update" id="button[update]" onclick="app.ranking.update_athlete" class="leftPad5"/>
-						<buttononly label="Print" onclick="app.ranking.print_topo" options="print" class="leftPad5"/>
+						<buttononly label=">>" id="button[next]" statustext="Next" onclick="app.ranking.lead_next" class="leftPad5"/>
+						<buttononly label="Print" id="button[print]" onclick="app.ranking.print_topo" options="print" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row>
