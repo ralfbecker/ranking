@@ -113,7 +113,7 @@
 					<template id="ranking.result.footer" span="all"/>
 				</row>
 				<row class="x $row_cont[class] $row_cont[quota_class]">
-					<description align="center" id="set[$row_cont[PerId]][result_rank]" no_lang="1" readonly="true" class="place"/>
+					<description align="center" id="{$row}[result_rank]" no_lang="1" readonly="true" class="place"/>
 					<description font_style="$row_cont[link]" id="{$row}[nachname]" no_lang="1" class="lastname leftPad5"/>
 					<description font_style="$row_cont[link]" id="{$row}[vorname]" no_lang="1" class="leftPad5"/>
 					<description align="center" id="{$row}[birthyear]" no_lang="1"/>
@@ -124,12 +124,12 @@
 					<description align="center" id="${row}[PerId]" no_lang="1"/>
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
-					<integer align="center" id="set[$row_cont[PerId]][false_start]" min="0" size="3" step="1" readonly="true"/>
+					<integer align="center" id="{$row}[false_start]" min="0" size="3" step="1" readonly="true"/>
 					<description align="center" id="{$row}[result]" no_lang="1"/>
 					<description align="center" id="${row}[start_order2n]" no_lang="1" class="noPrint"/>
 					<description align="center" id="{$row}[result_r]" no_lang="1"/>
 					<float align="center" id="${row}[ability_percent]" readonly="true"/>
-					<description align="center" id="set[$row_cont[PerId]][time_sum]"/>
+					<description align="center" id="{$row}[time_sum]"/>
 					<buttononly align="center" statustext="select participant for time measurment" label="Start" id="start_time_measurement" onclick="start_time_measurement(this,$row_cont[PerId]);" class="small noPrint"/>
 				</row>
 			</rows>
