@@ -75,6 +75,10 @@ class ranking_registration_ui extends ranking_bo
 			'acl_fed_id' => $query['calendar'] == 'SUI' ? $this->federation->federations('SUI', true, 'fed_shortcut') : array(),
 			'fed_parent' => $query['calendar'] == 'GER' ? $this->federation->federations('GER', true, 'fed_shortcut') : array(),
 		);
+		if ($comp && !isset($sel_options['comp'][$comp['WetId']]))
+		{
+			$sel_options['comp'][$comp['WetId']] = $comp['name'];
+		}
 
 		$matches = null;
 		$last_reg_fed = $last_cat = null;
@@ -509,10 +513,6 @@ class ranking_registration_ui extends ranking_bo
 			'sex' => $this->genders,
 			'state' => ranking_registration::$state_filters,
 		);
-		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
-		{
-			$select_options['comp'][$comp['WetId']] = $comp['name'];
-		}
 		$cont = $preserv = array(
 			'nm'       => array_merge($state, array(
 				'calendar' => $calendar,
