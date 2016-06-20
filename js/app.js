@@ -1281,7 +1281,7 @@ app.classes.ranking = AppJS.extend(
 		jQuery('#ranking-result-index_topo').click(jQuery.proxy(this.topo_clicked, this));
 		if (holds && holds.length) this.show_handholds(holds);
 		jQuery('#ranking-result-index').css('overflow-y', 'hidden');	// otherwise we get a permanent scrollbar
-
+		this._scalingHandler(jQuery('#ranking-result-index_topo').parent());
 		// mark current athlets height
 		var result_height = this.et2.getWidgetById('result_height');
 		var height = parseFloat(result_height.get_value ? result_height.get_value() : result_height.value);
@@ -1293,6 +1293,53 @@ app.classes.ranking = AppJS.extend(
 		}
 	},
 
+	/**
+	 * Function to scale up/down a given element
+	 *
+	 * Scaling happens based on pinch In/Out touch actions.
+	 *
+	 * @param {jQuery object} _node dom node to scale up
+	 */
+	_scalingHandler: function(_node)
+	{
+		var Sxy = 1;
+		var _init_swipe = function (_node)
+		{
+			_node.css({"transform-origin":"0 0"});
+			_node.swipe({
+				fingers:2,
+				pinchThreshold:0,
+		        preventDefaultEvents:false,
+				pinchStatus: function (event, phase, direction, distance , duration , fingerCount, pinchZoom, fingerData)
+				{
+					var zoom = (parseFloat(pinchZoom) - Math.floor(parseFloat(pinchZoom))) * 0.10;
+					if (fingerCount == 2)
+					{
+						switch (direction)
+						{
+							case 'out':
+								if (Sxy >1)
+								{
+									Sxy -= zoom;
+									if (Sxy <1) Sxy = 1;
+								}
+								break;
+							case 'in':
+								Sxy += zoom;
+							default:
+								break;
+						}
+					}
+					this[0].style.transform = "scale("+Sxy+","+Sxy+")";
+				}
+			});
+		};
+		_init_swipe (_node);
+	},
+
+	/**
+	 * Triggers vibrate
+	 */
 	_button_vibrate: function()
 	{
 		if (egwIsMobile()) framework.vibrate(50);
