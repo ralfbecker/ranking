@@ -1302,48 +1302,107 @@ app.classes.ranking = AppJS.extend(
 	 */
 	_scalingHandler: function(_node)
 	{
+		// scale xy used for transforming
 		var Sxy = 1;
-		var _init_swipe = function (_node)
+
+		// node to scale up/down
+		var node = _node;
+
+		// scaling threshold
+		var scaleThreshold = 0.10;
+
+		node.css({"transform-origin":"0 0"});
+
+		/**
+		 * Method to bind pinch handler for android devicces
+		 * @param {type} _node node
+		 */
+		var android_scale = function (_node)
 		{
-			_node.css({"transform-origin":"0 0"});
 			_node.swipe({
 				fingers:2,
 				pinchThreshold:0,
-		        preventDefaultEvents:false,
+		        preventDefaultEvents:true,
 				pinchStatus: function (event, phase, direction, distance , duration , fingerCount, pinchZoom, fingerData)
 				{
-					var zoom = (parseFloat(pinchZoom) - Math.floor(parseFloat(pinchZoom))) * 0.10;
-					var transform = "";
+					var zoom = (parseFloat(pinchZoom) - Math.floor(parseFloat(pinchZoom))) * scaleThreshold;
 					if (fingerCount == 2)
 					{
-						switch (direction)
-						{
-							case 'out':
-								if (Sxy >1)
-								{
-									Sxy -= zoom;
-									if (Sxy <1) Sxy = 1;
-								}
-								break;
-							case 'in':
-								Sxy += zoom;
-							default:
-								break;
-						}
-						transform = Sxy ==1? "":"scale("+Sxy+","+Sxy+")";
-						this.css ( {
-							'-webkit-transform': transform,
-							'transform':transform,
-							overflow:'auto'
-						});
-						this.parent().css({
-							overflow:'auto',
-						});
+						scale(zoom, direction);
 					}
 				}
 			});
 		};
-		_init_swipe (_node);
+
+		/**
+		 * Method to bind gusture (pinch) handlers for iOS devices
+		 *
+		 * @description Bind gesture handlers used for iOS devices
+		 * and prevents iOS default gusture handlers which
+		 * conflicts with our functionalities.
+		 *
+		 * @param {type} _node
+		 * @returns {undefined}
+		 */
+		var iOS_scale = function (_node)
+		{
+			_node.on({
+				gesturechange:function(e){
+					e.preventDefault();
+					scale(e.originalEvent.scale * scaleThreshold,Sxy < e.originalEvent.scale?"in":"out");
+				},
+				gestureend: function(e){
+					e.preventDefault();
+				},
+				gesturestart: function (e){
+					e.preventDefault();
+				}
+			});
+		};
+
+		/**
+		 * Scale in/out the node base on scale value
+		 *
+		 * @param {float} _scale scale number
+		 * @param {type} _direction direction to scale in/out
+		 */
+		var scale = function(_scale, _direction) {
+			var zoom = _scale;
+			var transform = "";
+			switch (_direction)
+			{
+				case 'out':
+					if (Sxy >1)
+					{
+						Sxy -= zoom;
+						if (Sxy <1) Sxy = 1;
+					}
+					break;
+				case 'in':
+					Sxy += zoom;
+				default:
+					break;
+			}
+			transform = Sxy ==1? "":"scale("+Sxy+","+Sxy+")";
+			node.css ( {
+				'-webkit-transform': transform,
+				'transform':transform,
+				overflow:'auto'
+			});
+			node.parent().css({
+				overflow:'auto',
+			});
+		};
+
+		// initialize gesture (pinch) handling base on devices
+		if (framework.getUserAgent() != 'iOS')
+		{
+			android_scale (node);
+		}
+		else
+		{
+			iOS_scale (node);
+		}
 	},
 
 	/**
