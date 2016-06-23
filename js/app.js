@@ -1224,6 +1224,7 @@ app.classes.ranking = AppJS.extend(
 	{
 		var topo_container = jQuery('div.topoContainer');
 		if (!topo_container.length) return;
+		topo_container.parent().css({overflow:'hidden'});
 		var y_ratio = 1.0;
 		// resize topoContainer to full page height
 		if (typeof resizeContainer == 'undefined' || resizeContainer)
@@ -1281,7 +1282,12 @@ app.classes.ranking = AppJS.extend(
 		jQuery('#ranking-result-index_topo').click(jQuery.proxy(this.topo_clicked, this));
 		if (holds && holds.length) this.show_handholds(holds);
 		jQuery('#ranking-result-index').css('overflow-y', 'hidden');	// otherwise we get a permanent scrollbar
-		this._scalingHandler(jQuery('#ranking-result-index_topo').parent());
+		if (egwIsMobile()){
+			this._scalingHandler(jQuery('#ranking-result-index_topo').parent());
+			jQuery(window).on("orientationchange",function(){
+				jQuery(window).trigger('resize');
+			});
+		}
 		// mark current athlets height
 		var result_height = this.et2.getWidgetById('result_height');
 		var height = parseFloat(result_height.get_value ? result_height.get_value() : result_height.value);
@@ -1386,20 +1392,21 @@ app.classes.ranking = AppJS.extend(
 			transform = Sxy ==1? "":"scale("+Sxy+","+Sxy+")";
 			node.css ( {
 				'-webkit-transform': transform,
-				'transform':transform,
-				overflow:'auto'
+				'transform':transform
 			});
 			node.parent().css({
-				overflow:'auto',
+				overflow:'hidden',
 			});
+			window.setTimeout(function(){node.parent().css({overflow:'auto'})},1);
+			jQuery(window).trigger('resize');
 		};
 
 		// initialize gesture (pinch) handling base on devices
-		if (framework.getUserAgent() != 'iOS')
+		if (egwIsMobile() && framework.getUserAgent() != 'iOS')
 		{
 			android_scale (node);
 		}
-		else
+		else if (egwIsMobile())
 		{
 			iOS_scale (node);
 		}
