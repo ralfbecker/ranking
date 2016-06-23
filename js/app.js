@@ -1313,6 +1313,7 @@ app.classes.ranking = AppJS.extend(
 				pinchStatus: function (event, phase, direction, distance , duration , fingerCount, pinchZoom, fingerData)
 				{
 					var zoom = (parseFloat(pinchZoom) - Math.floor(parseFloat(pinchZoom))) * 0.10;
+					var transform = "";
 					if (fingerCount == 2)
 					{
 						switch (direction)
@@ -1329,8 +1330,16 @@ app.classes.ranking = AppJS.extend(
 							default:
 								break;
 						}
+						transform = Sxy ==1? "":"scale("+Sxy+","+Sxy+")";
+						this.css ( {
+							'-webkit-transform': transform,
+							'transform':transform,
+							overflow:'auto'
+						});
+						this.parent().css({
+							overflow:'auto',
+						});
 					}
-					this[0].style.transform = "scale("+Sxy+","+Sxy+")";
 				}
 			});
 		};

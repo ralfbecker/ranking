@@ -21,8 +21,10 @@
 					</hbox>
 				</row>
 				<row>
-					<box class="topoContainer">
-						<image src="transparent" id="topo"/>
+					<box class="topoTopContainer">
+						<box class="topoContainer">
+							<image src="transparent" id="topo"/>
+						</box>
 					</box>
 				</row>
 				<row>
