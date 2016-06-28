@@ -217,6 +217,8 @@ class ranking_athlete extends so_sql
 					{
 						foreach($to_clear[0] == '!' ? array_diff(array_keys($data),$to_clear) : $to_clear as $name)
 						{
+							if (substr($name, 0, 4) == 'reg_') continue;	// do not clear registration data, using this method too
+
 							$data[$name] = $name == 'geb_date' && $data['geb_date'] ? (int)$data['geb_date'].'-01-01' : '';
 						}
 					}
