@@ -1370,7 +1370,7 @@ var Resultlist = (function() {
 			{
 				th.html('Für '+(_data.cup ? 'den '+_data.cup.name : 'die Rangliste')+' zählen die '+_data.max_comp+' besten Ergebnisse, nicht zählende Ergebnisse sind eingeklammert.'+
 					(_data.min_disciplines ? '<br/>Teilnahme an mindestens '+_data.min_disciplines+' Disziplinen ist erforderlich.' : '')+
-					(max_disciplines ? ' Maximal zählende Ergebnise pro Disziplin: '+max_disciplines : '')+
+					(max_disciplines ? ' Maximal zählende Ergebnisse pro Disziplin: '+max_disciplines : '')+
 					(_data.drop_equally ? ' Streichresultate erfolgen in allen Disziplinen gleichmäßig.' : ''));
 			}
 			else
