@@ -593,7 +593,7 @@ class ranking_calculation
 		}
 		$overall = count($cat['GrpIds']) > 1;
 
-		if ($this->debug) echo "<p>".__METHOD__."(cat='$cat[rkey]',stand='$stand',...,cup='$cup[rkey]')</p>\n";
+		if ($this->debug) error_log(__METHOD__."(cat='$cat[rkey]', stand='$stand',..., cup='$cup[rkey]')");
 
 		if (!$stand || $stand == '.')	// last comp. before today
 		{
@@ -629,7 +629,7 @@ class ranking_calculation
 				$stand = (int)$comp['datum'] . '-12-31';	// no further comp. -> stand 31.12.
 			}
 		}
-		if ($this->debug) echo "<p>".__METHOD__.": stand='$stand', comp='$comp[rkey]'</p>\n";
+		if ($this->debug) error_log(__METHOD__.": stand='$stand', comp='$comp[rkey]'");
 
 		if ($overall)
 		{
@@ -648,7 +648,7 @@ class ranking_calculation
 			$use_0_point_results = (boolean)$min_disciplines;
 			$drop_equally = $cup['drop_equally'];
 			$max_disciplines = $cup['max_disciplines'];
-			//error_log(__METHOD__."(".array2string(func_get_args()).") max_comp=$max_comp, max_drop_per_discipline=$max_drop_per_disciline, min_disciplines=$min_disciplines");
+			//error_log(__METHOD__."(".array2string(func_get_args()).") max_comp=$max_comp, min_disciplines=$min_disciplines");
 			if ((int) $stand >= 2000 && !in_array($cat['rkey'],(array)$cup['gruppen']))
 			{
 				return false;			// no cup (ranking) defined for that group
@@ -686,7 +686,7 @@ class ranking_calculation
 					break;
 			}
 		}
-		if ($this->debug) echo "<p>".__METHOD__.": start='$start'</p>\n";
+		if ($this->debug) error_log(__METHOD__.": start='$start'");
 
 		if ($cup)
 		{
@@ -710,15 +710,18 @@ class ranking_calculation
 
 		// enforce disciplines only for dropping equally
 		// (eg. you have not participated in boulder, you can not drop 2 boulder results, before having to drop any other result)
-		// this is implemented by adding 0 point results for every comp/discipline not participated
+		// this is implemented by adding 0 point results for every comp/discipline not participated,
+		// setting $min_disciplines to real number of disciplines in cup and remembering it in $fake_min_disciplines
+		$fake_min_disciplines = false;
 		if ($min_disciplines == 1 && $drop_equally)
 		{
-			$comps_and_disciplines = array();
+			$comps_and_disciplines = $disciplines = array();
 			foreach($results as $result)
 			{
 				$comp_and_discipline = $result['WetId'].':'.$result['discipline'];
 				if ($comp_and_discipline != ':' && !in_array($comp_and_discipline, $comps_and_disciplines))
 					$comps_and_disciplines[] = $comp_and_discipline;
+				if (!empty($result['discipline'])) $disciplines[$result['discipline']] = true;
 			}
 			$current_athlete = null;
 			$current_comps_and_disciplines = array();
@@ -742,13 +745,16 @@ class ranking_calculation
 				$current_athlete = $result['PerId'];
 				$current_comps_and_disciplines[] = $result['WetId'].':'.$result['discipline'];
 			}
+			$min_disciplines = count($disciplines);
+			$fake_min_disciplines = true;
 		}
 
 		$id = null;
 		foreach($results as $result)
 		{
 			// combined: set points=0, if number of disciplines < $min_disciplines (UI can then choose to show or hide these)
-			if (($overall || $min_disciplines) && $id && $id != $result['PerId'] && count($this->disciplines[$id]) < $min_disciplines)
+			if (($overall || $min_disciplines) && $id && $id != $result['PerId'] &&
+				!$fake_min_disciplines && count($this->disciplines[$id]) < $min_disciplines)
 			{
 				$this->pkte[$id] = 0;
 			}
@@ -895,7 +901,7 @@ class ranking_calculation
 		$ret_ex_aquo =& $ex_aquo;
 		$ret_pers = $this->pers;
 		$not_counting = $this->not_counting;
-		$not_counting['min_disciplines'] = $min_disciplines;
+		$not_counting['min_disciplines'] = $fake_min_disciplines ? null : $min_disciplines;
 		$not_counting['drop_equally'] = $drop_equally;
 		$not_counting['max_disciplines'] = $max_disciplines;
 
