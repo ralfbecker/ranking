@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2012-14 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2012-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
@@ -56,6 +56,8 @@ class ranking_selfservice extends ranking_bo
 		}
 		list($action,$action_id) = explode('-', $_action, 2);
 
+		echo '<div id="selfservice">';
+
 		if ($athlete)
 		{
 			echo "<h1 id='action-$action'>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
@@ -71,6 +73,7 @@ class ranking_selfservice extends ranking_bo
 				egw::redirect_link('/index.php',array(
 					'menuaction' => 'ranking.ranking_athlete_ui.edit',
 					'PerId' => $PerId,
+					'cd' => 'no',
 				));
 				break;
 
@@ -247,6 +250,7 @@ class ranking_selfservice extends ranking_bo
 			html::form_1button('profile', lang('Edit Profile'), '', '/index.php', array(
 				'menuaction' => 'ranking.ranking_athlete_ui.edit',
 				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
+				'cd' => 'no',
 			))."\n".
 			html::form_1button('logout', lang('Logout'), '',
 				'/ranking/athlete.php', array('action' => 'logout')).

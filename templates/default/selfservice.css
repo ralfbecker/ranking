@@ -6,11 +6,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2014 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2014-16 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
 
-body {
+div#selfservice {
 	margin: 10px !important;
 }
 p, td, select, body, button {
