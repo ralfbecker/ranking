@@ -63,14 +63,21 @@ class ranking_registration_ui extends ranking_bo
 		$total = $this->registration->get_rows($query, $rows, $readonlys, true);
 		if ($query['order'] == $default_order) $query['order'] = 'reg_fed';
 
+		// limit non-judge to feds user has registration rights
+		$allow_register_everyone = $this->is_admin || $this->is_judge($comp,true) ||
+			// national edit rights allow to register foreign athlets for national competition
+			in_array($comp['nation'],$this->register_rights) && in_array($comp['nation'],$this->edit_rights) ||
+			$comp && $this->acl_check_comp($comp);	// allow people with edit rights to a competition to register everyone
+		//error_log(__METHOD__."() allow_register_everyone=".array2string($allow_register_everyone).', is_judge='.array2string($this->is_judge($comp)));
+
 		$sel_options = array(
 			'comp'     => $this->comp->names(array(
 				'nation' => $query['calendar'],
 				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
-			'nation' => $this->federation->get_competition_federations($query['calendar'],
-				$query['allow_register_everyone'] ? null : $this->register_rights),
+			'nation' => !$comp ? array() : $this->federation->get_competition_federations($query['calendar'],
+				$allow_register_everyone ? null : $this->register_rights),
 			'GrpId' => $comp && $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
 			'acl_fed_id' => $query['calendar'] == 'SUI' ? $this->federation->federations('SUI', true, 'fed_shortcut') : array(),
 			'fed_parent' => $query['calendar'] == 'GER' ? $this->federation->federations('GER', true, 'fed_shortcut') : array(),
@@ -495,12 +502,6 @@ class ranking_registration_ui extends ranking_bo
 				}
 			}
 		}
-		// limit non-judge to feds user has registration rights
-		$allow_register_everyone = $state['allow_register_everyone'] = $this->is_admin || $this->is_judge($comp,true) ||
-			// national edit rights allow to register foreign athlets for national competition
-			in_array($comp['nation'],$this->register_rights) && in_array($comp['nation'],$this->edit_rights) ||
-			$comp && $this->acl_check_comp($comp);	// allow people with edit rights to a competition to register everyone
-		//error_log(__METHOD__."() allow_register_everyone=".array2string($allow_register_everyone).', is_judge='.array2string($this->is_judge($comp)));
 
 		$select_options = array(
 			'calendar' => $this->ranking_nations,
@@ -509,7 +510,6 @@ class ranking_registration_ui extends ranking_bo
 				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
 				'gruppen IS NOT NULL',
 			),0,'datum ASC'),
-			'nation' => $this->federation->get_competition_federations($comp['nation'],$allow_register_everyone ? null : $this->register_rights),
 			'sex' => $this->genders,
 			'state' => ranking_registration::$state_filters,
 		);
