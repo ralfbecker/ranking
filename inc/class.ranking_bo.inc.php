@@ -1223,7 +1223,16 @@ class ranking_bo extends ranking_so
 		}
 		if ($stagger)
 		{
-			$startlist[1] = $startlist[2] = array_merge($startlist[1],$startlist[2]);
+			if ($num_routes == 2)	// TWO_QUALI_GROUPS eg. lead world championship
+			{
+				$startlist[3] = $startlist[4] = $startlist[2];
+				$startlist[2] = $startlist[1];
+				$num_routes = 4;
+			}
+			else
+			{
+				$startlist[1] = $startlist[2] = array_merge($startlist[1],$startlist[2]);
+			}
 		}
 		// reverse the startlist if neccessary
 		for ($route = 1; $route <= $num_routes; ++$route)
@@ -1235,7 +1244,7 @@ class ranking_bo extends ranking_so
 			}
 			foreach($startlist[$route] as $n => $athlete)
 			{
-				$startlist[$route][$n]['start_order'] = !$stagger || $route != 2 ? 1+$n : self::stagger(1+$n, count($startlist[$route]));
+				$startlist[$route][$n]['start_order'] = !$stagger || $route & 1 ? 1+$n : self::stagger(1+$n, count($startlist[$route]));
 				// preserv the start_number if given
 				if ($old_startlist) $startlist[$route][$n]['start_number'] = $old_startlist[$athlete['PerId']]['start_number'];
 				// we preserve the registration number in the last 6 bit's

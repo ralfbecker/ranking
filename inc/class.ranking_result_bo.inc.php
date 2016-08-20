@@ -29,6 +29,7 @@ define('TWO_QUALI_ALL_NO_STAGGER',6);	// lead on 2 routes for all on sight
 define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
 define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
 define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012 EYC, no countback, otherwise like TWO_QUALI_ALL
+define('TWO_QUALI_GROUPS', 10);			// two quali groups with 2 flash routes each (different from TWOxTWO_QUALI!)
 
 define('LEAD',4);
 define('BOULDER',8);
@@ -67,6 +68,7 @@ class ranking_result_bo extends ranking_bo
 		TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
 		TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
 		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
+		TWO_QUALI_GROUPS => 'two Qualification Starting groups with two staggered flash routes',	// eg. world championships
 		// speed only
 		TWO_QUALI_BESTOF=> 'best of two (record format)',
 		TWO_QUALI_SPEED => 'two Qualification',
@@ -87,6 +89,7 @@ class ranking_result_bo extends ranking_bo
 			TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
 			ONE_QUALI      => 'one Qualification',
 			TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
+			TWO_QUALI_GROUPS => 'two Qualification starting groups with two flash routes staggered ',	// eg. world championships
 		),
 		'boulder' => array(
 			ONE_QUALI      => 'one Qualification',
@@ -294,7 +297,7 @@ class ranking_result_bo extends ranking_bo
 		$starters =& parent::generate_startlist($comp,$cat,
 			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
-			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM)),		// true = stagger, false = no stagger
+			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM,TWO_QUALI_GROUPS)),		// true = stagger, false = no stagger
 			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']), $add_cat);
 
 		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF && !$route_order)	// set 2. lane for record format qualification
@@ -314,18 +317,29 @@ class ranking_result_bo extends ranking_bo
 
 		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) && $discipline != 'speed')	// automatically generate 2. quali
 		{
-			$keys['route_order'] = 1;
-			if (!$this->route->read($keys))
+			$keys['route_order'] = 0;
+			$route = $this->route->read($keys,true);
+			$prefix = $route_type == TWO_QUALI_GROUPS ? lang('Group').' A ' : '';
+			$this->route->save(array(
+				'route_name' => $prefix.'1. '.$route['route_name'],
+			));
+
+			for($r = 1; $r < ($route_type == TWO_QUALI_GROUPS ? 4 : 2); ++$r)
 			{
-				$keys['route_order'] = 0;
-				$route = $this->route->read($keys,true);
-				$this->route->save(array(
-					'route_name'   => '2. '.$route['route_name'],
-					'route_order'  => 1,
-					'route_status' => STATUS_STARTLIST,
-				));
+				$keys['route_order'] = $r;
+				if (!$this->route->read($keys))
+				{
+					if ($route_type == TWO_QUALI_GROUPS && $r >= 2)	 $prefix = lang('Group').' B ';
+
+					$this->route->init($route);
+					$this->route->save(array(
+						'route_name'   => $prefix.(($r%2)+1).'. '.$route['route_name'],
+						'route_order'  => $r,
+						'route_status' => STATUS_STARTLIST,
+					));
+				}
+				$this->_store_startlist(isset($starters[1+$r]) ? $starters[1+$r] : $starters[$r], $r, isset($starters[1+$r]));
 			}
-			$this->_store_startlist(isset($starters[2]) ? $starters[2] : $starters[1],1,isset($starters[2]));
 		}
 		return $num;
 	}
@@ -785,7 +799,14 @@ class ranking_result_bo extends ranking_bo
 	 */
 	static function is_two_quali_all($route_type)
 	{
-		return in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM,TWO_QUALI_ALL_NO_COUNTBACK));
+		return in_array($route_type, array(
+			TWO_QUALI_ALL,
+			TWO_QUALI_ALL_NO_STAGGER,
+			TWO_QUALI_ALL_SEED_STAGGER,
+			TWO_QUALI_ALL_SUM,
+			TWO_QUALI_ALL_NO_COUNTBACK,
+			TWO_QUALI_GROUPS,
+		));
 	}
 
 	/**
