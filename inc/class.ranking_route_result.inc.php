@@ -194,6 +194,9 @@ class ranking_route_result extends so_sql
 			}
 			elseif ($route_order < 0)			// general result
 			{
+				// overall qualification result: 1: groupA, 2: groupB, 3: quali overall, 0: other
+				$quali_overall = $route_order < -2 ? $route_order+6 : 0;
+
 				$extra_cols[] = "1 AS general_result";
 				// use users from the qualification(s)
 				if ($route_type == TWOxTWO_QUALI)
@@ -203,6 +206,10 @@ class ranking_route_result extends so_sql
 				elseif ($route_type == TWO_QUALI_HALF)
 				{
 					$route_order = array(0,1);
+				}
+				elseif ($quali_overall == 2)	// Group B
+				{
+					$route_order = 2;
 				}
 				else
 				{
@@ -234,7 +241,7 @@ class ranking_route_result extends so_sql
 				$join .= $this->_general_result_join(array(
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
 					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
-				),$extra_cols,$order_by,$route_names,$route_type,$discipline,$result_cols);
+				), $extra_cols, $order_by, $route_names, $route_type, $discipline, $result_cols, $quali_overall);
 
 				foreach($filter as $col => $val)
 				{
@@ -354,16 +361,20 @@ class ranking_route_result extends so_sql
 	 *
 	 * @param int $route_order
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
+	 * @param int $quali_overal 1: Group A, 2: Group B, 3: Overal qualification, 0: other
 	 * @return string
 	 */
-	function _sql_rank_prev_heat($route_order,$route_type)
+	function _sql_rank_prev_heat($route_order, $route_type, $quali_overal)
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL_SUM)
 		{
 			return $this->rank_lead_sum;
 		}
-		if ($route_order == 2 && ranking_result_bo::is_two_quali_all($route_type))
+		if ($route_order == 2 && ranking_result_bo::is_two_quali_all($route_type) ||
+			$quali_overal == 2 && $route_order == 4)
 		{
+			$ro0 = $quali_overal == 2 && $route_order == 4 ? 2 : 0;
+			$ro1 = $quali_overal == 2 && $route_order == 4 ? 3 : 1;
 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
 			$c1 = $this->_count_ex_aquo('r1');
 			$c2 = $this->_count_ex_aquo('r2');
@@ -373,8 +384,8 @@ class ranking_route_result extends so_sql
 
 			//pre 2008: rounding to 2 digits: return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
 			return "SELECT SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2) FROM $this->table_name r1".
-				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.$this->id_col=r2.$this->id_col".
-				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
+				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=$ro1 AND r1.$this->id_col=r2.$this->id_col".
+				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=$ro0".
 				" AND $this->table_name.$this->id_col=r1.$this->id_col";
 		}
 /*		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
@@ -431,9 +442,10 @@ class ranking_route_result extends so_sql
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @param string &$discipline 'lead', 'speed', 'boulder', 'speedrelay'
 	 * @param array $result_cols =array() result relevant col
+	 * @param int $quali_overall =0 1: groupA, 2: groupB, 3: quali overall, 0: other
 	 * @return string join
 	 */
-	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array())
+	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array(), $quali_overall=0)
 	{
 		//echo "<p>".__METHOD__."(".print_r($keys,true).",".print_r($extra_cols,true).",,,type=$route_type,$discipline,".print_r($result_cols,true).")</p>\n";
 		unset($discipline);
@@ -441,7 +453,32 @@ class ranking_route_result extends so_sql
 		{
 			$GLOBALS['egw']->route = new ranking_route($this->source_charset,$this->db);
 		}
-		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys,'route_order');
+		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys+array('route_order >= 0'),'route_order');
+
+		// qualificaiton overall result or group A/B
+		if ($quali_overall)
+		{
+			if ($route_type == TWO_QUALI_GROUPS)
+			{
+				if($quali_overall == 3)	// overall group A+B
+				{
+					$route_names = array_slice($route_names, 0, 4, true);
+				}
+				elseif($quali_overall == 2)	// overall group B
+				{
+					$route_names = array_slice($route_names, 2, 2, true);
+				}
+				else	// overall for group A
+				{
+					$route_names = array_slice($route_names, 0, 2, true);
+				}
+			}
+			else	// overall for two qualifications --> ignore other rounds
+			{
+				$route_names = array_slice($route_names, 0, 2, true);
+			}
+		}
+
 		//echo "route_names="; _debug_array($route_names);
 		$order_bys = array("$this->table_name.result_rank");	// Quali
 
@@ -465,10 +502,11 @@ class ranking_route_result extends so_sql
 			}
 			if ($route_type == TWOxTWO_QUALI && $route_order < 2) continue;	// dont order by the 1. quali
 
-			if (ranking_result_bo::is_two_quali_all($route_type) && $route_order == 1)
+			if (ranking_result_bo::is_two_quali_all($route_type) && ($route_order == 1 ||
+				$quali_overall == 2 && $route_order == 3))	// Group B
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
-				$product = '('.$this->_sql_rank_prev_heat(1+$route_order,$route_type).')';
+				$product = '('.$this->_sql_rank_prev_heat(1+$route_order, $route_type, $quali_overall).')';
 				$order_bys = array($product);
 				if ($route_type == TWO_QUALI_ALL_SUM) $order_bys[0] .= ' DESC';
 				$extra_cols[] = "$product AS quali_points";
@@ -478,7 +516,7 @@ class ranking_route_result extends so_sql
 				$order_bys[] = "r$route_order.result_rank";
 			}
 			// not participating in one qualification (order 0 or 1) of TWO_QUALI_ALL is ok
-			if (!in_array($route_type, array(TWO_QUALI_ALL, TWO_QUALI_ALL_NO_COUNTBACK)) || $route_order >= 2)
+			if (!$quali_overall && (!in_array($route_type, array(TWO_QUALI_ALL, TWO_QUALI_ALL_NO_COUNTBACK)) || $route_order >= 2))
 			{
 				$order_bys[] = "r$route_order.result_rank IS NULL";
 			}

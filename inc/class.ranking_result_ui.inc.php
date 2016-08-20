@@ -107,7 +107,7 @@ class ranking_result_ui extends ranking_result_bo
 			);
 			if ($content['new_route'] || $button == 'startlist')
 			{
-				$param['show_result'] = $content['route_order'] != -1 ? 0 : 2;
+				$param['show_result'] = $content['route_order'] >= 0 ? 0 : 2;
 			}
 			switch($button)
 			{
@@ -550,13 +550,13 @@ class ranking_result_ui extends ranking_result_bo
 				$sel_options['fed_id'] = array(lang('Select a nation first'));
 			}
 		}
-		if ($content['route_order'] == -1)
+		if ($content['route_order'] < 0)
 		{
 			unset($sel_options['route_status'][0]);
 		}
 		// cant delete general result or not yet saved routes
 		$readonlys['button[startlist]'] = $readonlys['button[delete]'] =
-			$content['route_order'] == -1 || $content['new_route'] || $content['route_status'] == STATUS_RESULT_OFFICIAL;
+			$content['route_order'] < 0 || $content['new_route'] || $content['route_status'] == STATUS_RESULT_OFFICIAL;
 		// disable max. complimentary selection if no quali.
 		$disable_compl = false;
 		if ($content['route_order'] > (int)($content['route_type']==TWO_QUALI_HALF) || $content['route_order'] < 0)
@@ -649,7 +649,7 @@ class ranking_result_ui extends ranking_result_bo
 					}
 				}
 			}
-			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] == -1)
+			if ($content['route_status'] == STATUS_RESULT_OFFICIAL || $content['route_order'] < 0)
 			{
 				$content['no_upload'] = $readonlys['button[upload]'] = true;	// no upload if result offical or general result
 			}
@@ -1466,16 +1466,7 @@ class ranking_result_ui extends ranking_result_bo
 
 		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
 		{
-			if (substr($content['nm']['discipline'],0,5) == 'speed')	// for speed include pairing graph
-			{
-				$sel_options['show_result'][3] = lang('Pairing speed final');
-				$sel_options['route'] = array(-2 => lang('Pairing speed final'))+$sel_options['route'];
-			}
-			$label =  isset($sel_options['route'][-1]) ? $sel_options['route'][-1] : lang('General result');
-			unset($sel_options['route'][-1]);
-			$sel_options['route'] = array(-1 => $label)+$sel_options['route'];
-			$sel_options['show_result'][2] = lang('General result');
-
+			$this->add_general_result_options($sel_options['route'], $sel_options['show_result'], $route['route_type'], $content['nm']['discipline']);
 		}
 		elseif ($content['nm']['route'] == -1)	// general result with only one heat --> show quali if exist
 		{
@@ -1556,7 +1547,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		elseif ($content['nm']['show_result'] || $content['nm']['route'] < 0)
 		{
-			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -1 ? 2 : 3) : 1;
+			$content['nm']['show_result'] = $content['nm']['route'] < 0 ? ($content['nm']['route'] == -2 ? 3 : 2) : 1;
 		}
 
 		// need to reload route, if eg. general result was selected by show_result=2
@@ -1653,6 +1644,56 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		//_debug_array($content); exit;
 		return $tmpl->exec('ranking.ranking_result_ui.index', $content, $sel_options, $readonlys, $preserv, $output_mode);
+	}
+
+	/**
+	 * Add diverse general- and qualification-results to route-names
+	 *
+	 * @param array& $route route-names read from db
+	 * @param array& $show_result startlist, result selection
+	 * @param int $route_type (ONE|TWO)_QUALI*
+	 * @param string $discipline lead, boulder, speed, ...
+	 */
+	protected function add_general_result_options(&$route, &$show_result, $route_type, $discipline)
+	{
+		$num_routes = count($route);
+
+		// for speed include pairing graph (-2)
+		if (substr($discipline, 0, 5) == 'speed')
+		{
+			$show_result[3] = lang('Pairing speed final');
+			$route = array(-2 => lang('Pairing speed final'))+$route;
+		}
+
+		// remove general result, in case it exists
+		$label =  isset($route[-1]) ? $route[-1] : ranking_route::default_name(-1);
+		unset($route[-1]);
+
+		// add qualification result (-3)
+		if (self::is_two_quali_all($route_type))
+		{
+			$qualis = 2;
+			// add Group A/B result (-4/-5)
+			if ($route_type == TWO_QUALI_GROUPS)
+			{
+				$groupA = isset($route[-5]) ? $route[-5] : ranking_route::default_name(-5);
+				$groupB = isset($route[-4]) ? $route[-4] : ranking_route::default_name(-4);
+				unset($route[-4], $route[-5]);
+				$route = array_slice($route, 0, -4, true) + array(-4 => $groupB, -5 => $groupA) + array_slice($route, -4, null, true);
+				$qualis = 6;	// 4 qualis + 2 groups
+			}
+
+			// add overal qualification result
+			$quali = isset($route[-3]) ? $route[-3] : ranking_route::default_name(-3);
+			unset($route[-3]);
+			$route = array_slice($route, 0, -$qualis, true) + array(-3 => $quali) + array_slice($route, -$qualis, null, true);
+
+			if ($num_routes <= 2 || $route_type == TWO_QUALI_GROUPS && $num_routes <= 4) return;	// dont show general result yet
+		}
+
+		// add general result (-1)
+		$route = array(-1 => $label) + $route;
+		$show_result[2] = ranking_route::default_name(-1);
 	}
 
 	/**

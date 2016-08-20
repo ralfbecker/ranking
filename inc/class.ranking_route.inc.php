@@ -89,17 +89,18 @@ class ranking_route extends so_sql
 		}
 		$ret = parent::read($keys);
 
-		if (!$ret && $keys['route_order'] == -1)		// general result not found --> return a default one
+		if (!$ret && $keys['route_order'] < 0)		// general result not found --> return a default one
 		{
+			$route_order = $keys['route_order'];
 			$keys['route_order'] = 0;
 			if (($ret = parent::read($keys)))
 			{
 				$ret = $this->init(array(
 					'WetId' => $ret['WetId'],
 					'GrpId' => $ret['GrpId'],
-					'route_order' => -1,
+					'route_order' => $route_order,
 					'route_type'  => $ret['route_type'],
-					'route_name'  => lang('General result'),
+					'route_name'  => self::default_name($route_order),
 					'route_status'=> STATUS_STARTLIST,
 					'discipline'  => $ret['discipline'],
 				));
@@ -110,6 +111,26 @@ class ranking_route extends so_sql
 			$ret['route_type'] = TWO_QUALI_ALL;
 		}
 		return $ret;
+	}
+
+	function default_name($route_order)
+	{
+		switch($route_order)
+		{
+			case -3:
+				$name = lang('Qualification').' '.lang('overall result');
+				break;
+			case -4:
+				$name = lang('Group').' B '.lang('Qualification');
+				break;
+			case -5:
+				$name = lang('Group').' A '.lang('Qualification');
+				break;
+			default:
+				$name = lang('General result');
+				break;
+		}
+		return $name;
 	}
 
 	/**

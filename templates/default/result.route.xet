@@ -27,18 +27,18 @@
 						<select statustext="Select order for qualification startlist or use default" id="slist_order" options="Use default order"/>
 					</hbox>
 				</row>
-				<row class="row" disabled="@route_order=-1">
+				<row class="row" disabled="@route_order=/^-/">
 					<description value="Isolation" for="route_iso_open"/>
 					<hbox span="all">
 						<textbox blur="opens" id="route_iso_open" size="20" maxlength="40"/>
 						<textbox blur="closes" label="-" id="route_iso_close" size="20" maxlength="40"/>
 					</hbox>
 				</row>
-				<row class="row" disabled="@route_order=-1">
+				<row class="row" disabled="@route_order=/^-/">
 					<description value="Start heat" for="route_start"/>
 					<textbox blur="time" id="route_start" size="64" maxlength="64" span="all" class="inputFullWidth"/>
 				</row>
-				<row class="row" disabled="@route_order=-1">
+				<row class="row" disabled="@route_order=/^-/">
 					<description value="Observation time" for="route_observation_time"/>
 					<hbox span="all">
 						<textbox id="route_observation_time" size="20" maxlength="40"/>

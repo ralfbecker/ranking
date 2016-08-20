@@ -319,7 +319,7 @@ class ranking_result_bo extends ranking_bo
 		{
 			$keys['route_order'] = 0;
 			$route = $this->route->read($keys,true);
-			$prefix = $route_type == TWO_QUALI_GROUPS ? lang('Group').' A ' : '';
+			$prefix = $route_type == TWO_QUALI_GROUPS ? lang('Group').' B ' : '';
 			$this->route->save(array(
 				'route_name' => $prefix.'1. '.$route['route_name'],
 			));
@@ -329,7 +329,7 @@ class ranking_result_bo extends ranking_bo
 				$keys['route_order'] = $r;
 				if (!$this->route->read($keys))
 				{
-					if ($route_type == TWO_QUALI_GROUPS && $r >= 2)	 $prefix = lang('Group').' B ';
+					if ($route_type == TWO_QUALI_GROUPS && $r >= 2)	 $prefix = lang('Group').' A ';
 
 					$this->route->init($route);
 					$this->route->save(array(
@@ -1876,7 +1876,7 @@ class ranking_result_bo extends ranking_bo
 		switch (($order = $query['order']))
 		{
 			case 'result_rank':
-				if ($query['route'] == -1)      // in general result we sort unranked at the end and then as the rest by name
+				if ($query['route'] < 0)      // in general result we sort unranked at the end and then as the rest by name
 				{
 					$query['order'] = 'result_rank IS NULL '.$query['sort'];
 				}
