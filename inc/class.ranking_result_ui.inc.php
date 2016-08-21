@@ -958,7 +958,8 @@ class ranking_result_ui extends ranking_result_bo
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
 		if (!in_array($query['discipline'],array('speed','boulder')))
 		{
-			$rows['route_type'] = ranking_result_bo::is_two_quali_all($query['route_type']) ? 'TWO_QUALI_ALL' :
+			$rows['route_type'] = ranking_result_bo::is_two_quali_all($query['route_type']) ?
+				($query['route_type'] == TWO_QUALI_GROUPS ? 'TWO_QUALI_GROUPS' : 'TWO_QUALI_ALL') :
 				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' :
 				($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
 		}
@@ -1467,6 +1468,11 @@ class ranking_result_ui extends ranking_result_bo
 		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
 		{
 			$this->add_general_result_options($sel_options['route'], $sel_options['show_result'], $route['route_type'], $content['nm']['discipline']);
+			// if general result is suppressed, go for first in list, as that is what is displayed to user anyway
+			if (!isset($sel_options['route'][$content['nm']['route']]))
+			{
+				list($content['nm']['route']) = each($sel_options['route']);
+			}
 		}
 		elseif ($content['nm']['route'] == -1)	// general result with only one heat --> show quali if exist
 		{
@@ -1656,7 +1662,6 @@ class ranking_result_ui extends ranking_result_bo
 	 */
 	protected function add_general_result_options(array &$route, array &$show_result, $route_type, $discipline)
 	{
-		$num_routes = count($route);
 		// make sure real heats are sorted to the end of the array
 		uksort($route, function($a, $b)
 		{
@@ -1674,7 +1679,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 
 		// add qualification result (-3)
-		if (self::is_two_quali_all($route_type))
+		if (self::is_two_quali_all($route_type) || $route_type == TWO_QUALI_HALF)
 		{
 			$qualis = 2;
 			// add Group A/B result (-4/-5) above the 4 qualifications
@@ -1692,6 +1697,11 @@ class ranking_result_ui extends ranking_result_bo
 			unset($route[-3]);
 			$route = array_slice($route, 0, -$qualis, true) + array(-3 => $quali) + array_slice($route, -$qualis, null, true);
 
+			// count real heats, not general results
+			for($num_routes=0; isset($route[$num_routes]); ++$num_routes)
+			{
+
+			}
 			if ($num_routes <= 2 || $route_type == TWO_QUALI_GROUPS && $num_routes <= 4) return;	// dont show general result yet
 		}
 

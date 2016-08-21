@@ -211,6 +211,11 @@ class ranking_route_result extends so_sql
 				{
 					$route_order = 2;
 				}
+				// general result or qualification overall for two quali groups
+				elseif ($route_type == TWO_QUALI_GROUPS && in_array($route_order, array(-1, -3)))
+				{
+					$route_order = array(-4, -5);
+				}
 				else
 				{
 					$route_order = 0;
@@ -235,6 +240,13 @@ class ranking_route_result extends so_sql
 						$result_cols[] = 'result_zone';
 						break;
 				}
+
+				// keep _general_result_join from setting order_by
+				if (isset($filter['keep_order_by']))
+				{
+					$keep_order_by = $filter['keep_order_by'] ? $order_by : false;
+					unset($filter['keep_order_by']);
+				}
 				$order_by_parts = preg_split('/[ ,]/',$order_by);
 
 				$route_names = null;
@@ -242,6 +254,8 @@ class ranking_route_result extends so_sql
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
 					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
 				), $extra_cols, $order_by, $route_names, $route_type, $discipline, $result_cols, $quali_overall);
+
+				if ($keep_order_by) $order_by = $keep_order_by;
 
 				foreach($filter as $col => $val)
 				{
@@ -278,8 +292,8 @@ class ranking_route_result extends so_sql
 				//echo "<p>quali_preselected=$quali_preselected</p>\n";
 				foreach($rows as $n => &$row)
 				{
-					if ($row['route_order'] == 0) $row['result_rank0'] = $row['result_rank'];
-					$row['org_rank'] = $row['result_rank'.$row['route_order']];
+					if ($row['route_order'] <= 0) $row['result_rank0'] = $row['result_rank'];
+					$row['org_rank'] = $row['result_rank'.max(0, $row['route_order'])];
 					//echo "<p>$n: $row[nachname], org_rank=$row[org_rank], result_rank=$row[result_rank] ";
 
 					// check for ties
@@ -291,7 +305,8 @@ class ranking_route_result extends so_sql
 						if (($route_type==TWO_QUALI_ALL_NO_COUNTBACK || $quali_preselected) && $route_order < 2 && $row['result_rank2']) continue;
 
 						if ($route_type == TWOxTWO_QUALI && $route_order == 3 ||
-							$route_type == TWO_QUALI_HALF && $route_order == 1)
+							$route_type == TWO_QUALI_HALF && $route_order == 1 ||
+							$route_type == TWO_QUALI_GROUPS && $route_order < 0)
 						{
 							if (!$old || $old['org_rank'] < $row['org_rank']) $row['result_rank'] = $n+1;
 							//echo "route_order=$route_order, result_rank=$row[result_rank] --> no further countback ";
@@ -317,7 +332,8 @@ class ranking_route_result extends so_sql
 						}
 						// for quali on two routes with half quota, there's no countback to the quali only if there's a result for the 2. heat
 						if ($route_type == TWO_QUALI_HALF && $route_order == 2 && $row['result_rank2'] ||
-							$route_type == TWOxTWO_QUALI  && $route_order == 4 && $row['result_rank4'] )
+							$route_type == TWOxTWO_QUALI  && $route_order == 4 && $row['result_rank4'] ||
+							$route_type == TWO_QUALI_GROUPS && $route_order == 4 && $row['result_rank4'])
 						{
 							break;	// --> not use countback
 						}
@@ -329,7 +345,12 @@ class ranking_route_result extends so_sql
 				// now we need to check if user wants to sort by something else
 				$order = array_shift($order_by_parts);
 				$sort  = array_pop($order_by_parts);
-				if ($order != 'result_rank')
+				// $keep_order_by bypasses sorting here for startlist creation of first heat after quali. with two groups
+				if ($keep_order_by)
+				{
+
+				}
+				elseif ($order != 'result_rank')
 				{
 					// sort the rows now by the user's criteria
 					usort($rows, function($a, $b) use ($sort, $order)
@@ -342,6 +363,14 @@ class ranking_route_result extends so_sql
 				elseif($sort == 'DESC')
 				{
 					$rows = array_reverse($rows);
+				}
+				foreach(array(-4 => 1, -5 => 0, ) as $from => $to)
+				{
+					if (isset($route_names[$from]))
+					{
+						$route_names[$to] = $route_names[$from];
+						unset($route_names[$from]);
+					}
 				}
 				$rows['route_names'] = $route_names;
 
@@ -361,14 +390,20 @@ class ranking_route_result extends so_sql
 	 *
 	 * @param int $route_order
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
-	 * @param int $quali_overal 1: Group A, 2: Group B, 3: Overal qualification, 0: other
+	 * @param int $quali_overal =0 1: Group A, 2: Group B, 3: Overal qualification, 0: other
 	 * @return string
 	 */
-	function _sql_rank_prev_heat($route_order, $route_type, $quali_overal)
+	function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0)
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL_SUM)
 		{
 			return $this->rank_lead_sum;
+		}
+		// prev. result for heat after quali for two quali groups (must not be used in _general_result_join: $quali_overal > 0!)
+		if ($route_type == TWO_QUALI_GROUPS && $route_order == 4 && !$quali_overal)
+		{
+			return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
+				"p.route_order IN (-4,-5) AND $this->table_name.$this->id_col=p.$this->id_col";
 		}
 		if ($route_order == 2 && ranking_result_bo::is_two_quali_all($route_type) ||
 			$quali_overal == 2 && $route_order == 4)
@@ -388,24 +423,6 @@ class ranking_route_result extends so_sql
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=$ro0".
 				" AND $this->table_name.$this->id_col=r1.$this->id_col";
 		}
-/*		elseif ($route_order == 4 &&  $route_type == TWOxTWO_QUALI)
-		{
-			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
-			$r = 'r1';
-			$c1 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND c$r.route_order IN (0,1) AND $r.result_rank=c$r.result_rank";
-			$r = 'r2';
-			$c2 = "SELECT COUNT(*) FROM $this->table_name c$r WHERE $r.WetId=c$r.WetId AND $r.GrpId=c$r.GrpId AND c$r.route_order IN (2,3) AND $r.result_rank=c$r.result_rank";
-			$r = 'r1';
-			$r1 = "(1+(SELECT COUNT(*) FROM $this->table_name r$r WHERE $r.WetId=r$r.WetId AND $r.GrpId=r$r.GrpId AND r$r.route_order IN (0,1) AND $r.result_rank>r$r.result_rank))";
-			$r1 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r1 END)";
-			$r = 'r2';
-			$r2 = "(1+(SELECT COUNT(*) FROM $this->table_name r$r WHERE $r.WetId=r$r.WetId AND $r.GrpId=r$r.GrpId AND r$r.route_order IN (2,3) AND $r.result_rank>r$r.result_rank))";
-			$r2 = "(CASE WHEN $r.result_rank IS NULL THEN 999999 ELSE $r2 END)";
-			return "SELECT ROUND(SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2),2) FROM $this->table_name r1".
-				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order IN (2,3) AND r1.$this->id_col=r2.$this->id_col".
-				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order IN (0,1)".
-				" AND $this->table_name.$this->id_col=r1.$this->id_col";
-		}*/
 		elseif($route_type == TWOxTWO_QUALI && in_array($route_order,array(2,3)))
 		{
 			return "SELECT result_detail FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
@@ -456,27 +473,29 @@ class ranking_route_result extends so_sql
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys+array('route_order >= 0'),'route_order');
 
 		// qualificaiton overall result or group A/B
-		if ($quali_overall)
+		if ($route_type == TWO_QUALI_GROUPS)
 		{
-			if ($route_type == TWO_QUALI_GROUPS)
+			if ($quali_overall == 3 || !$quali_overall)	// overall group A+B (runs as $result_type == TWO_QUALI_HALF!)
 			{
-				if($quali_overall == 3)	// overall group A+B
+				$route_names = $GLOBALS['egw']->route->query_list('route_name', 'route_order',
+					$keys+array($quali_overall ? 'route_order <= -4' : '(route_order <= -4 OR route_order > 3)'),'route_order');
+				foreach(array(-5, -4) as $route_order)
 				{
-					$route_names = array_slice($route_names, 0, 4, true);
-				}
-				elseif($quali_overall == 2)	// overall group B
-				{
-					$route_names = array_slice($route_names, 2, 2, true);
-				}
-				else	// overall for group A
-				{
-					$route_names = array_slice($route_names, 0, 2, true);
+					if (!isset($route_names[$route_order])) $route_names[$route_order] = ranking_route::default_name($route_order);
 				}
 			}
-			else	// overall for two qualifications --> ignore other rounds
+			elseif($quali_overall == 2)	// overall group B
+			{
+				$route_names = array_slice($route_names, 2, 2, true);
+			}
+			else	// overall for group A
 			{
 				$route_names = array_slice($route_names, 0, 2, true);
 			}
+		}
+		elseif ($quali_overall)	// overall for two qualifications --> ignore other rounds
+		{
+			$route_names = array_slice($route_names, 0, 2, true);
 		}
 
 		//echo "route_names="; _debug_array($route_names);
@@ -485,7 +504,6 @@ class ranking_route_result extends so_sql
 		$join = "\n";
 		foreach(array_keys($route_names) as $route_order)
 		{
-			if ($route_order < 0) continue;	// general result
 			if ($route_type == TWOxTWO_QUALI)
 			{
 				if (in_array($route_order,array(2,3))) continue;	// base of the query, no need to join
@@ -590,13 +608,14 @@ class ranking_route_result extends so_sql
 		{
 			default:
 			case 'lead':
-				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'])	// lead result
+				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'] ||	// lead result
+					$data['general_result'] && $data['route_type'] == TWO_QUALI_GROUPS)
 				{
 					if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
 					foreach($data['general_result'] ? array(1,2,3,'',0,4,5,6) : array('') as $suffix)
 					{
 						$to_suffix = $suffix;
-						if ($data['general_result'] && $suffix === '' && $data['route_order'])
+						if ($data['general_result'] && $suffix === '' && $data['route_order'] > 0)
 						{
 							$to_suffix = $data['route_order'];
 						}
@@ -644,6 +663,18 @@ class ranking_route_result extends so_sql
 						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
 						{
 							if ($data['result'.$suffix] && $data['result_rank'.$suffix]) $data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
+						}
+					}
+					if ($data['general_result'] && $data['route_type'] == TWO_QUALI_GROUPS && !empty($data['result_rank']))
+					{
+						$detail = json_decode($data['result_detail'], true);
+						$data['route_order'] += 5;	// -4/-5 --> 0/1
+						if (!($suffix = $data['route_order'])) $suffix = '';
+						$data['result'.$suffix] = $data['result_rank'].'. '.sprintf('%4.2lf',$detail['quali_points']);
+						if ($suffix !== '')
+						{
+							$data['result_rank'.$suffix] = $data['result_rank'];
+							unset($data['result_rank']);
 						}
 					}
 					// lead time
@@ -1108,7 +1139,8 @@ class ranking_route_result extends so_sql
 		$extra_cols[] = $mode.' AS new_rank';
 
 		// do we have a countback
-		if ($quali_preselected && $keys['route_order'] == 2 || $route_type == TWO_QUALI_ALL_NO_COUNTBACK)
+		if ($quali_preselected && $keys['route_order'] == 2 || $route_type == TWO_QUALI_ALL_NO_COUNTBACK ||
+			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] == 4)
 		{
 			// no countback to quali, if we use preselected athletes or TWO_QUALI_ALL_NO_COUNTBACK
 		}
@@ -1256,9 +1288,46 @@ class ranking_route_result extends so_sql
 		}
 		$this->db->transaction_commit();
 
+		// update Group A/B results
+		if ($route_type == TWO_QUALI_GROUPS && $_keys['route_order'] < 4)
+		{
+			$this->update_group_ab($_keys, $discipline, $route_type);
+		}
+
 		if ($modified) ranking_result_bo::delete_export_route_cache($keys);
 
 		return $modified;
+	}
+
+	/**
+	 * Write qualification group A/B result into RouteResults table
+	 *
+	 * This is necessary, as rank is not done in pure SQL.
+	 *
+	 * @param array $_keys
+	 * @param string $discipline ='lead'
+	 * @param int $route_type =TWO_QUALI_GROUPS
+	 */
+	protected function update_group_ab(array $_keys, $discipline='lead', $route_type=TWO_QUALI_GROUPS)
+	{
+		$_keys['route_order'] = $_keys['route_order'] < 2 ? -5 : -4;
+		$results = $this->search(array(), false, 'result_rank ASC', '', '', false, 'AND', false, $_keys+array(
+			'discipline' => $discipline,
+			'route_type' => $route_type,
+		));
+		unset($results['route_names']);
+		$this->db->transaction_begin();
+		$this->delete($_keys);
+		foreach($results as $result)
+		{
+			$_keys['PerId'] = $result['PerId'];
+			$this->init(array(
+				'result_rank' => $result['result_rank'],
+				'result_detail' => json_encode(array('quali_points' => $result['quali_points'])),
+			));
+			$this->save($_keys);
+		}
+		$this->db->transaction_commit();
 	}
 
 	/**

@@ -534,6 +534,15 @@ class ranking_result_bo extends ranking_bo
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
 		}
+		if ($prev_route['route_type'] == TWO_QUALI_GROUPS && $keys['route_order'] == 4)
+		{
+			// read quote from overal quali result, not prev. heat == last quali heat
+			$prev_keys['route_order'] = -3;
+			if (($prev = $this->route->read($prev_keys))) $prev_route = $prev;
+			$prev_keys['route_type'] = $prev_route['route_type'];
+			$prev_keys['discipline'] = $prev_route['discipline'];
+			$prev_route['route_quota'] /= 2;	// as we have 2 groups, with their own rank
+		}
 		if ($prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
 		{
 			$prev_keys['route_order'] = array(2,3);		// use both quali groups
@@ -564,6 +573,12 @@ class ranking_result_bo extends ranking_bo
 			if ($ko_system || $start_order_mode == 'result')		// first speed final or start_order by result (eg. boulder 1/2-f)
 			{
 				$order_by = 'result_rank';					// --> use result of previous heat
+			}
+			// quali with two groups, use overal qualification result
+			elseif($prev_route['route_type'] == TWO_QUALI_GROUPS && $keys['route_order'] == 4)
+			{
+				$order_by = $this->route_result->table_name.'.result_rank DESC';		// --> reversed result
+				$prev_keys['keep_order_by'] = true;	// otherwise general result would do it's own order_by
 			}
 			// quali on two routes with multiplied ranking
 			elseif(self::is_two_quali_all($prev_route['route_type']) && $keys['route_order'] == 2)
@@ -607,6 +622,7 @@ class ranking_result_bo extends ranking_bo
 		}
 		//echo "<p>".__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n";
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
+		unset($starters['route_names']);
 		//_debug_array($starters);
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
@@ -653,8 +669,11 @@ class ranking_result_bo extends ranking_bo
 				$data['start_order'] = $start_order++;
 			}
 			$this->route_result->init($keys);
-			unset($data['result_rank']);
-			$this->route_result->save($data);
+			$this->route_result->save(array(
+				'PerId' => $data['PerId'],
+				'start_order' => $data['start_order'],
+				'start_number' => $data['start_number'],
+			));
 		}
 		// add prequalified to quali(s) and first final round
 		if ($comp && ($preselected = $this->comp->quali_preselected($keys['GrpId'], $comp['quali_preselected'])) && $keys['route_order'] <= 2)
