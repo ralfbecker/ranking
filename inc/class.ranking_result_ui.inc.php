@@ -1654,9 +1654,17 @@ class ranking_result_ui extends ranking_result_bo
 	 * @param int $route_type (ONE|TWO)_QUALI*
 	 * @param string $discipline lead, boulder, speed, ...
 	 */
-	protected function add_general_result_options(&$route, &$show_result, $route_type, $discipline)
+	protected function add_general_result_options(array &$route, array &$show_result, $route_type, $discipline)
 	{
 		$num_routes = count($route);
+		// make sure real heats are sorted to the end of the array
+		uksort($route, function($a, $b)
+		{
+			if ($a < 0) $a += 100;
+			if ($b < 0) $b += 100;
+
+			return $b - $a;
+		});
 
 		// for speed include pairing graph (-2)
 		if (substr($discipline, 0, 5) == 'speed')
@@ -1665,15 +1673,11 @@ class ranking_result_ui extends ranking_result_bo
 			$route = array(-2 => lang('Pairing speed final'))+$route;
 		}
 
-		// remove general result, in case it exists
-		$label =  isset($route[-1]) ? $route[-1] : ranking_route::default_name(-1);
-		unset($route[-1]);
-
 		// add qualification result (-3)
 		if (self::is_two_quali_all($route_type))
 		{
 			$qualis = 2;
-			// add Group A/B result (-4/-5)
+			// add Group A/B result (-4/-5) above the 4 qualifications
 			if ($route_type == TWO_QUALI_GROUPS)
 			{
 				$groupA = isset($route[-5]) ? $route[-5] : ranking_route::default_name(-5);
@@ -1683,7 +1687,7 @@ class ranking_result_ui extends ranking_result_bo
 				$qualis = 6;	// 4 qualis + 2 groups
 			}
 
-			// add overal qualification result
+			// add overal qualification result above all qualification and below next heat eg. 1/2-final
 			$quali = isset($route[-3]) ? $route[-3] : ranking_route::default_name(-3);
 			unset($route[-3]);
 			$route = array_slice($route, 0, -$qualis, true) + array(-3 => $quali) + array_slice($route, -$qualis, null, true);
@@ -1691,7 +1695,9 @@ class ranking_result_ui extends ranking_result_bo
 			if ($num_routes <= 2 || $route_type == TWO_QUALI_GROUPS && $num_routes <= 4) return;	// dont show general result yet
 		}
 
-		// add general result (-1)
+		// add general result (-1) on top of list
+		$label =  isset($route[-1]) ? $route[-1] : ranking_route::default_name(-1);
+		unset($route[-1]);
 		$route = array(-1 => $label) + $route;
 		$show_result[2] = ranking_route::default_name(-1);
 	}
