@@ -534,7 +534,9 @@ class ranking_result_bo extends ranking_bo
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
 		}
-		if ($prev_route['route_type'] == TWO_QUALI_GROUPS && $keys['route_order'] == 4)
+		// use new overal qualification result for generating startlist of heat after qualification
+		if ($prev_route['route_type'] == TWO_QUALI_GROUPS && $keys['route_order'] == 4 ||
+			$prev_route['route_type'] == TWO_QUALI_HALF  && $keys['route_order'] == 2)
 		{
 			// read quote from overal quali result, not prev. heat == last quali heat
 			$prev_keys['route_order'] = -3;
@@ -542,6 +544,7 @@ class ranking_result_bo extends ranking_bo
 			$prev_keys['route_type'] = $prev_route['route_type'];
 			$prev_keys['discipline'] = $prev_route['discipline'];
 			$prev_route['route_quota'] /= 2;	// as we have 2 groups, with their own rank
+			$prev_keys['keep_order_by'] = true;	// otherwise general result would do it's own order_by
 		}
 		if ($prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
 		{
@@ -575,10 +578,9 @@ class ranking_result_bo extends ranking_bo
 				$order_by = 'result_rank';					// --> use result of previous heat
 			}
 			// quali with two groups, use overal qualification result
-			elseif($prev_route['route_type'] == TWO_QUALI_GROUPS && $keys['route_order'] == 4)
+			elseif($prev_keys['keep_order_by'])
 			{
 				$order_by = $this->route_result->table_name.'.result_rank DESC';		// --> reversed result
-				$prev_keys['keep_order_by'] = true;	// otherwise general result would do it's own order_by
 			}
 			// quali on two routes with multiplied ranking
 			elseif(self::is_two_quali_all($prev_route['route_type']) && $keys['route_order'] == 2)
