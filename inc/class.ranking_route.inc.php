@@ -103,6 +103,7 @@ class ranking_route extends so_sql
 					'route_name'  => self::default_name($route_order),
 					'route_status'=> STATUS_STARTLIST,
 					'discipline'  => $ret['discipline'],
+					'route_quota' => ranking_result_bo::default_quota($ret['discipline'], $route_order, $ret['route_type']),
 				));
 			}
 		}

@@ -530,6 +530,11 @@ class ranking_result_bo extends ranking_bo
 			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
 			return false;	// prev. route not found or no result
 		}
+		// read quota from previous heat or for new overall quali result from there
+		if ((!$quota = $this->get_quota($keys, $prev_route['route_type'])))
+		{
+			$quota = $prev_route['route_quota'];	// fallback to old code
+		}
 		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
@@ -543,17 +548,16 @@ class ranking_result_bo extends ranking_bo
 			if (($prev = $this->route->read($prev_keys))) $prev_route = $prev;
 			$prev_keys['route_type'] = $prev_route['route_type'];
 			$prev_keys['discipline'] = $prev_route['discipline'];
-			$prev_route['route_quota'] /= 2;	// as we have 2 groups, with their own rank
+			$quota /= 2;	// as we have 2 groups, with their own rank
 			$prev_keys['keep_order_by'] = true;	// otherwise general result would do it's own order_by
 		}
 		if ($prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
 		{
 			$prev_keys['route_order'] = array(2,3);		// use both quali groups
 		}
-		if ($prev_route['route_quota'] &&
-			(!self::is_two_quali_all($prev_route['route_type']) || $keys['route_order'] > 2))
+		if ($quota && (!self::is_two_quali_all($prev_route['route_type']) || $keys['route_order'] > 2))
 		{
-			$prev_keys[] = 'result_rank <= '.(int)$prev_route['route_quota'];
+			$prev_keys[] = 'result_rank <= '.(int)$quota;
 		}
 		// which column get propagated to next heat
 		$cols = $this->route_result->startlist_cols();
@@ -565,7 +569,7 @@ class ranking_result_bo extends ranking_bo
 
 			$comp = $this->comp->read($keys['WetId']);
 		}
-		if ($prev_route['route_quota'] == 1 || 				// superfinal
+		if ($quota == 1 || 				// superfinal
 			$start_order_mode == 'previous' && !$ko_system || 	// 2. Quali uses same startorder
 			$ko_system && $keys['route_order'] > 2)			// speed-final
 		{
@@ -628,7 +632,7 @@ class ranking_result_bo extends ranking_bo
 		//_debug_array($starters);
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
-		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $prev_route['route_quota'])
+		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $quota)
 		{
 			$max_rank = $starters[count($starters)-1]['result_rank']-1;
 		}
@@ -642,24 +646,24 @@ class ranking_result_bo extends ranking_bo
 				$data['ranking'] = $data['ranking']['ranking'];
 			}
 			// applying a quota for TWO_QUALI_ALL, taking ties into account!
-			if (isset($data['quali_points']) && count($starters)-$n > $prev_route['route_quota'] &&
-				$data['quali_points'] > $starters[count($starters)-$prev_route['route_quota']]['quali_points'])
+			if (isset($data['quali_points']) && count($starters)-$n > $quota &&
+				$data['quali_points'] > $starters[count($starters)-$quota]['quali_points'])
 			{
-				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$prev_route['route_quota'])."]['quali_points']=".$starters[count($starters)-$prev_route['route_quota']]['quali_points']."</p>\n";
+				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$quota)."]['quali_points']=".$starters[count($starters)-$quota]['quali_points']."</p>\n";
 				continue;
 			}
 			if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem
 			{
-				if (!isset($this->ko_start_order[$prev_route['route_quota']])) return false;
+				if (!isset($this->ko_start_order[$quota])) return false;
 				if ($max_rank)
 				{
 					if ($data['result_rank'] > $max_rank) break;
-					if ($start_order <= $prev_route['route_quota']-$max_rank)
+					if ($start_order <= $quota-$max_rank)
 					{
 						$data['result_time'] = WILDCARD_TIME;
 					}
 				}
-				$data['start_order'] = $this->ko_start_order[$prev_route['route_quota']][$start_order++];
+				$data['start_order'] = $this->ko_start_order[$quota][$start_order++];
 			}
 			// 2. quali is stagger'ed of 1. quali
 			elseif(in_array($prev_route['route_type'],array(TWO_QUALI_ALL,TWO_QUALI_ALL_SEED_STAGGER)) && $keys['route_order'] == 1)
@@ -707,9 +711,9 @@ class ranking_result_bo extends ranking_bo
 		}
 		if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem --> fill up with wildcards
 		{
-			while($start_order <= $prev_route['route_quota'])
+			while($start_order <= $quota)
 			{
-				$this->_create_wildcard_co($keys,$this->ko_start_order[$prev_route['route_quota']][$start_order++]);
+				$this->_create_wildcard_co($keys,$this->ko_start_order[$quota][$start_order++]);
 			}
 		}
 		return $start_order-1;
@@ -1687,6 +1691,7 @@ class ranking_result_bo extends ranking_bo
 				{
 					case 0: $quota = $quali_type == TWO_QUALI_HALF ? 13 : 26; break;	// quali
 					case 1: $quota = 13; break;		// 2. quali
+					case -3: $quota = 26; break;
 					case 2: $quota = 8;  break;		// 1/2-final
 				}
 				break;
@@ -1696,12 +1701,56 @@ class ranking_result_bo extends ranking_bo
 				{
 					case 0: $quota = $quali_type == TWO_QUALI_HALF ? 10 : 20; break;	// quali
 					case 1: $quota = 10; break;		// 2. quali
+					case -3: $quota = 20; break;
 					case 2: $quota = 6;  break;		// 1/2-final
 				}
 				break;
 		}
 		//echo "<p>".__METHOD__."($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
 		return $quota;
+	}
+
+	/**
+	 * Get the quota for a given route from the previous heat
+	 *
+	 * @param array $keys
+	 * @param int $route_type =null default use $keys['route_type'], one of (ONE|TWO)_QUALI_*
+	 * @return int|null quote or null for first heat, exception if none is set in previous heat
+	 * @throws egw_exception_wrong_userinput with error message
+	 */
+	function get_quota(array $keys, $route_type=null)
+	{
+		if (!isset($route_type)) $route_type = $keys['route_type'];
+
+		// return null for quali / first heat / !$route_order
+		if (!($route_order = $keys['route_order']))
+		{
+			return null;
+		}
+
+		if ($route_type == ONE_QUALI && $route_order == 2)
+		{
+			$keys['route_order'] = 0;
+		}
+		// use new overall qualification result
+		elseif ($route_order == 4 && $route_type == TWO_QUALI_GROUPS  ||
+			$route_order == 2 && ($route_type != TWO_QUALI_GROUPS && self::is_two_quali_all($route_type) || $route_type == TWO_QUALI_HALF))
+		{
+			$keys['route_order'] = -3;
+		}
+		else
+		{
+			$keys['route_order'] = $route_order-1;
+		}
+		if (!($prev = $this->route->read($keys)))
+		{
+			throw new egw_exception_wrong_userinput(lang('No previous heat (%1) found!', $keys['route_order']));
+		}
+		if (!(int)$prev['route_quota'])
+		{
+			throw new egw_exception_wrong_userinput(lang('No quota set in the previous heat!!!'));
+		}
+		return (int)$prev['route_quota'];
 	}
 
 	/**
@@ -1785,9 +1834,12 @@ class ranking_result_bo extends ranking_bo
 			$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') :
 				($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
 
-			if ($previous && !$previous['route_quota']/* && ($discipline != 'speed' || $content['route_order'] <= 2)*/)
-			{
-				$msg = lang('No quota set in the previous heat!!!');
+			// check if previous heat has a quota set
+			try {
+				if ($previous) $this->get_quota($keys, $content['route_type']);
+			}
+			catch (egw_exception_wrong_userinput $e) {
+				$msg = $e->getMessage();
 			}
 			if (substr($discipline,0,5) != 'speed')
 			{
