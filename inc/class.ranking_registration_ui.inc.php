@@ -142,10 +142,15 @@ class ranking_registration_ui extends ranking_bo
 			{
 				if (!empty($row[ranking_registration::PREFIX.$state]))
 				{
-					if (!isset($row['state']) || $state == 'prequalified')
+					if (!isset($row['state']))
 					{
 						$row['class'] .= ' is'.ucfirst($state);
 						$row['state'] = $state;
+					}
+					// we allways want prequalified class, to show registered ones also as prequalified (italics)
+					elseif($state == 'prequalified')
+					{
+						$row['class'] .= ' is'.ucfirst($state);
 					}
 					$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
 					$row['state_changed'] .= egw_time::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
