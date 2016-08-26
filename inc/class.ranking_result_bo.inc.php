@@ -68,7 +68,7 @@ class ranking_result_bo extends ranking_bo
 		TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
 		TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
 		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
-		TWO_QUALI_GROUPS => 'two Qualification Starting groups with two staggered flash routes',	// eg. world championships
+		TWO_QUALI_GROUPS => 'two Qualification Starting groups with two staggered flash routes each',	// eg. world championships
 		// speed only
 		TWO_QUALI_BESTOF=> 'best of two (record format)',
 		TWO_QUALI_SPEED => 'two Qualification',
@@ -89,7 +89,7 @@ class ranking_result_bo extends ranking_bo
 			TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
 			ONE_QUALI      => 'one Qualification',
 			TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
-			TWO_QUALI_GROUPS => 'two Qualification starting groups with two flash routes staggered ',	// eg. world championships
+			TWO_QUALI_GROUPS => 'two Qualification starting groups with two staggered flash routes each',	// eg. world championships
 		),
 		'boulder' => array(
 			ONE_QUALI      => 'one Qualification',
@@ -295,7 +295,8 @@ class ranking_result_bo extends ranking_bo
 		}
 		// generate a startlist, without storing it in the result store
 		$starters =& parent::generate_startlist($comp,$cat,
-			in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ? 1 : 2,$max_compl,	// 1 = one route, 2 = two routes
+			in_array($route_type, array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ?
+				1 : ($route_type == TWO_QUALI_GROUPS ? 4 : 2), $max_compl,
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
 			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM,TWO_QUALI_GROUPS)),		// true = stagger, false = no stagger
 			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']), $add_cat);

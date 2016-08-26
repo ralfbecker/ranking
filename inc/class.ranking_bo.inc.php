@@ -1053,6 +1053,9 @@ class ranking_bo extends ranking_so
 		$distribution_only = ($order & 8) && !$quali_preselected;
 		//echo "<p>".__METHOD__."($comp,$cat,num_routes=$num_routes,max_compl=$max_compl,order=$order,stagger=$stagger,) use_ranking=$use_ranking,use_cup=$use_cup, reverse_ranking=$reverse_ranking, distribution_only=$distribution_only</p>\n";
 
+		// $num_routes == 4 is first distributed on 2 routes (like num_routes == 2) and then staggered to 4
+		$distribute_to = $num_routes == 4 ? 2 : $num_routes;
+
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
@@ -1069,7 +1072,7 @@ class ranking_bo extends ranking_so
 
 		if (!is_array($starters) || !count($starters)) return false;	// no starters, or eg. already a result
 
-		for ($route = 1; $route <= $num_routes; ++$route)
+		for ($route = 1; $route <= $distribute_to; ++$route)
 		{
 			$startlist[$route] = array();
 		}
@@ -1147,7 +1150,7 @@ class ranking_bo extends ranking_so
 				if (isset($starters[$athlete['PerId']]) && (!$quali_preselected || $athlete['platz'] <= $quali_preselected))
 				{
 					$starters[$athlete['PerId']]['ranking'] = $athlete['platz'];
-					$this->move_to_startlist($starters,$athlete['PerId'],$startlist,$num_routes,$reset_data,__LINE__);
+					$this->move_to_startlist($starters, $athlete['PerId'], $startlist, $distribute_to, $reset_data, __LINE__);
 					$reset_data = false;
 					$ranked[$athlete['PerId']] = true;
 				}
@@ -1157,7 +1160,7 @@ class ranking_bo extends ranking_so
 			{
 				// new modus, not for speed(!): unranked starters at the END of the startlist
 				// reverse the startlists now, to have the first in the ranking at the end of the list
-				for ($route = 1; $route <= $num_routes; ++$route)
+				for ($route = 1; $route <= $distribute_to; ++$route)
 				{
 					$startlist[$route] = array_reverse($startlist[$route]);
 				}
@@ -1173,15 +1176,18 @@ class ranking_bo extends ranking_so
 			}
 			foreach(array_diff_key($old_startlist,$ranked) as $PerId => $starter)
 			{
-				if(isset($starters[$PerId])) $this->move_to_startlist($starters,$PerId,$startlist,$num_routes,1+$starter['route_order'],__LINE__);
+				if(isset($starters[$PerId]))
+				{
+					$this->move_to_startlist($starters, $PerId, $startlist, $distribute_to, 1+$starter['route_order'], __LINE__);
+				}
 			}
 			// make sure both routes get equaly filled up
-			if ($num_routes == 2) $reset_data = 1+(int)(count($startlist[1]) > count($startlist[2]));
+			if (!($num_routes&1)) $reset_data = 1+(int)(count($startlist[1]) > count($startlist[2]));
 		}
 		// now we randomly pick starters and devide them on the routes
 		while(count($starters))
 		{
-			$this->move_to_startlist($starters,array_rand($starters),$startlist,$num_routes,$reset_data,__LINE__);
+			$this->move_to_startlist($starters, array_rand($starters), $startlist, $distribute_to, $reset_data, __LINE__);
 			$reset_data = false;
 		}
 		// we have an old startlist --> try to keep the position (unless we randomize everything / distribution only)
@@ -1203,11 +1209,11 @@ class ranking_bo extends ranking_so
 				$PerId = $data['PerId'];
 				if (isset($starters[1][$PerId]))
 				{
-					$this->move_to_startlist($starters[1],$PerId,$startlist,$num_routes,1,__LINE__);
+					$this->move_to_startlist($starters[1], $PerId, $startlist, $distribute_to, 1, __LINE__);
 				}
 				elseif (isset($starters[2][$PerId]))
 				{
-					$this->move_to_startlist($starters[2],$PerId,$startlist,$num_routes,2,__LINE__);
+					$this->move_to_startlist($starters[2], $PerId, $startlist, $distribute_to, 2, __LINE__);
 				}
 			}
 			// add the new athlets (not in old_startlist) after the existing ones
@@ -1223,11 +1229,10 @@ class ranking_bo extends ranking_so
 		}
 		if ($stagger)
 		{
-			if ($num_routes == 2)	// TWO_QUALI_GROUPS eg. lead world championship
+			if ($num_routes == 4)	// TWO_QUALI_GROUPS eg. lead world championship
 			{
 				$startlist[3] = $startlist[4] = $startlist[2];
 				$startlist[2] = $startlist[1];
-				$num_routes = 4;
 			}
 			else
 			{
