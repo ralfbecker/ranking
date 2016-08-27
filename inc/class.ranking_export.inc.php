@@ -568,6 +568,8 @@ class ranking_export extends ranking_result_bo
 		// return route_names as part of route, not as participant
 		if (isset($result['route_names']))
 		{
+			// no qualification overall or group results
+			unset($result['route_names'][-3], $result['route_names'][-4], $result['route_names'][-5]);
 			$route['route_names'] = $result['route_names'];
 			unset($result['route_names']);
 		}
@@ -576,6 +578,7 @@ class ranking_export extends ranking_result_bo
 			$route['route_names'] = $this->route->query_list('route_name','route_order',array(
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
+				'route_order >= -1',	// no qualification overall or group results
 			),'route_order');
 		}
 		// if we have more then one route, add general result, in case is has never been stored to database
