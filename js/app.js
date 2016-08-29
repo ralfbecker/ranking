@@ -71,10 +71,7 @@ app.classes.ranking = AppJS.extend(
 					delete this.resultlist.update_handle;
 				}
 				delete this.resultlist;
-				var self = this;
-				this.et2.iterateOver(function(_widget){
-					_widget.setNextmatch(self);
-				}, window, et2_nextmatch_sortheader);
+				this._set_nextmacth_sort_headers();
 				var sort_widget = this.et2.getWidgetById(this.content.nm.order);
 				if (sort_widget) sort_widget.setSortmode(this.content.nm.sort.toLowerCase());
 				jQuery('#ranking-result-index').css('overflow-y', 'auto');	// init_topo switches to "hidden"
@@ -116,6 +113,19 @@ app.classes.ranking = AppJS.extend(
 					'no_registration_hint');
 				break;
 		}
+	},
+
+	/**
+	 * This method sets nextmatch class for nextmatch_sortheaders
+	 * with "this" context in order to be able to call sortBy local
+	 * function by click on sortheaders.
+	 */
+	_set_nextmacth_sort_headers: function ()
+	{
+		var self = this;
+		this.et2.iterateOver(function(_widget){
+			_widget.setNextmatch(self);
+		}, window, et2_nextmatch_sortheader);
 	},
 
 	/**
@@ -1528,6 +1538,9 @@ app.classes.ranking = AppJS.extend(
 							//dialog.options.value = jQuery.extend(dialog.options.value, row.data);
 							//dialog.set_template(template);
 						}, self);
+						// We need to set nextmatch with this context to be able to
+						// call sortBy after update happens
+						self._set_nextmacth_sort_headers();
 						//return false;
 						break;
 					case 'next':
