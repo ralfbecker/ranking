@@ -951,6 +951,7 @@ class ranking_result_ui extends ranking_result_bo
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
 			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4 ||
+			$query['route_type'] == TWO_QUALI_GROUPS && $query['route'] < 4 ||
 			$query['quali_preselected'] && $query['route'] == 2;	// no countback to quali for quali_preselected
 
 		// which result to show
@@ -1145,6 +1146,12 @@ class ranking_result_ui extends ranking_result_bo
 		if ($route['route_order'] < 0)
 		{
 			$actions['edit']['enabled'] = $actions['measurement']['enabled'] = $actions['delete']['enabled'] = false;
+		}
+
+		// speed does not (yet) implement measurement
+		if (substr($route['discipline'], 0, 5) == 'speed')
+		{
+			$actions['measurement']['enabled'] = false;
 		}
 
 		return $actions;
