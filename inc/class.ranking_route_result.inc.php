@@ -1140,7 +1140,8 @@ class ranking_route_result extends so_sql
 
 		// do we have a countback
 		if ($quali_preselected && $keys['route_order'] == 2 || $route_type == TWO_QUALI_ALL_NO_COUNTBACK ||
-			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] == 4)
+			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] == 4 ||
+			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] < 4)
 		{
 			// no countback to quali, if we use preselected athletes or TWO_QUALI_ALL_NO_COUNTBACK
 		}
