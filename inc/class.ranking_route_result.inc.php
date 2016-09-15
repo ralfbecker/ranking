@@ -670,7 +670,7 @@ class ranking_route_result extends so_sql
 						$detail = json_decode($data['result_detail'], true);
 						$data['route_order'] += 5;	// -4/-5 --> 0/1
 						if (!($suffix = $data['route_order'])) $suffix = '';
-						$data['result'.$suffix] = $data['result_rank'].'. '.sprintf('%4.2lf',$detail['quali_points']);
+						$data['result'.$suffix] = $data['result_rank'].'. ['.sprintf('%4.2lf',$detail['quali_points']).']';
 						if ($suffix !== '')
 						{
 							$data['result_rank'.$suffix] = $data['result_rank'];
