@@ -53,6 +53,7 @@ $setup_info['ranking']['hooks']['edit_user']    = 'ranking.admin.edit_user';
 $setup_info['ranking']['hooks']['search_link']  = 'ranking_hooks::search_link';
 $setup_info['ranking']['hooks'][] = 'config';
 $setup_info['ranking']['hooks'][] = 'config_validate';
+$setup_info['ranking']['hooks']['backup_starts']  = 'ranking_hooks::backup_starts';
 
 // calendar integration
 $setup_info['ranking']['hooks']['calendar_search_union']  = 'ranking_calendar_integration::calendar_search_union';

@@ -11,6 +11,8 @@
  * @version $Id$
  */
 
+use EGroupware\Api;
+
 /**
  * Rankings - Hooks: diverse static methods to be called as hooks
  */
@@ -165,5 +167,29 @@ class ranking_hooks
 			),
 			'add_popup'  => '850x450',
 		);
+	}
+
+	/**
+	 * Hook called before backup starts
+	 *
+	 * Used to setup Api\Db::$tablealiases according to ranking configuration
+	 * to back up ranking tables in a different database.
+	 *
+	 * @param string|array $location
+	 */
+	static function backup_starts($location)
+	{
+		unset($location);	// not used
+
+		$config = Api\Config::read('ranking');
+
+		if (!empty($config['ranking_db_name']) && empty($config['ranking_db_host']) &&
+			empty($config['ranking_db_user']))
+		{
+			foreach(array_keys($GLOBALS['egw']->db->get_table_definitions('ranking')) as $table)
+			{
+				Api\Db::$tablealiases[$table] = $config['ranking_db_name'].'.'.$table;
+			}
+		}
 	}
 }
