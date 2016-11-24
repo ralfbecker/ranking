@@ -30,6 +30,7 @@ define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
 define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
 define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012 EYC, no countback, otherwise like TWO_QUALI_ALL
 define('TWO_QUALI_GROUPS', 10);			// two quali groups with 2 flash routes each (different from TWOxTWO_QUALI!)
+define('THREE_QUALI_ALL_NO_STAGGER',11);	// lead on 3 routes for all on flash
 
 define('LEAD',4);
 define('BOULDER',8);
@@ -68,6 +69,7 @@ class ranking_result_bo extends ranking_bo
 		TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
 		TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
 		TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
+		THREE_QUALI_ALL_NO_STAGGER => 'three Qualification for all, identical startorder (SUI)',
 		TWO_QUALI_GROUPS => 'two Qualification Starting groups with two staggered flash routes each',	// eg. world championships
 		// speed only
 		TWO_QUALI_BESTOF=> 'best of two (record format)',
@@ -87,6 +89,7 @@ class ranking_result_bo extends ranking_bo
 			TWO_QUALI_ALL_SEED_STAGGER => 'two Qualification for all, flash simultaniously',	// lead on 2 routes for all on flash
 			TWO_QUALI_ALL  => 'two Qualification for all, flash one after the other',			// multiply the rank
 			TWO_QUALI_ALL_NO_STAGGER   => 'two Qualification for all, identical startorder (SUI)',	// lead on 2 routes for all on sight
+			THREE_QUALI_ALL_NO_STAGGER => 'three Qualification for all, identical startorder (SUI)',
 			ONE_QUALI      => 'one Qualification',
 			TWO_QUALI_HALF => 'two Qualification, half quota',	// no countback
 			TWO_QUALI_GROUPS => 'two Qualification starting groups with two staggered flash routes each',	// eg. world championships
@@ -295,7 +298,7 @@ class ranking_result_bo extends ranking_bo
 		}
 		// generate a startlist, without storing it in the result store
 		$starters =& parent::generate_startlist($comp,$cat,
-			in_array($route_type, array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ?
+			in_array($route_type, array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,THREE_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ?
 				1 : ($route_type == TWO_QUALI_GROUPS ? 4 : 2), $max_compl,
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
 			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM,TWO_QUALI_GROUPS)),		// true = stagger, false = no stagger
@@ -325,7 +328,16 @@ class ranking_result_bo extends ranking_bo
 				'route_name' => $prefix.'1. '.$route['route_name'],
 			));
 
-			for($r = 1; $r < ($route_type == TWO_QUALI_GROUPS ? 4 : 2); ++$r)
+			$mod = $num = 2;
+			if ($route_type == TWO_QUALI_GROUPS)
+			{
+				$num = 4;
+			}
+			elseif ($route_type == THREE_QUALI_ALL_NO_STAGGER)
+			{
+				$num = $mod = 3;
+			}
+			for($r = 1; $r < $num; ++$r)
 			{
 				$keys['route_order'] = $r;
 				if (!$this->route->read($keys))
@@ -334,15 +346,39 @@ class ranking_result_bo extends ranking_bo
 
 					$this->route->init($route);
 					$this->route->save(array(
-						'route_name'   => $prefix.(($r%2)+1).'. '.$route['route_name'],
+						'route_name'   => $prefix.(($r%$mod)+1).'. '.$route['route_name'],
 						'route_order'  => $r,
 						'route_status' => STATUS_STARTLIST,
 					));
 				}
-				$this->_store_startlist(isset($starters[1+$r]) ? $starters[1+$r] : $starters[$r], $r, isset($starters[1+$r]));
+				$this->_store_startlist(isset($starters[1+$r]) ? $starters[1+$r] :
+					(isset($starters[$r]) ? $starters[$r] : $starters[1]), $r, isset($starters[1+$r]));
 			}
 		}
 		return $num;
+	}
+
+	/**
+	 * Get number of qualifications from $route_type
+	 *
+	 * @param int $route_type (ONE|TWO|THREE)*
+	 * @return int
+	 */
+	public static function num_qualis($route_type)
+	{
+		if ($route_type == TWO_QUALI_GROUPS)
+		{
+			return 4;
+		}
+		if($route_type == ONE_QUALI)
+		{
+			return 1;
+		}
+		if ($route_type == THREE_QUALI_ALL_NO_STAGGER)
+		{
+			return 3;
+		}
+		return 2;
 	}
 
 	/**
@@ -556,7 +592,8 @@ class ranking_result_bo extends ranking_bo
 		{
 			$prev_keys['route_order'] = array(2,3);		// use both quali groups
 		}
-		if ($quota && (!self::is_two_quali_all($prev_route['route_type']) || $keys['route_order'] > 2))
+		if ($quota && (!self::is_two_quali_all($prev_route['route_type']) && $prev_route['route_type'] != THREE_QUALI_ALL_NO_STAGGER ||
+			$keys['route_order'] > 2+(int)($prev_route['route_type'] == THREE_QUALI_ALL_NO_STAGGER)))
 		{
 			$prev_keys[] = 'result_rank <= '.(int)$quota;
 		}
@@ -588,10 +625,11 @@ class ranking_result_bo extends ranking_bo
 				$order_by = $this->route_result->table_name.'.result_rank DESC';		// --> reversed result
 			}
 			// quali on two routes with multiplied ranking
-			elseif(self::is_two_quali_all($prev_route['route_type']) && $keys['route_order'] == 2)
+			elseif(self::is_two_quali_all($prev_route['route_type']) && $keys['route_order'] == 2 ||
+				$prev_route['route_type'] == THREE_QUALI_ALL_NO_STAGGER && $keys['route_order'] == 3)
 			{
 				$cols = array();
-				if (self::is_two_quali_all($prev_route['route_type'])) $prev_keys['route_order'] = 0;
+				$prev_keys['route_order'] = 0;
 				$prev_keys[] = 'result_rank IS NOT NULL';	// otherwise not started athletes qualify too
 				$route_names = null;
 				$join = $this->route_result->_general_result_join(array(
@@ -599,6 +637,7 @@ class ranking_result_bo extends ranking_bo
 					'GrpId' => $keys['GrpId'],
 				),$cols,$order_by,$route_names,$prev_route['route_type'],$discipline,array());
 				$order_by = str_replace(array('r2.result_rank IS NULL,r2.result_rank,r1.result_rank IS NULL,',
+					'r3.result_rank IS NULL,r3.result_rank,',
 					',nachname ASC,vorname ASC'),'',$order_by);	// we dont want to order alphabetical, we have to add RAND()
 				$order_by .= ' DESC';	// we need reverse order
 

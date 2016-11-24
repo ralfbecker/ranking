@@ -952,6 +952,7 @@ class ranking_result_ui extends ranking_result_bo
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
 			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4 ||
 			$query['route_type'] == TWO_QUALI_GROUPS && $query['route'] < 4 ||
+			$query['route_type'] == THREE_QUALI_ALL_NO_STAGGER && $query['route'] < 3 ||
 			$query['quali_preselected'] && $query['route'] == 2;	// no countback to quali for quali_preselected
 
 		// which result to show
@@ -1686,9 +1687,9 @@ class ranking_result_ui extends ranking_result_bo
 		}
 
 		// add qualification result (-3)
-		if (self::is_two_quali_all($route_type) || $route_type == TWO_QUALI_HALF)
+		if (self::is_two_quali_all($route_type) || $route_type == TWO_QUALI_HALF || $route_type == THREE_QUALI_ALL_NO_STAGGER)
 		{
-			$qualis = 2;
+			$qualis = 2+(int)($route_type == THREE_QUALI_ALL_NO_STAGGER);
 			// add Group A/B result (-4/-5) above the 4 qualifications
 			if ($route_type == TWO_QUALI_GROUPS)
 			{
@@ -1699,7 +1700,7 @@ class ranking_result_ui extends ranking_result_bo
 				$qualis = 6;	// 4 qualis + 2 groups
 			}
 
-			// add overal qualification result above all qualification and below next heat eg. 1/2-final
+			// add overall qualification result above all qualification and below next heat eg. 1/2-final
 			$quali = isset($route[-3]) ? $route[-3] : ranking_route::default_name(-3);
 			unset($route[-3]);
 			$route = array_slice($route, 0, -$qualis, true) + array(-3 => $quali) + array_slice($route, -$qualis, null, true);

@@ -114,7 +114,7 @@ class ranking_route extends so_sql
 		return $ret;
 	}
 
-	function default_name($route_order)
+	static function default_name($route_order)
 	{
 		switch($route_order)
 		{
