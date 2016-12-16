@@ -1965,3 +1965,19 @@ function ranking_upgrade14_3_006()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '14.3.007';
 }
 
+
+/**
+ * Double size of extra quota column for competitions, to kope with German state and category specific quotas
+ *
+ * @return string
+ */
+function ranking_upgrade14_3_007()
+{
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Wettkaempfe','quota_extra',array(
+		'type' => 'varchar',
+		'precision' => '512'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.001';
+}
+
