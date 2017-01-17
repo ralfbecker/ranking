@@ -1297,6 +1297,21 @@ var Resultlist = (function() {
 					'points': 'Points',
 					'result' : 'Result'
 				};
+				// default columns for SUI ranking with NO details
+				if ((!detail || detail[1] == '0') && _data.nation == 'SUI')
+				{
+					this.result_cols = {
+						'result_rank': 'Rank',
+						'lastname' : {'label': 'Name', 'colspan': 2},
+						'firstname' : '',
+						'birthyear': 'Agegroup',
+						'city': 'City',
+						'federation' : 'Sektion',
+						'rgz': 'Regionalzentrum',
+						'points': 'Points',
+						'result' : 'Result'
+					};
+				}
 				if ((!detail || detail[1] == '0') && _data.participants[0].result_rank)
 				{
 					delete this.result_cols.result;

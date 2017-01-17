@@ -1330,6 +1330,7 @@ class ranking_export extends ranking_result_bo
 			'route_result' => implode('.', array_reverse(explode('-', $date))),
 			'route_order' => -1,
 			'discipline' => 'ranking',
+			'display_athlete' => ranking_competition::nation2display_athlete($cat['nation']),
 		);
 		if ($comp)	// comp not set if date given
 		{
@@ -2343,9 +2344,24 @@ class ranking_export extends ranking_result_bo
 			'fed_url' => $athlete['fed_url'],
 			'url' => self::profile_url($athlete, $cat),
 		);
-		if ($nation == 'GER')
+		switch ($nation)
 		{
+			case 'GER':
 				$data['federation'] = preg_replace("/^(DAV|Sektion|Deutscher|Dt|Alpenverein|[:., ])*/i", '', $athlete['verband']);
+				break;
+
+			case 'SUI':
+				$data['federation'] = preg_replace('/^Schweizer Alpen[ -]{1}Club /', '', $athlete['verband']);
+				if ($athlete['acl_fed_id'])
+				{
+					static $rgzs=null;
+					if (!isset($rgzs))
+					{
+						$rgzs = ranking_bo::getInstance()->athlete->federations('SUI');
+					}
+					$data['rgz'] = preg_replace('/^SAC-Regionalzentrum /', '', $rgzs[$athlete['acl_fed_id']]);
+				}
+				break;
 		}
 		return $data;
 	}

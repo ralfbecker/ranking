@@ -328,7 +328,7 @@ class ranking_result extends so_sql
 	{
 		unset($allowed_nations);	// not used, but required by function signature
 		$results = array();
-		foreach($this->db->query("SELECT $this->athlete_table.*,".
+		foreach($this->db->query("SELECT $this->athlete_table.*,acl.fed_id AS acl_fed_id,".
 			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,(CASE WHEN r.cup_platz IS NOT NULL THEN r.cup_platz ELSE r.platz END) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline".
 			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.platz > 0".
@@ -357,7 +357,7 @@ class ranking_result extends so_sql
 	function &ranking_results($cats,$stand,$start,$from_year=0,$to_year=0)
 	{
 		$results = array();
-		foreach($this->db->query($sql="SELECT $this->athlete_table.*,".
+		foreach($this->db->query($sql="SELECT $this->athlete_table.*,acl.fed_id AS acl_fed_id,".
 			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline'.
 			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".ranking_athlete::FEDERATIONS_JOIN.
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
