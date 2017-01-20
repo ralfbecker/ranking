@@ -868,6 +868,7 @@ class ranking_bo extends ranking_so
 			'reg_deleted IS NULL',
 		);
 		list($data) = $this->registration->search(array(), false, '', '', '*', false, 'AND', false, $keys);
+		$this->registration->init($data ? $data : array());
 		unset($keys[0]);	// reg_deleted IS NULL
 
 		// prequalify and confirm needs competition rights
