@@ -106,9 +106,9 @@ class ranking_so
 	/**
 	 * Error message
 	 *
-	 * @var string
+	 * @var array
 	 */
-	public $error = '';
+	public $error = array();
 
 	/**
 	 * sub-objects, which get automatic instanciated by __get()

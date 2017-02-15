@@ -757,8 +757,8 @@ class ranking_route_result extends so_sql
 						}
 						$tops = round($data['result_top'.$suffix] / 100);
 						$top_tries = $tops ? $tops * 100 - $data['result_top'.$suffix] : '';
-						$zones = round($data['result_zone'.$suffix] / 100);
-						$zone_tries = $zones ? $zones * 100 - $data['result_zone'.$suffix] : '';
+						$zones = abs(round($data['result_zone'.$suffix] / 100));
+						$zone_tries = $data['result_zone'.$suffix] ? $zones * 100 - $data['result_zone'.$suffix] : '';
 						// boulder without problem specific results (route_num_problems=0)
 						if (!$suffix && !isset($data['zone1']))
 						{

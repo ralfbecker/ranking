@@ -222,7 +222,7 @@
 				</row>
 				<row  class="row" disabled="@nm[num_problems]">
 					<label value="Bonus total number"/>
-					<select-number class="noWrap"  statustext="Bonus: total number or no" id="zones" onchange="app.ranking.check_boni" options="No,1,25"/>
+					<select-number class="noWrap"  statustext="Bonus: total number or no" id="zones" onchange="app.ranking.check_boni" options="No,0,25"/>
 				</row>
 				<row class="row" disabled="@nm[num_problems]">
 					<label value="Bonus number of tries"/>

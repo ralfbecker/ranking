@@ -44,7 +44,7 @@ class admin
 	/**
 	 * constructor
 	 */
-	function admin()
+	function __construct()
 	{
 		if (!$GLOBALS['egw_info']['user']['apps']['admin'])
 		{

@@ -918,7 +918,7 @@ class ranking_result_bo extends ranking_bo
 	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false,$order_by='start_order ASC')
 	{
 		//error_log(__METHOD__."(".array2string($keys).", results=".array2string($results).", route_type=$route_type, discipline='$discipline', old_values=".array2string($old_values).", quali_preselected=$quali_preselected, update_checked=$update_checked)");
-		$this->error = '';
+		$this->error = array();
 
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
