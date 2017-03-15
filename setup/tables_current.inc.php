@@ -30,7 +30,7 @@ $phpgw_baseline = array(
 			'ex_pkte' => array('type' => 'varchar','precision' => '3','default' => 'no'),
 			'nation' => array('type' => 'char','precision' => '5'),
 			'gruppen' => array('type' => 'varchar','precision' => '255'),
-			'homepage' => array('type' => 'varchar','precision' => '60'),
+			'homepage' => array('type' => 'varchar','precision' => '128'),
 			'quota' => array('type' => 'int','precision' => '2'),
 			'host_nation' => array('type' => 'varchar','precision' => '3'),
 			'host_quota' => array('type' => 'int','precision' => '2'),

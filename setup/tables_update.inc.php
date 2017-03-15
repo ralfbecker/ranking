@@ -1981,3 +1981,19 @@ function ranking_upgrade14_3_007()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.001';
 }
 
+
+/**
+ * Allow longer homepage url varchar(128) instead of 60
+ *
+ * @return string
+ */
+function ranking_upgrade16_1_001()
+{
+	$GLOBALS['egw_setup']->oProc->AlterColumn('Wettkaempfe','homepage',array(
+		'type' => 'varchar',
+		'precision' => '128'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.002';
+}
+
