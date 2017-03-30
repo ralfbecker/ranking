@@ -936,8 +936,8 @@ class ranking_bo extends ranking_so
 					{
 						$keys[!$athlete['acl_fed_id'] ? 'fed_parent' : 'acl_fed_id'] = $nat_fed;
 					}
-					$this->registration->search(array(), true, 'reg_id', 'COUNT(*) AS num', '', false, 'AND', false, $keys);
-					$max_quota = $this->comp->max_quota($nat_fed, $comp);
+					$this->registration->search(array(), true, 'reg_id', '', '', false, 'AND', array(0, 1), $keys);
+					$max_quota = $this->comp->quota($nat_fed, $keys['GrpId'], $comp);
 					if ($max_quota <= $this->registration->total)
 					{
 						if ($this->is_admin || $this->is_judge($comp))
