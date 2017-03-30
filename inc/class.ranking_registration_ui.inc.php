@@ -545,7 +545,7 @@ class ranking_registration_ui extends ranking_bo
 				'icon' => 'check',
 				'onExecute' => 'javaScript:app.ranking.register_action',
                 'enableClass' => 'allowRegister',
-				'allowOnMultiple' => true,
+				'allowOnMultiple' => false,
 				'group' => $group,
 				'default' => true,
 			),
@@ -554,7 +554,7 @@ class ranking_registration_ui extends ranking_bo
 				'icon' => 'check',
 				'onExecute' => 'javaScript:app.ranking.register_action',
                 'enableClass' => 'allowConfirm',
-				'allowOnMultiple' => true,
+				'allowOnMultiple' => false,
 				'group' => $group,
 			),
 			'mail' => array(
@@ -569,7 +569,7 @@ class ranking_registration_ui extends ranking_bo
 				'caption' => 'Delete',
 				'onExecute' => 'javaScript:app.ranking.register_action',
                 'enableClass' => 'allowDelete',
-				'allowOnMultiple' => true,
+				'allowOnMultiple' => false,
 				'group' => ++$group,
 			),
 		);
