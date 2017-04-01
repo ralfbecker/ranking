@@ -4,7 +4,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-		<script type="text/javascript" src="///egroupware/ranking/sitemgr/digitalrock/dr_api.js"></script>
+		<script type="text/javascript" src="/egroupware/ranking/sitemgr/digitalrock/dr_api.js"></script>
 		<link type="text/css" rel="StyleSheet" href="dr_list.css" />
 	</head>
 <body>
@@ -95,13 +95,13 @@
 <script type="text/javascript">
 	var profile;
 	$(document).ready(function() {
-		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace(/#!?/, '?')),
+		profile = new Profile('profile','/egroupware/ranking/json.php'+(location.search||location.hash.replace(/#!?/, '?')),
 			jQuery('#profile').html());
 
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);
 	});
 
-	if (document.location.href.match(/beamer=1/)) load_css('///egroupware/ranking/sitemgr/digitalrock/beamer.css');
+	if (document.location.href.match(/beamer=1/)) load_css('/egroupware/ranking/sitemgr/digitalrock/beamer.css');
 </script>
 </body>
 </html>
