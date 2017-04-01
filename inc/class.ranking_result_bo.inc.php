@@ -1196,6 +1196,7 @@ class ranking_result_bo extends ranking_bo
 			$keys['route_type'] = $route['route_type'];
 			$keys['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
 			$result = $this->has_results($keys);
+			$keys['comp_nation'] = $comp['nation'];
 			$athletes =& $this->route_result->search('',false,$result ? 'result_rank' : 'start_order','','',false,'AND',false,$keys);
 			//_debug_array($athletes); return;
 
@@ -1223,13 +1224,26 @@ class ranking_result_bo extends ranking_bo
 				'start_number' => 'startnumber',
 				'result' => 'result',
 			);
-			if ($comp['nation'] == 'SUI')
+			switch($comp['nation'])
 			{
-				$name2csv += array(
-					'ort'      => 'city',
-					'plz'      => 'postcode',
-					'geb_date' => 'birthdate',
-				);
+				case 'SUI':
+					$name2csv = array_merge(
+						array_slice($name2csv, 0, 12, true),
+						array('acl_fed'  => 'regionalzentrum'),
+						array_slice($name2csv, 12, 99, true),
+						array(
+						'ort'      => 'city',
+						'plz'      => 'postcode',
+						'geb_date' => 'birthdate',
+					));
+					break;
+				case 'GER':
+					$name2csv = array_merge(
+						array_slice($name2csv, 0, 12, true),
+						array('parent_fed'  => 'LV'),
+						array_slice($name2csv, 12, 99, true)
+					);
+					break;
 			}
 			switch($keys['discipline'])
 			{

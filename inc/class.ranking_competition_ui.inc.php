@@ -30,6 +30,7 @@ class ranking_competition_ui extends ranking_bo
 		ranking_competition::PC_CITY => 'PC City',
 		ranking_competition::NATION_PC_CITY => 'Nation PC City',
 		ranking_competition::PARENT_FEDERATION => 'Parent federation',
+		ranking_competition::FED_AND_PARENT => 'Federation and Parent',
 	);
 
 	function __construct()

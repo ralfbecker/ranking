@@ -64,6 +64,7 @@ class ranking_route_result extends so_sql
 	//var $athlete_join = 'LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations USING(fed_id)';
 	const ATHLETE_JOIN = ' LEFT JOIN Personen USING(PerId) LEFT JOIN Athlete2Fed a2f ON Personen.PerId=a2f.PerId AND a2f.a2f_end=9999 LEFT JOIN Federations ON a2f.fed_id=Federations.fed_id';
 	const ACL_FED_JOIN = ' LEFT JOIN Athlete2Fed a2acl_f ON Personen.PerId=a2acl_f.PerId AND a2acl_f.a2f_end=-1 LEFT JOIN Federations acl_fed ON a2acl_f.fed_id=acl_fed.fed_id';
+	const FED_PARENT_JOIN = ' LEFT JOIN Federations parent_fed ON Federations.fed_parent=parent_fed.fed_id';
 
 	var $rank_lead = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
 	var $rank_lead_countback = 'CASE WHEN result_height IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_height < r.result_height OR RouteResults.result_height = r.result_height AND RouteResults.result_plus < r.result_plus)) END';
@@ -155,6 +156,11 @@ class ranking_route_result extends so_sql
 			unset($filter['discipline']);
 			$extra_cols[] = "'$discipline' AS discipline";
 		}
+		if (is_array($filter) && array_key_exists('comp_nation',$filter))	// pseudo-filter to transport the nation
+		{
+			$comp_nation = $filter['comp_nation'];
+			unset($filter['comp_nation']);
+		}
 		if (is_array($filter) && isset($filter['route_order']))
 		{
 			$route_order =& $filter['route_order'];
@@ -177,10 +183,16 @@ class ranking_route_result extends so_sql
 					'ort','plz','rkey',
 				));
 
-				//if ($comp_nation == 'SUI')	// ToDo pass nation, so we dont need to do this join for other federations than SAC
+				switch($comp_nation)
 				{
-					$join .= self::ACL_FED_JOIN;
-					$extra_cols[] = 'acl_fed.verband AS acl_fed';
+					case 'SUI':
+						$join .= self::ACL_FED_JOIN;
+						$extra_cols[] = 'acl_fed.fed_shortcut AS acl_fed';
+						break;
+					case 'GER':
+						$join .= self::FED_PARENT_JOIN;
+						$extra_cols[] = 'parent_fed.fed_shortcut AS parent_fed';
+						break;
 				}
 			}
 			// first heat after qualification

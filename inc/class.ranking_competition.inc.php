@@ -51,6 +51,7 @@ class ranking_competition extends so_sql
 	const NATION_PC_CITY = 'nation_pc_city';
 	const CITY = 'city';
 	const PARENT_FEDERATION = 'fed_parent';
+	const FED_AND_PARENT = 'fed_and_parent';
 
 	var $selfregister_types = array(
 		0 => 'Not allowed',
@@ -123,7 +124,7 @@ class ranking_competition extends so_sql
 	 * Get default display_athlete value for a nation
 	 *
 	 * @param string $nation
-	 * @return string ranking_competition::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY) constants
+	 * @return string ranking_competition::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY|FED_AND_PARENT) constants
 	 */
 	public static function nation2display_athlete($nation, $intern=false)
 	{
@@ -131,7 +132,7 @@ class ranking_competition extends so_sql
 		{
 			default:
 			case 'GER':
-				return self::FEDERATION;
+				return self::FED_AND_PARENT;
 
 			case '':	// international
 			case 'NULL':

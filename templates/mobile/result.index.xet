@@ -92,8 +92,8 @@
 					<nextmatch-sortheader label="Firstname" id="vorname" class="leftPad5"/>
 					<nextmatch-sortheader align="center" label="Birthyear" id="geb_date"/>
 					<nextmatch-sortheader align="center" label="Nation" id="nation"/>
-					<nextmatch-header label="Sektion" id="verband"/>
-					<nextmatch-header label="Regionalzentrum" id="acl_fed"/>
+					<nextmatch-header label="@fed_label" id="verband"/>
+					<nextmatch-header label="@acl_fed_label" id="acl_fed"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-header align="center" label="License" id="PerId"/>
 					<nextmatch-sortheader align="center" label="Start- order" id="start_order" class="noPrint"/>

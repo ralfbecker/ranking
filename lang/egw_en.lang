@@ -264,6 +264,7 @@ false start %1: %2	ranking	en	False start %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	en	Family name of the athlete in latin chars! Accents and umlauts are ok
 fax	ranking	en	Fax
 federation	ranking	en	Federation
+federation and parent	ranking	en	Federation and parent
 federation deleted.	ranking	en	Federation deleted.
 federation needs to confirm	ranking	en	Federation needs to confirm
 federation or nationality	ranking	en	federation or nationality

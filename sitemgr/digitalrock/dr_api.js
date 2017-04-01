@@ -234,6 +234,7 @@ var DrBaseWidget = (function() {
 				this.replace_attribute(this.columns, 'nation', 'city', 'City');
 				break;
 			case 'federation':
+			case 'fed_and_parent':
 				var fed_label = 'Federation';
 				switch(_nation)
 				{

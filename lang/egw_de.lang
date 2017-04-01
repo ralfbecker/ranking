@@ -260,6 +260,7 @@ false start %1: %2	ranking	de	Fehlstart %1: %2
 family name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Familienname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
 fax	ranking	de	Fax
 federation	ranking	de	Verband
+federation and parent	ranking	de	Sektion und LV
 federation deleted.	ranking	de	Verband gelöscht.
 federation needs to confirm	ranking	de	Verband muss bestätigen
 federation or nationality	ranking	de	Verband oder Nationalität

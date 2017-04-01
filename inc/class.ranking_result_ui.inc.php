@@ -747,6 +747,7 @@ class ranking_result_ui extends ranking_result_bo
 			$query['discipline'] = $route['discipline'];
 		}
 		$query['col_filter']['discipline'] = $query['discipline'];
+		$query['col_filter']['comp_nation'] = $query['calendar'];
 		$query['col_filter']['quali_preselected'] = $query['quali_preselected'];
 		// check if route_result object is instancated for relay or not
 		if ($this->route_result->isRelay != ($query['discipline'] == 'speedrelay'))
@@ -800,6 +801,10 @@ class ranking_result_ui extends ranking_result_bo
 			);
 			$readonlys['delete[0]'] = true;
 			++$total;
+		}
+		if (empty($query['display_athlete']))
+		{
+			$query['display_athlete'] = ranking_competition::nation2display_athlete($query['calendar'], true);	// true = internal use, not feed export
 		}
 		$need_start_number = false;
 		$need_lead_time_column = false;
@@ -924,7 +929,8 @@ class ranking_result_ui extends ranking_result_bo
 			}
 
 			if ($query['display_athlete'] == ranking_competition::CITY) unset($row['plz']);
-			if ($query['display_athlete'] == ranking_competition::PARENT_FEDERATION && empty($row['acl_fed']))
+			if ($query['display_athlete'] == ranking_competition::PARENT_FEDERATION && empty($row['acl_fed']) ||
+				$query['display_athlete'] == ranking_competition::FED_AND_PARENT)	// German Sektion and LV
 			{
 				if ($row['fed_parent'])
 				{
@@ -983,8 +989,7 @@ class ranking_result_ui extends ranking_result_bo
 			$rows[$name] =& $query[$name];
 		}
 		// what columns to show for an athlete: can be set per comp. or has a national default
-		switch($query['display_athlete'] ? $query['display_athlete'] :
-			ranking_competition::nation2display_athlete($query['calendar'], true))	// true = internal use, not feed export
+		switch($query['display_athlete'])
 		{
 			case ranking_competition::NATION:
 				$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
@@ -1003,6 +1008,9 @@ class ranking_result_ui extends ranking_result_bo
 			case ranking_competition::PARENT_FEDERATION:
 				$rows['no_ort'] = $rows['no_verband'] = true;
 				break;
+			case ranking_competition::FED_AND_PARENT:
+				$rows['no_ort'] = $rows['no_nation'] = true;
+				break;
 		}
 		switch($query['calendar'])
 		{
@@ -1012,8 +1020,11 @@ class ranking_result_ui extends ranking_result_bo
 				unset($rows['no_acl_fed']);
 				break;
 			case 'GER':
+				$rows['acl_fed_label'] = 'LV';
 				$rows['fed_label'] = 'DAV Sektion';
 				break;
+			default:
+				$rows['fed_label'] = 'Federation';
 		}
 		// jury list --> switch extra columns on and all federation columns off
 		$rows['no_jury_result'] = $rows['no_jury_time'] = $rows['no_remark'] = $query['ranking'] != 4;
