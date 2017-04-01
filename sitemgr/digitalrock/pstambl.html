@@ -30,7 +30,7 @@
 	<tr>
 		<td>age:</td>
 		<td class="profileAge">$$age$$</td>
-		<td>date of birth:</td>
+		<td>year of birth:</td>
 		<td colspan="3" class="profileBirthdate">$$birthdate$$</td>
 	</tr>
 	<tr class="profileHideRowIfEmpty">

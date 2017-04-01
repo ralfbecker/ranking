@@ -1994,6 +1994,9 @@ class ranking_export extends ranking_result_bo
 		//_debug_array($athlete); exit;
 
 		$data = self::rename_key($athlete, self::$rename_athlete, true);
+		// export only birthyear, as we are not publishing dates for privacy reasons anyway
+		if (!empty($data['birthdate'])) $data['birthdate'] = (int)$data['birthdate'];
+
 		// athlete requested not to show his profile
 		// --> no results, no ranking, regular profile data already got removed by athlete->db2data called by read
 		if ($athlete['acl'] & 128)

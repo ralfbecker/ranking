@@ -1999,7 +1999,7 @@ var Profile = (function() {
 		'	<tr>\n'+
 		'		<td>age:</td>\n'+
 		'		<td class="profileAge">$$age$$</td>\n'+
-		'		<td>date of birth:</td>\n'+
+		'		<td>year of birth:</td>\n'+
 		'		<td colspan="3" class="profileBirthdate">$$birthdate$$</td>\n'+
 		'	</tr>\n'+
 		'	<tr class="profileHideRowIfEmpty">\n'+
