@@ -2,17 +2,21 @@
 
 HOST=dev
 DB=egw_www_digitalr
+MYSQL=mysql
 
 [ -n "$1" ] && HOST=$1
 [ -n "$2" ] && DB=$2
 
 SSH=''
-[ "$HOST" == "localhost" ] || SSH="ssh -C $HOST"
+[ "$HOST" == "localhost" ] || {
+	SSH="ssh -C $HOST"
+	MYSQL=galera
+}
 
-#echo "HOST=$HOST, DB=$DB, SSH=$SSH"
+#echo "HOST=$HOST, DB=$DB, SSH=$SSH, MYSQL=$MYSQL"
 
 # create table PersonenExport from Personen without "personal" data
-$SSH mysql $DB <<EOF
+$SSH $MYSQL $DB <<EOF
 DROP TABLE IF EXISTS PersonenExport;
 CREATE TABLE PersonenExport LIKE Personen;
 INSERT INTO PersonenExport (PerId,rkey,nachname,vorname,sex,ort,geb_date,acl)
@@ -20,7 +24,7 @@ SELECT PerId,rkey,nachname,vorname,sex,ort,concat(year(geb_date),"-01-01"),acl
 FROM Personen
 EOF
 # dump all tables but Personen (incl. PersonenExport)
-$SSH mysqldump $DB Athlete2Fed Federations Feldfaktoren Gruppen Gruppen2Personen Licenses RelayResults Results RouteResults Routes Serien Wettkaempfe Registration PersonenExport
+$SSH ${MYSQL}dump $DB Athlete2Fed Federations Feldfaktoren Gruppen Gruppen2Personen Licenses RelayResults Results RouteResults Routes Serien Wettkaempfe Registration PersonenExport
 # rename PersonenExport to Personen
 echo 'DROP TABLE IF EXISTS Personen;
 RENAME TABLE PersonenExport TO Personen;'
