@@ -1425,14 +1425,6 @@ class ranking_result_ui extends ranking_result_bo
 			),
 			'try' => array(0 => ' '),
 		);
-		// make official resutl readonly via $readonlys['__ALL__']
-		if ($route['route_status'] == STATUS_RESULT_OFFICIAL)
-		{
-			$readonlys['__ALL__'] = true;
-			$readonlys['nm[calendar]'] = $readonlys['nm[comp]'] = $readonlys['nm[cat]'] = $readonlys['nm[route]'] = false;
-			$readonlys['nm[show_result]'] = $readonlys['nm[ranking]'] = false;
-			$readonlys['button[edit]'] = $readonlys['button[new]'] = $readonlys['result_popup'] = false;
-		}
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
 
 		if ($content['nm']['route'] < 2) unset($sel_options['eliminated'][0]);
