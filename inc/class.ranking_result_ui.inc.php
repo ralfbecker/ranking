@@ -1772,10 +1772,13 @@ class ranking_result_ui extends ranking_result_bo
 			$response->call('egw.message', lang('Error').': '.lang('Route not found!'), 'error');
 			return;
 		}
+		$query = egw_cache::getSession('ranking', 'result');
+		$order_by = $query['order'].' '.$query['sort'];
+		if (!preg_match('/^[a-z0-9_]+ (asc|desc)$/i', $order_by)) $order_by = 'start_order ASC';
 
-		//error_log(__METHOD__."($PerId, ".array2string($update).", ".array2string($state).")");
+		//error_log(__METHOD__."(".array2string($keys).", $PerId, ".array2string($set).", $update_checked) order_by=$order_by");
 		if ($this->save_result($keys, array($PerId => $set), $route['route_type'],  $route['discipline'], null,
-			$this->comp->quali_preselected($keys['GrpId'], $comp['quali_preselected']), $update_checked))
+			$this->comp->quali_preselected($keys['GrpId'], $comp['quali_preselected']), $update_checked, $order_by))
 		{
 			// search filter needs route_type to not give SQL error
 			$filter = $keys+array('PerId' => $PerId,'route_type' => $route['route_type'], 'discipline' => $route['discipline']);
@@ -1792,7 +1795,6 @@ class ranking_result_ui extends ranking_result_bo
 		}
 
 		// return full data of all participants
-		$query = egw_cache::getSession('ranking', 'result');
 		$data = array('msg' => $msg);
 		$this->get_rows($query, $data['content'], $data['readonlys']);
 		array_unshift($data['content'], false, false, false);	// 3 header rows
