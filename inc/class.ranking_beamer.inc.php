@@ -44,6 +44,11 @@ class ranking_beamer
 				'beamer' => 1,
 			);
 		}
+		// add display to our connect-src CSP
+		if (!empty($content['display']))
+		{
+			Api\Header\ContentSecurityPolicy::add('connect-src', 'http://'.$content['display']);
+		}
 		if($content['comp']) $comp = ranking_result_bo::$instance->comp->read($content['comp']);
 
 		if (ranking_result_bo::$instance->only_nation)
