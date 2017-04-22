@@ -21,6 +21,7 @@
 						<checkbox label="Startlist" id="startlist" onchange="1" class="leftPad5"/>
 						<checkbox label="Beamer" id="beamer" onchange="1" class="leftPad5"/>
 						<textbox blur="top right bottom left px" label="Padding" id="padding" class="leftPad5"/>
+						<textbox blur="32pt" label="FontSize" id="font_size" class="leftPad5"/>
 					</hbox>
 				</row>
 				<row part="footer">

@@ -14,6 +14,12 @@
 			$(document).ready(function() {
 				var padding = location.search.match(/padding=([^&]+)/);
 				if (padding) jQuery('body').css('padding', decodeURIComponent(padding[1].replace(/\+/, '%20')));
+				var font_size = location.search.match(/font_size=(\d+(pt|px|em)?)/);
+				if (font_size){
+					jQuery('<style type="text/css"/>')
+						.text('td, th, .Resultlist h1, .Startlist h1 {font-size: '+font_size[1]+(font_size[2]?'':'pt')+';}')
+						.appendTo('head');
+				}
 				widget = new DrWidget('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.search||location.hash.replace(/^#!?/, '?')));
 
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
