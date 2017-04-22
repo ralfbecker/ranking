@@ -115,6 +115,28 @@ app.classes.ranking = AppJS.extend(
 		}
 	},
 
+	beamerGo: function()
+	{
+		var display = this.et2.getWidgetById('display');
+		var addr = display ? display.getValue() : null;
+		var url = this.et2.getWidgetById('href').getValue();
+
+		if (addr)
+		{
+			var fragment = '<iframe src="'+location.protocol+'//'+location.host+url+
+				'" scrolling="auto" frameborder="0" width="%width%" height="%height%" allowfullscreen></iframe>';
+
+			jQuery.get('http://'+display+'/pushURL', { url: fragment, embed: 1}, function()
+			{
+				egw.message('URL pushed');
+			});
+		}
+		else
+		{
+			document.location = url;
+		}
+	},
+
 	/**
 	 * This method sets nextmatch class for nextmatch_sortheaders
 	 * with "this" context in order to be able to call sortBy local

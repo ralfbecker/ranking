@@ -26,7 +26,8 @@
 				<row part="footer">
 					<hbox span="all">
 						<textbox id="href" size="-100" span="all"/>
-						<button label="Go" id="go" onclick="document.location = document.getElementById(form::name('href')).value; return false;"/>
+						<button label="Go" id="go" onclick="app.ranking.beamerGo"/>
+						<textbox id="display" blur="Display address" size="16"/>
 					</hbox>
 				</row>
 				<row disabled="!@comp">
