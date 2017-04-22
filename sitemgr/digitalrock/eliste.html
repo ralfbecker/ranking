@@ -14,10 +14,14 @@
 			$(document).ready(function() {
 				var padding = location.search.match(/padding=([^&]+)/);
 				if (padding) jQuery('body').css('padding', decodeURIComponent(padding[1].replace(/\+/, '%20')));
-				var font_size = location.search.match(/font_size=(\d+(pt|px|em)?)/);
+				var font_size = location.search.match(/font_size=((\d+)(pt|px|em)?)/);
 				if (font_size){
+					var boulder_size = Math.round(0.8*parseInt(font_size[2])) + (font_size[3] ? font_size[3] : 'pt');
+					font_size = font_size[1] + (font_size[3] ? font_size[3] : 'pt');
 					jQuery('<style type="text/css"/>')
-						.text('td, th, .Resultlist h1, .Startlist h1 {font-size: '+font_size[1]+(font_size[2]?'':'pt')+';}')
+						.text('td, th, .Resultlist h1, .Startlist h1 {font-size: '+font_size+';}'+
+							  'div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {'+
+									'width: '+boulder_size+'; height: '+boulder_size+'; margin-right: 4px;}')
 						.appendTo('head');
 				}
 				widget = new DrWidget('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.search||location.hash.replace(/^#!?/, '?')));
