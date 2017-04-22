@@ -131,6 +131,7 @@ div.boulder, div.boulderNone, div.boulderTop, div.boulderBonus {
 }
 td.boulder > div {
 	white-space: nowrap;
+	text-align: center;
 }
 
 div.boulderNone {
