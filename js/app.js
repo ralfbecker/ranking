@@ -126,7 +126,7 @@ app.classes.ranking = AppJS.extend(
 			var fragment = '<iframe src="'+location.protocol+'//'+location.host+url+
 				'" scrolling="auto" frameborder="0" width="%width%" height="%height%" allowfullscreen></iframe>';
 
-			jQuery.get('http://'+display+'/pushURL', { url: fragment, embed: 1}, function()
+			jQuery.get('http://'+addr+'/pushURL', { url: fragment, embed: 1}, function()
 			{
 				egw.message('URL pushed');
 			});
