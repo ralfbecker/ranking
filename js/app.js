@@ -118,15 +118,15 @@ app.classes.ranking = AppJS.extend(
 	beamerGo: function()
 	{
 		var display = this.et2.getWidgetById('display');
-		var addr = display ? display.getValue() : null;
 		var url = this.et2.getWidgetById('href').getValue();
 
-		if (addr)
+		// readonly/hidden display for anonymous session has no getValue method
+		if (display && display.getValue && display.getValue())
 		{
 			var fragment = '<iframe src="'+location.protocol+'//'+location.host+url+
 				'" scrolling="auto" frameborder="0" width="%width%" height="%height%" allowfullscreen></iframe>';
 
-			jQuery.get('http://'+addr+'/pushURL', { url: fragment, embed: 1}, function()
+			jQuery.get('http://'+display.getValue()+'/pushURL', { url: fragment, embed: 1}, function()
 			{
 				egw.message('URL pushed');
 			});
@@ -135,6 +135,28 @@ app.classes.ranking = AppJS.extend(
 		{
 			document.location = url;
 		}
+	},
+
+	/**
+	 * Apply changes to beamer url
+	 *
+	 * @param {DOMNode} _node
+	 * @param {et2_widget} _widget
+	 */
+	applyBeamerUrl: function(_node, _widget)
+	{
+		var href = this.et2.getWidgetById('href');
+		var regexp = new RegExp('&'+_widget.id+'=[^&]*');
+		var url = href.getValue().replace(regexp, '');
+		var value = _widget.getValue();
+
+		if (value !== '')
+		{
+			url += '&'+_widget.id+'='+encodeURIComponent(value);
+		}
+		href.set_value(url);
+
+		this.egw.json('ranking_beamer::ajax_set_session', [_widget.id, value]).sendRequest();
 	},
 
 	/**
@@ -1427,9 +1449,12 @@ app.classes.ranking = AppJS.extend(
 				'transform':transform
 			});
 			node.parent().css({
-				overflow:'hidden',
+				overflow:'hidden'
 			});
-			window.setTimeout(function(){node.parent().css({overflow:'auto'})},1);
+			window.setTimeout(function()
+			{
+				node.parent().css({overflow:'auto'});
+			}, 1);
 			jQuery(window).trigger('resize');
 		};
 

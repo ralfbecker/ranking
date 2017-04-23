@@ -11,24 +11,26 @@
 			<rows>
 				<row class="noPrint" disabled="@nm[cat]" part="header">
 					<hbox span="all">
-						<select statustext="Select calendar" id="calendar" no_lang="1" onchange="1" class="rightPad5"/>
+						<select statustext="Select calendar" id="calendar" no_lang="1" onchange="1"/>
 						<select id="comp" no_lang="1" onchange="1" options="Select competition"/>
 					</hbox>
 				</row>
 				<row part="header">
 					<hbox span="all">
-						<select id="detail" onchange="1" options="Default details"/>
-						<checkbox label="Startlist" id="startlist" onchange="1" class="leftPad5"/>
+						<select id="detail" options="Default details" onchange="app.ranking.applyBeamerUrl"/>
+						<checkbox label="Startlist" id="startlist" onchange="1"/>
 						<checkbox label="Beamer" id="beamer" onchange="1" class="leftPad5"/>
-						<textbox blur="top right bottom left px" label="Padding" id="padding" class="leftPad5"/>
-						<textbox blur="32pt" label="FontSize" id="font_size" class="leftPad5"/>
+						<textbox blur="top right bottom left px" label="Padding" id="padding" onchange="app.ranking.applyBeamerUrl"/>
+						<textbox blur="32pt" label="FontSize" id="font_size" size="5" onchange="app.ranking.applyBeamerUrl" validator="/^(\\d+(pt|px|em)?)?$/"/>
 					</hbox>
 				</row>
 				<row part="footer">
 					<hbox span="all">
 						<textbox id="href" size="-100" span="all"/>
 						<button label="Go" id="go" onclick="app.ranking.beamerGo"/>
-						<textbox id="display" blur="Display address" size="16"/>
+						<!-- need to postSubmit to set conect-src CSP for given display! -->
+						<textbox id="display" blur="display address" size="16" onchange="widget.getInstanceManager().postSubmit(); return false;"/>
+						<image id="display_help" src="help" statustext="Raspi software controling supported displays" href="https://github.com/baycom/nodeclock/blob/master/README.md" extra_link_target="_blank"/>
 					</hbox>
 				</row>
 				<row disabled="!@comp">

@@ -43,6 +43,11 @@ class ranking_beamer
 				'cat' => $result_state['cat'] ? array(3 => $result_state['cat']) : array(),
 				'beamer' => 1,
 			);
+			// incorporate user preferences
+			if ($GLOBALS['egw']->session->session_flags !== 'A' && is_array($GLOBALS['egw_info']['user']['preferences']['ranking']['beamer']))
+			{
+				$content += $GLOBALS['egw_info']['user']['preferences']['ranking']['beamer'];
+			}
 		}
 		// add display to our connect-src CSP
 		if (!empty($content['display']))
@@ -136,13 +141,52 @@ class ranking_beamer
 
 		$readonlys['go'] = (string)$routes[3] === '';
 
+		// anonymous session, disable displays
+		if ($GLOBALS['egw']->session->session_flags == 'A')
+		{
+			$readonlys['display'] = $readonlys['display_help'] = true;
+		}
+
 		if ((string)$routes[$n] !== '') $cats[++$n] = '';	// one new line
 		$content['cat'] = $cats;
 		$content['route'] = $routes;
 
-		Api\Cache::setSession('ranking', 'beamer', $content);
+		self::set_session($content);
 
 		$tmpl->exec('ranking.ranking_beamer.beamer',$content,$sel_options,$readonlys,$content,2);
+	}
+
+	/**
+	 * Add state to session and for none-anonymous users also to preferences
+	 *
+	 * @param type $attr
+	 * @param type $value
+	 */
+	public static function set_session($values)
+	{
+		Api\Cache::setSession('ranking', 'beamer', $values);
+
+		if ($GLOBALS['egw']->session->session_flags !== 'A' &&
+			($beamer_prefs = array_intersect_key($values, array_flip(array('detail', 'padding', 'display', 'font_size')))) !=
+				$GLOBALS['egw_info']['user']['preferences']['ranking']['beamer'])
+		{
+			$GLOBALS['egw']->preferences->add('ranking', 'beamer', $beamer_prefs);
+			$GLOBALS['egw']->preferences->save_repository();
+		}
+	}
+
+	/**
+	 * Add client-side changed attributes to session and preferences
+	 *
+	 * @param type $attr
+	 * @param type $value
+	 */
+	public static function ajax_set_session($attr=null, $value=null)
+	{
+		$values = Api\Cache::getSession('ranking', 'beamer');
+		$values[$attr] = $value;
+
+		self::set_session($values);
 	}
 
 	/**
