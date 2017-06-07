@@ -35,7 +35,7 @@ table.DrTable th, table.DrTable td {
 table.DrTable th.lastname, table.DrTable td.lastname, table.DrTable td.firstname, table.DrTable td.boulder,
 table.DrTable td.team_name, table.DrTable tbody th, .Starters table.DrTable th, .Starters table.DrTable td,
 table.DrTable th.federation, table.DrTable td.federation, table.DrTable th.rgz, table.DrTable td.rgz,
-table.DrTable th.city, table.DrTable td.city {
+table.DrTable th.city, table.DrTable td.city, table.DrTable th.footer {
 	padding-left: 5px;
 	text-align: left;
 }

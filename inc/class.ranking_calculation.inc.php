@@ -633,12 +633,19 @@ class ranking_calculation
 
 		if ($overall)
 		{
-			$max_comp = 5;
-			$min_disciplines = 2;
-			// int. overal requires points to count as a valid result for a discipline
-			$use_0_point_results = false;
-
 			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
+			// international combined ranking, no longer uses $min_disciplines
+			if ((int)$comp['datum'] >= 2017 || empty($comp['nation']))
+			{
+				$max_disciplines = $cup['max_disciplines'];
+			}
+			else // int. combined before 2017
+			{
+				$max_comp = 5;
+				$min_disciplines = 2;
+				// int. overal requires points to count as a valid result for a discipline
+				$use_0_point_results = false;
+			}
 		}
 		elseif ($cup)
 		{
@@ -770,7 +777,7 @@ class ranking_calculation
 				$comps[$result_id] = $this->bo->comp->read($result['WetId']);
 			}
 
-			// we only cound a fixed number of results per dicipline
+			// we only count a fixed number of results per dicipline
 			if ($max_disciplines)
 			{
 				if ($num_per_discipline[$result['discipline']] >= $max_disciplines[$result['discipline']])

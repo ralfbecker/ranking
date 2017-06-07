@@ -1366,7 +1366,7 @@ var Resultlist = (function() {
 		}
 		Startlist.prototype.handleResponse.call(this, _data);
 
-		if (_data.discipline == 'ranking' && (detail && detail[1] == '1' || !_data.participants[0].result_rank) && _data.max_comp)
+		if (_data.discipline == 'ranking' && (detail && detail[1] == '1' || !_data.participants[0].result_rank) && (_data.max_comp || _data.max_disciplines))
 		{
 			var tfoot = jQuery(document.createElement('tfoot'));
 			jQuery(this.table.dom).append(tfoot);
@@ -1374,6 +1374,7 @@ var Resultlist = (function() {
 			tfoot.append(jQuery(document.createElement('tr')).append(th));
 			var cols=0; for(var c in this.result_cols) cols++;
 			th.attr('colspan', cols);
+			th.attr('class', 'footer');
 			var max_disciplines = '';
 			if (_data.max_disciplines)
 			{
@@ -1384,17 +1385,19 @@ var Resultlist = (function() {
 			}
 			if (_data.nation)
 			{
-				th.html('Für '+(_data.cup ? 'den '+_data.cup.name : 'die Rangliste')+' zählen die '+_data.max_comp+' besten Ergebnisse, nicht zählende Ergebnisse sind eingeklammert.'+
-					(_data.min_disciplines ? '<br/>Teilnahme an mindestens '+_data.min_disciplines+' Disziplinen ist erforderlich.' : '')+
-					(max_disciplines ? ' Maximal zählende Ergebnisse pro Disziplin: '+max_disciplines : '')+
-					(_data.drop_equally ? ' Streichresultate erfolgen in allen Disziplinen gleichmäßig.' : ''));
+				th.html((_data.max_comp ? 'Für '+(_data.cup ? 'den '+_data.cup.name : 'die Rangliste')+' zählen die '+_data.max_comp+' besten Ergebnisse. ' : '')+
+					(max_disciplines ? ' Maximal zählende Ergebnisse pro Disziplin: '+max_disciplines+'. ' : '')+
+					'Nicht zählende Ergebnisse sind eingeklammert. '+
+					(_data.min_disciplines ? '<br/>Teilnahme an mindestens '+_data.min_disciplines+' Disziplinen ist erforderlich. ' : '')+
+					(_data.drop_equally ? 'Streichresultate erfolgen in allen Disziplinen gleichmäßig. ' : ''));
 			}
 			else
 			{
-				th.html(_data.max_comp+' best competition results are counting for '+(_data.cup ? _data.cup.name : 'the ranking')+', not counting points are in brackets.'+
+				th.html((_data.max_comp ? _data.max_comp+' best competition results are counting for '+(_data.cup ? _data.cup.name : 'the ranking')+'. ' : '')+
+					(max_disciplines ? 'Maximum number of counting results per discipline: '+max_disciplines+'. ' : '')+
+					'Not counting points are in brackets. '+
 					(_data.min_disciplines ? '<br/>Participation in at least '+_data.min_disciplines+' disciplines is required.' : '')+
-					(max_disciplines ? ' Maximum number of counting results per discipline: '+max_disciplines : '')+
-					(_data.drop_equally ? ' Not counting results are selected from all disciplines equally.' : ''));
+					(_data.drop_equally ? 'Not counting results are selected from all disciplines equally.' : ''));
 			}
 		}
 		if (_data.statistics && (_data.discipline == 'selfscore' || this.json_url.match('&stats=')))

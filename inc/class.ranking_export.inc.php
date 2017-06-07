@@ -37,7 +37,7 @@ class ranking_export extends ranking_result_bo
 	 * @var array
 	 */
 	public static $ignore_caching_hosts = array(
-		'boulder.outdoor-training.de', 'ralfsmacbook.local','ralfsmac.local', 'localhost', 'mserver.egroupware.org'
+		'boulder.egroupware.org', 'localhost'
 	);
 
 	/**
