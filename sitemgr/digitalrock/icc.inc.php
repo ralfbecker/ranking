@@ -61,8 +61,8 @@ $icc_adults = array(
 	'ICC_TR' => 'Team relay speed',
 );
 $icc_combined = array(
-	'ICC_MX' => 'MEN overall',
-	'ICC_FX' => 'WOMEN overall',
+	'ICC_MX' => 'MEN combined',
+	'ICC_FX' => 'WOMEN combined',
 );
 $icc_youth = array(
 	'ICC_F_J' => 'female juniors',
