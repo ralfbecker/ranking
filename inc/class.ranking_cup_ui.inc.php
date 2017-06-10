@@ -50,6 +50,8 @@ class ranking_cup_ui extends ranking_bo
 			if (!$_GET['SerId'] && !$_GET['rkey'])
 			{
 				$this->check_set_nation_fed_id($this->cup->data);
+
+				$this->cup->data['presets']['average_ex_aquo'] = true;
 			}
 			// we have no edit-rights for that nation
 			if (!$this->acl_check_comp($this->cup->data))
@@ -160,6 +162,7 @@ class ranking_cup_ui extends ranking_bo
 			$sel_options['per_cat'][$rkey] = $sel_options['gruppen'][$rkey];
 		}
 		$content['presets']['quali_preselected'][] = array('cat' => '');
+		$content['average_ex_aquo'] = $content['presets']['average_ex_aquo'];
 
 		if ($view)
 		{

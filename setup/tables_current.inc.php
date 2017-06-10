@@ -52,7 +52,8 @@ $phpgw_baseline = array(
 			'open_comp' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=No, 1=national, 2=DACH, 3=int.'),
 			'quali_preselected' => array('type' => 'varchar','precision' => '64','nullable' => False,'default' => '0','comment' => 'GrpId: number of preselected athletes, not climbing qualification'),
 			'prequal_type' => array('type' => 'int','precision' => '1','nullable' => False,'default' => '0','comment' => '0=comp. date, 1=1.1.'),
-			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania')
+			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania'),
+			'average_ex_aquo' => array('type' => 'bool','default'=>true,'comment' => '0: ex aquo get full points, 1: ex aquo get average points rounded down')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),

@@ -182,7 +182,8 @@
 				</row>
 				<row class="row">
 					<description for="faktor" value="Factor"/>
-					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor" span="all"/>
+					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor"/>
+					<checkbox label="Ex aquo get average points rounded down" id="average_ex_aquo" span="all"/>
 				</row>
 				<row class="row">
 					<description for="feld_pkte" value="Fieldfactorpoints"/>

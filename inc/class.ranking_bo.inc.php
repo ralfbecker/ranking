@@ -1466,8 +1466,8 @@ class ranking_bo extends ranking_so
 			$allowed_nations = $this->federation->continent_nations($comp['continent'] ?
 				$comp['continent'] : $cup['continent']);
 		}
-		// 2009+ int. competitions use only average points for ex aquos
-		if (empty($comp['nation']) && (int)$comp['datum'] >= 2009)
+		// 2009+ int. competitions use only average points for ex aquos (now an explicit attribute!)
+		if ($comp['average_ex_aquo'] || empty($comp['nation']) && (int)$comp['datum'] >= 2009)
 		{
 			$ex_aquos = $cup_ex_aquos = array();
 			$abs_place = $ex_place = $last_place = 1;

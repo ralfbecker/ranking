@@ -74,6 +74,8 @@ class ranking_competition_ui extends ranking_bo
 			if (!$_GET['WetId'] && !$_GET['rkey'])
 			{
 				$this->check_set_nation_fed_id($this->comp->data);
+
+				$this->comp->data['average_ex_aquo'] = true;
 			}
 			// we have no edit-rights for that nation
 			if (!$this->acl_check_comp($this->comp->data))

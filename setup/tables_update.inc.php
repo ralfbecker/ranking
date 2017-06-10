@@ -11,6 +11,8 @@
  * @version $Id$
  */
 
+use EGroupware\Api;
+
 function ranking_upgrade0_9_13_001()
 {
 	$GLOBALS['phpgw_setup']->oProc->AlterColumn('Wettkaempfe','name',array(
@@ -1997,3 +1999,19 @@ function ranking_upgrade16_1_001()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.002';
 }
 
+
+function ranking_upgrade16_1_002()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','average_ex_aquo',array(
+		'type' => 'bool',
+		'default' => true,
+		'comment' => '0: ex aquo get full points, 1: ex aquo get average points rounded down'
+	));
+	// set existing national competitions (GER until 2017) and int. before 2009 to false
+	$GLOBALS['egw_setup']->db->update('Wettkaempfe', array(
+		'average_ex_aquo' => false,
+	), "nation='GER' AND datum < '2017-01-01' OR datum < '2009-01-01' OR nation='SUI'",
+		__LINE__, __FILE__, 'ranking');
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.003';
+}
