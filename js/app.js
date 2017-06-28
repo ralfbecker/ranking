@@ -1667,6 +1667,22 @@ app.classes.ranking = AppJS.extend(
 		}
 	},
 
+	/**
+	 * Eliminated changed
+	 *
+	 * @param {jQuery.Event} _ev
+	 * @param {et2_widget} _widget
+	 * @param {DOMNode} _node
+	 */
+	time_changed: function(_ev, _widget, _node)
+	{
+		if (_widget.get_value())
+		{
+			var eliminated = _widget.getParent().getWidgetById(_widget.id.replace(/result_time/, 'eliminated'));
+			if (eliminated) eliminated.set_value('');
+		}
+	},
+
 	/***************************************************************************
 	 * Registration
 	 **************************************************************************/

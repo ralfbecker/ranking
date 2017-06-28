@@ -27,8 +27,11 @@ class ranking_route_result extends so_sql
 	const WILDCARD_TIME = 1;
 	/**
 	 * Number of false starts without penality / being eliminated
+	 *
+	 * 2016: 1 false start in whole competition was ok
+	 * 2017+: 0 false starts (competitor elimited on 1. false start!)
 	 */
-	const MAX_FALSE_STARTS = 1;
+	const MAX_FALSE_STARTS = 0;
 
 	/**
 	 * Name of the result table
@@ -807,7 +810,9 @@ class ranking_route_result extends so_sql
 					if ($data['false_start'] > self::MAX_FALSE_STARTS)
 					{
 						$data['result_time'] = null;
-						$data['time_sum'] = $data['result'] = lang('%1. false start', $data['false_start']);
+						$data['time_sum'] = $data['result'] =
+							$data['false_start'] > 1 ? lang('%1. false start', $data['false_start']) : lang('false start');
+						$data['eliminated'] = ranking_result_bo::ELIMINATED_FALSE_START;
 					}
 					if (!array_key_exists('result_time2',$data) && !$data['ability_percent'])
 					{
@@ -858,7 +863,7 @@ class ranking_route_result extends so_sql
 								{
 									$detail = self::unserialize($data['result_detail'.$suffix]);
 									$data['result'.$suffix] = $detail['false_start'] > self::MAX_FALSE_STARTS ?
-										lang('%1. false start', $detail['false_start']) : lang('fall');
+										($data['false_start'] > 1 ? lang('%1. false start', $data['false_start']) : lang('false start')) : lang('fall');
 								}
 								elseif ($data['result_time'.$suffix] == self::WILDCARD_TIME)
 								{

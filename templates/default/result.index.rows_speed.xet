@@ -77,7 +77,6 @@
 				<column/>
 				<column width="50"/>
 				<column width="50"/>
-				<column/>
 				<column width="15%"/>
 				<column width="5%" disabled="!@show_second_lane"/>
 				<column width="15%" disabled="@speed_only_one"/>
@@ -101,7 +100,6 @@
 					<nextmatch-header align="center" label="License" id="PerId"/>
 					<nextmatch-sortheader align="center" label="@@start_order_label" id="start_order" class="noPrint"/>
 					<nextmatch-sortheader align="center" label="Start- number" id="start_order"/>
-					<description align="center" value="False start"/>
 					<nextmatch-sortheader align="center" label="Time" id="result_time"/>
 					<nextmatch-sortheader align="center" label="Lane B" id="start_order2n" class="noPrint"/>
 					<description align="center" value="Time"/>
@@ -124,7 +122,6 @@
 					<description align="center" id="${row}[PerId]" no_lang="1"/>
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
-					<integer align="center" id="{$row}[false_start]" min="0" size="3" step="1" readonly="true"/>
 					<description align="center" id="{$row}[result]" no_lang="1"/>
 					<description align="center" id="${row}[start_order2n]" no_lang="1" class="noPrint"/>
 					<description align="center" id="{$row}[result_r]" no_lang="1"/>
@@ -160,28 +157,16 @@
 					</hbox>
 					<description align="right" id="time_sum"/>
 				</row>
-				<grid width="100%" span="all">
-					<columns>
-						<column/>
-						<column/>
-						<column/>
-						<column/>
-					</columns>
-					<rows>
-						<row class="row" height="50px">
-							<description label="Time"/>
-							<float id="result_time" precision="2" size="4"/>
-							<select align="center" id="eliminated" onchange="app.ranking.eliminated_changed"/>
-							<integer align="right" label="False start" id="false_start" min="0" size="3" step="1"/>
-						</row>
-						<row class="row" valign="top" height="40px" disabled="!@nm[rows][show_second_lane]">
-							<description label="Lane B"/>
-							<float id="result_time_r" precision="2" size="4"/>
-							<select align="center" id="eliminated_r" onchange="app.ranking.eliminated_changed"/>
-							<description/>
-						</row>
-					</rows>
-				</grid>
+				<row class="row" height="50px">
+					<description label="Time"/>
+					<float id="result_time" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<select id="eliminated" onchange="app.ranking.eliminated_changed" align="right"/>
+				</row>
+				<row class="row" valign="top" height="40px" disabled="!@nm[rows][show_second_lane]">
+					<description label="Lane B"/>
+					<float id="result_time_r" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<select id="eliminated_r" onchange="app.ranking.eliminated_changed" align="right"/>
+				</row>
 				<row class="row">
 					<label value="Last modified"/>
 					<date-time align="center" id="result_modified" readonly="true" class="noWrap"/>

@@ -104,9 +104,16 @@ class ranking_result_bo extends ranking_bo
 			TWO_QUALI_SPEED => 'two Qualification',
 		),
 	);
+
+	/**
+	 * Eliminated value for false start in UI
+	 */
+	const ELIMINATED_FALSE_START = 2;
+
 	var $eliminated_labels = array(
 		''=> ' ',
 		1 => 'fall',
+		self::ELIMINATED_FALSE_START => 'false start',
 		0 => 'wildcard',
 	);
 	/**
@@ -816,15 +823,16 @@ class ranking_result_bo extends ranking_bo
 		for($start_order=1; $start_order <= $prev_route['route_quota']; ++$start_order)
 		{
 			$data = $starters_by_startorder[$start_order];
-			if (!isset($data) || $data[$this->route_result->id_col] <= 0)	// no starter --> wildcard for co
+			if (!isset($data) || $data[$this->route_result->id_col] <= 0 || $data['false_start'] > ranking_route_result::MAX_FALSE_STARTS)
 			{
+				// no starter --> wildcard for co
 				$this->_create_wildcard_co($keys,$start_order,array('result_rank' => 2));
 			}
 			else	// regular starter
 			{
 				// check if our co is a regular starter, as we otherwise have a wildcard
 				$co = $starters_by_startorder[$start_order & 1 ? $start_order+1 : $start_order-1];
-				if (!isset($co) || $co[$this->route_result->id_col] <= 0)
+				if (!isset($co) || $co[$this->route_result->id_col] <= 0 || $co['false_start'] > ranking_route_result::MAX_FALSE_STARTS)
 				{
 					$data['result_time'] = WILDCARD_TIME;
 					$data['result_rank'] = 1;
@@ -967,6 +975,20 @@ class ranking_result_bo extends ranking_bo
 			//error_log(__METHOD__."() #$id: current=".array2string($current));
 			//error_log(__METHOD__."() #$id: old=".array2string($old));
 			//error_log(__METHOD__."() #$id: data=".array2string($data));
+
+			// speed result: split false_start value from eliminated
+			foreach(array('', '_r') as $postfix)
+			{
+				if ($data['eliminated'.$postfix] == ranking_result_bo::ELIMINATED_FALSE_START)
+				{
+					$data['eliminated'.$postfix] = '';
+					$data['false_start'.$postfix] = 1;
+				}
+				elseif(isset($data['eliminated'.$postfix]))
+				{
+					$data['false_start'.$postfix] = null;
+				}
+			}
 
 			// boulder result
 			for ($i=1; $i <= ranking_route_result::MAX_BOULDERS && isset($data['top'.$i]); ++$i)
