@@ -635,7 +635,7 @@ class ranking_calculation
 		{
 			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
 			// international combined ranking, no longer uses $min_disciplines
-			if ((int)$comp['datum'] >= 2017 || empty($comp['nation']))
+			if ((int)$stand >= 2017 || !empty($comp['nation']))
 			{
 				$max_disciplines = $cup['max_disciplines'];
 			}
