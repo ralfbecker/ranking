@@ -1,14 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - category UI
+ * EGroupware digital ROCK Rankings - category UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-14 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2011-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 class ranking_cats_ui extends ranking_bo
@@ -24,10 +23,10 @@ class ranking_cats_ui extends ranking_bo
 	/**
 	 * Edit an category
 	 *
-	 * @param array $content
+	 * @param array $_content
 	 * @param string $msg
 	 */
-	function edit(array $content=null,$msg='',$view=false)
+	function edit(array $_content=null,$msg='',$view=false)
 	{
 		if ($_GET['rkey'] || $_GET['GrpId'])
 		{
@@ -36,27 +35,28 @@ class ranking_cats_ui extends ranking_bo
 				$msg .= lang('Entry not found !!!');
 			}
 		}
-		if (!is_array($content))	// new call
+		if (!is_array($_content))	// new call
 		{
 			// for now only admins have edit rights
 			if (!$this->is_admin)
 			{
 				$view = true;
 			}
+			$matches = null;
 			$referer = preg_match('/menuaction=([^&]+)/',$_SERVER['HTTP_REFERER'],$matches) ?
 				$matches[1] : 'ranking.ranking_cats_ui.index';
 			$results = $this->cats->data['results'];
 		}
 		else
 		{
-			$view = $content['view'];
-			$referer = $content['referer'];
-			$results = $content['results'];
+			$view = $_content['view'];
+			$referer = $_content['referer'];
+			$results = $_content['results'];
 
-			$this->cats->init($content['cat_data']);
-			$this->cats->data_merge($content);
+			$this->cats->init($_content['cat_data']);
+			$this->cats->data_merge($_content);
 
-			list($button) = @each($content['button']);
+			list($button) = @each($_content['button']);
 
 			if ($button == 'save' || $button == 'apply')
 			{
@@ -80,9 +80,9 @@ class ranking_cats_ui extends ranking_bo
 					$msg .= lang('Permission denied !!!').' ('.$this->cats->data['nation'].')';
 				}
 				$link = $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => $content['referer'],
+					'menuaction' => $_content['referer'],
 					'msg' => $msg,
-				)+($content['row'] ? array('row['.$content['row'].']' => $this->cats->data['GrpId']) : array()));
+				)+($_content['row'] ? array('row['.$_content['row'].']' => $this->cats->data['GrpId']) : array()));
 				$js = "window.opener.location='$link'; $js";
 			}
 			if ($button == 'delete')
@@ -123,7 +123,7 @@ class ranking_cats_ui extends ranking_bo
 		}
 		if ($view)
 		{
-			foreach($this->cats->data as $name => $val)
+			foreach(array_keys($this->cats->data) as $name)
 			{
 				$readonlys[$name] = true;
 			}
@@ -206,16 +206,16 @@ class ranking_cats_ui extends ranking_bo
 	/**
 	 * List existing Categories
 	 *
-	 * @param array $content
+	 * @param array $_content
 	 * @param string $msg
 	 */
-	function index(array $content=null,$msg='')
+	function index(array $_content=null,$msg='')
 	{
-		if ($_GET['delete'] || is_array($content['nm']['rows']['delete']))
+		if ($_GET['delete'] || is_array($_content['nm']['rows']['delete']))
 		{
-			if (is_array($content['nm']['rows']['delete']))
+			if (is_array($_content['nm']['rows']['delete']))
 			{
-				list($id) = each($content['nm']['rows']['delete']);
+				list($id) = each($_content['nm']['rows']['delete']);
 			}
 			else
 			{
