@@ -7,15 +7,14 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id: setup.inc.php 1244 2015-05-06 17:25:40Z ralfbecker $
+ * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 // RB: never install by default, only via setup
 $setup_info['ranking']['only_db'] = array('never');
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '16.1.003';
+$setup_info['ranking']['version']   = '16.1.004';
 $setup_info['ranking']['app_order'] = 1;
 $setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','RelayResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses','RouteHolds','Registration');
 $setup_info['ranking']['only_db']   = array('none');	// do NOT install by default, was array('mysql','postgres');
@@ -40,7 +39,7 @@ $setup_info['ranking']['description'] =
 $setup_info['ranking']['note'] =
 	"<p>If you want more information about the system, please contact us:\n".
 	'<table><tr><td><a href="http://www.digitalrock.de" target="_blank"><img src="ranking/templates/default/images/navbar.png" /></a>&nbsp;&nbsp;</td>
-	<td><p><b>digital ROCK</b> a business unit of <a href="http://outdoor-training.de" target="_blank">Outdoor Unlimited Training GmbH</a><br />
+	<td><p><b>digital ROCK</b> a business unit of <a href="http://www.egroupware.org" target="_blank">EGroupware GmbH</a><br />
 	<a href="http://www.digitalrock.de" target="_blank">www.digitalROCK.de</a><br />
 	<a href="mailto:RalfBecker at digitalROCK.de"><span onClick="document.location=\'mailto:RalfBecker\'+\'@\'+\'digitalROCK.de\'; return false;">Ralf Becker</span></a></p></td></tr></table></p>';
 
@@ -60,10 +59,14 @@ $setup_info['ranking']['hooks']['calendar_search_union']  = 'ranking_calendar_in
 
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
+	 'appname' => 'api',
+	 'versions' => Array('16.1')
+);
+$setup_info['ranking']['depends'][] = array(
 	 'appname' => 'phpgwapi',
 	 'versions' => Array('14.1')
 );
 $setup_info['ranking']['depends'][] = array(
 	'appname' => 'etemplate',
-	'versions' => Array('1.8','14.1')
+	'versions' => Array('14.1')
 );

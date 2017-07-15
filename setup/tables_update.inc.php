@@ -7,11 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
-
-use EGroupware\Api;
 
 function ranking_upgrade0_9_13_001()
 {
@@ -2015,3 +2012,16 @@ function ranking_upgrade16_1_002()
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.003';
 }
+
+function ranking_upgrade16_1_003()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Gruppen','mgroups',array(
+		'type' => 'varchar',
+		'meta' => 'json',
+		'precision' => '255',
+		'comment' => 'GrpId: rkey hash for combined sub-categories'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.004';
+}
+

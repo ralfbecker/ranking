@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -29,20 +28,20 @@ class ranking_hooks
 			// add ranking version to the eGW version
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
 
-			$file = array(
+			$links = array(
 				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index')),
 				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
 				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index')),
-				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index')),
+				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index','ajax' => 'true')),
 				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index','ajax' => 'true')),
 				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index','ajax' => 'true')),
 				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.result','ajax' => 'true')),
 				'Ranking'       => egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
 				'Accounting'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index')),
 			);
-			if ($location == 'return_ranking_views') return $file;
-			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$file);
+			if ($location == 'return_ranking_views') return $links;
+			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$links);
 
 			$file = array();
 			$file[] = array(
@@ -87,7 +86,7 @@ class ranking_hooks
 				'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
 				'target' => 'docs'
 			);
-			// show SVN changelog under display
+			// show GitHug changelog under display
 			$file[] = array(
 				'text'   => 'Changelog',
 				'link'   => 'https://github.com/ralfbecker/ranking/commits/master',
@@ -127,6 +126,7 @@ class ranking_hooks
 	 */
 	static function hook_settings($hook_data)
 	{
+		unset($hook_data);	// not used, but required by function signature
 		$ranking_views = array();
 		foreach(self::all_hooks('return_ranking_views') as $label => $url)
 		{
@@ -154,6 +154,7 @@ class ranking_hooks
 	 */
 	static function search_link($location)
 	{
+		unset($location);	// not used, but required by function signature
 		return array(
 			'query' => 'ranking.ranking_athlete.link_query',
 			'title' => 'ranking.ranking_athlete.link_title',

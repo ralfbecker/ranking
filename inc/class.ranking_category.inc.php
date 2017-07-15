@@ -1,20 +1,21 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - category storage object
+ * EGroupware digital ROCK Rankings - category storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use Egroupware\Api;
 
 /**
  * category object
  */
-class ranking_category extends so_sql
+class ranking_category extends Api\Storage\Base
 {
 	/**
 	 * @var array $data['rkey']2old maps new to old category-names
@@ -71,24 +72,6 @@ class ranking_category extends so_sql
 	var $charset,$source_charset;
 
 	/**
-	 * Members of overall ranking groups, not yet in database, identical to icc.inc.php file
-	 *
-	 * @var array
-	 */
-	static $mgroups = array(
-		'ICC_MX' => array(
-			1 => 'ICC_M',
-			6 => 'ICC_MB',
-			23 => 'ICC_MS',
-		),
-		 'ICC_FX' => array(
-		 	2 => 'ICC_F',
-			5 => 'ICC_FB',
-			24 => 'ICC_FS',
-		),
-	);
-
-	/**
 	 * SQL for results column, counting results from all *Results tables for given GrpId
 	 *
 	 * @var string
@@ -104,7 +87,7 @@ class ranking_category extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = Api\Translation::charset();
 
 		// get counts from all *Results tables
 		foreach(array('Results','RouteResults','RelayResults') as $table)
@@ -142,13 +125,13 @@ class ranking_category extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->source_charset);
 		}
 		// set meta-groups for overall ranking categories
-		if (isset(self::$mgroups[$data['rkey']]))
+		if (!empty($data['mgroups']))
 		{
-			$data['GrpIds'] = array_keys(self::$mgroups[$data['rkey']]);
-			$data['mgroups'] = self::$mgroups[$data['rkey']];
+			$data['mgroups'] = json_decode($data['mgroups'], true);
+			$data['GrpIds'] = array_keys($data['mgroups']);
 		}
 		else
 		{
@@ -179,7 +162,11 @@ class ranking_category extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->charset,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->charset,$this->source_charset);
+		}
+		if (!empty($data['mgroups']))
+		{
+			$data['mgroups'] = json_encode($data['mgroups']);
 		}
 		return $data;
 	}

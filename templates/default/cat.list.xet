@@ -5,15 +5,14 @@
 	<template id="ranking.cat.list.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column width="100"/>
+				<column width="50%"/>
+				<column width="100"/>
+				<column width="100"/>
+				<column width="100"/>
+				<column width="100"/>
+				<column width="200"/>
+				<column width="80"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -25,51 +24,24 @@
 					<nextmatch-sortheader label="to year" id="to_year" align="center"/>
 					<nextmatch-filterheader options="Discipline..." id="discipline"/>
 					<nextmatch-sortheader label="Results" id="results"/>
-					<description value="Actions" align="center"/>
 				</row>
-				<row class="row">
+				<row class="row $row_cont[class]">
 					<description no_lang="1" id="${row}[rkey]"/>
 					<description class="ml10" no_lang="1" id="${row}[name]"/>
 					<description no_lang="1" align="center" id="${row}[nation]"/>
-					<menulist>
-						<menupopup id="${row}[sex]" readonly="true" align="center"/>
-					</menulist>
+					<select id="${row}[sex]" readonly="true" align="center"/>
 					<description id="${row}[from_year]" align="center"/>
 					<description id="${row}[to_year]" align="center"/>
-					<menulist>
-						<menupopup id="${row}[discipline]" readonly="true"/>
-					</menulist>
+					<select id="${row}[discipline]" readonly="true"/>
 					<description id="${row}[results]"/>
-					<hbox options="0,0" align="center">
-						<button label="Edit" id="edit[$row_cont[Grp]]" image="edit" statustext="Edit this athlete" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cats_ui.edit&amp;GrpId=$row_cont[GrpId]'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;"/>
-						<button id="delete[$row_cont[GrpId]]" image="delete" label="Delete" onclick="return confirm('Delete this category');" statustext="Delete this category"/>
-					</hbox>
 				</row>
 			</rows>
 		</grid>
-		<styles>
-			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
-		</styles>
+	</template>
+	<template id="ranking.cat.left" template="" lang="" group="0" version="1.9.001">
+		<buttononly statustext="Add" id="add" onclick="egw.open_link('ranking.ranking_cats_ui.edit',false,'660x400');"/>
 	</template>
 	<template id="ranking.cat.list" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%">
-			<columns>
-				<column/>
-				<column/>
-			</columns>
-			<rows>
-				<row disabled="!@msg">
-					<description id="msg" class="redItalic"/>
-					<template align="right" id="ranking.prog_start"/>
-				</row>
-				<row>
-					<nextmatch options="ranking.cat.list.rows" span="all" align="center" id="nm"/>
-				</row>
-				<row>
-					<button label="Add" id="nm[edit][0]" statustext="Add a new category" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cats_ui.edit'),'_blank','dependent=yes,width=640,height=480,scrollbars=yes,status=yes'); return false;"/>
-					<description/>
-				</row>
-			</rows>
-		</grid>
+		<nextmatch options="ranking.cat.list.rows" id="nm" header_left="ranking.cat.left" />
 	</template>
 </overlay>

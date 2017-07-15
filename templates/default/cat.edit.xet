@@ -1,8 +1,9 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.cat.edit" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%\0">
+		<grid width="100%">
 			<columns>
 				<column/>
 				<column/>
@@ -10,67 +11,55 @@
 				<column width="50%"/>
 			</columns>
 			<rows>
-				<row height="20">
-					<description id="msg" span="all" class="redItalic"/>
-					<description/>
-					<description/>
-					<description/>
-				</row>
-				<row class="th">
+				<row class="dialogHeader">
 					<description value="Key" for="rkey"/>
-					<textbox statustext="unique (internal) key, in the form: 'NAT_{F|M}_??' NAT=nation, F|M=gender, ?? = A|B|J for juniors + S|B|D for disciplin" id="rkey" needed="1" size="8" maxlength="8"/>
-					<description align="right" value="GrpId" id="GrpId" no_lang="1" span="all" class="gray"/>
+					<textbox statustext="unique (internal) key, in the form: 'NAT_{F|M}_??' NAT=nation, F|M=gender, ?? = A|B|J for juniors + S|B|D for disciplin" id="rkey" required="1" size="8" maxlength="8"/>
+					<description align="right" value="GrpId" id="GrpId" no_lang="1" span="all"/>
 					<description/>
 				</row>
 				<row class="row">
 					<description value="Nation" for="nation"/>
-					<menulist span="all">
-						<menupopup id="nation"/>
-					</menulist>
+					<select id="nation" onchange="1"/>
 				</row>
 				<row class="row">
 					<description value="Name" for="name"/>
-					<textbox statustext="full cathegory name (must not be empty)" id="name" needed="1" size="40" maxlength="40" span="all"/>
+					<textbox statustext="full cathegory name (must not be empty)" id="name" required="true" maxlength="40" span="all" class="et2_fullWidth"/>
 				</row>
 				<row class="row">
 					<description value="Gender" class="nowrap"/>
-					<menulist span="all">
-						<menupopup statustext="if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)" id="sex"/>
-					</menulist>
+					<select span="all" onchange="1" statustext="if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)" id="sex"/>
+				</row>
+				<row class="row">
+					<description value="Combined of" for="mgroups"/>
+					<select id="mgroups" blur="select categories for combined" multiple="true" class="et2_fullWidth" span="all" tags="true"/>
 				</row>
 				<row class="row">
 					<description value="Birthyears from" for="from_year"/>
-					<textbox type="integer" statustext="which birthyear are allowd in this cathegory, if it is limited on this" label="%s (&lt;0 age to)" id="from_year"/>
-					<description value="to year" for="to_year"/>
-					<textbox type="integer" statustext="which birthyear are allowd in this cathegory, if it is limited on this" label="%s (&lt;0 age from)" id="to_year"/>
+					<hbox span="all">
+						<textbox type="integer" statustext="which birthyear are allowd in this cathegory, if it is limited on this" label="%s (&lt;0 age to)" id="from_year"/>
+						<description value="to year" for="to_year"/>
+						<textbox type="integer" statustext="which birthyear are allowd in this cathegory, if it is limited on this" label="%s (&lt;0 age from)" id="to_year"/>
+					</hbox>
 				</row>
 				<row class="row">
 					<description value="Discipline" for="discipline"/>
-					<menulist span="all">
-						<menupopup id="discipline" options="None"/>
-					</menulist>
+					<select span="all" id="discipline" options="None"/>
 				</row>
 				<row class="row">
 					<description value="Rankingsystem" for="rls"/>
-					<menulist span="all">
-						<menupopup statustext="select how the ranking should be calculated" id="rls" needed="1" no_lang="1"/>
-					</menulist>
+					<select span="all" statustext="select how the ranking should be calculated" id="rls" needed="1" no_lang="1"/>
 				</row>
 				<row class="row">
 					<description value="previous Rankingsystem" for="vor_rls"/>
-					<menulist>
-						<menupopup statustext="which rankingsystem was used before, if any" id="vor_rls" no_lang="1" options="None"/>
-					</menulist>
+					<select statustext="which rankingsystem was used before, if any" id="vor_rls" no_lang="1" options="None"/>
 					<description value="before" for="vor"/>
-					<menulist>
-						<menupopup type="select-number" statustext="before which year the old system was used (first year of new system)" id="vor" options="None,1990,2020"/>
-					</menulist>
+					<select-number statustext="before which year the old system was used (first year of new system)" id="vor" options="None,1990,2020"/>
 				</row>
 				<row class="row">
 					<description value="Cuppattern" for="serien_pat"/>
 					<textbox statustext="how is the key for the default cup of this cathegory, eg. '??_WC' for the worldcup ?? is replaced by year" id="serien_pat" size="8" maxlength="8" span="all"/>
 				</row>
-				<row>
+				<row class="dialogFooterToolbar">
 					<hbox span="3">
 						<button statustext="Saves the changes made" label="Save" id="button[save]"/>
 						<button statustext="Applies the changes made" label="Apply" id="button[apply]"/>
@@ -80,6 +69,5 @@
 				</row>
 			</rows>
 		</grid>
-		<styles>.gray { color: gray; }</styles>
 	</template>
 </overlay>

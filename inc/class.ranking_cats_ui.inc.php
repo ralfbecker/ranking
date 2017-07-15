@@ -10,6 +10,8 @@
  * @copyright 2011-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Api;
+
 class ranking_cats_ui extends ranking_bo
 {
 	/**
@@ -32,8 +34,12 @@ class ranking_cats_ui extends ranking_bo
 		{
 			if (!$this->cats->read($_GET,array($this->cats->results_col)))
 			{
-				$msg .= lang('Entry not found !!!');
+				Api\Framework::window_close(lang('Entry not found !!!'));
 			}
+		}
+		else
+		{
+			$this->cats->init(array('sex' => '', 'nation' => 'NULL'));
 		}
 		if (!is_array($_content))	// new call
 		{
@@ -55,59 +61,65 @@ class ranking_cats_ui extends ranking_bo
 
 			$this->cats->init($_content['cat_data']);
 			$this->cats->data_merge($_content);
+			// fix mgroups as GrpId => rkey, not just GrpIds
+			if ($_content['mgroups'])
+			{
+				$this->cats->data['mgroups'] = $this->cats->query_list('rkey', 'GrpId', array('GrpId' => $_content['mgroups']));
+			}
 
 			list($button) = @each($_content['button']);
+			//error_log(__METHOD__."() button=$button, cats->data=".array2string($this->cats->data));
 
+			if (in_array($button, array('save', 'apply', 'delete')) && !$this->is_admin)
+			{
+				Api\Framework::window_close(lang('Permission denied !!!').' ('.$this->cats->data['nation'].')');
+			}
 			if ($button == 'save' || $button == 'apply')
 			{
-				if ($this->is_admin)
+				if ($this->cats->not_unique())
 				{
-					if ($this->cats->not_unique())
-					{
-						$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->cats->data['rkey']);
-					}
-					elseif ($this->cats->save())
-					{
-						$msg .= lang('Error: while saving !!!');
-					}
-					else
-					{
-						$msg .= lang('%1 saved',lang('Category'));
-					}
+					$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->cats->data['rkey']);
+				}
+				elseif ($this->cats->save())
+				{
+					$msg .= lang('Error: while saving !!!');
 				}
 				else
 				{
-					$msg .= lang('Permission denied !!!').' ('.$this->cats->data['nation'].')';
+					$msg .= lang('%1 saved',lang('Category'));
+					Api\Framework::refresh_opener($msg, 'ranking', $this->cats->data['GrpId'], $_content['GrpId'] ? 'edit' : 'add');
+					if ($button == 'save') Api\Framework::window_close();
 				}
-				$link = $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => $_content['referer'],
-					'msg' => $msg,
-				)+($_content['row'] ? array('row['.$_content['row'].']' => $this->cats->data['GrpId']) : array()));
-				$js = "window.opener.location='$link'; $js";
 			}
-			if ($button == 'delete')
+			if ($button == 'delete' && (int)$_content['GrpId'])
 			{
-				$link = $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => 'ranking.ranking_cats_ui.index',
-					'delete' => $this->cats->data['GrpId'],
-				));
-				$js = "window.opener.location='$link';";
-			}
-			if (in_array($button,array('save','delete','cancel')))
-			{
-				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
-				common::egw_exit();
+				if ($this->cats->delete(array('GrpId' => $_content['GrpId'])))
+				{
+					Api\Framework::refresh_opener(lang('%1 deleted',lang('Category')), 'ranking', $_content['GrpId'], 'delete');
+					Api\Framework::window_close();
+				}
+				else
+				{
+					$msg = lang('Error: deleting %1 !!!',lang('Category'));
+				}
 			}
 		}
-		$content = $this->cats->data + array(
+		$content = array(
 			'msg' => $msg,
-		);
+			'mgroups' => array_keys((array)$this->cats->data['mgroups']),
+			'sex' => $this->cats->data['sex'] ? $this->cats->data['sex'] : '',
+		)+$this->cats->data;
+
 		$sel_options = array(
 			'nation' => $this->ranking_nations,
 			'sex'    => $this->genders,
 			'discipline' => $this->disciplines,
 			'rls' => $this->rls_names,
 			'vor_rls' => $this->rls_names,
+			'mgroups' => $this->cats->query_list('rkey', 'GrpId', array(
+				'nation' => $this->cats->data['nation'] == 'NULL' ? null : $this->cats->data['nation'],
+				'sex' => $this->cats->data['sex'],
+			)),
 		);
 		$readonlys = array(
 			'button[delete]' => !$this->cats->data['GrpId'] || !$this->is_admin || $results,
@@ -135,8 +147,10 @@ class ranking_cats_ui extends ranking_bo
 				$readonlys['delete'] = true;
 			}
 		}
+
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Category'));
-		$tmpl = new etemplate('ranking.cat.edit');
+
+		$tmpl = new Api\Etemplate('ranking.cat.edit');
 		$tmpl->exec('ranking.ranking_cats_ui.edit',$content,
 			$sel_options,$readonlys,array(
 				'cat_data' => $this->cats->data,
@@ -155,10 +169,9 @@ class ranking_cats_ui extends ranking_bo
 	 */
 	function get_rows(&$query_in,&$rows,&$readonlys)
 	{
-		//echo __METHOD__."() query="; _debug_array($query_in);
 		if (!$query_in['csv_export'])	// only store state if NOT called as csv export
 		{
-			$GLOBALS['egw']->session->appsession('ranking','cats_state',$query_in);
+			Api\Cache::setSession('ranking', 'cats_state', $query_in);
 		}
 		$query = $query_in;
 
@@ -180,14 +193,12 @@ class ranking_cats_ui extends ranking_bo
 
 		$total = $this->cats->get_rows($query,$rows,$readonlys,'',false,false,array($this->cats->results_col));
 
-		//_debug_array($rows);
-
 		$readonlys = array();
 		foreach($rows as &$row)
 		{
 			if (!$this->is_admin || $row['results'])
 			{
-				$readonlys["delete[$row[GrpId]]"] = true;
+				$row['class'] = 'NoDelete';
 			}
 			if ($query['csv_export'])
 			{
@@ -195,11 +206,6 @@ class ranking_cats_ui extends ranking_bo
 			}
 		}
 
-		if ($this->debug)
-		{
-			echo "<p>".__METHOD__."(".print_r($query,true).") rows ="; _debug_array($rows);
-			_debug_array($readonlys);
-		}
 		return $total;
 	}
 
@@ -211,11 +217,11 @@ class ranking_cats_ui extends ranking_bo
 	 */
 	function index(array $_content=null,$msg='')
 	{
-		if ($_GET['delete'] || is_array($_content['nm']['rows']['delete']))
+		if ($_GET['delete'] || $_content && $_content['nm']['action'] == 'delete' && $_content['nm']['selected'])
 		{
-			if (is_array($_content['nm']['rows']['delete']))
+			if (is_array($_content['nm']['selected']))
 			{
-				list($id) = each($_content['nm']['rows']['delete']);
+				$id = array_shift($_content['nm']['selected']);
 			}
 			else
 			{
@@ -238,7 +244,7 @@ class ranking_cats_ui extends ranking_bo
 		$content = array(
 			'msg' => $msg ? $msg : $_GET['msg'],
 		);
-		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','cats_state');
+		if (!is_array($content['nm'])) $content['nm'] = Api\Cache::getSession('ranking','cats_state');
 
 		if (!is_array($content['nm']))
 		{
@@ -250,6 +256,7 @@ class ranking_cats_ui extends ranking_bo
 				'order'          =>	'rkey',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
+				'row_id'         => 'GrpId',
 			);
 			if ($this->only_nation_athlete)
 			{
@@ -261,15 +268,53 @@ class ranking_cats_ui extends ranking_bo
 				$content['nm']['col_filter']['nation'] = array_pop($fed_nations);
 			}
 		}
-		$readonlys['nm[rows][edit][0]'] = !$this->is_admin;
+		$content['nm']['actions'] = $this->get_actions();
+		$readonlys['add'] = !$this->is_admin;
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Categories');
 		$this->set_ui_state();
-		$tmpl = new etemplate('ranking.cat.list');
+
+		$tmpl = new Api\Etemplate('ranking.cat.list');
 		$tmpl->exec('ranking.ranking_cats_ui.index',$content,array(
 			'nation' => $this->ranking_nations,
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'discipline' => $this->disciplines,
 		),$readonlys);
+	}
+
+	/**
+	 * Return actions for start-/result-lists
+	 *
+	 * @return array
+	 */
+	function get_actions()
+	{
+		$actions =array(
+			'edit' => array(
+				'caption' => 'Edit',
+				'default' => true,
+				'allowOnMultiple' => false,
+				'url' => 'menuaction=ranking.ranking_cats_ui.edit&GrpId=$id',
+				'popup' => '660x400',
+				'group' => $group=0,
+			),
+			'add' => array(
+				'caption' => 'Add',
+				'url' => 'menuaction=ranking.ranking_cats_ui.edit',
+				'popup' => '660x400',
+				'disabled' => $this->is_admin,
+				'group' => $group,
+			),
+			'delete' => array(
+				'caption' => 'Delete',
+				'disableClass' => 'noDelete',	// checks has result
+				'allowOnMultiple' => false,
+				'confirm' => 'Delete this category',
+				'disableClass' => 'NoDelete',
+				'group' => $group=5,
+			),
+		);
+
+		return $actions;
 	}
 }

@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 $phpgw_baseline = array(
@@ -101,7 +100,8 @@ $phpgw_baseline = array(
 			'vor_rls' => array('type' => 'int','precision' => '2'),
 			'vor' => array('type' => 'int','precision' => '2'),
 			'extra' => array('type' => 'varchar','precision' => '40'),
-			'discipline' => array('type' => 'varchar','precision' => '16','default' => 'lead')
+			'discipline' => array('type' => 'varchar','precision' => '16','default' => 'lead'),
+			'mgroups' => array('type' => 'varchar','meta' => 'json','precision' => '255','comment' => 'GrpId: rkey hash for combined sub-categories')
 		),
 		'pk' => array('GrpId'),
 		'fk' => array(),
