@@ -456,4 +456,23 @@ class ranking_category extends Api\Storage\Base
 		//echo "<p>".__METHOD__."($birthdate,".array2string($cat).",$year) from_year=$from_year, to_year=$to_year --> returning ".array2string($ret)."$reason</p>\n";
 		return $ret;
 	}
+
+	/**
+	 * Get GrpId of combined category include $GrpId
+	 *
+	 * @param int $GrpId
+	 * @param array $groups array of rkey
+	 * @return int|null GrpId or null if no combined cat found including $GrpId
+	 */
+	function get_combined($GrpId, array $groups)
+	{
+		foreach($this->search(array(), false, '', '', '', false, 'AND', false, array('rkey' => $groups,'mgroups IS NOT NULL')) as $cat)
+		{
+			if (isset($cat['mgroups'][$GrpId]))
+			{
+				return $cat['GrpId'];
+			}
+		}
+		return null;
+	}
 }

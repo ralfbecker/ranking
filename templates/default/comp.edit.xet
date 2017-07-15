@@ -53,10 +53,18 @@
 					<checkbox label="No complimentary list (over quota)" id="no_complimentary"/>
 				</row>
 				<row class="row">
-					<description value="Quota" for="quota"/>
-					<menulist>
-						<menupopup type="select-number" id="quota" options="Select one,1,12,1"/>
-					</menulist>
+					<vbox class="quotaLabel">
+						<description value="Quota" for="quota"/>
+						<description value="Total per discipline" for="total_per_disciplin"/>
+					</vbox>
+					<vbox>
+						<menulist>
+							<menupopup type="select-number" id="quota" options="Select one,1,12,1"/>
+						</menulist>
+						<menulist>
+							<menupopup type="select-number" id="total_per_discipline" options="None,1,10"/>
+						</menulist>
+					</vbox>
 					<grid spacing="0" padding="1" id="quota_extra">
 						<columns>
 							<column/>
@@ -130,6 +138,9 @@
 				</row>
 			</rows>
 		</grid>
+		<styles>
+			table.quotaLabel&gt;tbody&gt;tr {height: 18pt}
+		</styles>
 	</template>
 	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="210" overflow="auto">

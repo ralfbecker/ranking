@@ -2025,3 +2025,15 @@ function ranking_upgrade16_1_003()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.004';
 }
 
+
+function ranking_upgrade16_1_004()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','total_per_discipline',array(
+		'type' => 'int',
+		'precision' => '1',
+		'comment' => 'total quota (combined+discipline)'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.005';
+}
+

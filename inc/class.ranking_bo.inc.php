@@ -940,13 +940,23 @@ class ranking_bo extends ranking_so
 					$max_quota = $this->comp->quota($nat_fed, $keys['GrpId'], $comp);
 					if ($max_quota <= $this->registration->total)
 					{
-						if ($this->is_admin || $this->is_judge($comp))
+						$msg = lang('No complimentary list (over quota)').' quota='.(int)$max_quota.'!';
+
+						if (!$this->is_admin && !$this->is_judge($comp))
 						{
-							$msg = lang('No complimentary list (over quota)').'!';
+							throw new egw_exception_wrong_userinput($msg);
 						}
-						else
+					}
+					// check total quota for combined plus single discipline registration, if one is set
+					if ($comp['total_per_discipline'] &&
+						($exceeding = $this->total_per_discipline_exceeded($comp, $cat, $keys)))
+					{
+						$msg = lang('Total quota of %1 exceeded in %2 incl. combined starters!',
+							$comp['total_per_discipline'], implode(' '.lang('and').' ', array_map('lang', $exceeding)));
+
+						if (!$this->is_admin && !$this->is_judge($comp))
 						{
-							throw new egw_exception_wrong_userinput(lang('No complimentary list (over quota)').' quota='.(int)$max_quota.'!');
+							throw new egw_exception_wrong_userinput($msg);
 						}
 					}
 				}
@@ -965,6 +975,52 @@ class ranking_bo extends ranking_so
 		$data[ranking_registration::PREFIX.$mode.ranking_registration::ACCOUNT_POSTFIX] = $this->user;
 
 		return !$this->registration->save($data);
+	}
+
+	/**
+	 * Check if total quota for combined plus single discipline is exceeded
+	 *
+	 * For a single discipline registration we only need to check together with combined category.
+	 * For a combined registration we need to check all 3 disciplines!
+	 *
+	 * @param array $comp
+	 * @param array $cat
+	 * @return array with disciplines in which total quota is exceeded
+	 */
+	function total_per_discipline_exceeded(array $comp, array $cat, array $keys)
+	{
+		$cats_to_check = array();
+		// registration is in combined category
+		if ($cat['mgroups'])
+		{
+			foreach(array_keys($cat['mgroups']) as $id)
+			{
+				$cats_to_check[] = array($cat['GrpId'], $id);
+			}
+		}
+		// single category registration --> search combined category including $cat
+		elseif (($combined = $this->cats->get_combined($cat['GrpId'], $comp['gruppen'])))
+		{
+			$cats_to_check[] = array($combined, $cat['GrpId']);
+		}
+		else
+		{
+			return array();	// not a combined cat, eg. TOF
+		}
+		$exceeding = array();
+		foreach($cats_to_check as $cats)
+		{
+			$keys['GrpId'] = $cats;
+			$this->registration->search(array(), true, 'reg_id', '', '', false, 'AND', array(0, 1), $keys);
+			//error_log(__METHOD__."() total_per_discipline=$comp[total_per_discipline], cats=".array2string($cats).", keys=".array2string($keys)." --> total-registered=".$this->registration->total);
+
+			if ($comp['total_per_discipline'] <= $this->registration->total &&
+				($ex_cat = $this->cats->read($keys['GrpId'][1])))
+			{
+				$exceeding[] = $ex_cat['discipline'];
+			}
+		}
+		return $exceeding;
 	}
 
 	/**

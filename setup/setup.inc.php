@@ -14,7 +14,7 @@
 $setup_info['ranking']['only_db'] = array('never');
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '16.1.004';
+$setup_info['ranking']['version']   = '16.1.005';
 $setup_info['ranking']['app_order'] = 1;
 $setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','RelayResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses','RouteHolds','Registration');
 $setup_info['ranking']['only_db']   = array('none');	// do NOT install by default, was array('mysql','postgres');
