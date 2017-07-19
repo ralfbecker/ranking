@@ -364,8 +364,9 @@ class ranking_registration_ui extends ranking_bo
 				break;
 			}
 		}
+		$msg_type = $msg ? 'info' : 'success';
 		$msg = ($registered == 1 && $athlete ? $this->athlete->link_title($athlete) : $registered).
-			' '.lang($mode2ts[$params['mode']]).'.'.($msg ? "\n$msg" : '');
+			' '.lang($mode2ts[$params['mode']]).'.'.($msg ? "\n\n".$msg : '');
 
 		if ($error)
 		{
@@ -383,7 +384,8 @@ class ranking_registration_ui extends ranking_bo
 		}
 		else
 		{
-			if ($registered) egw_json_response::get()->call('egw.refresh', $msg, 'ranking');
+			if ($registered) egw_json_response::get()->call('egw.refresh', $msg, 'ranking',
+				null, null, null, null, null, $msg_type);
 
 			// tell client-side how many successful registered and therefore to remove from selection,
 			// plus evtl. question and concerned athlete

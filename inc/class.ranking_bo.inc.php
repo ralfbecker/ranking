@@ -867,7 +867,8 @@ class ranking_bo extends ranking_so
 			'PerId' => $athlete['PerId'],
 			'reg_deleted IS NULL',
 		);
-		list($data) = $this->registration->search(array(), false, '', '', '*', false, 'AND', false, $keys);
+		// check for an active (not deleted) registration
+		list($data) = $this->registration->search(array(), false, '', '', '*', false, 'AND', false, $keys+array('reg_deleted IS NULL'));
 		$this->registration->init($data ? $data : array());
 		unset($keys[0]);	// reg_deleted IS NULL
 
@@ -948,17 +949,18 @@ class ranking_bo extends ranking_so
 						}
 					}
 					// check total quota for combined plus single discipline registration, if one is set
+					$info = null;
 					if ($comp['total_per_discipline'] &&
-						($exceeding = $this->total_per_discipline_exceeded($comp, $cat, $keys)))
+						($err = $this->check_combined_registration($comp, $cat, $keys, $athlete, $info)))
 					{
-						$msg = lang('Total quota of %1 exceeded in %2 incl. combined starters!',
-							$comp['total_per_discipline'], implode(' '.lang('and').' ', array_map('lang', $exceeding)));
+						$msg = $err;
 
-						if (!$this->is_admin && !$this->is_judge($comp))
+//						if (!$this->is_admin && !$this->is_judge($comp))
 						{
 							throw new egw_exception_wrong_userinput($msg);
 						}
 					}
+					if ($info) $msg = $info;
 				}
 				break;
 
@@ -978,16 +980,28 @@ class ranking_bo extends ranking_so
 	}
 
 	/**
-	 * Check if total quota for combined plus single discipline is exceeded
+	 * Registration checks for comeptions with combined categories
 	 *
+	 * 1) Do not allow registraition in single category, if already registered for combined
+	 *
+	 * 2) Check if total quota for combined plus single discipline is exceeded
 	 * For a single discipline registration we only need to check together with combined category.
 	 * For a combined registration we need to check all 3 disciplines!
 	 *
+	 * 3) For registration in combined, if already registered in one or more single categories,
+	 * modify single cat registrations in favor of the combined registration
+	 * (last "check" as it removes the single category registration!)
+	 *
 	 * @param array $comp
 	 * @param array $cat
-	 * @return array with disciplines in which total quota is exceeded
+	 * @param array $keys
+	 * @param array $athlete
+	 * @param string& $info on return information message eg. registration changed to a combined one
+	 * @return string error-message or null if registration is ok
+	 * @throws egw_exception_wrong_userinput for things even admin or judges are not allowed
+	 *	eg. register in single cat when already registered in combined
 	 */
-	function total_per_discipline_exceeded(array $comp, array $cat, array $keys)
+	function check_combined_registration(array $comp, array $cat, array $keys, array $athlete, &$info)
 	{
 		$cats_to_check = array();
 		// registration is in combined category
@@ -1001,17 +1015,31 @@ class ranking_bo extends ranking_so
 		// single category registration --> search combined category including $cat
 		elseif (($combined = $this->cats->get_combined($cat['GrpId'], $comp['gruppen'])))
 		{
+			// check if already registered in combined category
+			if ($this->registration->read(array(
+				'WetId' => $comp['WetId'],
+				'GrpId' => $combined,
+				'PerId' => $athlete['PerId'],
+				'reg_registered IS NOT NULL AND reg_deleted IS NULL'
+			)))
+			{
+				throw new egw_exception_wrong_userinput(lang('Already registered for combined, no single category registration allowed!'));
+			}
 			$cats_to_check[] = array($combined, $cat['GrpId']);
 		}
 		else
 		{
-			return array();	// not a combined cat, eg. TOF
+			return null;	// not a combined cat, eg. TOF
 		}
+		// checks need to take into account that athletes might be registered in single categories
 		$exceeding = array();
 		foreach($cats_to_check as $cats)
 		{
-			$keys['GrpId'] = $cats;
-			$this->registration->search(array(), true, 'reg_id', '', '', false, 'AND', array(0, 1), $keys);
+			$this->registration->search(array(), 'DISTINCT '.ranking_registration::TABLE.'.PerId',
+				'nachname', '', '', false, 'AND', array(0, 1), $keys+array(
+					'GrpId' => $cats,
+					ranking_registration::TABLE.'.PerId!='.(int)$athlete['PerId'],	// do not return athlete itself
+				)+$keys);
 			//error_log(__METHOD__."() total_per_discipline=$comp[total_per_discipline], cats=".array2string($cats).", keys=".array2string($keys)." --> total-registered=".$this->registration->total);
 
 			if ($comp['total_per_discipline'] <= $this->registration->total &&
@@ -1020,7 +1048,39 @@ class ranking_bo extends ranking_so
 				$exceeding[] = $ex_cat['discipline'];
 			}
 		}
-		return $exceeding;
+		if ($exceeding)
+		{
+			return lang('Total quota of %1 exceeded in %2 incl. combined starters!',
+				$comp['total_per_discipline'], implode(' '.lang('and').' ', array_map('lang', $exceeding)));
+		}
+		// check for combined registration, if there are already registrations in one or more single cats
+		// --> delete single category registrations, but preserve prequalified(!)
+		$deleted = 0;
+		foreach(array_keys($cat['mgroups']) as $GrpId)
+		{
+			if (($reg = $this->registration->read(array(
+				'WetId' => $comp['WetId'],
+				'GrpId' => $GrpId,
+				'PerId' => $athlete['PerId'],
+				'reg_registered IS NOT NULL AND reg_deleted IS NULL'
+			))))
+			{
+				$msg = null;
+				$backup = $this->registration->data;
+				$this->register($comp, $GrpId, $athlete, ranking_registration::DELETED, $msg);
+				$this->registration->data = $backup;
+
+				if ($msg) return $msg;
+
+				++$deleted;
+			}
+		}
+		if ($deleted)
+		{
+			// inform user about removed registrations
+			$info = lang('Current registration in %1 category(s) were deleted.', $deleted);
+		}
+		return null;
 	}
 
 	/**
