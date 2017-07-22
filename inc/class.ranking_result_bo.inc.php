@@ -793,13 +793,12 @@ class ranking_result_bo extends ranking_bo
 		}
 		else	// 1/2|4|8 Final
 		{
-			$prev_keys[] = 'result_rank = 1';
-
 			if (!$prev_route['route_quota'] && --$prev_keys['route_order'] &&	// final
 				!($prev_route = $this->route->read($prev_keys)))
 			{
 				return false;
 			}
+			$prev_keys[] = 'result_rank = 1';
 		}
 		// which column get propagated to next heat
 		$cols = $this->route_result->startlist_cols();
