@@ -887,10 +887,9 @@ class ranking_bo extends ranking_so
 		switch($mode)
 		{
 			case ranking_registration::DELETED:
-				// if athlete is registed and was explicit prequalified
+				// if athlete is registed and was prequalified
 				if ($data && $data[ranking_registration::PREFIX.ranking_registration::REGISTERED] &&
-					$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED] &&
-					$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED.ranking_registration::ACCOUNT_POSTFIX])
+					$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED])
 				{
 					// store current registration as just prequalified, but no longer registered or confirmed
 					$this->registration->save(array_merge($data, array(
@@ -953,14 +952,15 @@ class ranking_bo extends ranking_so
 					if ($comp['total_per_discipline'] &&
 						($err = $this->check_combined_registration($comp, $cat, $keys, $athlete, $info)))
 					{
-						$msg = $err;
+						$msg .= ($msg?"\n\n":'').$err;
 
-//						if (!$this->is_admin && !$this->is_judge($comp))
+						if (!$this->is_admin && !$this->is_judge($comp))
 						{
 							throw new egw_exception_wrong_userinput($msg);
 						}
 					}
-					if ($info) $msg = $info;
+
+					if ($info) $msg .= ($msg?"\n\n":'').$info;
 				}
 				break;
 
@@ -973,10 +973,11 @@ class ranking_bo extends ranking_so
 				throw new egw_exception_wrong_parameter(__METHOD__."($comp, $cat, , '$mode') unknown mode '$mode'!");
 		}
 
-		$data[ranking_registration::PREFIX.$mode] = $this->registration->now;
-		$data[ranking_registration::PREFIX.$mode.ranking_registration::ACCOUNT_POSTFIX] = $this->user;
-
-		return !$this->registration->save($data);
+		$this->registration->init($data);
+		return !$this->registration->save(array(
+			ranking_registration::PREFIX.$mode => $this->registration->now,
+			ranking_registration::PREFIX.$mode.ranking_registration::ACCOUNT_POSTFIX => $this->user,
+		));
 	}
 
 	/**
@@ -1036,19 +1037,31 @@ class ranking_bo extends ranking_so
 		foreach($cats_to_check as $cats)
 		{
 			$this->registration->search(array(), 'DISTINCT '.ranking_registration::TABLE.'.PerId',
-				'nachname', '', '', false, 'AND', array(0, 1), $keys+array(
+				'nachname', '', '', false, 'AND', array(0, 1), array(
 					'GrpId' => $cats,
 					ranking_registration::TABLE.'.PerId!='.(int)$athlete['PerId'],	// do not return athlete itself
 				)+$keys);
 			//error_log(__METHOD__."() total_per_discipline=$comp[total_per_discipline], cats=".array2string($cats).", keys=".array2string($keys)." --> total-registered=".$this->registration->total);
 
+			// check if athlete is prequalifed in combined or single discipline, and therefore not counting for quota
+			if ($comp['total_per_discipline'] == $this->registration->total &&
+				$this->registration->read(array(
+					'WetId' => $comp['WetId'],
+					'PerId' => $athlete['PerId'],
+					'GrpId' => $cats,
+					'reg_deleted IS NULL AND reg_prequalified IS NOT NULL'
+				)))
+			{
+				continue;
+			}
 			if ($comp['total_per_discipline'] <= $this->registration->total &&
-				($ex_cat = $this->cats->read($keys['GrpId'][1])))
+				($ex_cat = $this->cats->read($cats[1])))
 			{
 				$exceeding[] = $ex_cat['discipline'];
 			}
 		}
-		if ($exceeding)
+		// if exceeding and no admin/judge fail now (for admins we first delete single cats, as this is no error!)
+		if ($exceeding && !$this->is_admin && !$this->is_judge($comp))
 		{
 			return lang('Total quota of %1 exceeded in %2 incl. combined starters!',
 				$comp['total_per_discipline'], implode(' '.lang('and').' ', array_map('lang', $exceeding)));
@@ -1066,9 +1079,7 @@ class ranking_bo extends ranking_so
 			))))
 			{
 				$msg = null;
-				$backup = $this->registration->data;
 				$this->register($comp, $GrpId, $athlete, ranking_registration::DELETED, $msg);
-				$this->registration->data = $backup;
 
 				if ($msg) return $msg;
 
@@ -1079,6 +1090,11 @@ class ranking_bo extends ranking_so
 		{
 			// inform user about removed registrations
 			$info = lang('Current registration in %1 category(s) were deleted.', $deleted);
+		}
+		if ($exceeding)
+		{
+			return lang('Total quota of %1 exceeded in %2 incl. combined starters!',
+				$comp['total_per_discipline'], implode(' '.lang('and').' ', array_map('lang', $exceeding)));
 		}
 		return null;
 	}
