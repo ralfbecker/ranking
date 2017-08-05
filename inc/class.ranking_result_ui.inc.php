@@ -69,6 +69,8 @@ class ranking_result_ui extends ranking_result_bo
 		if (!isset($content['slist_order']))
 		{
 			$content['slist_order'] = self::quali_startlist_default($discipline,$content['route_type'],$comp['nation']);
+			// if we have a matching combined category in the competition, set it as additional cat to use for the startlist
+			$content['add_cat'] = $this->cats->get_combined($cat['GrpId'], $comp['gruppen']);
 		}
 		// check if user has NO edit rights
 		if (($view = !$this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp, false,
