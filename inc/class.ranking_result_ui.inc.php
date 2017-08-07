@@ -66,6 +66,11 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$msg .= $ok;
 		}
+		if ($content['discipline'] == 'combined')
+		{
+			$content['route_type'] = ONE_QUALI;
+			$readonlys['route_type'] = true;
+		}
 		if (!isset($content['slist_order']))
 		{
 			$content['slist_order'] = self::quali_startlist_default($discipline,$content['route_type'],$comp['nation']);
@@ -423,8 +428,10 @@ class ranking_result_ui extends ranking_result_bo
 		if ($msg) egw_framework::message($msg, strpos($msg, '!') ? 'error' : null);
 
 		$readonlys['button[delete]'] = $content['new_route'] || $view;
-		$readonlys['route_type'] = !!$content['route_order'];	// can only be set in the first route/quali
-
+		if (!isset($readonlys['route_type']))
+		{
+			$readonlys['route_type'] = !!$content['route_order'];	// can only be set in the first route/quali
+		}
 		$content += ($preserv = array(
 			'WetId'       => $comp['WetId'],
 			'GrpId'       => $cat['GrpId'],

@@ -7,9 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
  * @version $Id$
  */
+
+use EGroupware\Api;
 
 /**
  * @deprecated use ranking_route_result::(TOP_(PLUS|HEIGHT)|(ELIMINATED|WILDCARD)_TIME)
@@ -259,7 +261,9 @@ class ranking_result_bo extends ranking_bo
 			//echo "failed to generate startlist"; _debug_array($keys);
 			return false;
 		}
-		if ($route_order >= 2 || 	// further heat --> startlist from reverse result of previous heat
+		// further heat --> startlist from reverse result of previous heat
+		// but for combined we have 3 qualis (0, 2 and 3!)
+		if (!($discipline == 'combined' && $route_order <= 3) && $route_order >= 2 ||
 			$route_order == 1 && in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_NO_COUNTBACK)))	// 2. Quali uses same start-order
 		{
 			// delete existing starters
@@ -279,6 +283,11 @@ class ranking_result_bo extends ranking_bo
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
 		if (!$comp || !$cat) return false;
 
+		// combined startlist
+		if ($discipline == 'combined' && $route_order <= 3)
+		{
+			return $this->_combined_startlist($comp,$cat,$route_order,$route_type,$discipline,$max_compl,$order,$add_cat);
+		}
 		// depricated startlist stored in the result
 		if ($this->result->has_startlist(array(
 			'WetId' => $keys['WetId'],
@@ -363,6 +372,163 @@ class ranking_result_bo extends ranking_bo
 			}
 		}
 		return $num;
+	}
+
+	/**
+	 * Generate combined startlist for given competition, category and heat (route_order)
+	 *
+	 * Qualification:
+	 * a) import general result from single discipline(s) of same competition incl. rank
+	 * b) import from registration
+	 *
+	 * @param array $comp WetId or complete comp array
+	 * @param array $cat GrpId or complete cat array
+	 * @param int $route_order 0=speed, 2=boulder, 3=lead qualification
+	 *
+	 * Follwing original parameters probably make no sense ...
+	 * @param int $route_type =ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL*
+	 * @param int $discipline ='lead' 'lead', 'speed', 'boulder'
+	 * @param int $max_compl =999 maximum number of climbers from the complimentary list
+	 * @param int $order =null 0=random, 1=reverse ranking, 2=reverse cup, 3=random(distribution ranking), 4=random(distrib. cup), 5=ranking, 6=cup
+	 * @param int $order =null null = default order from self::quali_startlist_default(), int with bitfield of
+	 * 	&1  use ranking for order, unranked are random behind last ranked
+	 *  &2  use cup for order, unranked are random behind last ranked
+	 *  &4  reverse ranking or cup (--> unranked first)
+	 *  &8  use ranking/cup for distribution only, order is random
+	 * @param int $add_cat =null additional category to add registered atheletes from
+	 *
+	 * @return int|boolean number of starters, if startlist has been successful generated AND saved, false otherwise
+	 * @throws Api\Exception\WrongUserinput
+	 */
+	function _combined_startlist(array $comp, array $cat, $route_order/*,
+		$route_type=ONE_QUALI, $discipline='lead', $max_compl=999, $order=null, $add_cat=null*/)
+	{
+		if (!in_array($route_order, array(0, 2, 3)))
+		{
+			throw new Api\Exception\WrongUserinput("Can only generate qualification startlists from single discipline results!");
+		}
+		$discipline2route = array(
+			'speed' => null,
+			'boulder' => null,
+			'lead' => null,
+		);
+		foreach(array_keys($discipline2route) as $single_discipline)
+		{
+			foreach(array_keys($cat['mgroups']) as $gid)
+			{
+				if (($c = $this->cats->read($gid)) &&
+					in_array($c['rkey'], $comp['gruppen']) &&
+					($route = $this->route->read($keys = array(
+						'WetId' => $comp['WetId'],
+						'GrpId' => $c['GrpId'],
+						'route_order' => -1,
+					))) && $route['discipline'] == $single_discipline)
+				{
+					$discipline2route[$single_discipline] = $route;
+					break;
+				}
+			}
+			if (!$discipline2route[$single_discipline]) throw new Api\Exception\WrongUserinput(lang("No route with discipline %1 found!", lang($single_discipline)));
+		}
+		// now we have all single diciplines identified, so we can get their general results
+		$r_order = $ret = 0;
+		foreach($discipline2route as $single_discipline => $route)
+		{
+			if ($r_order < $route_order)
+			{
+				$r_order += !$r_order ? 2 : 1;	// 0, 2, 3 (no 1!)
+				continue;	// we are not on route_order == 0, skip generating routes before
+			}
+			if ($r_order != $route_order)
+			{
+				// ToDo create route
+				break;// break for now
+			}
+			if (!($result = $this->_general_result_for_combined($discipline2route, $single_discipline)))
+			{
+				throw new Api\Exception\WrongUserinput(lang("No result for discipline %1 found!", lang($single_discipline)));
+			}
+			$num = 0;
+			foreach($result as $PerId => $rank)
+			{
+				$this->route_result->init(array(
+					'WetId' => $comp['WetId'],
+					'GrpId' => $cat['GrpId'],
+					'route_order' => $r_order,
+					'result_modifier' => $this->user,
+					'result_modified' => $this->route_result->now,
+				));
+				if (!$this->route_result->save(array(
+					'PerId' => $PerId,
+					'start_order' => 1+$num,
+					'result_rank' => $rank,
+					// ToDo set some result so rank persists re-ranking
+				)))
+				{
+					++$num;
+				}
+			}
+			// return number of starters in route request (not others generated too)
+			if ($r_order == $route_order) $ret = $num;
+			++$r_order;
+		}
+		return $ret;
+	}
+
+	/**
+	 * Get general result of a dicipline for combined (only starters with all 3 disciplines!)
+	 *
+	 * @param array $disciplines $discipline => $route pairs
+	 * @param string $discipline discipline to return result from
+	 * @return array with general result PerId => rank pairs
+	 */
+	function _general_result_for_combined(array $disciplines, $discipline)
+	{
+		$keys = $disciplines[$discipline];
+		if (!isset($keys)) throw new Api\Exception\WrongParameter("Invalid discipline '$discipline'!");
+
+		$all_discipline_join = array();
+		foreach($disciplines as $dis => $route)
+		{
+			if ($dis != $discipline)
+			{
+				$all_discipline_join[] = 'JOIN '.ranking_route_result::RESULT_TABLE.' require_'.$dis.' ON '.
+					ranking_route_result::RESULT_TABLE.'.WetId = require_'.$dis.'.WetId AND '.
+					ranking_route_result::RESULT_TABLE.'.PerId = require_'.$dis.'.PerId AND '.
+					'require_'.$dis.'.GrpId = '.(int)$route['GrpId'].' AND '.
+					'require_'.$dis.'.route_order = 0 AND '.	// ToDo: must be "IN (0,1)" for 2 distinct groups
+					'require_'.$dis.'.result_rank IS NOT NULL';
+			}
+		}
+
+		$rank = $last_rank = $ex_aquo = 0;
+		$result = array();
+		foreach($this->route_result->search('', false, 'result_rank', '', '', false, 'AMD', false, array(
+			'WetId' => $keys['WetId'],
+			'GrpId' => $keys['GrpId'],
+			'route_order' => -1,
+			'discipline' => $keys['discipline'],
+			// TWO_QUALI_SPEED is handled like ONE_QUALI (sum is stored in the result, the 2 times in the extra array)
+			'route_type' => $keys['route_type'] == TWO_QUALI_SPEED ? ONE_QUALI : $keys['route_type'],
+		), implode("\n", $all_discipline_join)) as $row)
+		{
+			if (empty($row['PerId'])) continue;	// general result eg. returns key "route_names"
+
+			// need to re-rank, as $all_discipline_join eliminated results from athletes not competing in all disciplines
+			if ($row['result_rank'] == $last_rank)
+			{
+				++$ex_aquo;
+			}
+			else
+			{
+				$rank += $ex_aquo+1;
+				$ex_aquo = 0;
+			}
+			$result[$row['PerId']] = $rank;
+
+			$last_rank = $row['result_rank'];
+		}
+		return $result;
 	}
 
 	/**
@@ -1848,7 +2014,8 @@ class ranking_result_bo extends ranking_bo
 			return false;	// permission denied
 		}
 		$discipline = !empty($content['discipline']) ? $content['discipline'] :
-			($comp['discipline'] ? $comp['discipline'] : $cat['discipline']);
+			($comp['discipline'] ? $comp['discipline'] :
+			($cat['mgroups'] ? 'combined' : $cat['discipline']));
 		// switch route_result class to relay mode, if necessary
 		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
 		{
@@ -1906,12 +2073,35 @@ class ranking_result_bo extends ranking_bo
 						$keys['route_type'] = ONE_QUALI;
 				}
 			}
-			$keys['route_name'] = $keys['route_order'] >= 2 ? lang('Final') :
+			$keys['route_name'] = $keys['route_order'] >= 2 && !($discipline == 'combined' && $keys['route_order'] <= 3) ? lang('Final') :
 				($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
 
-			// check if previous heat has a quota set
+			if ($discipline == 'combined')
+			{
+				switch($keys['route_order'])
+				{
+					case 2:
+					case 7:
+						$keys['route_name'] .= ' '.lang('boulder');
+						break;
+					case 3:
+					case 8:
+						$keys['route_name'] .= ' '.lang('lead');
+						break;
+					case 0:
+					default:
+						$keys['route_name'] .= ' '.lang('speed');
+						break;
+				}
+			}
+			//error_log(__METHOD__."() discipline=$discipline, route_order=$keys[route_order]: $keys[route_name]");
+
+			// check if previous heat has a quota set (combined has 3 quali: 0, 1 and 3!)
 			try {
-				if ($previous) $this->get_quota($keys, $content['route_type']);
+				if ($previous && !($discipline == 'combined' && $route_order <= 3))
+				{
+					$this->get_quota($keys, $content['route_type']);
+				}
 			}
 			catch (egw_exception_wrong_userinput $e) {
 				$msg = $e->getMessage();

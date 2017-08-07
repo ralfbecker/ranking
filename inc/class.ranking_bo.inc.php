@@ -37,6 +37,7 @@ class ranking_bo extends ranking_so
 		'lead' => 'lead',
 		'boulder' => 'boulder',
 		'speed' => 'speed',
+		'combined' => 'combined',	// new olympic fromat
 		'speedrelay' => 'speedrelay',
 		'boulderheight' => 'boulder: height, tries',	// height and tries, as used in Arco
 		'selfscore' => 'boulder: self-scoring',	// self-scoring honesty system
@@ -1438,7 +1439,7 @@ class ranking_bo extends ranking_so
 	 * @param int $only_route 1, 2, ... if only a certain route-number should be returned (returns false if no match)
 	 * @return string/ startnumber or false, if it's the wrong route
 	 */
-	function pkt2start($pkt,$only_route=null)
+	function  pkt2start($pkt,$only_route=null)
 	{
 		$route = 1+($pkt >> 14);
 

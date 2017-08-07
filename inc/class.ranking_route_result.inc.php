@@ -178,7 +178,7 @@ class ranking_route_result extends so_sql
 		{
 			if (!$this->isRelay)
 			{
-				$join = self::ATHLETE_JOIN;
+				$join = self::ATHLETE_JOIN.($join && is_string($join) ? "\n".$join : '');
 				$extra_cols = array_merge($extra_cols, array(
 					'vorname','nachname','Federations.nation AS nation','geb_date',
 					'Federations.verband AS verband','Federations.fed_url AS fed_url',
