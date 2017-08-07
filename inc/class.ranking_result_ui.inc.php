@@ -68,7 +68,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		if ($content['discipline'] == 'combined')
 		{
-			$content['route_type'] = ONE_QUALI;
+			$content['route_type'] = THREE_QUALI_ALL_NO_STAGGER;
 			$readonlys['route_type'] = true;
 		}
 		if (!isset($content['slist_order']))
@@ -991,6 +991,9 @@ class ranking_result_ui extends ranking_result_bo
 		$readonlys['update'] = ($rows['time_measurement'] = $query['time_measurement']) ||
 			$query['route_status'] == STATUS_RESULT_OFFICIAL;
 		$rows['discipline'] = $query['discipline'];
+		// show first qualification in last column for 3 qualification routes
+		$rows['first_quali_last'] = $query['discipline'] == 'combined' ||
+			$query['route_type'] == THREE_QUALI_ALL_NO_STAGGER;
 
 		// make div. print values available
 		foreach(array('calendar','route_name','comp_name','comp_date','comp_logo','comp_sponsors','show_result','result_official','route_data') as $name)

@@ -81,8 +81,9 @@
 				<column disabled="!@route_names[4]"/>
 				<column disabled="!@route_names[3]"/>
 				<column disabled="!@route_names[2]"/>
-				<column/>
+				<column disabled="@first_quali_last"/>
 				<column disabled="!@route_names[1]"/>
+				<column disabled="!@first_quali_last"/>
 				<column disabled="!@show_ability"/>
 				<column disabled="!@route_type=/(TWO_QUALI_ALL|TWOxTWO_QUALI)/"/>
 			</columns>
@@ -108,6 +109,7 @@
 					<nextmatch-sortheader align="center" label="@route_names[2]" id="result_rank2" no_lang="1"/>
 					<nextmatch-sortheader align="center" label="@route_names[0]" id="result_rank0" no_lang="1"/>
 					<nextmatch-sortheader align="center" label="@route_names[1]" id="result_rank1" no_lang="1"/>
+					<nextmatch-sortheader align="center" label="@route_names[0]" id="result_rank0" no_lang="1"/>
 					<nextmatch-header align="center" label="Ability" id="ability_percent"/>
 					<nextmatch-sortheader align="center" label="Points" id="quali_points"/>
 				</row>
@@ -132,6 +134,7 @@
 					<description align="center" id="{$row}[result2]" no_lang="1"/>
 					<description align="center" id="{$row}[result]" no_lang="1"/>
 					<description align="center" id="{$row}[result1]" no_lang="1"/>
+					<description align="center" id="{$row}[result]" no_lang="1"/>
 					<textbox type="float" align="center" id="${row}[ability_percent]" readonly="true"/>
 					<textbox type="float" align="center" id="{$row}[quali_points]" no_lang="1" readonly="true" precision="2"/>
 				</row>

@@ -105,6 +105,9 @@ class ranking_result_bo extends ranking_bo
 			ONE_QUALI       => 'one Qualification',
 			TWO_QUALI_SPEED => 'two Qualification',
 		),
+		'combined' => array(
+			THREE_QUALI_ALL_NO_STAGGER => 'qualification in three disciplines',
+		),
 	);
 
 	/**
@@ -262,8 +265,8 @@ class ranking_result_bo extends ranking_bo
 			return false;
 		}
 		// further heat --> startlist from reverse result of previous heat
-		// but for combined we have 3 qualis (0, 2 and 3!)
-		if (!($discipline == 'combined' && $route_order <= 3) && $route_order >= 2 ||
+		// but for combined we have 3 qualis
+		if (!($discipline == 'combined' && $route_order < 3) && $route_order >= 2 ||
 			$route_order == 1 && in_array($route_type,array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_NO_COUNTBACK)))	// 2. Quali uses same start-order
 		{
 			// delete existing starters
@@ -284,7 +287,7 @@ class ranking_result_bo extends ranking_bo
 		if (!$comp || !$cat) return false;
 
 		// combined startlist
-		if ($discipline == 'combined' && $route_order <= 3)
+		if ($discipline == 'combined' && $route_order < 3)
 		{
 			return $this->_combined_startlist($comp,$cat,$route_order,$route_type,$discipline,$max_compl,$order,$add_cat);
 		}
@@ -403,7 +406,7 @@ class ranking_result_bo extends ranking_bo
 	function _combined_startlist(array $comp, array $cat, $route_order/*,
 		$route_type=ONE_QUALI, $discipline='lead', $max_compl=999, $order=null, $add_cat=null*/)
 	{
-		if (!in_array($route_order, array(0, 2, 3)))
+		if (!in_array($route_order, array(0, 1, 2)))
 		{
 			throw new Api\Exception\WrongUserinput("Can only generate qualification startlists from single discipline results!");
 		}
@@ -436,7 +439,7 @@ class ranking_result_bo extends ranking_bo
 		{
 			if ($r_order < $route_order)
 			{
-				$r_order += !$r_order ? 2 : 1;	// 0, 2, 3 (no 1!)
+				++$r_order;
 				continue;	// we are not on route_order == 0, skip generating routes before
 			}
 			if ($r_order != $route_order)
@@ -2074,31 +2077,17 @@ class ranking_result_bo extends ranking_bo
 				}
 			}
 			$keys['route_name'] = $keys['route_order'] >= 2 && !($discipline == 'combined' && $keys['route_order'] <= 3) ? lang('Final') :
-				($keys['route_order'] == 1 ? '2. ' : '').lang('Qualification');
+				($keys['route_order'] == 1 && $discipline != 'combined' ? '2. ' : '').lang('Qualification');
 
 			if ($discipline == 'combined')
 			{
-				switch($keys['route_order'])
-				{
-					case 2:
-					case 7:
-						$keys['route_name'] .= ' '.lang('boulder');
-						break;
-					case 3:
-					case 8:
-						$keys['route_name'] .= ' '.lang('lead');
-						break;
-					case 0:
-					default:
-						$keys['route_name'] .= ' '.lang('speed');
-						break;
-				}
+				$keys['route_name'] .= ' '.lang(self::combined_order2discipline($keys['route_order']));
 			}
 			//error_log(__METHOD__."() discipline=$discipline, route_order=$keys[route_order]: $keys[route_name]");
 
-			// check if previous heat has a quota set (combined has 3 quali: 0, 1 and 3!)
+			// check if previous heat has a quota set (combined has 3 quali)
 			try {
-				if ($previous && !($discipline == 'combined' && $route_order <= 3))
+				if ($previous && !($discipline == 'combined' && $route_order < 3))
 				{
 					$this->get_quota($keys, $content['route_type']);
 				}
@@ -2167,6 +2156,28 @@ class ranking_result_bo extends ranking_bo
 			$discipline = $content['discipline'] = 'boulder';
 		}
 		return $msg ? $msg : true;
+	}
+
+	/**
+	 * Get discipline of a combined heat
+	 *
+	 * @param string $route_order
+	 * @return string
+	 */
+	static public function combined_order2discipline($route_order)
+	{
+		switch($route_order)
+		{
+			case 1:
+			case 7:
+				return 'boulder';
+			case 2:
+			case 8:
+				return 'lead';
+			case 0:
+			default:
+				return 'speed';
+		}
 	}
 
 	/**

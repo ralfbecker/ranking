@@ -651,7 +651,7 @@ class ranking_route_result extends so_sql
 			default:
 			case 'lead':
 				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'] ||	// lead result
-					$data['general_result'] && $data['route_type'] == TWO_QUALI_GROUPS)
+					$data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_GROUPS,THREE_QUALI_ALL_NO_STAGGER)))
 				{
 					if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
 					foreach($data['general_result'] ? array(1,2,3,'',0,4,5,6) : array('') as $suffix)
@@ -701,11 +701,15 @@ class ranking_route_result extends so_sql
 						}
 					}
 					// general result with quali on two routes for all --> add rank to result
-					if ($data['general_result'] && in_array($data['route_type'],array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK)))
+					if ($data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK,THREE_QUALI_ALL_NO_STAGGER)))
 					{
-						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) : array('',1) as $suffix)
+						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) :
+							($data['route_type'] == THREE_QUALI_ALL_NO_STAGGER ? array('',1,2) : array('',1)) as $suffix)
 						{
-							if ($data['result'.$suffix] && $data['result_rank'.$suffix]) $data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
+							if (/*$data['result'.$suffix] &&*/ $data['result_rank'.$suffix])
+							{
+								$data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
+							}
 						}
 					}
 					if ($data['general_result'] && $data['route_type'] == TWO_QUALI_GROUPS && !empty($data['result_rank']))
