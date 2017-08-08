@@ -11,6 +11,8 @@
  * @version $Id$
  */
 
+use Egroupware\Api;
+
 class ranking_result_ui extends ranking_result_bo
 {
 	/**
@@ -66,10 +68,34 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$msg .= $ok;
 		}
+		$sel_options = array();
+
 		if ($content['discipline'] == 'combined')
 		{
 			$content['route_type'] = THREE_QUALI_ALL_NO_STAGGER;
 			$readonlys['route_type'] = true;
+
+			if ($cat['mgroups'])
+			{
+				try {
+					$this->combined_quali_discipline2route($comp, $cat);
+					$tmpl->disableElement('comb_quali');
+				}
+				catch (Api\Exception\WrongUserinput $ex) {
+					unset($ex);
+					if (($comb_qualis = $this->combined_quali_comps($comp, $cat)))
+					{
+						$sel_options['comb_quali'] = array(
+							'' => 'Select combined qualification'
+						)+$comb_qualis;
+						if (empty($content['comb_quali'])) list($content['comb_quali']) = each($comb_qualis);
+					}
+					else
+					{
+						$tmpl->disableElement('comb_quali');
+					}
+				}
+			}
 		}
 		if (!isset($content['slist_order']))
 		{
@@ -160,31 +186,38 @@ class ranking_result_ui extends ranking_result_bo
 					// fall-throught
 				case 'startlist':
 					//_debug_array($content);
-					if ($this->has_results($content))
-					{
-						$msg .= lang('Error: heat already has a result!!!');
-						$param['show_result'] = 1;
-					}
-					elseif (is_numeric($content['route_order']) &&
-						($num = $this->generate_startlist($comp,$cat,$content['route_order'],$content['route_type'],$content['discipline'],
-							$content['max_compl']!=='' ? $content['max_compl'] : 999,$content['slist_order'],$content['add_cat'])))
-					{
-						$msg .= lang('Startlist generated');
-
-						$to_set = array();
-						$to_set['route_status'] = $content['route_status'] = STATUS_STARTLIST;	// set status to startlist
-						/* RB 2013-10-06 commented as it does NOT allow to set quota=0 when creating a final
-						   not sure why it was there in the first place
-						if (!$content['route_quota'])
+					try {
+						if ($this->has_results($content))
 						{
-							$content['route_quota'] = $to_set['route_quota'] =
-								$this->default_quota($discipline,$content['route_order'],$content['quali_type'],$num);
-						}*/
-						if ($this->route->read($content,true)) $this->route->save($to_set);
-					}
-					else
-					{
-						$msg .= lang('Error: generating startlist!!!');
+							$msg .= lang('Error: heat already has a result!!!');
+							$param['show_result'] = 1;
+						}
+						elseif (is_numeric($content['route_order']) &&
+							($num = $this->generate_startlist($comp, $cat, $content['route_order'],
+								$content['route_type'], $content['discipline'],
+								$content['max_compl'] !== '' ? $content['max_compl'] : 999,
+								$content['slist_order'], $content['add_cat'], $content['comb_quali'])))
+						{
+							$msg .= lang('Startlist generated');
+
+							$to_set = array();
+							$to_set['route_status'] = $content['route_status'] = STATUS_STARTLIST;	// set status to startlist
+							/* RB 2013-10-06 commented as it does NOT allow to set quota=0 when creating a final
+							   not sure why it was there in the first place
+							if (!$content['route_quota'])
+							{
+								$content['route_quota'] = $to_set['route_quota'] =
+									$this->default_quota($discipline,$content['route_order'],$content['quali_type'],$num);
+							}*/
+							if ($this->route->read($content,true)) $this->route->save($to_set);
+						}
+						else
+						{
+							$msg .= lang('Error: generating startlist!!!');
+						}
+					} catch (\EGroupware\Api\Exception\WrongUserinput $e) {
+						$msg .= $e->getMessage();
+						unset($button);	// to not exit for save
 					}
 					$refresh = true;
 					break;
@@ -455,7 +488,7 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$preserv[$name] = $content[$name];
 		}
-		$sel_options = array(
+		$sel_options += array(
 			'WetId' => array($comp['WetId'] => strip_tags($comp['name'])),
 			'GrpId' => array($cat['GrpId']  => $cat['name']),
 			'route_order' => $this->order_nums,

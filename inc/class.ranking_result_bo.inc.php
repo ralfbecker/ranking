@@ -247,9 +247,10 @@ class ranking_result_bo extends ranking_bo
 	 *  &4  reverse ranking or cup (--> unranked first)
 	 *  &8  use ranking/cup for distribution only, order is random
 	 * @param int $add_cat =null additional category to add registered atheletes from
+	 * @param int $comb_quali =null (additional) combined qualification competition (WetId)
 	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 */
-	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null,$add_cat=null)
+	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null,$add_cat=null,$comb_quali=null)
 	{
 		$keys = array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
@@ -289,7 +290,7 @@ class ranking_result_bo extends ranking_bo
 		// combined startlist
 		if ($discipline == 'combined' && $route_order < 3)
 		{
-			return $this->_combined_startlist($comp,$cat,$route_order,$route_type,$discipline,$max_compl,$order,$add_cat);
+			return $this->_combined_startlist($comp, $cat, $route_order, $comb_quali);
 		}
 		// depricated startlist stored in the result
 		if ($this->result->has_startlist(array(
@@ -387,34 +388,134 @@ class ranking_result_bo extends ranking_bo
 	 * @param array $comp WetId or complete comp array
 	 * @param array $cat GrpId or complete cat array
 	 * @param int $route_order 0=speed, 2=boulder, 3=lead qualification
-	 *
-	 * Follwing original parameters probably make no sense ...
-	 * @param int $route_type =ONE_QUAL ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL*
-	 * @param int $discipline ='lead' 'lead', 'speed', 'boulder'
-	 * @param int $max_compl =999 maximum number of climbers from the complimentary list
-	 * @param int $order =null 0=random, 1=reverse ranking, 2=reverse cup, 3=random(distribution ranking), 4=random(distrib. cup), 5=ranking, 6=cup
-	 * @param int $order =null null = default order from self::quali_startlist_default(), int with bitfield of
-	 * 	&1  use ranking for order, unranked are random behind last ranked
-	 *  &2  use cup for order, unranked are random behind last ranked
-	 *  &4  reverse ranking or cup (--> unranked first)
-	 *  &8  use ranking/cup for distribution only, order is random
-	 * @param int $add_cat =null additional category to add registered atheletes from
-	 *
+	 * @param int $comb_quali =null (additional) combined qualification competition (WetId)
 	 * @return int|boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 * @throws Api\Exception\WrongUserinput
 	 */
-	function _combined_startlist(array $comp, array $cat, $route_order/*,
-		$route_type=ONE_QUALI, $discipline='lead', $max_compl=999, $order=null, $add_cat=null*/)
+	private function _combined_startlist(array $comp, array $cat, $route_order, $comb_quali=null)
 	{
 		if (!in_array($route_order, array(0, 1, 2)))
 		{
 			throw new Api\Exception\WrongUserinput("Can only generate qualification startlists from single discipline results!");
 		}
-		$discipline2route = array(
-			'speed' => null,
-			'boulder' => null,
-			'lead' => null,
-		);
+
+		// search single discipline routes for combined result of competion with single disciplines
+		try {
+			$discipline2route = $this->combined_quali_discipline2route($comp, $cat, $comb_quali);
+		}
+		catch (Api\Exception\WrongUserinput $e) {
+			// check if $comb_quali has a result for our category
+			if (($quali_route = $this->route->read(array(
+				'WetId' => $comb_quali,
+				'GrpId' => $cat['GrpId'],
+				'route_order' => -1,
+			))))
+			{
+				$discipline2route = array(
+					'speed' => $quali_route,
+					'boulder' => $quali_route,
+					'lead' => $quali_route,
+				);
+			}
+			else
+			{
+				throw $e;
+			}
+		}
+
+		// now we have all single diciplines identified, so we can get their general results
+		$r_order = $ret = 0;
+		$result = null;
+		foreach(array_keys($discipline2route) as $single_discipline)
+		{
+			if ($r_order < $route_order)
+			{
+				++$r_order;
+				continue;	// we are not on route_order == 0, skip generating routes before
+			}
+			if ($r_order != $route_order)
+			{
+				$route = array(
+					'WetId' => $comp['WetId'],
+					'GrpId' => $cat['GrpId'],
+					'route_order' => $r_order,
+				);
+				$d = null;
+				if (!$this->init_route($route, $comp, $cat, $d) ||
+					$this->route->save($route))
+				{
+					break;	// break, if we cant create the further routes
+				}
+			}
+			// use identical order for starters from a qualification event
+			if (!isset($quali_route) || !isset($result))
+			{
+				if (!($result = $this->_general_result_for_combined($discipline2route, $single_discipline)))
+				{
+					throw new Api\Exception\WrongUserinput(lang("No result for discipline %1 found!", lang($single_discipline)));
+				}
+				// startlist as reverse from a different qualification competition
+				if ($quali_route)
+				{
+					uasort($result, function($a, $b)
+					{
+						if ($a == $b)
+						{
+							return rand(0, 1) ? -1 : 1;	// randomize ex aquo
+						}
+						return $a > $b ? -1 : 1;
+					});
+				}
+			}
+			$num = 0;
+			foreach($result as $PerId => $rank)
+			{
+				// check quota, if one is given
+				if ($quali_route && $quali_route['route_quota'] > 0 && $rank > $quali_route['route_quota'])
+				{
+					continue;
+				}
+				$this->route_result->init(array(
+					'WetId' => $comp['WetId'],
+					'GrpId' => $cat['GrpId'],
+					'route_order' => $r_order,
+					'result_modifier' => $this->user,
+					'result_modified' => $this->route_result->now,
+				));
+				if (!$this->route_result->save(array(
+					'PerId' => $PerId,
+					'start_order' => 1+$num,
+					'result_rank' => $quali_route ? null : $rank,
+					// ToDo set some result so rank persists re-ranking
+				)))
+				{
+					++$num;
+				}
+			}
+			// return number of starters in route request (not others generated too)
+			if ($r_order == $route_order) $ret = $num;
+			++$r_order;
+		}
+		return $ret;
+	}
+
+	/**
+	 * Search single disciplines general result routes for a combined category
+	 *
+	 * @param array $comp competion to search in
+	 * @param array $cat combined category
+	 * @return array discipline ("speed","boulder","lead") => general result route or null
+	 */
+	private function _search_combined_qualis($comp, $cat, array $discipline2route=null)
+	{
+		if (!$discipline2route)
+		{
+			$discipline2route = array(
+				'speed' => null,
+				'boulder' => null,
+				'lead' => null,
+			);
+		}
 		foreach(array_keys($discipline2route) as $single_discipline)
 		{
 			foreach(array_keys($cat['mgroups']) as $gid)
@@ -431,51 +532,66 @@ class ranking_result_bo extends ranking_bo
 					break;
 				}
 			}
-			if (!$discipline2route[$single_discipline]) throw new Api\Exception\WrongUserinput(lang("No route with discipline %1 found!", lang($single_discipline)));
 		}
-		// now we have all single diciplines identified, so we can get their general results
-		$r_order = $ret = 0;
-		foreach($discipline2route as $single_discipline => $route)
+		return $discipline2route;
+	}
+
+	/**
+	 * Search single disciplines general result routes for a combined category
+	 *
+	 * $comb_quali is only taken into account, if at least on single discipline is found in $comp!
+	 *
+	 * @param array $comp competion to search in
+	 * @param array $cat combined category
+	 * @param int $comb_quali =null (additional) combined qualification competition (WetId)
+	 * @return array discipline ("speed","boulder","lead") => general result route
+	 * @throws Api\Exception\WrongUserinput if any single discipline is not found
+	 */
+	function combined_quali_discipline2route(array $comp, array $cat, $comb_quali=null)
+	{
+		$discipline2route = $this->_search_combined_qualis($comp, $cat);
+
+		$dis_not_found = array_filter($discipline2route, function($route) { return is_null($route); });
+		if ($dis_not_found < 3 && $comb_quali &&
+			($c = $this->comp->read($comb_quali)))
 		{
-			if ($r_order < $route_order)
-			{
-				++$r_order;
-				continue;	// we are not on route_order == 0, skip generating routes before
-			}
-			if ($r_order != $route_order)
-			{
-				// ToDo create route
-				break;// break for now
-			}
-			if (!($result = $this->_general_result_for_combined($discipline2route, $single_discipline)))
-			{
-				throw new Api\Exception\WrongUserinput(lang("No result for discipline %1 found!", lang($single_discipline)));
-			}
-			$num = 0;
-			foreach($result as $PerId => $rank)
-			{
-				$this->route_result->init(array(
-					'WetId' => $comp['WetId'],
-					'GrpId' => $cat['GrpId'],
-					'route_order' => $r_order,
-					'result_modifier' => $this->user,
-					'result_modified' => $this->route_result->now,
-				));
-				if (!$this->route_result->save(array(
-					'PerId' => $PerId,
-					'start_order' => 1+$num,
-					'result_rank' => $rank,
-					// ToDo set some result so rank persists re-ranking
-				)))
-				{
-					++$num;
-				}
-			}
-			// return number of starters in route request (not others generated too)
-			if ($r_order == $route_order) $ret = $num;
-			++$r_order;
+			$discipline2route = $this->_search_combined_qualis($comp, $cat, $c);
+			$dis_not_found = array_filter($discipline2route, function($route) { return is_null($route); });
 		}
-		return $ret;
+		if ($dis_not_found)
+		{
+			throw new Api\Exception\WrongUserinput(lang("No route with discipline %1 found!",
+				implode(', ', array_map('lang', array_keys($dis_not_found)))));
+		}
+		return $discipline2route;
+	}
+
+	/**
+	 * Search competitions with possible combined qualification for given category
+	 *
+	 * Only competions before or same date as given one and 2 month back are returned.
+	 *
+	 * @param array $comp
+	 * @param array $cat
+	 * @return array WetId => $name pairs with newest comp first
+	 */
+	function combined_quali_comps(array $comp, array $cat)
+	{
+		$date = new Api\DateTime($comp['datum']);
+		$date->add('-2 month');
+		$filter = array(
+			'WetId != '.$comp['WetId'],
+			'datum BETWEEN '.$this->db->quote($date->format('Y-m-d')).' AND '.$this->db->quote($comp['datum']),
+			'GrpId' => array_keys($cat['mgroups'])+array($cat['GrpId']),
+			'nation '.(empty($comp['nation']) ? 'IS NULL' : '= '.$this->db->quote($comp['nation'])),
+		);
+		$comps = array();
+		foreach($this->route->search(array(), false, 'datum DESC', 'name,datum', '', false, 'AND', false, $filter,
+			'JOIN '.$this->comp->table_name.' USING (WetId)') as $row)
+		{
+			$comps[$row['WetId']] = $row['name'];
+		}
+		return $comps;
 	}
 
 	/**
@@ -485,7 +601,7 @@ class ranking_result_bo extends ranking_bo
 	 * @param string $discipline discipline to return result from
 	 * @return array with general result PerId => rank pairs
 	 */
-	function _general_result_for_combined(array $disciplines, $discipline)
+	private function _general_result_for_combined(array $disciplines, $discipline)
 	{
 		$keys = $disciplines[$discipline];
 		if (!isset($keys)) throw new Api\Exception\WrongParameter("Invalid discipline '$discipline'!");
@@ -718,6 +834,7 @@ class ranking_result_bo extends ranking_bo
 	 * @param string $start_order_mode ='reverse' 'reverse' result, like 'previous' heat, as the 'result'
 	 * @param string $discipline
 	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
+	 * @throws Api\Exception\WrongUserinput for eg. no quota set
 	 */
 	function _startlist_from_previous_heat($keys,$start_order_mode='reverse',$discipline='lead')
 	{
@@ -744,10 +861,7 @@ class ranking_result_bo extends ranking_bo
 			return false;	// prev. route not found or no result
 		}
 		// read quota from previous heat or for new overall quali result from there
-		if ((!$quota = $this->get_quota($keys, $prev_route['route_type'])))
-		{
-			$quota = $prev_route['route_quota'];	// fallback to old code
-		}
+		$quota = $this->get_quota($keys, $prev_route['route_type']);
 		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
@@ -835,10 +949,16 @@ class ranking_result_bo extends ranking_bo
 			{
 				$order_by = 'result_rank DESC';		// --> reversed result
 			}
-			if (($comp = $this->comp->read($keys['WetId'])) &&
-				($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
-			{
-				$order_by .= ','.$ranking_sql.($start_order_mode != 'result' ? ' DESC' : '');	// --> use the (reversed) ranking
+			try {
+				if (($comp = $this->comp->read($keys['WetId'])) &&
+					($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
+				{
+					$order_by .= ','.$ranking_sql.($start_order_mode != 'result' ? ' DESC' : '');	// --> use the (reversed) ranking
+				}
+			}
+			catch(Exception $e) {
+				// ignore exception, if no ranking defined
+				unset($e);
 			}
 			$order_by .= ',RAND()';					// --> randomized
 		}
