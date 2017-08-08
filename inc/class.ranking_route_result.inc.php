@@ -159,6 +159,11 @@ class ranking_route_result extends so_sql
 			unset($filter['discipline']);
 			$extra_cols[] = "'$discipline' AS discipline";
 		}
+		if (is_array($filter) && array_key_exists('combined',$filter))	// pseudo-filter to transport route is combined
+		{
+			$combined = $filter['combined'];
+			unset($filter['combined']);
+		}
 		if (is_array($filter) && array_key_exists('comp_nation',$filter))	// pseudo-filter to transport the nation
 		{
 			$comp_nation = $filter['comp_nation'];
@@ -198,9 +203,14 @@ class ranking_route_result extends so_sql
 						break;
 				}
 			}
+			// combined heats have different route-order
+			if ($combined && $route_order > 0)
+			{
+
+			}
 			// first heat after qualification
 			// quali points are to be displayed with 2 digits for 2008 (but all digits counting)
-			if ($route_order == 2 && in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) ||
+			elseif ($route_order == 2 && in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) ||
 				$route_order == 3 && $route_type == THREE_QUALI_ALL_NO_STAGGER)
 			{
 				$extra_cols[] = 'ROUND(('.$this->_sql_rank_prev_heat($route_order,$route_type).'),2) AS rank_prev_heat';
@@ -242,21 +252,23 @@ class ranking_route_result extends so_sql
 				$result_cols = array('result_rank');
 				switch($discipline)
 				{
-					default:
-					case 'lead':
-						$result_cols[] = 'result_height';
-						$result_cols[] = 'result_plus';
-						break;
 					case 'speed':
 					case 'speedrelay':
 						$result_cols[] = 'result_time';
 						$result_cols[] = 'start_order';
 						$result_cols[] = 'result_detail';	// false_start
 						break;
+					case 'combined':
 					case 'boulder':
 					case 'selfscore':
 						$result_cols[] = 'result_top';
 						$result_cols[] = 'result_zone';
+						if ($discipline != 'combined') break;
+						// fall through for combined
+					default:
+					case 'lead':
+						$result_cols[] = 'result_height';
+						$result_cols[] = 'result_plus';
 						break;
 				}
 
@@ -648,6 +660,13 @@ class ranking_route_result extends so_sql
 		}
 		switch($data['discipline'])
 		{
+			case 'combined':
+				if ($data['general_result'])
+				{
+					$data_speed = $this->db2data(array('discipline' => 'speed')+$data);
+					$data_boulder = $this->db2data(array('discipline' => 'boulder')+$data);
+				}
+				// fall through
 			default:
 			case 'lead':
 				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'] ||	// lead result
@@ -747,6 +766,12 @@ class ranking_route_result extends so_sql
 				{
 					$data['result_height'] /= 100.0/$data['ability_percent'];
 				}
+
+				if ($data['discipline'] != 'combined' || !$data['general_result']) break;
+
+				// from here on we have combined general result
+				$data['result'] = $data_speed['result'] . '&nbsp;&nbsp;'.$data['result_rank'].'.';
+				$data['result1'] = $data_boulder['result1'] . '&nbsp;&nbsp;'.$data['result_rank1'].'.';
 				break;
 
 			case 'selfscore':
@@ -1146,9 +1171,10 @@ class ranking_route_result extends so_sql
 	 * @param int $quali_preselected =0 preselected participants for quali --> no countback to quali, if set!
 	 * @param boolean $is_final =false important for lead where we use time now in final, if tied after countback
 	 * @param int $selfscore_points =null point distributed per boulder, or null if 1 for each top
+	 * @param array $route =null whole route array, important for combined
 	 * @return int|boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($_keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$is_final=null,$selfscore_points=null)
+	function update_ranking($_keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$is_final=null,$selfscore_points=null,array $route=null)
 	{
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected)");
 		if (!$_keys['WetId'] || !$_keys['GrpId'] || !is_numeric($_keys['route_order'])) return false;
@@ -1190,7 +1216,8 @@ class ranking_route_result extends so_sql
 		// do we have a countback
 		if ($quali_preselected && $keys['route_order'] == 2 || $route_type == TWO_QUALI_ALL_NO_COUNTBACK ||
 			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] == 4 ||
-			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] < 4)
+			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] < 4 ||
+			$route && $route['discipline'] == 'combined' && $keys['route_order'] < 3)
 		{
 			// no countback to quali, if we use preselected athletes or TWO_QUALI_ALL_NO_COUNTBACK
 		}

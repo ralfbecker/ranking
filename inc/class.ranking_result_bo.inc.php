@@ -466,6 +466,20 @@ class ranking_result_bo extends ranking_bo
 						return $a > $b ? -1 : 1;
 					});
 				}
+				// for speed quali we need the number of starters to stagger the startlist
+				if ($route_order == 0 && $quali_route)
+				{
+					$num_starters = 0;
+					foreach($result as $PerId => $rank)
+					{
+						// check quota, if one is given
+						if ($quali_route && $quali_route['route_quota'] > 0 && $rank > $quali_route['route_quota'])
+						{
+							continue;
+						}
+						$num_starters++;
+					}
+				}
 			}
 			$num = 0;
 			foreach($result as $PerId => $rank)
@@ -486,6 +500,7 @@ class ranking_result_bo extends ranking_bo
 					'PerId' => $PerId,
 					'start_order' => 1+$num,
 					'result_rank' => $quali_route ? null : $rank,
+					'start_order2n' => $num_starters ? self::stagger(1+$num, $num_starters) : null,
 					// ToDo set some result so rank persists re-ranking
 				)))
 				{
@@ -1376,14 +1391,14 @@ class ranking_result_bo extends ranking_bo
 			if ($discipline == 'lead' && $keys['route_order'] >= 2)
 			{
 				if (is_null($route)) $route = $this->route->read($keys);
-				$is_final = !$route['route_quota'];
+				$is_final = !$route['route_quota'] && ($route['discipline'] == 'lead' || $keys['route_order'] >= 3);
 			}
 			$selfscore_points = null;
 			if ($discipline == 'selfscore' && ($route || ($route = $this->route->read($keys))))
 			{
 				$selfscore_points = $route['selfscore_points'];
 			}
-			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final,$selfscore_points);
+			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final,$selfscore_points,$route);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		// delete the export_route cache
@@ -2282,20 +2297,24 @@ class ranking_result_bo extends ranking_bo
 	 * Get discipline of a combined heat
 	 *
 	 * @param string $route_order
+	 * @param int& $route_type on return route/quali-type
 	 * @return string
 	 */
-	static public function combined_order2discipline($route_order)
+	static public function combined_order2discipline($route_order, &$route_type=null)
 	{
 		switch($route_order)
 		{
 			case 1:
 			case 7:
+				$route_type = ONE_QUALI;
 				return 'boulder';
 			case 2:
 			case 8:
+				$route_type = ONE_QUALI;
 				return 'lead';
 			case 0:
 			default:
+				$route_type = TWO_QUALI_BESTOF;
 				return 'speed';
 		}
 	}

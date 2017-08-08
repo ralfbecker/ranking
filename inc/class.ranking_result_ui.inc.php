@@ -68,7 +68,9 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$msg .= $ok;
 		}
-		$sel_options = array();
+		$sel_options = array(
+			'route_order' => $this->order_nums,
+		);
 
 		if ($content['discipline'] == 'combined')
 		{
@@ -94,6 +96,13 @@ class ranking_result_ui extends ranking_result_bo
 					{
 						$tmpl->disableElement('comb_quali');
 					}
+				}
+			}
+			foreach($this->order_nums as $n => $label)
+			{
+				if ($n > 0)
+				{
+					$sel_options['route_order'][$n] = ($n > 3 ? lang('Final') : lang('Qualification')).' '.lang($this->combined_order2discipline($n));
 				}
 			}
 		}
@@ -480,7 +489,8 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$readonlys['tabs']['measure'] = true;	// measurement tab only for judges
 		}
-		$tmpl->disableElement('route_num_problems', $discipline != 'boulder');
+		$tmpl->disableElement('route_num_problems',
+			($discipline != 'combined' ? $discipline : $this->combined_order2discipline($content['route_order'])) != 'boulder');
 
 		$readonlys['discipline'] = !!$content['route_order'];	// for no only allow to set discipline in 1. quali
 
@@ -491,7 +501,6 @@ class ranking_result_ui extends ranking_result_bo
 		$sel_options += array(
 			'WetId' => array($comp['WetId'] => strip_tags($comp['name'])),
 			'GrpId' => array($cat['GrpId']  => $cat['name']),
-			'route_order' => $this->order_nums,
 			'route_status' => $this->stati,
 			'route_type' => isset($this->quali_types_dicipline[$discipline]) ?
 				$this->quali_types_dicipline[$discipline] : $this->quali_types,
@@ -815,6 +824,14 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
 		$extra_cols = $query['csv_export'] ? array('strasse','email') : array();
+
+		// hack to fix combined general result(s) when comming from speed quali (looses boulder result otherwise)
+		if ($query['col_filter']['route_order'] < 0 && $query['col_filter']['discipline'] == 'combined')
+		{
+			$query['col_filter']['route_type'] = THREE_QUALI_ALL_NO_STAGGER;
+		}
+
+		//error_log(__METHOD__."() query[col_filter]=".array2string($query['col_filter']).", extra_cols=".array2string($extra_cols));
 		$total = $this->route_result->get_rows($query,$rows,$readonlys,$join='',false,false,$extra_cols);
 		//error_log(__METHOD__."() num_first_final=$num_first_final, skip=$skip, count(rows)=".count($rows));
 		//echo $total; _debug_array($rows);
@@ -1366,6 +1383,11 @@ class ranking_result_ui extends ranking_result_bo
 			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
 				$content['nm']['discipline'] == 'speedrelay');
 		}
+		// set single discipline for combined depending our route_order/heat
+		if ($content['nm']['discipline'] == 'combined' && $keys['route_order'] >= 0)
+		{
+			$content['nm']['discipline'] = $this->combined_order2discipline($keys['route_order'], $content['nm']['route_type']);
+		}
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
 
 		// check if user pressed a button and react on it
@@ -1490,7 +1512,7 @@ class ranking_result_ui extends ranking_result_bo
 		$content['nm']['calendar'] = $calendar;
 		$content['nm']['comp']     = $content['nm']['old_comp']= $comp ? $comp['WetId'] : null;
 		$content['nm']['cat']      = $content['nm']['old_cat'] = $cat ? $cat['GrpId'] : null;
-		$content['nm']['route_type'] = $route['route_type'];
+		if (empty($content['nm']['route_type'])) $content['nm']['route_type'] = $route['route_type'];
 		$content['nm']['route_status'] = $route['route_status'];
 		$content['nm']['num_problems'] = $route['route_num_problems'];
 		$content['nm']['time_measurement'] = $route['route_time_host'] && $route['route_status'] != STATUS_RESULT_OFFICIAL;
@@ -1686,7 +1708,7 @@ class ranking_result_ui extends ranking_result_bo
 
 		// for speed with two qualification rename "Startorder" to "Lane A"
 		if (!$route['route_order'] && $content['nm']['discipline'] == 'speed' &&
-			in_array($route['route_type'], array(TWO_QUALI_SPEED,TWO_QUALI_BESTOF)))
+			in_array($content['nm']['route_type'], array(TWO_QUALI_SPEED,TWO_QUALI_BESTOF)))
 		{
 			// eTemplate2: $tmpl->setElementAttribute('start_order', 'label', lang('Lane A'));
 			$content['start_order_label'] = lang('Lane A');
@@ -1727,8 +1749,8 @@ class ranking_result_ui extends ranking_result_bo
 			return $b - $a;
 		});
 
-		// for speed include pairing graph (-2)
-		if (substr($discipline, 0, 5) == 'speed')
+		// for speed include pairing graph (-2) (not for combined/three-qualis)
+		if (substr($discipline, 0, 5) == 'speed' && $route_type != THREE_QUALI_ALL_NO_STAGGER)
 		{
 			$show_result[3] = lang('Pairing speed final');
 			$route = array(-2 => lang('Pairing speed final'))+$route;
@@ -1817,6 +1839,11 @@ class ranking_result_ui extends ranking_result_bo
 			$response->call('egw.message', lang('Error').': '.lang('Route not found!'), 'error');
 			return;
 		}
+		if ($route['discipline'] == 'combined')
+		{
+			$route['discipline'] = $this->combined_order2discipline($route['route_order'], $route['route_type']);
+			$combined = true;
+		}
 		$query = egw_cache::getSession('ranking', 'result');
 		$order_by = $query['order'].' '.$query['sort'];
 		if (!preg_match('/^[a-z0-9_]+ (asc|desc)$/i', $order_by)) $order_by = 'start_order ASC';
@@ -1826,7 +1853,7 @@ class ranking_result_ui extends ranking_result_bo
 			$this->comp->quali_preselected($keys['GrpId'], $comp['quali_preselected']), $update_checked, $order_by))
 		{
 			// search filter needs route_type to not give SQL error
-			$filter = $keys+array('PerId' => $PerId,'route_type' => $route['route_type'], 'discipline' => $route['discipline']);
+			$filter = $keys+array('PerId' => $PerId,'route_type' => $route['route_type'], 'discipline' => $route['discipline'], 'combined' => $combined);
 			list($new_result) = $this->route_result->search(array(),false,'','','',false,'AND',false,$filter);
 			$msg = ranking_result_bo::athlete2string($new_result,true);
 		}
