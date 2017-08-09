@@ -802,7 +802,11 @@ class ranking_registration_ui extends ranking_bo
 
 						$stand = $comp['datum'];
 						$nul = $test = $ranking = null;
-		 				$this->ranking($c,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
+						try {
+							$this->ranking($c,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
+						} catch(Exception $e) {
+							_egw_log_exception($e);
+						}
 					}
 					$values = array();
 					foreach($name2csv as $name => $csv)
