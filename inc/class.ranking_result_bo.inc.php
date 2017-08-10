@@ -8,7 +8,6 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
  */
 
 use EGroupware\Api;
@@ -1433,7 +1432,8 @@ class ranking_result_bo extends ranking_bo
 			{
 				$selfscore_points = $route['selfscore_points'];
 			}
-if (is_null($route)) $route = $this->route->read($keys);
+			// combined needs route information availabe, to determine it's combined
+			if (is_null($route)) $route = $this->route->read($keys);
 			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final,$selfscore_points,$route);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}

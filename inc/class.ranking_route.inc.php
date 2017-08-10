@@ -7,14 +7,15 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-14 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * route object
  */
-class ranking_route extends so_sql
+class ranking_route extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 
@@ -28,7 +29,7 @@ class ranking_route extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 	}
 
 	/**
@@ -127,6 +128,9 @@ class ranking_route extends so_sql
 			case -5:
 				$name = lang('Group').' A '.lang('Qualification');
 				break;
+			case -6:
+				$name = lang('Final').' '.lang('Speed').' '.lang('overall result');
+				break;
 			default:
 				$name = lang('General result');
 				break;
@@ -139,8 +143,8 @@ class ranking_route extends so_sql
 	 *
 	 * Reimplemented to update modified, modifier and reset current_*, next_* if result offical.
 	 *
-	 * @param array $keys=null if given $keys are copied to data before saveing => allows a save as
-	 * @param string|array $extra_where=null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function save($keys=null,$extra_where=null)
@@ -190,7 +194,7 @@ class ranking_route extends so_sql
 	 * Reimplemented to delete the export-route cache
 	 *
 	 * @param array $fields
-	 * @param boolean $merge=true if true $fields will be merged with $this->data (after update!), otherwise $this->data will be just $fields
+	 * @param boolean $merge =true if true $fields will be merged with $this->data (after update!), otherwise $this->data will be just $fields
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
 	function update($fields,$merge=true)

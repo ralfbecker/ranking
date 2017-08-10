@@ -7,11 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
-use Egroupware\Api;
+use EGroupware\Api;
 
 class ranking_result_ui extends ranking_result_bo
 {
@@ -31,7 +30,7 @@ class ranking_result_ui extends ranking_result_bo
 	 */
 	function route($content=null,$msg='')
 	{
-		$tmpl = new etemplate_new('ranking.result.route');
+		$tmpl = new Api\Etemplate('ranking.result.route');
 
 		if (!is_array($content))
 		{
@@ -47,7 +46,7 @@ class ranking_result_ui extends ranking_result_bo
 			if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:([0-9]+))?(b?t?f?)?$/', $content['selfscore_mode'], $matches) ||
 				!($matches[1] > 0))
 			{
-				etemplate::set_validation_error('selfscore_mode', 'Wrong format!');
+				Api\Etemplate::set_validation_error('selfscore_mode', 'Wrong format!');
 				unset($content['button']);
 			}
 			else
@@ -62,7 +61,7 @@ class ranking_result_ui extends ranking_result_bo
 		$comp = $cat = $discipline = null;
 		if (!($ok = $this->init_route($content,$comp,$cat,$discipline)))
 		{
-			egw_framework::window_close(lang('Permission denied !!!'));
+			Api\Framework::window_close(lang('Permission denied !!!'));
 		}
 		elseif(is_string($ok))
 		{
@@ -452,8 +451,8 @@ class ranking_result_ui extends ranking_result_bo
 			}
 			if (in_array($button,array('save','delete')))	// close the popup and refresh the parent
 			{
-				egw_framework::refresh_opener($msg, 'ranking', $param);
-				egw_framework::window_close();
+				Api\Framework::refresh_opener($msg, 'ranking', $param);
+				Api\Framework::window_close();
 			}
 		}
 		if ($discipline == 'selfscore')
@@ -465,8 +464,8 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		$tmpl->disableElement('selfscore_mode', $discipline != 'selfscore');
 
-		if ($refresh) egw_framework::refresh_opener ($msg, 'ranking', $param);
-		if ($msg) egw_framework::message($msg, strpos($msg, '!') ? 'error' : null);
+		if ($refresh) Api\Framework::refresh_opener ($msg, 'ranking', $param);
+		if ($msg) Api\Framework::message($msg, strpos($msg, '!') ? 'error' : null);
 
 		$readonlys['button[delete]'] = $content['new_route'] || $view;
 		if (!isset($readonlys['route_type']))
@@ -878,7 +877,7 @@ class ranking_result_ui extends ranking_result_bo
 
 			if (!($rows[$k]['profile_url'] = $this->athlete->picture_url($row['rkey'])))
 			{
-				$rows[$k]['profile_url'] = common::image('ranking', 'transparent');
+				$rows[$k]['profile_url'] = Api\Image::find('ranking', 'transparent');
 			}
 			$rows[$k]['id'] = $row[$this->route_result->id_col];
 			/* not used anymore: results for setting on regular routes (no general result)
@@ -1131,7 +1130,7 @@ class ranking_result_ui extends ranking_result_bo
 	 */
 	function ajax_set_athlets($comp,$cat,$team_id,$nation)
 	{
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 		//$response->alert(__METHOD__."($comp,$cat,$team_id,'$nation')"); return;
 		$starters = $this->get_registered(array(
 			'WetId' => $comp,
@@ -1236,13 +1235,13 @@ class ranking_result_ui extends ranking_result_bo
 	 * @param array $content =null
 	 * @param string $msg =''
 	 * @param string $pstambl
-	 * @param int $output_mode =0 2: popup, 4: ajax response, see etemplate_new::exec()
+	 * @param int $output_mode =0 2: popup, 4: ajax response, see Api\Etemplate::exec()
 	 * @param boolean $update_checked =false
 	 * @return type
 	 */
 	function index($content=null, $msg='', $pstambl='', $output_mode=0, $update_checked=false)
 	{
-		$tmpl = new etemplate_new('ranking.result.index');
+		$tmpl = new Api\Etemplate('ranking.result.index');
 
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
@@ -1782,6 +1781,14 @@ class ranking_result_ui extends ranking_result_bo
 			if ($num_routes <= 2 || $route_type == TWO_QUALI_GROUPS && $num_routes <= 4) return;	// dont show general result yet
 		}
 
+		// add overall speed final for combined
+		if ($discipline == 'combined' && isset($route[4]))
+		{
+			$speed_final = isset($route[-6]) ? $route[-6] : ranking_route::default_name(-6);
+			unset($route[-6]);
+			$route = array_slice($route, 0, -7, true) + array(-6 => $speed_final) + array_slice($route, -7, null, true);
+		}
+
 		// add general result (-1) on top of list
 		$label =  isset($route[-1]) ? $route[-1] : ranking_route::default_name(-1);
 		unset($route[-1]);
@@ -1826,7 +1833,7 @@ class ranking_result_ui extends ranking_result_bo
 	function ajax_update(array $keys, $PerId, array $set, $update_checked=false)
 	{
 		//$start = microtime(true);
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
 		if (!($comp = $this->comp->read($keys['WetId'])))
 		{
@@ -1962,7 +1969,7 @@ class ranking_result_ui extends ranking_result_bo
 	function ajax_time_measurement($request_id,$PerId)
 	{
 		//$start = microtime(true);
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
 		if (!($request =& etemplate_request::read($request_id)))
 		{
@@ -2220,7 +2227,7 @@ class ranking_result_ui extends ranking_result_bo
 		return $this->_stop_time_measurement($response,lang('Time measured'));
 	}
 
-	function _update_ranks(array $keys,egw_json_response $response,etemplate_request $request)
+	function _update_ranks(array $keys,Api\Json\Response $response,etemplate_request $request)
 	{
 		//error_log("content[order]=".$request->content['nm']['order'].", changes[order]=".$request->changes['nm']['order']);
 		$order = $request->changes['nm']['order'] ? $request->changes['nm']['order'] : $request->content['nm']['order'];
@@ -2246,10 +2253,10 @@ class ranking_result_ui extends ranking_result_bo
 	 * Stop the running time measurement ON CLIENT SIDE
 	 *
 	 * @access private
-	 * @param egw_json_response $response response object with preset responses
+	 * @param Api\Json\Response $response response object with preset responses
 	 * @return string
 	 */
-	function _stop_time_measurement(egw_json_response $response,$msg = '')
+	function _stop_time_measurement(Api\Json\Response $response,$msg = '')
 	{
 		$response->call('set_style_by_class', 'td', 'ajax-loader', 'display', 'none');
 		$response->jquery('#msg', 'text', array($msg));

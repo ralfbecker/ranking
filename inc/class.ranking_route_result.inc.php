@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 if (!defined('ONE_QUALI'))
@@ -16,10 +15,12 @@ if (!defined('ONE_QUALI'))
 	include_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_result_bo.inc.php');
 }
 
+use EGroupware\Api;
+
 /**
  * route object
  */
-class ranking_route_result extends so_sql
+class ranking_route_result extends Api\Storage\Base
 {
 	const TOP_PLUS = 9999;
 	const TOP_HEIGHT = 99999999;
@@ -104,7 +105,7 @@ class ranking_route_result extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 	}
 
 	/**
@@ -237,6 +238,12 @@ class ranking_route_result extends so_sql
 				elseif ($route_type == TWO_QUALI_HALF)
 				{
 					$route_order = array(0,1);
+				}
+				elseif ($route_order == -6)		// combined: overall speed final
+				{
+					$route_order = 3;
+					$discipline = 'speed';
+					$quali_overall = 6;
 				}
 				elseif ($quali_overall == 2)	// Group B
 				{
@@ -428,7 +435,7 @@ class ranking_route_result extends so_sql
 	 * @param int $quali_overal =0 1: Group A, 2: Group B, 3: Overal qualification, 0: other
 	 * @return string
 	 */
-	function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0)
+	private function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0)
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL_SUM)
 		{
@@ -516,10 +523,9 @@ class ranking_route_result extends so_sql
 	 * @param int $quali_overall =0 1: groupA, 2: groupB, 3: quali overall, 0: other
 	 * @return string join
 	 */
-	function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array(), $quali_overall=0)
+	private function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array(), $quali_overall=0)
 	{
-		//echo "<p>".__METHOD__."(".print_r($keys,true).",".print_r($extra_cols,true).",,,type=$route_type,$discipline,".print_r($result_cols,true).")</p>\n";
-		unset($discipline);
+		error_log(__METHOD__."(".array2string($keys).",".array2string($extra_cols).",,,type=$route_type,$discipline,".array2string($result_cols).", quali_overall=$quali_overall)");
 		if (!isset($GLOBALS['egw']->route) || !is_object($GLOBALS['egw']->route))
 		{
 			$GLOBALS['egw']->route = new ranking_route($this->source_charset,$this->db);
@@ -547,7 +553,13 @@ class ranking_route_result extends so_sql
 				$route_names = array_slice($route_names, 0, 2, true);
 			}
 		}
-		elseif ($quali_overall)	// overall for two qualifications --> ignore other rounds
+		// overall speed final for combined
+		elseif ($discipline == 'speed' && $quali_overall == 6)
+		{
+			$route_names = array_slice($route_names, 3, 3, true);
+		}
+		// overall for two qualifications --> ignore other rounds
+		elseif ($quali_overall)
 		{
 			$route_names = array_slice($route_names, 0, 2+(int)($route_type == THREE_QUALI_ALL_NO_STAGGER), true);
 		}
@@ -562,7 +574,8 @@ class ranking_route_result extends so_sql
 			{
 				if (in_array($route_order,array(2,3))) continue;	// base of the query, no need to join
 			}
-			elseif ($route_order < 2-(int)ranking_result_bo::is_two_quali_all($route_type)-(int)($route_type == THREE_QUALI_ALL_NO_STAGGER))
+			elseif ($route_order < 2-(int)ranking_result_bo::is_two_quali_all($route_type)-(int)($route_type == THREE_QUALI_ALL_NO_STAGGER) ||
+				$discipline == 'speed' && $quali_overall == 6 && $route_order == 3)
 			{
 				continue;	// no need to join the qualification
 			}
@@ -591,7 +604,7 @@ class ranking_route_result extends so_sql
 			// not participating in one qualification (order 0 or 1) of TWO_QUALI_ALL is ok
 			if (!$quali_overall && (!in_array($route_type, array(TWO_QUALI_ALL, TWO_QUALI_ALL_NO_COUNTBACK, THREE_QUALI_ALL_NO_STAGGER)) ||
 				$route_order >= 2 && $route_type != THREE_QUALI_ALL_NO_STAGGER ||
-				$route_order >= 3))
+				$route_order >= 3) || $quali_overall == 6)
 			{
 				$order_bys[] = "r$route_order.result_rank IS NULL";
 			}
@@ -607,7 +620,7 @@ class ranking_route_result extends so_sql
 		}
 		$extra_cols[] = $this->table_name.'.*';		// trick so_sql to return the cols from the quali as regular cols
 
-		//echo "join=$join, order_by=$order_by, extra_cols="; _debug_array($extra_cols);
+		error_log(__METHOD__."() join=$join, order_by=$order_by, extra_cols=".array2string($extra_cols));
 		return $join;
 	}
 
@@ -788,6 +801,7 @@ class ranking_route_result extends so_sql
 				{
 					if ($data['result_rank'.$suffix])
 					{
+						if ($suffix == 3 && !isset($data_speed['result'.$suffix])) $data_speed['result'.$suffix] = $data_speed['result'];
 						$data['result'.$suffix] = $data_speed['result'.$suffix] . "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
 					}
 				}
@@ -869,8 +883,7 @@ class ranking_route_result extends so_sql
 							$data['false_start'] > 1 ? lang('%1. false start', $data['false_start']) : lang('false start');
 						$data['eliminated'] = ranking_result_bo::ELIMINATED_FALSE_START;
 					}
-					if (!array_key_exists('result_time2',$data) && !$data['ability_percent'] &&
-						!array_key_exists('result_time3',$data))	// route 0, 3, 4 and 5 are speed in combined
+					if (!$data['general_result'])
 					{
 						if ($data['result_time'])
 						{
@@ -910,7 +923,8 @@ class ranking_route_result extends so_sql
 					else
 					{
 						$suffix = '';	// general result can have route_order as suffix
-						while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]))
+						while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]) ||
+							$suffix < 1+$data['route_order'])
 						{
 							if ($data['result_time'.$suffix])
 							{
@@ -968,7 +982,7 @@ class ranking_route_result extends so_sql
 	 * @param string &$name
 	 * @param int $max =12 maximum length
 	 */
-	function _shorten_name(&$name,$max=13)
+	private function _shorten_name(&$name,$max=13)
 	{
 		if (strlen($name) <= $max) return;
 
