@@ -876,7 +876,7 @@ class ranking_result_bo extends ranking_bo
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
-			'route_order' => $keys['route_order']-1,
+			'route_order' => $discipline == 'combined' && $keys['route_order'] == 6 ? -6 : $keys['route_order']-1,
 		);
 		if ($prev_keys['route_order'] == 1 && !$this->route->read($prev_keys))
 		{
@@ -886,13 +886,14 @@ class ranking_result_bo extends ranking_bo
 		{
 			throw new Api\Exception\WrongUserinput(lang('Previous round not found!'));
 		}
-		if ($start_order_mode != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
+		// check if startorder depends on result
+		if ($start_order_mode != 'previous' && !$this->has_results($prev_keys) ||
 			$ko_system && !$prev_route['route_quota'])
 		{
 			throw new Api\Exception\WrongUserinput(lang('Previous round has no result!'));
 		}
 		// read quota from previous heat or for new overall quali result from there
-		$quota = $this->get_quota($keys, $prev_route['route_type']);
+		$quota = $this->get_quota($keys, $prev_route['route_type'], $discipline);
 		if ($prev_route['route_type'] == TWO_QUALI_HALF && $keys['route_order'] == 2)
 		{
 			$prev_keys['route_order'] = array(0,1);		// use both quali routes
@@ -993,9 +994,15 @@ class ranking_result_bo extends ranking_bo
 			}
 			$order_by .= ',RAND()';					// --> randomized
 		}
-		error_log(__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join')");
+		//error_log(__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join')");
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
 		unset($starters['route_names']);
+
+		// combined boulder final depends on overall speed final, which can not be easyly reversed in search --> do it now
+		if ($discipline == 'combined' && $keys['route_order'] == 6)
+		{
+			$starters = array_reverse($starters);
+		}
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
 		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $quota)
@@ -1501,6 +1508,9 @@ class ranking_result_bo extends ranking_bo
 	 */
 	function has_results($keys,$startlist_only=false)
 	{
+		// hack to not check result for combined boulder final depending on a general / virtual result
+		if ($keys['route_order'] == -6) return true;
+
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return null;
 
 		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0,'PerId'=>0,'team_id'=>0));
@@ -2138,10 +2148,11 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param array $keys
 	 * @param int $route_type =null default use $keys['route_type'], one of (ONE|TWO)_QUALI_*
+	 * @param string $discipline =null discipline to use, only matters so far for combined
 	 * @return int|null quote or null for first heat, exception if none is set in previous heat
-	 * @throws egw_exception_wrong_userinput with error message
+	 * @throws Api\Exception\WrongUserinput with error message
 	 */
-	function get_quota(array $keys, $route_type=null)
+	function get_quota(array $keys, $route_type=null, $discipline=null)
 	{
 		if (!isset($route_type)) $route_type = $keys['route_type'];
 
@@ -2162,18 +2173,23 @@ class ranking_result_bo extends ranking_bo
 		{
 			$keys['route_order'] = -3;
 		}
+		elseif($discipline == 'combined' && $route_order == 6)
+		{
+			$keys['route_order'] = -6;
+		}
 		else
 		{
 			$keys['route_order'] = $route_order-1;
 		}
 		if (!($prev = $this->route->read($keys)))
 		{
-			throw new egw_exception_wrong_userinput(lang('No previous heat (%1) found!', $keys['route_order']));
+			throw new Api\Exception\WrongUserinput(lang('No previous heat (%1) found!', $keys['route_order']));
 		}
 		//error_log(__METHOD__."(".array2string($keys).", '$route_type') prev=".array2string($prev));
-		if (!(int)$prev['route_quota'])
+		if (!(int)$prev['route_quota'] &&
+			!($discipline == 'combined' || $route_order == 3))	// combined only uses quote for speed final (3)
 		{
-			throw new egw_exception_wrong_userinput(lang('No quota set in the previous heat!!!'));
+			throw new Api\Exception\WrongUserinput(lang('No quota set in the previous heat!!!'));
 		}
 		return (int)$prev['route_quota'];
 	}
@@ -2275,7 +2291,7 @@ class ranking_result_bo extends ranking_bo
 					$this->get_quota($keys, $content['route_type']);
 				}
 			}
-			catch (egw_exception_wrong_userinput $e) {
+			catch (Api\Exception\WrongUserinput $e) {
 				$msg = $e->getMessage();
 			}
 			if (substr($discipline,0,5) != 'speed')
@@ -2353,11 +2369,11 @@ class ranking_result_bo extends ranking_bo
 		switch($route_order)
 		{
 			case 1:
-			case 7:
+			case 6:
 				$route_type = ONE_QUALI;
 				return 'boulder';
 			case 2:
-			case 8:
+			case 7:
 				$route_type = ONE_QUALI;
 				return 'lead';
 			case 0:

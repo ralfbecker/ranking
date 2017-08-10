@@ -1543,7 +1543,7 @@ class ranking_result_ui extends ranking_result_bo
 
 		if (count($sel_options['route']) > 1)	// more then 1 heat --> include a general result
 		{
-			$this->add_general_result_options($sel_options['route'], $sel_options['show_result'], $route['route_type'], $content['nm']['discipline']);
+			$this->add_general_result_options($sel_options['route'], $sel_options['show_result'], $route['route_type'], $route['discipline']);
 			// if general result is suppressed, go for first in list, as that is what is displayed to user anyway
 			if (!isset($sel_options['route'][$content['nm']['route']]))
 			{

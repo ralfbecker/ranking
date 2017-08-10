@@ -700,7 +700,7 @@ class ranking_route_result extends Api\Storage\Base
 					$data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_GROUPS,THREE_QUALI_ALL_NO_STAGGER)))
 				{
 					if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
-					foreach($data['general_result'] ? array(1,2,3,'',0,4,5,6) : array('') as $suffix)
+					foreach($data['general_result'] ? array(1,2,3,'',0,4,5,6,7) : array('') as $suffix)
 					{
 						$to_suffix = $suffix;
 						if ($data['general_result'] && $suffix === '' && $data['route_order'] > 0)
@@ -830,7 +830,8 @@ class ranking_route_result extends Api\Storage\Base
 						((string)$data['zone'.$i] !== '' ? 'b'.$data['zone'.$i] : '');
 				}
 				$suffix = $data['discipline'] == 'selfscore' ? 2 : '';	// general result can have route_order as suffix
-				while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]))
+				while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]) ||
+					$data['general_result'] && $suffix < 6)	// combined general result has boulder final with suffix 6
 				{
 					if (isset($data['result_zone'.$suffix]))
 					{
@@ -851,7 +852,7 @@ class ranking_route_result extends Api\Storage\Base
 							$data['zones'] = $zones;
 							$data['zone_tries'] = $zone_tries;
 						}
-						$data['result'.$to_suffix] = $tops.'t'.$top_tries.' '.$zones.'b'.$zone_tries;
+						$data['result'.$to_suffix] = $tops.'t'.$top_tries."\u{00A0}".$zones.'b'.$zone_tries;
 						if ($suffix !== $to_suffix)
 						{
 							$data['result_rank'.$to_suffix] = $data['result_rank'.$suffix];
