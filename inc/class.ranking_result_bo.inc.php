@@ -32,7 +32,7 @@ define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
 define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
 define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012 EYC, no countback, otherwise like TWO_QUALI_ALL
 define('TWO_QUALI_GROUPS', 10);			// two quali groups with 2 flash routes each (different from TWOxTWO_QUALI!)
-define('THREE_QUALI_ALL_NO_STAGGER',11);	// lead on 3 routes for all on flash
+define('THREE_QUALI_ALL_NO_STAGGER',11);	// lead on 3 routes for all on flash or combined format
 
 define('LEAD',4);
 define('BOULDER',8);
@@ -248,7 +248,8 @@ class ranking_result_bo extends ranking_bo
 	 *  &8  use ranking/cup for distribution only, order is random
 	 * @param int $add_cat =null additional category to add registered atheletes from
 	 * @param int $comb_quali =null (additional) combined qualification competition (WetId)
-	 * @return int/boolean number of starters, if startlist has been successful generated AND saved, false otherwise
+	 * @return int|boolean number of starters, if startlist has been successful generated AND saved, false otherwise
+	 * @throws Api\Exception\WrongUserinput with translated error-message
 	 */
 	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null,$add_cat=null,$comb_quali=null)
 	{
@@ -259,12 +260,15 @@ class ranking_result_bo extends ranking_bo
 		);
 		if (!$comp || !$cat || !is_numeric($route_order) ||
 			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||	// permission denied
-			!$this->route->read($keys) ||	// route does not exist
-			$this->has_results($keys))		// route already has a result
+			!$this->route->read($keys))		// route already has a result
 		{
-			//echo "failed to generate startlist"; _debug_array($keys);
-			return false;
+			throw new Api\Exception\WrongUserinput(lang('entry not found !!!'));
 		}
+		if ($this->has_results($keys))
+		{
+			throw new Api\Exception\WrongUserinput(lang('Error: route already has a result!!!'));
+		}
+
 		// further heat --> startlist from reverse result of previous heat
 		// but for combined we have 3 qualis
 		if (!($discipline == 'combined' && $route_order < 3) && $route_order >= 2 ||
@@ -280,12 +284,16 @@ class ranking_result_bo extends ranking_bo
 		// hack for speedrelay, which currently does NOT use registration --> randomize teams
 		if ($discipline == 'speedrelay')
 		{
-			return $this->_randomize_speedrelay($keys);
+			return $this->_randomize_startlist($keys);
 		}
+
 		// from now on only quali startlist from registration
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
 		if (!is_array($cat)) $cat = $this->cats->read($cat);
-		if (!$comp || !$cat) return false;
+		if (!$comp || !$cat)
+		{
+			throw new Api\Exception\WrongUserinput(lang('entry not found !!!'));
+		}
 
 		// combined startlist
 		if ($discipline == 'combined' && $route_order < 3)
@@ -389,8 +397,8 @@ class ranking_result_bo extends ranking_bo
 	 * @param array $cat GrpId or complete cat array
 	 * @param int $route_order 0=speed, 2=boulder, 3=lead qualification
 	 * @param int $comb_quali =null (additional) combined qualification competition (WetId)
-	 * @return int|boolean number of starters, if startlist has been successful generated AND saved, false otherwise
-	 * @throws Api\Exception\WrongUserinput
+	 * @return int number of starters, if startlist has been successful generated AND saved
+	 * @throws Api\Exception\WrongUserinput with translated error-message
 	 */
 	private function _combined_startlist(array $comp, array $cat, $route_order, $comb_quali=null)
 	{
@@ -689,12 +697,12 @@ class ranking_result_bo extends ranking_bo
 	}
 
 	/**
-	 * Randomize a startlist for speedrelay qualification
+	 * Randomize a startlist eg. for speedrelay qualification
 	 *
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @return int|boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
 	 */
-	function _randomize_speedrelay(array $keys)
+	private function _randomize_startlist(array $keys)
 	{
 		$start_order = null;
 		if (($starter = $this->route_result->search('',true,'RAND()','','','','AND',false,$keys)))
@@ -781,11 +789,11 @@ class ranking_result_bo extends ranking_bo
 	 * @param int $route_order if set only these starters get stored
 	 * @return int num starters stored
 	 */
-	function _store_startlist($starters,$route_order,$use_order=true)
+	private function _store_startlist($starters,$route_order,$use_order=true)
 	{
 		if (!$starters || !is_array($starters))
 		{
-			return false;
+			throw new Api\Exception\WrongUserinput('No starters!');
 		}
 		$num = 0;
 		foreach($starters as $starter)
@@ -818,7 +826,7 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @var array
 	 */
-	var $ko_start_order=array(
+	private static $ko_start_order=array(
 		16 => array(
 			1 => 1,  16 => 2,
 			8 => 3,  9  => 4,
@@ -835,6 +843,12 @@ class ranking_result_bo extends ranking_bo
 			2 => 5, 7 => 6,
 			3 => 7, 6 => 8,
 		),
+		// combined format final with 6, but with reversed result!
+		6 => array(
+			/*1*/6 => 1, /*6*/1 => 2,
+			/*2*/5 => 3, /*5*/2 => 4,
+			/*3*/4 => 5, /*4*/3 => 6,
+		),
 		4 => array(
 			1 => 1, 4 => 2,
 			2 => 3, 3 => 4,
@@ -848,16 +862,17 @@ class ranking_result_bo extends ranking_bo
 	 * @param array $keys values for WetId, GrpId and route_order
 	 * @param string $start_order_mode ='reverse' 'reverse' result, like 'previous' heat, as the 'result'
 	 * @param string $discipline
-	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
-	 * @throws Api\Exception\WrongUserinput for eg. no quota set
+	 * @return int number of starters, if the startlist has been successful generated AND saved
+	 * @throws Api\Exception\WrongUserinput with translated error-message, eg. no quota set
 	 */
-	function _startlist_from_previous_heat($keys,$start_order_mode='reverse',$discipline='lead')
+	private function _startlist_from_previous_heat($keys,$start_order_mode='reverse',$discipline='lead')
 	{
 		$ko_system = substr($discipline,0,5) == 'speed';
-		//echo "<p>".__METHOD__."(".array2string($keys).",$start_order_mode,$discipline) ko_system=$ko_system</p>\n";
-		if ($ko_system && $keys['route_order'] > 2)
+		//error_log(__METHOD__."(".array2string($keys).",$start_order_mode,$discipline) ko_system=$ko_system");
+		if ($ko_system && $keys['route_order'] > 2 ||
+			$discipline == 'combined' && in_array($keys['route_order'], array(4,5)))
 		{
-			return $this->_startlist_from_ko_heat($keys);
+			return $this->_startlist_from_ko_heat($keys, $discipline);
 		}
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
@@ -868,12 +883,14 @@ class ranking_result_bo extends ranking_bo
 		{
 			$prev_keys['route_order'] = 0;
 		}
-		if (!($prev_route = $this->route->read($prev_keys,true)) ||
-			$start_order_mode != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
+		if (!($prev_route = $this->route->read($prev_keys,true)))
+		{
+			throw new Api\Exception\WrongUserinput(lang('Previous round not found!'));
+		}
+		if ($start_order_mode != 'previous' && !$this->has_results($prev_keys) ||	// startorder does NOT depend on result
 			$ko_system && !$prev_route['route_quota'])
 		{
-			//echo "failed to generate startlist from"; _debug_array($prev_keys); _debug_array($prev_route);
-			return false;	// prev. route not found or no result
+			throw new Api\Exception\WrongUserinput(lang('Previous round has no result!'));
 		}
 		// read quota from previous heat or for new overall quali result from there
 		$quota = $this->get_quota($keys, $prev_route['route_type']);
@@ -929,7 +946,7 @@ class ranking_result_bo extends ranking_bo
 			{
 				$order_by = $this->route_result->table_name.'.result_rank DESC';		// --> reversed result
 			}
-			// quali on two routes with multiplied ranking
+			// quali on two or 2 routes with multiplied ranking
 			elseif(self::is_two_quali_all($prev_route['route_type']) && $keys['route_order'] == 2 ||
 				$prev_route['route_type'] == THREE_QUALI_ALL_NO_STAGGER && $keys['route_order'] == 3)
 			{
@@ -977,10 +994,9 @@ class ranking_result_bo extends ranking_bo
 			}
 			$order_by .= ',RAND()';					// --> randomized
 		}
-		//echo "<p>".__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n";
+		error_log(__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join')");
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
 		unset($starters['route_names']);
-		//_debug_array($starters);
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
 		if ($ko_system && $keys['route_order'] == 2 && count($starters) > $quota)
@@ -1003,9 +1019,14 @@ class ranking_result_bo extends ranking_bo
 				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$quota)."]['quali_points']=".$starters[count($starters)-$quota]['quali_points']."</p>\n";
 				continue;
 			}
-			if ($ko_system && $keys['route_order'] == 2)	// first final round in ko-sytem
+			// first final round in ko-sytem
+			if ($ko_system && $keys['route_order'] == 2 ||
+				$discipline == 'combined' && $keys['route_order'] == 3)
 			{
-				if (!isset($this->ko_start_order[$quota])) return false;
+				if (!isset(self::$ko_start_order[$quota]) || ($quota == 6) !== ($discipline == 'combined'))
+				{
+					throw new Api\Exception\WrongUserinput(lang('Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or 6 for combined)!', $quota));
+				}
 				if ($max_rank)
 				{
 					if ($data['result_rank'] > $max_rank) break;
@@ -1014,7 +1035,7 @@ class ranking_result_bo extends ranking_bo
 						$data['result_time'] = WILDCARD_TIME;
 					}
 				}
-				$data['start_order'] = $this->ko_start_order[$quota][$start_order++];
+				$data['start_order'] = self::$ko_start_order[$quota][$start_order++];
 			}
 			// 2. quali is stagger'ed of 1. quali
 			elseif(in_array($prev_route['route_type'],array(TWO_QUALI_ALL,TWO_QUALI_ALL_SEED_STAGGER)) && $keys['route_order'] == 1)
@@ -1064,7 +1085,7 @@ class ranking_result_bo extends ranking_bo
 		{
 			while($start_order <= $quota)
 			{
-				$this->_create_wildcard_co($keys,$this->ko_start_order[$quota][$start_order++]);
+				$this->_create_wildcard_co($keys,self::$ko_start_order[$quota][$start_order++]);
 			}
 		}
 		return $start_order-1;
@@ -1074,12 +1095,11 @@ class ranking_result_bo extends ranking_bo
 	 * Generate a startlist from the result of a previous heat
 	 *
 	 * @param array $keys values for WetId, GrpId and route_order
-	 * @param string $start_order ='reverse' 'reverse' result, like 'previous' heat, as the 'result'
-	 * @param boolean $ko_system =false use ko-system
 	 * @param string $discipline
-	 * @return int/boolean number of starters, if the startlist has been successful generated AND saved, false otherwise
+	 * @return int number of starters, if the startlist has been successful generated AND saved
+	 * @throws Api\Exception\WrongUserinput with translated error-message
 	 */
-	function _startlist_from_ko_heat($keys)
+	private function _startlist_from_ko_heat($keys, $discipline)
 	{
 		//echo "<p>".__METHOD__."(".print_r($keys,true).")</p>\n";
 		$prev_keys = array(
@@ -1089,9 +1109,25 @@ class ranking_result_bo extends ranking_bo
 		);
 		if (!($prev_route = $this->route->read($prev_keys)))
 		{
-			return false;
+			throw new Api\Exception\WrongUserinput(lang('Previous round not found!'));
 		}
-		if ($prev_route['route_quota'] == 2)	// small final
+		$order_by = 'start_order';
+		// combined integrates fastest loosers in 1/2-final and small final in final
+		if ($discipline == 'combined')
+		{
+			$prev_keys[] = 'result_rank <= 4';
+			// treat fastest looser like winner of 4th pairing
+			if ($keys['route_order'] == 4)
+			{
+				$order_by = 'CASE result_rank WHEN 4 THEN 2.5 ELSE start_order END';
+			}
+			// first loosers (small final) then winners, all by start_order
+			else
+			{
+				$order_by = 'result_rank=1,start_order';
+			}
+		}
+		elseif ($prev_route['route_quota'] == 2)	// small final
 		{
 			$prev_keys[] = 'result_rank > 2';
 		}
@@ -1100,7 +1136,7 @@ class ranking_result_bo extends ranking_bo
 			if (!$prev_route['route_quota'] && --$prev_keys['route_order'] &&	// final
 				!($prev_route = $this->route->read($prev_keys)))
 			{
-				return false;
+				throw new Api\Exception\WrongUserinput(lang('Previous round not found!'));
 			}
 			$prev_keys[] = 'result_rank = 1';
 		}
@@ -1109,19 +1145,18 @@ class ranking_result_bo extends ranking_bo
 		$cols[] = 'start_order';
 		$cols[] = 'result_detail AS detail';	// AS detail to not automatically unserialize (we only want false_start)
 		$starters =& $this->route_result->search('',$cols,
-			$order_by='start_order','','',false,'AND',false,$prev_keys);
-		//echo "<p>".__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).",'$join');</p>\n"; _debug_array($starters);
+			$order_by,'','',false,'AND',false,$prev_keys);
+		error_log(__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).") starters = ".array2string($starters));
 
 		// reindex by _new_ start_order
-		foreach($starters as &$starter)
+		foreach($starters as $n => &$starter)
 		{
 			unset($starter['result_rank']);
 			// copy number of false_start from previous heat
 			$detail = ranking_route_result::unserialize($starter['detail']);
 			unset($starter['detail']);
 			$starter['false_start'] = $detail['false_start'];
-			$start_order = (int)(($starter['start_order']+1)/2);
-			$starters_by_startorder[$start_order] =& $starter;
+			$starters_by_startorder[1+$n] =& $starter;
 		}
 		for($start_order=1; $start_order <= $prev_route['route_quota']; ++$start_order)
 		{
@@ -1156,7 +1191,7 @@ class ranking_result_bo extends ranking_bo
 	 * @param int $start_order
 	 * @param array $extra =array()
 	 */
-	function _create_wildcard_co(array $keys,$start_order,array $extra=array())
+	private function _create_wildcard_co(array $keys,$start_order,array $extra=array())
 	{
 		$this->route_result->init($keys);
 		$this->route_result->save($data=array(
@@ -1192,7 +1227,7 @@ class ranking_result_bo extends ranking_bo
 	 * @param string $stand date of the ranking as Y-m-d string
 	 * @return string sql or null for no ranking
 	 */
-	function _ranking_sql($cat,$stand,$PerId='PerId')
+	private function _ranking_sql($cat,$stand,$PerId='PerId')
 	{
 		$nul = null;
 	 	$ranking =& $this->ranking($cat,$stand,$nul,$nul,$nul,$nul,$nul,$nul);//,$mode == 2 ? $comp['serie'] : '');
@@ -1398,6 +1433,7 @@ class ranking_result_bo extends ranking_bo
 			{
 				$selfscore_points = $route['selfscore_points'];
 			}
+if (is_null($route)) $route = $this->route->read($keys);
 			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final,$selfscore_points,$route);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
@@ -2045,7 +2081,7 @@ class ranking_result_bo extends ranking_bo
 	 * @param int $route_order
 	 * @param int $quali_type =null TWO_QUALI_ALL, TWO_QUALI_HALF, ONE_QUALI
 	 * @param int $num_participants =null
-	 * @return int
+	 * @return int|NULL
 	 */
 	static function default_quota($discipline,$route_order,$quali_type=null,$num_participants=null)
 	{
@@ -2084,8 +2120,16 @@ class ranking_result_bo extends ranking_bo
 					case 2: $quota = 6;  break;		// 1/2-final
 				}
 				break;
+
+			case 'combined':
+				switch($route_order)
+				{
+					case -3: $quota = 6; break;	// 6 from qualification to 1/4-final speed
+					case 3:
+					case 4: $quota = 4; break;	// 4 to 1/2-final and final speed (includes small final)
+				}
 		}
-		//echo "<p>".__METHOD__."($discipline,$route_order,$quali_type,$num_participants)=$quota</p>\n";
+		//error_log(__METHOD__."($discipline,$route_order,$quali_type,$num_participants)=$quota");
 		return $quota;
 	}
 
@@ -2113,7 +2157,8 @@ class ranking_result_bo extends ranking_bo
 		}
 		// use new overall qualification result
 		elseif ($route_order == 4 && $route_type == TWO_QUALI_GROUPS  ||
-			$route_order == 2 && ($route_type != TWO_QUALI_GROUPS && self::is_two_quali_all($route_type) || $route_type == TWO_QUALI_HALF))
+			$route_order == 2 && ($route_type != TWO_QUALI_GROUPS && self::is_two_quali_all($route_type) || $route_type == TWO_QUALI_HALF) ||
+			$route_order == 3 && $route_type == THREE_QUALI_ALL_NO_STAGGER)
 		{
 			$keys['route_order'] = -3;
 		}
@@ -2125,6 +2170,7 @@ class ranking_result_bo extends ranking_bo
 		{
 			throw new egw_exception_wrong_userinput(lang('No previous heat (%1) found!', $keys['route_order']));
 		}
+		//error_log(__METHOD__."(".array2string($keys).", '$route_type') prev=".array2string($prev));
 		if (!(int)$prev['route_quota'])
 		{
 			throw new egw_exception_wrong_userinput(lang('No quota set in the previous heat!!!'));
@@ -2211,12 +2257,14 @@ class ranking_result_bo extends ranking_bo
 						$keys['route_type'] = ONE_QUALI;
 				}
 			}
-			$keys['route_name'] = $keys['route_order'] >= 2 && !($discipline == 'combined' && $keys['route_order'] <= 3) ? lang('Final') :
+			$keys['route_name'] = $keys['route_order'] >= 2 && !($discipline == 'combined' && $keys['route_order'] < 3) ? lang('Final') :
 				($keys['route_order'] == 1 && $discipline != 'combined' ? '2. ' : '').lang('Qualification');
 
 			if ($discipline == 'combined')
 			{
-				$keys['route_name'] .= ' '.lang(self::combined_order2discipline($keys['route_order']));
+				static $route_order_prefix = array(3 => '1/4-', 4 => '1/2-');
+				$keys['route_name'] = $route_order_prefix[$keys['route_order']].$keys['route_name'].' '.
+					lang(self::combined_order2discipline($keys['route_order']));
 			}
 			//error_log(__METHOD__."() discipline=$discipline, route_order=$keys[route_order]: $keys[route_name]");
 

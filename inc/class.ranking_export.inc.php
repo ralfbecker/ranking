@@ -598,6 +598,11 @@ class ranking_export extends ranking_result_bo
 		$route['category_offical'] = $general_result && ($general_result['route_status'] == STATUS_RESULT_OFFICIAL ||
 			egw_time::to($comp['datum'],'ts') - time() > 10*24*3600);
 
+		// get discipline from combined heat
+		if ($discipline == 'combined' && $heat >= 0)
+		{
+			$route['discipline'] = $discipline = ranking_result_bo::combined_order2discipline($heat);
+		}
 		switch($discipline)
 		{
 			default:

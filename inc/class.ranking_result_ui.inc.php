@@ -72,12 +72,14 @@ class ranking_result_ui extends ranking_result_bo
 			'route_order' => $this->order_nums,
 		);
 
+		// disable selection of combined qualification event, for everything but combined qualification
+		$tmpl->disableElement('comb_quali');
 		if ($content['discipline'] == 'combined')
 		{
 			$content['route_type'] = THREE_QUALI_ALL_NO_STAGGER;
 			$readonlys['route_type'] = true;
 
-			if ($cat['mgroups'])
+			if ($cat['mgroups'] && 0 <= $content['route_order'] && $content['route_order'] < 3)
 			{
 				try {
 					$this->combined_quali_discipline2route($comp, $cat);
@@ -91,10 +93,7 @@ class ranking_result_ui extends ranking_result_bo
 							'' => 'Select combined qualification'
 						)+$comb_qualis;
 						if (empty($content['comb_quali'])) list($content['comb_quali']) = each($comb_qualis);
-					}
-					else
-					{
-						$tmpl->disableElement('comb_quali');
+						$tmpl->disableElement('comb_quali', false);
 					}
 				}
 			}
@@ -102,7 +101,7 @@ class ranking_result_ui extends ranking_result_bo
 			{
 				if ($n > 0)
 				{
-					$sel_options['route_order'][$n] = ($n > 3 ? lang('Final') : lang('Qualification')).' '.lang($this->combined_order2discipline($n));
+					$sel_options['route_order'][$n] = ($n >= 3 ? lang('Final') : lang('Qualification')).' '.lang($this->combined_order2discipline($n));
 				}
 			}
 		}
@@ -225,7 +224,7 @@ class ranking_result_ui extends ranking_result_bo
 							$msg .= lang('Error: generating startlist!!!');
 						}
 					} catch (\EGroupware\Api\Exception\WrongUserinput $e) {
-						$msg .= $e->getMessage();
+						$msg = $e->getMessage();
 						unset($button);	// to not exit for save
 					}
 					$refresh = true;

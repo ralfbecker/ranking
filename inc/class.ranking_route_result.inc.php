@@ -76,6 +76,8 @@ class ranking_route_result extends so_sql
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
 	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time >= r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
+	// (combined) speed final incl. small final in first 2 starters (return 3 for final and 2 for small final, all non-winners (!=1) are then sorted by time)
+	var $rank_speed_combi_final = 'CASE WHEN result_time IS NULL THEN NULL WHEN (start_order-1)DIV 2 THEN 2 ELSE 3 END';
 
 	/**
 	 * Discipline only set by ranking_result_bo->save_result, to be used in data2db
@@ -252,23 +254,24 @@ class ranking_route_result extends so_sql
 				$result_cols = array('result_rank');
 				switch($discipline)
 				{
+					case 'combined':	// needs all columns
+					default:
+					case 'lead':
+						$result_cols[] = 'result_height';
+						$result_cols[] = 'result_plus';
+						if ($discipline != 'combined') break;
+						// fall through for combined
 					case 'speed':
 					case 'speedrelay':
 						$result_cols[] = 'result_time';
 						$result_cols[] = 'start_order';
 						$result_cols[] = 'result_detail';	// false_start
-						break;
-					case 'combined':
+						if ($discipline != 'combined') break;
+						// fall through for combined
 					case 'boulder':
 					case 'selfscore':
 						$result_cols[] = 'result_top';
 						$result_cols[] = 'result_zone';
-						if ($discipline != 'combined') break;
-						// fall through for combined
-					default:
-					case 'lead':
-						$result_cols[] = 'result_height';
-						$result_cols[] = 'result_plus';
 						break;
 				}
 
@@ -621,7 +624,7 @@ class ranking_route_result extends so_sql
 
 		static $plus2string = array(
 			-1 => '-',
-			0  => '&nbsp;',
+			0  => "\u{00A0}",
 			1  => '+',
 		);
 		if (!is_array($data))
@@ -658,15 +661,26 @@ class ranking_route_result extends so_sql
 			}
 			unset($data['result_detail']);
 		}
+		if ($data['discipline'] == 'combined')
+		{
+			if ($data['general_result'])
+			{
+				// remove unused data to not have to send it to clients
+				unset($data['result_time1'], $data['result_time2'], $data['result_time7'], $data['result_time8']);
+				unset($data['result_top'], $data['result_top2'], $data['result_top3'], $data['result_top4'], $data['result_top5'], $data['result_top7']);
+				unset($data['result_zone'], $data['result_zone2'], $data['result_zone3'], $data['result_zone4'], $data['result_zone5'], $data['result_zone7']);
+				unset($data['result_height'], $data['result_height1'], $data['result_height3'], $data['result_height4'], $data['result_height5'], $data['result_height6']);
+				unset($data['result_plus'], $data['result_plus1'], $data['result_plus3'], $data['result_plus4'], $data['result_plus5'], $data['result_plus6']);
+				$data_speed = $this->db2data(array('discipline' => 'speed')+$data);
+				$data_boulder = $this->db2data(array('discipline' => 'boulder')+$data);
+			}
+			else
+			{
+				$data['discipline'] = ranking_result_bo::combined_order2discipline($data['route_order']);
+			}
+		}
 		switch($data['discipline'])
 		{
-			case 'combined':
-				if ($data['general_result'])
-				{
-					$data_speed = $this->db2data(array('discipline' => 'speed')+$data);
-					$data_boulder = $this->db2data(array('discipline' => 'boulder')+$data);
-				}
-				// fall through
 			default:
 			case 'lead':
 				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'] ||	// lead result
@@ -690,7 +704,7 @@ class ranking_route_result extends so_sql
 							$data['result_height'.$to_suffix] = 0.001 * $data['result_height'.$suffix];
 							$data['result'.$suffix] = $data['result_height'.$suffix] >= 999 ?
 								lang('Top') : $data['result_height'.$suffix];
-							$data['result'.$suffix] .= '&nbsp;'.(100-$data['result_plus'.$suffix]).'.';
+							$data['result'.$suffix] .= "\u{00A0}".(100-$data['result_plus'.$suffix]).'.';
 						}
 						elseif ($data['result_height'.$suffix] == self::TOP_HEIGHT)
 						{
@@ -725,9 +739,9 @@ class ranking_route_result extends so_sql
 						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) :
 							($data['route_type'] == THREE_QUALI_ALL_NO_STAGGER ? array('',1,2) : array('',1)) as $suffix)
 						{
-							if (/*$data['result'.$suffix] &&*/ $data['result_rank'.$suffix])
+							if ($data['result_rank'.$suffix])
 							{
-								$data['result'.$suffix] .= '&nbsp;&nbsp;'.$data['result_rank'.$suffix].'.';
+								$data['result'.$suffix] .= "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
 							}
 						}
 					}
@@ -751,7 +765,7 @@ class ranking_route_result extends so_sql
 				}
 				if ($data['qoints'] && $data['result_rank'] && !$data['general_result'])
 				{
-					$data['result'] .= '&nbsp;&nbsp;'.sprintf('%4.2lf',$data['qoints']);
+					$data['result'] .= "\u{00A0}\u{00A0}".sprintf('%4.2lf',$data['qoints']);
 				}
 				if ($data['other_detail'])
 				{
@@ -770,8 +784,20 @@ class ranking_route_result extends so_sql
 				if ($data['discipline'] != 'combined' || !$data['general_result']) break;
 
 				// from here on we have combined general result
-				$data['result'] = $data_speed['result'] . '&nbsp;&nbsp;'.$data['result_rank'].'.';
-				$data['result1'] = $data_boulder['result1'] . '&nbsp;&nbsp;'.$data['result_rank1'].'.';
+				foreach(array('', 3, 4, 5) as $suffix)
+				{
+					if ($data['result_rank'.$suffix])
+					{
+						$data['result'.$suffix] = $data_speed['result'.$suffix] . "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
+					}
+				}
+				foreach(array(1, 6) as $suffix)
+				{
+					if ($data['result_rank'.$suffix])
+					{
+						$data['result'.$suffix] = $data_boulder['result'.$suffix] . "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
+					}
+				}
 				break;
 
 			case 'selfscore':
@@ -843,7 +869,8 @@ class ranking_route_result extends so_sql
 							$data['false_start'] > 1 ? lang('%1. false start', $data['false_start']) : lang('false start');
 						$data['eliminated'] = ranking_result_bo::ELIMINATED_FALSE_START;
 					}
-					if (!array_key_exists('result_time2',$data) && !$data['ability_percent'])
+					if (!array_key_exists('result_time2',$data) && !$data['ability_percent'] &&
+						!array_key_exists('result_time3',$data))	// route 0, 3, 4 and 5 are speed in combined
 					{
 						if ($data['result_time'])
 						{
@@ -1176,7 +1203,7 @@ class ranking_route_result extends so_sql
 	 */
 	function update_ranking($_keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$is_final=null,$selfscore_points=null,array $route=null)
 	{
-		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected)");
+		//error_log(__METHOD__.'('.array2string($_keys).", route_type=$route_type, '$discipline', quali_preselcted=$quali_preselected, is_final=$is_final, selfscore_points=$selfscore_points, ".array2string($route).")");
 		if (!$_keys['WetId'] || !$_keys['GrpId'] || !is_numeric($_keys['route_order'])) return false;
 
 		$keys = array_intersect_key($_keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
@@ -1199,10 +1226,20 @@ class ranking_route_result extends so_sql
 				}
 				else
 				{
-					$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_final);
-					// ORDER BY CASE column-alias does NOT work with MySQL 5.0.22-Debian_Ubuntu6.06.6, it works with 5.0.51a-log SUSE
-					//$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
-					$order_by = "result_time IS NULL,CASE ($mode) WHEN 1 THEN 0 ELSE result_time END ASC";
+					// combined final include small final as first 2 starters
+					// (could also be used for speed to save one column in general result)
+					if ($route && $route['discipline'] == 'combined' && $keys['route_order'] == 5)
+					{
+						$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_combi_final);
+						$order_by = "result_time IS NULL,$mode,result_time";
+					}
+					else
+					{
+						$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_final);
+						// ORDER BY CASE column-alias does NOT work with MySQL 5.0.22-Debian_Ubuntu6.06.6, it works with 5.0.51a-log SUSE
+						//$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
+						$order_by = "result_time IS NULL,CASE ($mode) WHEN 1 THEN 0 ELSE result_time END ASC";
+					}
 					$extra_cols[] = 'result_time';
 				}
 				break;
