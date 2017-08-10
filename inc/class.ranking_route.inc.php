@@ -123,10 +123,10 @@ class ranking_route extends Api\Storage\Base
 				$name = lang('Qualification').' '.lang('overall result');
 				break;
 			case -4:
-				$name = lang('Group').' B '.lang('Qualification');
+				$name = lang('Group').' A '.lang('Qualification');
 				break;
 			case -5:
-				$name = lang('Group').' A '.lang('Qualification');
+				$name = lang('Group').' B '.lang('Qualification');
 				break;
 			case -6:
 				$name = lang('Final').' '.lang('Speed').' '.lang('overall result');
