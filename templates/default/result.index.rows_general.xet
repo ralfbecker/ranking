@@ -76,6 +76,7 @@
 				<column disabled="@no_ort"/>
 				<column width="50"/>
 				<column/>
+				<column disabled="!@final_points"/>
 				<column disabled="!@route_names[7]"/>
 				<column disabled="!@route_names[6]"/>
 				<column disabled="!@route_names[5]"/>
@@ -86,7 +87,7 @@
 				<column disabled="!@route_names[1]"/>
 				<column disabled="!@first_quali_last"/>
 				<column disabled="!@show_ability"/>
-				<column disabled="!@route_type=/(TWO_QUALI_ALL|TWOxTWO_QUALI)/"/>
+				<column disabled="!@route_type=/(TWO_QUALI_ALL|TWOxTWO_QUALI|THREE_QUALI_ALL_NO_STAGGER)/"/>
 			</columns>
 			<rows>
 				<row part="header">
@@ -103,6 +104,7 @@
 					<nextmatch-sortheader label="City" id="ort"/>
 					<nextmatch-sortheader align="center" label="start- number" id="start_number"/>
 					<nextmatch-header align="center" label="License" id="PerId"/>
+					<nextmatch-sortheader align="center" label="Final Points" id="final_points"/>
 					<nextmatch-sortheader align="center" label="@route_names[7]" id="result_rank7" no_lang="1"/>
 					<nextmatch-sortheader align="center" label="@route_names[6]" id="result_rank6" no_lang="1"/>
 					<nextmatch-sortheader align="center" label="@route_names[5]" id="result_rank5" no_lang="1"/>
@@ -129,6 +131,7 @@
 					<description value="$row_cont[plz]" id="${row}[ort]"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
 					<description align="center" id="{$row}[PerId]" no_lang="1"/>
+					<textbox type="float" align="center" id="{$row}[final_points]" no_lang="1" readonly="true" precision="2"/>
 					<description align="center" id="{$row}[result7]" no_lang="1"/>
 					<description align="center" id="{$row}[result6]" no_lang="1"/>
 					<description align="center" id="{$row}[result5]" no_lang="1"/>

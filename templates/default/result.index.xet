@@ -119,7 +119,7 @@
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
 					<description align="center" id="{$row}[result]" no_lang="1" readonly="true"/>
-					<float align="center" id="set[$row_cont[PerId]][result_time]" readonly="true"/>
+					<float align="center" id="{$row}[result_time]" readonly="true"/>
 					<description align="center" id="{$row}[rank_prev_heat]" no_lang="1"/>
 					<vbox class="noPrint">
 						<date-time id="${row}[result_modified]" readonly="true" class="noWrap"/>

@@ -131,7 +131,7 @@ class ranking_route_result extends Api\Storage\Base
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
-		//echo "<p>".__METHOD__."(crit=".print_r($criteria,true).",only_keys=".print_r($only_keys,true).",order_by=$order_by,extra_cols=".print_r($extra_cols,true).",$wildcard,$empty,$op,$start,filter=".print_r($filter,true).",join=$join)</p>\n";
+		//error_log(__METHOD__."(crit=".array2string($criteria).",only_keys=".array2string($only_keys).",order_by=$order_by,extra_cols=".array2string($extra_cols).",$wildcard,$empty,$op,$start,filter=".array2string($filter).",join=$join)");
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
 
 		// avoid PerId is ambigous SQL error
@@ -384,28 +384,42 @@ class ranking_route_result extends Api\Storage\Base
 					$old = $row;
 				}
 
+				// randomize ex-aquos for startlist
+				if (($k = array_search('RAND()', $order_by_parts)) !== false)
+				{
+					usort($rows, function($a,$b)
+					{
+						if ($a['result_rank'] == $b['result_rank'])
+						{
+							return rand(0,1) ? -1 : 1;
+						}
+						return $a['result_rank'] - $b['result_rank'];
+					});
+					unset($order_by_parts[$k]);
+				}
+
 				// now we need to check if user wants to sort by something else
 				$order = array_shift($order_by_parts);
 				$sort  = array_pop($order_by_parts);
 				// $keep_order_by bypasses sorting here for startlist creation of first heat after quali. with two groups
-				if ($keep_order_by)
+				if (!$keep_order_by)
 				{
-
-				}
-				elseif ($order != 'result_rank')
-				{
-					// sort the rows now by the user's criteria
-					usort($rows, function($a, $b) use ($sort, $order)
+					if ($order != 'result_rank')
 					{
-						return ($sort == 'DESC' ? -1 : 1)*
-							($this->table_def['fd'][$order] == 'varchar' || in_array($order, array('nachname','vorname','nation','ort')) ?
-								strcasecmp($a[$order], $b[$order]) : ($a[$order] - $b[$order]));
-					});
+						// sort the rows now by the user's criteria
+						usort($rows, function($a, $b) use ($sort, $order)
+						{
+							return ($sort == 'DESC' ? -1 : 1)*
+								($this->table_def['fd'][$order] == 'varchar' || in_array($order, array('nachname','vorname','nation','ort')) ?
+									strcasecmp($a[$order], $b[$order]) : ($a[$order] - $b[$order]));
+						});
+					}
+					elseif($sort == 'DESC')
+					{
+						$rows = array_reverse($rows);
+					}
 				}
-				elseif($sort == 'DESC')
-				{
-					$rows = array_reverse($rows);
-				}
+
 				foreach(array(-4 => 1, -5 => 0, ) as $from => $to)
 				{
 					if (isset($route_names[$from]))
@@ -435,7 +449,7 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param int $quali_overal =0 1: Group A, 2: Group B, 3: Overal qualification, 0: other
 	 * @return string
 	 */
-	private function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0)
+	private function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0, array $route_names=null)
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL_SUM)
 		{
@@ -465,19 +479,23 @@ class ranking_route_result extends Api\Storage\Base
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=$ro0".
 				" AND $this->table_name.$this->id_col=r1.$this->id_col";
 		}
-		// 3 qualifications
-		elseif ($route_type == THREE_QUALI_ALL_NO_STAGGER && $route_order == 3)
+		// 3 qualifications or finals (combined only)
+		elseif ($route_type == THREE_QUALI_ALL_NO_STAGGER && in_array($route_order, array(3, -6)))
 		{
-			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
-			$c1 = $this->_count_ex_aquo('r1');
-			$c2 = $this->_count_ex_aquo('r2');
-			$c3 = $this->_count_ex_aquo('r3');
+			$result = $route_order == 3 ? array('r1','r2','r3') : array('r5','r6','r7');
+ 			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
+			$c1 = $this->_count_ex_aquo($result[0]);//'r1'
+			$c2 = $this->_count_ex_aquo($result[1]);//'r2'
+			$c3 = $this->_count_ex_aquo($result[2]);//'r3'
 
-			$r1 = $this->_unranked('r1');
-			$r2 = $this->_unranked('r2');
-			$r3 = $this->_unranked('r3');
+			$r1 = $this->_unranked($result[0]);//'r1'
+			$r2 = $this->_unranked($result[1]);//'r2'
+			$r3 = $this->_unranked($result[2]);//'r3'
 
-			return "SELECT SQRT((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2 * (($c3)+2*$r3-1)/2) FROM $this->table_name r1".
+			// if we have no lead final (7) yet, just use factor of 1
+			if ($route_order == -6 && !isset($route_names[7])) $r3 = $c3 = 1;
+
+			return "SELECT ((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2 * (($c3)+2*$r3-1)/2) FROM $this->table_name r1".
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.$this->id_col=r2.$this->id_col".
 				" JOIN $this->table_name r3 ON r1.WetId=r3.WetId AND r1.GrpId=r3.GrpId AND r3.route_order=2 AND r1.$this->id_col=r3.$this->id_col".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
@@ -525,7 +543,7 @@ class ranking_route_result extends Api\Storage\Base
 	 */
 	private function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array(), $quali_overall=0)
 	{
-		error_log(__METHOD__."(".array2string($keys).",".array2string($extra_cols).",,,type=$route_type,$discipline,".array2string($result_cols).", quali_overall=$quali_overall)");
+		//error_log(__METHOD__."(".array2string($keys).",".array2string($extra_cols).",,,type=$route_type,$discipline,".array2string($result_cols).", quali_overall=$quali_overall)");
 		if (!isset($GLOBALS['egw']->route) || !is_object($GLOBALS['egw']->route))
 		{
 			$GLOBALS['egw']->route = new ranking_route($this->source_charset,$this->db);
@@ -563,27 +581,46 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			$route_names = array_slice($route_names, 0, 2+(int)($route_type == THREE_QUALI_ALL_NO_STAGGER), true);
 		}
+		// combined general result --> use overall speed final (-6) instead of speed finals (3,4,5)
+		elseif ($discipline == 'combined' && count($route_names) > 6)	// require at least boulder final to exist
+		{
+			$route_names = array_slice($route_names, 0, 3, true)+
+				array(-6 => empty($route_names[5])?lang('Final').' '.lang('Speed'):$route_names[5])+
+				array_slice($route_names, 6, 2, true);
+
+			// do NOT add lead final to general result, unless it has a result, messes up startlist generation of it
+			if (isset($route_names[7]) && !ranking_result_bo::getInstance()->has_results(array(
+				'WetId' => $keys['WetId'],
+				'GrpId' => $keys['GrpId'],
+				'route_order' => 7,
+			)))
+			{
+				unset($route_names[7]);
+			}
+		}
 
 		//echo "route_names="; _debug_array($route_names);
 		$order_bys = array("$this->table_name.result_rank");	// Quali
 
 		$join = "\n";
+		$no_more_heats = false;
 		foreach(array_keys($route_names) as $route_order)
 		{
 			if ($route_type == TWOxTWO_QUALI)
 			{
 				if (in_array($route_order,array(2,3))) continue;	// base of the query, no need to join
 			}
-			elseif ($route_order < 2-(int)ranking_result_bo::is_two_quali_all($route_type)-(int)($route_type == THREE_QUALI_ALL_NO_STAGGER) ||
+			elseif (0 <= $route_order && $route_order < 2-(int)ranking_result_bo::is_two_quali_all($route_type)-(int)($route_type == THREE_QUALI_ALL_NO_STAGGER) ||
 				$discipline == 'speed' && $quali_overall == 6 && $route_order == 3)
 			{
 				continue;	// no need to join the qualification
 			}
 
-			$join .= "LEFT JOIN $this->table_name r$route_order ON $this->table_name.WetId=r$route_order.WetId AND $this->table_name.GrpId=r$route_order.GrpId AND r$route_order.route_order=$route_order AND $this->table_name.$this->id_col=r$route_order.$this->id_col\n";
+			if (($ro = $route_order) < 0) $ro = 5;	// fix combined -6 to 5
+			$join .= "LEFT JOIN $this->table_name r$ro ON $this->table_name.WetId=r$ro.WetId AND $this->table_name.GrpId=r$ro.GrpId AND r$ro.route_order=$route_order AND $this->table_name.$this->id_col=r$ro.$this->id_col\n";
 			foreach($result_cols as $col)
 			{
-				$extra_cols[] = "r$route_order.$col AS $col$route_order";
+				$extra_cols[] = "r$ro.$col AS $col$ro";
 			}
 			if ($route_type == TWOxTWO_QUALI && $route_order < 2) continue;	// dont order by the 1. quali
 
@@ -597,7 +634,15 @@ class ranking_route_result extends Api\Storage\Base
 				if ($route_type == TWO_QUALI_ALL_SUM) $order_bys[0] .= ' DESC';
 				$extra_cols[] = "$product AS quali_points";
 			}
-			else
+			// combined final (-6 speed final overall)
+			elseif ($route_order == -6)
+			{
+				$product = '('.$this->_sql_rank_prev_heat(-6, $route_type, $quali_overall, $route_names).')';
+				$order_bys[] = $product;
+				$extra_cols[] = "$product AS final_points";
+				$no_more_heats = true;
+			}
+			elseif (!$no_more_heats)
 			{
 				$order_bys[] = "r$route_order.result_rank";
 			}
@@ -606,7 +651,7 @@ class ranking_route_result extends Api\Storage\Base
 				$route_order >= 2 && $route_type != THREE_QUALI_ALL_NO_STAGGER ||
 				$route_order >= 3) || $quali_overall == 6)
 			{
-				$order_bys[] = "r$route_order.result_rank IS NULL";
+				$order_bys[] = "r$ro.result_rank IS NULL";
 			}
 		}
 		$order_by = implode(',',array_reverse($order_bys));
@@ -620,7 +665,13 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		$extra_cols[] = $this->table_name.'.*';		// trick so_sql to return the cols from the quali as regular cols
 
-		error_log(__METHOD__."() join=$join, order_by=$order_by, extra_cols=".array2string($extra_cols));
+		// fix combined general result again to contain route_names[5] == 'Speed final'
+		if (isset($route_names[-6]))
+		{
+			$route_names = array_slice($route_names, 0, 3, true)+array(5 => $route_names[-6])+array_slice($route_names, 4, 2, true);
+		}
+
+		//error_log(__METHOD__."() join=$join, order_by=$order_by, extra_cols=".array2string($extra_cols));
 		return $join;
 	}
 
@@ -699,7 +750,8 @@ class ranking_route_result extends Api\Storage\Base
 				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'] ||	// lead result
 					$data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_GROUPS,THREE_QUALI_ALL_NO_STAGGER)))
 				{
-					if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
+					// commented as combined produces without sqrt bigger numbers, not sure why it was in here anyway
+					//if ($data['quali_points'] > 999) $data['quali_points'] = '';	// 999 = sqrt(999999)
 					foreach($data['general_result'] ? array(1,2,3,'',0,4,5,6,7) : array('') as $suffix)
 					{
 						$to_suffix = $suffix;
@@ -750,7 +802,7 @@ class ranking_route_result extends Api\Storage\Base
 					if ($data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK,THREE_QUALI_ALL_NO_STAGGER)))
 					{
 						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) :
-							($data['route_type'] == THREE_QUALI_ALL_NO_STAGGER ? array('',1,2) : array('',1)) as $suffix)
+							($data['route_type'] == THREE_QUALI_ALL_NO_STAGGER ? array('',1,2,7) : array('',1)) as $suffix)
 						{
 							if ($data['result_rank'.$suffix])
 							{
@@ -812,6 +864,7 @@ class ranking_route_result extends Api\Storage\Base
 						$data['result'.$suffix] = $data_boulder['result'.$suffix] . "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
 					}
 				}
+				if (isset($data['final_points'])) $data['final_points'] = sprintf('%4.2lf', $data['final_points']);
 				break;
 
 			case 'selfscore':
@@ -925,7 +978,7 @@ class ranking_route_result extends Api\Storage\Base
 					{
 						$suffix = '';	// general result can have route_order as suffix
 						while (isset($data['result_time'.$suffix]) || $suffix < 2 || isset($data['result_time'.(1+$suffix)]) ||
-							$suffix < 1+$data['route_order'])
+							$suffix < 1+$data['route_order'] || isset($data['result_time5']) && $suffix < 5)
 						{
 							if ($data['result_time'.$suffix])
 							{
@@ -1211,14 +1264,14 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param int $route_type =ONE_QUALI ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
 	 * @param string $discipline ='lead' 'lead', 'speed', 'boulder', 'speedrelay'
 	 * @param int $quali_preselected =0 preselected participants for quali --> no countback to quali, if set!
-	 * @param boolean $is_final =false important for lead where we use time now in final, if tied after countback
+	 * @param boolean $use_time =false important for lead where we use time now in final, if tied after countback
 	 * @param int $selfscore_points =null point distributed per boulder, or null if 1 for each top
 	 * @param array $route =null whole route array, important for combined
 	 * @return int|boolean updated rows or false on error (no route specified in $keys)
 	 */
-	function update_ranking($_keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$is_final=null,$selfscore_points=null,array $route=null)
+	function update_ranking($_keys,$route_type=ONE_QUALI,$discipline='lead',$quali_preselected=0,$use_time=null,$selfscore_points=null,array $route=null)
 	{
-		//error_log(__METHOD__.'('.array2string($_keys).", route_type=$route_type, '$discipline', quali_preselcted=$quali_preselected, is_final=$is_final, selfscore_points=$selfscore_points, ".array2string($route).")");
+		//error_log(__METHOD__.'('.array2string($_keys).", route_type=$route_type, '$discipline', quali_preselcted=$quali_preselected, use_time=$use_time, selfscore_points=$selfscore_points, ".array2string($route).")");
 		if (!$_keys['WetId'] || !$_keys['GrpId'] || !is_numeric($_keys['route_order'])) return false;
 
 		$keys = array_intersect_key($_keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));	// remove other content
@@ -1280,6 +1333,12 @@ class ranking_route_result extends Api\Storage\Base
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS other_detail';
 			}
 		}
+		// combined lead and boulder final has not countback to previous heat
+		elseif ($discipline == 'lead' && $keys['route_order'] == 7 ||
+			$discipline == 'boulder' && $keys['route_order'] == 6)
+		{
+
+		}
 		elseif (substr($discipline,0,5) != 'speed' && $keys['route_order'] >= (2+(int)($route_type == TWO_QUALI_HALF)))
 		{
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS rank_prev_heat';
@@ -1303,7 +1362,7 @@ class ranking_route_result extends Api\Storage\Base
 			}
 		}
 		// lead final use time, after regular countback
-		if ($discipline == 'lead' && $is_final)
+		if ($use_time)
 		{
 			$order_by .= ',result_time ASC';
 		}
@@ -1379,7 +1438,7 @@ class ranking_route_result extends Api\Storage\Base
 				//echo "<p>$i. ".$data[$this->id_col].": prev=$data[rank_prev_heat], $data[result_rank] --> $data[new_rank]</p>\n";
 			}
 			// break ties in lead finals (already ordered by time)
-			if ($data['new_rank'] && $data['new_rank'] != $i+1 && $discipline == 'lead' && $is_final)
+			if ($data['new_rank'] && $data['new_rank'] != $i+1 && $use_time)
 			{
 				$data['new_rank'] = $old_time < $data['result_time_l'] ? $i+1 : $old_rank;
 				//echo "<p>".($i+1).'. '.$data[$this->id_col].": old_time=$old_time, time=$data[result_time_l] --> $data[new_rank]</p>\n";
@@ -1402,7 +1461,6 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				$to_update['result_top'] = $to_update['result_zone'] = $data['result_top'];
 			}
-//_debug_array($data); _debug_array($to_update);
 			// for lead finals, do not yet store first places, they might have to use the time
 			if ($data['new_rank'] != $data['result_rank'])
 			{
@@ -1419,46 +1477,71 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		$this->db->transaction_commit();
 
-		// update Group A/B results
+		// store Group A/B results in result-table
 		if ($route_type == TWO_QUALI_GROUPS && $_keys['route_order'] < 4)
 		{
-			$this->update_group_ab($_keys, $discipline, $route_type);
+			$this->_store_ranking($_keys, $_keys['route_order'] < 2 ? -5 : -4, $discipline, $route_type);
 		}
-
+		// store combined speed final in result-table
+		elseif ($route && $route['discipline'] == 'combined' && in_array($_keys['route_order'], array(3,4,5)))
+		{
+			$this->_store_ranking($_keys, -6, $route['discipline'], $route['route_type']);
+		}
 		if ($modified) ranking_result_bo::delete_export_route_cache($keys);
 
 		return $modified;
 	}
 
 	/**
-	 * Write qualification group A/B result into RouteResults table
+	 * Store ranking in RouteResults table
 	 *
-	 * This is necessary, as rank is not done in pure SQL.
+	 * This is necessary, as ranking is not done in pure SQL, and we need it's result for place multiplication later.
 	 *
-	 * @param array $_keys
+	 * @param array $keys
+	 * @param int $route_order
 	 * @param string $discipline ='lead'
 	 * @param int $route_type =TWO_QUALI_GROUPS
 	 */
-	protected function update_group_ab(array $_keys, $discipline='lead', $route_type=TWO_QUALI_GROUPS)
+	private function _store_ranking(array $keys, $route_order, $discipline='lead', $route_type=TWO_QUALI_GROUPS)
 	{
-		$_keys['route_order'] = $_keys['route_order'] < 2 ? -5 : -4;
-		$results = $this->search(array(), false, 'result_rank ASC', '', '', false, 'AND', false, $_keys+array(
-			'discipline' => $discipline,
-			'route_type' => $route_type,
-		));
+		$keys['route_order'] = $route_order;
+		$keys['discipline'] = $discipline;
+		$keys['route_type'] = $route_type;
+		$results = $this->search(array(), false, 'result_rank ASC', '', '', false, 'AND', false, $keys);
 		unset($results['route_names']);
+
 		$this->db->transaction_begin();
-		$this->delete($_keys);
+		$this->delete($keys);
 		foreach($results as $result)
 		{
-			$_keys['PerId'] = $result['PerId'];
+			$keys['PerId'] = $result['PerId'];
+			$result_time = $result_detail = null;
+			if ($discipline == 'combined')	// result from combined speed final
+			{
+				foreach(array(5,4,'') as $suffix)
+				{
+					if (!empty($result['result_time'.$suffix]))
+					{
+						$result_time = $result['result_time'.$suffix];
+						if ($result_time > 1000 && $result_time != ELIMINATED_TIME) $result_time /= 1000.0;
+						break;
+					}
+				}
+			}
+			elseif ($result['quali_points'])
+			{
+				$result_detail = json_encode(array('quali_points' => $result['quali_points']));
+			}
 			$this->init(array(
-				'result_rank' => $result['result_rank'],
-				'result_detail' => json_encode(array('quali_points' => $result['quali_points'])),
+				'result_rank'   => $result['result_rank'],
+				'result_time'   => $result_time,
+				'result_detail' => $result_detail,
 			));
-			$this->save($_keys);
+			$this->save($keys);
 		}
 		$this->db->transaction_commit();
+
+		ranking_result_bo::delete_export_route_cache($keys);
 	}
 
 	/**

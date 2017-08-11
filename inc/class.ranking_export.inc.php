@@ -1737,7 +1737,7 @@ class ranking_export extends ranking_result_bo
 	 */
 	protected function _result_categories($comp, $categories=array())
 	{
-		foreach($this->result->search(array(
+		foreach((array)$this->result->search(array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
 			'platz > 0',
 		), 'DISTINCT GrpId') as $route)

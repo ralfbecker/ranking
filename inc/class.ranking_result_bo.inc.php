@@ -108,6 +108,25 @@ class ranking_result_bo extends ranking_bo
 			THREE_QUALI_ALL_NO_STAGGER => 'qualification in three disciplines',
 		),
 	);
+	/**
+	 * Translate route_type to constant name (used in templates)
+	 *
+	 * @var array
+	 */
+	static $route_type2const = array(
+		0 => 'ONE_QUALI',
+		1 => 'TWO_QUALI_HALF',
+		2 => 'TWO_QUALI_ALL',
+		3 => 'TWO_QUALI_SPEED',
+		4 => 'TWOxTWO_QUALI',
+		5 => 'TWO_QUALI_ALL_SEED_STAGGER',
+		6 => 'TWO_QUALI_ALL_NO_STAGGER',
+		7 => 'TWO_QUALI_BESTOF',
+		8 => 'TWO_QUALI_ALL_SUM',
+		9 => 'TWO_QUALI_ALL_NO_COUNTBACK',
+		10 => 'TWO_QUALI_GROUPS',
+		11 => 'THREE_QUALI_ALL_NO_STAGGER',
+	);
 
 	/**
 	 * Eliminated value for false start in UI
@@ -876,8 +895,21 @@ class ranking_result_bo extends ranking_bo
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
-			'route_order' => $discipline == 'combined' && $keys['route_order'] == 6 ? -6 : $keys['route_order']-1,
+			'route_order' => $keys['route_order']-1,
 		);
+		// combined finals dont depend on direct previous route
+		if ($discipline == 'combined')
+		{
+			switch($keys['route_order'])
+			{
+				case 6:	// boulder only speed final overal
+					$prev_keys['route_order'] = -6;
+					break;
+				case 7:	// lead final on multiplication of boulder and speed rank
+					$prev_keys['route_order'] = -1;
+					break;
+			}
+		}
 		if ($prev_keys['route_order'] == 1 && !$this->route->read($prev_keys))
 		{
 			$prev_keys['route_order'] = 0;
@@ -886,8 +918,11 @@ class ranking_result_bo extends ranking_bo
 		{
 			throw new Api\Exception\WrongUserinput(lang('Previous round not found!'));
 		}
+		// add discipline and route_type to $prev_keys, as it is needed by ranking_route_result::search
+		$prev_keys['discipline'] = $prev_route['discipline'];
+		$prev_keys['route_type'] = $prev_route['route_type'];
 		// check if startorder depends on result
-		if ($start_order_mode != 'previous' && !$this->has_results($prev_keys) ||
+		if ($start_order_mode != 'previous' && $prev_keys['route_order'] != -1 && !$this->has_results($prev_keys) ||
 			$ko_system && !$prev_route['route_quota'])
 		{
 			throw new Api\Exception\WrongUserinput(lang('Previous round has no result!'));
@@ -998,10 +1033,10 @@ class ranking_result_bo extends ranking_bo
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
 		unset($starters['route_names']);
 
-		// combined boulder final depends on overall speed final, which can not be easyly reversed in search --> do it now
-		if ($discipline == 'combined' && $keys['route_order'] == 6)
+		// combined lead final uses general result --> fixed quota of 6
+		if ($discipline == 'combined' && $keys['route_order'] == 7)
 		{
-			$starters = array_reverse($starters);
+			$starters = array_slice($starters, -6);
 		}
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
@@ -1019,7 +1054,8 @@ class ranking_result_bo extends ranking_bo
 				$data['ranking'] = $data['ranking']['ranking'];
 			}
 			// applying a quota for TWO_QUALI_ALL, taking ties into account!
-			if (isset($data['quali_points']) && count($starters)-$n > $quota &&
+			if (!($discipline == 'combined' && $keys['route_order'] == 7) &&
+				isset($data['quali_points']) && count($starters)-$n > $quota &&
 				$data['quali_points'] > $starters[count($starters)-$quota]['quali_points'])
 			{
 				//echo "<p>ignoring: n=$n, points={$data['quali_points']}, starters[".(count($starters)-$quota)."]['quali_points']=".$starters[count($starters)-$quota]['quali_points']."</p>\n";
@@ -1423,25 +1459,26 @@ class ranking_result_bo extends ranking_bo
 		{
 			unset($keys[$this->route_result->id_col]);
 
+			// combined needs route information available, to determine it's combined
+			$route = $this->route->read($keys);
+
 			if ($keys['route_order'] == 2 && is_null($route_type))	// check the route_type, to know if we have a countback to the quali
 			{
 				$route = $this->route->read($keys);
 				$route_type = $route['route_type'];
 			}
-			$is_final = false;
-			if ($discipline == 'lead' && $keys['route_order'] >= 2)
+			$use_time = false;
+			// regular lead finals (quote = 0) or combined uses time to break ties
+			if ($discipline == 'lead' && ($keys['route_order'] >= 2 || $route['discipline'] == 'combined'))
 			{
-				if (is_null($route)) $route = $this->route->read($keys);
-				$is_final = !$route['route_quota'] && ($route['discipline'] == 'lead' || $keys['route_order'] >= 3);
+				$use_time = !$route['route_quota'] || $route['discipline'] == 'combined';
 			}
 			$selfscore_points = null;
 			if ($discipline == 'selfscore' && ($route || ($route = $this->route->read($keys))))
 			{
 				$selfscore_points = $route['selfscore_points'];
 			}
-			// combined needs route information availabe, to determine it's combined
-			if (is_null($route)) $route = $this->route->read($keys);
-			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$is_final,$selfscore_points,$route);
+			$n = $this->route_result->update_ranking($keys,$route_type,$discipline,$quali_preselected,$use_time,$selfscore_points,$route);
 			//echo '<p>--> '.($n !== false ? $n : 'error, no')." places changed</p>\n";
 		}
 		// delete the export_route cache
@@ -1508,9 +1545,6 @@ class ranking_result_bo extends ranking_bo
 	 */
 	function has_results($keys,$startlist_only=false)
 	{
-		// hack to not check result for combined boulder final depending on a general / virtual result
-		if ($keys['route_order'] == -6) return true;
-
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order'])) return null;
 
 		if (count($keys) > 3) $keys = array_intersect_key($keys,array('WetId'=>0,'GrpId'=>0,'route_order'=>0,'PerId'=>0,'team_id'=>0));

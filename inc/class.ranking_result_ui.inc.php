@@ -1016,17 +1016,15 @@ class ranking_result_ui extends ranking_result_bo
 			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4 ||
 			$query['route_type'] == TWO_QUALI_GROUPS && $query['route'] < 4 ||
 			$query['route_type'] == THREE_QUALI_ALL_NO_STAGGER && $query['route'] < 3 ||
+			$query['route_data']['discipline'] == 'combined' ||		// combined never used previous heat, because of multiplication of disciplines
 			$query['quali_preselected'] && $query['route'] == 2;	// no countback to quali for quali_preselected
 
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';
 		$rows['rw_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? 'displayNone' : 'noPrint';
-		if (!in_array($query['discipline'],array('speed','boulder')))
+		if (!in_array($query['discipline'], array('speed','boulder')))
 		{
-			$rows['route_type'] = ranking_result_bo::is_two_quali_all($query['route_type']) ?
-				($query['route_type'] == TWO_QUALI_GROUPS ? 'TWO_QUALI_GROUPS' : 'TWO_QUALI_ALL') :
-				($query['route_type'] == TWO_QUALI_HALF ? 'TWO_QUALI_HALF' :
-				($query['route_type'] == ONE_QUALI ? 'ONE_QUALI' : 'TWOxTWO_QUALI'));
+			$rows['route_type'] = self::$route_type2const[$query['route_type']];
 		}
 		$rows['speed_only_one'] = $query['route_type'] == ONE_QUALI && !$query['route'] ||
 			// record format uses 2 lanes only for quali
@@ -1042,7 +1040,9 @@ class ranking_result_ui extends ranking_result_bo
 		// show first qualification in last column for 3 qualification routes
 		$rows['first_quali_last'] = $query['discipline'] == 'combined' ||
 			$query['route_type'] == THREE_QUALI_ALL_NO_STAGGER;
-
+		// display final points (multiplication of rank from 3 single discipline finals in combined)
+		$rows['final_points'] = $query['discipline'] == 'combined' &&
+			$query['route'] == -1 && isset($rows['route_names'][6]);
 		// make div. print values available
 		foreach(array('calendar','route_name','comp_name','comp_date','comp_logo','comp_sponsors','show_result','result_official','route_data') as $name)
 		{

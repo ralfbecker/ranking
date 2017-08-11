@@ -703,6 +703,9 @@ var Startlist = (function() {
 				});
 				break;
 
+			case 'combined':
+				this.result_cols.final_points = 'Final Points';
+				// fall through
 			default:
 				this.startlist_cols = {
 					'start_order': {'label': 'StartNr', 'colspan': 2},
@@ -837,7 +840,9 @@ var Startlist = (function() {
 						this.columns['quali_points'] = 'Qualification';
 					}
 				}
-
+				if (_data.discipline == 'combined' && typeof _data.participants[0].final_points == 'undefined') {
+					delete this.columns.final_points;
+				}
 				title_prefix = '';
 			}
 			if (this.columns.result && _data.participants[0].rank_prev_heat && !this.json_url.match(/detail=0/))
