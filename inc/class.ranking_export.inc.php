@@ -673,7 +673,7 @@ class ranking_export extends ranking_result_bo
 		{
 			if (isset($row['quali_points']) && $row['quali_points'])
 			{
-				$row['quali_points'] = number_format($row['quali_points'],2);
+				$row['quali_points'] = number_format($row['quali_points'], 2, '.', '');
 			}
 			if ($row['result_modified'] > $last_modified) $last_modified = $row['result_modified'];
 

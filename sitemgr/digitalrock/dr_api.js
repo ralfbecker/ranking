@@ -1370,6 +1370,7 @@ var Resultlist = (function() {
 			delete this.result_cols.start_number;
 		}
 		Startlist.prototype.handleResponse.call(this, _data);
+		align_td_nbsp('table.DrTable td');
 
 		if (_data.discipline == 'ranking' && (detail && detail[1] == '1' || !_data.participants[0].result_rank) && (_data.max_comp || _data.max_disciplines))
 		{
@@ -2936,6 +2937,23 @@ function load_css(href)
 	cssnode.rel = "stylesheet";
 	cssnode.href = href;
 	headID.appendChild(cssnode);
+}
+
+/**
+ * Align non-breaking-space separated parts of text in a td by wrapping them in equally sized spans
+ *
+ * @param {string|jQuery} elems
+ */
+function align_td_nbsp(elems)
+{
+	jQuery(elems).replaceWith(function()
+	{
+		var parts = jQuery(this).contents().text().split(/\u00A0+/);
+		if (parts.length == 1) return jQuery(this).clone();
+		var prefix = '<div class="tdAlign'+parts.length+'">';
+		var postfix = '</div>';
+		return jQuery('<td>'+prefix+parts.join(postfix+prefix)+postfix+'</td>');
+	});
 }
 
 /**

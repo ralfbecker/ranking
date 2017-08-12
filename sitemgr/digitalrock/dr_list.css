@@ -39,10 +39,20 @@ table.DrTable th.city, table.DrTable td.city, table.DrTable th.footer {
 	padding-left: 5px;
 	text-align: left;
 }
+table.DrTable td.final_points, table.DrTable td.quali_points {
+	padding-right: 5px;
+	text-align: right;
+}
+table.DrTable td.final_points {
+	padding-right: 15px;
+}
 table.DrTable tbody th a {
 	padding-left: 10px;
 	font-weight: normal;
 }
+table.DrTable td div.tdAlign2 { width: 40%; display: inline-block; }
+table.DrTable td div.tdAlign3 { width: 30%; display: inline-block; }
+table.DrTable td div.tdAlign4 { width: 20%; display: inline-block; }
 /**
  * Capitalize names
  */

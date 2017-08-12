@@ -688,7 +688,7 @@ class ranking_route_result extends Api\Storage\Base
 
 		static $plus2string = array(
 			-1 => '-',
-			0  => "\u{00A0}",
+			0  => " ",
 			1  => '+',
 		);
 		if (!is_array($data))
