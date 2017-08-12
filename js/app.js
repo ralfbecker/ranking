@@ -99,6 +99,8 @@ app.classes.ranking = AppJS.extend(
 				}
 				else
 				{
+					this.align_td_nbsp('div#ranking-result-index_rows_template table tr.row td[align=center]');
+
 					this.show_hint(this.egw.lang("How to use Resultservice"),
 						this.egw.lang("There is a manual in left menu under preferences.")+"\n\n"+
 						this.egw.lang("Start- and result-lists no longer contain input fields or buttons:\ndouble-click on an athlete to enter his result, or right click for more options."),
@@ -113,6 +115,23 @@ app.classes.ranking = AppJS.extend(
 					'no_registration_hint');
 				break;
 		}
+	},
+
+	/**
+	 * Align non-breaking-space separated parts of text in a td by wrapping them in equally sized spans
+	 *
+	 * @param {string|jQuery} elems
+	 */
+	align_td_nbsp: function(elems)
+	{
+		jQuery(elems).replaceWith(function()
+		{
+			var parts = jQuery(this).contents().text().split(/\u00A0+/);
+			if (parts.length == 1) return jQuery(this).clone();
+			var prefix = '<div class="tdAlign'+parts.length+'">';
+			var postfix = '</div>';
+			return jQuery('<td align="center">'+prefix+parts.join(postfix+prefix)+postfix+'</td>');
+		});
 	},
 
 	beamerGo: function()

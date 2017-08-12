@@ -77,7 +77,12 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
  */
 #ranking-result-index span.nextmatch_sortheader {
 	margin-right: 0;
+	padding-right: 0;
 }
+#ranking-result-index table.et2_grid td div.tdAlign2 { width: 40%; display: inline-block; text-align: center; padding-left: 2px; }
+#ranking-result-index table.et2_grid td div.tdAlign3 { width: 30%; display: inline-block; text-align: center; padding-left: 2px; }
+#ranking-result-index table.et2_grid td div.tdAlign4 { width: 20%; display: inline-block; text-align: center; padding-left: 2px; }
+
 /**
  * Printing of start- and result-lists
  */

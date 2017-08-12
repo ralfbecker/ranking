@@ -131,7 +131,7 @@
 					<description value="$row_cont[plz]" id="${row}[ort]"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
 					<description align="center" id="{$row}[PerId]" no_lang="1"/>
-					<textbox type="float" align="center" id="{$row}[final_points]" no_lang="1" readonly="true" precision="2"/>
+					<textbox type="float" align="right" id="{$row}[final_points]" no_lang="1" readonly="true" precision="2"/>
 					<description align="center" id="{$row}[result7]" no_lang="1"/>
 					<description align="center" id="{$row}[result6]" no_lang="1"/>
 					<description align="center" id="{$row}[result5]" no_lang="1"/>
@@ -142,7 +142,7 @@
 					<description align="center" id="{$row}[result1]" no_lang="1"/>
 					<description align="center" id="{$row}[result]" no_lang="1"/>
 					<textbox type="float" align="center" id="${row}[ability_percent]" readonly="true"/>
-					<textbox type="float" align="center" id="{$row}[quali_points]" no_lang="1" readonly="true" precision="2"/>
+					<textbox type="float" align="right" id="{$row}[quali_points]" no_lang="1" readonly="true" precision="2"/>
 				</row>
 			</rows>
 		</grid>
