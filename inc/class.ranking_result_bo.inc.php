@@ -593,10 +593,10 @@ class ranking_result_bo extends ranking_bo
 		$discipline2route = $this->_search_combined_qualis($comp, $cat);
 
 		$dis_not_found = array_filter($discipline2route, function($route) { return is_null($route); });
-		if ($dis_not_found < 3 && $comb_quali &&
+		if (count($dis_not_found) < 3 && $comb_quali &&
 			($c = $this->comp->read($comb_quali)))
 		{
-			$discipline2route = $this->_search_combined_qualis($comp, $cat, $c);
+			$discipline2route = $this->_search_combined_qualis($c, $cat, $discipline2route);
 			$dis_not_found = array_filter($discipline2route, function($route) { return is_null($route); });
 		}
 		if ($dis_not_found)
@@ -652,11 +652,24 @@ class ranking_result_bo extends ranking_bo
 		{
 			if ($dis != $discipline)
 			{
+				// what heats to look at: for 2 distinct groups, we need to join with both
+				switch($route['route_type'])
+				{
+					case TWO_QUALI_HALF:
+						$cond = ' IN (0,1)';
+						break;
+					case TWO_QUALI_GROUPS:
+						$cond = ' IN (0,2)';
+						break;
+					default:
+						$cond = ' = 0';
+						break;
+				}
 				$all_discipline_join[] = 'JOIN '.ranking_route_result::RESULT_TABLE.' require_'.$dis.' ON '.
-					ranking_route_result::RESULT_TABLE.'.WetId = require_'.$dis.'.WetId AND '.
-					ranking_route_result::RESULT_TABLE.'.PerId = require_'.$dis.'.PerId AND '.
+					'require_'.$dis.'.WetId='.(int)$route['WetId'].' AND '.
 					'require_'.$dis.'.GrpId = '.(int)$route['GrpId'].' AND '.
-					'require_'.$dis.'.route_order = 0 AND '.	// ToDo: must be "IN (0,1)" for 2 distinct groups
+					ranking_route_result::RESULT_TABLE.'.PerId = require_'.$dis.'.PerId AND '.
+					'require_'.$dis.'.route_order '.$cond.' AND '.
 					'require_'.$dis.'.result_rank IS NOT NULL';
 			}
 		}
