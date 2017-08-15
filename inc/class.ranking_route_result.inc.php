@@ -599,7 +599,7 @@ class ranking_route_result extends Api\Storage\Base
 			}
 		}
 
-		//echo "route_names="; _debug_array($route_names);
+		//error_log(__METHOD__."() route_names=".array2string($route_names));
 		$order_bys = array("$this->table_name.result_rank");	// Quali
 
 		$join = "\n";
@@ -611,12 +611,20 @@ class ranking_route_result extends Api\Storage\Base
 				if (in_array($route_order,array(2,3))) continue;	// base of the query, no need to join
 			}
 			elseif (0 <= $route_order && $route_order < 2-(int)ranking_result_bo::is_two_quali_all($route_type)-(int)($route_type == THREE_QUALI_ALL_NO_STAGGER) ||
+				$route_type == TWO_QUALI_GROUPS && in_array($route_order, array(-4, -5)) ||
 				$discipline == 'speed' && $quali_overall == 6 && $route_order == 3)
 			{
 				continue;	// no need to join the qualification
 			}
 
-			if (($ro = $route_order) < 0) $ro = 5;	// fix combined -6 to 5
+			switch ($ro = $route_order)
+			{
+				case -6:	// combined speed final
+				case -5:	// overall group A
+					$ro = 5; break;
+				case -4:	// overall group B
+					$ro = 4; break;
+			}
 			$join .= "LEFT JOIN $this->table_name r$ro ON $this->table_name.WetId=r$ro.WetId AND $this->table_name.GrpId=r$ro.GrpId AND r$ro.route_order=$route_order AND $this->table_name.$this->id_col=r$ro.$this->id_col\n";
 			foreach($result_cols as $col)
 			{
@@ -644,7 +652,7 @@ class ranking_route_result extends Api\Storage\Base
 			}
 			elseif (!$no_more_heats)
 			{
-				$order_bys[] = "r$route_order.result_rank";
+				$order_bys[] = "r$ro.result_rank";
 			}
 			// not participating in one qualification (order 0 or 1) of TWO_QUALI_ALL is ok
 			if (!$quali_overall && (!in_array($route_type, array(TWO_QUALI_ALL, TWO_QUALI_ALL_NO_COUNTBACK, THREE_QUALI_ALL_NO_STAGGER)) ||
