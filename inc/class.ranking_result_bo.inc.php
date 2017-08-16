@@ -1002,7 +1002,7 @@ class ranking_result_bo extends ranking_bo
 				$prev_keys['route_order'] = 0;
 				$prev_keys[] = 'result_rank IS NOT NULL';	// otherwise not started athletes qualify too
 				$route_names = null;
-				$join = $this->route_result->_general_result_join(array(
+				$join = $this->route_result->general_result_join(array(
 					'WetId' => $keys['WetId'],
 					'GrpId' => $keys['GrpId'],
 				),$cols,$order_by,$route_names,$prev_route['route_type'],$discipline,array());

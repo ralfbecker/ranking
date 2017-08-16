@@ -282,7 +282,7 @@ class ranking_route_result extends Api\Storage\Base
 						break;
 				}
 
-				// keep _general_result_join from setting order_by
+				// keep general_result_join from setting order_by
 				if (isset($filter['keep_order_by']))
 				{
 					$keep_order_by = $filter['keep_order_by'] ? $order_by : false;
@@ -291,7 +291,7 @@ class ranking_route_result extends Api\Storage\Base
 				$order_by_parts = preg_split('/[ ,]/',$order_by);
 
 				$route_names = null;
-				$join .= $this->_general_result_join(array(
+				$join .= $this->general_result_join(array(
 					'WetId' => $filter['WetId'] ? $filter['WetId'] : $criteria['WetId'],
 					'GrpId' => $filter['GrpId'] ? $filter['GrpId'] : $criteria['GrpId'],
 				), $extra_cols, $order_by, $route_names, $route_type, $discipline, $result_cols, $quali_overall);
@@ -455,7 +455,7 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			return $this->rank_lead_sum;
 		}
-		// prev. result for heat after quali for two quali groups (must not be used in _general_result_join: $quali_overal > 0!)
+		// prev. result for heat after quali for two quali groups (must not be used in general_result_join: $quali_overal > 0!)
 		if ($route_type == TWO_QUALI_GROUPS && $route_order == 4 && !$quali_overal)
 		{
 			return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
@@ -530,7 +530,6 @@ class ranking_route_result extends Api\Storage\Base
 	/**
 	 * Return join and extra_cols for a general result
 	 *
-	 * @internal
 	 * @param array $keys values for WetId and GrpId
 	 * @param array &$extra_cols
 	 * @param string &$order_by
@@ -541,7 +540,7 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param int $quali_overall =0 1: groupA, 2: groupB, 3: quali overall, 0: other
 	 * @return string join
 	 */
-	private function _general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array(), $quali_overall=0)
+	public function general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array(), $quali_overall=0)
 	{
 		//error_log(__METHOD__."(".array2string($keys).",".array2string($extra_cols).",,,type=$route_type,$discipline,".array2string($result_cols).", quali_overall=$quali_overall)");
 		if (!isset($GLOBALS['egw']->route) || !is_object($GLOBALS['egw']->route))
