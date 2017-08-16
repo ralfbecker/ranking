@@ -1000,7 +1000,7 @@ class ranking_result_bo extends ranking_bo
 			{
 				$cols = array();
 				$prev_keys['route_order'] = 0;
-				$prev_keys[] = 'result_rank IS NOT NULL';	// otherwise not started athletes qualify too
+				$prev_keys[] = $this->route_result->table_name.'.result_rank IS NOT NULL';	// otherwise not started athletes qualify too
 				$route_names = null;
 				$join = $this->route_result->general_result_join(array(
 					'WetId' => $keys['WetId'],
@@ -1014,9 +1014,12 @@ class ranking_result_bo extends ranking_bo
 				// just the col-name is ambigues
 				foreach($prev_keys as $col => $val)
 				{
-					$prev_keys[] = $this->route_result->table_name.'.'.
-						$this->db->expression($this->route_result->table_name,array($col => $val));
-					unset($prev_keys[$col]);
+					if (!is_int($col) && !in_array($col, array('discipline', 'route_type')))
+					{
+						$prev_keys[] = $this->route_result->table_name.'.'.
+							$this->db->expression($this->route_result->table_name,array($col => $val));
+						unset($prev_keys[$col]);
+					}
 				}
 				foreach($cols as $key => $col)
 				{
