@@ -7,9 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2014-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2014-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * Measurement plugin for selfscore boulder competitions
@@ -23,7 +24,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 * @param array &$sel_options
 	 * @param array %$readonlys
 	 */
-	public static function measurement(array &$content, array &$sel_options, array &$readonlys, etemplate_new $tmpl)
+	public static function measurement(array &$content, array &$sel_options, array &$readonlys, Api\Etemplate $tmpl)
 	{
 		//error_log(__METHOD__."() user_agent=".html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
 		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
@@ -79,7 +80,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 					{
 						for($c=0; $c < $num_cols; ++$c)
 						{
-							$col = etemplate_new::num2chrs($c-1);
+							$col = Api\Etemplate::num2chrs($c-1);
 							if ($n++ < $num_problems)
 							{
 								$score[$r.$col] = array(
