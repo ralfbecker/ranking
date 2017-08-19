@@ -30,9 +30,7 @@
 				</row>
 				<row class="row">
 					<description for="display_athlete" value="Display athlete"/>
-					<menulist>
-						<menupopup id="display_athlete"/>
-					</menulist>
+					<select id="display_athlete"/>
 					<description/>
 					<description/>
 				</row>

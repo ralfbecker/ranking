@@ -149,6 +149,22 @@ class ranking_bo extends ranking_so
 	 * @var int
 	 */
 	var $judge_right_days = 10;
+	/**
+	 * What extra column(s) to display for an athlete (beside name)
+	 *
+	 * @var array
+	 */
+	var $display_athlete_types = array(
+		'' => 'Default',
+		ranking_competition::NATION => 'Nation',
+		ranking_competition::FEDERATION => 'Federation',
+		ranking_competition::CITY => 'City',
+		ranking_competition::PC_CITY => 'PC City',
+		ranking_competition::NATION_PC_CITY => 'Nation PC City',
+		ranking_competition::PARENT_FEDERATION => 'Parent federation',
+		ranking_competition::FED_AND_PARENT => 'Federation and Parent',
+		ranking_competition::NONE => 'None',
+	);
 
 	/**
 	 * Constructor

@@ -9,7 +9,7 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top" height="115">
-					<description for="gruppen" value="Categories"/>
+					<description value="Categories" for="gruppen"/>
 					<listbox id="gruppen" no_lang="1" rows="9"/>
 				</row>
 			</rows>
@@ -92,7 +92,7 @@
 	</template>
 	<template id="ranking.cup.edit.comment" template="" lang="" group="0" version="14.3.001">
 		<description value="Comment is displayed in &quot;See also&quot; list below ranking"/>
-		<textbox multiline="true" id="comment" rows="14" cols="100" class="fullWidth"/>
+		<textbox multiline="true" cols="100" id="comment" rows="14" class="fullWidth"/>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="210" overflow="auto">
@@ -144,6 +144,12 @@
 				<row class="row">
 					<description for="presets[name]" value="Competition name"/>
 					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
+				</row>
+				<row>
+					<description value="Display athlete" for="presets[display_athlete]"/>
+					<menulist>
+						<menupopup id="presets[display_athlete]"/>
+					</menulist>
 				</row>
 				<row class="row">
 					<description value="Selfregister"/>

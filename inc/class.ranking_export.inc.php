@@ -1335,7 +1335,8 @@ class ranking_export extends ranking_result_bo
 			'route_result' => implode('.', array_reverse(explode('-', $date))),
 			'route_order' => -1,
 			'discipline' => 'ranking',
-			'display_athlete' => ranking_competition::nation2display_athlete($cat['nation']),
+			'display_athlete' => $cup['presets']['display_athlete'] ? $cup['presets']['display_athlete'] :
+				ranking_competition::nation2display_athlete($cat['nation']),
 		);
 		if ($comp)	// comp not set if date given
 		{

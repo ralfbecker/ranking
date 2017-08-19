@@ -229,6 +229,9 @@ var DrBaseWidget = (function() {
 	{
 		switch(_display_athlete)
 		{
+			case 'none':
+				delete this.columns.nation;
+				break;
 			case 'city':
 			case 'pc_city':
 				this.replace_attribute(this.columns, 'nation', 'city', 'City');

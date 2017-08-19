@@ -149,6 +149,7 @@ class ranking_cup_ui extends ranking_bo
 			'fed_id'       => $this->federation->federations($this->cup->data['nation'], true),
 			'selfregister' => $this->comp->selfregister_types,
 			'continent' => ranking_federation::$continents,
+			'display_athlete' => $this->display_athlete_types,
 		);
 		$content['per_cat'] = $content['max_per'] = array();
 		foreach($this->cup->data['max_per_cat'] as $rkey => $max)

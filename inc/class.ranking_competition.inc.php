@@ -45,6 +45,7 @@ class ranking_competition extends so_sql
 	/**
 	 * Values for display_athlete column
 	 */
+	const NONE = 'none';
 	const NATION = 'nation';
 	const FEDERATION = 'federation';
 	const PC_CITY = 'pc_city';
@@ -124,7 +125,7 @@ class ranking_competition extends so_sql
 	 * Get default display_athlete value for a nation
 	 *
 	 * @param string $nation
-	 * @return string ranking_competition::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY|FED_AND_PARENT) constants
+	 * @return string ranking_competition::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY|FED_AND_PARENT|NONE) constants
 	 */
 	public static function nation2display_athlete($nation, $intern=false)
 	{
