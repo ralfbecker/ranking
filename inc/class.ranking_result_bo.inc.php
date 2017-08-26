@@ -1623,8 +1623,13 @@ class ranking_result_bo extends ranking_bo
 
 			$stand = $comp['datum'];
 			$nul = $test = $ranking = null;
- 			$this->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
-
+			try {
+				$this->calc->ranking($cat,$stand,$nul,$test,$ranking,$nul,$nul,$nul);
+			}
+			catch(Exception $e) {
+				// ignore "No ranking defined" exception eg. for combined
+				_egw_log_exception($e);
+			}
 			html::content_header($cat['name'].' - '.$route['route_name'].'.csv','text/comma-separated-values');
 			$name2csv = array(
 				'WetId'    => 'comp',
