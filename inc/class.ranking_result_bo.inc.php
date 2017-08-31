@@ -956,7 +956,6 @@ class ranking_result_bo extends ranking_bo
 			$prev_keys['route_type'] = $prev_route['route_type'];
 			$prev_keys['discipline'] = $prev_route['discipline'];
 			$quota /= 2;	// as we have 2 groups, with their own rank
-			$prev_keys['keep_order_by'] = true;	// otherwise general result would do it's own order_by
 		}
 		if ($prev_route['route_type'] == TWOxTWO_QUALI && $keys['route_order'] == 4)
 		{
