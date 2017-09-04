@@ -1127,7 +1127,8 @@ class ranking_athlete extends so_sql
 				{
 					$filter[] = self::ATHLETE_TABLE.'.PerId != '.(int)substr($part,1);
 				}
-				elseif (strlen($part) == 3)	// nation
+				// nation (can be 2 letters too: NC for New Caledonia, recogniced as NF by IFSC, but part of FRA for IOC!)
+				elseif (preg_match('/^[A-Z]{2,3}$/i', $part))
 				{
 					$filter['nation'] = strtoupper($part);
 				}
