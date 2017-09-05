@@ -354,7 +354,8 @@ class ranking_route_result extends Api\Storage\Base
 							break;		// no further countback
 						}
 						if (ranking_result_bo::is_two_quali_all($route_type) && $route_order == 1 ||
-							$route_type == THREE_QUALI_ALL_NO_STAGGER  && $route_order == 2)
+							$route_type == THREE_QUALI_ALL_NO_STAGGER  && $route_order == 2 ||
+							$route_type == TWO_QUALI_GROUPS && $route_order < 4)
 						{
 							if ($route_type == TWO_QUALI_ALL_SUM)	// sum is in quali_points and higher points are better
 							{
@@ -811,7 +812,7 @@ class ranking_route_result extends Api\Storage\Base
 						foreach(in_array($data['route_type'], array(TWOxTWO_QUALI,TWO_QUALI_GROUPS)) ? array('',1,2,3) :
 							($data['route_type'] == THREE_QUALI_ALL_NO_STAGGER ? array('',1,2,7) : array('',1)) as $suffix)
 						{
-							if ($data['result_rank'.$suffix])
+							if ($data['result_rank'.$suffix] && $data['result'.$suffix])
 							{
 								$data['result'.$suffix] .= "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
 							}
