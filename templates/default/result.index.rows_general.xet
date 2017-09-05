@@ -87,7 +87,7 @@
 				<column disabled="!@route_names[1]"/>
 				<column disabled="!@first_quali_last"/>
 				<column disabled="!@show_ability"/>
-				<column disabled="!@route_type=/(TWO_QUALI_ALL|TWOxTWO_QUALI|THREE_QUALI_ALL_NO_STAGGER|TWO_QUALI_GROUPS)/"/>
+				<column disabled="!@quali_points"/>
 			</columns>
 			<rows>
 				<row part="header">

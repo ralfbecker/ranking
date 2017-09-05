@@ -1040,6 +1040,8 @@ class ranking_result_ui extends ranking_result_bo
 		// show first qualification in last column for 3 qualification routes
 		$rows['first_quali_last'] = $query['discipline'] == 'combined' ||
 			$query['route_type'] == THREE_QUALI_ALL_NO_STAGGER;
+		$rows['quali_points'] = in_array($query['route_type'], array(TWO_QUALI_ALL,TWOxTWO_QUALI,THREE_QUALI_ALL_NO_STAGGER)) ||
+			$query['route_type'] == TWO_QUALI_GROUPS && in_array($query['route'], array(-4, -5));
 		// display final points (multiplication of rank from 3 single discipline finals in combined)
 		$rows['final_points'] = $query['discipline'] == 'combined' &&
 			$query['route'] == -1 && isset($rows['route_names'][6]);
