@@ -806,9 +806,9 @@ class ranking_route_result extends Api\Storage\Base
 						}
 					}
 					// general result with quali on two routes for all --> add rank to result
-					if ($data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK,THREE_QUALI_ALL_NO_STAGGER)))
+					if ($data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_ALL,TWOxTWO_QUALI,TWO_QUALI_ALL_NO_COUNTBACK,THREE_QUALI_ALL_NO_STAGGER,TWO_QUALI_GROUPS)))
 					{
-						foreach($data['route_type'] == TWOxTWO_QUALI ? array('',1,2,3) :
+						foreach(in_array($data['route_type'], array(TWOxTWO_QUALI,TWO_QUALI_GROUPS)) ? array('',1,2,3) :
 							($data['route_type'] == THREE_QUALI_ALL_NO_STAGGER ? array('',1,2,7) : array('',1)) as $suffix)
 						{
 							if ($data['result_rank'.$suffix])
