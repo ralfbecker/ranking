@@ -31,7 +31,7 @@ define('TWO_QUALI_BESTOF',7);			// speed best of two (record format)
 define('TWO_QUALI_ALL_SUM',8);			// lead on 2 routes with height sum
 define('TWO_QUALI_ALL_NO_COUNTBACK',9);	// 2012 EYC, no countback, otherwise like TWO_QUALI_ALL
 define('TWO_QUALI_GROUPS', 10);			// two quali groups with 2 flash routes each (different from TWOxTWO_QUALI!)
-define('THREE_QUALI_ALL_NO_STAGGER',11);	// lead on 3 routes for all on flash or combined format
+define('THREE_QUALI_ALL_NO_STAGGER',11);	// lead on 3 routes for all on flash for combined format
 
 define('LEAD',4);
 define('BOULDER',8);
