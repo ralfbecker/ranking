@@ -812,7 +812,7 @@ class ranking_route_result extends Api\Storage\Base
 						foreach(in_array($data['route_type'], array(TWOxTWO_QUALI,TWO_QUALI_GROUPS)) ? array('',1,2,3) :
 							($data['route_type'] == THREE_QUALI_ALL_NO_STAGGER ? array('',1,2,7) : array('',1)) as $suffix)
 						{
-							if ($data['result_rank'.$suffix] && $data['result'.$suffix])
+							if ($data['result_rank'.$suffix] && ($data['result'.$suffix] || $data['route_type'] == THREE_QUALI_ALL_NO_STAGGER))
 							{
 								$data['result'.$suffix] .= "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
 							}
