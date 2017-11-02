@@ -6,8 +6,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2011-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 $GLOBALS['egw_info'] = array(
@@ -21,19 +20,18 @@ $_GET['cd'] = 'no';	// stop jdots framework
 include('../header.inc.php');
 
 /**
- * Check if we allow anon access and with which creditials
+ * Create anonymous session without checking credentials
  *
  * @param array &$anon_account anon account_info with keys 'login', 'passwd' and optional 'passwd_type'
- * @return boolean true if we allow anon access, false otherwise
+ * @return boolean|string string with sessionid or false on error (no anonymous user)
  */
 function check_anon_access(&$anon_account)
 {
-	$anon_account = array(
-		'login'  => 'anonymous',
-		'passwd' => 'anonymous',
-		'passwd_type' => 'text',
-	);
-	return true;
+	$anon_account = null;
+
+	// create session without checking auth: create(..., false, false)
+	return $GLOBALS['egw']->session->create('anonymous@'.$GLOBALS['egw_info']['user']['domain'],
+		'', 'text', false, false);
 }
 
 ranking_beamer::beamer();
