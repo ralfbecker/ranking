@@ -1,4 +1,5 @@
-%1 deleted	ranking	es-es	%1 borrado
+%1 deleted	ranking	es-es	%1 suprimido
+%1 saved	ranking	es-es	%1 grabado
 accounting	ranking	es-es	Cuentas
 actions	ranking	es-es	Acciones
 before	ranking	es-es	Antes
@@ -28,7 +29,6 @@ id	ranking	es-es	Id
 ignore	ranking	es-es	Ignorar
 import	ranking	es-es	Importar
 import file	ranking	es-es	Importar fichero
-mail all participants	ranking	es-es	Enviar correo a todos los participantes
 male	ranking	es-es	Masculino
 more	ranking	es-es	Más
 not allowed	ranking	es-es	no permitido
@@ -51,3 +51,4 @@ website	ranking	es-es	Sitio web
 wrong admin-account or -password !!!	ranking	es-es	¡La cuenta de administración o la contraseña son incorrectas!
 you need to select a file first!	ranking	es-es	¡Necesita seleccionar un fichero antes!
 zip code	ranking	es-es	Código postal
+mail all participants	ranking	es-es	Enviar correo a todos los participantes
