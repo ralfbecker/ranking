@@ -1096,13 +1096,15 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		if ($query['route_type'] == TWO_QUALI_BESTOF)	// best of mode is quali AND final!
 		{
-			$rows['show_second_lane'] = $query['route'] == 0;	// 2. lane is only in quali
 			$rows['sum_or_bestof'] = lang('Best of');
 		}
 		else
 		{
 			$rows['sum_or_bestof'] = lang('Sum');
 		}
+		// 2. speed lane is only in quali and only if NOT just one quali (sum or bestof)
+		$rows['show_second_lane'] = $query['route'] == 0 && $query['route_type'] != ONE_QUALI;
+
 		// disable checked and modified column for sitemgr or result display
 		$rows['no_result_modified'] = $rows['no_check'] = !empty($GLOBALS['Common_BO']);
 
