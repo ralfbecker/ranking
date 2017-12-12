@@ -2216,7 +2216,7 @@ class ranking_result_bo extends ranking_bo
 			return null;
 		}
 
-		if (in_array($route_type, array(ONE_QUALI, TWO_QUALI_BESTOF)) && $route_order == 2)
+		if (in_array($route_type, array(ONE_QUALI, TWO_QUALI_BESTOF, TWO_QUALI_SPEED)) && $route_order == 2)
 		{
 			$keys['route_order'] = 0;
 		}
