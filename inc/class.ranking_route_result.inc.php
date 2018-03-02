@@ -176,7 +176,7 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			$route_order =& $filter['route_order'];
 		}
-		else
+		elseif (isset($criteria['route_order']))
 		{
 			$route_order =& $criteria['route_order'];
 		}
