@@ -181,7 +181,7 @@ class ranking_route extends Api\Storage\Base
 			), array(
 				'WetId' => $this->data['WetId'],
 				'GrpId' => $this->data['GrpId'],
-			));
+			), __LINE__, __FILE__);
 		}
 		ranking_result_bo::delete_export_route_cache($this->data, null, null, true);	// true = invalidate prev. heats
 
