@@ -51,7 +51,8 @@ table.DrTable tbody th a {
 	font-weight: normal;
 }
 table.DrTable td div.tdAlign2 { width: 40%; display: inline-block; }
-table.DrTable td div.tdAlign3 { width: 30%; display: inline-block; }
+table.DrTable td div.tdAlign3 { width: 20%; display: inline-block; }
+table.DrTable td div.tdAlign3:first-child { width: 40%; display: inline-block; }
 table.DrTable td div.tdAlign4 { width: 20%; display: inline-block; }
 /**
  * Capitalize names

@@ -35,10 +35,11 @@ class ranking_bo extends ranking_so
 	);
 	var $disciplines = array(
 		'lead' => 'lead',
-		'boulder' => 'boulder',
+		'boulder2018' => 'boulder: 2018+ rules (tops, zones, top-tries, zone-tries)',
 		'speed' => 'speed',
 		'combined' => 'combined',	// new olympic fromat
 		'speedrelay' => 'speedrelay',
+		'boulder' => 'boulder: pre 2018 rules (tops, top-tries, bonus, bonus-tries)',
 		'boulderheight' => 'boulder: height, tries',	// height and tries, as used in Arco
 		'selfscore' => 'boulder: self-scoring',	// self-scoring honesty system
 	);

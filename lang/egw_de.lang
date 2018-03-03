@@ -93,10 +93,10 @@ birthday, shows only the year	ranking	de	Geburtstag, zeigt nur das Jahr
 birthyear	ranking	de	Jahrgang
 birthyears from	ranking	de	Geburtsjahr von
 body height in centimeter	ranking	de	Körpergröße in Zentimeter
-bonus	ranking	de	Bonus
-bonus: number of tries	ranking	de	Bonus: Anzahl Versuche
-bonus: number of tries or no	ranking	de	Bonus: Anzahl Versuche oder Nein
-bonus: total number or no	ranking	de	Bonus: Gesamtanzahl oder Nein
+zone	ranking	de	Zone
+zone: number of tries	ranking	de	Zone: Anzahl Versuche
+zone: number of tries or no	ranking	de	Zone: Anzahl Versuche oder Nein
+zone: total number or no	ranking	de	Zone: Gesamtanzahl oder Nein
 both password do not match!	ranking	de	Beide Passwörter stimmen NICHT überein!
 boulder	ranking	de	Bouldern
 boulder: height, tries	ranking	de	Bouldern: Höhe, Versuche

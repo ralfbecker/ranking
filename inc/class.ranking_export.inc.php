@@ -610,6 +610,7 @@ class ranking_export extends ranking_result_bo
 				$num_current = 1;
 				break;
 			case 'boulder':
+			case 'boulder2018':
 				$num_current = $route['route_num_problems'];
 				break;
 			case 'speed':
@@ -651,7 +652,7 @@ class ranking_export extends ranking_result_bo
 			'next_1','next_2','next_3','next_4','next_5','next_6','next_7','next_8',
 			'RelayResults.*',	// not needed and gives warning in xml export
 		)));
-		if (!in_array($discipline, array('boulder','selfscore'))) unset($route['route_num_problems']);
+		if (!in_array($discipline, array('boulder','boulder2018','selfscore'))) unset($route['route_num_problems']);
 
 		if ($discipline == 'speedrelay')	// fetch athlete names
 		{
@@ -730,7 +731,7 @@ class ranking_export extends ranking_result_bo
 				}
 			}
 			// remove single boulder meaningless in general result, or not existing boulder
-			if ($discipline == 'boulder')
+			if (substr($discipline, 0, 7) == 'boulder')
 			{
 				for($i = 1; $i <= ranking_route_result::MAX_BOULDERS; ++$i)
 				{
@@ -755,6 +756,7 @@ class ranking_export extends ranking_result_bo
 						}
 						break;
 					case 'boulder':
+					case 'boulder2018':
 						for($i = 1; $i <= $route['route_num_problems']; $i++)
 						{
 							foreach(array('bonus' => 'zone', 'top' => 'top') as $name => $row_name)
@@ -859,6 +861,7 @@ class ranking_export extends ranking_result_bo
 			switch($discipline)
 			{
 				case 'boulder':
+				case 'boulder2018':
 					foreach($statistics as &$stats)
 					{
 						foreach(array('top', 'bonus') as $name)

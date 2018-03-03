@@ -488,7 +488,7 @@ class ranking_result_ui extends ranking_result_bo
 			$readonlys['tabs']['measure'] = true;	// measurement tab only for judges
 		}
 		$tmpl->disableElement('route_num_problems',
-			($discipline != 'combined' ? $discipline : $this->combined_order2discipline($content['route_order'])) != 'boulder');
+			substr($discipline != 'combined' ? $discipline : $this->combined_order2discipline($content['route_order']), 0, 7) != 'boulder');
 
 		$readonlys['discipline'] = !!$content['route_order'];	// for no only allow to set discipline in 1. quali
 
@@ -1563,7 +1563,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		// add measurement for judges and admins, if on a regular lead route (not on general result)
 		if ($comp && $cat && ($this->is_judge($comp,false,$route) || $this->is_admin || $content['nm']['discipline'] == 'selfscore') &&
-			$content['nm']['route'] != -1 && in_array($content['nm']['discipline'], array('lead','boulder','selfscore')))
+			$content['nm']['route'] != -1 && in_array($content['nm']['discipline'], array('lead','boulder','boulder2018','selfscore')))
 		{
 			$sel_options['show_result'][4] = lang('Measurement');
 		}
@@ -1626,6 +1626,7 @@ class ranking_result_ui extends ranking_result_bo
 					$content['measurement_template'] = 'ranking.result.selfscore_measurement';
 					break;
 				case 'boulder':
+				case 'boulder2018':
 					ranking_boulder_measurement::measurement($content, $sel_options, $readonlys);
 					$content['measurement_template'] = 'ranking.result.boulder_measurement';
 					break;
@@ -1951,6 +1952,7 @@ class ranking_result_ui extends ranking_result_bo
 				case 'lead':    return 'ranking.result.index.rows_lead';
 				case 'speed':   return 'ranking.result.index.rows_speed';
 				case 'selfscore':
+				case 'boulder2018':
 				case 'boulder': return 'ranking.result.index.rows_boulder';
 				case 'speedrelay': return 'ranking.result.index.rows_relay_speed';
 			}

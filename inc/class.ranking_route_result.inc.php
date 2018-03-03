@@ -276,6 +276,7 @@ class ranking_route_result extends Api\Storage\Base
 						if ($discipline != 'combined') break;
 						// fall through for combined
 					case 'boulder':
+					case 'boulder2018':
 					case 'selfscore':
 						$result_cols[] = 'result_top';
 						$result_cols[] = 'result_zone';
@@ -885,10 +886,11 @@ class ranking_route_result extends Api\Storage\Base
 				}
 				// fall through, as final for selfscore is always boulder
 			case 'boulder':
+			case 'boulder2018':
 				for($i=1; $i <= self::MAX_BOULDERS; ++$i)
 				{
 					$data['boulder'.$i] = ($data['top'.$i] ? 't'.$data['top'.$i].' ' : '').
-						((string)$data['zone'.$i] !== '' ? 'b'.$data['zone'.$i] : '');
+						((string)$data['zone'.$i] !== '' ? ($data['discipline'] === 'boulder2018' ? 'z' : 'b').$data['zone'.$i] : '');
 				}
 				$suffix = $data['discipline'] == 'selfscore' ? 2 : '';	// general result can have route_order as suffix
 				while (isset($data['result_zone'.$suffix]) || $suffix < 2 || isset($data['result_zone'.(1+$suffix)]) ||
@@ -913,7 +915,14 @@ class ranking_route_result extends Api\Storage\Base
 							$data['zones'] = $zones;
 							$data['zone_tries'] = $zone_tries;
 						}
-						$data['result'.$to_suffix] = $tops.'t'.$top_tries."\u{00A0}".$zones.'b'.$zone_tries;
+						if ($data['discipline'] === 'boulder2018')
+						{
+							$data['result'.$to_suffix] = $tops.'T'.$zones.'z'."\u{00A0}".(int)$top_tries."\u{00A0}".(int)$zone_tries;
+						}
+						else
+						{
+							$data['result'.$to_suffix] = $tops.'t'.$top_tries."\u{00A0}".$zones.'b'.$zone_tries;
+						}
 						if ($suffix !== $to_suffix)
 						{
 							$data['result_rank'.$to_suffix] = $data['result_rank'.$suffix];
@@ -1319,6 +1328,11 @@ class ranking_route_result extends Api\Storage\Base
 					$extra_cols[] = 'result_time';
 				}
 				break;
+			case 'boulder2018':
+				$extra_cols[] = $this->boulder_points('result_top', 'result_zone').' AS boints';
+				$mode = $this->rank_boulder_points();
+				$order_by = 'boints DESC';
+				break;
 			case 'boulder':
 			case 'selfscore':
 				$mode = $this->rank_boulder;
@@ -1343,7 +1357,7 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		// combined lead and boulder final has not countback to previous heat
 		elseif ($discipline == 'lead' && $keys['route_order'] == 7 ||
-			$discipline == 'boulder' && $keys['route_order'] == 6)
+			substr($discipline, 0, 7) == 'boulder' && $keys['route_order'] == 6)
 		{
 
 		}
@@ -1498,6 +1512,34 @@ class ranking_route_result extends Api\Storage\Base
 		if ($modified) ranking_result_bo::delete_export_route_cache($keys);
 
 		return $modified;
+	}
+
+	/**
+	 * Return SQL to calculate 2018+ boulder points from combined top/zone columns
+	 *
+	 * @param string $result_top
+	 * @param string $result_zone
+	 * @return string SQL
+	 */
+	function boulder_points($result_top='result_top', $result_zone='result_zone')
+	{
+		return "(COALESCE(1000000*(($result_top+99) div 100),0)+".
+			"10000*(($result_zone+99) div 100)-".
+			"COALESCE(100*(100-$result_top mod 100),0)-".
+			"(100-$result_zone mod 100))";
+	}
+
+	/**
+	 * Rank a single boulder heat by 2018+ boulder points
+	 *
+	 * @return string SQL
+	 */
+	function rank_boulder_points()
+	{
+		return "CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (".
+			"SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND ".
+			$this->boulder_points('RouteResults.result_top', 'RouteResults.result_zone')." < ".
+			$this->boulder_points('r.result_top', 'r.result_zone').") END";
 	}
 
 	/**

@@ -1354,7 +1354,7 @@ var Resultlist = (function() {
 					'result': 'Result'
 				};
 				// for boulder heats use new display, but not for general result!
-				if (_data.discipline == 'boulder' && _data.route_order != -1)
+				if (_data.discipline.substr(0, 7) == 'boulder' && _data.route_order != -1)
 				{
 					delete this.result_cols.result;
 					var that = this;
@@ -1470,7 +1470,7 @@ var Resultlist = (function() {
 			if (result && result != 'b0')
 			{
 				var top_tries = result.match(/t([0-9]+)/);
-				var bonus_tries = result.match(/b([0-9]+)/);
+				var bonus_tries = result.match(/(b|z)([0-9]+)/);
 				if (top_tries)
 				{
 					boulder.className = 'boulderTop';
@@ -1485,7 +1485,7 @@ var Resultlist = (function() {
 				}
 				var bonus_text = document.createElement('div');
 				bonus_text.className = 'bonusTries';
-				jQuery(bonus_text).text(bonus_tries[1]);
+				jQuery(bonus_text).text(bonus_tries[2]);
 				jQuery(boulder).append(bonus_text);
 			}
 			else
