@@ -30,7 +30,9 @@
 				</row>
 				<row class="row">
 					<description for="display_athlete" value="Display athlete"/>
-					<select id="display_athlete"/>
+					<menulist>
+						<menupopup id="display_athlete"/>
+					</menulist>
 					<description/>
 					<description/>
 				</row>
@@ -60,7 +62,7 @@
 							<menupopup type="select-number" id="quota" options="Select one,1,12,1"/>
 						</menulist>
 						<menulist>
-							<menupopup type="select-number" id="total_per_discipline" options="None,1,10"/>
+							<menupopup type="select-number" id="total_per_discipline" options="None,1,20"/>
 						</menulist>
 					</vbox>
 					<grid spacing="0" padding="1" id="quota_extra">
@@ -78,7 +80,7 @@
 									<menupopup class="selectboxFullWidth" id="${row}[cat]" options="Category"/>
 								</menulist>
 								<menulist>
-									<menupopup type="select-number" id="${row}[num]" options="None,1,10"/>
+									<menupopup type="select-number" id="${row}[num]" options="None,1,20"/>
 								</menulist>
 							</row>
 						</rows>
