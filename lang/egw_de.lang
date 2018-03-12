@@ -93,10 +93,6 @@ birthday, shows only the year	ranking	de	Geburtstag, zeigt nur das Jahr
 birthyear	ranking	de	Jahrgang
 birthyears from	ranking	de	Geburtsjahr von
 body height in centimeter	ranking	de	Körpergröße in Zentimeter
-zone	ranking	de	Zone
-zone: number of tries	ranking	de	Zone: Anzahl Versuche
-zone: number of tries or no	ranking	de	Zone: Anzahl Versuche oder Nein
-zone: total number or no	ranking	de	Zone: Gesamtanzahl oder Nein
 both password do not match!	ranking	de	Beide Passwörter stimmen NICHT überein!
 boulder	ranking	de	Bouldern
 boulder: height, tries	ranking	de	Bouldern: Höhe, Versuche
@@ -415,6 +411,7 @@ open comp.	ranking	de	Offener Wettk.
 open scorecards:	ranking	de	Offene Scorekarten:
 opens	ranking	de	öffnet
 or	ranking	de	oder
+or the organizer of the competition	ranking	de	oder den Veranstalter des Wettkampfes
 other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
 pagename for athlete profile (default: pstambl)	ranking	de	Seitenname für die Athletenprofile (Vorgabe: pstambl)
@@ -693,3 +690,7 @@ you need to select some federations first!	ranking	de	Sie müssen zuerst einige 
 your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 zip code	ranking	de	Postleitzahl
+zone	ranking	de	Zone
+zone: number of tries	ranking	de	Zone: Anzahl Versuche
+zone: number of tries or no	ranking	de	Zone: Anzahl Versuche oder Nein
+zone: total number or no	ranking	de	Zone: Gesamtanzahl oder Nein

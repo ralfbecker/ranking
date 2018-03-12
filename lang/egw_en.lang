@@ -97,10 +97,6 @@ birthday, shows only the year	ranking	en	birthday, shows only the year
 birthyear	ranking	en	Birthyear
 birthyears from	ranking	en	Birthyears from
 body height in centimeter	ranking	en	body height in centimeter
-zone	ranking	en	Zone
-zone: number of tries	ranking	en	Zone: number of tries
-zone: number of tries or no	ranking	en	Zone: Number of tries or no
-zone: total number or no	ranking	en	Zone: total number or no
 both password do not match!	ranking	en	Both password do NOT match!
 boulder	ranking	en	boulder
 boulder: height, tries	ranking	en	boulder: height, tries
@@ -423,6 +419,7 @@ open comp.	ranking	en	Open comp.
 open scorecards:	ranking	en	Open scorecards:
 opens	ranking	en	opens
 or	ranking	en	or
+or the organizer of the competition	ranking	en	or the organizer of the competition
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
 pagename for athlete profile (default: pstambl)	ranking	en	Pagename for athlete profile (default: pstambl)
@@ -703,3 +700,7 @@ you need to select some federations first!	ranking	en	You need to select some fe
 your new password is now active.	ranking	en	Your new password is now active.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	en	Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.
 zip code	ranking	en	Zip Code
+zone	ranking	en	Zone
+zone: number of tries	ranking	en	Zone: number of tries
+zone: number of tries or no	ranking	en	Zone: Number of tries or no
+zone: total number or no	ranking	en	Zone: total number or no

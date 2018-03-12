@@ -287,8 +287,10 @@ class ranking_selfservice extends ranking_bo
 		{
 			if (empty($_POST['email']) || !($athlete = $this->athlete->read(array('email' => $_POST['email']))))
 			{
-				echo "<p class='error'>".lang('EMail address NOT found!')."</p>\n";
-				echo "<p>".lang('Maybe you have a different one registered. Try looking it up by using "Edit profile" on your profile page.')."</p>\n";
+				echo "<p class='error'>".lang('EMail address NOT found!')."<br/>\n";
+				echo lang('Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.',
+					lang('or the organizer of the competition'))."<br/>\n";
+				echo lang('Maybe you have a different one registered. Try looking it up by using "Edit profile" on your profile page.')."</p>\n";
 			}
 			else
 			{
