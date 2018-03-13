@@ -1467,7 +1467,7 @@ var Resultlist = (function() {
 		{
 			var boulder = document.createElement('div');
 			var result = _data['boulder'+i];
-			if (result && result != 'b0')
+			if (result && result != 'z0' && result != 'b0')
 			{
 				var top_tries = result.match(/t([0-9]+)/);
 				var bonus_tries = result.match(/(b|z)([0-9]+)/);
