@@ -391,7 +391,7 @@ class ranking_registration_ui extends ranking_bo
 			// plus evtl. question and concerned athlete
 			egw_json_response::get()->data(array(
 				'registered' => $registered,
-			)+(!isset($question) ? array() : array(
+			)+(!isset($question) || $question === true ? array() : array(
 				'question'  => $question,
 				'PerId'     => $athlete['PerId'],
 				'GrpId'     => $params['GrpId'],

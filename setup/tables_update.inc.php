@@ -2037,3 +2037,21 @@ function ranking_upgrade16_1_004()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '16.1.005';
 }
 
+
+/**
+ * Add no_license column
+ *
+ * ALTER TABLE `Wettkaempfe` ADD `no_license` TINYINT NOT NULL DEFAULT '0'
+ *
+ * @return string
+ */
+function ranking_upgrade16_1_005()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','no_license',array(
+		'type' => 'bool',
+		'default' => '0',
+		'comment' => '0: license required, 1: no license'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.001';
+}

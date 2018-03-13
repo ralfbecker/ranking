@@ -159,10 +159,26 @@ class ranking_selfservice extends ranking_bo
 			{
 				die("<p class='error'>".lang('Athlete is suspended !!!')."</p>\n");
 			}
+			$error = false;
+			// check if competion requires a license
+			if (empty($comp['no_license']))
+			{
+				if (!($athlete = $this->athlete->read($athlete['PerId'], '', (int)$comp['datum'], $comp['nation'])) ||
+					$athlete['license'] == 'n')
+				{
+					echo "<p class='error'>".lang('This athlete has NO license!').' '.
+						($comp['nation'] === 'SUI' ? '<a href="http://www.sac-cas.ch/wettkampfsport/swiss-climbing/baechli-swiss-climbing-cup/wettkampflizenz.html" target="_blank">'.
+							'Informationen und Beantragung der Lizenz.'.'</a>' :
+							lang('Please contact your federation (%1).', $this->federation->get_contacts($athlete))).
+						"</p>\n";
+					$error = true;
+				}
+			}
 			// check available categories (matching sex and evtl. agegroup) and if athlete is already registered
 			if (!($cats = $this->matching_cats($comp, $athlete)))
 			{
-				die("<p class='error'>".lang('Competition has no categories you are allowed to register for!')."</p>\n");
+				echo "<p class='error'>".lang('Competition has no categories you are allowed to register for!')."</p>\n";
+				$error = true;
 			}
 			asort($cats);
 
@@ -175,7 +191,6 @@ class ranking_selfservice extends ranking_bo
 			{
 				$data = $data['GrpId'];
 			}
-
 			if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['password']))
 			{
 				//_debug_array($_POST['GrpId']);
@@ -199,11 +214,14 @@ class ranking_selfservice extends ranking_bo
 				}
 				$registered = (array)$_POST['GrpId'];
 			}
-			echo "<p>".lang('Please check the categories you want to register for:')."</p>\n";
-			echo "<form method='POST'>\n<table><tr valign='bottom'>\n";
-			echo '<td>'.html::checkbox_multiselect('GrpId', $registered, $cats)."</td>\n";
-			echo '<td>'.html::input('',lang('Register'),'submit')."</td>\n";
-			echo "</tr></table>\n</form>\n";
+			if (!$error)
+			{
+				echo "<p>".lang('Please check the categories you want to register for:')."</p>\n";
+				echo "<form method='POST'>\n<table><tr valign='bottom'>\n";
+				echo '<td>'.html::checkbox_multiselect('GrpId', $registered, $cats)."</td>\n";
+				echo '<td>'.html::input('',lang('Register'),'submit')."</td>\n";
+				echo "</tr></table>\n</form>\n";
+			}
 		}
 		// list selfscoring
 		$selfscore_found = 0;

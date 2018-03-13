@@ -577,6 +577,11 @@ class ranking_bo extends ranking_so
 		{
 			return false;
 		}
+		// check if competition requires no license
+		if ($comp['no_license'])
+		{
+			return true;
+		}
 		/* SUI stoped using day licenses in 2018
 		if ($comp['nation'] == 'SUI')
 		{

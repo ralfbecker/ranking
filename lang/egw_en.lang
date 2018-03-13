@@ -392,6 +392,7 @@ no categories defined!	ranking	en	No categories defined!
 no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	en	No competition (&comp=XYZ) and no cup (&cup=XYZ) selected via the URL!
 no complimentary list (over quota)	ranking	en	No complimentary list (over quota)
 no federation selected to edit!	ranking	en	No federation selected to edit!
+no license required for registration	ranking	en	no license required for registration
 no participant with startnumber "%1"!	ranking	en	No participant with startnumber "%1"!
 no participants yet!	ranking	en	No participants yet!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous round!!!
@@ -447,6 +448,7 @@ place	ranking	en	Place
 place of birth	ranking	en	Place of birth
 please check the categories you want to register for:	ranking	en	Please check the categories you want to register for:
 please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	en	Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.
+please contact your federation (%1).	ranking	en	Please contact your federation (%1).
 please enter your email address and password to register for competitions or edit your profile:	ranking	en	Please enter your EMail address and password to register for competitions or edit your profile:
 please enter your new password:	ranking	en	Please enter your new password:
 please enter your password to log in or %1click here%2, if you forgot it.	ranking	en	Please enter your password to log in or %1click here%2, if you forgot it.

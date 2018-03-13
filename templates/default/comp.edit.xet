@@ -97,9 +97,10 @@
 				</row>
 				<row class="row">
 					<description for="selfregister" value="Selfregister"/>
-					<menulist span="all">
+					<menulist>
 						<menupopup statustext="Allow athletes to register themself for this competition" id="selfregister"/>
 					</menulist>
+					<checkbox label="no license required for registration" id="no_license" span="all"/>
 				</row>
 				<row class="th">
 					<description value="Prequalified competitiors" span="2"/>
