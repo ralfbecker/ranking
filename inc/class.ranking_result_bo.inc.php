@@ -2271,9 +2271,6 @@ class ranking_result_bo extends ranking_bo
 			($comp['discipline'] ? $comp['discipline'] :
 			($cat['mgroups'] ? 'combined' : $cat['discipline']));
 
-		// use new boulder mode by default
-		if ($discipline === 'boulder') $discipline = 'boulder2018';
-
 		// switch route_result class to relay mode, if necessary
 		if ($this->route_result->isRelay != ($discipline == 'speedrelay'))
 		{
@@ -2284,6 +2281,9 @@ class ranking_result_bo extends ranking_bo
 		{
 			return true;	// no new route
 		}
+		// use new boulder mode by default
+		if ($discipline === 'boulder') $discipline = 'boulder2018';
+
 		$keys = array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
