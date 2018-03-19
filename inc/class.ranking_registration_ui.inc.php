@@ -154,8 +154,8 @@ class ranking_registration_ui extends ranking_bo
 					}
 					$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
 					$row['state_changed'] .= egw_time::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
-						($modifier ? lang('by').' '.common::grab_owner_name($modifier).' ' : '')."<br>\n".
-						($state == 'prequalified' ? str_replace("\n", "<br>\n", $row['reg_prequal_reason']) : '');
+						($modifier ? lang('by').' '.common::grab_owner_name($modifier).' ' : '')."\n".
+						($state == 'prequalified' ? $row['reg_prequal_reason'] : '');
 				}
 			}
 			if ($comp_rights || $this->registration_check($comp, $row['nation']) ||
