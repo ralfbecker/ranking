@@ -17,8 +17,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2010 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2010-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 $GLOBALS['egw_info'] = array(
@@ -51,8 +50,11 @@ $result = ranking_export::export($root_tag);
 $encoding = translation::charset();
 
 $xml = new XMLWriter();
-if (!isset($_GET['debug']) || !$_GET['debug'])
+if (empty($_GET['debug']))
 {
+	// switch evtl. set output-compression off, as we cant calculate a Content-Length header with transparent compression
+	ini_set('zlib.output_compression', 0);
+
 	header('Content-Type: application/xml; charset='.$encoding);
 	egw_session::cache_control(isset($result['expires']) ? $result['expires'] : ranking_export::EXPORT_DEFAULT_EXPIRES);
 
@@ -66,13 +68,12 @@ if (!isset($_GET['debug']) || !$_GET['debug'])
 		header('HTTP/1.1 304 Not Modified');
 		common::egw_exit();
 	}
-	$xml->openURI('php://output');
 }
 else
 {
-	$xml->openMemory();
 	header('Content-Type: text/html; charset='.$encoding);
 }
+$xml->openMemory();
 $xml->setIndent(true);
 $xml->setIndentString("\t");
 $xml->startDocument('1.0',$encoding);
@@ -146,7 +147,7 @@ function write_array($xml,$arr)
 		{
 			if (substr($name,-1) == 's') $name = substr($name,0,-1);
 			$xml->startElement($name.'s');
-			foreach($value as $id => &$val)
+			foreach($value as &$val)
 			{
 				if (is_array($val))
 				{
@@ -164,7 +165,22 @@ function write_array($xml,$arr)
 	}
 }
 
-if (isset($_GET['debug']) && $_GET['debug'])
+if (empty($_GET['debug']))
+{
+	$content = $xml->outputMemory(true);
+
+	// we run our own gzip compression, to set a correct Content-Length of the encoded content
+	if (in_array('gzip', explode(',',$_SERVER['HTTP_ACCEPT_ENCODING'])) && function_exists('gzencode'))
+	{
+		$content = gzencode($content);
+		header('Content-Encoding: gzip');
+	}
+
+	// Content-Lenght header is important, otherwise browsers dont cache!
+	Header('Content-Length: '.bytes($content));
+	echo $content;
+}
+else
 {
 	switch($_GET['debug'])
 	{
