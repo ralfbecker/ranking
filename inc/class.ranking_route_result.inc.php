@@ -1600,6 +1600,11 @@ class ranking_route_result extends Api\Storage\Base
 	}
 
 	/**
+	 * Max. number of attempts to use for tie breaking in final
+	 */
+	const MAX_ATTEMPTS = 10;
+
+	/**
 	 * Apply 2018+ boulder final tie-breaking rules
 	 *
 	 * Results are already stored, but transaction is NOT yet commited.
@@ -1620,7 +1625,7 @@ class ranking_route_result extends Api\Storage\Base
 			$last_result = null;
 			foreach(array('top', 'zone') as $what)
 			{
-				for($attempt=1; $attempt < 10; ++$attempt)
+				for($attempt=1; $attempt <= self::MAX_ATTEMPTS; ++$attempt)
 				{
 					$to_split = array();
 					unset($last_result);
@@ -1630,7 +1635,7 @@ class ranking_route_result extends Api\Storage\Base
 
 						if ($result['new_rank'] < $place) continue;	// keep attempts!
 						unset($result['detail']['attempts']);
-						if ($result['new_rank'] > $place) continue;
+						if ($result['new_rank'] > $place || $attempt == self::MAX_ATTEMPTS) continue;
 
 						// calculate how many $what (top/zone) are archived in $attempt try
 						for($n = 1, $num=0; $n <= $num_problems; ++$n)
@@ -1669,19 +1674,23 @@ class ranking_route_result extends Api\Storage\Base
 									$last_num_attempt !== (int)$result['detail']['attempts'])
 							{
 								$result['new_rank'] += $n;
-								$this->db->update($this->table_name,array(
-									'result_rank' => $result['new_rank'],
-									'result_detail' => json_encode($result['detail']),
-								),$keys+array(
-									'PerId' => $result['PerId'],
-								),__LINE__,__FILE__);
 								$split++;
+								$last_num_attempt = (int)$result['detail']['attempts'];
 							}
+							// loosers have their place incremented by number of split ones
 							else
 							{
 								$result['new_rank'] += $split;
+								$last_num_attempt = (int)$result['detail']['attempts'];
+								unset($result['detail']['attempts']);
 							}
-							$last_num_attempt = (int)$result['detail']['attempts'];
+
+							$this->db->update($this->table_name,array(
+								'result_rank' => $result['new_rank'],
+								'result_detail' => json_encode($result['detail']),
+							),$keys+array(
+								'PerId' => $result['PerId'],
+							),__LINE__,__FILE__);
 						}
 						// todo: this is not yet correct for case c)!
 						if ($split) $place += $split-1;
@@ -1691,37 +1700,9 @@ class ranking_route_result extends Api\Storage\Base
 							case 0:	// none split --> continue with higher attempt
 								break;
 							case count($to_split):	// all split --> continue to next place
-								break 3;
 							default:	// some, but not all split --> continue with higher attempt (and maybe different place)
-								break;
+								break 3;
 						}
-						if ($split === count($to_split))
-						{
-							break 3;
-						}
-						/*if ($last_num_attempt && $num != $last_num_attempt)
-						{
-							if ($num > $last_num_attempt)
-							{
-								$last_result['new_rank']++;
-							}
-							else
-							{
-								$result['new_rank']++;
-							}
-							foreach(array($last_result, $result) as $data)
-							{
-								$this->db->update($this->table_name,array(
-									'result_rank' => $data['new_rank'],
-									'result_detail' => json_encode($data['detail']),
-								),$keys+array(
-									'PerId' => $data['PerId'],
-								),__LINE__,__FILE__);
-							}
-							error_log(__METHOD__."() found winner: ".array2string($result).' <=> '.array2string($last_result));
-						}
-						$last_num_attempt = $num;
-						$last_result = $result;*/
 					}
 				}
 			}

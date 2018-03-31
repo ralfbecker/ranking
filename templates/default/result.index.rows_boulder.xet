@@ -139,7 +139,10 @@
 					<description align="center" id="{$row}[PerId]" no_lang="1"/>
 					<description align="center" id="${row}[start_order]" class="noPrint"/>
 					<description align="center" id="{$row}[start_number]" no_lang="1"/>
-					<description align="center" id="{$row}[result]" no_lang="1" class="noWrap"/>
+					<vbox align="center">
+						<description align="center" id="{$row}[result]" no_lang="1" class="noWrap"/>
+						<description align="center" id="{$row}[attempts]" no_lang="1" class="noWrap"/>
+					</vbox>
 					<checkbox readonly="1" id="{$row}[checked]" ro_true="✔" class="noPrint"/>
 					<description id="{$row}[boulder1]" no_lang="1"/>
 					<description id="{$row}[boulder2]" no_lang="1"/>
