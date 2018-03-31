@@ -1664,9 +1664,9 @@ class ranking_route_result extends Api\Storage\Base
 						foreach($to_split as $n => &$result)
 						{
 							// current one is split from next or in case last from the one before --> write it
-							if ($n < count($to_split)-1 &&
-								(int)$result['detail']['attempts'] !== (int)$to_split[1+$n]['detail']['attempts'] ||
-								$last_num_attempt !== (int)$result['detail']['attempts'])
+							if ($n < count($to_split)-1 ?
+									(int)$result['detail']['attempts'] !== (int)$to_split[1+$n]['detail']['attempts'] :
+									$last_num_attempt !== (int)$result['detail']['attempts'])
 							{
 								$result['new_rank'] += $n;
 								$this->db->update($this->table_name,array(
@@ -1731,12 +1731,17 @@ class ranking_route_result extends Api\Storage\Base
 		// sort by new rank
 		usort($results, function($a, $b)
 		{
+			if (!isset($a['new_rank'])) $a['new_rank'] = 99999;
+			if (!isset($b['new_rank'])) $b['new_rank'] = 99999;
 			return $a['new_rank'] - $b['new_rank'];
 		});
-		// dump results for writing tests
-		file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
-			"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
-		error_log(__METHOD__."() logged input and results to ".realpath($path));
+		// dump results for writing tests, if not running the test ;)
+		if ($keys['WetId'])
+		{
+			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
+				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
+			error_log(__METHOD__."() logged input and results to ".realpath($path));
+		}
 	}
 
 	/**
