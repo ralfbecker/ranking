@@ -1497,6 +1497,11 @@ class ranking_route_result extends Api\Storage\Base
 			$old_time = $data['result_time_l'] ? $data['result_time_l'] : $data['time_sum'];
 			$old_rank = $data['new_rank'];
 		}
+		// final with 2018+ boulder rules --> apply tie breaking
+		if ($discipline === 'boulder2018' && !$route['quote'])
+		{
+			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
+		}
 		$this->db->transaction_commit();
 
 		// store Group A/B results in result-table
@@ -1592,6 +1597,146 @@ class ranking_route_result extends Api\Storage\Base
 		$this->db->transaction_commit();
 
 		ranking_result_bo::delete_export_route_cache($keys);
+	}
+
+	/**
+	 * Apply 2018+ boulder final tie-breaking rules
+	 *
+	 * Results are already stored, but transaction is NOT yet commited.
+	 * New rank is in key 'new_rank' (NOT 'result_rank')!
+	 *
+	 * @param array& $results
+	 * @param array $keys
+	 * @param int $num_problems
+	 */
+	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems)
+	{
+		// todo: check results are ordered by (new_)rank
+		$input = $results;
+
+		// split only podium
+		for($place=1; $place <= 3; ++$place)
+		{
+			$last_result = null;
+			foreach(array('top', 'zone') as $what)
+			{
+				for($attempt=1; $attempt < 10; ++$attempt)
+				{
+					$to_split = array();
+					unset($last_result);
+					foreach($results as &$result)
+					{
+						if (is_string($result['detail'])) $result['detail'] = self::unserialize($result['detail']);
+
+						if ($result['new_rank'] < $place) continue;	// keep attempts!
+						unset($result['detail']['attempts']);
+						if ($result['new_rank'] > $place) continue;
+
+						// calculate how many $what (top/zone) are archived in $attempt try
+						for($n = 1, $num=0; $n <= $num_problems; ++$n)
+						{
+							if ($result['detail'][$what.$n] == $attempt) ++$num;
+						}
+						$result['detail']['attempts'] = $num.' '.$what.'s in '.$attempt.'.';
+
+						$to_split[] =& $result;
+					}
+					// check if we need tie-breaking on given $place --> continue to next place if not
+					if ($to_split < 2)
+					{
+						break 2;
+					}
+					else
+					{
+						// sort by highes number of top/zone in given attempt (usort keeps references!)
+						usort($to_split, function($a, $b)
+						{
+							return $b['detail']['attempts'] - $a['detail']['attempts'];
+						});
+						/* Check if we found a winner, we have multiple cases, eg. for 3 tied:
+						 * a) all slit, eg:    0: 2, 1: 1, 2: 0 --> write all and break to next place
+						 * b) first split, eg: 0: 2, 1: 1, 2: 1 --> write first, increment places of others!
+						 * c) last split, eg:  0: 1, 1: 1, 2: 0 --> write last with $place+=$n
+						 * z) none split, eg:  0: 1, 1: 1, 2: 1 --> continue with higher attempt
+						 */
+						$last_num_attempt = null;
+						$split = 0;
+						foreach($to_split as $n => &$result)
+						{
+							// current one is split from next or in case last from the one before --> write it
+							if ($n < count($to_split)-1 &&
+								(int)$result['detail']['attempts'] !== (int)$to_split[1+$n]['detail']['attempts'] ||
+								$last_num_attempt !== (int)$result['detail']['attempts'])
+							{
+								$result['new_rank'] += $n;
+								$this->db->update($this->table_name,array(
+									'result_rank' => $result['new_rank'],
+									'result_detail' => json_encode($result['detail']),
+								),$keys+array(
+									'PerId' => $result['PerId'],
+								),__LINE__,__FILE__);
+								$split++;
+							}
+							else
+							{
+								$result['new_rank'] += $split;
+							}
+							$last_num_attempt = (int)$result['detail']['attempts'];
+						}
+						// todo: this is not yet correct for case c)!
+						if ($split) $place += $split-1;
+						// check how many are split
+						switch($split)
+						{
+							case 0:	// none split --> continue with higher attempt
+								break;
+							case count($to_split):	// all split --> continue to next place
+								break 3;
+							default:	// some, but not all split --> continue with higher attempt (and maybe different place)
+								break;
+						}
+						if ($split === count($to_split))
+						{
+							break 3;
+						}
+						/*if ($last_num_attempt && $num != $last_num_attempt)
+						{
+							if ($num > $last_num_attempt)
+							{
+								$last_result['new_rank']++;
+							}
+							else
+							{
+								$result['new_rank']++;
+							}
+							foreach(array($last_result, $result) as $data)
+							{
+								$this->db->update($this->table_name,array(
+									'result_rank' => $data['new_rank'],
+									'result_detail' => json_encode($data['detail']),
+								),$keys+array(
+									'PerId' => $data['PerId'],
+								),__LINE__,__FILE__);
+							}
+							error_log(__METHOD__."() found winner: ".array2string($result).' <=> '.array2string($last_result));
+						}
+						$last_num_attempt = $num;
+						$last_result = $result;*/
+					}
+				}
+			}
+			// no tie-break archived --> remove detail "attempts"
+		}
+
+		// sort by new rank
+		usort($results, function($a, $b)
+		{
+			return $a['new_rank'] - $b['new_rank'];
+		});
+		// dump results for writing tests
+		file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
+			"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
+		error_log(__METHOD__."() logged input and results to ".realpath($path));
 	}
 
 	/**
