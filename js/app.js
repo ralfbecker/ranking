@@ -99,7 +99,7 @@ app.classes.ranking = AppJS.extend(
 				}
 				else
 				{
-					this.align_td_nbsp('div#ranking-result-index_rows_template table tr.row td[align=center]');
+					this.align_nbsp('div#ranking-result-index_rows_template table tr.row td[align=center] span.et2_label');
 
 					this.show_hint(this.egw.lang("How to use Resultservice"),
 						this.egw.lang("There is a manual in left menu under preferences.")+"\n\n"+
@@ -118,19 +118,21 @@ app.classes.ranking = AppJS.extend(
 	},
 
 	/**
-	 * Align non-breaking-space separated parts of text in a td by wrapping them in equally sized spans
+	 * Align non-breaking-space separated parts of text by wrapping them in equally sized spans
 	 *
 	 * @param {string|jQuery} elems
 	 */
-	align_td_nbsp: function(elems)
+	align_nbsp: function(elems)
 	{
-		jQuery(elems).replaceWith(function()
+		jQuery(elems).contents().filter(function(){
+			return this.nodeType === 3;
+		}).replaceWith(function()
 		{
-			var parts = jQuery(this).contents().text().split(/\u00A0+/);
+			var parts = jQuery(this).text().split(/\u00A0+/);
 			if (parts.length == 1) return jQuery(this).clone();
 			var prefix = '<div class="tdAlign'+parts.length+'">';
 			var postfix = '</div>';
-			return jQuery('<td align="center">'+prefix+parts.join(postfix+prefix)+postfix+'</td>');
+			return jQuery(prefix+parts.join(postfix+prefix)+postfix);
 		});
 	},
 
