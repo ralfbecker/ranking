@@ -41,24 +41,24 @@ foreach(scandir(__DIR__) as $file)
 			}
 			echo "\n";
 		}
-		die("\nTest failed :(\n\n");
+		echo "\nTest failed :(\n\n";
 	}
 }
 
 function compute_array_diff($got, $expected)
 {
 	$diff = array();
-	foreach($got as $name => $value)
+	foreach(array_merge(array_keys($got), array_keys($expected)) as $name)
 	{
-		if ($value != $expected[$name])
+		if ($got[$name] != $expected[$name])
 		{
-			if (is_array($value))
+			if (is_array($got[$name]))
 			{
-				$diff[$name] = compute_array_diff($value, $expected[$name]);
+				$diff[$name] = compute_array_diff($got[$name], $expected[$name]);
 			}
 			else
 			{
-				$diff[$name]['got'] = $value;
+				$diff[$name]['got'] = $got[$name];
 				$diff[$name]['expected'] = $expected[$name];
 			}
 		}

@@ -1616,7 +1616,21 @@ class ranking_route_result extends Api\Storage\Base
 	 */
 	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems)
 	{
-		// todo: check results are ordered by (new_)rank
+		// remove "old" attempts, in case they get not written again
+		foreach($results as &$result)
+		{
+			if (is_string($result['detail'])) $result['detail'] = self::unserialize($result['detail']);
+
+			if (!empty($result['detail']['attempts']))
+			{
+				unset($result['detail']['attempts']);
+				$this->db->update($this->table_name,array(
+					'result_detail' => json_encode($result['detail']),
+				),$keys+array(
+					'PerId' => $result['PerId'],
+				),__LINE__,__FILE__);
+			}
+		}
 		$input = $results;
 
 		// split only podium
@@ -1631,8 +1645,6 @@ class ranking_route_result extends Api\Storage\Base
 					unset($last_result);
 					foreach($results as &$result)
 					{
-						if (is_string($result['detail'])) $result['detail'] = self::unserialize($result['detail']);
-
 						if ($result['new_rank'] < $place) continue;	// keep attempts!
 						unset($result['detail']['attempts']);
 						if ($result['new_rank'] > $place || $attempt == self::MAX_ATTEMPTS) continue;
@@ -1647,8 +1659,9 @@ class ranking_route_result extends Api\Storage\Base
 						$to_split[] =& $result;
 					}
 					// check if we need tie-breaking on given $place --> continue to next place if not
-					if ($to_split < 2)
+					if (count($to_split) < 2)
 					{
+						unset($to_split[0]['detail']['attempts']);
 						break 2;
 					}
 					else

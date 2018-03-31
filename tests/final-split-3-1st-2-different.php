@@ -15,7 +15,7 @@ $input = array (
   array (
     'PerId' => '70578',
     'result_rank' => '1',
-    'detail' => '{"top1":"3","zone1":"1","top2":"2","zone2":"1","top3":"2","zone3":"1","top4":"1","zone4":"1","top5":"2","zone5":"1","checked":"","attempts":"1 tops in 1."}',
+    'detail' => '{"top1":"3","zone1":"1","top2":"2","zone2":"1","top3":"2","zone3":"1","top4":"1","zone4":"1","top5":"2","zone5":"1","checked":""}',
     'boints' => '5048995',
     'new_rank' => '1',
     'nachname' => NULL,
@@ -25,7 +25,7 @@ $input = array (
   array (
     'PerId' => '5089',
     'result_rank' => '2',
-    'detail' => '{"top1":"2","zone1":"1","top2":"2","zone2":"1","top3":"2","zone3":"1","top4":"2","zone4":"1","top5":"2","zone5":"1","checked":"","attempts":"0 tops in 1."}',
+    'detail' => '{"top1":"2","zone1":"1","top2":"2","zone2":"1","top3":"2","zone3":"1","top4":"2","zone4":"1","top5":"2","zone5":"1","checked":""}',
     'boints' => '5048995',
     'new_rank' => '1',
     'nachname' => NULL,
@@ -125,7 +125,6 @@ $results = array (
       'top5' => '2',
       'zone5' => '1',
       'checked' => '',
-      'attempts' => '5 tops in 2.',
     ),
     'boints' => '5048995',
     'new_rank' => 2,
@@ -149,7 +148,6 @@ $results = array (
       'top5' => '2',
       'zone5' => '1',
       'checked' => '',
-      'attempts' => '5 tops in 2.',
     ),
     'boints' => '5048995',
     'new_rank' => 2,
