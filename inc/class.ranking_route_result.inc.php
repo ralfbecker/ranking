@@ -1498,7 +1498,7 @@ class ranking_route_result extends Api\Storage\Base
 			$old_rank = $data['new_rank'];
 		}
 		// final with 2018+ boulder rules --> apply tie breaking
-		if ($discipline === 'boulder2018' && !$route['quote'])
+		if ($discipline === 'boulder2018' && !$route['route_quota'])
 		{
 			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
 		}
