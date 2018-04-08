@@ -7,14 +7,15 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2016 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2016-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * registration storage object
  */
-class ranking_registration extends so_sql
+class ranking_registration extends Api\Storage\Base
 {
 	/**
 	 * Table name for registration
@@ -78,7 +79,7 @@ class ranking_registration extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 	}
 
 	/**
@@ -220,7 +221,7 @@ class ranking_registration extends so_sql
 	 * Check if there are prequalified athletes for given competition
 	 *
 	 * @param int $WetId
-	 * @return int number of prequalified athletes or 1 for the marker from add_prequalified, if there are none
+	 * @return int number of prequalified athletes or 1 for the marker from update_prequalified, if there are none
 	 */
 	function check_prequalified($WetId)
 	{
@@ -238,27 +239,24 @@ class ranking_registration extends so_sql
 	 * If there are no prequalified athletes, we add a marker so check_prequalified finds something next time.
 	 *
 	 * @param int $WetId
-	 * @return int false if there are not prequalified, or number of prequalified added
+	 * @param int& $deleted =null number of no longer prequalified and not registered and therefore deleted
+	 * @param array& $unprequalified =null list by categoriy of registered athletes with no longer valid prequalification removed
+	 * @param int& $changed =null number or changed/added prequalifications
+	 * @return int false if there are no prequalified, or number of prequalified
 	 */
-	function add_prequalified($WetId)
+	function update_prequalified($WetId, &$deleted=null, array &$unprequalified=null, &$changed=null)
 	{
-		if (!($prequalified = ranking_bo::getInstance()->prequalified($WetId)))
-		{
-			// set a marker to not try adding them again
-			$this->db->insert($this->table_name, array(
-				'WetId' => $WetId,
-				'GrpId' => 0,
-				'PerId' => 0,
-				'reg_prequalified' => time(),
-			), false, __LINE__, __FILE__, 'ranking');
-		}
-		else
+		$deleted = $changed = 0;
+		$unprequalified = array();
+
+		if (($prequalified = ranking_bo::getInstance()->prequalified($WetId)))
 		{
 			//error_log(__METHOD__."($WetId) prequalified=".array2string($prequalified));
 			foreach($prequalified as $GrpId => $athletes)
 			{
 				foreach($athletes as $PerId => $reason)
 				{
+					$matches = null;
 					// try updating first, in case is athlete is already registered or manually prequalified
 					$this->db->update($this->table_name, array(
 						'reg_prequalified' => time(),
@@ -281,6 +279,50 @@ class ranking_registration extends so_sql
 							'reg_prequal_reason' => $reason,
 						), false, __LINE__, __FILE__, 'ranking');
 					}
+					elseif($this->db->Type === 'mysqli' &&
+						preg_match_all ('/(\S[^:]+): (\d+)/', mysqli_info ($this->db->Link_ID), $matches))
+					{
+						$info = array_combine ($matches[1], $matches[2]);
+						$changed += $info['Changed'];
+					}
+				}
+
+				// remove prequalification from everyone no longer (automatic) prequalified
+				$where = array(
+					'WetId' => $WetId,
+					'GrpId' => $GrpId,
+					'reg_deleted IS NULL',
+					'reg_prequalified IS NOT NULL',
+					'reg_prequalified_by IS NULL',
+				);
+				if ($athletes)
+				{
+					$where[] = $this->db->expression($this->table_name, 'NOT '.$this->table_name.'.', array('PerId' => array_keys($athletes)));
+				}
+				// first delete everyone with no registration yet
+				$this->db->update($this->table_name, array(
+					'reg_prequalified' => null,
+					'reg_prequal_reason' => 'Prequalification removed',
+					'reg_deleted' => time(),
+				), array_merge($where, array(
+					'reg_registered IS NULL',
+				)), __LINE__, __FILE__, 'ranking');
+				$deleted += $this->db->affected_rows();
+
+				// then query no longer prequalifed, but already registered ones
+				if (($unqualified = $this->search(null, true, '', '', '', false, 'AND', false, $where, true)))
+				{
+					// generate a list with name and nation
+					$unprequalified[$GrpId] = array_map(function($athlete)
+					{
+						return strtoupper($athlete['nachname']).' '.$athlete['vorname'].' ('.$athlete['nation'].')';
+					}, $unqualified);
+
+					// then remove just the prequalification from everyone already registered
+					$this->db->update($this->table_name, array(
+						'reg_prequalified' => null,
+						'req_prequalified_reason' => 'Prequalification removed '.Api\DateTime::to('now', 'Y-m-d H:i:s'),
+					), $where, __LINE__, __FILE__, 'ranking');
 				}
 			}
 		}
@@ -339,7 +381,7 @@ class ranking_registration extends so_sql
 		}
 		if ($filter['state'] != self::REGISTERED && !$this->check_prequalified($filter['WetId']))
 		{
-			$this->add_prequalified($filter['WetId']);
+			$this->update_prequalified($filter['WetId']);
 		}
 		unset($filter['state']);
 

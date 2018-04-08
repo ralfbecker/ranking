@@ -158,6 +158,12 @@ class ranking_registration_ui extends ranking_bo
 						($state == 'prequalified' ? $row['reg_prequal_reason'] : '');
 				}
 			}
+			// always add prequal reason, as it contains also a note when it got removed
+			if (empty($row[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]) && !empty($row['reg_prequal_reason']))
+			{
+				$row['state_changed'] .= "\n".$row['reg_prequal_reason'];
+
+			}
 			if ($comp_rights || $this->registration_check($comp, $row['nation']) ||
 				$comp['nation'] && ($this->registration_check($comp, $row['fed_parent']) ||
 					$this->registration_check($comp, $row['acl_fed_id'])))

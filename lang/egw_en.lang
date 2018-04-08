@@ -5,7 +5,10 @@
 %1 is already registered!	ranking	en	%1 is already registered!
 %1 is an admin and has therefor all rights!	ranking	en	%1 is an admin and has therefor all rights!
 %1 lines read from file.	ranking	en	%1 lines read from file.
+%1 no longer prequalified athletes (without registration) deleted.	ranking	en	%1 no longer prequalified athletes (without registration) deleted.
+%1 no longer prequalified athletes with registration, you need to check quota!	ranking	en	%1 no longer prequalified athletes with registration, you need to check quota!
 %1 participants imported	ranking	en	%1 participants imported
+%1 prequalified athletes in registration, %2 changed or added.	ranking	en	%1 prequalified athletes in registration, %2 changed or added.
 %1 registered.	ranking	en	%1 registered.
 %1 saved	ranking	en	%1 saved
 %1 years, since %2	ranking	en	%1 years, since %2
@@ -57,6 +60,7 @@ allow athletes to register themself for this competition	ranking	en	Allow athlet
 allowed without extra confirmation	ranking	en	Allowed without extra confirmation
 allows athletes to register themself for this competition	ranking	en	Allows athletes to register themself for this competition
 already registered	ranking	en	Already registered
+already registered for combined, no single category registration allowed!	ranking	en	Already registered for combined, no single category registration allowed!
 an email with instructions how to (re-)set the password has been sent.	ranking	en	An EMail with instructions how to (re-)set the password has been sent.
 an error happend, while storing your password!	ranking	en	An error happend, while storing your password!
 applied	ranking	en	applied
@@ -164,6 +168,7 @@ cup (unranked last)	ranking	en	cup (unranked last)
 cup not found!!!	ranking	en	Cup not found!!!
 cuppattern	ranking	en	Cuppattern
 cups	ranking	en	Cups
+current registration in %1 category(s) were deleted.	ranking	en	Current registration in %1 category(s) were deleted.
 database	admin	en	Database
 dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	en	Dataline %1 has a different number of columns (%2) then labels (%3)!
 deadline	ranking	en	Deadline
@@ -395,11 +400,14 @@ no federation selected to edit!	ranking	en	No federation selected to edit!
 no license required for registration	ranking	en	no license required for registration
 no participant with startnumber "%1"!	ranking	en	No participant with startnumber "%1"!
 no participants yet!	ranking	en	No participants yet!
+no previous heat (%1) found!	ranking	en	No previous heat (%1) found!
 no quota set in the previous heat!!!	ranking	en	No quota set in the previous round!!!
 no ranking defined or no results yet for category %1 !!!	ranking	en	No ranking defined or no results yet for category %1 !!!
+no result for discipline %1 found!	ranking	en	No result for discipline %1 found!
 no result imported, need to select all athletes first!	ranking	en	No result imported, need to select ALL athletes first!
 no result yet !!!	ranking	en	No result yet !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	en	No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!
+no route with discipline %1 found!	ranking	en	No route with discipline %1 found!
 no starters yet !!!	ranking	en	No starters yet !!!
 no startlist or result yet!	ranking	en	No startlist or result yet!
 not allowed	ranking	en	Not allowed
@@ -423,6 +431,7 @@ or	ranking	en	or
 or the organizer of the competition	ranking	en	or the organizer of the competition
 other sports	ranking	en	other sports
 other sports practiced	ranking	en	other sports practiced
+overall result	ranking	en	overall result
 pagename for athlete profile (default: pstambl)	ranking	en	Pagename for athlete profile (default: pstambl)
 pagename for ranglists (default: ranglist)	ranking	en	Pagename for ranglists (default: ranglist)
 pagename for results (default: result)	ranking	en	Pagename for results (default: result)
@@ -467,6 +476,8 @@ presets	ranking	en	Presets
 presets for competitions	ranking	en	Presets for competitions
 previous heat	ranking	en	previous round
 previous rankingsystem	ranking	en	previous Rankingsystem
+previous round has no result!	ranking	en	Previous round has no result!
+previous round not found!	ranking	en	Previous round not found!
 previous years cup "%1" not found!	ranking	en	Previous years cup "%1" not found!
 professional	ranking	en	Professional
 profile	ranking	en	Profile
@@ -615,6 +626,7 @@ top: total number or no	ranking	en	Top: total number or no
 topo deleted.	ranking	en	Topo deleted.
 topo uploaded as %1.	ranking	en	Topo uploaded as %1.
 total of %1 athlets registered in all categories.	ranking	en	Total of %1 athlets registered in all categories.
+total quota of %1 exceeded in %2 incl. combined starters!	ranking	en	Total quota of %1 exceeded in %2 incl. combined starters!
 tries	ranking	en	Tries
 try	ranking	en	Try
 try again after %1 minutes.	ranking	en	Try again after %1 minutes.
@@ -682,6 +694,7 @@ wrong mode="%1" for discipline "%2"!	ranking	en	Wrong Mode="%1" for discipline "
 wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	en	Wrong Mode="%1" for this heat (qualification - final mismatch)!
 wrong nationality	ranking	en	Wrong Nationality
 wrong or not configured vfs directory	ranking	en	Wrong or NOT configured VFS directory
+wrong quota of %1 for co-system (use 16, 8 or 4 for speed or 6 for combined)!	ranking	en	Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or 6 for combined)!
 xml file uses unknown schema (format)!	ranking	en	XML file uses unknown schema (format)!
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you are not allowed to register for %1!	ranking	en	You are not allowed to register for %1!

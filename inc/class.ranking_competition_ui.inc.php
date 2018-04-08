@@ -101,7 +101,7 @@ class ranking_competition_ui extends ranking_bo
 			$this->comp->data_merge($_content);
 			//echo "<br>ranking_competition_ui::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (!$view  && ($_content['save'] || $_content['apply'] || $_content['add_prequal']) && $this->acl_check_comp($this->comp->data))
+			if (!$view  && ($_content['save'] || $_content['apply'] || $_content['update_prequal']) && $this->acl_check_comp($this->comp->data))
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -168,10 +168,27 @@ class ranking_competition_ui extends ranking_bo
 							}
 						}
 					}
-					if ($_content['add_prequal'])
+					if ($_content['update_prequal'])
 					{
-						$msg .= "\n".lang('%1 prequalified athletes add to or updated in registration.',
-							$this->registration->add_prequalified($this->comp->data['WetId']));
+						$deleted = $unprequalified = $changed = null;
+						$msg .= "\n".lang('%1 prequalified athletes in registration, %2 changed or added.',
+							$this->registration->update_prequalified($this->comp->data['WetId'], $deleted, $unprequalified, $changed), $changed);
+
+						if ($deleted)
+						{
+							$msg .= "\n".lang('%1 no longer prequalified athletes (without registration) deleted.', $deleted);
+						}
+						if ($unprequalified)
+						{
+							$msg .= "\n".lang('%1 no longer prequalified athletes with registration, you need to check quota!',
+								count(call_user_func_array('array_merge', $unprequalified)));
+							$names = $this->cats->names(array('GrpId' => array_keys($unprequalified)), 0);
+							foreach($unprequalified as $GrpId => $athletes)
+							{
+								$msg .= "\n".$names[$GrpId].': '.implode(', ', $athletes);
+							}
+						}
+
 					}
 					$link = egw::link($_content['referer'],array(
 						'msg' => $msg,

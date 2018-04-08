@@ -104,7 +104,7 @@
 				</row>
 				<row class="th">
 					<description value="Prequalified competitiors" span="2"/>
-					<button align="right" statustext="Only necessary, if you change something, after registration started.&lt;br/&gt;Existing prequalified are NOT removed!" label="Add to registration" id="add_prequal"/>
+					<button align="right" statustext="Only necessary, if you change something, after registration started." label="Update registration" id="update_prequal"/>
 				</row>
 				<row class="row">
 					<menulist>

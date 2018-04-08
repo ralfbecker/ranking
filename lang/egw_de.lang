@@ -5,7 +5,10 @@
 %1 is already registered!	ranking	de	%1 ist bereits registriert!
 %1 is an admin and has therefor all rights!	ranking	de	%1 ist ein Administrator und hat daher alle Rechte!
 %1 lines read from file.	ranking	de	%1 Zeilen von der Datei gelesen.
+%1 no longer prequalified athletes (without registration) deleted.	ranking	de	%1 nicht länger vorqualifizierte Athleten (ohne Registrierung) gelöscht.
+%1 no longer prequalified athletes with registration, you need to check quota!	ranking	de	%1 nicht länger vorqualifizierte Athleten mit Registrierung, Sie müssen die Quota überprüfen!
 %1 participants imported	ranking	de	%1 Teilnehmer importiert
+%1 prequalified athletes in registration, %2 changed or added.	ranking	de	%1 vorqualifizierte Athleten in der Registrierung, %2 geändert oder hinzugefügt.
 %1 registered.	ranking	de	%1 registriert.
 %1 saved	ranking	de	%1 gespeichert
 %1 years, since %2	ranking	de	%1 Jahre, seit %2
@@ -415,6 +418,7 @@ or	ranking	de	oder
 or the organizer of the competition	ranking	de	oder den Veranstalter des Wettkampfes
 other sports	ranking	de	Andere Sportarten
 other sports practiced	ranking	de	ausgeübte andere Sportarten
+overall result	ranking	de	Gesamtergebnis
 pagename for athlete profile (default: pstambl)	ranking	de	Seitenname für die Athletenprofile (Vorgabe: pstambl)
 pagename for ranglists (default: ranglist)	ranking	de	Seitenname für Ranglisten (Vorgabe: ranglist)
 pagename for results (default: result)	ranking	de	Seitenname für Ergebnisse (Vorgabe: result)
@@ -459,6 +463,8 @@ presets	ranking	de	Voreinstellungen
 presets for competitions	ranking	de	Voreinstellungen für die Wettkämpfe
 previous heat	ranking	de	Vorrunde
 previous rankingsystem	ranking	de	vorhergegendes Ranglistensystem
+previous round has no result!	ranking	de	Vorherige Runde hat kein Ergebnis!
+previous round not found!	ranking	de	Vorherige Runde nicht gefunden!
 previous years cup "%1" not found!	ranking	de	Cup des Vorjahres "%1" nicht gefunden!
 professional	ranking	de	Profi
 profile	ranking	de	Profil
@@ -605,6 +611,7 @@ top: total number or no	ranking	de	Top: Gesamtanzahl oder Nein
 topo deleted.	ranking	de	Topo gelöscht.
 topo uploaded as %1.	ranking	de	Topo hochgeladen als %1.
 total of %1 athlets registered in all categories.	ranking	de	Insgesamt %1 Athleten in allen Kategorien registriert.
+total quota of %1 exceeded in %2 incl. combined starters!	ranking	de	Gesamtquota von %1 überschrintten in %2 einschl. kombinierte Starter!
 tries	ranking	de	Versuche
 try	ranking	de	Try
 try again after %1 minutes.	ranking	de	Bitte nach %1 Minuten nochmal versuchen.
