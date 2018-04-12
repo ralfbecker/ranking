@@ -13,13 +13,13 @@
 				<row>
 					<description id="comp_name" no_lang="1" span="all"/>
 				</row>
-				<row>
+				<row valign="middle">
 					<image src="comp_logo" class="fed_logo"/>
 					<vbox>
 						<description id="route_name" no_lang="1"/>
 						<description id="comp_date" no_lang="1"/>
 					</vbox>
-					<image align="right" class="fed_logo" src="sac110.gif"/>
+					<image align="right" class="fed_logo" src="sac110.png"/>
 				</row>
 			</rows>
 		</grid>

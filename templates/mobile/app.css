@@ -7,7 +7,6 @@
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @author Hadi Nategh <hn@stylite.de>
  * @package Ranking
- * @version $Id$
  */
 /**
  * EGroupware digital ROCK Rankings & ResultService - css
@@ -138,7 +137,13 @@ button.small {
   padding-left: 2px;
 }
 #ranking-result-index table.et2_grid td div.tdAlign3 {
-  width: 30%;
+  width: 20%;
+  display: inline-block;
+  text-align: center;
+  padding-left: 2px;
+}
+#ranking-result-index table.et2_grid td div.tdAlign3:first-child {
+  width: 40%;
   display: inline-block;
   text-align: center;
   padding-left: 2px;
@@ -178,7 +183,7 @@ button.small {
     font-weight: bold;
   }
   .fed_logo img {
-    height: 60px;
+    height: 60px !important;
     margin: 10px;
   }
   #ranking-result-index_route_name,
