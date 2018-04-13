@@ -1036,6 +1036,7 @@ class ranking_result_bo extends ranking_bo
 					($ranking_sql = $this->_ranking_sql($keys['GrpId'],$comp['datum'],$this->route_result->table_name.'.PerId')))
 				{
 					$order_by .= ','.$ranking_sql.($start_order_mode != 'result' ? ' DESC' : '');	// --> use the (reversed) ranking
+					$prev_keys['keep_order_by'] = true;	// otherwise we use order of general result
 				}
 			}
 			catch(Exception $e) {

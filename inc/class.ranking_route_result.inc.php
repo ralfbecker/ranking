@@ -387,7 +387,7 @@ class ranking_route_result extends Api\Storage\Base
 				}
 
 				// randomize ex-aquos for startlist
-				if (($k = array_search('RAND()', $order_by_parts)) !== false)
+				if (!$keep_order_by && ($k = array_search('RAND()', $order_by_parts)) !== false)
 				{
 					usort($rows, function($a,$b)
 					{
