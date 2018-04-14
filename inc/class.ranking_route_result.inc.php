@@ -182,6 +182,13 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		if ($route_order === 0) $route_order = '0';		// otherwise it get's ignored by so_sql;
 
+		// keep general_result_join from setting order_by
+		if (isset($filter['keep_order_by']))
+		{
+			$keep_order_by = $filter['keep_order_by'] ? $order_by : false;
+			unset($filter['keep_order_by']);
+		}
+
 		if (!$only_keys && !$join || $route_order < 0)
 		{
 			if (!$this->isRelay)
@@ -283,12 +290,6 @@ class ranking_route_result extends Api\Storage\Base
 						break;
 				}
 
-				// keep general_result_join from setting order_by
-				if (isset($filter['keep_order_by']))
-				{
-					$keep_order_by = $filter['keep_order_by'] ? $order_by : false;
-					unset($filter['keep_order_by']);
-				}
 				$order_by_parts = preg_split('/[ ,]/',$order_by);
 
 				$route_names = null;
