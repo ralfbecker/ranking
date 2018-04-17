@@ -249,6 +249,14 @@ class ranking_registration extends Api\Storage\Base
 		$deleted = $changed = 0;
 		$unprequalified = array();
 
+		// check to update prequalified only after 1. Jan in the year of the competition
+		// as ranking is not valid before and prequalifying competitons might not be updated
+		if (!($comp = ranking_bo::getInstance()->comp->read($WetId)) ||
+			(int)$comp['datum'] != date('Y'))
+		{
+			return false;
+		}
+
 		if (($prequalified = ranking_bo::getInstance()->prequalified($WetId)))
 		{
 			//error_log(__METHOD__."($WetId) prequalified=".array2string($prequalified));

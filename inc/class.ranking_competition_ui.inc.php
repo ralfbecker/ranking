@@ -171,9 +171,16 @@ class ranking_competition_ui extends ranking_bo
 					if ($_content['update_prequal'])
 					{
 						$deleted = $unprequalified = $changed = null;
-						$msg .= "\n".lang('%1 prequalified athletes in registration, %2 changed or added.',
-							$this->registration->update_prequalified($this->comp->data['WetId'], $deleted, $unprequalified, $changed), $changed);
-
+						$prequalified = $this->registration->update_prequalified($this->comp->data['WetId'], $deleted, $unprequalified, $changed);
+						if ($prequalified === false)
+						{
+							$msg .= "\n".lang('Prequalified will be generated automatic on January 1st, no need for a manual update.');
+						}
+						else
+						{
+							$msg .= "\n".lang('%1 prequalified athletes in registration, %2 changed or added.',
+								$prequalified, $changed);
+						}
 						if ($deleted)
 						{
 							$msg .= "\n".lang('%1 no longer prequalified athletes (without registration) deleted.', $deleted);
