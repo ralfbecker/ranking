@@ -86,7 +86,7 @@ class ranking_athlete extends so_sql
 		self::ACL_DENY_STREET    => array('strasse','plz'),
 		self::ACL_DENY_CITY      => array('ort'),
 		self::ACL_DENY_PROFILE   => array('!','PerId','rkey','vorname','nachname','sex','nation','verband','license','acl','last_comp',
-			'platz','pkt','WetId','GrpId'),		// otherwise they get no points in the ranking!
+			'discipline','platz','pkt','WetId','GrpId'),		// otherwise they get no points in the ranking!
 	);
 	/**
 	 * year we check the license for
