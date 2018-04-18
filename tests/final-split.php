@@ -1,7 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-$_REQUEST['domain'] = 'boulder.egroupware.org';
+$_REQUEST['domain'] = php_uname('n') == 'RalfsMac.local' ? 'boulder.egroupware.org' :
+	(substr(php_uname('n'), 0, 4) == 'fpm-' ? 'www.digitalrock.de' : 'default');
 $GLOBALS['egw_info']['flags'] = array('currentapp' => 'login');
 require(__DIR__.'/../../header.inc.php');
 
