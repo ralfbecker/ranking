@@ -7,11 +7,12 @@ require(__DIR__.'/../../header.inc.php');
 
 $result = new ranking_route_result();
 
-foreach(scandir(__DIR__) as $file)
+$failed = $successful = 0;
+foreach(scandir($fixtures=__DIR__.'/fixtures') as $file)
 {
 	if (!preg_match('/^'.basename(__FILE__, '.php').'.+\.php$/', $file)) continue;
 
-	require(__DIR__.'/'.$file);
+	require($fixtures.'/'.$file);
 	echo basename($file, '.php').': ';
 	$r = $input;
 	$result->boulder2018_final_tie_breaking($r, ['WetId' => 0, 'GrpId' => 0, 'route_order' => 0], 5);
@@ -19,6 +20,7 @@ foreach(scandir(__DIR__) as $file)
 	if ($r == $results)
 	{
 		echo "Test successful :)\n";
+		$successful++;
 	}
 	else
 	{
@@ -42,8 +44,12 @@ foreach(scandir(__DIR__) as $file)
 			echo "\n";
 		}
 		echo "\nTest failed :(\n\n";
+		$failed++;
 	}
 }
+echo basename(__FILE__, '.php').": $successful Test successful, $failed Tests failed.\n";
+
+exit($failed);
 
 function compute_array_diff($got, $expected)
 {

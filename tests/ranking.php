@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-$_REQUEST['domain'] = 'boulder.egroupware.org';
+$_REQUEST['domain'] = php_uname('n') == 'RalfsMac.local' ? 'boulder.egroupware.org' : 'default';
 $GLOBALS['egw_info']['flags'] = array('currentapp' => 'login');
 require(__DIR__.'/../../header.inc.php');
 
@@ -9,11 +9,12 @@ $result = new ranking_calculation();
 
 //$GLOBALS['egw_info']['server']['temp_dir'] = __DIR__;
 //ranking_calculation::$dump_ranking_results = true;
-foreach(scandir(__DIR__) as $file)
+$failed = $successful = 0;
+foreach(scandir($fixtures=__DIR__.'/fixtures') as $file)
 {
 	if (!preg_match('/^'.basename(__FILE__, '.php').'.+\.php$/', $file)) continue;
 
-	require(__DIR__.'/'.$file);
+	require($fixtures.'/'.$file);
 	echo basename($file, '.php').': ';
 	$stand = $input['stand'];
 	$start = $ret_pers = $rls = $ret_ex_aquo = $not_counting = $max_comp = null;
@@ -31,6 +32,7 @@ foreach(scandir(__DIR__) as $file)
 	if ($r == $results)
 	{
 		echo "Test successful :)\n";
+		$successful++;
 	}
 	else
 	{
@@ -70,8 +72,12 @@ foreach(scandir(__DIR__) as $file)
 			}
 		}
 		echo "\nTest failed :(\n\n";
+		$failed++;
 	}
 }
+echo basename(__FILE__, '.php').": $successful Test successful, $failed Tests failed.\n";
+
+exit($failed);
 
 function compute_array_diff($got, $expected)
 {
