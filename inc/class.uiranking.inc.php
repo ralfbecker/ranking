@@ -7,9 +7,8 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-15 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
- */
+ * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
+8 */
 
 class uiranking extends ranking_bo
 {
@@ -69,7 +68,7 @@ class uiranking extends ranking_bo
 		$cat = $_content['cat'] ? $this->cats->read($_content['cat']) : '';
 		// if no cat selected or cat invalid for the choosen nation and cup ==> use first cat from list
 		if (!$cat || $nation != ($cat['nation'] ? $cat['nation'] : 'NULL') ||
-			$cup && !in_array($cat['rkey'],$cup['gruppen']))
+			$cup && !in_array($cat['rkey'],$cup['gruppen']) && array_intersect($cat['mgroups'], $cup['gruppen']) != $cat['mgroups'])
 		{
 			list($cat) = each($select_options['cat']);	// use the first cat
 			if ($cat) $cat = $this->cats->read($cat);
