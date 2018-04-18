@@ -54,7 +54,7 @@ class ranking_calculation
 	 *
 	 * @var boolean
 	 */
-	public static $dump_ranking_results = false;
+	public static $dump_ranking_results;
 
 	public function __construct(ranking_bo $bo=null)
 	{
@@ -703,11 +703,9 @@ class ranking_calculation
 		}
 		if ($this->debug) error_log(__METHOD__.": start='$start'");
 
-		$dump_results = self::$dump_ranking_results;
 		if (isset($results))
 		{
 			// already supplied for unit tests
-			$dump_results = false;
 		}
 		elseif ($cup)
 		{
@@ -927,7 +925,7 @@ class ranking_calculation
 		$not_counting['max_disciplines'] = $max_disciplines;
 
 		// dump results for writing tests
-		if ($dump_results)
+		if (!empty(self::$dump_ranking_results))
 		{
 			$input = array(
 				'cat' => $cat,
@@ -947,6 +945,24 @@ class ranking_calculation
 				'rls'   => $rls,
 				'max_comp' => $max_comp,
 			);
+			// clean up unnecessary information from athletes
+			foreach(array(&$input['results'], &$results['rang'], &$results['ret_pers']) as &$athletes)
+			{
+				$athletes = array_map(function($athlete)
+				{
+					return array_diff_key($athlete, array_flip(array(
+						'strasse', 'plz', 'ort', 'tel', 'fax', 'geb_ort',
+						'practice', 'groesse', 'gewicht', 'lizenz', 'kader',
+						'anrede', 'bemerkung', 'hobby', 'sport', 'profi',
+						'email', 'homepage', 'mobil', 'acl', 'freetext',
+						'modified', 'modifier',
+						'password', 'recover_pw_hash', 'recover_pw_time',
+						'last_login', 'login_failed',
+						'facebook', 'twitter', 'instagram', 'youtube', 'video_iframe',
+						'verband', 'fed_url', 'geb_year', 'age',
+					)));
+				}, $athletes);
+			}
 			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].
 				'/ranking-'.($cup ? $cup['rkey'].'-' : '').$cat['rkey'].'-'.str_replace('-', '', $stand).'.php',
 				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");

@@ -7,6 +7,8 @@ require(__DIR__.'/../../header.inc.php');
 
 $result = new ranking_calculation();
 
+//$GLOBALS['egw_info']['server']['temp_dir'] = __DIR__;
+//ranking_calculation::$dump_ranking_results = true;
 foreach(scandir(__DIR__) as $file)
 {
 	if (!preg_match('/^'.basename(__FILE__, '.php').'.+\.php$/', $file)) continue;
