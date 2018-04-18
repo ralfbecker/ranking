@@ -49,6 +49,13 @@ class ranking_calculation
 	 */
 	var $debug = false;
 
+	/**
+	 * Should we dump ranking parametes and results for unit tests
+	 *
+	 * @var boolean
+	 */
+	public static $dump_ranking_results = false;
+
 	public function __construct(ranking_bo $bo=null)
 	{
 		$this->bo = $bo ? $bo : new ranking_bo();
@@ -561,7 +568,8 @@ class ranking_calculation
 	 * @param array &$not_counting on return: array PerId => string off all not valued WetId's pairs
 	 * @param mixed $cup ='' rkey,SerId or array of cup or '' for a ranking
 	 * @param array &$comps=null if array on return WetId => comp array
-	 * @param &$max_comp=null on return max. number of competitions counting
+	 * @param int &$max_comp=null on return max. number of competitions counting
+	 * @param array& $results =null supplied results for unit-tests
 	 * @return array sorted by ranking place
 	 *
 	 * Achtung:   Nicht berücksichtigt sind die folgenden Parameter:
@@ -581,7 +589,7 @@ class ranking_calculation
 	 * 01.01.2009: Int. competition use "averaged" points for ex aquo
 	 */
 	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup=null,
-		array &$comps=null, &$max_comp=null)
+		array &$comps=null, &$max_comp=null, &$results=null)
 	{
 		if ($cup && !is_array($cup))
 		{
@@ -695,7 +703,13 @@ class ranking_calculation
 		}
 		if ($this->debug) error_log(__METHOD__.": start='$start'");
 
-		if ($cup)
+		$dump_results = self::$dump_ranking_results;
+		if (isset($results))
+		{
+			// already supplied for unit tests
+			$dump_results = false;
+		}
+		elseif ($cup)
 		{
 			$results =& $this->bo->result->cup_results($cup,$cat['GrpIds'],$stand,
 				stristr($cup['rkey'],'EYC') || stristr($cup['rkey'],'EYS') ? $this->european_nations : false,
@@ -905,12 +919,39 @@ class ranking_calculation
 		}
 		ksort ($rang);			// array $rang contains now the ranking, sorted by points, lastname, firstname
 
-		$ret_ex_aquo =& $ex_aquo;
+		$ret_ex_aquo = $ex_aquo;
 		$ret_pers = $this->pers;
 		$not_counting = $this->not_counting;
 		$not_counting['min_disciplines'] = $fake_min_disciplines ? null : $min_disciplines;
 		$not_counting['drop_equally'] = $drop_equally;
 		$not_counting['max_disciplines'] = $max_disciplines;
+
+		// dump results for writing tests
+		if ($dump_results)
+		{
+			$input = array(
+				'cat' => $cat,
+				'stand' => $stand,
+				'start' => $start,
+				'comp'  => $comp,
+				'cup' => $cup,
+				'comps' => $comps,
+				'results' => $results,
+			);
+			$results = array(
+				'stand' => $stand,
+				'rang' => $rang,
+				'ret_pers' => $ret_pers,
+				'ret_ex_aquo' => $ex_aquo,
+				'not_counting' => $not_counting,
+				'rls'   => $rls,
+				'max_comp' => $max_comp,
+			);
+			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].
+				'/ranking-'.($cup ? $cup['rkey'].'-' : '').$cat['rkey'].'-'.str_replace('-', '', $stand).'.php',
+				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
+			error_log(__METHOD__."() logged input and results to ".realpath($path));
+		}
 
 		return $rang;
 	}

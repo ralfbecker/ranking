@@ -10,7 +10,7 @@
  * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
-use Egroupware\Api;
+use EGroupware\Api;
 
 /**
  * category object

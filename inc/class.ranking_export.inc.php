@@ -1257,6 +1257,7 @@ class ranking_export extends ranking_result_bo
 		if (empty($date)) $date = '.';
 		$location = self::export_ranking_location($cat, $date, $cup);
 		if (($force_cache || !in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts)) &&
+			empty($_GET['dump_results']) &&	// triger to dump results for unit-tests
 			($data = self::getCache($location)))
 		{
 			return $data;
@@ -1271,6 +1272,7 @@ class ranking_export extends ranking_result_bo
 		}
 		$overall = count($cat['GrpIds']) > 1;
 
+		ranking_calculation::$dump_ranking_results = !empty($_GET['dump_results']);
 		$comps = array();
 		$start = $comp = $pers = $rls = $ex_aquo = $not_counting = $max_comp = null;
 		if (!($ranking = $this->calc->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
