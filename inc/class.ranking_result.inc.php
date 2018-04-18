@@ -7,14 +7,15 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * result object
  */
-class ranking_result extends so_sql
+class ranking_result extends Api\Storage\Base
 {
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 	);
@@ -37,7 +38,7 @@ class ranking_result extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 	}
 
 	/**
@@ -178,7 +179,7 @@ class ranking_result extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->source_charset);
 		}
 		return $data;
 	}
@@ -197,7 +198,7 @@ class ranking_result extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->charset,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}
@@ -337,7 +338,7 @@ class ranking_result extends so_sql
 			' AND w.serie='.(int) $cup['SerId'].
 			($use_0_point_results ? '' : ' AND r.cup_pkt > 0').
 			' AND w.datum <= '.$this->db->quote($stand).
-			' ORDER BY r.PerId,r.GrpId,r.cup_pkt DESC,w.datum DESC',__LINE__,__FILE__) as $row)
+			' ORDER BY r.PerId,r.GrpId,r.cup_pkt DESC,w.datum DESC',__LINE__,__FILE__, 0, -1, false, Api\Db::FETCH_ASSOC) as $row)
 		{
 			$results[] = $this->athlete_db2data($row);
 		}
@@ -366,7 +367,7 @@ class ranking_result extends so_sql
 			' AND '.$this->db->quote($start).' <= w.datum AND w.datum <= '.$this->db->quote($stand).
 			($from_year && $to_year ? ' AND NOT ISNULL(geb_date) AND '.
 			(int) $from_year.' <= YEAR(geb_date) AND YEAR(geb_date) <= '.(int) $to_year : '').
-			' ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__) as $row)
+			' ORDER BY r.PerId,r.pkt DESC',__LINE__,__FILE__, 0, -1, false, Api\Db::FETCH_ASSOC) as $row)
 		{
 			$results[] = $this->athlete_db2data($row);
 		}
