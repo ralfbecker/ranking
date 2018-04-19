@@ -1,7 +1,7 @@
 language: php
 php:
-  - 5.6
-  - 7
+  #- 5.6
+  #- 7
   - 7.1
   - 7.2
   - master
@@ -11,24 +11,47 @@ matrix:
   allow_failures:
     - php: master
 
-#env:
-  #matrix:
-    #- LOWEST_DEPS=""
-    #- LOWEST_DEPS="--prefer-lowest"
+addons:
+  mariadb: '10.0'
 
-#services:
-#  - mysql
+sudo: required
 
-sudo: false
+install:
+  - git clone -b 17.1 https://github.com/EGroupware/egroupware.git .
+  - git clone https://github.com/ralfbecker/ranking.git
 
 before_script:
-  # - mysql -e 'create database egroupware'
-  - rm -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
-  #- composer update --prefer-source $LOWEST_DEPS
+  - sudo apt-get update -qq
+  - sudo apt-get install -y myrepos libpcre3-dev
+  - case $(phpenv version-name) in
+    "5.6")
+       yes "" | pecl install apcu-4.0.11;
+       phpenv config-rm xdebug.ini;
+       composer require 'phpunit/phpunit:~5.7';
+       ;;
+    "7"|"7.0"|"7.1"|"7.2"|"7.3"|"master")
+       yes "" | pecl install apcu;
+       phpenv config-rm xdebug.ini;
+       composer require 'phpunit/phpunit:~6.3';
+      ;;
+    esac
+  #- php -m
+  - php -i
+  - sed 's/^update = git stash -q/update = \#git stash -q/g' .mrconfig
+  - mr --trust-all --stats up
+  # create data directory
+  - sudo mkdir /var/lib/egroupware
+  - sudo chown travis /var/lib/egroupware
+  - ln -s /var/lib/egroupware/header.inc.php
+  # install egroupware using MariaDB as domain "default"
+  # and add an admin user "demo" with password "guest"
+  - php doc/rpm-build/post_install.php --domain default
+    --source_dir `pwd` --start_db '' --autostart_db '' --start_webserver '' --webserver_user ''
+    --admin_user demo --admin_passwd guest --admin_email noreply@example.com
 
 script:
-  - find . -name "*.php" | xargs -n1 php -l
-  #- ./vendor/bin/sabre-cs-fixer fix . --dry-run --diff
+  - find ranking -name "*.php" | xargs -n1 php -l
+  - for test in ranking/tests/*.php; do ./$test; done
 
 cache:
   directories:
