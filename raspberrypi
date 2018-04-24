@@ -1,3 +1,23 @@
+Raspberry Timer HowTo:
+---------------------
+
+- Raspis use Bounjour/Zeroconf to be reachable in local network by there name eg. masterclock.local
+- to remote manage a clock go to /manage url eg. http://masterclock.local/manage
+- set a timer and use [Push] to push local setting to connected display and slaves
+- use [PushURL] to push eg. a digital ROCK beamer URL (without protocol!!!)
+
+ToDo:
+- Using Beamer from ResultService with a Raspi name to push the URL is currently broken:
+==> mixed content warning (http Raspi URL in https page from www.digitalrock.de/ifsc.egroupware.net)
+--> could use http:// to access unauthenticated beamer URL (currently prevented by EGw webserver_url with https)
+--> Raspi could have UI to build the usr using JSON feeds
+
+Questions:
+- how are slaves paired with a master
+- how to un-pair and send an own URL to a slave
+
+
+
 Installing Timy stuff on Raspberry Pi
 =====================================
 
