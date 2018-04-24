@@ -1624,7 +1624,7 @@ class ranking_bo extends ranking_so
 				$comp['continent'] : $cup['continent']);
 		}
 		// 2009+ int. competitions use only average points for ex aquos (now an explicit attribute!)
-		if ($comp['average_ex_aquo'] || empty($comp['nation']) && (int)$comp['datum'] >= 2009)
+		if ($comp['average_ex_aquo'] || empty($comp['nation']) && (int)$comp['datum'] >= 2009 || $cup && $cup['presets']['average_ex_aquo'])
 		{
 			$ex_aquos = $cup_ex_aquos = array();
 			$abs_place = $ex_place = $last_place = 1;
