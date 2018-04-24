@@ -275,6 +275,13 @@ tr.profileMarginTop > td {
 .Resultlist h3.resultDate:after {
 	content: " after";
 }
+.Resultlist h3.error:empty {
+	display: none;
+}
+.Resultlist h3.error {
+	color: red;
+	font-style: italic;
+}
 
 /**
  * Fix some CSS on www.ifsc-climbing.org

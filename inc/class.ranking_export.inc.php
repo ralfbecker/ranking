@@ -1275,9 +1275,15 @@ class ranking_export extends ranking_result_bo
 		ranking_calculation::$dump_ranking_results = !empty($_GET['dump_results']);
 		$comps = array();
 		$start = $comp = $pers = $rls = $ex_aquo = $not_counting = $max_comp = null;
-		if (!($ranking = $this->calc->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
-		{
-			throw new Exception(lang('No ranking defined or no results yet for category %1 !!!',$cat['name']));
+		try {
+			if (!($ranking = $this->calc->ranking($cat, $date, $start, $comp, $pers, $rls, $ex_aquo, $not_counting, $cup, $comps, $max_comp)))
+			{
+				throw new Exception(lang('No ranking defined or no results yet for category %1 !!!',$cat['name']));
+			}
+		}
+		catch (Exception $e) {
+			$ranking = array();
+			$error = $e->getMessage();
 		}
 		$rows = array();
 		foreach($ranking as $athlete)
@@ -1337,11 +1343,13 @@ class ranking_export extends ranking_result_bo
 			'participants' => $rows,
 			'route_name' => $comp ? $comp['name'].' ('.implode('.', array_reverse(explode('-', $comp['datum']))).')' : '',
 			'route_names' => $route_names,
-			'route_result' => implode('.', array_reverse(explode('-', $date))),
+			'route_result' => !empty($error) ? $error :
+				implode('.', array_reverse(explode('-', $date))),
 			'route_order' => -1,
 			'discipline' => 'ranking',
 			'display_athlete' => $cup['presets']['display_athlete'] ? $cup['presets']['display_athlete'] :
 				ranking_competition::nation2display_athlete($cat['nation']),
+			'error' => $error,
 		);
 		if ($comp)	// comp not set if date given
 		{

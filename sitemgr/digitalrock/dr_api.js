@@ -735,7 +735,7 @@ var Startlist = (function() {
 
 		var sort;
 		// if we have no result columns or no ranked participant, show a startlist
-		if (typeof this.result_cols == 'undefined' || !_data.participants[0].result_rank && _data.discipline != 'ranking')
+		if (typeof this.result_cols == 'undefined' || _data.participants[0] && !_data.participants[0].result_rank && _data.discipline != 'ranking')
 		{
 			this.columns = this.startlist_cols;
 			sort = 'start_order';
@@ -832,7 +832,7 @@ var Startlist = (function() {
 					}
 				}
 				// evtl. add points column
-				if (_data.participants[0].quali_points)
+				if (_data.participants[0] && _data.participants[0].quali_points)
 				{
 					this.columns['quali_points'] = 'Points';
 					// delete single qualification results
@@ -843,12 +843,12 @@ var Startlist = (function() {
 						this.columns['quali_points'] = 'Qualification';
 					}
 				}
-				if (_data.discipline == 'combined' && typeof _data.participants[0].final_points == 'undefined') {
+				if (_data.discipline == 'combined' && _data.participants[0] && typeof _data.participants[0].final_points == 'undefined') {
 					delete this.columns.final_points;
 				}
 				title_prefix = '';
 			}
-			if (this.columns.result && _data.participants[0].rank_prev_heat && !this.json_url.match(/detail=0/))
+			if (this.columns.result && _data.participants[0] && _data.participants[0].rank_prev_heat && !this.json_url.match(/detail=0/))
 			{
 				this.columns['rank_prev_heat'] = 'previous heat';
 			}
@@ -870,11 +870,13 @@ var Startlist = (function() {
 			this.displayToc(_data);
 
 			// create new table
-			this.table = new DrTable(_data.participants,this.columns,this.sort,true,
-				_data.route_result ? _data.route_quota : null,this.navigateTo,
-				_data.discipline == 'ranking' && (detail || !_data.participants[0].result_rank));
-
-			jQuery(this.container).append(this.table.dom);
+			if (!_data.error && _data.participants.length)
+			{
+				this.table = new DrTable(_data.participants,this.columns,this.sort,true,
+					_data.route_result ? _data.route_quota : null,this.navigateTo,
+					_data.discipline == 'ranking' && (detail || !_data.participants[0].result_rank));
+				jQuery(this.container).append(this.table.dom);
+			}
 
 			this.seeAlso(_data.see_also);
 		}
@@ -1091,7 +1093,16 @@ var Startlist = (function() {
 		this.comp_header.empty();
 		this.comp_header.text(_data.comp_name);
 		this.result_date.empty();
-		this.result_date.text(_data.route_result);
+		if (_data.error)
+		{
+			this.result_date.text(_data.error);
+			this.result_date.removeClass('resultDate');
+			this.result_date.addClass('error');
+		}
+		else
+		{
+			this.result_date.text(_data.route_result);
+		}
 		this.header.empty();
 		this.header.text(header);
 	};
@@ -1321,7 +1332,7 @@ var Resultlist = (function() {
 						'result' : 'Result'
 					};
 				}
-				if ((!detail || detail[1] == '0') && _data.participants[0].result_rank)
+				if ((!detail || detail[1] == '0') && _data.participants[0] && _data.participants[0].result_rank)
 				{
 					delete this.result_cols.result;
 					// allow to click on points to show single results
@@ -1375,7 +1386,8 @@ var Resultlist = (function() {
 		Startlist.prototype.handleResponse.call(this, _data);
 		align_td_nbsp('table.DrTable td');
 
-		if (_data.discipline == 'ranking' && (detail && detail[1] == '1' || !_data.participants[0].result_rank) && (_data.max_comp || _data.max_disciplines))
+		if (_data.discipline == 'ranking' && !_data.error &&
+			(detail && detail[1] == '1' || !_data.participants[0].result_rank) && (_data.max_comp || _data.max_disciplines))
 		{
 			var tfoot = jQuery(document.createElement('tfoot'));
 			jQuery(this.table.dom).append(tfoot);

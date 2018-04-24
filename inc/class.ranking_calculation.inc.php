@@ -642,6 +642,7 @@ class ranking_calculation
 		if ($overall)
 		{
 			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
+			if ((int)$stand >= 2018) throw new egw_exception_assertion_failed('Overall ranking 2018+ requires 2 competitions per discipline (and is not yet implemented)!');
 			// international combined ranking, no longer uses $min_disciplines
 			if ((int)$stand >= 2017 || !empty($comp['nation']))
 			{
