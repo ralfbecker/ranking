@@ -387,7 +387,9 @@ class ranking_registration extends Api\Storage\Base
 				$filter[] = self::PREFIX.self::DELETED.' IS NULL';
 				break;
 		}
-		if ($filter['state'] != self::REGISTERED && !$this->check_prequalified($filter['WetId']))
+		// check if we need to generate prequalified athletes
+		if (isset($filter['state']) && $filter['state'] != self::REGISTERED &&
+			$this->check_prequalified($filter['WetId']) === 0)
 		{
 			$this->update_prequalified($filter['WetId']);
 		}
