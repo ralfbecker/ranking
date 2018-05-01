@@ -17,12 +17,9 @@ addons:
 sudo: required
 
 install:
-  # moving ranking app cloned to . into ../this-repo, as advised by Travis staff
-  - mkdir ../this-repo
-  - find . -mindepth 1 -maxdepth 1 -exec mv -t../this-repo -- {} +
-  # cloning egroupware into current directory
-  - git clone -b 17.1 https://github.com/EGroupware/egroupware.git .
-  - cp -r ../this-repo/ ranking/
+  # cloning egroupware into egroupware directory
+  - git clone -b 17.1 https://github.com/EGroupware/egroupware.git
+  - git clone https://github.com/ralfbecker/ranking.git egroupware/ranking
 
 before_script:
   - sudo apt-get update -qq
@@ -41,6 +38,7 @@ before_script:
     esac
   #- php -m
   - php -i
+  - cd egroupware/
   - sed 's/^update = git stash -q/update = \#git stash -q/g' .mrconfig
   - mr --trust-all --stats up
   # create data directory
