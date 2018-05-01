@@ -57,7 +57,7 @@ before_script:
     --admin_user demo --admin_passwd guest --admin_email noreply@example.com
 
 script:
-  - find ranking -name "*.php" | xargs -n1 php -l
+  - find ranking -name "*.php" | xargs -n1 php -l | grep -v "^No syntax errors detected in"
   - for test in ranking/tests/*.php; do ./$test; done
 
 cache:
