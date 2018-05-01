@@ -17,8 +17,12 @@ addons:
 sudo: required
 
 install:
+  # moving ranking app cloned to . into ../this-repo, as advised by Travis staff
+  - mkdir ../this-repo
+  - find . -mindepth 1 -maxdepth 1 -exec mv -t../this-repo -- {} +
+  # cloning egroupware into current directory
   - git clone -b 17.1 https://github.com/EGroupware/egroupware.git .
-  - git clone https://github.com/ralfbecker/ranking.git
+  - cp -r ../this-repo/ ranking/
 
 before_script:
   - sudo apt-get update -qq
