@@ -48,18 +48,18 @@ before_script:
   - composer install
   # create data directory
   - sudo mkdir -p /var/lib/egroupware/default/files/sqlfs
-  - sudo chown travis /var/lib/egroupware
+  - sudo mkdir -p /var/lib/egroupware/default/backup
+  - sudo chown -R travis /var/lib/egroupware
   - ln -s /var/lib/egroupware/header.inc.php
   # install egroupware using MariaDB as domain "default"
   # and add an admin user "demo" with password "guest"
   - php doc/rpm-build/post_install.php --domain default
     --source_dir `pwd` --start_db '' --autostart_db '' --start_webserver '' --webserver_user ''
     --admin_user demo --admin_passwd guest --admin_email noreply@example.com
-    --install-update-app ranking
 
 script:
-  - find ranking -name "*.php" | xargs -n1 php -l | grep -v "^No syntax errors detected in"
-  #- php doc/rpm-build/post_install.php --install-update-app ranking
+  - doc/php_syntax_check.sh ranking
+  - php doc/rpm-build/post_install.php --install-update-app ranking
   - for test in ranking/tests/*.php; do ./$test; done
 
 cache:
