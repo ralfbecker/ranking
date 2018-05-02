@@ -23,8 +23,10 @@ install:
   # ranking app still needs old compatibility api (phpgwapi+etemplate)
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/phpgwapi.git egroupware/phpgwapi
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/etemplate.git egroupware/etemplate
+  # finally copy tested app into it's subdirectory ranking/
+  - cp -r *.php inc lang setup templates tests ranking/
   # finally clone own repo, maybe just copy ...
-  - git clone --depth=50 --branch=master https://github.com/ralfbecker/ranking.git egroupware/ranking
+  #- git clone --depth=50 --branch=master https://github.com/ralfbecker/ranking.git egroupware/ranking
 
 before_script:
   - sudo apt-get update -qq
@@ -46,7 +48,7 @@ before_script:
   - cd egroupware/
   - composer install
   # create data directory
-  - sudo mkdir /var/lib/egroupware
+  - sudo mkdir -p /var/lib/egroupware/default/files/sqlfs
   - sudo chown travis /var/lib/egroupware
   - ln -s /var/lib/egroupware/header.inc.php
   # install egroupware using MariaDB as domain "default"
