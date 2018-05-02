@@ -18,15 +18,17 @@ sudo: required
 
 install:
   # cloning egroupware into egroupware directory
+  - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/ADOdb.git egroupware/api/src/Db/ADOdb
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/egroupware.git
+  # ranking app still needs old compatibility api (phpgwapi+etemplate)
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/phpgwapi.git egroupware/phpgwapi
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/etemplate.git egroupware/etemplate
-  - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/ADOdb.git egroupware/api/src/Db/ADOdb
+  # finally clone own repo, maybe just copy ...
   - git clone --depth=50 --branch=master https://github.com/ralfbecker/ranking.git egroupware/ranking
 
 before_script:
   - sudo apt-get update -qq
-  - sudo apt-get install -y myrepos libpcre3-dev
+  - sudo apt-get install -y libpcre3-dev
   - case $(phpenv version-name) in
     "5.6")
        yes "" | pecl install apcu-4.0.11;
@@ -42,9 +44,6 @@ before_script:
   #- php -m
   - php -i
   - cd egroupware/
-  # not using mr, but just composer install for now
-  #- sed 's/^update = git stash -q/update = \#git stash -q/g' .mrconfig
-  #- mr --trust-all --stats up
   - composer install
   # create data directory
   - sudo mkdir /var/lib/egroupware
@@ -58,6 +57,7 @@ before_script:
 
 script:
   - find ranking -name "*.php" | xargs -n1 php -l | grep -v "^No syntax errors detected in"
+  - php doc/rpm-build/post_install.php --install-update-app ranking
   - for test in ranking/tests/*.php; do ./$test; done
 
 cache:
