@@ -18,8 +18,8 @@ sudo: required
 
 install:
   # cloning egroupware into egroupware directory
-  - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/ADOdb.git egroupware/api/src/Db/ADOdb
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/egroupware.git
+  - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/ADOdb.git egroupware/api/src/Db/ADOdb
   # ranking app still needs old compatibility api (phpgwapi+etemplate)
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/phpgwapi.git egroupware/phpgwapi
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/etemplate.git egroupware/etemplate
