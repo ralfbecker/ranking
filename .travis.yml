@@ -24,7 +24,8 @@ install:
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/phpgwapi.git egroupware/phpgwapi
   - git clone --depth=50 --branch=17.1 https://github.com/EGroupware/etemplate.git egroupware/etemplate
   # finally copy tested app into it's subdirectory ranking/
-  - cp -r *.php inc lang setup templates tests ranking/
+  - mkdir egroupware/ranking/
+  - cp -r *.php inc lang setup templates tests egroupware/ranking/
   # finally clone own repo, maybe just copy ...
   #- git clone --depth=50 --branch=master https://github.com/ralfbecker/ranking.git egroupware/ranking
 
