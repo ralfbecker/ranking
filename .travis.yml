@@ -26,6 +26,7 @@ install:
   # finally copy tested app into it's subdirectory ranking/
   - mkdir egroupware/ranking/
   - cp -r *.php inc lang setup templates tests egroupware/ranking/
+  - ls -l egroupware/ranking
   # finally clone own repo, maybe just copy ...
   #- git clone --depth=50 --branch=master https://github.com/ralfbecker/ranking.git egroupware/ranking
 
@@ -59,7 +60,9 @@ before_script:
     --admin_user demo --admin_passwd guest --admin_email noreply@example.com
 
 script:
-  - find ranking -name "*.php" | xargs -n1 php -l | grep -v "^No syntax errors detected in"
+  - ls -l ranking
+  - find ranking -name "*.php" | xargs -n1 php -l
+  #- find ranking -name "*.php" | xargs -n1 php -l | grep -v "^No syntax errors detected in"
   - php doc/rpm-build/post_install.php --install-update-app ranking
   - for test in ranking/tests/*.php; do ./$test; done
 
