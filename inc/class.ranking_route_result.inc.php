@@ -1839,7 +1839,7 @@ class ranking_route_result extends Api\Storage\Base
 				'WetId' => $data['WetId'],
 				'GrpId' => $data['GrpId'],
 				'route_order' => $data['route_order'],
-			))->fetchColumn();
+			), __LINE__, __FILE__)->fetchColumn();
 
 			// Example for 21 starters: 1. in Lane A will be 11. in LaneB
 			$this->db->query("UPDATE $this->table_name SET start_order2n=1+((FLOOR($num_participants/2)+start_order-1) % $num_participants) WHERE ".
