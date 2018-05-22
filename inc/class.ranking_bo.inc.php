@@ -582,13 +582,13 @@ class ranking_bo extends ranking_so
 		{
 			return true;
 		}
-		/* SUI stoped using day licenses in 2018
-		if ($comp['nation'] == 'SUI')
+		// SUI does NOT allow exceptions for judges or user with national edit permission
+		if ($comp['nation'] == 'SUI' && !$this->is_admin)
 		{
-			return lang('This athlete has NO license!').' '.lang('Do you want to use a day-license?');
+			/* SUI stoped using day licenses in 2018
+			return lang('This athlete has NO license!').' '.lang('Do you want to use a day-license?'); */
 		}
-		else*/
-		if ($this->is_admin || $this->is_judge($comp,true) ||	// judges are allowed to register unlimited time before competition
+		elseif ($this->is_admin || $this->is_judge($comp,true) ||	// judges are allowed to register unlimited time before competition
 			$this->acl_check_comp($comp))	// allow people with edit rights to a competition to grant exceptions from licenses
 		{
 			return lang('This athlete has NO license!').' '.lang('Are you sure you want to make an EXCEPTION?');
