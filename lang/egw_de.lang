@@ -153,6 +153,7 @@ complete profile	ranking	de	komplettes Profil
 complete result	ranking	de	komplettes Ergebnis
 complimentary	ranking	de	Zusätzlich
 confirmed	ranking	de	bestätigt
+consent data storage	ranking	de	Zustimmung Datenspeicherung
 contact	ranking	de	Kontakt
 copy current formats to the new competition, which does not have any formats yet?	ranking	de	Sollen die aktuellen Formate zum neuen Wettkampf, der noch keine Formate hat, kopiert werden?
 could not open %1!	ranking	de	Kann %1 nicht öffnen!
@@ -163,10 +164,12 @@ cup (unranked last)	ranking	de	Cup (nicht gelistet zuletzt)
 cup not found!!!	ranking	de	Cup nicht gefunden!!!
 cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
+custom acl right	ranking	de	Detaillierte Zugriffsrechte
 database	admin	de	Datenbank
 dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	de	Datenzeile %1 hat eine andere Anzahl Spalten (%2) als die Kopfzeile (%3)!
 deadline	ranking	de	Anmeldeschluss
 default details	ranking	de	Vorgabe für Details
+default for active competitors	ranking	de	Vorgabe für aktive Wettkämpfer
 default ranking view	ranking	de	Standardansicht Ranglisten
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	de	definiert wie viele Punkte für jeden Platz im Cup vergeben werden (nicht in der Rangliste)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	de	definiert wie viele Punkte für jeden Platz in der Rangliste vergeben werden (nicht im Cup)
@@ -303,6 +306,9 @@ heat	ranking	de	Runde
 heat deleted	ranking	de	Runde gelöscht
 heat saved	ranking	de	Runde gespeichert
 heat updated	ranking	de	Runde aktualisiert
+hide complete profile page	ranking	de	Komplettes Athleten Profil verbergen
+hide contact data, birthday and city from public display. still shows optional data like hobbies!	ranking	de	Verberge Kontaktdaten, Geburtstag und Wohnort von der öffentlichen Anzeige. Zeigt immer noch optionale Daten wie Hobbies!
+hide only contact data and birthday from public display.	ranking	de	Nur Kontaktdaten von der öffentlichen Anzeige ausnehmen.
 hobbies	ranking	de	Hobies
 homepage	ranking	de	Internetadresse
 host	admin	de	Rechner
@@ -443,7 +449,7 @@ picture resized to %1 pixel	ranking	de	Bild auf %1 Pixel verkleinert
 place	ranking	de	Platz
 place of birth	ranking	de	Geburtsort
 please check the categories you want to register for:	ranking	de	Bitte Kategorien abhaken für die Du registrieren willst:
-please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	de	Bitte sprich Deinen Verband (%1) an, um Deine EMail Adresse einzutragen. Dann können wir Dir ein Passwort zusenden.
+please contact your federation (%1), to have your email address added to your athlete profile, so we can mail you a password.	ranking	de	Bitte sprich Deinen Verband (%1) an, um Deine EMail Adresse einzutragen. Dann können wir Dir ein Passwort zusenden.
 please contact your federation (%1).	ranking	de	Bitte sprich Deinen Verband (%1) an.
 please enter your email address and password to register for competitions or edit your profile:	ranking	de	Bitte E-Mail Adresse und Password eingeben, zur Anmeldung an Wettkämpfe oder um das eigene Profil zu bearbeiten:
 please enter your new password:	ranking	de	Bitte neues Passwort eingeben:
@@ -550,6 +556,7 @@ shortcut	ranking	de	Abkürzung
 show athlets from all categories	ranking	de	zeige Athleten aller Kategorien
 show jurylist	ranking	de	Juryliste anzeigen
 show password	ranking	de	Passwort anzeigen
+show profile page with results	ranking	de	Zeige Athleten Profil mit Ergebnissen
 since	ranking	de	seit
 since how many years is the athlete climbing (not only competing)	ranking	de	Seit wievielen Jahren klettert der Athlet (nicht nur Wettkämpfe)
 size (cm)	ranking	de	Größe (cm)
@@ -661,6 +668,7 @@ view this athlete	ranking	de	Diesen Athleten anzeigen
 view this competition	ranking	de	Diesen Wettkampf anzeigen
 view this cup	ranking	de	Diesen Cup anzeigen
 website	ranking	de	Webseite
+website visitors will be told that athlete asked to no longer show his profile page.	ranking	de	Besucher der Webseite bekommen gesagt, dass der Athlete sein Profil nicht länger anzeigen möchte.
 weight (kg)	ranking	de	Gewicht (kg)
 weight in kilogram	ranking	de	Gewicht in Kilogram
 weight, size, hobbies, ...	ranking	de	Gewicht, Größe, Hobies, ...

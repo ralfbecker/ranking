@@ -230,7 +230,9 @@ $phpgw_baseline = array(
 			'twitter' => array('type' => 'varchar','precision' => '64'),
 			'instagram' => array('type' => 'varchar','precision' => '64'),
 			'youtube' => array('type' => 'varchar','precision' => '64'),
-			'video_iframe' => array('type' => 'varchar','precision' => '128')
+			'video_iframe' => array('type' => 'varchar','precision' => '128'),
+			'consent_time' => array('type' => 'timestamp','comment' => 'time athlete consented to personal data storage'),
+			'consent_ip' => array('type' => 'ascii','precision' => '45','comment' => 'ip address used for consent')
 		),
 		'pk' => array('PerId'),
 		'fk' => array(),

@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id: class.ranking_athlete.inc.php 1245 2015-06-05 18:10:34Z ralfbecker $
+ * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 /**
@@ -31,7 +30,19 @@ class ranking_athlete extends so_sql
 	const ACL_DENY_CELLPHONE = 16;
 	const ACL_DENY_STREET = 32;
 	const ACL_DENY_CITY = 64;
+
+	/**
+	 * Deny access to complete profile
+	 */
 	const ACL_DENY_PROFILE = 128;
+	/**
+	 * Deny access to contact-data and birthday (only show year)
+	 */
+	const ACL_DEFAULT = self::ACL_DENY_BIRTHDAY|self::ACL_DENY_EMAIL|self::ACL_DENY_PHONE|self::ACL_DENY_FAX|self::ACL_DENY_CELLPHONE|self::ACL_DENY_STREET;
+	/**
+	 * Deny access to contact-data, birthday and city, but still show profil page
+	 */
+	const ACL_MINIMAL = self::ACL_DEFAULT|self::ACL_DENY_CITY;
 
 	/**
 	 * extra colums of the federation table (initialisied in init_static)
@@ -283,14 +294,7 @@ class ranking_athlete extends so_sql
 		parent::init($arr);
 
 		// switching everything off, but the city
-		$this->data['acl'] = array(
-			self::ACL_DENY_BIRTHDAY,
-			self::ACL_DENY_CELLPHONE,
-			self::ACL_DENY_EMAIL,
-			self::ACL_DENY_FAX,
-			self::ACL_DENY_PHONE,
-			self::ACL_DENY_STREET,
-		);
+		$this->data['acl'] = self::ACL_DEFAULT;
 	}
 
 	/**

@@ -158,6 +158,7 @@ complete profile	ranking	en	complete profile
 complete result	ranking	en	complete result
 complimentary	ranking	en	Complimentary
 confirmed	ranking	en	confirmed
+consent data storage	ranking	en	Consent data storage
 contact	ranking	en	Contact
 copy current formats to the new competition, which does not have any formats yet?	ranking	en	Copy current formats to the new competition, which does not have any formats yet?
 could not open %1!	ranking	en	Could not open %1!
@@ -169,10 +170,12 @@ cup not found!!!	ranking	en	Cup not found!!!
 cuppattern	ranking	en	Cuppattern
 cups	ranking	en	Cups
 current registration in %1 category(s) were deleted.	ranking	en	Current registration in %1 category(s) were deleted.
+custom acl right	ranking	en	custom ACL right
 database	admin	en	Database
 dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	en	Dataline %1 has a different number of columns (%2) then labels (%3)!
 deadline	ranking	en	Deadline
 default details	ranking	en	Default details
+default for active competitors	ranking	en	Default for active competitors
 default ranking view	ranking	en	Default ranking view
 defines how many points gets awarded for each place in the cup (not ranking)	ranking	en	defines how many points gets awarded for each place in the cup (not ranking)
 defines how many points gets awarded for each place in the ranking (not cup)	ranking	en	defines how many points gets awarded for each place in the ranking (not cup)
@@ -309,6 +312,9 @@ heat	ranking	en	Round
 heat deleted	ranking	en	Round deleted
 heat saved	ranking	en	Round saved
 heat updated	ranking	en	Round updated
+hide complete profile page	ranking	en	Hide complete profile page
+hide contact data, birthday and city from public display. still shows optional data like hobbies!	ranking	en	Hide contact data, birthday and city from public display. Still shows optional data like hobbies!
+hide only contact data and birthday from public display.	ranking	en	Hide only contact data and birthday from public display.
 hobbies	ranking	en	Hobbies
 homepage	ranking	en	Homepage
 host	admin	en	Host
@@ -456,7 +462,7 @@ picture resized to %1 pixel	ranking	en	Picture resized to %1 pixel
 place	ranking	en	Place
 place of birth	ranking	en	Place of birth
 please check the categories you want to register for:	ranking	en	Please check the categories you want to register for:
-please contact your federation (%1), to have your email addressed added to your athlete profile, so we can mail you a password.	ranking	en	Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.
+please contact your federation (%1), to have your email address added to your athlete profile, so we can mail you a password.	ranking	en	Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.
 please contact your federation (%1).	ranking	en	Please contact your federation (%1).
 please enter your email address and password to register for competitions or edit your profile:	ranking	en	Please enter your EMail address and password to register for competitions or edit your profile:
 please enter your new password:	ranking	en	Please enter your new password:
@@ -565,6 +571,7 @@ shortcut	ranking	en	Shortcut
 show athlets from all categories	ranking	en	show athlets from all categories
 show jurylist	ranking	en	show jurylist
 show password	ranking	en	show password
+show profile page with results	ranking	en	Show profile page with results
 since	ranking	en	since
 since how many years is the athlete climbing (not only competing)	ranking	en	since how many years is the athlete climbing (not only competing)
 size (cm)	ranking	en	Size (cm)
@@ -676,6 +683,7 @@ view this athlete	ranking	en	View this athlete
 view this competition	ranking	en	View this competition
 view this cup	ranking	en	View this cup
 website	ranking	en	Website
+website visitors will be told that athlete asked to no longer show his profile page.	ranking	en	Website visitors will be told that athlete asked to no longer show his profile page.
 weight (kg)	ranking	en	Weight (kg)
 weight in kilogram	ranking	en	weight in kilogram
 weight, size, hobbies, ...	ranking	en	Weight, size, hobbies, ...

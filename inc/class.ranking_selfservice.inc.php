@@ -7,9 +7,12 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2012-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2012-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
+use EGroupware\Api\Framework;
+use EGroupware\Api\Egw;
 
 /**
  * athletes selfservie: profile, registration
@@ -31,9 +34,14 @@ class ranking_selfservice extends ranking_bo
 	 */
 	function selfservice($PerId, $_action)
 	{
-		egw_framework::validate_file('.', 'selfservice', 'ranking');
-		egw_framework::includeCSS('ranking', 'selfservice', false);
-		egw_framework::$navbar_done = true;	// do NOT display navbar
+		static $nation2lang = array(
+			'AUT' => 'de',
+			'GER' => 'de',
+			'SUI' => 'de',
+		);
+		Framework::includeJS('.', 'selfservice', 'ranking');
+		Framework::includeCSS('ranking', 'selfservice', false);
+		Framework::$navbar_done = true;	// do NOT display navbar
 		$_GET['cd'] = 'no';	// suppress framework
 		if (substr($_GET['action'], 0, 10) != 'scorecard-') echo $GLOBALS['egw']->framework->header();
 
@@ -41,18 +49,7 @@ class ranking_selfservice extends ranking_bo
 		unset($this->athlete->acl2clear[ranking_athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
 		if (($PerId || ($PerId = $this->is_selfservice())) && !($athlete = $this->athlete->read($PerId)))
 		{
-			throw new egw_exception_wrong_userinput("Athlete NOT found!");
-		}
-		static $nation2lang = array(
-			'AUT' => 'de',
-			'GER' => 'de',
-			'SUI' => 'de',
-		);
-		$lang = $PerId && isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
-		if (translation::$userlang !== $lang)
-		{
-			translation::$userlang = $lang;
-			translation::init();
+			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
 		}
 		list($action,$action_id) = explode('-', $_action, 2);
 
@@ -65,12 +62,24 @@ class ranking_selfservice extends ranking_bo
 		if ((!$athlete || !$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId) &&
 			!($PerId = $this->selfservice_auth($athlete, $action)))
 		{
+			$this->show_footer($nation2lang[$athlete['nation']]);
 			return;
+		}
+		$lang = $PerId && isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
+		if (Api\Translation::$userlang !== $lang)
+		{
+			Api\Translation::$userlang = $lang;
+			Api\Translation::init();
+		}
+		// check if athlete contented to store his data, if not show consent screen
+		if ($action !== 'logout' && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
+		{
+			$this->consent_data_storage($athlete, $lang);
 		}
 		switch((string)$action)
 		{
 			case 'profile':
-				egw::redirect_link('/index.php',array(
+				Egw::redirect_link('/index.php',array(
 					'menuaction' => 'ranking.ranking_athlete_ui.edit',
 					'PerId' => $PerId,
 					'cd' => 'no',
@@ -97,8 +106,84 @@ class ranking_selfservice extends ranking_bo
 				break;
 
 			default:
-				throw new egw_exception_wrong_parameter("Unknown action '$action'!");
+				throw new Api\Exception\WrongParameter("Unknown action '$action'!");
 		}
+		$this->show_footer($lang);
+	}
+
+	/**
+	 * Ask athlete to consent to data storage
+	 *
+	 * This will NOT return, unless athlete consents!
+	 *
+	 * @param array $athlete
+	 * @param string $lang ='en' 'de' for DACH
+	 */
+	private function consent_data_storage(array $athlete, $lang='en')
+	{
+		if (empty($_POST['consent']))
+		{
+			if (!file_exists($file=EGW_SERVER_ROOT.'/ranking/templates/default/consent_data_storage.'.$lang.'.html'))
+			{
+				$file = EGW_SERVER_ROOT.'/ranking/templates/default/consent_data_storage.html';
+			}
+			if (!($content = file_get_contents($file)))
+			{
+				$content = "<p><label>".Api\Html::checkbox('consent')." I agree to store my personal data.</label></p>";
+			}
+			// make athlete data available as replacements
+			$replacements = array(
+				'$$host$$' => $_SERVER['HTTP_HOST'],
+				'$$date$$' => date('Y-m-d H:i:s'),
+				'$$ip$$' => Api\Session::getuser_ip(),
+			);
+			foreach($athlete as $name => $value)
+			{
+				if (in_array($name, array('password'))) continue;
+				if (is_array($value)) $value = implode(', ', $value);
+				$replacements['$$'.$name.'$$'] = htmlspecialchars($value);
+			}
+			echo Api\Html::form(strtr($content, $replacements).
+				Api\Html::submit_button('submit', 'Save', ''),
+				array(), '/ranking/athlete.php', array('PerId' => $athlete['PerId']),
+				'',	'style="display: contents"')."\n";
+
+			echo html::form_1button('logout', lang('Logout'), '',
+					'/ranking/athlete.php', array('action' => 'logout'));
+			$this->show_footer($lang);
+			exit;
+		}
+		// store athlete consent time and IP
+		$this->athlete->update(array(
+			'consent_time' => $this->athlete->now,
+			'consent_ip' => Api\Session::getuser_ip(),
+		));
+	}
+
+	/**
+	 * Zeige einen Footer an
+	 *
+	 * @param string $lang ='en'
+	 */
+	private function show_footer($lang='en')
+	{
+		if (!file_exists($file=EGW_SERVER_ROOT.'/ranking/templates/default/selfservice_footer.'.$lang.'.html'))
+		{
+			$file = EGW_SERVER_ROOT.'/ranking/templates/default/selfservice_footer.html';
+		}
+		if (!($content = file_get_contents($file)))
+		{
+			$content = "<hr>\n".
+				"| $\$host$$ is a service of EGroupware GmbH\n".
+				"| <a href='https://www.digitalrock.de/kontakt.php' target='_blank'>contact / Impressum</a>\n".
+				"| <a href='https://www.digitalrock.de/kontakt.php?privacy-policy' target='_blank'>privacy / Datenschutz</a> |\n";
+		}
+		$replacements = array(
+			'$$host$$' => $_SERVER['HTTP_HOST'],
+			'$$date$$' => date('Y-m-d H:i:s'),
+			'$$ip$$' => Api\Session::getuser_ip(),
+		);
+		echo strtr($content, $replacements);
 	}
 
 	/**
@@ -139,7 +224,7 @@ class ranking_selfservice extends ranking_bo
 		{
 			if (!($comp = $this->comp->read($WetId)))
 			{
-				throw egw_exception_wrong_parameter("Unknown competition ID $WetId!");
+				throw Api\Exception\WrongParameter("Unknown competition ID $WetId!");
 			}
 			echo "<p><b>$comp[name]</b></p>\n<p>".$this->comp->datespan()."</p>\n";
 
@@ -174,10 +259,10 @@ class ranking_selfservice extends ranking_bo
 					$error = true;
 				}
 			}
-			// check available categories (matching sex and evtl. agegroup) and if athlete is already registered
+			// check available Api\Categories (matching sex and evtl. agegroup) and if athlete is already registered
 			if (!($cats = $this->matching_cats($comp, $athlete)))
 			{
-				echo "<p class='error'>".lang('Competition has no categories you are allowed to register for!')."</p>\n";
+				echo "<p class='error'>".lang('Competition has no Api\Categories you are allowed to register for!')."</p>\n";
 				$error = true;
 			}
 			asort($cats);
@@ -216,10 +301,10 @@ class ranking_selfservice extends ranking_bo
 			}
 			if (!$error)
 			{
-				echo "<p>".lang('Please check the categories you want to register for:')."</p>\n";
+				echo "<p>".lang('Please check the Api\Categories you want to register for:')."</p>\n";
 				echo "<form method='POST'>\n<table><tr valign='bottom'>\n";
-				echo '<td>'.html::checkbox_multiselect('GrpId', $registered, $cats)."</td>\n";
-				echo '<td>'.html::input('',lang('Register'),'submit')."</td>\n";
+				echo '<td>'.Api\Html::checkbox_multiselect('GrpId', $registered, $cats)."</td>\n";
+				echo '<td>'.Api\Html::input('',lang('Register'),'submit')."</td>\n";
 				echo "</tr></table>\n</form>\n";
 			}
 		}
@@ -229,7 +314,7 @@ class ranking_selfservice extends ranking_bo
 		{
 			if (!$selfscore_found++) echo "<p>".lang('Open scorecards:')."</p>\n<ul>\n";
 			echo "<li>".$this->comp->datespan($comp).': '.
-				html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'scorecard-'.$comp['WetId'].'-'.$comp['GrpId'].'-'.$comp['route_order'])).
+				Api\Html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'scorecard-'.$comp['WetId'].'-'.$comp['GrpId'].'-'.$comp['route_order'])).
 				"</li>\n";
 		}
 		if ($selfscore_found) echo "</ul>\n";
@@ -248,7 +333,7 @@ class ranking_selfservice extends ranking_bo
 
 			if (!$found++) echo "<p>".lang('Further competitions you can register for:')."</p>\n<ul>\n";
 			echo "<li>".$this->comp->datespan($comp).': '.
-				html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'register-'.$comp['WetId'])).
+				Api\Html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'register-'.$comp['WetId'])).
 				"</li>\n";
 		}
 		if ($found) echo "</ul>\n";
@@ -264,7 +349,7 @@ class ranking_selfservice extends ranking_bo
 	private function profile_logout_buttons($athlete)
 	{
 		// Edit profile and logout buttons
-		echo "<p id='profile-logout-buttons'>".
+		echo "<div id='profile-logout-buttons'>".
 			html::form_1button('profile', lang('Edit Profile'), '', '/index.php', array(
 				'menuaction' => 'ranking.ranking_athlete_ui.edit',
 				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
@@ -272,7 +357,7 @@ class ranking_selfservice extends ranking_bo
 			))."\n".
 			html::form_1button('logout', lang('Logout'), '',
 				'/ranking/athlete.php', array('action' => 'logout')).
-			"</p>\n";
+			"</div>\n";
 	}
 
 	/**
@@ -306,7 +391,7 @@ class ranking_selfservice extends ranking_bo
 			if (empty($_POST['email']) || !($athlete = $this->athlete->read(array('email' => $_POST['email']))))
 			{
 				echo "<p class='error'>".lang('EMail address NOT found!')."<br/>\n";
-				echo lang('Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.',
+				echo lang('Please contact your federation (%1), to have your EMail address added to your athlete profile, so we can mail you a password.',
 					lang('or the organizer of the competition'))."<br/>\n";
 				echo lang('Maybe you have a different one registered. Try looking it up by using "Edit profile" on your profile page.')."</p>\n";
 			}
@@ -316,7 +401,7 @@ class ranking_selfservice extends ranking_bo
 			}
 		}
 
-		$recovery_link = egw::link('/ranking/athlete.php', array(
+		$recovery_link = Egw::link('/ranking/athlete.php', array(
 			'PerId' => $athlete['PerId'],
 			'action'  => 'recovery',
 		));
@@ -365,7 +450,7 @@ class ranking_selfservice extends ranking_bo
 						{
 							echo "<p class='error'>".lang('Both password do NOT match!')."</p>\n";
 						}
-						elseif(($msg = auth::crackcheck($_POST['password'])))
+						elseif(($msg = Api\Auth::crackcheck($_POST['password'])))
 						{
 							echo "<p class='error'>".$msg."</p>\n";
 						}
@@ -382,12 +467,13 @@ class ranking_selfservice extends ranking_bo
 								setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
 
 								echo "<p><b>".lang('Your new password is now active.')."</b></p>\n";
-								$link = egw::link('/index.php',array(
+								$link = Egw::link('/index.php',array(
 									'menuaction' => 'ranking.ranking_athlete_ui.edit',
 									'PerId' => $athlete['PerId'],
 								));
-								echo "<p>".lang('You can now %1edit your profile%2 or register for a competition in the calendar.','<a href="'.$link.'">','</a>')."</p>\n";
-								common::egw_exit();
+								return $athlete['PerId'];
+								//echo "<p>".lang('You can now %1edit your profile%2 or register for a competition in the calendar.','<a href="'.$link.'">','</a>')."</p>\n";
+								//common::egw_exit();
 							}
 							else
 							{
@@ -396,7 +482,7 @@ class ranking_selfservice extends ranking_bo
 						}
 						echo "<p>".lang('Please try again ...')."</p>\n";
 					}
-					$link = egw::link('/ranking/athlete.php', array(
+					$link = Egw::link('/ranking/athlete.php', array(
 						'PerId' => $athlete['PerId'],
 						'action'  => 'set',
 						'hash' => $athlete['recover_pw_hash'],
@@ -430,9 +516,10 @@ class ranking_selfservice extends ranking_bo
 					error_log(__METHOD__."($athlete[PerId], '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
 					echo "<p class='error'>".lang('Login suspended, too many unsuccessful tries!')."</p>\n";
 					echo "<p>".lang('Try again after %1 minutes.',self::LOGIN_SUSPENDED/60)."</p>\n";
-					common::egw_exit();
+					$this->show_footer();
+					exit;
 				}
-				elseif (!auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
+				elseif (!Api\Auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
 				{
 					$this->athlete->update(array(
 						'last_login' => $this->athlete->now,
@@ -457,7 +544,7 @@ class ranking_selfservice extends ranking_bo
 					return $athlete['PerId'];	// we are now authenticated for $athlete['PerId']
 				}
 			}
-			$link = egw::link('/ranking/athlete.php', array(
+			$link = Egw::link('/ranking/athlete.php', array(
 				'PerId' => $athlete['PerId'],
 				'action'  => $action,
 			));
@@ -491,7 +578,7 @@ class ranking_selfservice extends ranking_bo
 	 * @param string $body =null 2.-last list of above file
 	 * @param string $from ='digtal ROCK <info@digitalrock.de>'
 	 * @param type $is_html =false
-	 * @throws egw_exception_wrong_parameter
+	 * @throws Api\Exception\WrongParameter
 	 */
 	public function password_reset_mail(array $athlete, $subject=null, $body=null, $from='digtal ROCK <info@digitalrock.de>', $is_html=false)
 	{
@@ -501,7 +588,7 @@ class ranking_selfservice extends ranking_bo
 
 			if (!file_exists($template) || !is_readable($template))
 			{
-				throw new egw_exception_wrong_parameter("Mail template '$template' not found!");
+				throw new Api\Exception\WrongParameter("Mail template '$template' not found!");
 			}
 			$is_html = !preg_match('/\.txt$/',$template);
 
@@ -515,7 +602,7 @@ class ranking_selfservice extends ranking_bo
 				'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
 				'recover_pw_time' => $this->athlete->now,
 			));
-			$link = egw::link('/ranking/athlete.php', array(
+			$link = Egw::link('/ranking/athlete.php', array(
 				'PerId' => $athlete['PerId'],
 				'action'  => 'password',
 				'hash' => $this->athlete->data['recover_pw_hash'],
@@ -552,7 +639,7 @@ class ranking_selfservice extends ranking_bo
 			$replace['$$'.$name.'$$'] = $value;
 		}
 
-		$mailer = new egw_mailer();
+		$mailer = new Api\Mailer();
 
 		$matches = null;
 		if (preg_match_all('/"?(.+)"?<(.+)>,?/',$email,$matches))

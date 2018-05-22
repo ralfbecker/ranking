@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 class ranking_athlete_ui extends ranking_bo
@@ -21,10 +20,44 @@ class ranking_athlete_ui extends ranking_bo
 		'edit'  => true,
 		'licenseform' => true,
 	);
+
 	/**
-	 * @var array $acl_deny_lables
+	 * ACL labels including explenation titles
+	 *
+	 * @var array
 	 */
-	var $acl_deny_labels = array();
+	static $acl_labels = array(
+		ranking_athlete::ACL_DEFAULT => array(
+			'label' => 'Default for active competitors',
+			'title' => 'Hide only contact data and birthday from public display.',
+		),
+		ranking_athlete::ACL_MINIMAL => array(
+			'label' => 'Show profile page with results',
+			'title' => 'Hide contact data, birthday and city from public display. Still shows optional data like hobbies!',
+		),
+		ranking_athlete::ACL_DENY_PROFILE => array(
+			'label' => 'Hide complete profile page',
+			'title' => 'Website visitors will be told that athlete asked to no longer show his profile page.'
+		),
+		'custom' => 'custom ACL right',
+	);
+
+	/**
+	 * Labels for custom ACL settings
+	 *
+	 * @var array
+	 */
+	static $acl_deny_labels = array(
+		ranking_athlete::ACL_DENY_BIRTHDAY	=> 'birthday, shows only the year',
+		ranking_athlete::ACL_DENY_EMAIL		=> 'email',
+		ranking_athlete::ACL_DENY_PHONE		=> 'phone',
+		ranking_athlete::ACL_DENY_FAX		=> 'fax',
+		ranking_athlete::ACL_DENY_CELLPHONE	=> 'cellphone',
+		ranking_athlete::ACL_DENY_STREET    => 'street, postcode',
+		ranking_athlete::ACL_DENY_CITY		=> 'city',
+		ranking_athlete::ACL_DENY_PROFILE	=> 'complete profile',
+	);
+
 	/**
 	 * Instance of etemplate
 	 *
@@ -50,17 +83,6 @@ class ranking_athlete_ui extends ranking_bo
 		parent::__construct();
 
 		$this->tmpl = new etemplate;
-
-		$this->acl_deny_labels = array(
-			ranking_athlete::ACL_DENY_BIRTHDAY	=> lang('birthday, shows only the year'),
-			ranking_athlete::ACL_DENY_EMAIL		=> lang('email'),
-			ranking_athlete::ACL_DENY_PHONE		=> lang('phone'),
-			ranking_athlete::ACL_DENY_FAX		=> lang('fax'),
-			ranking_athlete::ACL_DENY_CELLPHONE	=> lang('cellphone'),
-			ranking_athlete::ACL_DENY_STREET		=> lang('street, postcode'),
-			ranking_athlete::ACL_DENY_CITY		=> lang('city'),
-			ranking_athlete::ACL_DENY_PROFILE	=> lang('complete profile'),
-		);
 	}
 
 	/**
@@ -202,6 +224,20 @@ class ranking_athlete_ui extends ranking_bo
 			$old_geb_date = $this->athlete->data['geb_date'];
 
 			$this->athlete->data_merge($content);
+			// deal with custom ACL
+			if ($content['acl'] === 'custom')
+			{
+				$this->athlete->data['acl'] = $content['custom_acl'];
+			}
+			else
+			{
+				$this->athlete->data['acl'] = array();
+				for($acl=1; $acl <= ranking_athlete::ACL_DENY_PROFILE; $acl *= 2)
+				{
+					if ($content['acl'] & $acl) $this->athlete->data['acl'][] = $acl;
+				}
+				$content['custom_acl'] = $this->athlete->data['acl'];
+			}
 			$this->athlete->data['acl_fed_id'] = (int)$content['acl_fed_id']['fed_id'];
 			//echo "<br>ranking_athlete_ui::edit: athlete->data ="; _debug_array($this->athlete->data);
 
@@ -437,7 +473,9 @@ class ranking_athlete_ui extends ranking_bo
 				}
 			}
 		}
-		if (true) $content = $this->athlete->data + array(
+		if (true) $content = array(
+			'acl' => !empty($content['acl']) ? $content['acl'] : $this->athlete->data['acl'],
+		) + $this->athlete->data + array(
 			'msg' => $msg,
 			'is_admin' => $this->is_admin,
 			'tabs' => $content['tabs'],
@@ -449,6 +487,24 @@ class ranking_athlete_ui extends ranking_bo
 			'referer' => $content['referer'],
 			'merge_to' => $content['merge_to'],
 		);
+		// initialise ACL selectbox
+		$content['custom_acl'] = $this->athlete->data['acl'];
+		if ($content['acl'] !== 'custom')
+		{
+			$content['acl'] = 0;
+			foreach($this->athlete->data['acl'] as $acl)
+			{
+				$content['acl'] |= $acl;
+			}
+			if (in_array(ranking_athlete::ACL_DENY_PROFILE, $content['custom_acl']))
+			{
+				$content['acl'] = ranking_athlete::ACL_DENY_PROFILE;
+			}
+			elseif (!isset(self::$acl_labels[$content['acl']]))
+			{
+				$content['acl'] = 'custom';
+			}
+		}
 		if ($this->athlete->data['password'] == $content['password'])
 		{
 			unset($content['password']);
@@ -475,7 +531,8 @@ Continuer';
 		$sel_options = array(
 			'nation' => $nations,
 			'sex'    => $this->genders,
-			'acl'    => $this->acl_deny_labels,
+			'acl'    => self::$acl_labels,
+			'custom_acl' => self::$acl_deny_labels,
 			'license'=> $this->license_labels,
 			'fed_id' => !$content['nation'] ? array(lang('Select a nation first')) :
 				$this->athlete->federations($content['nation'],false,$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
@@ -500,6 +557,7 @@ Continuer';
 			// for now disable merge, if user is no admin: !$this->is_admin || (can be removed later)
 			'merge' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
+			'custom_acl' => !($this->is_admin || $edit_rights || !$this->athlete->data['PerId']) || $content['acl'] !== 'custom',
 		);
 		// only allow to set license-category when applying or having rights to change license
 		$readonlys['license_cat'] = $readonlys['apply_license'] && $readonlys['license'];
@@ -555,7 +613,7 @@ Continuer';
 			if ($this->athlete->data['PerId'] && $this->is_selfservice() == $this->athlete->data['PerId'])
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = $readonlys['geb_date'] = true;
-				$readonlys['fed_id'] = $readonlys['a2f_start'] = $readonlys['acl'] = true;
+				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
 				// 'til we have some kind of review mechanism
 				$readonlys['tabs']['pictures'] = true;
 			}
@@ -580,6 +638,7 @@ Continuer';
 				'license' => $content['license'],
 				'old_license_nation' => $content['license_nation'],
 				'acl_fed_id' => $content['acl_fed_id'],
+				'custom_acl' => $content['custom_acl'],
 			),2);
 	}
 

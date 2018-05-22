@@ -2055,3 +2055,23 @@ function ranking_upgrade16_1_005()
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.001';
 }
+
+/**
+ * Add Personen.consent_ip/time, to store DSGVO consent to personal data storage
+ *
+ * @return sting
+ */
+function ranking_upgrade17_1_001()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','consent_time',array(
+		'type' => 'timestamp',
+		'comment' => 'time athlete consented to personal data storage'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Personen','consent_ip',array(
+		'type' => 'ascii',
+		'precision' => '45',
+		'comment' => 'ip address used for consent'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.002';
+}

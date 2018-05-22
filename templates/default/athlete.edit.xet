@@ -119,14 +119,19 @@
 			<columns>
 				<column width="100"/>
 				<column width="15%"/>
-				<column/>
+				<column width="200"/>
 				<column/>
 				<column/>
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description value="deny public access to" for="acl"/>
-					<listbox statustext="deny public display of the checked information" id="acl" no_lang="1" rows="7" span="all"/>
+					<description value="Access" for="acl"/>
+					<menulist>
+						<menupopup statustext="deny public display of the checked information" id="acl" onchange="1"/>
+					</menulist>
+					<description value="deny public access to" for="custom_acl"/>
+					<listbox statustext="deny public display of the checked information" id="custom_acl" rows="7"/>
+					<description/>
 				</row>
 				<row class="row" disabled="!@is_admin">
 					<description value="Key" for="rkey"/>
@@ -138,6 +143,13 @@
 				<row class="row">
 					<description value="Squad" for="kader"/>
 					<textbox statustext="not used at the moment" id="kader" size="5" maxlength="5" span="all"/>
+				</row>
+				<row>
+					<description value="Consent data storage"/>
+					<date-time id="consent_time" readonly="true"/>
+					<description value="by"/>
+					<description id="consent_ip"/>
+					<description/>
 				</row>
 			</rows>
 		</grid>
