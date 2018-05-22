@@ -1350,20 +1350,37 @@ var Resultlist = (function() {
 				break;
 
 			default:
-				this.result_cols = detail && detail[1] == '0' ? {
-					'result_rank': 'Rank',
-					'lastname' : {'label': 'Name', 'colspan': 2},
-					'firstname' : '',
-					'nation' : 'Nation',
-					'result': 'Result'
-				} : {
-					'result_rank': 'Rank',
-					'lastname' : {'label': 'Name', 'colspan': 2},
-					'firstname' : '',
-					'nation' : 'Nation',
-					'start_number': 'StartNr',
-					'result': 'Result'
-				};
+				// default columns for SUI ranking with NO details
+				if ((!detail || detail[1] == '0') && _data.nation == 'SUI')
+				{
+					this.result_cols = {
+						'result_rank': 'Rank',
+						'lastname' : {'label': 'Name', 'colspan': 2},
+						'firstname' : '',
+						'birthyear': 'Agegroup',
+						'city': 'City',
+						'federation' : 'Sektion',
+						'rgz': 'Regionalzentrum',
+						'result' : 'Result'
+					};
+				}
+				else
+				{
+					this.result_cols = detail && detail[1] == '0' ? {
+						'result_rank': 'Rank',
+						'lastname' : {'label': 'Name', 'colspan': 2},
+						'firstname' : '',
+						'nation' : 'Nation',
+						'result': 'Result'
+					} : {
+						'result_rank': 'Rank',
+						'lastname' : {'label': 'Name', 'colspan': 2},
+						'firstname' : '',
+						'nation' : 'Nation',
+						'start_number': 'StartNr',
+						'result': 'Result'
+					};
+				}
 				// for boulder heats use new display, but not for general result!
 				if (_data.discipline.substr(0, 7) == 'boulder' && _data.route_order != -1)
 				{

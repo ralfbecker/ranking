@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2011-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 /**
@@ -562,6 +561,7 @@ class ranking_export extends ranking_result_bo
 			'discipline'  => $discipline,
 			'route_type'  => $route['route_type'],
 			'quali_preselected' => $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']),
+			'comp_nation' => $comp['nation'],
 		)))) $result = array();
 		//_debug_array($filter); _debug_array($result);
 

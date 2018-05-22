@@ -206,6 +206,7 @@ class ranking_route_result extends Api\Storage\Base
 					case 'SUI':
 						$join .= self::ACL_FED_JOIN;
 						$extra_cols[] = 'acl_fed.fed_shortcut AS acl_fed';
+						$extra_cols[] = 'acl_fed.fed_id AS acl_fed_id';
 						break;
 					case 'GER':
 						$join .= self::FED_PARENT_JOIN;
