@@ -554,7 +554,7 @@ class ranking_athlete extends so_sql
 	}
 
 	/**
-	 * checks if an athlete already has results or a result-service result recorded
+	 * Checks if an athlete already has results, a result-service result recorded or is registered for a competition
 	 *
 	 * @param int|array $keys PerId or array with keys of the athlete to check, default null = use keys in data
 	 * @return boolean
@@ -573,8 +573,9 @@ class ranking_athlete extends so_sql
 		$PerId = is_numeric($keys) ? $keys : $this->data['PerId'];
 		if ($data_backup) $this->data = $data_backup;
 
-		return $this->db->select('Results','COUNT(*)',array('PerId' => $PerId,'platz > 0'),__LINE__,__FILE__)->fetchColumn() ||
-			$this->db->select('RouteResults','COUNT(*)',array('PerId' => $PerId),__LINE__,__FILE__)->fetchColumn();
+		return $this->db->select('Results', 'COUNT(*)',array('PerId' => $PerId,'platz > 0'), __LINE__, __FILE__)->fetchColumn() ||
+			$this->db->select('RouteResults','COUNT(*)',array('PerId' => $PerId), __LINE__, __FILE__)->fetchColumn() ||
+			$this->db->select('Registration', 'COUNT(*)',array('PerId' => $PerId,'reg_deleted IS NULL'), __LINE__, __FILE__)->fetchColumn();
 	}
 
 	/**
