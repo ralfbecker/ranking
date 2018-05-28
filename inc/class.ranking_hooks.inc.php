@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -149,7 +149,7 @@ class ranking_hooks
 	/**
 	 * Hook called by link-class to include athletes in the appregistry of the linkage
 	 *
-	 * @param array/string $location location and other parameters (not used)
+	 * @param array|string $location location and other parameters (not used)
 	 * @return array with method-names
 	 */
 	static function search_link($location)
@@ -166,7 +166,7 @@ class ranking_hooks
 			'add' => array(
 				'menuaction' => 'ranking.ranking_athlete_ui.edit'
 			),
-			'add_popup'  => '850x450',
+			'add_popup'  => '900x470',
 		);
 	}
 

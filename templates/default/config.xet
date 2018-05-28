@@ -29,6 +29,13 @@
 					<textbox id="newsettings[picture_path]" size="80"/>
 				</row>
 				<row>
+					<vbox>
+						<description value="Filesystem path for upload of consent document for athletes"/>
+						<description value="Default: ranking/athlete-consent-docs (relative to files directory)"/>
+					</vbox>
+					<textbox id="newsettings[athlete_consent_docs]" size="80"/>
+				</row>
+				<row>
 					<description value="Install-ID of instance to use for export caching (default current one)"/>
 					<textbox id="newsettings[export_cache_level]"/>
 				</row>

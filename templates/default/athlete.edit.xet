@@ -51,27 +51,27 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Weight (kg)" for="gewicht"/>
+					<description for="gewicht" value="Weight (kg)"/>
 					<textbox type="integer" statustext="weight in kilogram" id="gewicht"/>
 				</row>
 				<row class="row">
-					<description value="Size (cm)" for="groesse"/>
+					<description for="groesse" value="Size (cm)"/>
 					<textbox type="integer" statustext="body height in centimeter" id="groesse"/>
 				</row>
 				<row class="row">
-					<description value="climbing since (years)" for="practice"/>
+					<description for="practice" value="climbing since (years)"/>
 					<textbox type="integer" statustext="since how many years is the athlete climbing (not only competing)" id="practice" min="1" max="99"/>
 				</row>
 				<row class="row">
-					<description value="Professional" for="profi"/>
+					<description for="profi" value="Professional"/>
 					<textbox statustext="use &quot;yes&quot; or &quot;no, prefession&quot;" id="profi" maxlength="40" span="all"/>
 				</row>
 				<row class="row">
-					<description value="other sports" for="sport"/>
+					<description for="sport" value="other sports"/>
 					<textbox statustext="other sports practiced" id="sport" size="60" maxlength="60" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Hobbies" for="hobby"/>
+					<description for="hobby" value="Hobbies"/>
 					<textbox id="hobby" size="60" maxlength="60" span="all"/>
 				</row>
 			</rows>
@@ -85,34 +85,34 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Website" for="homepage"/>
+					<description for="homepage" value="Website"/>
 					<url statustext="URL to own homepage, eg. http://domain.com" id="homepage" options="64,60"/>
 				</row>
 				<row class="row">
-					<description value="Facebook" for="facebook"/>
+					<description for="facebook" value="Facebook"/>
 					<url id="facebook" options="64,64"/>
 				</row>
 				<row class="row">
-					<description value="Twitter" for="twitter"/>
+					<description for="twitter" value="Twitter"/>
 					<url id="twitter" options="64,64"/>
 				</row>
 				<row class="row">
-					<description value="Instagram" for="instagram"/>
+					<description for="instagram" value="Instagram"/>
 					<url id="instagram" options="64,64" span="all"/>
 				</row>
 				<row class="row">
-					<description value="YouTube" for="youtube"/>
+					<description for="youtube" value="YouTube"/>
 					<url id="youtube" options="64,64" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Video iframe" for="video_iframe"/>
+					<description for="video_iframe" value="Video iframe"/>
 					<url id="video_iframe" options="64,128" span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.9.001">
-		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="120px" width="100%" expand_toolbar="true"/>
+		<htmlarea expand_toolbar="true" height="120px" statustext="This text will be shown in the profil on the website." mode="extended" id="freetext" width="100%"/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -125,31 +125,35 @@
 			</columns>
 			<rows>
 				<row class="row" valign="top">
-					<description value="Access" for="acl"/>
+					<description for="acl" value="Access"/>
 					<menulist>
 						<menupopup statustext="deny public display of the checked information" id="acl" onchange="1"/>
 					</menulist>
-					<description value="deny public access to" for="custom_acl"/>
+					<description for="custom_acl" value="deny public access to"/>
 					<listbox statustext="deny public display of the checked information" id="custom_acl" rows="7"/>
 					<description/>
-				</row>
-				<row class="row" disabled="!@is_admin">
-					<description value="Key" for="rkey"/>
-					<textbox statustext="internal key, leave it empty to have it automaticaly generated" id="rkey" size="8" maxlength="8"/>
-					<textbox statustext="not used at the moment" label="License number" id="lizenz" size="6" maxlength="6"/>
-					<passwd label="Password" id="password"/>
-					<passwd id="password2"/>
-				</row>
-				<row class="row">
-					<description value="Squad" for="kader"/>
-					<textbox statustext="not used at the moment" id="kader" size="5" maxlength="5" span="all"/>
 				</row>
 				<row>
 					<description value="Consent data storage"/>
 					<date-time id="consent_time" readonly="true"/>
-					<description value="by"/>
-					<description id="consent_ip"/>
-					<description/>
+					<description value="by" id="consent_ip"/>
+					<hbox span="all">
+						<button label="View consent document" id="download_consent" image="view"/>
+						<file statustext="Upload document about consent to data storage and use" id="upload_consent"/>
+					</hbox>
+				</row>
+				<row class="row">
+					<description for="kader" id="profile_status" font_style="bi" span="all"/>
+				</row>
+				<row class="row" disabled="!@is_admin">
+					<description for="rkey" value="Key"/>
+					<hbox span="2">
+						<textbox statustext="internal key, leave it empty to have it automaticaly generated" id="rkey" size="8" maxlength="8"/>
+						<textbox statustext="not used at the moment" label="Squad" id="kader" size="5" maxlength="5"/>
+						<textbox statustext="not used at the moment" label="License number" id="lizenz" size="6" maxlength="6"/>
+					</hbox>
+					<passwd label="Password" id="password"/>
+					<passwd id="password2"/>
 				</row>
 			</rows>
 		</grid>
@@ -206,16 +210,18 @@
 				<column width="20%"/>
 				<column width="12%"/>
 				<column/>
-				<column/>
 			</columns>
 			<rows>
 				<row>
-					<description id="msg" no_lang="1" span="4" class="redItalic"/>
+					<description id="msg" no_lang="1" span="all" class="redItalic"/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row class="th">
-					<description value="Last name" for="nachname"/>
+					<description for="nachname" value="Last name"/>
 					<textbox statustext="Family name of the athlete in latin chars! Accents and umlauts are ok" id="nachname" needed="1" size="20" maxlength="40"/>
-					<description value="First name" for="vorname"/>
+					<description for="vorname" value="First name"/>
 					<textbox statustext="First name of the athlete in Latin chars! Accents and umlauts are ok" id="vorname" needed="1" size="20" maxlength="40"/>
 					<hbox align="right">
 						<menulist>
@@ -228,11 +234,11 @@
 					</hbox>
 				</row>
 				<row class="row">
-					<description value="Gender" for="sex"/>
+					<description for="sex" value="Gender"/>
 					<menulist>
 						<menupopup statustext="gender of the athlete" id="sex" needed="1" options="Select one"/>
 					</menulist>
-					<description value="Nation" for="nation"/>
+					<description for="nation" value="Nation"/>
 					<menulist>
 						<menupopup statustext="nation the athlete is competing for" id="nation" needed="1" no_lang="1" onchange="1" options="Select one"/>
 					</menulist>
@@ -244,27 +250,27 @@
 					</hbox>
 				</row>
 				<row class="row">
-					<description value="Birthdate" for="geb_date"/>
+					<description for="geb_date" value="Birthdate"/>
 					<date statustext="use access control to deny display on the website" id="geb_date" options="Y-m-d"/>
-					<description value="Place of birth" for="geb_ort"/>
+					<description for="geb_ort" value="Place of birth"/>
 					<textbox statustext="where is the athlete born (incl. nation)" id="geb_ort" size="35" maxlength="60" span="all"/>
 				</row>
 				<row class="row">
-					<description value="Federation" for="verband"/>
+					<description for="verband" value="Federation"/>
 					<menulist span="2">
-						<menupopup id="fed_id" class="selectboxFullWidth"/>
+						<menupopup class="selectboxFullWidth" id="fed_id"/>
 					</menulist>
 				</row>
 				<row>
-					<tabbox id="tabs" span="all">
+					<tabbox id="ranking.athlete.edit.contact|ranking.athlete.edit.profile|ranking.athlete.edit.links|ranking.athlete.edit.freetext|ranking.athlete.edit.other|ranking.athlete.edit.pictures|ranking.athlete.edit.results" span="all">
 						<tabs>
-							<tab id="contact" label="Contact" statustext="telephone, email, city, ..."/>
-							<tab id="profile" label="Profile" statustext="Weight, size, hobbies, ..."/>
-							<tab id="links" label="Social links" statustext="Homepage, Facebook, ..."/>
-							<tab id="freetext" label="Free text" statustext="This text will be shown in the profil on the website."/>
-							<tab id="other" label="Access" statustext="access control, key"/>
-							<tab id="pictures" label="Picture" statustext="Picture"/>
-							<tab id="results" label="Results" statustext="Competition results"/>
+							<tab id="ranking.athlete.edit.contact" label="Contact" statustext="telephone, email, city, ..."/>
+							<tab id="ranking.athlete.edit.profile" label="Profile" statustext="Weight, size, hobbies, ..."/>
+							<tab id="ranking.athlete.edit.links" label="Social links" statustext="Homepage, Facebook, ..."/>
+							<tab id="ranking.athlete.edit.freetext" label="Free text" statustext="This text will be shown in the profil on the website."/>
+							<tab id="ranking.athlete.edit.other" label="Access" statustext="access control, key"/>
+							<tab id="ranking.athlete.edit.pictures" label="Picture" statustext="Picture"/>
+							<tab id="ranking.athlete.edit.results" label="Results" statustext="Competition results"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.athlete.edit.contact"/>

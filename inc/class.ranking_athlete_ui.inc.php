@@ -10,6 +10,8 @@
  * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Api;
+
 class ranking_athlete_ui extends ranking_bo
 {
 	/**
@@ -241,6 +243,23 @@ class ranking_athlete_ui extends ranking_bo
 			$this->athlete->data['acl_fed_id'] = (int)$content['acl_fed_id']['fed_id'];
 			//echo "<br>ranking_athlete_ui::edit: athlete->data ="; _debug_array($this->athlete->data);
 
+			// download (latest) consent document
+			if ($content['download_consent'] && ($path = $this->athlete->consent_document()) &&
+				($content = fopen($path, 'r')))
+			{
+				Api\Header\Content::safe($content, $path);
+				if (is_resource($content))
+				{
+					fpassthru($content);
+					fclose($content);
+				}
+				else
+				{
+					echo $content;
+				}
+				exit;
+			}
+
 			if (($content['save'] || $content['apply']) || $content['apply_license'])
 			{
 				if ($this->acl_check_athlete($this->athlete->data))
@@ -326,6 +345,11 @@ class ranking_athlete_ui extends ranking_bo
 										lang('Picture attached') : lang('Error attaching the picture'));
 								}
 							}
+						}
+						if ($content['upload_consent'])
+						{
+							$msg .= ($msg ? ', ' : '') . ($this->athlete->attach_consent($content['upload_consent']) ?
+								lang('Consent document attached') : lang('Error attaching consent document'));
 						}
 						if ($content['apply_license'])
 						{
@@ -473,10 +497,12 @@ class ranking_athlete_ui extends ranking_bo
 				}
 			}
 		}
+		$shown_msg = null;
 		if (true) $content = array(
 			'acl' => !empty($content['acl']) ? $content['acl'] : $this->athlete->data['acl'],
 		) + $this->athlete->data + array(
 			'msg' => $msg,
+			'profile_status' => $this->athlete->profile_hidden($this->athlete->data, $shown_msg),
 			'is_admin' => $this->is_admin,
 			'tabs' => $content['tabs'],
 			'foto' => $this->athlete->picture_url().'?'.time(),
@@ -487,6 +513,15 @@ class ranking_athlete_ui extends ranking_bo
 			'referer' => $content['referer'],
 			'merge_to' => $content['merge_to'],
 		);
+		// give explicit message if profile is hidden or why it is shown
+		if (empty($content['profile_status']))
+		{
+			$content['profile_status'] = lang('Profile shown').': '.$shown_msg;
+		}
+		elseif(empty($msg))
+		{
+			$content['msg'] = $content['profile_status'] = lang('Profile hidden').': '.$content['profile_status'];
+		}
 		// initialise ACL selectbox
 		$content['custom_acl'] = $this->athlete->data['acl'];
 		if ($content['acl'] !== 'custom')
@@ -544,7 +579,7 @@ Continuer';
 		);
 		$edit_rights = $this->acl_check_athlete($this->athlete->data);
 		$readonlys = array(
-			'delete' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->data['comp'],
+			'delete' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->has_results(),
 			'nation' => !!$this->only_nation_athlete,
 			'edit'   => $view || !$edit_rights,
 			'pw_mail'=> !$content['email'],
@@ -558,6 +593,7 @@ Continuer';
 			'merge' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'custom_acl' => !($this->is_admin || $edit_rights || !$this->athlete->data['PerId']) || $content['acl'] !== 'custom',
+			'download_consent' => !$this->athlete->data['PerId'] || !$edit_rights && !$this->is_admin || !$this->athlete->consent_document(),
 		);
 		// only allow to set license-category when applying or having rights to change license
 		$readonlys['license_cat'] = $readonlys['apply_license'] && $readonlys['license'];

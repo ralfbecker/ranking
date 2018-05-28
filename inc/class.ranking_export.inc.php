@@ -2018,9 +2018,9 @@ class ranking_export extends ranking_result_bo
 
 		// athlete requested not to show his profile
 		// --> no results, no ranking, regular profile data already got removed by athlete->db2data called by read
-		if ($athlete['acl'] & 128)
+		if (($msg = $this->athlete->profile_hidden($athlete)))
 		{
-			$data['freetext'] = $data['error'] = lang('Sorry, the climber requested not to show his profile!');
+			$data['freetext'] = $data['error'] = $msg;
 			$data['last_modified'] = egw_time::to($athlete['modified'], 'ts');
 		}
 		else

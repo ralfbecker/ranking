@@ -88,6 +88,14 @@ class ranking_athlete extends so_sql
 	 * @var string
 	 */
 	var $picture_path = '/var/lib/egroupware/ifsc-climbing.org/files/jpgs';
+
+	/**
+	 * Filesystem path to store athlete consent documents
+	 *
+	 * @var string
+	 */
+	var $consent_docs;
+
 	var $acl2clear = array(
 		self::ACL_DENY_BIRTHDAY  => array('geb_date'),
 		self::ACL_DENY_EMAIL     => array('email'),
@@ -159,6 +167,8 @@ class ranking_athlete extends so_sql
 		}
 		$config = config::read('ranking');
 		$this->picture_path = empty($config['picture_path']) ? $_SERVER['DOCUMENT_ROOT'].'/jpgs' : $config['picture_path'];
+		$this->consent_docs = empty($config['athlete_consent_docs']) ? 'ranking/athlete-consent-docs' : $config['athlete_consent_docs'];
+		if ($this->consent_docs[0] !== '/') $this->consent_docs = $GLOBALS['egw_info']['server']['files_dir'].'/'.$this->consent_docs;
 
 		$this->license_year = (int) date('Y');
 
@@ -604,7 +614,7 @@ class ranking_athlete extends so_sql
 	{
 		$path = $this->picture_path($rkey, $num);
 
-//error_log(__METHOD__."('$fname', '$rkey') path=$path, file_exists($fname)=".array2string(file_exists($fname)).", is_readable($fname)=".array2string(is_readable($fname)).", is_writable($this->picture_path)=".array2string(is_writable($this->picture_path)).")");
+		//error_log(__METHOD__."('$fname', '$rkey') path=$path, file_exists($fname)=".array2string(file_exists($fname)).", is_readable($fname)=".array2string(is_readable($fname)).", is_writable($this->picture_path)=".array2string(is_writable($this->picture_path)).")");
 		if (!$path || !file_exists($fname) || !is_readable($fname) || !is_writeable($this->picture_path)) return false;
 
 		if (file_exists($path)) @unlink($path);
@@ -641,6 +651,169 @@ class ranking_athlete extends so_sql
 	}
 
 	/**
+	 * Get path to store consent file
+	 *
+	 * Uses the ranking config "athlete_consent_docs" defaulting to "ranking/athlete-consent-docs" in files directory.
+	 *
+	 * @param int|array|NULL $athlete =null PerId or array of the athlete or null to use this->data[PerId]
+	 * @return string full filesystem path
+	 */
+	function consent_dir($athlete=null)
+	{
+		return $this->consent_docs.'/'.(int)(is_array($athlete) ? $athlete['PerId'] : $athlete);
+	}
+
+	/**
+	 * Get filesystem path of consent document for athlete
+	 *
+	 * @param string $fname filename of the picture to attach
+	 * @param int|array|NULL $athlete =null PerId or array of the athlete or null to use this->data[PerId]
+	 * @return string|NULL full path to consent document or null
+	 */
+	function consent_document($athlete=null)
+	{
+		$path = $this->consent_dir($athlete ? $athlete : $this->data);
+
+		if (file_exists($path))
+		{
+			foreach(scandir($path, SCANDIR_SORT_DESCENDING) as $file)
+			{
+				$file = $path.'/'.$file;
+				if (file_exists($file) && is_readable($file))
+				{
+					return $file;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Attach consent document for athlete
+	 *
+	 * Consent document are versions by prefixing them with a descending letter starting with "A".
+	 *
+	 * @param string|array $upload filename of the picture to attach or upload-array with tmp_name and name
+	 * @param int|array|NULL $athlete =null PerId or array of the athlete or null to use this->data[PerId]
+	 * @return boolean true on success, flase otherwise
+	 */
+	function attach_consent($upload, $athlete=null)
+	{
+		$path = $this->consent_dir($athlete ? $athlete : $this->data);
+
+		$fname = is_array($upload) ? $upload['tmp_name'] : $upload;
+
+		//error_log(__METHOD__."('$fname', .".array2string($athlete).") path=$path, file_exists($fname)=".array2string(file_exists($fname)).", is_readable($fname)=".array2string(is_readable($fname)).", is_writable($this->consent_docs)=".array2string(is_writable($this->consent_docs)).")");
+		if (!file_exists($fname) || !is_readable($fname) ||
+			!(file_exists($path) || mkdir($path, 0700, true)) ||
+			!is_writable($path))
+		{
+			return false;
+		}
+		// we version the attached files by using a prefix starting with 'A'
+		foreach(scandir($path, SCANDIR_SORT_DESCENDING) as $file)
+		{
+			if (in_array($file, array('.', '..'))) continue;
+
+			$letter = chr(1+ord($file[0]));
+			break;
+		}
+		if (empty($letter)) $letter = 'A';
+
+		return copy($fname, $path.'/'.$letter.'-'.
+			(is_array($upload) && !empty($upload['name']) ? $upload['name'] : 'consent'));
+	}
+
+	/**
+	 * Age / year of last result before which profiles are hidden by default,
+	 * if there is no explicit athlete consent
+	 * In 2018: 2018-2 = 2016 --> no result or registration in 2016 or newer
+	 */
+	const PROFILE_DEFAULT_HIDDEN_AGE = 2;
+
+	/**
+	 * Check if athlete profile is hidden
+	 *
+	 * @param int|string|array $athlete array with athlete data, PerId or rkey
+	 * @param string& $shown_msg =null message why profile is NOT hidden
+	 * @return string|null string with reason the profile is hidden or null, if it is NOT hidden
+	 */
+	public function profile_hidden(array $athlete, &$shown_msg=null)
+	{
+		if (!is_array($athlete) && !($athlete = $this->read($athlete)))
+		{
+			return lang('Athlete NOT found !!!');
+		}
+
+		// check if profile is explcitly hidden
+		if ($athlete['acl'] & 128)
+		{
+			return lang('Sorry, the climber requested not to show his profile!');
+		}
+
+		// check if we have athlete consent to show his data
+		$have_doc = $shown_msg = null;
+		if (!empty($athlete['consent_ip']) && !empty($athlete['consent_time']) ||
+			($have_doc = $this->consent_document($athlete)))
+		{
+			if ($have_doc)
+			{
+				$shown_msg = lang('A document with the athlete consent was uploaded.');
+			}
+			if (!empty($athlete['consent_ip']) && !empty($athlete['consent_time']))
+			{
+				$shown_msg = (!empty($shown_msg) ? $shown_msg.' ' : '').
+					lang('Online consent of athlete on %1.', $athlete['consent_time']);
+			}
+			return null;
+		}
+
+		// policy when to show a profile, if we have no explicit consent
+		$hide_before_year = date('Y') - self::PROFILE_DEFAULT_HIDDEN_AGE;
+		// check results imported into ranking
+		if (!isset($athlete['last_comp']))
+		{
+			$athlete['last_comp'] = $this->db->select($this->result_table, 'MAX(datum)', array(
+				'PerId' => $athlete['PerId'],
+			), __LINE__, __FILE__)->fetchColumn();
+		}
+		if (!empty($athlete['last_comp']) && (int)$athlete['last_comp'] >= $hide_before_year)
+		{
+			$shown_msg = lang('Athlete has a recent result from %1.', $athlete['last_comp']);
+			return null;
+		}
+		// check results in result-service
+		$last_result = $this->db->select('RouteResults', 'DATE(FROM_UNIXTIME(MAX(result_modified)))', array(
+			'PerId' => $athlete['PerId'],
+		), __LINE__, __FILE__)->fetchColumn();
+		if (!empty($last_result) && (int)$last_result >= $hide_before_year)
+		{
+			$shown_msg = lang('Athlete has a recent result from %1.', $last_result);
+			return null;
+		}
+		/* not considering registration a consent, therefore not checking it
+		$last_registration = $this->db->select('Registration', 'DATE(MAX(reg_registered))', array(
+			'PerId' => $athlete['PerId'],
+			'reg_deleted IS NULL',
+		), __LINE__, __FILE__)->fetchColumn();
+		if (!empty($last_registration) && (int)$last_registration >= $hide_before_year)
+		{
+			$shown_msg = lang('Athlete has a recent registration from %1.', $last_registration);
+			return null;
+		}*/
+
+		// new profiles are hidden by default, as long as they have no result
+		if (empty($athlete['last_comp']) && empty($last_result) &&
+			(int)$athlete['modified'] >= $hide_before_year)
+		{
+			return lang('New athlete profile with no result yet.');
+		}
+
+		// profile is hidden by default
+		return lang('Historic athlete profile is hidden as we have no explicit consent from him/her to show the data.');
+	}
+
+	/**
 	 * deletes athlete(s), see so_sql
 	 *
 	 * reimplemented to delete the picture too, works only if one athlete (specified by rkey or internal data) is deleted!
@@ -666,6 +839,17 @@ class ranking_athlete extends so_sql
 			$this->db->delete(self::ATHLETE2FED_TABLE,array(
 				'PerId' => is_null($keys) ? $this->data['PerId'] : $keys['PerId'],
 			),__LINE__,__FILE__);
+			// remove consent file(s)
+			if (file_exists(($path = $this->consent_dir($keys))))
+			{
+				foreach(scandir($path, SCANDIR_SORT_DESCENDING) as $file)
+				{
+					if (in_array($file, array('.', '..'))) continue;
+
+					unlink($path.'/'.$file);
+				}
+				rmdir($path);
+			}
 		}
 		return $Ok;
 	}

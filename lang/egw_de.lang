@@ -32,6 +32,7 @@
 2. qualification	ranking	de	2. Qualifikation
 2. time	ranking	de	2. Zeit
 3. place	ranking	de	3. Platz
+a document with the athlete consent was uploaded.	ranking	de	Ein Dokument mit der Zustimmung des Athleten wurde hochgeladen.
 aborts without saving changes	ranking	de	Abbruch ohne Änderungen zu speichern
 access control, key	ranking	de	Zugriffskontrolle, Schlüssel
 accounting	ranking	de	Abrechnung
@@ -73,6 +74,7 @@ as of	ranking	de	Stand
 athlete	ranking	de	Athlet
 athlete %1 not found!	ranking	de	Athlet %1 nicht gefunden!
 athlete does not meet registration requirements: %1!	ranking	de	Athlete erfüllt NICHT die Vorrausetzung für eine Registrierung: %1!
+athlete has a recent result from %1.	ranking	de	Athlete hat ein aktuelles Ergebnis vom %1.
 athlete has no license! use regular registration to apply for a license first.	ranking	de	Athlet hat keine Lizenz! Benutzen Sie die reguläre Registrierung um eine zu beantragen.
 athlete including %1 results merged.	ranking	de	Athlet einschließlich %1 Ergebnisse vereinigt.
 athlete is not in agegroup of selected license category!	ranking	de	Athlet is NICHT in der Altersklasse der ausgewählten Lizenzkategorie!
@@ -309,6 +311,7 @@ heat updated	ranking	de	Runde aktualisiert
 hide complete profile page	ranking	de	Komplettes Athleten Profil verbergen
 hide contact data, birthday and city from public display. still shows optional data like hobbies!	ranking	de	Verberge Kontaktdaten, Geburtstag und Wohnort von der öffentlichen Anzeige. Zeigt immer noch optionale Daten wie Hobbies!
 hide only contact data and birthday from public display.	ranking	de	Nur Kontaktdaten von der öffentlichen Anzeige ausnehmen.
+historic athlete profile is hidden as we have no explicit consent from him/her to show the data.	ranking	de	Historisches Athletenprofil ist verborgen da wir keine explizite Zustimmung zur Anzeige der Daten haben.
 hobbies	ranking	de	Hobies
 homepage	ranking	de	Internetadresse
 host	admin	de	Rechner
@@ -386,6 +389,7 @@ national registration	ranking	de	Nationale Registrierung
 national team ranking	ranking	de	Nationen-Team-Rangliste
 nationname	ranking	de	Name des Landes
 nations and federations	ranking	de	Nationen und Verbände
+new athlete profile with no result yet.	ranking	de	Neues Athletenprofil bisher ohne Ergebnisse.
 next startnumber increment by	ranking	de	Nächste Startnumber erhöhen um
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	de	Kein Athlete (&person=XYZ) oder keine Kategorie (&cat=XYZ) über die URL ausgewählt!
 no birthdate	ranking	de	kein Geburtsdatum
@@ -415,6 +419,7 @@ number of problems	ranking	de	Anzahl Probleme
 observation time	ranking	de	Besichtigungszeit
 on how many routes is the first round	ranking	de	Auf wievielen Routen findet die erste Runde statt
 one qualification	ranking	de	eine Qualifikation
+online consent of athlete on %1.	ranking	de	Online Zustimmung des Athleten am %1.
 only %1 of %2 entries displayed!	ranking	de	Nur %1 von %2 Einträgen angezeigt!
 only fill values different from egw	admin	de	nur Werte ausfüllen, die sich von der eGW Installation unterscheiden
 open comp.	ranking	de	Offener Wettk.
@@ -474,6 +479,8 @@ previous round not found!	ranking	de	Vorherige Runde nicht gefunden!
 previous years cup "%1" not found!	ranking	de	Cup des Vorjahres "%1" nicht gefunden!
 professional	ranking	de	Profi
 profile	ranking	de	Profil
+profile hidden	ranking	de	Profil verborgen
+profile shown	ranking	de	Profil angezeigt
 provisional	ranking	de	provisorische
 provisional result	ranking	de	provisorisches Ergebnis
 qualification	ranking	de	Qualifikation
@@ -647,6 +654,7 @@ up	ranking	de	Nach oben
 update result	ranking	de	Ergebnis aktualisieren
 update time	ranking	de	Zeit aktualisieren
 upload a portrait picture for the profile	ranking	de	Ein Protrait Bild für das Profil hochladen
+upload document about consent to data storage and use	ranking	de	Dokument mit Zustimmung zur Speicherung und Nutzung der Daten hochladen
 upload topo	ranking	de	Topo hochladen
 uploaded picture is no jpeg !!!	ranking	de	Hochgeladenes Bild ist kein JPEG !!!
 url for pdf files (excluding the year)	admin	de	URL für PDF Dateien (ohne das Jahr)
@@ -663,6 +671,7 @@ vfs directory for the pdf files (excluding the year)	admin	de	VFS Verzeichnis f�
 vfs directory for topo files (excluding the year)	admin	de	VFS Verzeichnis für Topo Dateien (ohne das Jahr)
 vfs path for pictures of the athletes	ranking	de	VFS Pfad für Bilder der Athleten
 view %1	ranking	de	%1 anzeigen
+view consent document	ranking	de	Anzeigen des Dokuments mit der Zustimmung
 view the attached pdf	ranking	de	Angehangenes PDF anzeigen
 view this athlete	ranking	de	Diesen Athleten anzeigen
 view this competition	ranking	de	Diesen Wettkampf anzeigen

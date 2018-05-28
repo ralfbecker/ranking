@@ -32,6 +32,7 @@
 2. qualification	ranking	en	2. Qualification
 2. time	ranking	en	2. Time
 3. place	ranking	en	3. place
+a document with the athlete consent was uploaded.	ranking	en	A document with the athlete consent was uploaded.
 ability	ranking	en	Ability
 aborts without saving changes	ranking	en	aborts without saving changes
 access control, key	ranking	en	access control, key
@@ -78,6 +79,7 @@ athlete 1	ranking	en	Athlete 1
 athlete 2	ranking	en	Athlete 2
 athlete 3	ranking	en	Athlete 3
 athlete does not meet registration requirements: %1!	ranking	en	Athlete does NOT meet registration requirements: %1!
+athlete has a recent result from %1.	ranking	en	Athlete has a recent result from %1.
 athlete has no license! use regular registration to apply for a license first.	ranking	en	Athlete has no license! Use regular registration to apply for a license first.
 athlete including %1 results merged.	ranking	en	Athlete including %1 results merged.
 athlete is not in agegroup of selected license category!	ranking	en	Athlete is NOT in agegroup of selected license category!
@@ -315,6 +317,7 @@ heat updated	ranking	en	Round updated
 hide complete profile page	ranking	en	Hide complete profile page
 hide contact data, birthday and city from public display. still shows optional data like hobbies!	ranking	en	Hide contact data, birthday and city from public display. Still shows optional data like hobbies!
 hide only contact data and birthday from public display.	ranking	en	Hide only contact data and birthday from public display.
+historic athlete profile is hidden as we have no explicit consent from him/her to show the data.	ranking	en	Historic athlete profile is hidden as we have no explicit consent from him/her to show the data.
 hobbies	ranking	en	Hobbies
 homepage	ranking	en	Homepage
 host	admin	en	Host
@@ -396,6 +399,7 @@ national registration	ranking	en	National registration
 national team ranking	ranking	en	National team ranking
 nationname	ranking	en	Nationname
 nations and federations	ranking	en	Nations and Federations
+new athlete profile with no result yet.	ranking	en	New athlete profile with no result yet.
 next startnumber increment by	ranking	en	Next startnumber increment by
 no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	en	No athlete (&person=XYZ) or no category (&cat=XYZ) selected via the URL!
 no birthdate	ranking	en	no Birthdate
@@ -428,6 +432,7 @@ number of problems	ranking	en	Number of problems
 observation time	ranking	en	Observation time
 on how many routes is the first round	ranking	en	On how many routes is the first round
 one qualification	ranking	en	one Qualification
+online consent of athlete on %1.	ranking	en	Online consent of athlete on %1.
 only %1 of %2 entries displayed!	ranking	en	Only %1 of %2 entries displayed!
 only fill values different from egw	admin	en	only fill values different from eGW
 open comp.	ranking	en	Open comp.
@@ -487,6 +492,8 @@ previous round not found!	ranking	en	Previous round not found!
 previous years cup "%1" not found!	ranking	en	Previous years cup "%1" not found!
 professional	ranking	en	Professional
 profile	ranking	en	Profile
+profile hidden	ranking	en	Profile hidden
+profile shown	ranking	en	Profile shown
 provisional	ranking	en	provisional
 provisional result	ranking	en	provisional result
 qualification	ranking	en	Qualification
@@ -662,6 +669,7 @@ up	ranking	en	Up
 update result	ranking	en	Update Result
 update time	ranking	en	update time
 upload a portrait picture for the profile	ranking	en	Upload a portrait picture for the profile
+upload document about consent to data storage and use	ranking	en	Upload document about consent to data storage and use
 upload topo	ranking	en	Upload topo
 uploaded picture is no jpeg !!!	ranking	en	Uploaded picture is no JPEG !!!
 url for pdf files (excluding the year)	admin	en	URL for pdf files (excluding the year)
@@ -678,6 +686,7 @@ vfs directory for the pdf files (excluding the year)	admin	en	VFS directory for 
 vfs directory for topo files (excluding the year)	admin	en	VFS directory for topo files (excluding the year)
 vfs path for pictures of the athletes	ranking	en	VFS path for pictures of the athletes
 view %1	ranking	en	view %1
+view consent document	ranking	en	View consent document
 view the attached pdf	ranking	en	View the attached PDF
 view this athlete	ranking	en	View this athlete
 view this competition	ranking	en	View this competition

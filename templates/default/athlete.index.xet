@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.athlete.index.rows" template="" lang="" group="0" version="1.9.001">
@@ -67,7 +66,7 @@
 							<menulist>
 								<menupopup id="${row}[license]" readonly="true"/>
 							</menulist>
-							<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]&amp;license_cat=$cont[license_cat]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" class="small"/>
+							<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]&amp;license_cat=$cont[license_cat]'),'_blank','dependent=yes,width=900,height=470,scrollbars=yes,status=yes'); return false;" class="small"/>
 						</hbox>
 						<menulist>
 							<menupopup id="${row}[license_cat]" readonly="true"/>
@@ -80,7 +79,7 @@
 						</menulist>
 					</vbox>
 					<hbox options="0,0">
-						<button statustext="Edit this athlete" label="Edit" id="edit[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" image="edit"/>
+						<button statustext="Edit this athlete" label="Edit" id="edit[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=900,height=470,scrollbars=yes,status=yes'); return false;" image="edit"/>
 						<button statustext="Delete this athlete" label="Delete" id="delete[$row_cont[PerId]]" onclick="return confirm('Delete this athlete');" image="delete"/>
 					</hbox>
 				</row>
@@ -103,7 +102,7 @@
 					<nextmatch id="nm" template="ranking.athlete.index.rows"/>
 				</row>
 				<row>
-					<button statustext="add a new athlete" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;"/>
+					<button statustext="add a new athlete" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit'),'_blank','dependent=yes,width=900,height=470,scrollbars=yes,status=yes'); return false;"/>
 				</row>
 			</rows>
 		</grid>
