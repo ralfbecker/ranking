@@ -255,10 +255,14 @@
 					<description for="geb_ort" value="Place of birth"/>
 					<textbox statustext="where is the athlete born (incl. nation)" id="geb_ort" size="35" maxlength="60" span="all"/>
 				</row>
-				<row class="row">
+				<row>
 					<description for="verband" value="Federation"/>
 					<menulist span="2">
 						<menupopup class="selectboxFullWidth" id="fed_id"/>
+					</menulist>
+					<description value="since" id="a2f_start"/>
+					<menulist>
+						<menupopup id="acl_fed_id[fed_id]" options="Administrated by: parent federation" class="selectboxFullWidth"/>
 					</menulist>
 				</row>
 				<row>
