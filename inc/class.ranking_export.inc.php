@@ -1929,6 +1929,7 @@ class ranking_export extends ranking_result_bo
 	 * @var array
 	 */
 	public static $rename_athlete = array(
+		'error' => 'error',
 		'PerId' => 'PerId',
 		'rkey' => 'rkey',
 		'nachname' => 'lastname',
@@ -2010,6 +2011,15 @@ class ranking_export extends ranking_result_bo
 		{
 			throw new Exception(lang('Athlete NOT found !!!'));
 		}
+
+		if (($msg = $this->athlete->profile_hidden($athlete)))
+		{
+			$athlete['acl'] = ranking_athlete::ACL_DENY_PROFILE;
+			$athlete = $this->athlete->clear_data_by_acl($athlete, ranking_athlete::ACL_DENY_PROFILE);
+			unset($athlete['last_comp'], $athlete['photo']);
+			$athlete['freetext'] = $athlete['error'] = $msg;
+			$athlete['last_modified'] = egw_time::to($athlete['modified'], 'ts');
+		}
 		//_debug_array($athlete); exit;
 
 		$data = self::rename_key($athlete, self::$rename_athlete, true);
@@ -2018,12 +2028,7 @@ class ranking_export extends ranking_result_bo
 
 		// athlete requested not to show his profile
 		// --> no results, no ranking, regular profile data already got removed by athlete->db2data called by read
-		if (($msg = $this->athlete->profile_hidden($athlete)))
-		{
-			$data['freetext'] = $data['error'] = $msg;
-			$data['last_modified'] = egw_time::to($athlete['modified'], 'ts');
-		}
-		else
+		if (!($athlete['acl'] & ranking_athlete::ACL_DENY_PROFILE))
 		{
 			foreach(array(
 				'photo' => null,

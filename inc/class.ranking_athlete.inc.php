@@ -232,18 +232,7 @@ class ranking_athlete extends so_sql
 			// blank out the acl'ed fields, if user has no athletes rights
 			if (is_object($GLOBALS['ranking_bo']) && !$GLOBALS['ranking_bo']->acl_check_athlete($data))
 			{
-			   	foreach($this->acl2clear as $deny => $to_clear)
-				{
-					if ($acl & $deny)
-					{
-						foreach($to_clear[0] == '!' ? array_diff(array_keys($data),$to_clear) : $to_clear as $name)
-						{
-							if (substr($name, 0, 4) == 'reg_') continue;	// do not clear registration data, using this method too
-
-							$data[$name] = $name == 'geb_date' && $data['geb_date'] ? (int)$data['geb_date'].'-01-01' : '';
-						}
-					}
-				}
+				$data = $this->clear_data_by_acl($data, $acl);
 			}
 		}
 		if (array_key_exists('license',$data) && !$data['license'])
@@ -251,6 +240,30 @@ class ranking_athlete extends so_sql
 			$data['license'] = 'n';
 		}
 		return parent::db2data($intern ? null : $data);	// important to use null, if $intern!
+	}
+
+	/**
+	 * Clear fields hidden by ACL
+	 *
+	 * @param array $data
+	 * @param int $acl
+	 * @return array
+	 */
+	function clear_data_by_acl(array $data, $acl)
+	{
+		foreach($this->acl2clear as $deny => $to_clear)
+		{
+			if ($acl & $deny)
+			{
+				foreach($to_clear[0] == '!' ? array_diff(array_keys($data),$to_clear) : $to_clear as $name)
+				{
+					if (substr($name, 0, 4) == 'reg_') continue;	// do not clear registration data, using this method too
+
+					$data[$name] = $name == 'geb_date' && $data['geb_date'] ? (int)$data['geb_date'].'-01-01' : '';
+				}
+			}
+		}
+		return $data;
 	}
 
 	/**

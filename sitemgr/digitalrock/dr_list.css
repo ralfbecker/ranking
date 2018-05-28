@@ -275,10 +275,10 @@ tr.profileMarginTop > td {
 .Resultlist h3.resultDate:after {
 	content: " after";
 }
-.Resultlist h3.error:empty {
+.error:empty {
 	display: none;
 }
-.Resultlist h3.error {
+.error {
 	color: red;
 	font-style: italic;
 }

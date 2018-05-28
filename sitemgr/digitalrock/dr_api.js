@@ -1866,6 +1866,14 @@ var Profile = (function() {
 	 */
 	Profile.prototype.handleResponse = function(_data)
 	{
+		if (_data.error)
+		{
+			var error = jQuery(document.createElement('h3'));
+			error.addClass('error');
+			error.text(_data.error);
+			this.container.replaceWith(error);
+			return;
+		}
 		// replace non-result data
 		var that = this;
 		var html = this.template.replace(this.pattern, function(match, placeholder)
