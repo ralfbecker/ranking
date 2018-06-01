@@ -758,8 +758,20 @@ class ranking_athlete extends so_sql
 			return lang('Athlete NOT found !!!');
 		}
 
+		if (is_array($athlete['acl']))
+		{
+			$acl = 0;
+			foreach($athlete['acl'] as $rights)
+			{
+				$acl |= $rights;
+			}
+		}
+		else
+		{
+			$acl = (int)$athlete['acl'];
+		}
 		// check if profile is explcitly hidden
-		if ($athlete['acl'] & 128)
+		if ($acl & self::ACL_DENY_PROFILE)
 		{
 			return lang('Sorry, the climber requested not to show his profile!');
 		}
