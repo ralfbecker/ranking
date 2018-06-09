@@ -314,10 +314,10 @@ class ranking_result_bo extends ranking_bo
 		}
 
 		// combined startlist
-		if ($discipline == 'combined' && $route_order < 3)
+		/*if ($discipline == 'combined' && $route_order < 3)
 		{
 			return $this->_combined_startlist($comp, $cat, $route_order, $comb_quali);
-		}
+		}*/
 		// depricated startlist stored in the result
 		if ($this->result->has_startlist(array(
 			'WetId' => $keys['WetId'],
@@ -350,7 +350,9 @@ class ranking_result_bo extends ranking_bo
 			in_array($route_type,array(TWO_QUALI_ALL_SEED_STAGGER,TWO_QUALI_ALL_SUM,TWO_QUALI_GROUPS)),		// true = stagger, false = no stagger
 			$old_startlist, $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected']), $add_cat);
 
-		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF && !$route_order)	// set 2. lane for record format qualification
+		// set 2. lane for speed record format and combined speed qualification
+		if ($discipline == 'speed' && $route_type == TWO_QUALI_BESTOF && !$route_order ||
+			$discipline == 'combined' && !$route_order)	// combined speed qualification
 		{
 			unset($starter);
 			foreach($starters[1] as &$starter)
@@ -2430,7 +2432,7 @@ class ranking_result_bo extends ranking_bo
 			case 1:
 			case 6:
 				$route_type = ONE_QUALI;
-				return 'boulder';
+				return 'boulder2018';
 			case 2:
 			case 7:
 				$route_type = ONE_QUALI;
