@@ -47,6 +47,7 @@ class ranking_selfservice extends ranking_bo
 
 		$athlete = array();
 		unset($this->athlete->acl2clear[ranking_athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
+		unset($this->athlete->acl2clear[ranking_athlete::ACL_DENY_PROFILE]);	// same is true for a fully denied profile
 		if (($PerId || ($PerId = $this->is_selfservice())) && !($athlete = $this->athlete->read($PerId)))
 		{
 			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
