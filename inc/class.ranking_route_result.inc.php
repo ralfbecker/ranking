@@ -747,7 +747,7 @@ class ranking_route_result extends Api\Storage\Base
 				unset($data['result_height'], $data['result_height1'], $data['result_height3'], $data['result_height4'], $data['result_height5'], $data['result_height6']);
 				unset($data['result_plus'], $data['result_plus1'], $data['result_plus3'], $data['result_plus4'], $data['result_plus5'], $data['result_plus6']);
 				$data_speed = $this->db2data(array('discipline' => 'speed')+$data);
-				$data_boulder = $this->db2data(array('discipline' => 'boulder')+$data);
+				$data_boulder = $this->db2data(array('discipline' => 'boulder2018')+$data);
 			}
 			else
 			{
