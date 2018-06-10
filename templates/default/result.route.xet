@@ -48,7 +48,7 @@
 				</row>
 				<row class="row">
 					<description value="Quota" for="route_quota"/>
-					<textbox type="integer" label="%s Quota has to be 0 for lead final, otherwise time is NOT used!" id="route_quota" span="all"/>
+					<textbox type="integer" blur="Final" label="%s Quota has to be 0 for final only, to mark round as final! (Use 999 for all)" id="route_quota" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Result official"/>

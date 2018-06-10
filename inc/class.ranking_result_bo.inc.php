@@ -313,11 +313,11 @@ class ranking_result_bo extends ranking_bo
 			throw new Api\Exception\WrongUserinput(lang('entry not found !!!'));
 		}
 
-		// combined startlist
-		/*if ($discipline == 'combined' && $route_order < 3)
+		// combined startlist from separate qualification competition
+		if ($discipline == 'combined' && $route_order < 3 && $comb_quali)
 		{
 			return $this->_combined_startlist($comp, $cat, $route_order, $comb_quali);
-		}*/
+		}
 		// depricated startlist stored in the result
 		if ($this->result->has_startlist(array(
 			'WetId' => $keys['WetId'],
@@ -367,15 +367,18 @@ class ranking_result_bo extends ranking_bo
 
 		$num = $this->_store_startlist($starters[1],$route_type == TWO_QUALI_HALF ? 0 : $route_order);
 
+		// automatically generate further startlists
 		if (!in_array($route_type,array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) && $discipline != 'speed')	// automatically generate 2. quali
 		{
 			$keys['route_order'] = 0;
 			$route = $this->route->read($keys,true);
 			$prefix = $route_type == TWO_QUALI_GROUPS ? lang('Group').' B ' : '';
-			$this->route->save(array(
-				'route_name' => $prefix.'1. '.$route['route_name'],
-			));
-
+			if ($discipline != 'combined')
+			{
+				$this->route->save(array(
+					'route_name' => $prefix.'1. '.$route['route_name'],
+				));
+			}
 			$mod = $num = 2;
 			if ($route_type == TWO_QUALI_GROUPS)
 			{
@@ -392,12 +395,18 @@ class ranking_result_bo extends ranking_bo
 				{
 					if ($route_type == TWO_QUALI_GROUPS && $r >= 2)	 $prefix = lang('Group').' A ';
 
+					$route['route_order'] = $r;
+					$route['route_status'] = STATUS_STARTLIST;
+					if ($discipline == 'combined')
+					{
+						$this->init_route($route, $comp, $cat, $discipline);
+					}
+					else
+					{
+						$route['route_name'] = $prefix.(($r%$mod)+1).'. '.$route['route_name'];
+					}
 					$this->route->init($route);
-					$this->route->save(array(
-						'route_name'   => $prefix.(($r%$mod)+1).'. '.$route['route_name'],
-						'route_order'  => $r,
-						'route_status' => STATUS_STARTLIST,
-					));
+					$this->route->save();
 				}
 				$this->_store_startlist(isset($starters[1+$r]) ? $starters[1+$r] :
 					(isset($starters[$r]) ? $starters[$r] : $starters[1]), $r, isset($starters[1+$r]));
@@ -625,7 +634,7 @@ class ranking_result_bo extends ranking_bo
 		$filter = array(
 			'WetId != '.$comp['WetId'],
 			'datum BETWEEN '.$this->db->quote($date->format('Y-m-d')).' AND '.$this->db->quote($comp['datum']),
-			'GrpId' => array_keys($cat['mgroups'])+array($cat['GrpId']),
+			'GrpId' => ($cat['mgroups'] ? array_keys($cat['mgroups']) : array())+array($cat['GrpId']),
 			'nation '.(empty($comp['nation']) ? 'IS NULL' : '= '.$this->db->quote($comp['nation'])),
 		);
 		$comps = array();
@@ -2194,6 +2203,8 @@ class ranking_result_bo extends ranking_bo
 					case -3: $quota = 6; break;	// 6 from qualification to 1/4-final speed
 					case 3:
 					case 4: $quota = 4; break;	// 4 to 1/2-final and final speed (includes small final)
+					case 0: case 1: case 2:
+						$quota = 999; break;	// no quota (0 would trigger final rules!)
 				}
 		}
 		//error_log(__METHOD__."($discipline,$route_order,$quali_type,$num_participants)=$quota");
@@ -2280,7 +2291,9 @@ class ranking_result_bo extends ranking_bo
 			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
 				$discipline == 'speedrelay');
 		}
-		if (count($content) > 3)
+		if (count($content) > 3 &&
+			// switching to combined and not having store the route yet
+			!($content['discipline'] === 'combined' && !$this->route->read($content,true)))
 		{
 			return true;	// no new route
 		}
@@ -2293,7 +2306,7 @@ class ranking_result_bo extends ranking_bo
 			'route_order' => $route_order=$content['route_order'],
 		);
 		if ((int)$comp['WetId'] && (int)$cat['GrpId'] && (!is_numeric($route_order) ||
-			!($content = $this->route->read($content,true))))
+			!($route = $this->route->read($content,true))))
 		{
 			// try reading the previous heat, to set some stuff from it
 			if (($keys['route_order'] = $this->route->get_max_order($comp['WetId'],$cat['GrpId'])) >= 0 &&
@@ -2340,8 +2353,9 @@ class ranking_result_bo extends ranking_bo
 			if ($discipline == 'combined')
 			{
 				static $route_order_prefix = array(3 => '1/4-', 4 => '1/2-');
+				$dummy = null;
 				$keys['route_name'] = $route_order_prefix[$keys['route_order']].$keys['route_name'].' '.
-					lang(self::combined_order2discipline($keys['route_order']));
+					lang(self::combined_order2discipline($keys['route_order'], $dummy, true));
 			}
 			//error_log(__METHOD__."() discipline=$discipline, route_order=$keys[route_order]: $keys[route_name]");
 
@@ -2359,7 +2373,7 @@ class ranking_result_bo extends ranking_bo
 			{
 				if ($comp['nation'] == 'SUI')
 				{
-					$keys['route_quota'] = '';	// no default quota for SUI
+					$keys['route_quota'] = 999;	// no default quota for SUI
 				}
 				else
 				{
@@ -2395,13 +2409,18 @@ class ranking_result_bo extends ranking_bo
 					$keys['route_judge'] = implode(', ',$keys['route_judge']);
 				}
 			}
-			$content = $this->route->init($keys);
+			$content = array_merge($content, $this->route->init($keys));
 			$content['new_route'] = true;
 			$content['route_status'] = STATUS_STARTLIST;
 
 			// default to 5 boulders
 			$content['route_num_problems'] = 5;
 		}
+		else
+		{
+			$content = array_merge($content, $route);
+		}
+
 		if (empty($content['discipline']))
 		{
 			$content['discipline'] = $discipline;
@@ -2423,16 +2442,17 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param string $route_order
 	 * @param int& $route_type on return route/quali-type
+	 * @param boolean $return_boulder =false true: return "boulder" instead of "boulder2018" eg. for translation
 	 * @return string
 	 */
-	static public function combined_order2discipline($route_order, &$route_type=null)
+	static public function combined_order2discipline($route_order, &$route_type=null, $return_boulder=false)
 	{
 		switch($route_order)
 		{
 			case 1:
 			case 6:
 				$route_type = ONE_QUALI;
-				return 'boulder2018';
+				return $return_boulder ? 'boulder' : 'boulder2018';
 			case 2:
 			case 7:
 				$route_type = ONE_QUALI;

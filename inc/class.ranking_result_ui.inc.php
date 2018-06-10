@@ -78,7 +78,7 @@ class ranking_result_ui extends ranking_result_bo
 			$content['route_type'] = THREE_QUALI_ALL_NO_STAGGER;
 			$readonlys['route_type'] = true;
 
-			if ($cat['mgroups'] && 0 <= $content['route_order'] && $content['route_order'] < 3)
+			if (0 <= $content['route_order'] && $content['route_order'] < 3)
 			{
 				try {
 					$this->combined_quali_discipline2route($comp, $cat);
@@ -89,18 +89,19 @@ class ranking_result_ui extends ranking_result_bo
 					if (($comb_qualis = $this->combined_quali_comps($comp, $cat)))
 					{
 						$sel_options['comb_quali'] = array(
-							'' => 'Select combined qualification'
+							'' => 'Select combined qualification or use registration'
 						)+$comb_qualis;
-						if (empty($content['comb_quali'])) list($content['comb_quali']) = each($comb_qualis);
 						$tmpl->disableElement('comb_quali', false);
 					}
 				}
 			}
 			foreach($this->order_nums as $n => $label)
 			{
-				if ($n > 0)
+				if ($n >= 0)
 				{
-					$sel_options['route_order'][$n] = ($n >= 3 ? lang('Final') : lang('Qualification')).' '.lang($this->combined_order2discipline($n));
+					$dummy = null;
+					$sel_options['route_order'][$n] = ($n >= 3 ? lang('Final') : lang('Qualification')).
+						' '.lang($this->combined_order2discipline($n, $dummy, true));
 				}
 			}
 		}
@@ -222,7 +223,7 @@ class ranking_result_ui extends ranking_result_bo
 						{
 							$msg .= lang('Error: generating startlist!!!');
 						}
-					} catch (\EGroupware\Api\Exception\WrongUserinput $e) {
+					} catch (Api\Exception\WrongUserinput $e) {
 						$msg = $e->getMessage();
 						unset($button);	// to not exit for save
 					}
@@ -1387,6 +1388,8 @@ class ranking_result_ui extends ranking_result_bo
 			$this->route_result->__construct($this->config['ranking_db_charset'],$this->db,null,
 				$content['nm']['discipline'] == 'speedrelay');
 		}
+		// update route_type, in case it changed eg. by changing from a combined route/comp to a conventional one
+		if ($route) $content['nm']['route_type'] = $route['route_type'];
 		// set single discipline for combined depending our route_order/heat
 		if ($content['nm']['discipline'] == 'combined' && $keys['route_order'] >= 0)
 		{
