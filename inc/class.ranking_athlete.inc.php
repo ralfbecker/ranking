@@ -317,7 +317,11 @@ class ranking_athlete extends so_sql
 		parent::init($arr);
 
 		// switching everything off, but the city
-		$this->data['acl'] = self::ACL_DEFAULT;
+		// do NOT do it, if acl is already set, as we would loose ability to eg. search for an email address
+		if (!is_array($arr) || !array_key_exists('acl', $arr))
+		{
+			$this->data['acl'] = self::ACL_DEFAULT;
+		}
 	}
 
 	/**
