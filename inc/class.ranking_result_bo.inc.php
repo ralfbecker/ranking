@@ -1004,7 +1004,7 @@ class ranking_result_bo extends ranking_bo
 			{
 				$order_by = $this->route_result->table_name.'.result_rank DESC';		// --> reversed result
 			}
-			// quali on two or 2 routes with multiplied ranking
+			// quali on two or 2 routes with multiplied ranking or combined speed final
 			elseif(self::is_two_quali_all($prev_route['route_type']) && $keys['route_order'] == 2 ||
 				$prev_route['route_type'] == THREE_QUALI_ALL_NO_STAGGER && $keys['route_order'] == 3)
 			{
@@ -1037,6 +1037,12 @@ class ranking_result_bo extends ranking_bo
 				}
 				$cols[] = $this->route_result->table_name.'.PerId AS PerId';
 				$cols[] = $this->route_result->table_name.'.start_number AS start_number';
+
+				// combined speed final needs qualification time
+				if ($discipline == 'combined' && $keys['route_order'] == 3)
+				{
+					$cols[] = $this->route_result->table_name.'.result_time AS result_time';
+				}
 			}
 			else
 			{
@@ -1060,10 +1066,19 @@ class ranking_result_bo extends ranking_bo
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
 		unset($starters['route_names']);
 
-		// combined lead final uses general result --> fixed quota of 6
-		if ($discipline == 'combined' && $keys['route_order'] == 7)
+		// combined speed & lead final uses general result --> fixed quota of 6
+		if ($discipline == 'combined' && in_array($keys['route_order'], array(7, 3)))
 		{
-			$starters = array_slice($starters, -6);
+			$starters = array_slice($starters, -($quota=6));
+
+			// sort speed final by speed (was overall qualification)
+			if ($keys['route_order'] == 3)
+			{
+				usort($starters, function($a, $b)
+				{
+					return $b['result_time']-$a['result_time'];
+				});
+			}
 		}
 
 		// ko-system: ex aquos on last place are NOT qualified, instead we use wildcards
