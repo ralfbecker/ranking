@@ -21,6 +21,8 @@ $sac_adults = array(
 );
 
 $sac_youth = array(
+	'SUI_F_10'=> 'U10 Damen',
+	'SUI_M_10'=> 'U10 Herren',
 	'SUI_F_12'=> 'U12 Damen',
 	'SUI_M_12'=> 'U12 Herren',
 	'SUI_F_M' => 'U14 Damen',

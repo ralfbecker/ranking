@@ -1,7 +1,7 @@
 <!-- $Id: dav_footer.inc.php,v 1.7 2012/05/13 15:41:01 ralf Exp $ -->
 <p>F&uuml;r Informationen &uuml;ber das Wettkampfklettern in Deutschland wenden sie sich an den
 <A HREF="http://www.alpenverein.de" target=_blank> Deutschen Alpenverein</A>,
-<?php echo mailto('christoph.gabrysch@alpenverein.de','Christoph Gabrysch'); ?>.</p>
+<?php echo mailto('ricardo.schumann@alpenverein.de','Resort Lesitungssport'); ?>.</p>
 
 <p>Die Ergebnisse und Ranglisten wurden von <A HREF="/" target=_blank>digital ROCK</A>,
 (c) 1990-<?php echo date('Y'); ?> by <?php echo mailto('RalfBecker@digitalROCK.de','Ralf Becker'); ?> 
