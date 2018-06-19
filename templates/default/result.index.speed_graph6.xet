@@ -69,13 +69,19 @@
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[6]"/>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" class="half_down" content="heat5[1]"/>
-					<description value="3. place" align="center"/>
+					<description value="3. place" align="center" class="third_down"/>
 				</row>
 				<row>
 					<description/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" class="half_down" content="heat5[2]"/>
-					<template id="ranking.result.index.speed_graph.cell" content="winner3" class="winner" />
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="winner3" class="third_down winner" />
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[2]"/>
+					<description/>
 				</row>
 			</rows>
 		</grid>
