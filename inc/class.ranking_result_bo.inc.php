@@ -1200,10 +1200,13 @@ class ranking_result_bo extends ranking_bo
 		if ($discipline == 'combined')
 		{
 			$prev_keys[] = 'result_rank <= 4';
+			$cols[] = 'result_rank';
 			// treat fastest looser like winner of 4th pairing
 			if ($keys['route_order'] == 4)
 			{
-				$order_by = 'CASE result_rank WHEN 4 THEN 2.5 ELSE start_order END';
+				// we want winners by start_order first, then loosers by result_rank
+				// to be able to stop after fastest looser, independent how many winners we have
+				$order_by = 'result_rank,start_order';
 			}
 			// first loosers (small final) then winners, all by start_order
 			else
@@ -1230,17 +1233,47 @@ class ranking_result_bo extends ranking_bo
 		$cols[] = 'result_detail AS detail';	// AS detail to not automatically unserialize (we only want false_start)
 		$starters =& $this->route_result->search('',$cols,
 			$order_by,'','',false,'AND',false,$prev_keys);
-		error_log(__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).") starters = ".array2string($starters));
+		//error_log(__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).") starters = ".array2string($starters));
 
 		// reindex by _new_ start_order
-		foreach($starters as $n => &$starter)
+		$starters_by_startorder = array();
+		foreach($starters as &$starter)
 		{
-			unset($starter['result_rank']);
 			// copy number of false_start from previous heat
 			$detail = ranking_route_result::unserialize($starter['detail']);
 			unset($starter['detail']);
 			$starter['false_start'] = $detail['false_start'];
-			$starters_by_startorder[1+$n] =& $starter;
+
+			$new_start_order = (int)(($starter['start_order']+1)/2);
+
+			if ($discipline == 'combined')
+			{
+				switch ($keys['route_order'])
+				{
+					case 4: // startorder for 1/2-final
+						if ($starter['result_rank'] > 1)
+						{
+							// fastest looser goes to start_order=2 against winner of first pairing (start_order=1)
+							$starters_by_startorder[2] =& $starter;
+							unset($starter['result_rank']);
+							break 2; // we only want 1 looser, not more due to a pairing were both false start or fall
+						}
+						elseif ($new_start_order > 1)
+						{
+							// make space for fastest looser
+							$new_start_order = $new_start_order+1;
+						}
+						break;
+					case 5: // startorder for final: small final (loosers), then final
+						if ($starter['result_rank'] == 1)
+						{
+							$new_start_order = $new_start_order+2;
+						}
+						break;
+				}
+			}
+			$starters_by_startorder[$new_start_order] =& $starter;
+			unset($starter['result_rank']);
 		}
 		for($start_order=1; $start_order <= $prev_route['route_quota']; ++$start_order)
 		{
