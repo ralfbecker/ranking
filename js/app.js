@@ -1600,7 +1600,7 @@ app.classes.ranking = AppJS.extend(
 						self.update_result_row.call(self, _button, entry, _values, function(_data)
 						{
 							// reopen dialog with changed content
-							this.action_edit({},[{id: PerId}]);
+							self.action_edit({},[{id: PerId}]);
 							// ToDo: update dialog with returned values and not reopen it
 							//var row = this.getRowById(_data.content, PerId);
 							//dialog.options.value = jQuery.extend(dialog.options.value, row.data);
