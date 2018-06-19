@@ -808,17 +808,23 @@ class ranking_result_ui extends ranking_result_bo
 		// fix sorting, add eg. alphabetic sort behind result_rank
 		self::process_sort($query,$this->route_result->isRelay);
 
-		if($query['route'] == -2 && $query['discipline'] == 'speed' && strstr($query['template'],'speed_graph'))
+		if($query['route'] == -2 && in_array($query['discipline'], array('speed','combined')) && strstr($query['template'],'speed_graph'))
 		{
 			$query['order'] = 'result_rank';
 			$query['sort']  = 'ASC';
 		}
 		// for speed: skip 1/8 and 1/4 Final if there are less then 16 (8) starters
-		if($query['route'] == -2 && substr($query['discipline'],0,5) == 'speed' && strstr($query['template'],'speed_graph'))
+		if($query['route'] == -2 && strstr($query['template'],'speed_graph') &&
+			(substr($query['discipline'],0,5) == 'speed' || $query['discipline'] == 'combined'))
 		{
 			$num_first_final = $this->route_result->get_count(array('route_order' => 2, 'WetId' => $query['comp'],'GrpId' => $query['cat']));
 			$skip = $num_first_final >= 16 ? 0 : 1+($num_first_final < 8);
 			if (!$skip) $rows['heat3'] = array(true);	// to not hide the 1/8-Final because of no participants yet
+			if ($query['discipline'] == 'combined')
+			{
+				$query['col_filter']['route_order'] = -6;
+				$num_first_final = 6;
+			}
 			$query['num_rows'] = $num_first_final;	// dont need further quali-participants
 		}
 		//echo "<p align=right>order='$query[order]', sort='$query[sort]', start=$query[start]</p>\n";
@@ -915,7 +921,8 @@ class ranking_result_ui extends ranking_result_bo
 				$rows[$k]['ranking_points'] = $ranking[$row['PerId']]['pkt'];
 			}
 			// for the speed graphic, we have to make the athlets availible by the startnumber of each heat
-			if($query['route'] == -2 && substr($query['discipline'],0,5) == 'speed' && strstr($query['template'],'speed_graph'))
+			if ($query['route'] == -2 && strstr($query['template'],'speed_graph') &&
+				(substr($query['discipline'],0,5) == 'speed' || $query['discipline'] == 'combined'))
 			{
 				for($suffix=2; $suffix <= 6; ++$suffix)
 				{
@@ -925,10 +932,17 @@ class ranking_result_ui extends ranking_result_bo
 						$rows['heat'.($suffix+$skip)][$row['start_order'.$suffix]] = $row;
 						unset($rows[$k]['result']);	// only used for winner and 3. place
 						// make final or small final winners availible as winner1 and winner3
-						if ($suffix+$skip >= 5 && $row['result'.$suffix] && $row['result_rank'.$suffix] == 1)
+						if ($suffix+$skip >= 5 && $row['result'.$suffix] && in_array($rank=$row['result_rank'.$suffix], array(1, 3)))
 						{
-							$rows['winner'.$row['result_rank']] = $row;
+							// regular speed has small final in own heat, therefore are both on $row['result_rank'.$suffix] == 1
+							if ($rank == 1 && isset($rows['winner'.$rank])) $rank = $row['result_rank'];
+							$rows['winner'.$rank] = $row;
 						}
+					}
+					elseif($suffix == 3 && $query['discipline'] == 'combined')
+					{
+						$row['result'] = $row['result'.$suffix];
+						$rows['heat'.($suffix+$skip)][$row['start_order']] = $row;
 					}
 				}
 				// we dont need original rows for speed-graph, in fact they confuse autorepeating in et2
@@ -1699,7 +1713,8 @@ class ranking_result_ui extends ranking_result_bo
 		$tmpl->disableElement('nm[ranking]', $content['nm']['show_result'] || $tmpl->sitemgr || !$this->has_startlist($keys));
 		// do we show the start- or result-list?
 		$content['no_list'] = (string)$content['nm']['route'] === '' || $content['nm']['show_result'] == 4;
-		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],$content['nm']['discipline']);
+		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],
+			$content['nm']['discipline'], $content['discipline']);
 		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_
 		$content['nm']['route_quota'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_quota'] : 0;
 
@@ -1757,7 +1772,7 @@ class ranking_result_ui extends ranking_result_bo
 			return $b - $a;
 		});
 
-		// for speed include pairing graph (-2) (not for combined/three-qualis)
+		// for speed include pairing graph (-2)
 		if (substr($discipline, 0, 5) == 'speed' && $route_type != THREE_QUALI_ALL_NO_STAGGER)
 		{
 			$show_result[3] = lang('Pairing speed final');
@@ -1791,12 +1806,16 @@ class ranking_result_ui extends ranking_result_bo
 			if ($num_routes <= 2 || $route_type == TWO_QUALI_GROUPS && $num_routes <= 4) return;	// dont show general result yet
 		}
 
-		// add overall speed final for combined
+		// add overall speed final and pairing for combined
 		if ($discipline == 'combined' && isset($route[4]))
 		{
 			$speed_final = isset($route[-6]) ? $route[-6] : ranking_route::default_name(-6);
 			unset($route[-6]);
-			$route = array_slice($route, 0, -7, true) + array(-6 => $speed_final) + array_slice($route, -7, null, true);
+			$route = array_slice($route, 0, -7, true) + array(
+				-6 => $speed_final,
+				-2 => lang('Pairing speed final'),
+			) + array_slice($route, -7, null, true);
+			$show_result[3] = lang('Pairing speed final');
 		}
 
 		// add general result (-1) on top of list
@@ -1929,13 +1948,15 @@ class ranking_result_ui extends ranking_result_bo
 	 *
 	 * @param int $show_result 0=startlist, 1=result, 2=general result
 	 * @param string $discipline 'lead', 'boulder', 'speed'
+	 * @param string $discipline2 'combined' even if heat has single discipline
 	 * @return string
 	 */
-	function _template_name($show_result,$discipline='lead')
+	function _template_name($show_result, $discipline='lead', $discipline2=null)
 	{
-		if ($show_result == 3 && substr($discipline,0,5) == 'speed')
+		if ($show_result == 3)
 		{
-			return 'ranking.result.index.speed_graph';
+			return $discipline2 == 'combined' ? 'ranking.result.index.speed_graph6' :
+				'ranking.result.index.speed_graph';
 		}
 		if ($show_result == 2)
 		{

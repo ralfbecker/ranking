@@ -127,6 +127,7 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 	}
 }
 .half_down { position: relative; top: 1.3em; }
+.third_down { position: relative; top: 0.7em; }
 .winner { font-weight: bold; }
 .selectboxFullWidth select { width: 100%; }
 .inputFullWidth input { width:100%; }
