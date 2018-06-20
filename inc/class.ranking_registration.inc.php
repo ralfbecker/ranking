@@ -430,7 +430,7 @@ class ranking_registration extends Api\Storage\Base
 			{
 				if (is_int($col)) continue;
 
-				if ($col == 'nation')	// nation is from the joined Federations table
+				if ($col == 'nation' || $col == 'fed_parent')	// nation is from the joined Federations table
 				{
 					if ($val)
 					{
@@ -443,7 +443,7 @@ class ranking_registration extends Api\Storage\Base
 						),')');
 						$filter[] = $f;
 					}
-					unset($filter['nation']);
+					unset($filter[$col]);
 				}
 				elseif (!isset($this->db_cols[$col]))	// assume it's from joined Athletes table
 				{
