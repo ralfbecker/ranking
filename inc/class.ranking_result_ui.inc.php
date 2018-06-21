@@ -1115,7 +1115,7 @@ class ranking_result_ui extends ranking_result_bo
 			// 2. speed lane is only in quali for bestof
 			$rows['show_second_lane'] = $query['route'] == 0;
 		}
-		else
+		elseif ($query['discipline'] == 'speed')
 		{
 			$rows['sum_or_bestof'] = lang('Sum');
 			// 2. speed lane is only in two qualis (sum) and there also for final
