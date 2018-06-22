@@ -314,7 +314,7 @@ class ranking_result_bo extends ranking_bo
 		}
 
 		// combined startlist from separate qualification competition
-		if ($discipline == 'combined' && $route_order < 3 && $comb_quali)
+		if ($discipline == 'combined' && $route_order < 3 && $comb_quali !== '')
 		{
 			return $this->_combined_startlist($comp, $cat, $route_order, $comb_quali);
 		}
@@ -450,7 +450,7 @@ class ranking_result_bo extends ranking_bo
 			{
 				$discipline2route = array(
 					'speed' => $quali_route,
-					'boulder' => $quali_route,
+					'boulder2018' => $quali_route,
 					'lead' => $quali_route,
 				);
 			}
@@ -564,7 +564,7 @@ class ranking_result_bo extends ranking_bo
 		{
 			$discipline2route = array(
 				'speed' => null,
-				'boulder' => null,
+				'boulder2018' => null,
 				'lead' => null,
 			);
 		}
