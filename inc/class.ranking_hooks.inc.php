@@ -43,6 +43,25 @@ class ranking_hooks
 			if ($location == 'return_ranking_views') return $links;
 			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$links);
 
+			$docs = array();
+			$docs[] = array(
+				'text'   => 'Manual',
+				'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
+				'target' => 'manual'
+			);
+			$docs[] = array(
+				'text'   => 'Combined Format Manual',
+				'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/CombinedFormatManual.pdf',
+				'target' => 'combined'
+			);
+			// show GitHub changelog under Documenation
+			$docs[] = array(
+				'text'   => 'Changelog',
+				'link'   => 'https://github.com/ralfbecker/ranking/commits/master',
+				'target' => 'changelog',
+			);
+			display_sidebox($appname, lang('Documentation'), $docs);
+
 			$file = array();
 			$file[] = array(
 				'text' => lang('Beamer / videowalls'),
@@ -81,17 +100,6 @@ class ranking_hooks
 					'menuaction' => 'ranking.ranking_display_ui.display',
 				),false)."','display$dsp_id',640,480,'yes')";
 			}
-			$file[] = array(
-				'text'   => 'Manual',
-				'link'   => $GLOBALS['egw_info']['server']['webserver_url'].'/ranking/doc/manual.pdf',
-				'target' => 'docs'
-			);
-			// show GitHug changelog under display
-			$file[] = array(
-				'text'   => 'Changelog',
-				'link'   => 'https://github.com/ralfbecker/ranking/commits/master',
-				'target' => 'changelog',
-			);
 			display_sidebox($appname,lang('Displays'),$file);
 		}
 
