@@ -514,7 +514,7 @@ function wettk_link_str($wettk,$text='',$class='')
 	if (!$wettk->homepage)
 		return $text;
 
-	if (!stristr($wettk->homepage,'http://'))
+	if (strpos($wettk->homepage,'http') !== 0)
 	{
 		if (preg_match('/^([0-9][0-9]+)_.*/',$wettk->homepage,$args))
 		{
