@@ -1,12 +1,12 @@
-<!-- $Id$ -->
+<?php if (!function_exists('mailto')) require_once('open_db.inc.php'); ?>
 <p>Resultservice and rankings provided by <a href="http://www.digitalROCK.de" target=_blank>
 digital ROCK</A>, (c) 1990-<?php echo date('Y'); ?> by <?php echo mailto('RalfBecker@digitalROCK.de',
-'Ralf Becker'); ?>. </p>
+'Ralf Becker'); ?>.</p>
 
-<p>Digital ROCK was contracted until 2008 by the
+<p>Digital ROCK is contracted by
 <a href="http://www.ifsc-climbing.org" target="_blank">IFSC - International Federation of Sport Climbing</a>
-to provide the rankings for the IFSC Climbing Worldcup and the Worldranking.<br />
-We still provide international results and rankings to display them with the calendars of our
-customers DAV &amp; SAC-CAS (German and Swiss national climing federations) and for the convinience of users of this website.</p>
+to provide services for athlete registration,<br/>
+on-site results-service and rankings for the various competition they run and to host their website.<br/>
 
-<p>If you are interessed in our services, please <a href="http://www.digitalROCK.de/kontakt.php">contact us</a>.</p>
+If you are interessed in our services, please <a href="/kontakt.php">contact us</a>
+or visit our <a href="/?load=kontakt.php%3Fprivacy-policy">privacy statement</a>.</p>

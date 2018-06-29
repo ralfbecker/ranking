@@ -54,6 +54,54 @@
  */
 
 /**
+ * Show nation specific footer
+ *
+ * @param {jQuery|String} selector where to show the footer
+ * @param {String} nation
+ */
+function showFooterByNation(selector, nation)
+{
+	var jelem = jQuery(selector);
+	var footer = '/icc_footer.inc.php';
+	switch(nation) {
+		case 'GER':
+			footer = '/dav_footer.inc.php';
+			break;
+		case 'SUI':
+			footer = '/sac_footer.inc.php p:not(.register)';
+			break;
+	}
+	jelem.load(footer, function()
+	{
+		jelem.fadeIn('slow');
+	});
+}
+
+/**
+ * Show category specific footer
+ *
+ * @param {jQuery|String} selector where to show the footer
+ * @param {Number|String} cat default read it from cat parameter of document
+ */
+function showFooterByCat(selector, cat)
+{
+	var cat = parseInt(cat || document.location.href.match(/cat=(\d+)/)[1]);
+	var national_cats = {
+		'GER': [212,211,207,294,205,14,202,201,296,200,206,213,4,215,13,108,12,11,66,7,226,223,217,216,214,25,54,109,107,106,67,48,49,50,51,52,53,110,111,113,114,28,27,26,112,115],
+		'SUI': [47,46,44,116,30,35,69,68,43,41,209,208,219,222,31,32,33,34,36,37,38,39]
+	};
+	for(var nation in national_cats)
+	{
+		if (national_cats[nation].indexOf(cat) >= 0)
+		{
+			showFooterByNation(selector, nation);
+			return;
+		}
+	}
+	showFooterByNation(selector);
+}
+
+/**
  * Baseclass for all widgets
  *
  * We only use jQuery() here (not $() or $j()!) to be able to run as well inside EGroupware as with stock jQuery from googleapis.

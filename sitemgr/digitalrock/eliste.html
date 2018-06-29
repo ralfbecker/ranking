@@ -9,6 +9,7 @@
 	</head>
 	<body>
 		<div id="table"></div>
+		<div id="footer" style="display: none; font-size: 90%"></div>
 		<script type="text/javascript">
 			var widget;
 			$(document).ready(function() {
@@ -27,6 +28,10 @@
 				widget = new DrWidget('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.search||location.hash.replace(/^#!?/, '?')));
 
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
+
+				if (!document.location.href.match(/beamer=1/)) {
+					showFooterByCat('div#footer');
+				}
 			});
 
 			if (document.location.href.match(/beamer=1/)) load_css('beamer.css');

@@ -92,13 +92,21 @@
   </tbody>
 </table>
 </div>
+<div id="footer" style="display: none; font-size: 90%"></div>
 <script type="text/javascript">
 	var profile;
-	$(document).ready(function() {
+	jQuery(document).ready(function() {
 		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace(/#!?/, '?')),
 			jQuery('#profile').html());
 
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);
+
+		if (!document.location.href.match(/beamer=1/)) {
+			setTimeout(function()
+			{
+				showFooterByNation('div#footer', jQuery('.profileNation').text());
+			}, 500);
+		}
 	});
 
 	if (document.location.href.match(/beamer=1/)) load_css('beamer.css');

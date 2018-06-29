@@ -31,18 +31,15 @@
 			<a href="/" target=_blank><img src="/dig_rock.klein.jpg" title="digital ROCK's Homepage" border="0" /></a>
 		</div>
 	</div>
+	<div id="footer" style="display: none; font-size: 90%"></div>
 	<script>
 		var widget;
 		$(document).ready(function() {
 			widget = new Aggregated('container', '/egroupware/ranking/json.php?type=regionalzentren');
+
+			if (!document.location.href.match(/beamer=1/))
+				showFooterByCat('div#footer', 'SUI');
 		});
 	</script>
-
-	<p>Die Ergebnisse und Ranglisten wurden von <A HREF="/" target=_blank>digital ROCK</A>,
-	(c) 1990-2013 by <a href="#" onclick="location.href='mai'+'lto:'+'RalfBecker'+unescape('%40')+'digitalROCK'+unescape('%2E')+'de'; return false;" title="RalfBecker AT digitalROCK DOT de">Ralf Becker</a>,
-	zur Verf&uuml;gung gestellt. Digital ROCK ist vom SAC beauftragt die Schweizer Rangliste und die 
-	Wertung des Swisscups zu f&uuml;hren.<br>
-	Wenn Sie sich f&uuml;r unseren Leistungen interessieren, bitte nehmen Sie
-	<a href="/kontakt.php">mit uns Kontakt auf</a>.</p>
 </body>
 </html>

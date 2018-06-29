@@ -306,3 +306,9 @@ section#gkMainbody table.DrTable {
 section#gkMainbody td.profileLogo {
         display: none;
 }
+
+/* footer */
+div.footer {
+	display: hidden;
+	color: gray;
+}
