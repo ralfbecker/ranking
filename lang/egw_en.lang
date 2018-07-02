@@ -57,6 +57,7 @@ all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
 all participants	ranking	en	All participants
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
+all: profile and name	ranking	en	all: profile and name
 allow athletes to register themself for this competition	ranking	en	Allow athletes to register themself for this competition
 allowed without extra confirmation	ranking	en	Allowed without extra confirmation
 allows athletes to register themself for this competition	ranking	en	Allows athletes to register themself for this competition

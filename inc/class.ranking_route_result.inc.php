@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 if (!defined('ONE_QUALI'))
@@ -195,7 +195,7 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				$join = self::ATHLETE_JOIN.($join && is_string($join) ? "\n".$join : '');
 				$extra_cols = array_merge($extra_cols, array(
-					'vorname','nachname','Federations.nation AS nation','geb_date',
+					'vorname','nachname','acl','Federations.nation AS nation','geb_date',
 					'Federations.verband AS verband','Federations.fed_url AS fed_url',
 					'Federations.fed_id AS fed_id','Federations.fed_parent AS fed_parent',
 					'ort','plz','rkey',
@@ -706,6 +706,10 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			$data =& $this->data;
 		}
+
+		// make sure all includes profile!
+		if ($data['acl'] & ranking_athlete::ACL_DENY_ALL) $data['acl'] |= ranking_athlete::ACL_DENY_PROFILE;
+
 		if (!$data['discipline'])	// get's only set by search method
 		{
 			if ($data['result_height'] || $data['result_height1'])	// lead result

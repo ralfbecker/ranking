@@ -65,6 +65,14 @@ table.DrTable td div.tdAlign4 { width: 20%; display: inline-block; }
 }
 
 /**
+ * Hide names (this is only for show, no real name below filter)
+ */
+tr.hideNames .lastname, tr.hideNames .firstname {
+	-webkit-filter: blur(2px) grayscale(1) opacity(50%);
+	filter: blur(2px) grayscale(1) opacity(50%);
+}
+
+/**
  * Format the header
  */
 .Results h1, .Startlist h1, .Resultlist h1, .Starters h1, .Profile h1 {
@@ -94,9 +102,6 @@ table.DrTable td div.tdAlign4 { width: 20%; display: inline-block; }
 /**
  * See also links
  */
-ul.seeAlso:before {
-	content: "See also:";
-}
 ul.seeAlso li {
 	display: block ! important;
 }
@@ -268,12 +273,6 @@ tr.profileMarginTop > td {
  */
 .Resultlist h3.resultDate:empty {
 	display: none;
-}
-.Resultlist h3.resultDate:before {
-	content: "As of ";
-}
-.Resultlist h3.resultDate:after {
-	content: " after";
 }
 .error:empty {
 	display: none;

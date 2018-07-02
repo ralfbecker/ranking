@@ -5,6 +5,7 @@
 		<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="dr_api.js"></script>
+		<script type="text/javascript" src="dr_translations.js"></script>
 		<link type="text/css" rel="StyleSheet" href="dr_list.css" />
 	</head>
 	<body>
@@ -12,7 +13,14 @@
 		<script type="text/javascript">
 			var widget;
 			$(document).ready(function() {
-				widget = new ResultChooser('table',location.pathname.replace(/sitemgr.*$/,'json.php')+(location.hash.replace(/#!?/, '?')||location.search||'?comp=.'));
+				var json_url = '/egroupware/ranking/json.php';
+				if (location.pathname.match(/sitemgr.*$/))
+				{
+					json_url = location.pathname.replace(/sitemgr.*$/,'json.php');
+				}
+				var query = location.hash.replace(/#!?/, '?')||location.search||'?comp=.';
+				if (query.match(/nation=/)) query = query.replace(/nation=/, 'comp=');
+				widget = new ResultChooser('table', json_url+query);
 
 				setTimeout(function(){window.scrollTo(0, 1);}, 100);
 			});

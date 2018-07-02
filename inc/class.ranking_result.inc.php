@@ -104,7 +104,7 @@ class ranking_result extends Api\Storage\Base
 
 				if (!$extra_cols)
 				{
-					$extra_cols = "nachname,vorname,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
+					$extra_cols = "nachname,vorname,acl,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
 				}
 				else
 				{
@@ -181,6 +181,9 @@ class ranking_result extends Api\Storage\Base
 		{
 			$data = Api\Translation::convert($data,$this->source_charset);
 		}
+		// make sure all includes profile!
+		if ($data['acl'] & ranking_athlete::ACL_DENY_ALL) $data['acl'] |= ranking_athlete::ACL_DENY_PROFILE;
+
 		return $data;
 	}
 

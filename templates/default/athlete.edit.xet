@@ -51,27 +51,27 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description for="gewicht" value="Weight (kg)"/>
+					<description value="Weight (kg)" for="gewicht"/>
 					<textbox type="integer" statustext="weight in kilogram" id="gewicht"/>
 				</row>
 				<row class="row">
-					<description for="groesse" value="Size (cm)"/>
+					<description value="Size (cm)" for="groesse"/>
 					<textbox type="integer" statustext="body height in centimeter" id="groesse"/>
 				</row>
 				<row class="row">
-					<description for="practice" value="climbing since (years)"/>
+					<description value="climbing since (years)" for="practice"/>
 					<textbox type="integer" statustext="since how many years is the athlete climbing (not only competing)" id="practice" min="1" max="99"/>
 				</row>
 				<row class="row">
-					<description for="profi" value="Professional"/>
+					<description value="Professional" for="profi"/>
 					<textbox statustext="use &quot;yes&quot; or &quot;no, prefession&quot;" id="profi" maxlength="40" span="all"/>
 				</row>
 				<row class="row">
-					<description for="sport" value="other sports"/>
+					<description value="other sports" for="sport"/>
 					<textbox statustext="other sports practiced" id="sport" size="60" maxlength="60" span="all"/>
 				</row>
 				<row class="row">
-					<description for="hobby" value="Hobbies"/>
+					<description value="Hobbies" for="hobby"/>
 					<textbox id="hobby" size="60" maxlength="60" span="all"/>
 				</row>
 			</rows>
@@ -85,34 +85,34 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description for="homepage" value="Website"/>
+					<description value="Website" for="homepage"/>
 					<url statustext="URL to own homepage, eg. http://domain.com" id="homepage" options="64,60"/>
 				</row>
 				<row class="row">
-					<description for="facebook" value="Facebook"/>
+					<description value="Facebook" for="facebook"/>
 					<url id="facebook" options="64,64"/>
 				</row>
 				<row class="row">
-					<description for="twitter" value="Twitter"/>
+					<description value="Twitter" for="twitter"/>
 					<url id="twitter" options="64,64"/>
 				</row>
 				<row class="row">
-					<description for="instagram" value="Instagram"/>
+					<description value="Instagram" for="instagram"/>
 					<url id="instagram" options="64,64" span="all"/>
 				</row>
 				<row class="row">
-					<description for="youtube" value="YouTube"/>
+					<description value="YouTube" for="youtube"/>
 					<url id="youtube" options="64,64" span="all"/>
 				</row>
 				<row class="row">
-					<description for="video_iframe" value="Video iframe"/>
+					<description value="Video iframe" for="video_iframe"/>
 					<url id="video_iframe" options="64,128" span="all"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.9.001">
-		<htmlarea expand_toolbar="true" height="120px" statustext="This text will be shown in the profil on the website." mode="extended" id="freetext" width="100%"/>
+		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="120px" width="100%" expand_toolbar="true"/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -266,15 +266,15 @@
 					</menulist>
 				</row>
 				<row>
-					<tabbox id="ranking.athlete.edit.contact|ranking.athlete.edit.profile|ranking.athlete.edit.links|ranking.athlete.edit.freetext|ranking.athlete.edit.other|ranking.athlete.edit.pictures|ranking.athlete.edit.results" span="all">
+					<tabbox id="tabs" span="all">
 						<tabs>
-							<tab id="ranking.athlete.edit.contact" label="Contact" statustext="telephone, email, city, ..."/>
-							<tab id="ranking.athlete.edit.profile" label="Profile" statustext="Weight, size, hobbies, ..."/>
-							<tab id="ranking.athlete.edit.links" label="Social links" statustext="Homepage, Facebook, ..."/>
-							<tab id="ranking.athlete.edit.freetext" label="Free text" statustext="This text will be shown in the profil on the website."/>
-							<tab id="ranking.athlete.edit.other" label="Access" statustext="access control, key"/>
-							<tab id="ranking.athlete.edit.pictures" label="Picture" statustext="Picture"/>
-							<tab id="ranking.athlete.edit.results" label="Results" statustext="Competition results"/>
+							<tab id="contact" label="Contact" statustext="telephone, email, city, ..."/>
+							<tab id="profile" label="Profile" statustext="Weight, size, hobbies, ..."/>
+							<tab id="links" label="Social links" statustext="Homepage, Facebook, ..."/>
+							<tab id="freetext" label="Free text" statustext="This text will be shown in the profil on the website."/>
+							<tab id="other" label="Access" statustext="access control, key"/>
+							<tab id="pictures" label="Picture" statustext="Picture"/>
+							<tab id="results" label="Results" statustext="Competition results"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.athlete.edit.contact"/>

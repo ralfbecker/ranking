@@ -384,7 +384,7 @@ class ranking_calculation
 		$extra_cols = $this->bo->comp->table_name.'.name AS comp_name,'.
 			$this->bo->comp->table_name.'.dru_bez AS comp_short,'.
 			$this->bo->comp->table_name.'.datum AS comp_date,'.
-			$this->bo->cats->table_name.'.name AS cat_name,nachname,vorname,'.
+			$this->bo->cats->table_name.'.name AS cat_name,nachname,vorname,acl,'.
 			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,'.
 			ranking_athlete::FEDERATIONS_TABLE.'.fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,'.
 			ranking_athlete::ATHLETE_TABLE.'.PerId AS PerId';

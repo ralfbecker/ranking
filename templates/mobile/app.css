@@ -203,6 +203,10 @@ button.small {
   position: relative;
   top: 1.3em;
 }
+.third_down {
+  position: relative;
+  top: 0.7em;
+}
 .winner {
   font-weight: bold;
 }

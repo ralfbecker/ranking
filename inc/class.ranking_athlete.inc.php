@@ -32,6 +32,10 @@ class ranking_athlete extends so_sql
 	const ACL_DENY_CITY = 64;
 
 	/**
+	 * Deny access to complete profile plus not showing names
+	 */
+	const ACL_DENY_ALL = 256;
+	/**
 	 * Deny access to complete profile
 	 */
 	const ACL_DENY_PROFILE = 128;
@@ -222,6 +226,8 @@ class ranking_athlete extends so_sql
 		if ($data['acl'])
 		{
 			$acl = $data['acl'];
+			// make sure all includes profile!
+			if ($acl & self::ACL_DENY_ALL) $acl |= self::ACL_DENY_PROFILE;
 			$data['acl'] = array();
 			for($i = $n = 1; $i <= 16; ++$i, $n <<= 1)
 			{

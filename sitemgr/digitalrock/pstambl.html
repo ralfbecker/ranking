@@ -5,6 +5,7 @@
 		<meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 		<script type="text/javascript" src="dr_api.js"></script>
+		<script type="text/javascript" src="dr_translations.js"></script>
 		<link type="text/css" rel="StyleSheet" href="dr_list.css" />
 	</head>
 <body>
@@ -96,7 +97,12 @@
 <script type="text/javascript">
 	var profile;
 	jQuery(document).ready(function() {
-		profile = new Profile('profile',location.pathname.replace(/sitemgr.*$/,'/json.php')+(location.search||location.hash.replace(/#!?/, '?')),
+		var json_url = '/egroupware/ranking/json.php';
+		if (location.pathname.match(/sitemgr.*$/))
+		{
+			json_url = location.pathname.replace(/sitemgr.*$/,'json.php');
+		}
+		profile = new Profile('profile', json_url+(location.search||location.hash.replace(/#!?/, '?')),
 			jQuery('#profile').html());
 
 		setTimeout(function(){window.scrollTo(0, 1);}, 100);

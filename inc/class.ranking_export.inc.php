@@ -1584,9 +1584,11 @@ class ranking_export extends ranking_result_bo
 			'categorys' => array_values($cats_by_id),
 			'competitions' => $comps,
 			'last_modified' => $last_modified,
-			'display_athlete' => $comp['display_athlete'] ? $comp['display_athlete'] :
-				ranking_competition::nation2display_athlete($comp['nation']),
 		);
+		if (empty($data['display_athlete']))
+		{
+			$data['display_athlete'] = ranking_competition::nation2display_athlete($comp['nation']);
+		}
 		// add see also links to national team ranking and combined ranking
 		if (!$comp['nation'] && $comp['quota'] && (
 			(int)$comp['datum'] >= 2005 && preg_match('/^[0-9]{2}_[^I]+/',$comp['rkey']) ||	// world cup from 2005 on
@@ -2389,6 +2391,14 @@ class ranking_export extends ranking_result_bo
 					$data['rgz'] = preg_replace('/^SAC-Regionalzentrum /', '', $rgzs[$athlete['acl_fed_id']]);
 				}
 				break;
+		}
+		if (is_array($athlete['acl']) ? in_array(ranking_athlete::ACL_DENY_ALL, $athlete['acl']) : $athlete['acl'] & ranking_athlete::ACL_DENY_ALL)
+		{
+			foreach(array('firstname', 'lastname') as $name)
+			{
+				$data[$name] = ucfirst(substr('Hiddenhiddenhiddenhidden', 0, strlen($data[$name])));
+			}
+			$data['className'] = 'hideNames';
 		}
 		return $data;
 	}

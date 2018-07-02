@@ -41,6 +41,11 @@ class ranking_athlete_ui extends ranking_bo
 			'label' => 'Hide complete profile page',
 			'title' => 'Website visitors will be told that athlete asked to no longer show his profile page.'
 		),
+		/* dont want to make it to convienient to disable display of name
+		ranking_athlete::ACL_DENY_ALL => array(
+			'label' => 'Hide all: name and profile page',
+			'title' => 'Name will not be shown to website visitors and they will be told that athlete asked to no longer show his profile page.'
+		),*/
 		'custom' => 'custom ACL right',
 	);
 
@@ -58,6 +63,7 @@ class ranking_athlete_ui extends ranking_bo
 		ranking_athlete::ACL_DENY_STREET    => 'street, postcode',
 		ranking_athlete::ACL_DENY_CITY		=> 'city',
 		ranking_athlete::ACL_DENY_PROFILE	=> 'complete profile',
+		ranking_athlete::ACL_DENY_ALL	    => 'all: profile and name',
 	);
 
 	/**
@@ -234,7 +240,7 @@ class ranking_athlete_ui extends ranking_bo
 			else
 			{
 				$this->athlete->data['acl'] = array();
-				for($acl=1; $acl <= ranking_athlete::ACL_DENY_PROFILE; $acl *= 2)
+				for($acl=1; $acl <= ranking_athlete::ACL_DENY_ALL; $acl *= 2)
 				{
 					if ($content['acl'] & $acl) $this->athlete->data['acl'][] = $acl;
 				}
@@ -531,7 +537,12 @@ class ranking_athlete_ui extends ranking_bo
 			{
 				$content['acl'] |= $acl;
 			}
-			if (in_array(ranking_athlete::ACL_DENY_PROFILE, $content['custom_acl']))
+			if (in_array(ranking_athlete::ACL_DENY_ALL, $content['custom_acl']))
+			{
+				//$content['acl'] = ranking_athlete::ACL_DENY_ALL;
+				$content['acl'] = 'custom';
+			}
+			elseif (in_array(ranking_athlete::ACL_DENY_PROFILE, $content['custom_acl']))
 			{
 				$content['acl'] = ranking_athlete::ACL_DENY_PROFILE;
 			}

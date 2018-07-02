@@ -3,7 +3,7 @@
  *
  * @link http://www.digitalrock.de
  * @author Ralf Becker <RalfBecker@digitalROCK.de>
- * @copyright 2010-16 by RalfBecker@digitalROCK.de
+ * @copyright 2010-18 by RalfBecker@digitalROCK.de
  * @version $Id: dr_api.js 1250 2015-06-18 06:49:01Z ralfbecker $
  */
 
@@ -85,14 +85,14 @@ function showFooterByNation(selector, nation)
  */
 function showFooterByCat(selector, cat)
 {
-	var cat = parseInt(cat || document.location.href.match(/cat=(\d+)/)[1]);
+	if (!cat) cat = (document.location.href.match(/cat=([a-z]{3}|\d+)/i) || [])[1];
 	var national_cats = {
 		'GER': [212,211,207,294,205,14,202,201,296,200,206,213,4,215,13,108,12,11,66,7,226,223,217,216,214,25,54,109,107,106,67,48,49,50,51,52,53,110,111,113,114,28,27,26,112,115],
 		'SUI': [47,46,44,116,30,35,69,68,43,41,209,208,219,222,31,32,33,34,36,37,38,39]
 	};
 	for(var nation in national_cats)
 	{
-		if (national_cats[nation].indexOf(cat) >= 0)
+		if (cat.toUpperCase() === nation || national_cats[nation].indexOf(parseInt(cat)) >= 0)
 		{
 			showFooterByNation(selector, nation);
 			return;
@@ -218,6 +218,7 @@ var DrBaseWidget = (function() {
 			!this.json_url.match(/toc=0/) && !this.json_url.match(/beamer=1/))
 		{
 			var ul = jQuery(document.createElement('ul')).attr('class', 'seeAlso');
+			ul.prepend(document.createTextNode(this.lang('See also:')));
 			for(var i=0; i < _see_also.length; ++i)
 			{
 				var tag = jQuery(document.createElement('li'));
@@ -317,6 +318,53 @@ var DrBaseWidget = (function() {
 		});
 	};
 
+	/**
+	 * Translate english phrase into user language
+	 *
+	 * @param {string} _msg
+	 * @returns {string}
+	 */
+	DrBaseWidget.prototype.lang = function(_msg)
+	{
+		if(_msg === null)
+		{
+			return '';
+		}
+		if(typeof _msg !== "string" && _msg)
+		{
+			console.log("Cannot translate an object", _msg);
+			return _msg;
+		}
+		var translation = _msg;
+
+		if (typeof dr_translations !== 'undefined')
+		{
+			if (typeof DrBaseWidget.user_lang === 'undefined')
+			{
+				var language = navigator.languages && navigator.languages[0] || // Chrome / Firefox
+					navigator.language ||   // All browsers
+					navigator.userLanguage; // IE <= 10
+				DrBaseWidget.user_lang = language.replace(/-[A-Z]+/, '');
+			}
+			if (dr_translations[_msg] && dr_translations[_msg][DrBaseWidget.user_lang])
+			{
+				translation = dr_translations[_msg][DrBaseWidget.user_lang];
+			}
+		}
+		if (arguments.length == 1) return translation;
+
+		if (arguments.length == 2) return translation.replace('%1', arguments[1]);
+
+		// to cope with arguments containing '%2' (eg. an urlencoded path like a referer),
+		// we first replace all placeholders '%N' with '|%N|' and then we replace all '|%N|' with arguments[N]
+		translation = translation.replace(/%([0-9]+)/g, '|%$1|');
+		for(var i = 1; i < arguments.length; ++i)
+		{
+			translation = translation.replace('|%'+i+'|', arguments[i]);
+		}
+		return translation;
+	};
+
 	return DrBaseWidget;
 })();
 
@@ -386,7 +434,7 @@ var DrTable = (function() {
 					{
 						var a = jQuery(document.createElement('a'));
 						a.attr('href', data.url);
-						a.text('complete result');
+						a.text(this.lang('complete result'));
 						if (this.navigateTo || typeof data.click != 'undefined') a.click(this.navigateTo || data.click);
 						th.append(a);
 					}
@@ -410,6 +458,8 @@ var DrTable = (function() {
 		}
 		//console.log(this.athletes);
 	}
+
+	DrTable.prototype.lang = DrBaseWidget.prototype.lang;
 
 	/**
 	 * Update table with new data, trying to re-use existing rows
@@ -505,6 +555,11 @@ var DrTable = (function() {
 		if (typeof _data.PerId != 'undefined' && _data.PerId > 0)
 		{
 			row.id = _data.PerId;
+			if (_data.className)
+			{
+				row.className = _data.className;
+				if (row.className.match(/hideNames/)) row.title = this.lang('Athlete asked not to show his name anymore.');
+			}
 			this.athletes[_data.PerId] = row;
 		}
 		else if (typeof _data.team_id != 'undefined' && _data.team_id > 0)
@@ -729,42 +784,42 @@ var Startlist = (function() {
 		{
 			case 'speedrelay':
 				this.startlist_cols = detail === null ? {	// default detail
-					'start_order': 'StartNr',
-					'team_name': 'Teamname',
-					'athletes/0/lastname': 'Athlete #1',
-					'athletes/1/lastname': 'Athlete #2',
-					'athletes/2/lastname': 'Athlete #3'
+					'start_order': this.lang('StartNr'),
+					'team_name': this.lang('Teamname'),
+					'athletes/0/lastname': this.lang('Athlete #1'),
+					'athletes/1/lastname': this.lang('Athlete #2'),
+					'athletes/2/lastname': this.lang('Athlete #3')
 				} : (detail ? {	// detail=1
-					'start_order': 'StartNr',
-					'team_name': 'Teamname',
+					'start_order': this.lang('StartNr'),
+					'team_name': this.lang('Teamname'),
 					//'team_nation': 'Nation',
-					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3},
+					'athletes/0/lastname': {'label': this.lang('Athlete #1'), 'colspan': 3},
 					'athletes/0/firstname': '',
 					'athletes/0/result_time': '',
-					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3},
+					'athletes/1/lastname': {'label': this.lang('Athlete #2'), 'colspan': 3},
 					'athletes/1/firstname': '',
 					'athletes/1/result_time': '',
-					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3},
+					'athletes/2/lastname': {'label': this.lang('Athlete #3'), 'colspan': 3},
 					'athletes/2/firstname': '',
 					'athletes/2/result_time': ''
 				} : {	// detail=0
-					'start_order': 'StartNr',
-					'team_name': 'Teamname',
-					'team_nation': 'Nation'
+					'start_order': this.lang('StartNr'),
+					'team_name': this.lang('Teamname'),
+					'team_nation': this.lang('Nation')
 				});
 				break;
 
 			case 'combined':
-				this.result_cols.final_points = 'Final Points';
+				this.result_cols.final_points = this.lang('Final Points');
 				// fall through
 			default:
 				this.startlist_cols = {
-					'start_order': {'label': 'StartNr', 'colspan': 2},
+					'start_order': {'label': this.lang('StartNr'), 'colspan': 2},
 					'start_number': '',
-					'lastname' : {'label': 'Name', 'colspan': 2},
+					'lastname' : {'label': this.lang('Name'), 'colspan': 2},
 					'firstname' : '',
-					'birthyear' : 'Birthyear',
-					'nation' : 'Nation'
+					'birthyear' : this.lang('Birthyear'),
+					'nation' : this.lang('Nation')
 				};
 				break;
 		}
@@ -776,7 +831,7 @@ var Startlist = (function() {
 			var start_order = this.startlist_cols.start_order;
 			this.startlist_cols.start_order = function(_data,_tag,col) {
 				if (_tag == 'th') return start_order;
-				if (_data.ranking <= quali_preselected) return 'Vorqualifiziert';	//'preselected';
+				if (_data.ranking <= quali_preselected) return this.lang('Vorqualifiziert');	//'preselected';
 				return _data[col];
 			};
 		}
@@ -882,13 +937,13 @@ var Startlist = (function() {
 				// evtl. add points column
 				if (_data.participants[0] && _data.participants[0].quali_points)
 				{
-					this.columns['quali_points'] = 'Points';
+					this.columns['quali_points'] = this.lang('Points');
 					// delete single qualification results
 					if (this.no_navigation)
 					{
 						delete this.columns.result0;
 						delete this.columns.result1;
-						this.columns['quali_points'] = 'Qualification';
+						this.columns['quali_points'] = this.lang('Qualification');
 					}
 				}
 				if (_data.discipline == 'combined' && _data.participants[0] && typeof _data.participants[0].final_points == 'undefined') {
@@ -898,7 +953,7 @@ var Startlist = (function() {
 			}
 			if (this.columns.result && _data.participants[0] && _data.participants[0].rank_prev_heat && !this.json_url.match(/detail=0/))
 			{
-				this.columns['rank_prev_heat'] = 'previous heat';
+				this.columns['rank_prev_heat'] = this.lang('previous heat');
 			}
 
 			// competition
@@ -1128,8 +1183,8 @@ var Startlist = (function() {
 	 */
 	Startlist.prototype.setHeader = function(_data)
 	{
-		var title_prefix = (this.sort == 'start_order' ? 'Startlist' :
-			(_data.route_result ? 'Result' : 'provisional Result'))+': ';
+		var title_prefix = (this.sort == 'start_order' ? this.lang('Startlist') :
+			(_data.route_result ? this.lang('Result') : this.lang('provisional Result')))+': ';
 
 		var header = _data.route_name;
 		// if NOT detail=0 and not for general result, add prefix before route name
@@ -1147,9 +1202,11 @@ var Startlist = (function() {
 			this.result_date.removeClass('resultDate');
 			this.result_date.addClass('error');
 		}
-		else
+		else if (_data.route_result)
 		{
 			this.result_date.text(_data.route_result);
+			this.result_date.prepend(document.createTextNode(this.lang('As of')+' '));
+			this.result_date.append(document.createTextNode(' '+this.lang('after')));
 		}
 		this.header.empty();
 		this.header.text(header);
@@ -1328,56 +1385,56 @@ var Resultlist = (function() {
 		{
 			case 'speedrelay':
 				this.result_cols = !detail ? {	// default detail
-					'result_rank': 'Rank',
-					'team_name': 'Teamname',
-					'athletes/0/lastname': 'Athlete #1',
-					'athletes/1/lastname': 'Athlete #2',
-					'athletes/2/lastname': 'Athlete #3',
-					'result': 'Sum'
+					'result_rank': this.lang('Rank'),
+					'team_name': this.lang('Teamname'),
+					'athletes/0/lastname': this.lang('Athlete #1'),
+					'athletes/1/lastname': this.lang('Athlete #2'),
+					'athletes/2/lastname': this.lang('Athlete #3'),
+					'result': this.lang('Sum')
 				} : (detail[1] == '1' ? {	// detail=1
-					'result_rank': 'Rank',
-					'team_name': 'Teamname',
-					//'team_nation': 'Nation',
-					'athletes/0/lastname': {'label': 'Athlete #1', 'colspan': 3},
+					'result_rank': this.lang('Rank'),
+					'team_name': this.lang('Teamname'),
+					//'team_nation': this.lang('Nation'),
+					'athletes/0/lastname': {'label': this.lang('Athlete #1'), 'colspan': 3},
 					'athletes/0/firstname': '',
 					'athletes/0/result_time': '',
-					'athletes/1/lastname': {'label': 'Athlete #2', 'colspan': 3},
+					'athletes/1/lastname': {'label': this.lang('Athlete #2'), 'colspan': 3},
 					'athletes/1/firstname': '',
 					'athletes/1/result_time': '',
-					'athletes/2/lastname': {'label': 'Athlete #3', 'colspan': 3},
+					'athletes/2/lastname': {'label': this.lang('Athlete #3'), 'colspan': 3},
 					'athletes/2/firstname': '',
 					'athletes/2/result_time': '',
-					'result': 'Sum'
+					'result': this.lang('Sum')
 				} : {	// detail=0
-					'result_rank': 'Rank',
-					'team_name': 'Teamname',
-					'team_nation': 'Nation',
-					'result': 'Sum'
+					'result_rank': this.lang('Rank'),
+					'team_name': this.lang('Teamname'),
+					'team_nation': this.lang('Nation'),
+					'result': this.lang('Sum')
 				});
 				break;
 
 			case 'ranking':
 				this.result_cols = {
-					'result_rank': 'Rank',
-					'lastname' : {'label': 'Name', 'colspan': 2},
+					'result_rank': this.lang('Rank'),
+					'lastname' : {'label': this.lang('Name'), 'colspan': 2},
 					'firstname' : '',
-					'nation' : 'Nation',
-					'points': 'Points',
-					'result' : 'Result'
+					'nation' : this.lang('Nation'),
+					'points': this.lang('Points'),
+					'result' : this.lang('Result')
 				};
 				// default columns for SUI ranking with NO details
 				if ((!detail || detail[1] == '0') && _data.nation == 'SUI')
 				{
 					this.result_cols = {
-						'result_rank': 'Rank',
-						'lastname' : {'label': 'Name', 'colspan': 2},
+						'result_rank': this.lang('Rank'),
+						'lastname' : {'label': this.lang('Name'), 'colspan': 2},
 						'firstname' : '',
-						'birthyear': 'Agegroup',
-						'city': 'City',
+						'birthyear': this.lang('Agegroup'),
+						'city': this.lang('City'),
 						'federation' : 'Sektion',
 						'rgz': 'Regionalzentrum',
-						'points': 'Points',
-						'result' : 'Result'
+						'points': this.lang('Points'),
+						'result' : this.lang('Result')
 					};
 				}
 				if ((!detail || detail[1] == '0') && _data.participants[0] && _data.participants[0].result_rank)
@@ -1391,7 +1448,7 @@ var Resultlist = (function() {
 					// add calculation to see-also links
 					if (typeof _data.see_also == 'undefined') _data.see_also = [];
 					_data.see_also.push({
-						name: 'calculation of this ranking',
+						name: this.lang('calculation of this ranking'),
 						url: location.href+'&detail=1'
 					});
 				}
@@ -1402,31 +1459,31 @@ var Resultlist = (function() {
 				if ((!detail || detail[1] == '0') && _data.nation == 'SUI')
 				{
 					this.result_cols = {
-						'result_rank': 'Rank',
-						'lastname' : {'label': 'Name', 'colspan': 2},
+						'result_rank': this.lang('Rank'),
+						'lastname' : {'label': this.lang('Name'), 'colspan': 2},
 						'firstname' : '',
-						'birthyear': 'Agegroup',
-						'city': 'City',
-						'federation' : 'Sektion',
-						'rgz': 'Regionalzentrum',
-						'result' : 'Result'
+						'birthyear': this.lang('Agegroup'),
+						'city': this.lang('City'),
+						'federation' : this.lang('Sektion'),
+						'rgz': this.lang('Regionalzentrum'),
+						'result' : this.lang('Result')
 					};
 				}
 				else
 				{
 					this.result_cols = detail && detail[1] == '0' ? {
-						'result_rank': 'Rank',
-						'lastname' : {'label': 'Name', 'colspan': 2},
+						'result_rank': this.lang('Rank'),
+						'lastname' : {'label': this.lang('Name'), 'colspan': 2},
 						'firstname' : '',
-						'nation' : 'Nation',
-						'result': 'Result'
+						'nation' : this.lang('Nation'),
+						'result': this.lang('Result')
 					} : {
-						'result_rank': 'Rank',
-						'lastname' : {'label': 'Name', 'colspan': 2},
+						'result_rank': this.lang('Rank'),
+						'lastname' : {'label': this.lang('Name'), 'colspan': 2},
 						'firstname' : '',
-						'nation' : 'Nation',
-						'start_number': 'StartNr',
-						'result': 'Result'
+						'nation' : this.lang('Nation'),
+						'start_number': this.lang('StartNr'),
+						'result': this.lang('Result')
 					};
 				}
 				// for boulder heats use new display, but not for general result!
@@ -1439,7 +1496,7 @@ var Resultlist = (function() {
 						return that.getBoulderResult.call(that, _data, _tag, num_problems);
 					};
 					//Resultlist.prototype.getBoulderResult;
-					if (!detail || detail[1] != 0) this.result_cols.result = 'Sum';
+					if (!detail || detail[1] != 0) this.result_cols.result = this.lang('Sum');
 				}
 				break;
 		}
@@ -1607,10 +1664,10 @@ var Results = (function() {
 	Results.prototype.handleResponse = function(_data)
 	{
 		this.columns = {
-			'result_rank': 'Rank',
-			'lastname' : {'label': 'Name', 'colspan': 2},
+			'result_rank': this.lang('Rank'),
+			'lastname' : {'label': this.lang('Name'), 'colspan': 2},
 			'firstname' : '',
-			'nation' : 'Nation'
+			'nation' : this.lang('Nation')
 		};
 		this.replace_nation(_data.display_athlete, _data.nation);
 
@@ -1651,7 +1708,7 @@ var Results = (function() {
 		if (!this.no_navigation)
 		{
 			var option = jQuery(document.createElement('option'));
-			option.text('Select another competition ...');
+			option.text(this.lang('Select another competition ...'));
 			this.comp_chooser.append(option);
 			for(var i=0; i < _data.competitions.length; ++i)
 			{
@@ -1744,7 +1801,7 @@ var Starters = (function() {
 			this.comp_date.empty();
 		}
 		this.comp_header.text(_data.name+' : '+_data.date_span);
-		if (_data.deadline) this.comp_date.text('Deadline: '+_data.deadline);
+		if (_data.deadline) this.comp_date.text(this.lang('Deadline')+': '+_data.deadline);
 
 		this.table = jQuery(document.createElement('table')).addClass('DrTable');
 		this.container.append(this.table);
@@ -1754,7 +1811,7 @@ var Starters = (function() {
 		// create header row
 		var row = jQuery(document.createElement('tr'));
 		var th = jQuery(document.createElement('th'));
-		th.text(typeof _data.federations != 'undefined' ? 'Federation' : 'Nation');
+		th.text(typeof _data.federations != 'undefined' ? this.lang('Federation') : this.lang('Nation'));
 		if (!this.json_url.match(/no_fed=1/)) row.append(th);
 		var cats = {};
 		for(var i=0; i < _data.categorys.length; ++i)
@@ -1825,7 +1882,7 @@ var Starters = (function() {
 		var th = jQuery(document.createElement('th'));
 		tfoot.append(jQuery(document.createElement('tr')).append(th));
 		th.attr('colspan', 1+_data.categorys.length);
-		th.text('Total of '+num_competitors+' athletes registered in all categories.');
+		th.text(this.lang('Total of %1 athletes registered in all categories.', num_competitors));
 	};
 	/**
 	 * Fill a single fed-row up to a given position with empty td's
@@ -1951,7 +2008,7 @@ var Profile = (function() {
 			switch(placeholder)
 			{
 				case 'practice':
-					data += ' years, since '+((new Date).getFullYear()-data);
+					data += ' '+this.lang('years, since')+' '+((new Date).getFullYear()-data);
 					break;
 				case 'height':
 					data += ' cm';
@@ -2309,7 +2366,7 @@ var Competitions = (function() {
 
 		var year = this.json_url.match(this.year_regexp);
 		year = year ? parseInt(year[2]) : (new Date).getFullYear();
-		var h1 = jQuery(document.createElement('h1')).text('Calendar '+year);
+		var h1 = jQuery(document.createElement('h1')).text(this.lang('Calendar')+' '+year);
 		this.container.append(h1);
 
 		var filter = jQuery(document.createElement('div')).addClass('filter');
@@ -2367,7 +2424,13 @@ var Competitions = (function() {
 			comp_div.append(jQuery(document.createElement('div')).addClass('date').text(competition.date_span));
 			var cats_ul = jQuery(document.createElement('ul')).addClass('cats');
 			var have_cats = false;
-			var links = { 'homepage': 'Event Website', 'info': 'Regulation', 'info2': 'Info Sheet', 'startlist': 'Startlist', 'result': 'Result' };
+			var links = {
+				homepage: this.lang('Event Website'),
+				info: this.lang('Regulation'),
+				info2: this.lang('Info Sheet'),
+				startlist: this.lang('Startlist'),
+				result: this.lang('Result')
+			};
 			// add comp_url as first link with given label
 			if (this.comp_url && this.comp_url_label)
 			{
@@ -2384,7 +2447,7 @@ var Competitions = (function() {
 					switch(cat.status)
 					{
 						case 4:	// registration
-							links.starters = 'Starters';
+							links.starters = this.lang('Starters');
 							competition.starters = '#!type=starters&comp='+competition.WetId;
 							break;
 						case 2:	// startlist in result-service
@@ -2537,10 +2600,10 @@ var Aggregated = (function() {
 			this.installPopState();
 		}
 		this.columns = {
-			'rank': 'Rank',
+			'rank': this.lang('Rank'),
 			'nation': { 'label': _data.aggregated_name, 'colspan': 2},
 			'name': _data.aggregated_name,
-			'points': {'label': 'Points'}
+			'points': {'label': this.lang('Points')}
 		};
 		if (location.hash.indexOf('detail=1') == -1)
 		{
@@ -2649,8 +2712,8 @@ var Aggregated = (function() {
 		tfoot.append(jQuery(document.createElement('tr')).append(th));
 		var cols=0; for(var c in this.columns) cols++;
 		th.attr('colspan', cols);
-		th.text('For '+_data.name+' '+_data.best_results+' best results per competition and category are counting. '+
-				'Not counting results are in brackets.');
+		th.text(this.lang('For %1 %2 best results per competition and category are counting.', _data.name, _data.best_results)+' '+
+				this.lang('Not counting results are in brackets.'));
 
 		this.container.append(this.table.dom);
 
@@ -2980,7 +3043,7 @@ var ResultChooser = (function() {
 		// fill category chooser
 		var option = jQuery(document.createElement('option'));
 		option.attr('value', '');
-		option.text('Select a single category to show ...');
+		option.text(this.lang('Select a single category to show ...'));
 		this.cat_chooser.append(option);
 		var cat_found = false;
 		for(var i=0; i < _data.categorys.length; ++i)
