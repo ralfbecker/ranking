@@ -130,11 +130,12 @@ var DrBaseWidget = (function() {
 		// some browsers, eg. Chrome, generate a pop on inital page-load
 		// to prevent loading page initially twice, we store initial location
 		this.prevent_initial_pop = location.href;
+		var initial_params = this.json_url.replace(/^.*(#!|#|\?)/, '') || '';
 		var that = this;
 		jQuery(window).bind(window.history.pushState ? "popstate" : "hashchange", function(e) {
 			if (!that.prevent_initial_pop || that.prevent_initial_pop != location.href)
 			{
-				that.update();
+				that.update(location.hash || location.query || initial_params);
 			}
 			delete that.prevent_initial_pop;
 		});
