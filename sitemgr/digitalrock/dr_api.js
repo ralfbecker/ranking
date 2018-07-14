@@ -2009,7 +2009,7 @@ var Profile = (function() {
 			switch(placeholder)
 			{
 				case 'practice':
-					data += ' '+this.lang('years, since')+' '+((new Date).getFullYear()-data);
+					data += ' '+that.lang('years, since')+' '+((new Date).getFullYear()-data);
 					break;
 				case 'height':
 					data += ' cm';
