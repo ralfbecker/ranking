@@ -50,10 +50,15 @@ table.DrTable tbody th a {
 	padding-left: 10px;
 	font-weight: normal;
 }
-table.DrTable td div.tdAlign2 { width: 40%; display: inline-block; }
+/**
+ * alignment of multiple values in a column by align_td_nbsp function
+ */
+table.DrTable td div.tdAlign2 { width: 30%; display: inline-block; }
+table.DrTable td div.tdAlign2:first-child { width: 60%; display: inline-block; }
 table.DrTable td div.tdAlign3 { width: 20%; display: inline-block; }
 table.DrTable td div.tdAlign3:first-child { width: 40%; display: inline-block; }
-table.DrTable td div.tdAlign4 { width: 20%; display: inline-block; }
+table.DrTable td div.tdAlign4 { width: 16%; display: inline-block; }
+table.DrTable td div.tdAlign4:first-child { width: 50%; display: inline-block; }
 /**
  * Capitalize names
  */

@@ -812,6 +812,7 @@ var Startlist = (function() {
 
 			case 'combined':
 				this.result_cols.final_points = this.lang('Final Points');
+				delete this.result_cols.start_number;	// table is far too big anyway
 				// fall through
 			default:
 				this.startlist_cols = {
@@ -944,7 +945,9 @@ var Startlist = (function() {
 					{
 						delete this.columns.result0;
 						delete this.columns.result1;
-						this.columns['quali_points'] = this.lang('Qualification');
+						if (_data.discipline == 'combined') delete this.columns.result2;
+						this.columns['quali_points'] = _data.discipline == 'combined' ?
+							this.lang('Quali.') : this.lang('Qualification');
 					}
 				}
 				if (_data.discipline == 'combined' && _data.participants[0] && typeof _data.participants[0].final_points == 'undefined') {
