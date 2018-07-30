@@ -1807,7 +1807,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 
 		// add overall speed final and pairing for combined
-		if ($discipline == 'combined' && isset($route[4]))
+		if ($discipline == 'combined' && isset($route[3]))
 		{
 			$speed_final = isset($route[-6]) ? $route[-6] : ranking_route::default_name(-6);
 			unset($route[-6]);
