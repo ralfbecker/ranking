@@ -1880,6 +1880,20 @@ class ranking_result_ui extends ranking_result_bo
 			$combined = true;
 		}
 		$query = egw_cache::getSession('ranking', 'result');
+		// set query by $parametes, if we have no session, eg. just a json request to set data
+		if (empty($query) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') === 0)
+		{
+			$query = array(
+				'calendar' => empty($comp['nation']) ? 'NULL' : $comp['nation'],
+				'comp' => $comp['WetId'],
+				'cat'  => $route['GrpId'],
+				'num_rows' => 999,
+				'show_result' => 1,
+				'discipline' => $route['discipline'],
+				'route_type' => $route['route_type'],
+				'route_data' => $route,
+			);
+		}
 		$order_by = $query['order'].' '.$query['sort'];
 		if (!preg_match('/^[a-z0-9_]+ (asc|desc)$/i', $order_by)) $order_by = 'start_order ASC';
 
