@@ -642,9 +642,9 @@ class ranking_calculation
 		if ($overall)
 		{
 			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
-			if ((int)$stand >= 2018) throw new egw_exception_assertion_failed('Overall ranking 2018+ requires 2 competitions per discipline (and is not yet implemented)!');
+			if ((int)$stand >= 2018 && empty($cup['nation'])) throw new egw_exception_assertion_failed('Overall ranking 2018+ requires 2 competitions per discipline (and is not yet implemented)!');
 			// international combined ranking, no longer uses $min_disciplines
-			if ((int)$stand >= 2017 || !empty($comp['nation']))
+			if ((int)$stand >= 2017 || !empty($cup['nation']))
 			{
 				$max_disciplines = $cup['max_disciplines'];
 			}
@@ -710,6 +710,11 @@ class ranking_calculation
 		}
 		elseif ($cup)
 		{
+			// allow to use own cat-id in results, eg. "Summer Challenge" uses GER_FX/MX
+			if (!in_array($cat['GrpId'], $cat['GrpIds']))
+			{
+				$cat['GrpIds'][] = $cat['GrpId'];
+			}
 			$results =& $this->bo->result->cup_results($cup,$cat['GrpIds'],$stand,
 				stristr($cup['rkey'],'EYC') || stristr($cup['rkey'],'EYS') ? $this->european_nations : false,
 				$use_0_point_results);
