@@ -18,6 +18,12 @@ foreach(scandir($fixtures=__DIR__.'/fixtures') as $file)
 	$r = $input;
 	$result->boulder2018_final_tie_breaking($r, ['WetId' => 0, 'GrpId' => 0, 'route_order' => 0], 5);
 
+	// new code set NULL for attempts, which dont harm, but fails in $r == $results
+	foreach($r as $n => &$d)
+	{
+		if (!isset($d['detail']['attempts'])) unset($d['detail']['attempts']);
+	}
+
 	if ($r == $results)
 	{
 		echo "Test successful :)\n";

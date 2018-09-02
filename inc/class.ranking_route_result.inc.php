@@ -1458,6 +1458,11 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			self::calc_selfscore_points($result, $selfscore_points);
 		}
+		// final with 2018+ boulder rules --> apply tie breaking
+		if ($discipline === 'boulder2018' && !$route['route_quota'])
+		{
+			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
+		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
 		$old_rank = $old_speed_rank = null;
@@ -1508,6 +1513,10 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				$to_update['result_top'] = $to_update['result_zone'] = $data['result_top'];
 			}
+			if (is_array($data['detail']) && array_key_exists('attempts', $data['detail']))
+			{
+				$to_update['result_detail'] = json_encode($data['detail']);
+			}
 			// for lead finals, do not yet store first places, they might have to use the time
 			if ($data['new_rank'] != $data['result_rank'])
 			{
@@ -1521,11 +1530,6 @@ class ranking_route_result extends Api\Storage\Base
 			$old_prev_rank = $data['rank_prev_heat'];
 			$old_time = $data['result_time_l'] ? $data['result_time_l'] : $data['time_sum'];
 			$old_rank = $data['new_rank'];
-		}
-		// final with 2018+ boulder rules --> apply tie breaking
-		if ($discipline === 'boulder2018' && !$route['route_quota'])
-		{
-			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
 		}
 		$this->db->transaction_commit();
 
@@ -1632,28 +1636,23 @@ class ranking_route_result extends Api\Storage\Base
 	/**
 	 * Apply 2018+ boulder final tie-breaking rules
 	 *
-	 * Results are already stored, but transaction is NOT yet commited.
 	 * New rank is in key 'new_rank' (NOT 'result_rank')!
 	 *
-	 * @param array& $results
+	 * @param array& $results on return new_rank and detail[attempts] might be changed (and need storing)
 	 * @param array $keys
 	 * @param int $num_problems
 	 */
 	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems)
 	{
 		// remove "old" attempts, in case they get not written again
+		$old_attempts = array();
 		foreach($results as &$result)
 		{
-			if (is_string($result['detail'])) $result['detail'] = self::unserialize($result['detail']);
-
-			if (!empty($result['detail']['attempts']))
+			if (is_string($result['detail']))
 			{
+				$result['detail'] = self::unserialize($result['detail']);
+				$old_attempts[$result['PerId']] = $result['detail']['attempts'];
 				unset($result['detail']['attempts']);
-				$this->db->update($this->table_name,array(
-					'result_detail' => json_encode($result['detail']),
-				),$keys+array(
-					'PerId' => $result['PerId'],
-				),__LINE__,__FILE__);
 			}
 		}
 		$input = $results;
@@ -1683,15 +1682,15 @@ class ranking_route_result extends Api\Storage\Base
 
 						$to_split[] =& $result;
 					}
-					// check if we need tie-breaking on given $place --> continue to next place if not
+					// check if we need tie-breaking on given $place --> continue to zone or next place if not
 					if (count($to_split) < 2)
 					{
 						unset($to_split[0]['detail']['attempts']);
-						break 2;
+						break 1;
 					}
 					else
 					{
-						// sort by highes number of top/zone in given attempt (usort keeps references!)
+						// sort by highest number of top/zone in given attempt (usort keeps references!)
 						usort($to_split, function($a, $b)
 						{
 							return $b['detail']['attempts'] - $a['detail']['attempts'];
@@ -1723,12 +1722,15 @@ class ranking_route_result extends Api\Storage\Base
 								unset($result['detail']['attempts']);
 							}
 
-							$this->db->update($this->table_name,array(
-								'result_rank' => $result['new_rank'],
-								'result_detail' => json_encode($result['detail']),
-							),$keys+array(
-								'PerId' => $result['PerId'],
-							),__LINE__,__FILE__);
+							foreach($results as &$r)
+							{
+								if ($r['PerId'] == $result['PerId'])
+								{
+									$r['new_rank'] = $result['new_rank'];
+									$r['detail'] = $result['detail'];
+									break;
+								}
+							}
 						}
 						// todo: this is not yet correct for case c)!
 						if ($split) $place += $split-1;
@@ -1754,6 +1756,19 @@ class ranking_route_result extends Api\Storage\Base
 			if (!isset($b['new_rank'])) $b['new_rank'] = 99999;
 			return $a['new_rank'] - $b['new_rank'];
 		});
+		// only return attempts, if they really changed
+		foreach($results as &$result)
+		{
+			if ($old_attempts[$result['PerId']] == $result['detail']['attempts'])
+			{
+				unset($result['detail']['attempts']);
+			}
+			else
+			{
+				//error_log(__METHOD__."() attempts changed from '{$old_attempts[$result['PerId']]}' to '{$result['detail']['attempts']}'");
+				if (!isset($result['detail']['attempts'])) $result['detail']['attempts'] = null;	// need to force update by update_ranking
+			}
+		}
 		// dump results for writing tests, if not running the test ;)
 		if ($keys['WetId'])
 		{
