@@ -799,6 +799,10 @@ class ranking_result_ui extends ranking_result_bo
 		$query['col_filter']['discipline'] = $query['discipline'];
 		$query['col_filter']['comp_nation'] = $query['calendar'];
 		$query['col_filter']['quali_preselected'] = $query['quali_preselected'];
+		if (!empty($query['route_data']) && $query['route_data']['discipline'] === 'combined')
+		{
+			$query['col_filter']['combined'] = true;
+		}
 		// check if route_result object is instancated for relay or not
 		if ($this->route_result->isRelay != ($query['discipline'] == 'speedrelay'))
 		{
@@ -1028,7 +1032,7 @@ class ranking_result_ui extends ranking_result_bo
 
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
-			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4 ||
+			$query['route_type'] == TWOxTWO_QUALI && $query['route'] == 4 ||
 			$query['route_type'] == TWO_QUALI_GROUPS && $query['route'] < 4 ||
 			$query['route_type'] == THREE_QUALI_ALL_NO_STAGGER && $query['route'] < 3 ||
 			// combined uses previous heat / quali only for boulder (6) and lead (7) final

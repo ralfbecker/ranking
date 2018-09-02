@@ -215,7 +215,7 @@ class ranking_route_result extends Api\Storage\Base
 				}
 			}
 			// combined heats have different route-order
-			if ($route_type == THREE_QUALI_ALL_NO_STAGGER && in_array($route_order, array(6, 7)))
+			if ($combined && in_array($route_order, array(6, 7)))
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order, 'combined').') AS rank_prev_heat';
 			}
@@ -990,7 +990,7 @@ class ranking_route_result extends Api\Storage\Base
 							else
 							{
 								$data['result_time'] *= 0.001;
-								$data['time_sum'] = $data['result'] = sprintf('%4.2lf',$data['result_time']);
+								$data['time_sum'] = $data['result'] = sprintf('%4.3lf',$data['result_time']);
 							}
 						}
 						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
@@ -998,13 +998,13 @@ class ranking_route_result extends Api\Storage\Base
 							// do not overwrite false start for final or quali on single route
 							if ($data['false_start'] <= self::MAX_FALSE_STARTS || $data['result_time_l'] && (string)$data['eliminated_l'] === '')
 							{
-								$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.2lf',$data['result_time_l']) :
+								$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.3lf',$data['result_time_l']) :
 									($data['eliminated_l'] ? lang('fall') : lang('Wildcard'));
 							}
 							$data['result_time'] = $data['result_time_l'];
 							$data['eliminated'] = $data['eliminated_l'];
 							$data['result_r'] = (string)$data['eliminated_r'] === '' ?
-								($data['result_time_r'] ? sprintf('%4.2lf',$data['result_time_r']) : '') :
+								($data['result_time_r'] ? sprintf('%4.3lf',$data['result_time_r']) : '') :
 								($data['eliminated_r'] ? lang('fall') : lang('Wildcard'));
 						}
 					}
@@ -1029,7 +1029,7 @@ class ranking_route_result extends Api\Storage\Base
 								}
 								else
 								{
-									$data['result'.$suffix] = sprintf('%4.2lf',$data['result_time'.$suffix]);
+									$data['result'.$suffix] = sprintf('%4.3lf',$data['result_time'.$suffix]);
 								}
 							}
 							++$suffix;
