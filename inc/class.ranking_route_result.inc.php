@@ -215,7 +215,11 @@ class ranking_route_result extends Api\Storage\Base
 				}
 			}
 			// combined heats have different route-order
-			if ($combined && $route_order > 0)
+			if ($route_type == THREE_QUALI_ALL_NO_STAGGER && in_array($route_order, array(6, 7)))
+			{
+				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order, 'combined').') AS rank_prev_heat';
+			}
+			elseif ($combined && $route_order > 0)
 			{
 
 			}
@@ -449,7 +453,7 @@ class ranking_route_result extends Api\Storage\Base
 	 * Subquery to get the rank in the previous heat
 	 *
 	 * @param int $route_order
-	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL
+	 * @param int|string $route_type ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL or "combined" for combined boulder or lead final
 	 * @param int $quali_overal =0 1: Group A, 2: Group B, 3: Overal qualification, 0: other
 	 * @return string
 	 */
@@ -482,6 +486,13 @@ class ranking_route_result extends Api\Storage\Base
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=$ro1 AND r1.$this->id_col=r2.$this->id_col".
 				" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=$ro0".
 				" AND $this->table_name.$this->id_col=r1.$this->id_col";
+		}
+		// combined lead and boulder finals have countback to their disciplines qualification
+		elseif ($route_type === 'combined' && in_array($route_order, array(6, 7)))
+		{
+			// boulder: 6 -> 1, lead: 7 -> 2
+			return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
+				'p.route_order='.(int)($route_order-5)." AND $this->table_name.$this->id_col=p.$this->id_col";
 		}
 		// 3 qualifications or finals (combined only)
 		elseif ($route_type == THREE_QUALI_ALL_NO_STAGGER && in_array($route_order, array(3, -6)))
@@ -1361,9 +1372,16 @@ class ranking_route_result extends Api\Storage\Base
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'],$route_type).') AS other_detail';
 			}
 		}
-		// combined lead and boulder final has not countback to previous heat
-		elseif ($discipline == 'lead' && $keys['route_order'] == 7 ||
-			substr($discipline, 0, 7) == 'boulder' && $keys['route_order'] == 6)
+		// combined lead and boulder finals have countback to their disciplines qualification
+		elseif ($route && $route['discipline'] == 'combined' && in_array($keys['route_order'], array(6, 7)))
+		{
+			// combined lead final uses time BEFORE countback to qualification
+			if ($use_time) $order_by .= ',result_time ASC';
+			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'combined').') AS rank_prev_heat';
+			$order_by .= ',rank_prev_heat ASC';
+		}
+		// combined speed finals are complicated ;)
+		elseif ($route && $route['discipline'] == 'combined' && in_array($keys['route_order'], array(3, 4, 5)))
 		{
 
 		}
@@ -1393,6 +1411,7 @@ class ranking_route_result extends Api\Storage\Base
 		if ($use_time)
 		{
 			$order_by .= ',result_time ASC';
+			$extra_cols[] = 'result_time';
 		}
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected) extra_cols=".array2string($extra_cols).", order_by=$order_by");
 		$this->db->transaction_begin();

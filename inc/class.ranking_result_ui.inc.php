@@ -1031,7 +1031,8 @@ class ranking_result_ui extends ranking_result_bo
 			$query['route_type']==TWOxTWO_QUALI && $query['route'] == 4 ||
 			$query['route_type'] == TWO_QUALI_GROUPS && $query['route'] < 4 ||
 			$query['route_type'] == THREE_QUALI_ALL_NO_STAGGER && $query['route'] < 3 ||
-			$query['route_data']['discipline'] == 'combined' ||		// combined never used previous heat, because of multiplication of disciplines
+			// combined uses previous heat / quali only for boulder (6) and lead (7) final
+			$query['route_data']['discipline'] == 'combined' && $query['route'] < 6 ||
 			$query['quali_preselected'] && $query['route'] == 2;	// no countback to quali for quali_preselected
 
 		// which result to show
