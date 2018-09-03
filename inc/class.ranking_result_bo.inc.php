@@ -1437,7 +1437,7 @@ class ranking_result_bo extends ranking_bo
 				if ($data['eliminated'.$postfix] == ranking_result_bo::ELIMINATED_FALSE_START)
 				{
 					$data['eliminated'.$postfix] = '';
-					$data['false_start'.$postfix] = 1;
+					$data['false_start'] = 1;	// we only store "false_start", no "false_start_r"
 				}
 				elseif(isset($data['eliminated'.$postfix]))
 				{

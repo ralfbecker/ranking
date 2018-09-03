@@ -990,10 +990,18 @@ class ranking_route_result extends Api\Storage\Base
 				{
 					if ($data['false_start'] > self::MAX_FALSE_STARTS)
 					{
-						$data['result_time'] = null;
-						$data['time_sum'] = $data['result'] =
-							$data['false_start'] > 1 ? lang('%1. false start', $data['false_start']) : lang('false start');
-						$data['eliminated'] = ranking_result_bo::ELIMINATED_FALSE_START;
+						$data['time_sum'] = $data['false_start'] > 1 ?
+							lang('%1. false start', $data['false_start']) : lang('false start');
+						if ($data['result_time_l'] || $data['eliminated_l'])
+						{
+							$data['eliminated_r'] = ranking_result_bo::ELIMINATED_FALSE_START;
+						}
+						else
+						{
+							$data['eliminated_l'] = ranking_result_bo::ELIMINATED_FALSE_START;
+							$data['result'] = $data['time_sum'];
+							$data['result_time'] = null;
+						}
 					}
 					if (!$data['general_result'])
 					{
@@ -1003,7 +1011,8 @@ class ranking_route_result extends Api\Storage\Base
 							{
 								$data['eliminated'] = 1;
 								$data['result_time'] = null;
-								$data['time_sum'] = $data['result'] = lang('fall');
+								$data['result'] = lang('fall');
+								if (!isset($data['time_sum'])) $data['time_sum'] = $data['result'];
 							}
 							elseif ($data['result_time'] == 1000*self::WILDCARD_TIME)
 							{
@@ -1027,9 +1036,18 @@ class ranking_route_result extends Api\Storage\Base
 							}
 							$data['result_time'] = $data['result_time_l'];
 							$data['eliminated'] = $data['eliminated_l'];
-							$data['result_r'] = (string)$data['eliminated_r'] === '' ?
-								($data['result_time_r'] ? sprintf('%4.3lf',$data['result_time_r']) : '') :
-								($data['eliminated_r'] ? lang('fall') : lang('Wildcard'));
+							switch((string)$data['eliminated_r'])
+							{
+								case '':
+									$data['result_r'] = $data['result_time_r'] ? sprintf('%4.3lf',$data['result_time_r']) : '';
+									break;
+								case ranking_result_bo::ELIMINATED_FALSE_START:
+									$data['result_r'] = $data['time_sum'];
+									break;
+								default:
+									$data['result_r'] = lang('fall');
+									break;
+							}
 						}
 					}
 					else
