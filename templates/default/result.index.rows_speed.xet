@@ -82,6 +82,9 @@
 				<column width="15%" disabled="@speed_only_one"/>
 				<column disabled="!@show_ability"/>
 				<column disabled="@speed_only_one"/>
+				<!-- only combined speed final used both speed quali times -->
+				<column disabled="!@quali_times"/>
+				<column disabled="!@quali_times"/>
 				<column disabled="!@time_measurement"/>
 			</columns>
 			<rows>
@@ -105,6 +108,8 @@
 					<description align="center" value="Time"/>
 					<nextmatch-header align="center" label="Ability" id="ability_percent"/>
 					<nextmatch-sortheader align="center" label="@sum_or_bestof" id="result_time"/>
+					<description align="center" label="Quali" id="quali_time"/>
+					<description align="center" label="2. Time" id="quali_time2"/>
 					<description align="center" value="Actions" class="noPrint"/>
 				</row>
 				<row class="onlyPrint" part="footer">
@@ -127,6 +132,8 @@
 					<description align="center" id="{$row}[result_r]" no_lang="1"/>
 					<float align="center" id="${row}[ability_percent]" readonly="true"/>
 					<description align="center" id="{$row}[time_sum]"/>
+					<description align="center" id="{$row}[quali_time]"/>
+					<description align="center" id="{$row}[quali_time2]"/>
 					<buttononly align="center" statustext="select participant for time measurment" label="Start" id="start_time_measurement" onclick="start_time_measurement(this,$row_cont[PerId]);" class="small noPrint"/>
 				</row>
 			</rows>

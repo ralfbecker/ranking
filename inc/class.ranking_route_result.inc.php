@@ -76,9 +76,9 @@ class ranking_route_result extends Api\Storage\Base
 	var $rank_lead_sum = 'CASE WHEN RouteResults.result_height IS NULL THEN r1.result_height/1000.0+r1.result_plus/100.0 WHEN r1.result_height IS NULL THEN RouteResults.result_height/1000.0+RouteResults.result_plus/100.0 ELSE (RouteResults.result_height+r1.result_height)/1000.0+(RouteResults.result_plus+r1.result_plus)/100.0 END';
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
-	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time >= r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
+	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time > r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
 	// (combined) speed final incl. small final in first 2 starters (return 3 for final and 2 for small final, all non-winners (!=1) are then sorted by time)
-	var $rank_speed_combi_final = 'CASE WHEN result_time IS NULL THEN NULL WHEN (start_order-1)DIV 2 THEN 2 ELSE 3 END';
+	var $rank_speed_combi_final = 'CASE WHEN result_time IS NULL THEN NULL WHEN (start_order-1)DIV 2 THEN 2 ELSE 4 END';
 
 	/**
 	 * Discipline only set by ranking_result_bo->save_result, to be used in data2db
@@ -218,6 +218,10 @@ class ranking_route_result extends Api\Storage\Base
 			if ($combined && in_array($route_order, array(6, 7)))
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order, 'combined').') AS rank_prev_heat';
+			}
+			elseif ($combined && in_array($route_order, array(3, 4, 5)))
+			{
+				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order, 'combined').') AS quali_details';
 			}
 			elseif ($combined && $route_order > 0)
 			{
@@ -494,6 +498,13 @@ class ranking_route_result extends Api\Storage\Base
 			return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
 				'p.route_order='.(int)($route_order-5)." AND $this->table_name.$this->id_col=p.$this->id_col";
 		}
+		// all combined speed finals have countback to speed qualification
+		elseif ($route_type === 'combined' && in_array($route_order, array(3, 4, 5)))
+		{
+			// we need both times from details
+			return "SELECT result_detail FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
+				"p.route_order=0 AND $this->table_name.$this->id_col=p.$this->id_col";
+		}
 		// 3 qualifications or finals (combined only)
 		elseif ($route_type == THREE_QUALI_ALL_NO_STAGGER && in_array($route_order, array(3, -6)))
 		{
@@ -750,6 +761,19 @@ class ranking_route_result extends Api\Storage\Base
 				$data[$name] = $value;
 			}
 			unset($data['result_detail']);
+		}
+		// combined speed final needs qualification times
+		if (!empty($data['quali_details']))
+		{
+			$data['quali_details'] = self::unserialize($data['quali_details']);
+			$data['quali_time'] = $data['quali_details']['eliminated_l'] === '' &&
+				$data['quali_details']['result_time_l'] < $data['quali_details']['result_time_r'] ||
+				$data['quali_details']['eliminated_r'] !== '' || empty($data['quali_details']['result_time_r']) ?
+				$data['quali_details']['result_time_l'] : $data['quali_details']['result_time_r'];
+			$data['quali_time2'] = $data['quali_details']['eliminated_l'] === '' &&
+				$data['quali_details']['result_time_l'] < $data['quali_details']['result_time_r'] ||
+				$data['quali_details']['eliminated_r'] !== '' || empty($data['quali_details']['result_time_r']) ?
+				$data['quali_details']['result_time_r'] : $data['quali_details']['result_time_l'];
 		}
 		if ($data['discipline'] == 'combined')
 		{
@@ -1343,6 +1367,15 @@ class ranking_route_result extends Api\Storage\Base
 						$order_by = "result_time IS NULL,CASE ($mode) WHEN 1 THEN 0 ELSE result_time END ASC";
 					}
 					$extra_cols[] = 'result_time';
+
+					// speed final used time(s) from speed qualification
+					if ($route && $route['discipline'] == 'combined' && $keys['route_order'])
+					{
+						$extra_cols[] = '('.str_replace('result_detail','result_time',
+							$this->_sql_rank_prev_heat($keys['route_order'], 'combined')).') AS quali_time';
+						$extra_cols[] = 'start_order';	// needed to identify the pairings
+						$order_by .= ',(start_order-1) DIV 2,quali_time';	// order tied pairs by quali_time
+					}
 				}
 				break;
 			case 'boulder2018':
@@ -1383,7 +1416,7 @@ class ranking_route_result extends Api\Storage\Base
 		// combined speed finals are complicated ;)
 		elseif ($route && $route['discipline'] == 'combined' && in_array($keys['route_order'], array(3, 4, 5)))
 		{
-
+			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'combined').') AS quali_details';
 		}
 		elseif (substr($discipline,0,5) != 'speed' && $keys['route_order'] >= (2+(int)($route_type == TWO_QUALI_HALF)))
 		{
@@ -1462,6 +1495,11 @@ class ranking_route_result extends Api\Storage\Base
 		if ($discipline === 'boulder2018' && !$route['route_quota'])
 		{
 			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
+		}
+		// combined speed final tie breaking by countback to speed qualification
+		if ($route && $route['discipline'] == 'combined' && in_array($keys['route_order'], array(3, 4, 5)))
+		{
+			$this->combined_speed_final_tie_breaking($result, $keys);
 		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
@@ -1769,13 +1807,122 @@ class ranking_route_result extends Api\Storage\Base
 				if (!isset($result['detail']['attempts'])) $result['detail']['attempts'] = null;	// need to force update by update_ranking
 			}
 		}
-		// dump results for writing tests, if not running the test ;)
+		/* dump results for writing tests, if not running the test ;)
 		if ($keys['WetId'])
 		{
 			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
 				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
 			error_log(__METHOD__."() logged input and results to ".realpath($path));
+		}*/
+	}
+
+	/**
+	 * Apply 2018+ boulder final tie-breaking rules
+	 *
+	 * New rank is in key 'new_rank' (NOT 'result_rank')!
+	 *
+	 * @param array& $results on return new_rank might be changed (and need storing)
+	 * @param array $keys
+	 */
+	public function combined_speed_final_tie_breaking(array &$results, array $keys)
+	{
+		$input = $results;
+		$last_new_rank = $last_pairing = $last_quali_time = $last_quali_time2 = $last_time = null;
+		foreach($results as $n => &$result)
+		{
+			$quali_time2 = $result['quali_details']['result_time_l'] == $result['quali_time'] ?
+				$result['quali_details']['result_time_r'] : $result['quali_details']['result_time_l'];
+
+			// check if we have a tie in a pairing (other ties wont matter for KO system!)
+			if ($last_new_rank && $last_new_rank == $result['new_rank'] && $last_pairing == intdiv($result['start_order']-1, 2))
+			{
+				// in last final heat (small final and final) we are NOT sorted by result_time
+				if ($result['result_time'] != $last_time)
+				{
+					if ($last_time && (!$result['result_time'] || $result['result_time'] > $last_time))
+					{
+						$result['new_rank']++;
+					}
+					elseif ($result['result_time'] && (!$last_time || $last_time > $result['result_time']))
+					{
+						$results[$n-1]['new_rank']++;
+					}
+				}
+				if ($last_new_rank != $result['new_rank'])
+				{
+					// already fixed above for last final heat
+				}
+				elseif ($result['quali_time'] > $last_quali_time)
+				{
+					$result['new_rank']++;
+				}
+				elseif ($result['quali_time'] == $last_quali_time)
+				{
+					// while every finalist must have a quali_time, they might not have a $quali_time2 (worse result from quali)
+					if ($last_quali_time2 && (!$quali_time2 || $quali_time2 > $last_quali_time2))
+					{
+						$result['new_rank']++;
+					}
+					// as we cant (yet) order by some json, we have to check if last one is the looser because of 2. time
+					elseif ($quali_time2 && (!$last_quali_time2 || $last_quali_time2 > $quali_time2))
+					{
+						$results[$n-1]['new_rank']++;
+					}
+				}
+			}
+			$last_new_rank = $result['new_rank'];
+			$last_time = $result['result_time'];
+			$last_pairing = intdiv($result['start_order']-1, 2);
+			$last_quali_time = $result['quali_time'];
+			$last_quali_time2 = $quali_time2;
 		}
+
+		// order again by new_rank, as it might have changed because of above tie-breaks
+		usort($results, function($a, $b)
+		{
+			if (!isset($a['new_rank'])) $a['new_rank'] = 99999;
+			if (!isset($b['new_rank'])) $b['new_rank'] = 99999;
+			// sort first by new_rank
+			if ($a['new_rank'] != $b['new_rank'])
+			{
+				return $a['new_rank'] - $b['new_rank'];
+			}
+			// sort tied with times by time
+			elseif ($a['result_time'] && $b['result_time'])
+			{
+				// first by result-time
+				if ($a['result_time'] != $b['result_time'])
+				{
+					return $a['result_time'] > $b['result_time'] ? 1 : -1;
+				}
+				// then by quali-time
+				elseif ($a['quali_time'] != $b['quali_time'])
+				{
+					return $a['quali_time'] > $b['quali_time'] ? 1 : -1;
+				}
+			}
+			// sort by having a time first
+			return $a['result_time'] ? -1 : 1;
+		});
+
+		// now we need to fix new_rank for loosers of broken ties, as regular code only looks for result_time
+		if ($keys['route_order'] < 5)
+		{
+			foreach($results as $n => &$result)
+			{
+				if ($result['new_rank'] > 1 && $result['result_time'])
+				{
+					$result['new_rank'] = $n;
+				}
+			}
+		}
+		/* dump results for writing tests, if not running the test ;)
+		if ($keys['WetId'])
+		{
+			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
+				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
+			error_log(__METHOD__."() logged input and results to ".realpath($path));
+		}*/
 	}
 
 	/**
