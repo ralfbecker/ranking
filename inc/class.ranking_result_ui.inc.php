@@ -1038,8 +1038,8 @@ class ranking_result_ui extends ranking_result_bo
 			// combined uses previous heat / quali only for boulder (6) and lead (7) final
 			$query['route_data']['discipline'] == 'combined' && $query['route'] < 6 ||
 			$query['quali_preselected'] && $query['route'] == 2;	// no countback to quali for quali_preselected
-		$rows['quali_times'] = !empty($query['route_data']) && $query['route_data']['discipline'] === 'combined' &&
-			in_array($query['route'], array(3, 4, 5));
+		// speed finals need to show quali times
+		$rows['quali_times'] = $query['discipline'] === 'speed' && $query['route'] >= 2;
 
 		// which result to show
 		$rows['ro_result'] = $query['route_status'] == STATUS_RESULT_OFFICIAL ? '' : 'onlyPrint';

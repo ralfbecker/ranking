@@ -219,9 +219,9 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order, 'combined').') AS rank_prev_heat';
 			}
-			elseif ($combined && in_array($route_order, array(3, 4, 5)))
+			elseif ($discipline === 'speed' && $route_order >= 2)
 			{
-				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order, 'combined').') AS quali_details';
+				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order, 'speed-final').') AS quali_details';
 			}
 			elseif ($combined && $route_order > 0)
 			{
@@ -498,8 +498,8 @@ class ranking_route_result extends Api\Storage\Base
 			return "SELECT result_rank FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
 				'p.route_order='.(int)($route_order-5)." AND $this->table_name.$this->id_col=p.$this->id_col";
 		}
-		// all combined speed finals have countback to speed qualification
-		elseif ($route_type === 'combined' && in_array($route_order, array(3, 4, 5)))
+		// speed finals have countback to speed qualification
+		elseif ($route_type === 'speed-final' && $route_order >= 2)
 		{
 			// we need both times from details
 			return "SELECT result_detail FROM $this->table_name p WHERE $this->table_name.WetId=p.WetId AND $this->table_name.GrpId=p.GrpId AND ".
@@ -1387,13 +1387,10 @@ class ranking_route_result extends Api\Storage\Base
 					$extra_cols[] = 'result_time';
 
 					// speed final used time(s) from speed qualification
-					if ($route && $route['discipline'] == 'combined' && $keys['route_order'])
-					{
-						$extra_cols[] = '('.str_replace('result_detail','result_time',
-							$this->_sql_rank_prev_heat($keys['route_order'], 'combined')).') AS quali_time';
-						$extra_cols[] = 'start_order';	// needed to identify the pairings
-						$order_by .= ',(start_order-1) DIV 2,quali_time';	// order tied pairs by quali_time
-					}
+					$extra_cols[] = '('.str_replace('result_detail','result_time',
+						$this->_sql_rank_prev_heat($keys['route_order'], 'speed-final')).') AS quali_time';
+					$extra_cols[] = 'start_order';	// needed to identify the pairings
+					$order_by .= ',(start_order-1) DIV 2,quali_time';	// order tied pairs by quali_time
 				}
 				break;
 			case 'boulder2018':
@@ -1431,10 +1428,10 @@ class ranking_route_result extends Api\Storage\Base
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'combined').') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
 		}
-		// combined speed finals are complicated ;)
-		elseif ($route && $route['discipline'] == 'combined' && in_array($keys['route_order'], array(3, 4, 5)))
+		// speed finals use countback to speed qualification
+		elseif ($discipline == 'speed' && $keys['route_order'] >= 2)
 		{
-			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'combined').') AS quali_details';
+			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'speed-final').') AS quali_details';
 		}
 		elseif (substr($discipline,0,5) != 'speed' && $keys['route_order'] >= (2+(int)($route_type == TWO_QUALI_HALF)))
 		{
@@ -1514,10 +1511,10 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
 		}
-		// combined speed final tie breaking by countback to speed qualification
-		if ($route && $route['discipline'] == 'combined' && in_array($keys['route_order'], array(3, 4, 5)))
+		// speed final tie breaking by countback to speed qualification
+		if ($discipline == 'speed' && $keys['route_order'] >= 2)
 		{
-			$this->combined_speed_final_tie_breaking($result, $keys);
+			$this->speed_final_tie_breaking($result, $keys, $route && $route['discipline'] === 'combined');
 		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
@@ -1832,17 +1829,19 @@ class ranking_route_result extends Api\Storage\Base
 				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
 			error_log(__METHOD__."() logged input and results to ".realpath($path));
 		}*/
+		unset($keys, $input);	// suppress warning for not used parameters
 	}
 
 	/**
-	 * Apply 2018+ boulder final tie-breaking rules
+	 * Apply 2018+ speed final tie-breaking rules
 	 *
 	 * New rank is in key 'new_rank' (NOT 'result_rank')!
 	 *
 	 * @param array& $results on return new_rank might be changed (and need storing)
 	 * @param array $keys
+	 * @param boolean $combined =false true for combined
 	 */
-	public function combined_speed_final_tie_breaking(array &$results, array $keys)
+	public function speed_final_tie_breaking(array &$results, array $keys, $combined=false)
 	{
 		$input = $results;
 		$last_new_rank = $last_pairing = $last_quali_time = $last_quali_time2 = $last_time = null;
@@ -1924,7 +1923,7 @@ class ranking_route_result extends Api\Storage\Base
 		});
 
 		// now we need to fix new_rank for loosers of broken ties, as regular code only looks for result_time
-		if ($keys['route_order'] < 5)
+		if (!$combined || $keys['route_order'] < 5)
 		{
 			foreach($results as $n => &$result)
 			{
@@ -1941,6 +1940,7 @@ class ranking_route_result extends Api\Storage\Base
 				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
 			error_log(__METHOD__."() logged input and results to ".realpath($path));
 		}*/
+		unset($keys, $input);	// suppress warning for not used parameters
 	}
 
 	/**
