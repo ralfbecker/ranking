@@ -14,7 +14,7 @@ global $header_logos,$calendar_no_cats,$cats,$anz_year;
 $header_logos ="<table>
  <tr>
   <td><a href=\"$url_drock\" title=\"$t_dig_rock_alt\" target=\"_blank\"><img src='dig_rock.mini.gif' border=0></a></td>
-  <td><A HREF=\"http://www.sac-cas.ch\" target=_blank><IMG SRC=\"sac80.gif\" title=\"Schweizer Alpen-Club - Club Alpin Suisse\" BORDER=0></A></td>
+  <td><A HREF=\"http://www.sac-cas.ch\" target=_blank><IMG SRC=\"sac110.gif\" title=\"Schweizer Alpen-Club - Club Alpin Suisse\" BORDER=0></A></td>
  </tr>
 </table>
 ";
