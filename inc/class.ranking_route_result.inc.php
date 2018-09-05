@@ -1929,7 +1929,7 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				if ($result['new_rank'] > 1 && $result['result_time'])
 				{
-					$result['new_rank'] = $n;
+					$result['new_rank'] = $n+1;
 				}
 			}
 		}
