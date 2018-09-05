@@ -845,7 +845,7 @@ class ranking_result_ui extends ranking_result_bo
 		//error_log(__METHOD__."() num_first_final=$num_first_final, skip=$skip, count(rows)=".count($rows));
 		//echo $total; _debug_array($rows);
 
-		if (($query['ranking'] & 3) && strstr($query['template'],'startlist') &&
+		if (((int)$query['ranking'] & 3) && strstr($query['template'],'startlist') &&
 			($cat = $this->cats->read($query['cat'])))
 		{
 			$comp = $this->comp->read($query['comp']);

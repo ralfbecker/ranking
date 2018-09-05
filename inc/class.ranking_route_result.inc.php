@@ -133,6 +133,7 @@ class ranking_route_result extends Api\Storage\Base
 	{
 		//error_log(__METHOD__."(crit=".array2string($criteria).",only_keys=".array2string($only_keys).",order_by=$order_by,extra_cols=".array2string($extra_cols).",$wildcard,$empty,$op,$start,filter=".array2string($filter).",join=$join)");
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
+		$initial_filter = $filter;
 
 		// avoid PerId is ambigous SQL error
 		if (is_array($criteria) && isset($criteria[$this->id_col]))
@@ -181,6 +182,7 @@ class ranking_route_result extends Api\Storage\Base
 			$route_order =& $criteria['route_order'];
 		}
 		if ($route_order === 0) $route_order = '0';		// otherwise it get's ignored by so_sql;
+		$initial_route_order = $route_order;
 
 		// keep general_result_join from setting order_by
 		if (isset($filter['keep_order_by']))
@@ -338,64 +340,72 @@ class ranking_route_result extends Api\Storage\Base
 
 				if (!$rows) return $rows;
 
-				// the general result is always sorted by the overal rank (to get it)
-				// now we need to store that rank in result_rank
-				$old = null;
-				//echo "<p>quali_preselected=$quali_preselected</p>\n";
-				foreach($rows as $n => &$row)
+				// apply head to head comparison to break ties in overall ranking of combined final or qualification
+				// as the head-to-head must have higher precedence then the regular countback, we can not use regular code
+				if ($discipline == 'combined' && (in_array($quali_overall, array(3, 6)) || $initial_route_order == -1))
 				{
-					if ($row['route_order'] <= 0) $row['result_rank0'] = $row['result_rank'];
-					$row['org_rank'] = $row['result_rank'.max(0, $row['route_order'])];
-					//echo "<p>$n: $row[nachname], org_rank=$row[org_rank], result_rank=$row[result_rank] ";
-
-					// check for ties
-					$row['result_rank'] = $old['result_rank'];
-					foreach(array_reverse(array_keys($route_names)) as $route_order)
-					{
-						// for quali_preselected: do NOT use qualification, if we have a first final result (route_order=2)
-						// same is true for 2012+ EYC: no countback to quali
-						if (($route_type==TWO_QUALI_ALL_NO_COUNTBACK || $quali_preselected) && $route_order < 2 && $row['result_rank2']) continue;
-
-						if ($route_type == TWOxTWO_QUALI && $route_order == 3 ||
-							$route_type == TWO_QUALI_HALF && $route_order == 1 ||
-							$route_type == TWO_QUALI_GROUPS && $route_order < 0)
-						{
-							if (!$old || $old['org_rank'] < $row['org_rank']) $row['result_rank'] = $n+1;
-							//echo "route_order=$route_order, result_rank=$row[result_rank] --> no further countback ";
-							break;		// no further countback
-						}
-						if (ranking_result_bo::is_two_quali_all($route_type) && $route_order == 1 ||
-							$route_type == THREE_QUALI_ALL_NO_STAGGER  && $route_order == 2 ||
-							$route_type == TWO_QUALI_GROUPS && $route_order < 4)
-						{
-							if ($route_type == TWO_QUALI_ALL_SUM)	// sum is in quali_points and higher points are better
-							{
-								if (!$old || $old['quali_points'] > $row['quali_points']) $row['result_rank'] = $n+1;
-							}
-							else	// original quali_points --> lower points are better
-							{
-								if (!$old || $old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
-							}
-							break;		// no further countback
-						}
-						if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
-							$old['result_rank'.$route_order] < $row['result_rank'.$route_order])	// or worse place then the previous
-						{
-							$row['result_rank'] = $n+1;						// --> set the place according to the position in the list
-							break;
-						}
-						// for quali on two routes with half quota, there's no countback to the quali only if there's a result for the 2. heat
-						if ($route_type == TWO_QUALI_HALF && $route_order == 2 && $row['result_rank2'] ||
-							$route_type == TWOxTWO_QUALI  && $route_order == 4 && $row['result_rank4'] ||
-							$route_type == TWO_QUALI_GROUPS && $route_order == 4 && $row['result_rank4'])
-						{
-							break;	// --> not use countback
-						}
-					}
-					//echo " --> rank=$row[result_rank]</p>\n";
-					$old = $row;
+					$this->do_combined_general_result($rows, $quali_overall, $initial_filter);
 				}
+				else
+				{
+					// the general result is always sorted by the overal rank (to get it)
+					// now we need to store that rank in result_rank
+					$old = null;
+					//echo "<p>quali_preselected=$quali_preselected</p>\n";
+					foreach($rows as $n => &$row)
+					{
+						if ($row['route_order'] <= 0) $row['result_rank0'] = $row['result_rank'];
+						$row['org_rank'] = $row['result_rank'.max(0, $row['route_order'])];
+						//echo "<p>$n: $row[nachname], org_rank=$row[org_rank], result_rank=$row[result_rank] ";
 
+						// check for ties
+						$row['result_rank'] = $old['result_rank'];
+						foreach(array_reverse(array_keys($route_names)) as $route_order)
+						{
+							// for quali_preselected: do NOT use qualification, if we have a first final result (route_order=2)
+							// same is true for 2012+ EYC: no countback to quali
+							if (($route_type==TWO_QUALI_ALL_NO_COUNTBACK || $quali_preselected) && $route_order < 2 && $row['result_rank2']) continue;
+
+							if ($route_type == TWOxTWO_QUALI && $route_order == 3 ||
+								$route_type == TWO_QUALI_HALF && $route_order == 1 ||
+								$route_type == TWO_QUALI_GROUPS && $route_order < 0)
+							{
+								if (!$old || $old['org_rank'] < $row['org_rank']) $row['result_rank'] = $n+1;
+								//echo "route_order=$route_order, result_rank=$row[result_rank] --> no further countback ";
+								break;		// no further countback
+							}
+							if (ranking_result_bo::is_two_quali_all($route_type) && $route_order == 1 ||
+								$route_type == THREE_QUALI_ALL_NO_STAGGER  && $route_order == 2 ||
+								$route_type == TWO_QUALI_GROUPS && $route_order < 4)
+							{
+								if ($route_type == TWO_QUALI_ALL_SUM)	// sum is in quali_points and higher points are better
+								{
+									if (!$old || $old['quali_points'] > $row['quali_points']) $row['result_rank'] = $n+1;
+								}
+								else	// original quali_points --> lower points are better
+								{
+									if (!$old || $old['quali_points'] < $row['quali_points']) $row['result_rank'] = $n+1;
+								}
+								break;		// no further countback
+							}
+							if (!$old || !$row['result_rank'.$route_order] && $old['result_rank'.$route_order] ||	// 1. place or no result yet
+								$old['result_rank'.$route_order] < $row['result_rank'.$route_order])	// or worse place then the previous
+							{
+								$row['result_rank'] = $n+1;						// --> set the place according to the position in the list
+								break;
+							}
+							// for quali on two routes with half quota, there's no countback to the quali only if there's a result for the 2. heat
+							if ($route_type == TWO_QUALI_HALF && $route_order == 2 && $row['result_rank2'] ||
+								$route_type == TWOxTWO_QUALI  && $route_order == 4 && $row['result_rank4'] ||
+								$route_type == TWO_QUALI_GROUPS && $route_order == 4 && $row['result_rank4'])
+							{
+								break;	// --> not use countback
+							}
+						}
+						//echo " --> rank=$row[result_rank]</p>\n";
+						$old = $row;
+					}
+				}
 				// randomize ex-aquos for startlist
 				if (!$keep_order_by && ($k = array_search('RAND()', $order_by_parts)) !== false)
 				{
@@ -454,14 +464,198 @@ class ranking_route_result extends Api\Storage\Base
 	}
 
 	/**
+	 * Calculate rank in combined general result using several tie-breakers
+	 *
+	 * Rules require a certain order of tie breakes being applied:
+	 * Final:
+	 * - final_points (sorted by them in SQL already)
+	 * - head-to-head comparison for max. 2 tied, not applying for more!
+	 * - countback to qualification
+	 * Qualification:
+	 * - quali_points (sorted by them in SQL already)
+	 * - head-to-head comparison for max. 2 tied, not applying for more!
+	 * - seeding list aka start-order of speed qualification
+	 *
+	 * @param array& $results result-rows with rank in key "result_rank" on return
+	 * @param int $quali_overall 0: general result, 3: overall qualification, 6: overall final
+	 * @param array $filter filter for this ranking to be able load qualification, if needed
+	 * @param array $qualification =null qualification result, default query it (for testing)
+	 */
+	function do_combined_general_result(array &$results, $quali_overall, array $filter, array $qualification=null)
+	{
+		$input = $results;
+		// we only check finals, if lead final has at least one result (first rank has a lead final result)
+		$check_finals = $quali_overall != 3;// && !empty($results[0]['result_rank7']);
+
+		// first set result_rank by final_points or quali_points (already ordered by them)
+		$old = null;
+		foreach($results as $n => &$result)
+		{
+			if (!$old)
+			{
+				$result['result_rank'] = 1;
+			}
+			// check n-1 and n are tied
+			else
+			{
+				$result['result_rank'] = $old['result_rank'];
+
+				if (isset($old['final_points']))
+				{
+					if (!isset($result['final_points']) ||
+						$old['final_points'] < $result['final_points'])
+					{
+						$result['result_rank'] = $n+1;
+					}
+				}
+				elseif (isset($old['quali_points']))
+				{
+					if (!isset($result['quali_points']) ||
+						$old['quali_points'] < $result['quali_points'])
+					{
+						$result['result_rank'] = $n+1;
+					}
+				}
+			}
+			$old =& $result;
+		}
+
+		// now do the tie-breaking and countback in order specified in the rules
+		unset($old);
+		$skip = 0;
+		$need_sorting = false;
+		foreach($results as $n => &$result)
+		{
+			if ($skip-- > 0 || !empty($old) && $result['result_rank'] == $old['result_rank'])
+			{
+				$score = 0;
+				if ($check_finals && isset($result['final_points']))
+				{
+					// final head-to-head tie-breaker: check only 2 are tied (requirement for head-to-head comparison!)
+					if ($n == count($results)-1 || $results[$n+1]['result_rank'] != $result['result_rank'])
+					{
+						$score = self::head_to_head_comp($result, $old, array(-6, 6, 7));
+					}
+
+					// no head-to-head tie-break --> countback to qualification
+					if (!$score)
+					{
+						// we need to load full quali overall, as tie breaker wont work (no pre-ordered list!)
+						if (!isset($qualification))
+						{
+							$filter['route_order'] = -3;	// qualification overall
+							$qualification = array();
+							foreach($this->search(array(), true, 'result_rank', '', '', 'AND', false, $filter) as $row)
+							{
+								$qualification[$row['PerId']] = $row['result_rank'];
+							}
+						}
+						// get tied athletes we need to do quali countback (might be more then just $old and $result!)
+						$tied = array();
+						for($i = $n-1; $i < count($results) && $old['result_rank'] == $results[$i]['result_rank']; ++$i)
+						{
+							$tied[$i] = $qualification[$results[$i]['PerId']];
+						}
+					}
+				}
+				// qualification head-to-head tie-breaker: check only 2 are tied (requirement for head-to-head comparison!)
+				elseif ($n == count($results)-1 || $results[$n+1]['result_rank'] != $result['result_rank'])
+				{
+					$score = self::head_to_head_comp($result, $old, array(0, 1, 2));
+				}
+				else
+				{
+					// get tied athletes we need to do seeding list countback (might be more then just $old and $result!)
+					$tied = array();
+					for($i = $n-1; $i < count($results) && $old['result_rank'] == $results[$i]['result_rank']; ++$i)
+					{
+						$tied[$i] = 1000 - $results[$i]['start_order'];	// best in seeding list starts last!
+					}
+				}
+
+				if (isset($tied))
+				{
+					// sort them by ascending quali result or seeding/start-list
+					asort($tied, SORT_NUMERIC);
+					$rank = $old['result_rank'];
+					$skip = -2;	// old and result are already processed, no need to skip
+					foreach(array_keys($tied) as $i)
+					{
+						$results[$i]['result_rank'] = $rank++;
+					}
+					$need_sorting = true;
+					unset($tied);
+				}
+				elseif ($score < 0)
+				{
+					++$result['result_rank'];
+				}
+				else
+				{
+					++$old['result_rank'];
+					$need_sorting = true;
+				}
+			}
+			$old =& $result;
+		}
+
+		if ($need_sorting)
+		{
+			usort($results, function($a, $b)
+			{
+				return $a['result_rank']-$b['result_rank'];
+			});
+		}
+		// dump results for writing tests, if not running the test ;)
+		if ($filter)
+		{
+			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/combined-general-'.$filter['WetId'].'-'.$filter['GrpId'].'-'.$filter['route_order'].'.php',
+				"<?php\n\n\$input = ".var_export($input, true).";\n\$quali_overall = $quali_overall;\n\$qualification = ".var_export($qualification)."\n\$results = ".var_export($results, true).";\n");
+			error_log(__METHOD__."() logged input and results to ".realpath($path));
+		}
+}
+
+	/**
+	 * Do a head to head comparison for two results and given heats
+	 *
+	 * @param array $first
+	 * @param array $second
+	 * @param array $heats
+	 * @return int <0 if $first wins more often, >0 if $second, 0 no tie-break
+	 */
+	static function head_to_head_comp(array $first, array $second, array $heats)
+	{
+		$score = 0;
+		foreach($heats as $heat)
+		{
+			if (empty($first['result_rank'.$heat]) || empty($second['result_rank'.$heat]))
+			{
+				// do nothing until both have a result
+			}
+			elseif ($first['result_rank'.$heat] < $second['result_rank'.$heat])
+			{
+				$score--;
+			}
+			elseif ($first['result_rank'.$heat] < $second['result_rank'.$heat])
+			{
+				$score++;
+			}
+		}
+		if ($score) error_log(__METHOD__."() head-to-head tie-break on $first[result_rank]. place between $first[nachname], $first[vorname] ($first[nation]) and $second[nachname], $second[vorname] ($second[nation]) heats=".implode(',', $heats)." score=$score");
+		return $score;
+	}
+
+	/**
 	 * Subquery to get the rank in the previous heat
 	 *
 	 * @param int $route_order
 	 * @param int|string $route_type ONE_QUALI, TWO_QUALI_HALF, TWO_QUALI_ALL or "combined" for combined boulder or lead final
 	 * @param int $quali_overal =0 1: Group A, 2: Group B, 3: Overal qualification, 0: other
+	 * @param array $route_names =null
+	 * @param array $keys =null WetId and GrpId for combined final checks
 	 * @return string
 	 */
-	private function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0, array $route_names=null)
+	private function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0, array $route_names=null, array $keys=null)
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL_SUM)
 		{
@@ -518,8 +712,30 @@ class ranking_route_result extends Api\Storage\Base
 			$r2 = $this->_unranked($result[1]);//'r2'
 			$r3 = $this->_unranked($result[2]);//'r3'
 
-			// if we have no lead final (7) yet, just use factor of 1
-			if ($route_order == -6 && !isset($route_names[7])) $r3 = $c3 = 1;
+			// combined final
+			if ($route_order == -6)
+			{
+				// check if we already have a result for boulder (6) or lead (7), if not use factor of 1
+				for($r = 6; $r <= 7; ++$r)
+				{
+					if (!isset($route_names[$r]) || $keys && !$this->get_count(array(
+						'WetId' => $keys['WetId'],
+						'GrpId' => $keys['GrpId'],
+						'route_order' => $r,
+					), 'result_rank'))
+					{
+						switch($r)
+						{
+							case 6:	// no boulder final result yet
+								$r2 = $c2 = 1;
+								break;
+							case 7:	// no lead final result yet
+								$r3 = $c3 = 1;
+								break;
+						}
+					}
+				}
+			}
 
 			return "SELECT ((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2 * (($c3)+2*$r3-1)/2) FROM $this->table_name r1".
 				" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.$this->id_col=r2.$this->id_col".
@@ -563,7 +779,7 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param int $route_type ONE_QUALI, TWO_QUALI_HALF or TWO_QUALI_ALL
 	 * @param string &$discipline 'lead', 'speed', 'boulder', 'speedrelay'
 	 * @param array $result_cols =array() result relevant col
-	 * @param int $quali_overall =0 1: groupA, 2: groupB, 3: quali overall, 0: other
+	 * @param int $quali_overall =0 1: groupA, 2: groupB, 3: quali overall, 6: combined final, 0: other
 	 * @return string join
 	 */
 	public function general_result_join($keys,&$extra_cols,&$order_by,&$route_names,$route_type,$discipline,$result_cols=array(), $quali_overall=0)
@@ -663,16 +879,16 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order, $route_type, $quali_overall).')';
-				$order_bys = array($product);
-				if ($route_type == TWO_QUALI_ALL_SUM) $order_bys[0] .= ' DESC';
 				$extra_cols[] = "$product AS quali_points";
+				$order_bys = array('quali_points');
+				if ($route_type == TWO_QUALI_ALL_SUM) $order_bys[0] .= ' DESC';
 			}
 			// combined final (-6 speed final overall)
 			elseif ($route_order == -6)
 			{
-				$product = '('.$this->_sql_rank_prev_heat(-6, $route_type, $quali_overall, $route_names).')';
-				$order_bys[] = $product;
+				$product = '('.$this->_sql_rank_prev_heat(-6, $route_type, $quali_overall, $route_names, $keys).')';
 				$extra_cols[] = "$product AS final_points";
+				$order_bys[] = 'final_points IS NULL,final_points';
 				$no_more_heats = true;
 			}
 			elseif (!$no_more_heats)
