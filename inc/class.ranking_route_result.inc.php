@@ -610,7 +610,7 @@ class ranking_route_result extends Api\Storage\Base
 		if ($filter)
 		{
 			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/combined-general-'.$filter['WetId'].'-'.$filter['GrpId'].'-'.$filter['route_order'].'.php',
-				"<?php\n\n\$input = ".var_export($input, true).";\n\$quali_overall = $quali_overall;\n\$qualification = ".var_export($qualification)."\n\$results = ".var_export($results, true).";\n");
+				"<?php\n\n\$input = ".var_export($input, true).";\n\$quali_overall = $quali_overall;\n\$qualification = ".var_export($qualification, true)."\n\$results = ".var_export($results, true).";\n");
 			error_log(__METHOD__."() logged input and results to ".realpath($path));
 		}
 }
