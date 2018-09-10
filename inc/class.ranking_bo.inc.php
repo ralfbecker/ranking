@@ -644,9 +644,9 @@ class ranking_bo extends ranking_so
 				in_array($comp['nation'],$this->register_rights) || // user has national registration rights OR
 				(($this->acl_check_athlete($athlete, EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
-						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));							//   user has result-rights for that calendar ] ) }
+						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));						//   user has result-rights for that calendar ] ) }
 
-		//error_log(__METHOD__."(".array2string($comp).",'$nation') = ".array2string($ret));
+		//error_log(__METHOD__."(".array2string($comp).", ".array2string($athlete).", $cat) returning ".array2string($ret));
 		return $ret;
 	}
 
@@ -838,7 +838,7 @@ class ranking_bo extends ranking_so
 		{
 			$error = lang('Registration for this competition is over!');
 		}
-		elseif (!$this->registration_check($comp, $athlete, $cat))
+		elseif (!$this->registration_check($comp, $athlete, $cat['GrpId']))
 		{
 			$error = lang('Missing registration rights!');
 		}
