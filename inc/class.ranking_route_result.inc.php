@@ -491,6 +491,8 @@ class ranking_route_result extends Api\Storage\Base
 		$old = null;
 		foreach($results as $n => &$result)
 		{
+			$result['result_rank0'] = $result['result_rank'];	// save qualification result to result_rank0
+
 			if (!$old)
 			{
 				$result['result_rank'] = 1;
@@ -517,6 +519,7 @@ class ranking_route_result extends Api\Storage\Base
 					}
 				}
 			}
+			//error_log("1: $result[nachname], $result[vorname] ($result[nation]) final_points=$result[final_points], quali_points=$result[quali_points], start_order=$result[start_order] --> result_rank=$result[result_rank]");
 			$old =& $result;
 		}
 
@@ -526,15 +529,15 @@ class ranking_route_result extends Api\Storage\Base
 		$need_sorting = false;
 		foreach($results as $n => &$result)
 		{
+			$score = 0;
 			if ($skip-- > 0 || !empty($old) && $result['result_rank'] == $old['result_rank'])
 			{
-				$score = 0;
 				if ($check_finals && isset($result['final_points']))
 				{
 					// final head-to-head tie-breaker: check only 2 are tied (requirement for head-to-head comparison!)
 					if ($n == count($results)-1 || $results[$n+1]['result_rank'] != $result['result_rank'])
 					{
-						$score = self::head_to_head_comp($result, $old, array(-6, 6, 7));
+						$score = self::head_to_head_comp($result, $old, array(5, 6, 7));
 					}
 
 					// no head-to-head tie-break --> countback to qualification
@@ -543,11 +546,12 @@ class ranking_route_result extends Api\Storage\Base
 						// we need to load full quali overall, as tie breaker wont work (no pre-ordered list!)
 						if (!isset($qualification))
 						{
-							$filter['route_order'] = -3;	// qualification overall
 							$qualification = array();
-							foreach($this->search(array(), true, 'result_rank', '', '', 'AND', false, $filter) as $row)
+							foreach($this->search(array(), false, 'result_rank', '', '', false, 'AND', false, array(
+								'route_order' => -3,	// qualification overall
+							)+$filter) as $k => $row)
 							{
-								$qualification[$row['PerId']] = $row['result_rank'];
+								if (is_int($k)) $qualification[$row['PerId']] = $row['result_rank'];
 							}
 						}
 						// get tied athletes we need to do quali countback (might be more then just $old and $result!)
@@ -558,21 +562,25 @@ class ranking_route_result extends Api\Storage\Base
 						}
 					}
 				}
-				// qualification head-to-head tie-breaker: check only 2 are tied (requirement for head-to-head comparison!)
-				elseif ($n == count($results)-1 || $results[$n+1]['result_rank'] != $result['result_rank'])
-				{
-					$score = self::head_to_head_comp($result, $old, array(0, 1, 2));
-				}
 				else
 				{
-					// get tied athletes we need to do seeding list countback (might be more then just $old and $result!)
-					$tied = array();
-					for($i = $n-1; $i < count($results) && $old['result_rank'] == $results[$i]['result_rank']; ++$i)
+					// qualification head-to-head tie-breaker: check only 2 are tied (requirement for head-to-head comparison!)
+					if ($n == count($results)-1 || $results[$n+1]['result_rank'] != $result['result_rank'])
 					{
-						$tied[$i] = 1000 - $results[$i]['start_order'];	// best in seeding list starts last!
+						$score = self::head_to_head_comp($result, $old, array(0, 1, 2));
+					}
+
+					// no head-to-head tie-break --> countback to seeding list
+					if (!$score)
+					{
+						// get tied athletes we need to do seeding list countback (might be more then just $old and $result!)
+						$tied = array();
+						for($i = $n-1; $i < count($results) && $old['result_rank'] == $results[$i]['result_rank']; ++$i)
+						{
+							$tied[$i] = 1000 - $results[$i]['start_order'];	// best in seeding list starts last!
+						}
 					}
 				}
-
 				if (isset($tied))
 				{
 					// sort them by ascending quali result or seeding/start-list
@@ -596,6 +604,7 @@ class ranking_route_result extends Api\Storage\Base
 					$need_sorting = true;
 				}
 			}
+			//error_log("2: $result[nachname], $result[vorname] ($result[nation]) final_points=$result[final_points], quali_points=$result[quali_points], score=$score, start_order=$result[start_order] --> result_rank=$result[result_rank]");
 			$old =& $result;
 		}
 
@@ -610,7 +619,7 @@ class ranking_route_result extends Api\Storage\Base
 		if ($filter)
 		{
 			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/combined-general-'.$filter['WetId'].'-'.$filter['GrpId'].'-'.$filter['route_order'].'.php',
-				"<?php\n\n\$input = ".var_export($input, true).";\n\$quali_overall = $quali_overall;\n\$qualification = ".var_export($qualification, true)."\n\$results = ".var_export($results, true).";\n");
+				"<?php\n\n\$input = ".var_export($input, true).";\n\$quali_overall = $quali_overall;\n\$qualification = ".var_export($qualification, true).";\n\$results = ".var_export($results, true).";\n");
 			error_log(__METHOD__."() logged input and results to ".realpath($path));
 		}
 }
@@ -621,7 +630,7 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param array $first
 	 * @param array $second
 	 * @param array $heats
-	 * @return int <0 if $first wins more often, >0 if $second, 0 no tie-break
+	 * @return int >0 if $first wins more often, <0 if $second, 0 no tie-break
 	 */
 	static function head_to_head_comp(array $first, array $second, array $heats)
 	{
@@ -632,7 +641,7 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				// do nothing until both have a result
 			}
-			elseif ($first['result_rank'.$heat] < $second['result_rank'.$heat])
+			elseif ($first['result_rank'.$heat] > $second['result_rank'.$heat])
 			{
 				$score--;
 			}
