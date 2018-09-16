@@ -2069,7 +2069,7 @@ class ranking_route_result extends Api\Storage\Base
 	public function speed_final_tie_breaking(array &$results, array $keys, $combined=false)
 	{
 		$input = $results;
-		$last_new_rank = $last_pairing = $last_quali_time = $last_quali_time2 = $last_time = null;
+		$last = $last_new_rank = $last_pairing = $last_quali_time2 = null;
 		foreach($results as $n => &$result)
 		{
 			$quali_time2 = $result['quali_details']['result_time_l'] == $result['quali_time'] ?
@@ -2079,13 +2079,13 @@ class ranking_route_result extends Api\Storage\Base
 			if ($last_new_rank && $last_new_rank == $result['new_rank'] && $last_pairing == intdiv($result['start_order']-1, 2))
 			{
 				// in last final heat (small final and final) we are NOT sorted by result_time
-				if ($result['result_time'] != $last_time)
+				if ($result['result_time'] != $last['result_time'])
 				{
-					if ($last_time && (!$result['result_time'] || $result['result_time'] > $last_time))
+					if ($last['result_time'] && (!$result['result_time'] || $result['result_time'] > $last['result_time']))
 					{
 						$result['new_rank']++;
 					}
-					elseif ($result['result_time'] && (!$last_time || $last_time > $result['result_time']))
+					elseif ($result['result_time'] && (!$last['result_time'] || $last['result_time'] > $result['result_time']))
 					{
 						$results[$n-1]['new_rank']++;
 					}
@@ -2094,11 +2094,21 @@ class ranking_route_result extends Api\Storage\Base
 				{
 					// already fixed above for last final heat
 				}
-				elseif ($result['quali_time'] > $last_quali_time)
+				// do result have a have a wildcard
+				elseif (!isset($result['result_time']) && !$result['eliminated'])
+				{
+					$results[$n-1]['new_rank']++;
+				}
+				// do last have a have a wildcard
+				elseif (!isset($last['result_time']) && !$last['eliminated'])
 				{
 					$result['new_rank']++;
 				}
-				elseif ($result['quali_time'] == $last_quali_time)
+				elseif ($result['quali_time'] > $last['quali_time'])
+				{
+					$result['new_rank']++;
+				}
+				elseif ($result['quali_time'] == $last['quali_time'])
 				{
 					// while every finalist must have a quali_time, they might not have a $quali_time2 (worse result from quali)
 					if ($last_quali_time2 && (!$quali_time2 || $quali_time2 > $last_quali_time2))
@@ -2112,10 +2122,9 @@ class ranking_route_result extends Api\Storage\Base
 					}
 				}
 			}
+			$last = $result;
 			$last_new_rank = $result['new_rank'];
-			$last_time = $result['result_time'];
 			$last_pairing = intdiv($result['start_order']-1, 2);
-			$last_quali_time = $result['quali_time'];
 			$last_quali_time2 = $quali_time2;
 		}
 
