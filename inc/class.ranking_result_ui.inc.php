@@ -828,6 +828,7 @@ class ranking_result_ui extends ranking_result_bo
 			{
 				$query['col_filter']['route_order'] = -6;
 				$num_first_final = 6;
+				$skip = 0;
 			}
 			$query['num_rows'] = $num_first_final;	// dont need further quali-participants
 		}
