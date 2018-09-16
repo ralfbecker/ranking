@@ -1224,6 +1224,7 @@ class ranking_route_result extends Api\Storage\Base
 						else
 						{
 							$data['eliminated_l'] = ranking_result_bo::ELIMINATED_FALSE_START;
+							$data['eliminated'] = 2;
 							$data['result'] = $data['time_sum'];
 							$data['result_time'] = null;
 						}
@@ -1290,7 +1291,8 @@ class ranking_route_result extends Api\Storage\Base
 									$data['result'.$suffix] = $detail['false_start'] > self::MAX_FALSE_STARTS ?
 										($data['false_start'] > 1 ? lang('%1. false start', $data['false_start']) : lang('false start')) : lang('fall');
 								}
-								elseif ($data['result_time'.$suffix] == self::WILDCARD_TIME)
+								elseif ($data['result_time'.$suffix] == self::WILDCARD_TIME ||
+									$data['result_time'.$suffix] == 1000.0*self::WILDCARD_TIME)	// Wildcard in combined general result
 								{
 									$data['result'.$suffix] = lang('Wildcard');
 								}
