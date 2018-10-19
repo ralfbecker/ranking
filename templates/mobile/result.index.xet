@@ -177,9 +177,9 @@
 		<vbox class="et2_nextmatch">
 			<hbox width="100%" class="dialogHeadbar">
 				<buttononly id="button[new]" disabled="@no_route_selection" background_image="1" onclick="" image="add" class="noPrint"/>
-				<buttononly id="button[edit]" disabled="@no_route_selection" background_image="1" onclick="egw.open_link('ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','result_route','700x500','ranking')" image="edit" class="noPrint"/>
+				<buttononly id="button[edit]" disabled="@no_route_selection" background_image="1" onclick="egw.open_link('ranking.ranking_result_ui.route&amp;comp={$cont['nm']['comp']}&amp;cat={$cont['nm']['cat']}&amp;route={$cont['nm']['route']}','result_route','700x500','ranking')" image="edit" class="noPrint"/>
 				<buttononly background_image="1" image="menu_list" class="headerToggle" onclick="jQuery('.et2_nextmatch').toggleClass('selectHeader');"/>
-				<buttononly id="result_popup" disabled="@no_route_selection" background_image="1" onclick="egw.open_link('/ranking/sitemgr/digitalrock/eliste.html?comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','_blank')" options="search" class=""/>
+				<buttononly id="result_popup" disabled="@no_route_selection" background_image="1" onclick="egw.open_link('/ranking/sitemgr/digitalrock/eliste.html?comp={$cont['comp']['WetId']}&amp;cat={$cont['nm']['cat']}&amp;route={$cont['nm']['route']}','_blank')" options="search" class=""/>
 				<button disabled="@no_list" statustext="Apply the changes made"  id="button[apply]"/>
 			</hbox>
 			<vbox  class="noPrint resultHeader nextmatch_header_row">

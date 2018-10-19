@@ -106,7 +106,7 @@
 					<description align="center" id="{$row}[start_order]" no_lang="1"/>
 					<description id="{$row}[team_id]"/>
 					<menulist>
-						<menupopup id="set[$row_cont[team_id]][team_nation]" no_lang="1" onchange="if (this.value) xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_set_athlets',{$cont[route_data][WetId]},{$cont[route_data][GrpId]},$row_cont[team_id],this.value);" options="Select one"/>
+						<menupopup id="set[$row_cont[team_id]][team_nation]" no_lang="1" onchange="if (this.value) xajax_doXMLHTTP('ranking.ranking_result_ui.ajax_set_athlets',{$cont['route_data']['WetId']},{$cont['route_data']['GrpId']},$row_cont[team_id],this.value);" options="Select one"/>
 					</menulist>
 					<textbox id="set[$row_cont[team_id]][team_name]" no_lang="1" size="10" maxlength="64" class="required"/>
 					<menulist>

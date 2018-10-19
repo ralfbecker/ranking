@@ -195,10 +195,10 @@
 					<hbox>
 						<select class="header rightPad5" statustext="Select type of list to show" id="nm[show_result]" no_lang="1" onchange="1"/>
 						<select class="header" statustext="Select heat" id="nm[route]" no_lang="1" onchange="1"/>
-						<buttononly label="Edit this heat" id="button[edit]" onclick="egw.open_link('ranking.ranking_result_ui.route&amp;comp={$cont[nm][comp]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','result_route','700x500','ranking')" image="edit" class="leftPad5 noPrint"/>
+						<buttononly label="Edit this heat" id="button[edit]" onclick="egw.open_link('ranking.ranking_result_ui.route&amp;comp={$cont['nm']['comp']}&amp;cat={$cont['nm']['cat']}&amp;route={$cont['nm']['route']}','result_route','700x500','ranking')" image="edit" class="leftPad5 noPrint"/>
 						<buttononly label="Add a new heat" id="button[new]" onclick="" image="new" class="leftPad5 noPrint"/>
 						<buttononly label="Download" id="button[download]" onclick="widget.getInstanceManager().postSubmit()" image="filesave" class="leftPad5 noPrint"/>
-						<buttononly label="Result" id="result_popup" onclick="egw.open_link('/ranking/sitemgr/digitalrock/eliste.html?comp={$cont[comp][WetId]}&amp;cat={$cont[nm][cat]}&amp;route={$cont[nm][route]}','_blank')" options="view" class="leftPad5"/>
+						<buttononly label="Result" id="result_popup" onclick="egw.open_link('/ranking/sitemgr/digitalrock/eliste.html?comp={$cont['comp']['WetId']}&amp;cat={$cont['nm]['cat']}&amp;route={$cont['nm']['route']}','_blank')" options="view" class="leftPad5"/>
 						<select class="noPrint leftPad5" id="nm[ranking]" onchange="1" options="display no ranking"/>
 					</hbox>
 				</row>
