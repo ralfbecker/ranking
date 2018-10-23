@@ -344,7 +344,7 @@ class ranking_route_result extends Api\Storage\Base
 				// as the head-to-head must have higher precedence then the regular countback, we can not use regular code
 				if ($discipline == 'combined' && (in_array($quali_overall, array(3, 6)) || $initial_route_order == -1))
 				{
-					$this->do_combined_general_result($rows, $quali_overall, $initial_filter);
+					$this->do_combined_general_result($rows, $quali_overall, $initial_filter, null, $comp_nation);
 				}
 				else
 				{
@@ -480,8 +480,9 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param int $quali_overall 0: general result, 3: overall qualification, 6: overall final
 	 * @param array $filter filter for this ranking to be able load qualification, if needed
 	 * @param array $qualification =null qualification result, default query it (for testing)
+	 * @param string $comp_nation =null nation of the competition: "GER" does NOT use seeding list as final tie breaker
 	 */
-	function do_combined_general_result(array &$results, $quali_overall, array $filter, array $qualification=null)
+	function do_combined_general_result(array &$results, $quali_overall, array $filter, array $qualification=null, $comp_nation=null)
 	{
 		$input = $results;
 		// we only check finals, if lead final has at least one result (first rank has a lead final result)
@@ -571,7 +572,7 @@ class ranking_route_result extends Api\Storage\Base
 					}
 
 					// no head-to-head tie-break --> countback to seeding list
-					if (!$score)
+					if (!$score && $comp_nation !== 'GER')
 					{
 						// get tied athletes we need to do seeding list countback (might be more then just $old and $result!)
 						$tied = array();
@@ -593,6 +594,10 @@ class ranking_route_result extends Api\Storage\Base
 					}
 					$need_sorting = true;
 					unset($tied);
+				}
+				elseif(!$score)
+				{
+					// GER does not use seeding list
 				}
 				elseif ($score < 0)
 				{
