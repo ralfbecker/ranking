@@ -1522,7 +1522,12 @@ class ranking_result_bo extends ranking_bo
 					$data['result_modifier'] = $this->user;
 
 					//error_log(__METHOD__."() old: route_result->data=".array2string($this->route_result->data));
-					$this ->route_result->save($data);
+					if (($err = $this->route_result->save($data)))
+					{
+						$this->error[$id]['error'] = lang('Error saving the result (%1)',
+							$this->db->readonly ? lang('Database is readonly') : $err);
+						return false;
+					}
 					//error_log(__METHOD__."() new: route_result->data=".array2string($this->route_result->data));
 					++$modified;
 					break;
