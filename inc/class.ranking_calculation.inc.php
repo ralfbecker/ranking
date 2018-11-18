@@ -808,7 +808,7 @@ class ranking_calculation
 			}
 
 			//if (!isset($this->pers[$id])) error_log(__METHOD__."() *** $result[nachname] $result[vorname] ***");
-			$reserve_for_min_disciplines = $min_disciplines - count($this->disciplines[$id]);
+			$reserve_for_min_disciplines = $min_disciplines - count((array)$this->disciplines[$id]);
 			if ($overall || $reserve_for_min_disciplines < 0 || !$min_disciplines) $reserve_for_min_disciplines = 0;
 			if (!$max_comp || $this->cats[$id][$result['GrpId']] < $max_comp-
 				(isset($this->disciplines[$id][$result['discipline']]) ? $reserve_for_min_disciplines : 0))
