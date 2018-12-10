@@ -1,54 +1,203 @@
+%1 athletes imported.	ranking	es-es	%1 deportistas importados.
 %1 deleted	ranking	es-es	%1 suprimido
+%1 federations added to parent federation.	ranking	es-es	%1 federaciones añadidas a la federación padre.
+%1 federations merged.	ranking	es-es	%1 federaciones fusionadas.
+%1 is already registered!	ranking	es-es	¡%1 ya está registrado!
+%1 is an admin and has therefor all rights!	ranking	es-es	¡%1 es un administrador y tiene todos los derechos!
+%1 lines read from file.	ranking	es-es	%1 líneas leídas del archivo.
+%1 no longer prequalified athletes (without registration) deleted.	ranking	es-es	%1 atletas ya no precalificados (sin registro) eliminados.
+%1 no longer prequalified athletes with registration, you need to check quota!	ranking	es-es	%1 atletas ya no precalificados con registro, ¡necesitas revisar la cuota!
+%1 participants imported	ranking	es-es	%1 participantes importados
+%1 prequalified athletes in registration, %2 changed or added.	ranking	es-es	%1 atletas precalificados en registro, %2 modificados o añadidos.
+%1 registered.	ranking	es-es	%1 registrado.
 %1 saved	ranking	es-es	%1 grabado
+%1 years, since %2	ranking	es-es	%1 años, desde %2
+%1, %2 deleted for category %3	ranking	es-es	%1, %2 suprimido para la categoría %3
+%1, %2 registered for category %3	ranking	es-es	%1, %2 registrado para la categoría %3
+%1. heat	ranking	es-es	%1. Ronda
+1. january	ranking	es-es	1. Enero
+access control, key	ranking	es-es	control de acceso, clave
 accounting	ranking	es-es	Cuentas
 actions	ranking	es-es	Acciones
+add a cup	ranking	es-es	Añadir una copa
+add a new athlete	ranking	es-es	añadir un atleta nuevo
+add a new category	ranking	es-es	Añadir una categoría nueva
+add a new competition	ranking	es-es	añadir una competencia nueva
+add a new cup	ranking	es-es	añadir una copa nueva
+add a new heat	ranking	es-es	Añadir una ronda nueva
+add athletes	ranking	es-es	añadir atletas
+add heat	ranking	es-es	Añadir una ronda
+add new athlete with the given data	ranking	es-es	Añadir atleta nuevo con los datos dados.
+additional category	ranking	es-es	Categoría adicional
+admin rights required!	ranking	es-es	¡Se requieren derechos de administrador!
+age	ranking	es-es	Edad
+all above	ranking	es-es	todo lo de arriba
+all participants	ranking	es-es	Todos los participantes
+allow athletes to register themself for this competition	ranking	es-es	Permitir a los atletas registrarse ellos mismos para esta competencia
+allowed without extra confirmation	ranking	es-es	Permitido sin confirmación adicional
+allows athletes to register themself for this competition	ranking	es-es	Permitir a los atletas registrarse ellos mismos para esta competencia
+already registered	ranking	es-es	Ya registrado
+applied	ranking	es-es	aplicado
+applied for a %1 license	ranking	es-es	Aplicado a %1 licencias
+athlete	ranking	es-es	Atleta
+athlete %1 not found!	ranking	es-es	¡Atleta %1 no encontrado!
+athlete 1	ranking	es-es	Atleta 1
+athlete 2	ranking	es-es	Atleta 2
+athlete 3	ranking	es-es	Atleta 3
+athlete is suspended !!!	ranking	es-es	¡¡¡El atleta está suspendido!!!
+athlete not found !!!	ranking	es-es	¡¡¡Atleta NO encontrado!!!
+athletes	ranking	es-es	Atletas
 before	ranking	es-es	Antes
-birthday	ranking	es-es	Fecha de nacimiento
+birthdate	ranking	es-es	Fecha de nacimiento
+birthday	ranking	es-es	Día de nacimiento
+birthyear	ranking	es-es	Año de nacimiento
+category not found !!!	ranking	es-es	¡¡¡Categoría NO encontrada!!!
+cathegories	ranking	es-es	Categorías
+cellphone	ranking	es-es	Teléfono celular
 check all	ranking	es-es	Marcar todo
+checked	ranking	es-es	Marcado
 children	ranking	es-es	Hijos
 city	ranking	es-es	Ciudad
 columns	ranking	es-es	Columnas
 comments	ranking	es-es	Comentarios
+competition	ranking	es-es	Competencia
+competition calendar	ranking	es-es	Calendario de competencias
+competition logo	ranking	es-es	Logo de la competencia
+competition name	ranking	es-es	Nombre de la competencia
+competition not found !!!	ranking	es-es	¡¡¡Competencia NO encontrada!!!
+competition not found!	ranking	es-es	¡Competencia no encontrada!
+competition results	ranking	es-es	Resultados de la competencia
+competitions	ranking	es-es	Competencias
 confirmed	ranking	es-es	Confirmado
 contact	ranking	es-es	Contacto
+cup	ranking	es-es	Copa
+cups	ranking	es-es	Copas
 database	admin	es-es	Base de datos
+deadline	ranking	es-es	Fecha tope
+delete all rights for this nation	ranking	es-es	Suprimir todos los derechos a esta nación
+delete result	ranking	es-es	suprimir resultado
+delete this athlete	ranking	es-es	Suprimir este atleta
 delete this category	ranking	es-es	borrar esta categoría
+delete this competition	ranking	es-es	Suprimir esta competencia
+delete this cup	ranking	es-es	Suprimir esta copa
+delete this federation	ranking	es-es	Suprimir esta federación
+deleted	ranking	es-es	suprimido
+deletes this cup	ranking	es-es	suprimir esta copa
 display	ranking	es-es	Mostrar
+display athlete	ranking	es-es	Mostrar atleta
+display cup	ranking	es-es	Mostrar copa
 down	ranking	es-es	Abajo
 download	ranking	es-es	Descargar
 edit %1	ranking	es-es	Editar %1
+edit athlete	ranking	es-es	Editar atleta
+edit competition	ranking	es-es	Editar competencia
+edit heat	ranking	es-es	Editar ronda
+edit profile	ranking	es-es	Editar perfil
+edit this athlete	ranking	es-es	Editar este atleta
+edit this competition	ranking	es-es	Editar esta competencia
+edit this cup	ranking	es-es	Editar esta copa
+edit this heat	ranking	es-es	Editar esta ronda
 end	ranking	es-es	Fin
 error: while saving !!!	ranking	es-es	¡¡Error al guardar!!
 fax	ranking	es-es	Fax
+federation	ranking	es-es	Federación
+federation deleted.	ranking	es-es	Federación suprimida.
+federation or nationality	ranking	es-es	federación o nacionalidad
+federation saved.	ranking	es-es	Federación grabada.
+federations	ranking	es-es	Federaciones
 female	ranking	es-es	Femenino
+file is not a pdf	ranking	es-es	Archivo no es un PDF
+file is not an image (%1)	ranking	es-es	Archivo no es una imagen (%1)
+format	ranking	es-es	Formato
+format #%1 not found!	ranking	es-es	¡Formato #%1 no encontrado!
+format deleted	ranking	es-es	Formato suprimido
+format saved	ranking	es-es	Formato grabado
 from	ranking	es-es	De
 gender	ranking	es-es	Género
+gender of the athlete	ranking	es-es	género del atleta
+gender...	ranking	es-es	Género...
 general	ranking	es-es	General
 go	ranking	es-es	Ir
+heat	ranking	es-es	Ronda
+heat deleted	ranking	es-es	Ronda suprimida
+heat saved	ranking	es-es	Ronda grabada
+heat updated	ranking	es-es	Ronda actualizada
+hobbies	ranking	es-es	Pasatiempos
 id	ranking	es-es	Id
 ignore	ranking	es-es	Ignorar
 import	ranking	es-es	Importar
+import as	ranking	es-es	Importar como
 import file	ranking	es-es	Importar fichero
+judge	ranking	es-es	Juez
+judges	ranking	es-es	Jueces
 male	ranking	es-es	Masculino
 more	ranking	es-es	Más
-not allowed	ranking	es-es	no permitido
-permission denied !!!	ranking	es-es	¡Permiso denegado!
-phone	ranking	es-es	Llamada telefónica
+narrow your search	ranking	es-es	Reduce tu búsqueda
+nation	ranking	es-es	Nación
+nations and federations	ranking	es-es	Naciones y Federaciones
+not allowed	ranking	es-es	No permitido
+not deleted	ranking	es-es	No suprimido
+participant deleted	ranking	es-es	Participante suprimido
+participants without password	ranking	es-es	Participantes sin contraseña
+password email	ranking	es-es	Contraseña del correo-e
+permission denied !!!	ranking	es-es	¡¡¡Permiso denegado!!!
+phone	ranking	es-es	Teléfono
 picture	ranking	es-es	Imagen
+picture attached	ranking	es-es	Imagen adjuntada
 port	admin	es-es	puerto
-registration	ranking	es-es	Autorregistro
-remark	ranking	es-es	Comentario
+prequalified	ranking	es-es	precalificado
+prequalified competitiors	ranking	es-es	competidores precalificados
+professional	ranking	es-es	Profesional
+profile	ranking	es-es	Perfil
+profile hidden	ranking	es-es	Perfil oculto
+profile shown	ranking	es-es	Perfil mostrado
+provisional	ranking	es-es	provisional
+provisional result	ranking	es-es	resultado provisional
+quota	ranking	es-es	Cuota
+registered	ranking	es-es	Registrado
+registration	ranking	es-es	Registro
+registration deadline	ranking	es-es	Fecha tope de registro
+remark	ranking	es-es	Observación
+repeat	ranking	es-es	Repetir
+result	ranking	es-es	Resultado
+results	ranking	es-es	Resultados
 rows	ranking	es-es	Filas
 saves the changes made	ranking	es-es	guarda los cambios realizados
+select a competition	ranking	es-es	Seleccionar una competencia
+select a federation	ranking	es-es	Seleccionar una federación
 select an action	ranking	es-es	Seleccionar una acción
-start	ranking	es-es	Empezar
+select calendar	ranking	es-es	Seleccionar un calendario
+select competition	ranking	es-es	Seleccionar una competencia
+select heat	ranking	es-es	Seleccionar una ronda
+selected category	ranking	es-es	Categoría seleccionada
+selected participants	ranking	es-es	participantes seleccionados
+size (cm)	ranking	es-es	Tamaño (cm)
+speed	ranking	es-es	velocidad
+start	ranking	es-es	Inicio
+start heat	ranking	es-es	Iniciar ronda
 startdate	ranking	es-es	Fecha de inicio
 street	ranking	es-es	Calle
 sum	ranking	es-es	Suma
+suspended	ranking	es-es	suspendido
+unknown type	ranking	es-es	Tipo desconocido
 unpublished	ranking	es-es	sin publicar
 up	ranking	es-es	Arriba
+update result	ranking	es-es	Actualizar resultado
+uploaded picture is no jpeg !!!	ranking	es-es	¡¡¡Imagen actualizada no es un JPEG!!!
+view %1	ranking	es-es	ver %1
+view the attached pdf	ranking	es-es	Ver el PDF adjunto
+view this athlete	ranking	es-es	Ver este atleta
+view this competition	ranking	es-es	Ver esta competencia
+view this cup	ranking	es-es	Ver esta copa
 website	ranking	es-es	Sitio web
+weight (kg)	ranking	es-es	Peso (kg)
+weight in kilogram	ranking	es-es	peso en kilogramos
+weight, size, hobbies, ...	ranking	es-es	Peso, tamaño, pasatiempos, ...
 wrong admin-account or -password !!!	ranking	es-es	¡La cuenta de administración o la contraseña son incorrectas!
+wrong gender	ranking	es-es	Género equivocado
+wrong nationality	ranking	es-es	Nacionalidad equivocada
+you have not yet a password set!	ranking	es-es	¡Aún no tienes una contraseña establecida!
+you need to delete the results first !!!	ranking	es-es	¡¡¡Necesitas suprimir los resultados primero!!!
 you need to select a file first!	ranking	es-es	¡Necesita seleccionar un fichero antes!
 zip code	ranking	es-es	Código postal
-mail all participants	ranking	es-es	Enviar correo a todos los participantes
+zone	ranking	es-es	Zona
