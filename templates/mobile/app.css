@@ -149,7 +149,13 @@ button.small {
   padding-left: 2px;
 }
 #ranking-result-index table.et2_grid td div.tdAlign4 {
-  width: 20%;
+  width: 17%;
+  display: inline-block;
+  text-align: center;
+  padding-left: 2px;
+}
+#ranking-result-index table.et2_grid td div.tdAlign4:first-child {
+  width: 35%;
   display: inline-block;
   text-align: center;
   padding-left: 2px;
