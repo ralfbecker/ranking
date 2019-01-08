@@ -402,7 +402,9 @@ $phpgw_baseline = array(
 			'fed_url' => array('type' => 'varchar','precision' => '128'),
 			'fed_nationname' => array('type' => 'varchar','precision' => '80'),
 			'fed_continent' => array('type' => 'int','precision' => '1','default' => '0'),
-			'fed_shortcut' => array('type' => 'varchar','precision' => '20')
+			'fed_shortcut' => array('type' => 'varchar','precision' => '20'),
+			'fed_since' => array('type' => 'int','precision' => '4','comment' => 'new parent since'),
+			'fed_parent_since' => array('type' => 'int','precision' => '4','comment' => 'new parent')
 		),
 		'pk' => array('fed_id'),
 		'fk' => array(),

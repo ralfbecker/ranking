@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.federation.index.rows" template="" lang="" group="0" version="1.5.001">
@@ -66,7 +65,7 @@
 					<description align="center" id="msg" no_lang="1" class="redItalic"/>
 				</row>
 				<row>
-					<nextmatch id="nm" options="ranking.federation.index.rows"/>
+					<nextmatch id="nm" template="ranking.federation.index.rows"/>
 				</row>
 				<row disabled="!@is_admin">
 					<hbox align="right">
@@ -90,8 +89,8 @@
 									<hbox options="0,0">
 										<textbox id="nation" onchange="1" size="3" maxlength="3" class="inputRequired"/>
 										<textbox id="fed_nationname" size="60" maxlength="80" class="leftPad5"/>
-										<menulist class="leftPad5">
-											<menupopup id="fed_continent" options="Select one"/>
+										<menulist>
+											<menupopup id="fed_continent" options="Select one" class="leftPad5"/>
 										</menulist>
 									</hbox>
 								</row>
@@ -108,9 +107,15 @@
 								</row>
 								<row>
 									<description value="Parent federation" for="fed_parent"/>
-									<menulist>
-										<menupopup id="fed_parent" options="None"/>
-									</menulist>
+									<hbox>
+										<menulist>
+											<menupopup id="fed_parent" options="None"/>
+										</menulist>
+										<textbox type="integer" label="since" id="fed_since"/>
+										<menulist>
+											<menupopup id="fed_parent_since" options="None"/>
+										</menulist>
+									</hbox>
 								</row>
 								<row valign="top">
 									<description value="Rechte" font_style="3" activate_links="0" for="0"/>

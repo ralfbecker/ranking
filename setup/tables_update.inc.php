@@ -2075,3 +2075,20 @@ function ranking_upgrade17_1_001()
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.002';
 }
+
+function ranking_upgrade17_1_002()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_since',array(
+		'type' => 'int',
+		'precision' => '4',
+		'comment' => 'new parent since'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_parent_since',array(
+		'type' => 'int',
+		'precision' => '4',
+		'comment' => 'new parent'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.003';
+}
+

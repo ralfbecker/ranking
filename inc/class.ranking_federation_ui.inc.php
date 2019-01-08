@@ -41,6 +41,10 @@ class ranking_federation_ui extends ranking_bo
 		$readonlys = $parent_ids = array();
 		foreach($rows as $n => &$fed)
 		{
+			if ($fed['fed_since'] >= date('Y') && $fed['fed_parent_since'])
+			{
+				$fed['fed_parent'] = $fed['fed_parent_since'];
+			}
 			if ($fed['fed_parent'])
 			{
 				$parent_ids[$n] = $fed['fed_parent'];
@@ -210,6 +214,11 @@ class ranking_federation_ui extends ranking_bo
 		if (!$content['fed']) $content['fed']['nation'] = $content['nm']['col_filter']['nation'];
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nations and Federations');
+		$fed_parents = !$content['fed']['nation'] ? array() :
+				$this->federation->query_list('verband','fed_id',array(
+					'nation' => $content['fed']['nation'],
+					'fed_id != '.(int)$content['fed']['fed_id'],
+				),ranking_federation::FEDERATION_CHILDREN.' DESC,verband ASC');
 		$tpl->exec('ranking.ranking_federation_ui.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'action' => array(
@@ -218,11 +227,8 @@ class ranking_federation_ui extends ranking_bo
 				'parent' => lang('Add to parent federation opened for editing'),
 			),
 			'fed_continent' => ranking_federation::$continents,
-			'fed_parent' => !$content['fed']['nation'] ? array() :
-				$this->federation->query_list('verband','fed_id',array(
-					'nation' => $content['fed']['nation'],
-					'fed_id != '.(int)$content['fed']['fed_id'],
-				),ranking_federation::FEDERATION_CHILDREN.' DESC,verband ASC'),
+			'fed_parent' => $fed_parents,
+			'fed_parent_since' => $fed_parents,
 		),$readonlys,array(
 			'fed' => array('fed_id' => $content['fed']['fed_id']),
 			'nm'  => $content['nm'],

@@ -407,7 +407,9 @@ class ranking_athlete extends so_sql
 				$f = $table.'.'.$name.(is_null($filter[$name]) ? ' IS NULL' : '='.$this->db->quote($filter[$name]));
 				if ($name == 'fed_id' && !is_null($filter[$name]))	// also filter for acl federation (SAC Regionalzentrum) and fed_parent
 				{
-					$f = '('.$f.' OR '.str_replace('a2f.fed_id','acl.fed_id',$f).' OR fed_parent='.(int)$filter[$name].')';
+					$year = (int)date('Y');
+					$f = '('.$f.' OR '.str_replace('a2f.fed_id','acl.fed_id',$f).
+						" OR (CASE WHEN fed_since >= $year THEN fed_parent_since ELSE fed_parent END)=".(int)$filter[$name].')';
 				}
 				$filter[] = $f;
 			}

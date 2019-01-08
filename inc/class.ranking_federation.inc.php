@@ -142,6 +142,22 @@ class ranking_federation extends so_sql
 
 		$order_by .= ($order_by ? ',' : '').'nation ASC,verband ASC';
 
+		// use fed_since when filtering by parent federation
+		if ($filter['fed_parent'])
+		{
+			$filter[] = $this->db->expression(self::FEDERATIONS_TABLE,
+				'((fed_since IS NULL OR fed_since < '.(int)date('Y').') AND ', array('fed_parent' => $filter['fed_parent']),
+				'  OR fed_since >= '.(int)date('Y').' AND ', array('fed_parent_since' => $filter['fed_parent']), ')');
+			unset($filter['fed_parent']);
+		}
+		if (is_array($criteria) && $criteria['fed_parent'])
+		{
+			$criteria[] = $this->db->expression(self::FEDERATIONS_TABLE,
+				'((fed_since IS NULL OR fed_since < '.(int)date('Y').') AND ', array('fed_parent' => $criteria['fed_parent']),
+				'  OR fed_since >= '.(int)date('Y').' AND ', array('fed_parent_since' => $criteria['fed_parent']), ')');
+			unset($criteria['fed_parent']);
+		}
+
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
 	}
 
@@ -375,11 +391,12 @@ class ranking_federation extends so_sql
 				$grants[(int)substr($data['location'],1)] = $data['rights'];
 			}
 			// now include the direkt children (eg. sektionen from the landesverbände)
-			if ($grants && ($children = $this->search(array('fed_parent' => array_keys($grants)),'fed_id,fed_parent')))
+			if ($grants && ($children = $this->search(array('fed_parent' => array_keys($grants)),'fed_id,fed_parent,fed_since,fed_parent_since')))
 			{
 				foreach($children as $child)
 				{
-					$grants[$child['fed_id']] = $grants[$child['fed_parent']];
+					$parent = $child['fed_since'] >= date('Y') ? $child['fed_parent_since'] : $child['fed_parent'];
+					$grants[$child['fed_id']] = $grants[$parent];
 				}
 			}
 		}
