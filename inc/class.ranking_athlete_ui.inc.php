@@ -854,8 +854,8 @@ Continuer';
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
 			);
-			// only enable csv export, if user has at least for one nation athlete rights
-			if (count($this->athlete_rights))
+			// only enable csv export, if user has at least for one nation athlete rights or federation / LV rights
+			if (count($this->athlete_rights) || $this->federation->get_user_grants())
 			{
 				$content['nm']['csv_fields'] = array(
 					'nachname' => lang('Name'),
