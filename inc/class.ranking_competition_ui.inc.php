@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 class ranking_competition_ui extends ranking_bo
@@ -452,6 +451,7 @@ class ranking_competition_ui extends ranking_bo
 		$tmpl->exec('ranking.ranking_competition_ui.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),
+			'discipline' => $this->disciplines,
 			'cat_id' => array(lang('None')),
 		),$readonlys);
 	}

@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -49,6 +49,21 @@ class ranking_result_bo extends ranking_bo
 	 * @var array
 	 */
 	var $order_nums;
+	/**
+	 * Disciplines / result-modi
+	 *
+	 * @var array
+	 */
+	var $rs_disciplines = array(
+		'lead' => 'lead',
+		'boulder2018' => 'boulder: 2018+ rules (tops, zones, top-tries, zone-tries)',
+		'speed' => 'speed',
+		'combined' => 'combined',	// new olympic fromat
+		'speedrelay' => 'speedrelay',
+		'boulder' => 'boulder: pre 2018 rules (tops, top-tries, bonus, bonus-tries)',
+		'boulderheight' => 'boulder: height, tries',	// height and tries, as used in Arco
+		'selfscore' => 'boulder: self-scoring',	// self-scoring honesty system
+	);
 	/**
 	 * values and labels for route_status
 	 *

@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<?xml version="1.0"?>
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="1.9.001">
+	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="17.1.001">
 		<grid width="100%">
 			<columns>
 				<column/>
 				<column width="40%"/>
+				<column/>
 				<column/>
 				<column/>
 				<column/>
@@ -25,6 +25,7 @@
 					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..." class="selectboxFullWidth"/>
 					<nextmatch-filterheader align="center" id="serie" no_lang="1" options="Cup..." class="selectboxFullWidth"/>
 					<nextmatch-sortheader label="Category" id="cat_id"/>
+					<nextmatch-filterheader id="discipline" options="Discipline"/>
 					<nextmatch-sortheader align="center" label="Quota" id="quota"/>
 					<nextmatch-sortheader label="Deadline" id="deadline"/>
 					<nextmatch-accountfilter id="judges" options="Judges" class="selectboxFullWidth"/>
@@ -42,6 +43,9 @@
 					</menulist>
 					<menulist>
 						<menupopup type="select-cat" id="${row}[cat_id]" readonly="true"/>
+					</menulist>
+					<menulist>
+						<menupopup id="${row}[discipline]" readonly="true"/>
 					</menulist>
 					<textbox type="integer" align="center" id="${row}[quota]" readonly="true"/>
 					<date id="${row}[deadline]" readonly="true" options="Y-m-d"/>
@@ -82,7 +86,7 @@
 					<description align="center" id="msg" no_lang="1" class="redItalic"/>
 				</row>
 				<row>
-					<nextmatch id="nm" options="ranking.comp.list.rows"/>
+					<nextmatch id="nm" template="ranking.comp.list.rows"/>
 				</row>
 				<row>
 					<button statustext="Add a new competition" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_competition_ui.edit'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>

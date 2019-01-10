@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-17 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2007-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -503,7 +503,7 @@ class ranking_result_ui extends ranking_result_bo
 			'route_status' => $this->stati,
 			'route_type' => isset($this->quali_types_dicipline[$discipline]) ?
 				$this->quali_types_dicipline[$discipline] : $this->quali_types,
-			'discipline' => $this->disciplines,
+			'discipline' => $this->rs_disciplines,
 			'upload_options' => array(
 				1 => array(
 					'label' => 'delete result',
