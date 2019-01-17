@@ -168,6 +168,10 @@ class ranking_category extends Api\Storage\Base
 		{
 			$data['mgroups'] = json_encode($data['mgroups']);
 		}
+		elseif (isset($data['mgroups']))
+		{
+			$data['mgroups'] = null;
+		}
 		return $data;
 	}
 
