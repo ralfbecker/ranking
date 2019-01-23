@@ -9,8 +9,8 @@ Following documents content of public JSON and/or XML feeds.
 
 Please note:
 -----------
-- www.digitalrock.de uses "/egroupware", while http://egw.ifsc-climbing.org uses "/egw"!
-- Only use CDN domain http://egw.ifsc-climbing.org and NOT https://ifsc.egroupware.net/ for any public access!
+- https://www.digitalrock.de uses "/egroupware", while http://egw.ifsc-climbing.org uses "/egw"!
+- Only use CDN domain https://ifsc-egw.wavecdn.net or http://egw.ifsc-climbing.org (http only!) and NOT https://ifsc.egroupware.net/ for any public access!
 
 Result data via XML or JSON
 ===========================
