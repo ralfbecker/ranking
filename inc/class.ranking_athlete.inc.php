@@ -1153,6 +1153,8 @@ class ranking_athlete extends so_sql
 		//echo "<p>".__METHOD__."($fed_id,$a2f_start,$PerId,$fed_parent)</p>\n";
 		if (!$PerId || !$fed_id) return false;
 
+		if (!($a2f_start > 2000)) $a2f_start = (int)date('Y');
+
 		if (!is_null($fed_parent))
 		{
 			// set or delete explicit fed_parent
@@ -1191,8 +1193,6 @@ class ranking_athlete extends so_sql
 		}
 		elseif($a2f_start && $a2f_start > $fed['a2f_start']) 	// federation changed and (valid) start given --> record old one
 		{
-			if (!($a2f_start > 2000)) $a2f_start = (int)date('Y');
-
 			$this->db->update(self::ATHLETE2FED_TABLE,array('a2f_end' => $a2f_start-1),$fed,__LINE__,__FILE__);
 		}
 		else	// no (valid) start given, use current one
