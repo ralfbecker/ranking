@@ -12,9 +12,17 @@
 
 /**
  * Editing athletes data is mapped to EGW_ACL_ADD
+ *
+ * @var int 2
  */
 define('EGW_ACL_ATHLETE',EGW_ACL_ADD);
+/**
+ * @var int 64
+ */
 define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
+/**
+ * @var int 4|64=68
+ */
 define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
 
 /**
@@ -376,8 +384,8 @@ class ranking_bo extends ranking_so
 			$check = false;	// athlete not found
 			$which = 'athlete NOT found!';
 		}
-		// first check the nation ACL
-		elseif ($this->acl_check($athlete['nation'],$required,$comp))
+		// first check the nation ACL (do not use judge rights for licenses!)
+		elseif ($this->acl_check($athlete['nation'], $required, !$license ? $comp : null, false, null, (bool)$license))
 		{
 			$check = true;
 			$which = 'national ACL grants access';
@@ -416,7 +424,7 @@ class ranking_bo extends ranking_so
 				{
 					if (is_numeric($fed_id) && !isset($fed_grants[$fed_id]))
 					{
-						$fed_grants[$fed_id] = EGW_ACL_ATHLETE;
+						$fed_grants[$fed_id] |= EGW_ACL_ATHLETE;
 						$grants[] = $fed_id;
 					}
 				}
@@ -425,7 +433,7 @@ class ranking_bo extends ranking_so
 				{
 					foreach($children as $child)
 					{
-						$fed_grants[$child['fed_id']] = EGW_ACL_ATHLETE;
+						$fed_grants[$child['fed_id']] |= EGW_ACL_ATHLETE;
 					}
 				}
 			}
