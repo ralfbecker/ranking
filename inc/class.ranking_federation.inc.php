@@ -388,7 +388,7 @@ class ranking_federation extends so_sql
 				{
 					continue;
 				}
-				$grants[(int)substr($data['location'],1)] = $data['rights'];
+				$grants[(int)substr($data['location'],1)] |= $data['rights'];
 			}
 			// now include the direkt children (eg. sektionen from the landesverbände)
 			if ($grants && ($children = $this->search(array('fed_parent' => array_keys($grants)),'fed_id,fed_parent,fed_since,fed_parent_since')))
