@@ -510,7 +510,7 @@ class ranking_athlete_ui extends ranking_bo
 			'msg' => $msg,
 			'profile_status' => $this->athlete->profile_hidden($this->athlete->data, $shown_msg),
 			'is_admin' => $this->is_admin,
-			'tabs' => $content['tabs'],
+			'tabs' => str_replace('ranking.athlete.edit.', '', $content['tabs']),
 			'foto' => $this->athlete->picture_url().'?'.time(),
 			'foto2' => $this->athlete->picture_url(null, 2).'?'.time(),
 			'license_year' => $content['license_year'],

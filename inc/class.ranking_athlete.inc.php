@@ -126,6 +126,15 @@ class ranking_athlete extends so_sql
 	var $timestamps = array('modified','recover_pw_time','last_login');
 
 	/**
+	 * Names for social media urls
+	 *
+	 * @var array
+	 */
+	static $social_links = array(
+		'homepage', 'facebook', 'twitter', 'instagram', 'youtube', 'video_iframe'
+	);
+
+	/**
 	 * Initialise the static vars of this class, called by including the class
 	 */
 	static function init_static()
@@ -222,6 +231,14 @@ class ranking_athlete extends so_sql
 			list($y, $m, $d) = explode('-', $data['geb_date']);
 			list($ny, $nm, $nd) = explode('-', date('Y-m-d'));
 			$data['age'] = $ny - $y - ($m > $nm || $m == $nm && $d > $nd);
+		}
+		// prefix all links without scheme with https://
+		foreach(self::$social_links as $name)
+		{
+			if (!empty($data[$name]) && !preg_match('|^https?://|', $data[$name]))
+			{
+				$data[$name] = 'https://'.$data[$name];
+			}
 		}
 		if ($data['acl'])
 		{
