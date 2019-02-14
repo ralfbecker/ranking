@@ -131,7 +131,7 @@ class ranking_athlete extends so_sql
 	 * @var array
 	 */
 	static $social_links = array(
-		'homepage', 'facebook', 'twitter', 'instagram', 'youtube', 'video_iframe'
+		'homepage',
 	);
 
 	/**
