@@ -129,18 +129,17 @@ class ranking_export extends ranking_result_bo
 	{
 		switch($_SERVER['HTTP_HOST'])
 		{
-//			case 'ralfsmacbook.local':
 			case 'www.ifsc-climbing.org':
 			case 'ifsc.egroupware.net':
 			case 'egw.ifsc-climbing.org':
-				$host = $use_egw ? 'egw.ifsc-climbing.org' : 'www.ifsc-climbing.org';	// use CDN urls
+				$host = $use_egw ? 'ifsc-egw.wavecdn.net' : 'www.ifsc-climbing.org';	// use CDN urls
 				break;
 
 			default:
 				$host = $_SERVER['HTTP_HOST'];
 				break;
 		}
-		return 'http://'.$host;
+		return 'https://'.$host;
 	}
 
 	/**
