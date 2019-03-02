@@ -1,8 +1,8 @@
-<?xml version="1.0"?>
-<!-- $Id$ -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
 <overlay>
 	<template id="ranking.comp.edit.general" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="210" overflow="auto">
+		<grid width="100%" height="240" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -20,9 +20,7 @@
 					<description for="gruppen" value="Cathegories"/>
 					<listbox statustext="which cathegories are competing" id="gruppen" no_lang="1" rows="6"/>
 					<description for="discipline" value="Discipline"/>
-					<menulist>
-						<menupopup id="discipline" options="set by category"/>
-					</menulist>
+					<select id="discipline" options="set by category"/>
 				</row>
 				<row class="row">
 					<description for="homepage" value="Homepage"/>
@@ -30,9 +28,7 @@
 				</row>
 				<row class="row">
 					<description for="display_athlete" value="Display athlete"/>
-					<menulist>
-						<menupopup id="display_athlete"/>
-					</menulist>
+					<select id="display_athlete"/>
 					<description/>
 					<description/>
 				</row>
@@ -40,7 +36,7 @@
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.registration" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%" height="210" overflow="auto">
+		<grid width="100%" height="240" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="15%"/>
@@ -58,12 +54,8 @@
 						<description value="Total per discipline" for="total_per_disciplin"/>
 					</vbox>
 					<vbox>
-						<menulist>
-							<menupopup type="select-number" id="quota" options="Select one,1,12,1"/>
-						</menulist>
-						<menulist>
-							<menupopup type="select-number" id="total_per_discipline" options="None,1,20"/>
-						</menulist>
+						<select-number id="quota" options="Select one,1,12,1"/>
+						<select-number id="total_per_discipline" options="None,1,20"/>
 					</vbox>
 					<grid spacing="0" padding="1" id="quota_extra">
 						<columns>
@@ -73,33 +65,21 @@
 						</columns>
 						<rows>
 							<row>
-								<menulist>
-									<menupopup class="selectboxFullWidth" id="${row}[fed]" options="Federation"/>
-								</menulist>
-								<menulist>
-									<menupopup class="selectboxFullWidth" id="${row}[cat]" options="Category"/>
-								</menulist>
-								<menulist>
-									<menupopup type="select-number" id="${row}[num]" options="None,1,20"/>
-								</menulist>
+								<select class="selectboxFullWidth" id="${row}[fed]" options="Federation"/>
+								<select class="selectboxFullWidth" id="${row}[cat]" options="Category"/>
+								<select-number id="${row}[num]" options="None,1,20"/>
 							</row>
 						</rows>
 					</grid>
 				</row>
 				<row class="row">
 					<description value="Host quota" for="host_quota"/>
-					<menulist>
-						<menupopup type="select-number" id="host_quota" options="None,1,20,1"/>
-					</menulist>
-					<menulist>
-						<menupopup label="Host nation" id="host_nation" no_lang="1" options="Select one"/>
-					</menulist>
+					<select-number id="host_quota" options="None,1,20,1"/>
+					<select label="Host nation" id="host_nation" no_lang="1" options="Select one"/>
 				</row>
 				<row class="row">
 					<description for="selfregister" value="Selfregister"/>
-					<menulist>
-						<menupopup statustext="Allow athletes to register themself for this competition" id="selfregister"/>
-					</menulist>
+					<select statustext="Allow athletes to register themself for this competition" id="selfregister"/>
 					<checkbox label="no license required for registration" id="no_license" span="all"/>
 				</row>
 				<row class="th">
@@ -107,12 +87,8 @@
 					<button align="right" statustext="Only necessary, if you change something, after registration started." label="Update registration" id="update_prequal"/>
 				</row>
 				<row class="row">
-					<menulist>
-						<menupopup label="ranking" id="prequal_type"/>
-					</menulist>
-					<menulist>
-						<menupopup type="select-number" id="prequal_ranking" options="None,1,15,1"/>
-					</menulist>
+					<select label="ranking" id="prequal_type"/>
+					<select-number id="prequal_ranking" options="None,1,15,1"/>
 					<grid spacing="0" padding="1" id="prequal_extra">
 						<columns>
 							<column/>
@@ -120,21 +96,15 @@
 						</columns>
 						<rows>
 							<row>
-								<menulist>
-									<menupopup id="${row}[cat]" options="Category"/>
-								</menulist>
-								<menulist>
-									<menupopup type="select-number" id="${row}[num]" options="None,1,30"/>
-								</menulist>
+								<select id="${row}[cat]" options="Category"/>
+								<select-number id="${row}[num]" options="None,1,30"/>
 							</row>
 						</rows>
 					</grid>
 				</row>
 				<row class="row" valign="top">
 					<description value="from other competitions" for="prequal_comps"/>
-					<menulist>
-						<menupopup type="select-number" id="prequal_comp" options="None,1,10"/>
-					</menulist>
+					<select-number id="prequal_comp" options="None,1,10"/>
 					<listbox id="prequal_comps" no_lang="1" rows="3" options="max-width:100%"/>
 				</row>
 			</rows>
@@ -144,7 +114,7 @@
 		</styles>
 	</template>
 	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%" height="210" overflow="auto">
+		<grid width="100%" height="240" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -162,9 +132,7 @@
 						</columns>
 						<rows>
 							<row>
-								<menulist>
-									<menupopup id="${row}[cat]" options="Category"/>
-								</menulist>
+								<select id="${row}[cat]" options="Category"/>
 								<textbox type="integer" statustext="|Participants, at least on that place in the used ranking or cup, don't need to climb qualification" id="${row}[num]" min="0"/>
 							</row>
 						</rows>
@@ -174,7 +142,7 @@
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%" height="210" overflow="auto">
+		<grid width="100%" height="240" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -184,13 +152,9 @@
 			<rows>
 				<row class="row">
 					<description for="pkte" value="Pointalocation"/>
-					<menulist>
-						<menupopup statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
-					</menulist>
+					<select statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
 					<description for="pkt_bis" value="til place"/>
-					<menulist>
-						<menupopup type="select-percent" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
-					</menulist>
+					<select-percent statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
 				</row>
 				<row class="row">
 					<description for="faktor" value="Factor"/>
@@ -199,19 +163,15 @@
 				</row>
 				<row class="row">
 					<description for="feld_pkte" value="Fieldfactorpoints"/>
-					<menulist>
-						<menupopup statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
-					</menulist>
+					<select statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
 					<description for="feld_bis" value="til place"/>
-					<menulist>
-						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
-					</menulist>
+					<select-percent statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="14.2.001">
-		<grid width="100%" height="210" overflow="auto">
+		<grid width="100%" height="240" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="1%"/>
@@ -262,7 +222,7 @@
 		</grid>
 	</template>
 	<template id="ranking.comp.edit.judges" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="210">
+		<grid width="100%" height="240">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -270,13 +230,13 @@
 			<rows>
 				<row class="row" valign="top">
 					<description value="Judges" for="judges"/>
-					<listbox type="select-account" statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition" id="judges" rows="14"/>
+					<select-account statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition" id="judges" rows="9"/>
 				</row>
 			</rows>
 		</grid>
 	</template>
 	<template id="ranking.comp.edit" template="" lang="" group="0" version="14.2.001">
-		<grid width="100%\0">
+		<grid width="100%">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -292,15 +252,9 @@
 				</row>
 				<row class="th">
 					<description for="nation" value="Nation"/>
-					<hbox options="0,0">
-						<menulist>
-							<menupopup statustext="nation if national competition or internatinal" id="nation" no_lang="1" onchange="1"/>
-						</menulist>
-					</hbox>
+					<select statustext="nation if national competition or internatinal" id="nation" no_lang="1" onchange="1"/>
 					<description for="serie" value="Cup"/>
-					<menulist span="all">
-						<menupopup id="serie" no_lang="1" onchange="1"/>
-					</menulist>
+					<select id="serie" no_lang="1" onchange="1" span="all"/>
 				</row>
 				<row class="row">
 					<description for="name" value="Name"/>
@@ -314,24 +268,16 @@
 				</row>
 				<row class="row">
 					<description for="open_comp" value="Open comp."/>
-					<menulist>
-						<menupopup id="open_comp"/>
-					</menulist>
+					<select id="open_comp"/>
 					<description value="Federation"/>
-					<menulist span="all">
-						<menupopup id="fed_id" options="national federation" class="selectboxFullWidth"/>
-					</menulist>
+					<select id="fed_id" options="national federation" class="selectboxFullWidth" span="all"/>
 					<description/>
 				</row>
 				<row class="row">
 					<description for="cat_id" value="Category"/>
-					<menulist>
-						<menupopup type="select-cat" id="cat_id" options="$cont[cat_parent_name],,,,$cont[cat_parent]" class="selectboxFullWidth"/>
-					</menulist>
+					<select-cat id="cat_id" empty_label="$cont[cat_parent_name]" options=",,,,$cont[cat_parent]" class="selectboxFullWidth"/>
 					<description value="Continent" for="continent"/>
-					<menulist>
-						<menupopup id="continent" options="All"/>
-					</menulist>
+					<select id="continent" options="All"/>
 					<description/>
 				</row>
 				<row>
@@ -354,16 +300,17 @@
 						</tabpanels>
 					</tabbox>
 				</row>
-				<row>
+				<row class="dialogFooterToolbar">
 					<hbox span="2">
-						<button statustext="Edit this competition" label="Edit" id="edit"/>
-						<button statustext="saves the changes made" label="Save" id="save"/>
-						<button statustext="saves the changes made" label="Apply" id="apply"/>
-						<button statustext="aborts without saving changes" label="Cancel" id="cancel" onclick="window.close();"/>
+						<button statustext="Edit this competition" label="Edit" id="button[edit]"/>
+						<button statustext="saves the changes made" label="Save" id="button[save]"/>
+						<button statustext="saves the changes made" label="Apply" id="button[apply]"/>
+						<button statustext="aborts without saving changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
-					<button align="right" label="Copy" id="copy"/>
-					<description onclick="return confirm('Delete this competition');"/>
-					<button align="right" statustext="Delete this competition" label="Delete" id="delete" onclick="return confirm('Delete this competition');"/>
+					<hbox span="3">
+						<button align="center" label="Copy" id="button[copy]"/>
+						<button align="right" statustext="Delete this competition" label="Delete" id="button[delete]" onclick="return confirm('Delete this competition');"/>
+					</hbox>
 				</row>
 			</rows>
 		</grid>

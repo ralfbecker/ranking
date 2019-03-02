@@ -1,22 +1,21 @@
-<?xml version="1.0"?>
-<!-- $Id$ -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
 <overlay>
 	<template id="ranking.comp.list.rows" template="" lang="" group="0" version="17.1.001">
 		<grid width="100%">
 			<columns>
-				<column/>
-				<column width="40%"/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column width="80"/>
+				<column width="30%"/>
+				<column width="50"/>
+				<column width="50"/>
+				<column width="100"/>
+				<column width="80"/>
+				<column width="40"/>
+				<column width="80"/>
+				<column width="100"/>
+				<column width="80"/>
+				<column width="120"/>
+				<column width="80"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -29,45 +28,29 @@
 					<nextmatch-sortheader align="center" label="Quota" id="quota"/>
 					<nextmatch-sortheader label="Deadline" id="deadline"/>
 					<nextmatch-accountfilter id="judges" options="Judges" class="selectboxFullWidth"/>
-					<nextmatch-sortheader align="center" label="Key" id="rkey"/>
+					<nextmatch-sortheader label="Key" id="rkey"/>
 					<nextmatch-sortheader label="Last modified" id="modified"/>
 					<nextmatch-header align="center" label="Status" id="status"/>
-					<description align="center" value="Action"/>
 				</row>
 				<row class="nmr">
 					<date align="center" id="${row}[datum]" readonly="true" options="Y-m-d"/>
 					<html id="${row}[name]" no_lang="1" class="ml10"/>
 					<description align="center" id="${row}[nation]" no_lang="1"/>
-					<menulist>
-						<menupopup align="center" id="${row}[serie]" no_lang="1" readonly="true"/>
-					</menulist>
-					<menulist>
-						<menupopup type="select-cat" id="${row}[cat_id]" readonly="true"/>
-					</menulist>
-					<menulist>
-						<menupopup id="${row}[discipline]" readonly="true"/>
-					</menulist>
+					<select align="center" id="${row}[serie]" no_lang="1" readonly="true"/>
+					<select-cat id="${row}[cat_id]" readonly="true"/>
+					<select id="${row}[discipline]" readonly="true"/>
 					<textbox type="integer" align="center" id="${row}[quota]" readonly="true"/>
 					<date id="${row}[deadline]" readonly="true" options="Y-m-d"/>
-					<menulist>
-						<menupopup type="select-account" id="${row}[judges]" readonly="true"/>
-					</menulist>
-					<description align="center" id="${row}[rkey]" no_lang="1"/>
-					<vbox options="0,0">
+					<select-account id="${row}[judges]" readonly="true"/>
+					<description id="${row}[rkey]" no_lang="1"/>
+					<vbox>
 						<date-time id="${row}[modified]" readonly="true"/>
-						<menulist>
-							<menupopup type="select-account" id="${row}[modifier]" readonly="true"/>
-						</menulist>
+						<select-account id="${row}[modifier]" readonly="true"/>
 					</vbox>
 					<hbox>
 						<image statustext="View the attached PDF" label="@${row}[pdf][info][label]" src="${row}[pdf][info][icon]" no_lang="1" href="@${row}[pdf][info][link]"/>
 						<image statustext="View the attached PDF" label="@${row}[pdf][startlist][label]" src="${row}[pdf][startlist][icon]" no_lang="1" href="@${row}[pdf][startlist][link]"/>
 						<image statustext="View the attached PDF" label="@${row}[pdf][result][label]" src="${row}[pdf][result][icon]" no_lang="1" href="@${row}[pdf][result][link]"/>
-					</hbox>
-					<hbox align="center">
-						<button statustext="View this competition" label="View" id="view[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_competition_ui.view&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="view"/>
-						<button statustext="Edit this competition" label="Edit" id="edit[$row_cont[WetId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_competition_ui.edit&amp;WetId=$row_cont[WetId]'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;" image="edit"/>
-						<button statustext="Delete this competition" label="Delete" id="delete[$row_cont[WetId]]" onclick="return confirm('Delete this competition');" image="delete"/>
 					</hbox>
 				</row>
 			</rows>
@@ -76,22 +59,10 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
-	<template id="ranking.comp.list" template="" lang="" group="0" version="1.7.001">
-		<grid width="100%">
-			<columns>
-				<column/>
-			</columns>
-			<rows>
-				<row disabled="!@msg">
-					<description align="center" id="msg" no_lang="1" class="redItalic"/>
-				</row>
-				<row>
-					<nextmatch id="nm" template="ranking.comp.list.rows"/>
-				</row>
-				<row>
-					<button statustext="Add a new competition" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_competition_ui.edit'),'_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes'); return false;"/>
-				</row>
-			</rows>
-		</grid>
+	<template id="ranking.comp.left" template="" lang="" group="0" version="1.9.001">
+		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_comp_ui.edit',false,'900x500');"/>
+	</template>
+	<template id="ranking.comp.list" template="" lang="" group="0" version="1.9.001">
+		<nextmatch id="nm" template="ranking.comp.list.rows" span="all" header_left="ranking.comp.left"/>
 	</template>
 </overlay>

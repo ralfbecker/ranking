@@ -7,16 +7,16 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
+use EGroupware\Api\Vfs;
 
 /**
  * competition object
  */
-class ranking_competition extends so_sql
+class ranking_competition extends Api\Storage\Base
 {
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 		'durartion' => 'duration'
@@ -104,7 +104,7 @@ class ranking_competition extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 
 		foreach(array(
 				'cats'  => 'ranking_category',
@@ -147,7 +147,7 @@ class ranking_competition extends so_sql
 	/**
 	 * initializes an empty competition
 	 *
-	 * reimplemented from so_sql to set some defaults
+	 * reimplemented from Api\Storage\Base to set some defaults
 	 *
 	 * @param array $keys array with keys in form internalName => value
 	 */
@@ -176,7 +176,7 @@ class ranking_competition extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->source_charset);
 		}
 		if ($data['name'])
 		{
@@ -277,7 +277,7 @@ class ranking_competition extends so_sql
 		if (isset($data['serie']) && (string)$data['serie'] === '0') $data['serie'] = null;
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->charset,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->charset,$this->source_charset);
 		}
 
 		if (isset($data['quali_preselected']))
@@ -419,7 +419,7 @@ class ranking_competition extends so_sql
 	/**
 	 * Search for competitions
 	 *
-	 * reimplmented from so_sql unset/not use some columns in the search
+	 * reimplmented from Api\Storage\Base unset/not use some columns in the search
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
 	{
@@ -690,7 +690,7 @@ class ranking_competition extends so_sql
 			{
 				$ext = str_replace(array('\\','?','$'),'',$ext_regexp);
 
-				if (egw_vfs::stat($vfs_path.$ext))
+				if (Vfs::stat($vfs_path.$ext))
 				{
 					$extension = $ext;
 					break;
@@ -722,9 +722,9 @@ class ranking_competition extends so_sql
 			if ($only_pdf && ($type == 'logo' || $type == 'sponsors')) continue;
 
 			$vfs_path = $this->attachment_path($type,$data);
-			if (egw_vfs::stat($vfs_path))
+			if (Vfs::stat($vfs_path))
 			{
-				$attachments[$type] = egw_vfs::download_url($vfs_path);
+				$attachments[$type] = Vfs::download_url($vfs_path);
 				if ($add_host && $attachments[$type][0] == '/' ||
 					// might need to replace domain with CDN domain
 					is_string($add_host) && parse_url($attachments[$type], PHP_URL_HOST) == $_SERVER['HTTP_HOST'])
@@ -756,27 +756,27 @@ class ranking_competition extends so_sql
 	{
 		if ($keys && !$this->read($keys)) return false;
 
-		egw_vfs::$is_root = true;		// acl is based on edit rights for the competition and NOT the vfs rights
+		Vfs::$is_root = true;		// Acl is based on edit rights for the competition and NOT the vfs rights
 		foreach($files as $type => $path)
 		{
 			if (!file_exists($path) || !is_readable($path))
 			{
 				$error_msg = lang("'%1' does not exist or is not readable by the webserver !!!",$path);
-				egw_vfs::$is_root = false;
+				Vfs::$is_root = false;
 				return false;
 			}
 			$vfs_path = $this->attachment_path($type,null,null,$extension);
 
 			// check and evtl. create the year directory
-			if (!egw_vfs::is_dir($dir = dirname($vfs_path)) &&
-				!egw_vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
+			if (!Vfs::is_dir($dir = dirname($vfs_path)) &&
+				!Vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
 			{
 				$error_msg = lang("Can not create directory '%1' !!!",$dir);
-				egw_vfs::$is_root = false;
+				Vfs::$is_root = false;
 				return false;
 			}
 			$ok = false;
-			if ((!($from_fp = fopen($path,'r')) || !($to_fp = egw_vfs::fopen($vfs_path,'w')) ||
+			if ((!($from_fp = fopen($path,'r')) || !($to_fp = Vfs::fopen($vfs_path,'w')) ||
 				!($ok = stream_copy_to_stream($from_fp,$to_fp) !== false)))
 			{
 				$error_msg = lang("Can not move '%1' to %2 !!!",$path,$vfs_path);
@@ -786,7 +786,7 @@ class ranking_competition extends so_sql
 
 	 		if (!$ok) return false;
 		}
-		egw_vfs::$is_root = false;
+		Vfs::$is_root = false;
 
 		return true;
 	}
@@ -802,9 +802,9 @@ class ranking_competition extends so_sql
 	{
 		if ($keys && !$this->read($keys)) return false;
 
-		egw_vfs::$is_root = true;		// acl is based on edit rights for the competition and NOT the vfs rights
-		$Ok = egw_vfs::remove($this->attachment_path($type));
-		egw_vfs::$is_root = false;
+		Vfs::$is_root = true;		// Acl is based on edit rights for the competition and NOT the vfs rights
+		$Ok = Vfs::remove($this->attachment_path($type));
+		Vfs::$is_root = false;
 
 		return $Ok;
 	}
@@ -822,20 +822,20 @@ class ranking_competition extends so_sql
 		if (!$old_rkey || $keys && !$this->read($keys)) return false;
 
 		$ok = true;
-		egw_vfs::$is_root = true;		// acl is based on edit rights for the competition and NOT the vfs rights
+		Vfs::$is_root = true;		// Acl is based on edit rights for the competition and NOT the vfs rights
 		foreach(array_keys($this->attachment_prefixes) as $type)
 		{
 			$old_path = $this->attachment_path($type,null,$old_rkey);
 			$new_path = $this->attachment_path($type,null,null,self::is_image($old_path));
 			//echo "$old_path --> $new_path<br>\n";
 
-			if ($old_path != $new_path && egw_vfs::stat($old_path) &&
-				!egw_vfs::rename($old_path,$new_path))
+			if ($old_path != $new_path && Vfs::stat($old_path) &&
+				!Vfs::rename($old_path,$new_path))
 			{
 				$ok = false;
 			}
 		}
-		egw_vfs::$is_root = false;
+		Vfs::$is_root = false;
 
 		return $ok;
 	}

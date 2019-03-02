@@ -446,6 +446,7 @@ class ranking_registration_ui extends ranking_bo
 				'no_filter2'     => true,
 				'order'          => 'reg_fed',
 				'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
+				'dataStorePrefix' => 'ranking_regi',
 				'row_id'         => 'id',
 				'actions'        => self::get_actions(),
 				'default_cols'   => '!ort,nation,acl_fed_id,verband',

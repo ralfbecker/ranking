@@ -10,6 +10,10 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Api;
+use EGroupware\Api\Egw;
+use EGroupware\Api\Acl;
+
 class ranking_competition_ui extends ranking_bo
 {
 	/**
@@ -18,7 +22,6 @@ class ranking_competition_ui extends ranking_bo
 	var $public_functions = array(
 		'index' => true,
 		'edit'  => true,
-		'view'  => true,
 	);
 	var $attachment_type = array();
 
@@ -36,14 +39,6 @@ class ranking_competition_ui extends ranking_bo
 	}
 
 	/**
-	 * View a competition
-	 */
-	function view()
-	{
-		$this->edit(null,'',true);
-	}
-
-	/**
 	 * Edit a competition
 	 *
 	 * @param array $_content =null
@@ -51,11 +46,9 @@ class ranking_competition_ui extends ranking_bo
 	 */
 	function edit($_content=null,$msg='',$view=false)
 	{
-		$tmpl = new etemplate('ranking.comp.edit');
-
 		if (($_GET['rkey'] || $_GET['WetId']) && !$this->comp->read($_GET))
 		{
-			$msg .= lang('Entry not found !!!');
+			Api\Framework::window_close(lang('Entry not found !!!'));
 		}
 		// set and enforce nation ACL
 		if (!is_array($_content))	// new call
@@ -74,12 +67,15 @@ class ranking_competition_ui extends ranking_bo
 		}
 		else
 		{
+			$button = key($_content['button']);
+			unset($_content['button']);
+
 			//echo "<br>ranking_competition_ui::edit: content ="; _debug_array($_content);
 			$this->comp->data = $_content['comp_data'];
 			$old_rkey = $_content['comp_data']['rkey'];
 			unset($_content['comp_data']);
 
-			if (substr($_content['homepage'], 0, 4) === 'www.') $_content['homepage'] = 'http://'.$_content['homepage'];
+			if (substr($_content['homepage'], 0, 4) === 'www.') $_content['homepage'] = 'https://'.$_content['homepage'];
 
 			$view = $_content['view'] && !($_content['edit'] && $this->acl_check_comp($this->comp->data));
 
@@ -100,7 +96,7 @@ class ranking_competition_ui extends ranking_bo
 			$this->comp->data_merge($_content);
 			//echo "<br>ranking_competition_ui::edit: comp->data ="; _debug_array($this->comp->data);
 
-			if (!$view  && ($_content['save'] || $_content['apply'] || $_content['update_prequal']) && $this->acl_check_comp($this->comp->data))
+			if (!$view  && in_array($button, ['save', 'apply', 'update_prequal']) && $this->acl_check_comp($this->comp->data))
 			{
 				if (!$this->comp->data['rkey'])
 				{
@@ -167,7 +163,7 @@ class ranking_competition_ui extends ranking_bo
 							}
 						}
 					}
-					if ($_content['update_prequal'])
+					if ($button === 'update_prequal')
 					{
 						$deleted = $unprequalified = $changed = null;
 						$prequalified = $this->registration->update_prequalified($this->comp->data['WetId'], $deleted, $unprequalified, $changed);
@@ -196,33 +192,22 @@ class ranking_competition_ui extends ranking_bo
 						}
 
 					}
-					$link = egw::link($_content['referer'],array(
-						'msg' => $msg,
-					));
-					$js = "window.opener.location='$link';";
+					Api\Framework::refresh_opener($msg, 'ranking', $this->comp->data['WetId'], $_content['WetId'] ? 'edit' : 'add');
+					if ($button === 'save') Api\Framework::window_close();
 				}
 			}
-			if ($_content['delete'])
+			if ($button === 'delete')
 			{
-				$link = egw::link('/index.php',array(
-					'menuaction' => 'ranking.ranking_competition_ui.index',
-					'delete' => $this->comp->data['WetId'],
-				));
-				$js = "window.opener.location='$link';";
+				Api\Framework::refresh_opener(lang('Competition deleted.'), 'ranking', $this->comp->data['WetId'], 'delete');
+				Api\Framework::window_close();
 			}
-			if ($_content['copy'])
+			if ($button === 'copy')
 			{
 				unset($this->comp->data['WetId']);
 				unset($this->comp->data['rkey']);
 				unset($this->comp->data['datum']);
 				$msg .= lang('Entry copied - edit and save the copy now.');
 			}
-			if ($_content['save'] || $_content['delete'])
-			{
-				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
-				common::egw_exit();
-			}
-			if (!empty($js)) egw_framework::set_onload($js);
 
 			if ($_content['remove'] && $this->acl_check_comp($this->comp->data))
 			{
@@ -237,13 +222,13 @@ class ranking_competition_ui extends ranking_bo
 			'msg'  => $msg,
 			'tabs' => $_content['tabs'],
 			'referer' => $_content['referer'] ? $_content['referer'] :
-				common::get_referer('/index.php?menuaction=ranking.ranking_competition_ui.index'),
+				Api\Header\Referer::get('/index.php?menuaction=ranking.ranking_competition_ui.index'),
 		);
 		foreach((array) $this->comp->attachments(null,false,false) as $type => $linkdata)
 		{
 			$content['files'][$type] = array(
 				'icon' => $type != 'logo' && $type != 'sponsors' ? $type :
-					egw::link($linkdata),
+					Egw::link($linkdata),
 				'file' => $this->comp->attachment_path($type),
 				'link' => $linkdata,
 			);
@@ -284,7 +269,8 @@ class ranking_competition_ui extends ranking_bo
 		{
 			$readonlys = array(
 				'__ALL__' => true,
-				'cancel' => false,
+				'button[cancel]' => false,
+				'button[edit]' => !$this->acl_check_comp($this->comp->data),
 			);
 		}
 		else
@@ -294,11 +280,11 @@ class ranking_competition_ui extends ranking_bo
 					!$this->acl_check_comp($this->comp->data),
 				'nation' => !!$this->only_nation_edit,
 				'fed_id' => is_numeric($this->only_nation_edit),
-				'edit'   => !$view || !$this->acl_check_comp($this->comp->data),
-				'copy'   => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
+				'button[edit]'   => true,
+				'button[copy]'   => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
 			);
 			// if only federation rights (no national rights), switch of ranking tab, to not allow changes there
-			if (!$this->acl_check($this->comp->data['nation'], EGW_ACL_EDIT))
+			if (!$this->acl_check($this->comp->data['nation'], Acl::EDIT))
 			{
 				$readonlys['tabs'] = array('ranking' => true);
 				// ToDo: limit category to state category(s)
@@ -306,6 +292,7 @@ class ranking_competition_ui extends ranking_bo
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 
+		$tmpl = new Api\Etemplate('ranking.comp.edit');
 		$tmpl->exec('ranking.ranking_competition_ui.edit',$content,
 			$sel_options,$readonlys,array(
 				'comp_data' => $this->comp->data,
@@ -319,11 +306,11 @@ class ranking_competition_ui extends ranking_bo
 	 *
 	 * @param array $query
 	 * @param array &$rows returned rows/competitions
-	 * @param array &$readonlys eg. to disable buttons based on acl
+	 * @param array &$readonlys eg. to disable buttons based on Acl
 	 */
 	function get_rows($query,&$rows,&$readonlys)
 	{
-		$GLOBALS['egw']->session->appsession('ranking','comp_state',$query);
+		Api\Cache::setSession('comp_state', 'ranking', $query);
 		if (!$this->is_admin && !in_array($query['col_filter']['nation'],$this->read_rights))
 		{
 			$query['col_filter']['nation'] = $this->read_rights;
@@ -359,27 +346,25 @@ class ranking_competition_ui extends ranking_bo
 		$total = $this->comp->get_rows($query,$rows,$readonlys);
 
 		$readonlys = array();
-		foreach($rows as $n => $row)
+		foreach($rows as &$row)
 		{
 			foreach((array) $this->comp->attachments($row,true) as $type => $linkdata)
 			{
-				$rows[$n]['pdf'][$type] = array(
+				$row['pdf'][$type] = array(
 					'icon' => $type,
 					'file' => $this->comp->attachment_path($type,$row),
 					'link' => $linkdata.',_blank',
 					'label'=> $this->attachment_type[$type],
 				);
 			}
-			$readonlys["edit[$row[WetId]]"] = $readonlys["delete[$row[WetId]]"] = !$this->acl_check_comp($row);
+			if (!$this->acl_check_comp($row))
+			{
+				$row['class'] = 'NoDelete';
+			}
 		}
 		// set the cups based on the selected nation
 		$rows['sel_options']['serie'] = $cups;
 
-		if ($this->debug)
-		{
-			echo "<p>ranking_competition_ui::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
-			_debug_array($readonlys);
-		}
 		return $total;
 	}
 
@@ -391,35 +376,31 @@ class ranking_competition_ui extends ranking_bo
 	 */
 	function index($_content=null,$msg='')
 	{
-		$tmpl = new etemplate('ranking.comp.list');
-
-		if ($_content['nm']['rows']['delete'] || $_GET['delete'] > 0)
+		if ($_content && $_content['nm']['action'] && $_content['nm']['selected'])
 		{
-			if ($_content['nm']['rows']['delete'])
+			foreach($_content['nm']['selected'] as $id)
 			{
-				list($id) = each($_content['nm']['rows']['delete']);
-			}
-			elseif($_GET['delete'] > 0)
-			{
-				$id = (int)$_GET['delete'];
-			}
-			if (!$this->comp->read(array('WetId' => $id)) || !$this->acl_check_comp($this->comp->data))
-			{
-				$msg = lang('Permission denied !!!');
-			}
-			elseif ($this->comp->has_results($id))
-			{
-				$msg = lang('You need to delete the results first !!!');
-			}
-			else
-			{
-				$msg = $this->comp->delete(array('WetId' => $id)) ? lang('%1 deleted',lang('Competition')) :
-					lang('Error: deleting %1 !!!',lang('Competition'));
+				switch($_content['nm']['action'])
+				{
+					case 'delete':
+						if (!$this->comp->read(array('WetId' => $id)) || !$this->acl_check_comp($this->comp->data))
+						{
+							$msg = lang('Permission denied !!!');
+						}
+						elseif ($this->comp->has_results($id))
+						{
+							$msg = lang('You need to delete the results first !!!');
+						}
+						else
+						{
+							$msg = $this->comp->delete(array('WetId' => $id)) ? lang('%1 deleted',lang('Competition')) :
+								lang('Error: deleting %1 !!!',lang('Competition'));
+						}
+						break;
+				}
 			}
 		}
-		$content = array();
-
-		$content['nm'] = $GLOBALS['egw']->session->appsession('ranking','comp_state');
+		$content = array('nm' => Api\Cache::getSession('comp_state', 'ranking'));
 
 		if (!is_array($content['nm']))
 		{
@@ -431,6 +412,10 @@ class ranking_competition_ui extends ranking_bo
 				'order'          =>	'datum',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
+				'default_cols'   => '!status',
+				'actions'        => $this->get_actions(),
+				'dataStorePrefix' => 'ranking_comp',
+				'row_id'         => 'WetId',
 			);
 			// do not consider "XYZ" when setting a default filter
 			$read_rights = array_values(array_diff($this->read_rights, array('XYZ')));
@@ -445,14 +430,50 @@ class ranking_competition_ui extends ranking_bo
 			}
 		}
 		$content['msg'] = $msg ? $msg : $_GET['msg'];
-		$readonlys['nm[rows][edit][0]'] = !$this->edit_rights && !$this->is_admin;
+		$this->set_ui_state();
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
+		$tmpl = new Api\Etemplate('ranking.comp.list');
 		$tmpl->exec('ranking.ranking_competition_ui.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),
 			'discipline' => $this->disciplines,
 			'cat_id' => array(lang('None')),
-		),$readonlys);
+		));
+	}
+
+	/**
+	 * Return actions for cup list
+	 *
+	 * @return array
+	 */
+	function get_actions()
+	{
+		$actions =array(
+			'edit' => array(
+				'caption' => 'Edit',
+				'default' => true,
+				'allowOnMultiple' => false,
+				'url' => 'menuaction=ranking.ranking_competition_ui.edit&WetId=$id',
+				'popup' => '900x500',
+				'group' => $group=0,
+			),
+			'add' => array(
+				'caption' => 'Add',
+				'url' => 'menuaction=ranking.ranking_competition_ui.edit',
+				'popup' => '900x500',
+				'disabled' => !$this->edit_rights && !$this->is_admin,
+				'group' => $group,
+			),
+			'delete' => array(
+				'caption' => 'Delete',
+				'disableClass' => 'noDelete',	// checks has result
+				'allowOnMultiple' => false,
+				'confirm' => 'Delete this competition',
+				'group' => $group=5,
+			),
+		);
+
+		return $actions;
 	}
 }

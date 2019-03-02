@@ -21,16 +21,7 @@ class ranking_cup_ui extends ranking_bo
 	var $public_functions = array(
 		'index' => true,
 		'edit'  => true,
-		'view'  => true,
 	);
-
-	/**
-	 * View a cup
-	 */
-	function view()
-	{
-		$this->edit(null,'',true);
-	}
 
 	/**
 	 * Edit a cup
@@ -44,7 +35,7 @@ class ranking_cup_ui extends ranking_bo
 
 		if (($_GET['rkey'] || $_GET['SerId']) && !$this->cup->read($_GET))
 		{
-			$msg .= lang('Entry not found !!!');
+			Api\Framework::window_close(lang('Entry not found !!!'));
 		}
 		// set and enforce nation ACL
 		if (!is_array($_content))	// new call
@@ -115,7 +106,7 @@ class ranking_cup_ui extends ranking_bo
 			}
 			if ($button === 'delete' && $this->acl_check_comp($this->cup->data))
 			{
-				Api\Framework::refresh_opener(lang('Cup delted.'), 'ranking', $this->cup->data['SerId'], 'delete');
+				Api\Framework::refresh_opener(lang('Cup deleted.'), 'ranking', $this->cup->data['SerId'], 'delete');
 				Api\Framework::window_close();
 			}
 			if ($button === 'copy')
@@ -239,8 +230,6 @@ class ranking_cup_ui extends ranking_bo
 	 */
 	function index($_content=null,$msg='')
 	{
-		$tmpl = new Api\Etemplate('ranking.cup.list');
-
 		if ($_content && $_content['nm']['action'] && $_content['nm']['selected'])
 		{
 			foreach($_content['nm']['selected'] as $id)
@@ -263,9 +252,7 @@ class ranking_cup_ui extends ranking_bo
 				}
 			}
 		}
-		$content = array();
-
-		if (!is_array($content['nm'])) $content['nm'] = Api\Cache::getSession('cup_state', 'ranking');
+		$content = array('nm' => Api\Cache::getSession('cup_state', 'ranking'));
 
 		if (!is_array($content['nm']))
 		{
@@ -279,6 +266,7 @@ class ranking_cup_ui extends ranking_bo
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
 				'actions'        => $this->get_actions(),
+				'dataStorePrefix' => 'ranking_cup',
 				'row_id'         => 'SerId',
 			);
 			// do not consider "XYZ" when setting a default filter
@@ -292,6 +280,7 @@ class ranking_cup_ui extends ranking_bo
 		$this->set_ui_state();
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('cups');
+		$tmpl = new Api\Etemplate('ranking.cup.list');
 		$tmpl->exec('ranking.ranking_cup_ui.index',$content,array(
 			'nation' => $this->ranking_nations,
 		));
@@ -317,7 +306,7 @@ class ranking_cup_ui extends ranking_bo
 				'caption' => 'Add',
 				'url' => 'menuaction=ranking.ranking_cup_ui.edit',
 				'popup' => '660x400',
-				'disabled' => $this->is_admin,
+				'disabled' => !$this->edit_rights && !$this->is_admin,
 				'group' => $group,
 			),
 			'delete' => array(

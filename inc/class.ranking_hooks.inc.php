@@ -31,7 +31,7 @@ class ranking_hooks
 			$links = array(
 				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index')),
 				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
-				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index')),
+				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index','ajax' => 'true')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index','ajax' => 'true')),
 				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index','ajax' => 'true')),
 				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index','ajax' => 'true')),

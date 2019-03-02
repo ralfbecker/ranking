@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<!-- $Id$ -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
 <overlay>
 	<template id="ranking.cup.edit.general" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%" height="250" overflow="auto">
@@ -33,9 +33,7 @@
 						</columns>
 						<rows>
 							<row>
-								<menulist>
-									<menupopup id="per_cat[$row]" options="Select category"/>
-								</menulist>
+								<select id="per_cat[$row]" options="Select category"/>
 								<textbox type="integer" statustext="number of competitions counting for the cup" id="max_per[$row]"/>
 							</row>
 						</rows>
@@ -49,22 +47,14 @@
 				<row>
 					<description value="Per discipline"/>
 					<hbox span="all">
-						<menulist>
-							<menupopup type="select-number" label="Lead" id="max_disciplines[lead]" options="None,1,10"/>
-						</menulist>
-						<menulist>
-							<menupopup type="select-number" label="Boulder" id="max_disciplines[boulder]" options="None,1,10"/>
-						</menulist>
-						<menulist>
-							<menupopup type="select-number" label="Speed" id="max_disciplines[speed]" options="None,1,10"/>
-						</menulist>
+						<select-number label="Lead" id="max_disciplines[lead]" options="None,1,10"/>
+						<select-number label="Boulder" id="max_disciplines[boulder]" options="None,1,10"/>
+						<select-number label="Speed" id="max_disciplines[speed]" options="None,1,10"/>
 					</hbox>
 				</row>
 				<row class="row">
 					<description for="pkte" value="Pointalocation"/>
-					<menulist>
-						<menupopup statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
-					</menulist>
+					<select statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
 					<checkbox statustext="edit via preset tab" label="Ex aquo get average points rounded down" id="average_ex_aquo" readonly="true"/>
 				</row>
 				<row class="row">
@@ -74,9 +64,7 @@
 				</row>
 				<row class="row">
 					<description for="split_by_places" value="Better result splits ties"/>
-					<menulist>
-						<menupopup statustext="Use better result to break ties in the ranking" id="split_by_places"/>
-					</menulist>
+					<select statustext="Use better result to break ties in the ranking" id="split_by_places"/>
 					<description/>
 				</row>
 				<row class="row">
@@ -105,13 +93,9 @@
 			<rows>
 				<row class="row">
 					<description for="pkte" value="Pointalocation"/>
-					<menulist>
-						<menupopup statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
-					</menulist>
+					<select statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
 					<description for="pkt_bis" value="til place"/>
-					<menulist>
-						<menupopup type="select-percent" statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
-					</menulist>
+					<select-percent statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
 				</row>
 				<row class="row">
 					<description for="faktor" value="Factor"/>
@@ -120,13 +104,9 @@
 				</row>
 				<row class="row">
 					<description for="feld_pkte" value="Fieldfactorpoints"/>
-					<menulist>
-						<menupopup statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
-					</menulist>
+					<select statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
 					<description for="feld_bis" value="til place"/>
-					<menulist>
-						<menupopup type="select-percent" statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
-					</menulist>
+					<select-percent statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
 				</row>
 			</rows>
 		</grid>
@@ -147,15 +127,11 @@
 				</row>
 				<row>
 					<description value="Display athlete" for="presets[display_athlete]"/>
-					<menulist>
-						<menupopup id="presets[display_athlete]"/>
-					</menulist>
+					<select id="presets[display_athlete]"/>
 				</row>
 				<row class="row">
 					<description value="Selfregister"/>
-					<menulist>
-						<menupopup statustext="Allows athletes to register themself for this competition" id="presets[selfregister]"/>
-					</menulist>
+					<select statustext="Allows athletes to register themself for this competition" id="presets[selfregister]"/>
 				</row>
 				<row>
 					<template content="presets" id="ranking.comp.edit.ranking" span="all"/>
@@ -172,12 +148,6 @@
 				<column/>
 			</columns>
 			<rows>
-				<row>
-					<description id="msg" no_lang="1" span="all" class="redItalic"/>
-					<description/>
-					<description/>
-					<description/>
-				</row>
 				<row class="th">
 					<description for="name" value="Name"/>
 					<hbox span="all">
@@ -187,21 +157,15 @@
 				</row>
 				<row class="row">
 					<description for="nation" value="Nation"/>
-					<menulist>
-						<menupopup statustext="nation if national competition or none for an internatinal one" id="nation" no_lang="1"/>
-					</menulist>
+					<select statustext="nation if national competition or none for an internatinal one" id="nation" no_lang="1"/>
 					<description value="Federation"/>
-					<menulist span="all">
-						<menupopup id="fed_id" options="national federation"/>
-					</menulist>
+					<select id="fed_id" options="national federation" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Category"/>
 					<select-cat id="presets[cat_id]" empty_label="$cont[cat_parent_name]" options=",,,,$cont[cat_parent]"/>
 					<description for="continent" value="Continent"/>
-					<menulist>
-						<menupopup id="continent" options="All"/>
-					</menulist>
+					<select id="continent" options="All"/>
 				</row>
 				<row>
 					<tabbox id="ranking.cup.edit.general|ranking.cup.edit.ranking|ranking.cup.edit.comment|ranking.cup.edit.presets" span="all">
