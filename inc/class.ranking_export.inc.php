@@ -7,8 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-18 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
+use EGroupware\Api\Egw;
 
 /**
  * XML/JSON export logic
@@ -101,7 +104,7 @@ class ranking_export extends ranking_result_bo
 		}
 		catch(Exception $e)
 		{
-			egw_session::cache_control(self::EXPIRES_404_NOT_FOUND);		// allow to cache for 15min
+			Api\Session::cache_control(self::EXPIRES_404_NOT_FOUND);		// allow to cache for 15min
 			header("HTTP/1.1 404 Not Found");
 			echo "<html>\n<head>\n\t<title>Error ".$e->getMessage()."</title>\n</head>\n";
 			echo "<body>\n\t<h1>".$e->getMessage()."</h1>\n";
@@ -164,7 +167,7 @@ class ranking_export extends ranking_result_bo
 			}
 			else
 			{
-				$link = egw::link('/ranking/sitemgr/digitalrock/eliste.html#comp=');
+				$link = Egw::link('/ranking/sitemgr/digitalrock/eliste.html#comp=');
 				$base = ($link[0] == '/' ? $base : '').$link;
 			}
 		}
@@ -194,7 +197,7 @@ class ranking_export extends ranking_result_bo
 			}
 			else
 			{
-				$link = egw::link('/ranking/sitemgr/digitalrock/pstambl.html#person=');
+				$link = Egw::link('/ranking/sitemgr/digitalrock/pstambl.html#person=');
 				$base = ($link[0] == '/' ? $base : '').$link;
 			}
 		}
@@ -279,7 +282,7 @@ class ranking_export extends ranking_result_bo
 	const EXPORT_ROUTE_OFFICAL_EXPIRES = 86400;
 
 	/**
-	 * Where to cache: egw_cache::Instance or Install-ID of instance to use
+	 * Where to cache: Api\Cache::Instance or Install-ID of instance to use
 	 *
 	 * @var string
 	 */
@@ -290,9 +293,9 @@ class ranking_export extends ranking_result_bo
 	 */
 	static protected function set_cache_level()
 	{
-		$config = config::read('ranking');
+		$config = Api\Config::read('ranking');
 
-		self::$cache_level = $config['export_cache_level'] ? $config['export_cache_level'] : egw_cache::INSTANCE;
+		self::$cache_level = $config['export_cache_level'] ? $config['export_cache_level'] : Api\Cache::INSTANCE;
 	}
 
 	/**
@@ -307,7 +310,7 @@ class ranking_export extends ranking_result_bo
 	{
 		if (!isset(self::$cache_level)) self::set_cache_level();
 
-		return egw_cache::setCache(self::$cache_level, 'ranking', $location, $data, $expiration);
+		return Api\Cache::setCache(self::$cache_level, 'ranking', $location, $data, $expiration);
 	}
 
 	/**
@@ -324,7 +327,7 @@ class ranking_export extends ranking_result_bo
 	{
 		if (!isset(self::$cache_level)) self::set_cache_level();
 
-		return egw_cache::getCache(self::$cache_level, 'ranking', $location, $callback, $callback_params,$expiration);
+		return Api\Cache::getCache(self::$cache_level, 'ranking', $location, $callback, $callback_params,$expiration);
 	}
 
 	/**
@@ -337,7 +340,7 @@ class ranking_export extends ranking_result_bo
 	{
 		if (!isset(self::$cache_level)) self::set_cache_level();
 
-		return egw_cache::unsetCache(self::$cache_level, 'ranking', $location);
+		return Api\Cache::unsetCache(self::$cache_level, 'ranking', $location);
 	}
 
 	/**
@@ -595,7 +598,7 @@ class ranking_export extends ranking_result_bo
 		}
 		// mark whole category offical/finished if general result is offical or competition date 10+ days over
 		$route['category_offical'] = $general_result && ($general_result['route_status'] == STATUS_RESULT_OFFICIAL ||
-			egw_time::to($comp['datum'],'ts') - time() > 10*24*3600);
+			Api\DateTime::to($comp['datum'],'ts') - time() > 10*24*3600);
 
 		// get discipline from combined heat
 		if ($discipline == 'combined' && $heat >= 0)
@@ -1375,7 +1378,7 @@ class ranking_export extends ranking_result_bo
 		$data['comp_name'] .= ': '.$cat['name'];
 
 		// calculate expiration date based on date of ranking and duration of last competition
-		$date_ts = egw_time::to($date, 'ts');
+		$date_ts = Api\DateTime::to($date, 'ts');
 		//error_log(__METHOD__."() comp=".array2string($comp)." (time()=".time()." - date_ts=$date_ts)/86400 = ".(time()-$date_ts)/86400);
 		if (substr($data['end'], -6) == '-12-31' || (time()-$date_ts)/86400 > $comp['duration']+1)	// +1 to compensate for timezones
 		{
@@ -1393,7 +1396,7 @@ class ranking_export extends ranking_result_bo
 				$cat['mgroups'] ? $cat['mgroups'] : $cat['rkey'],	// for overall we have to use contained categories
 				$comp['nation'], $cup?$cup['SerId']:0, true, false)))
 		{
-			$next_comp_ts = egw_time::to($next_comp['datum'], 'ts');
+			$next_comp_ts = Api\DateTime::to($next_comp['datum'], 'ts');
 
 			if (time() > $next_comp_ts)	// waiting for next result
 			{
@@ -1570,7 +1573,7 @@ class ranking_export extends ranking_result_bo
 			$result_filter,
 		)) as $result)
 		{
-			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
+			$modified = Api\DateTime::createFromFormat(Api\DateTime::DATABASE, $result['modified'], Api\DateTime::$server_timezone);
 			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
 			$cats_by_id[$result['GrpId']]['results'][] = array(
 				'result_rank' => $result['platz'],
@@ -1651,7 +1654,7 @@ class ranking_export extends ranking_result_bo
 			}
 		}
 
-		$comp_ts = egw_time::to($comp['datum'], 'ts');
+		$comp_ts = Api\DateTime::to($comp['datum'], 'ts');
 		$data['expires'] = (time()-$comp_ts)/86400 > $comp['duration']+1 ?	// +1 to compensate for different timezones
 			self::EXPORT_RESULTS_HISTORIC_EXPIRES : self::EXPORT_RESULTS_RUNNING_EXPIRES;
 
@@ -1659,7 +1662,7 @@ class ranking_export extends ranking_result_bo
 		if ($data['expires'] == self::EXPORT_RESULTS_HISTORIC_EXPIRES &&
 			($next_comp = $this->comp->next_comp($comp['datum'], null, $comp['nation'], 0, false, false)))
 		{
-			$next_comp_ts = egw_time::to($next_comp['datum'], 'ts');
+			$next_comp_ts = Api\DateTime::to($next_comp['datum'], 'ts');
 
 			if (time() > $next_comp_ts)	// waiting for next result
 			{
@@ -1702,7 +1705,7 @@ class ranking_export extends ranking_result_bo
 		{
 			$discipline = $cat['discipline'];
 		}
-		$modified = egw_time::createFromFormat(egw_time::DATABASE, $comp['modified'], egw_time::$server_timezone);
+		$modified = Api\DateTime::createFromFormat(Api\DateTime::DATABASE, $comp['modified'], Api\DateTime::$server_timezone);
 		$last_modified = $modified->format('U');
 
 		$results = array();
@@ -1712,7 +1715,7 @@ class ranking_export extends ranking_result_bo
 			'platz > 0',
 		)) as $result)
 		{
-			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['modified'], egw_time::$server_timezone);
+			$modified = Api\DateTime::createFromFormat(Api\DateTime::DATABASE, $result['modified'], Api\DateTime::$server_timezone);
 			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
 			$results[] = array(
 				'result_rank' => $result['platz'],
@@ -1855,13 +1858,13 @@ class ranking_export extends ranking_result_bo
 		{
 			if (!empty($result['reg_deleted']))
 			{
-				$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['reg_deleted'], egw_time::$server_timezone);
+				$modified = Api\DateTime::createFromFormat(Api\DateTime::DATABASE, $result['reg_deleted'], Api\DateTime::$server_timezone);
 				if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
 				continue;	// use deleted only for timestamp/etag
 			}
 			if (empty($result['reg_registered'])) continue;	// dont list just prequalified
 
-			$modified = egw_time::createFromFormat(egw_time::DATABASE, $result['reg_registered'], egw_time::$server_timezone);
+			$modified = Api\DateTime::createFromFormat(Api\DateTime::DATABASE, $result['reg_registered'], Api\DateTime::$server_timezone);
 			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
 
 			if (!isset($cats[$result['GrpId']]) && ($cat = $this->cats->read($result['GrpId'])))
@@ -2019,7 +2022,7 @@ class ranking_export extends ranking_result_bo
 			$athlete = $this->athlete->clear_data_by_acl($athlete, ranking_athlete::ACL_DENY_PROFILE);
 			unset($athlete['last_comp'], $athlete['photo']);
 			$athlete['freetext'] = $athlete['error'] = $msg;
-			$athlete['last_modified'] = egw_time::to($athlete['modified'], 'ts');
+			$athlete['last_modified'] = Api\DateTime::to($athlete['modified'], 'ts');
 		}
 		//_debug_array($athlete); exit;
 
@@ -2043,7 +2046,7 @@ class ranking_export extends ranking_result_bo
 						preg_replace('|^https?://[^/]+|', '', $data[$pic]));
 				}
 			}
-			$last_modified = egw_time::to($athlete['modified'], 'ts');
+			$last_modified = Api\DateTime::to($athlete['modified'], 'ts');
 			// fetch results and calculate their weight, to allow clients to easyly show N best competitions
 			if (($results = $this->result->read(array(
 				'PerId' => $athlete['PerId'],
@@ -2053,7 +2056,7 @@ class ranking_export extends ranking_result_bo
 				$year = (int)date('Y');
 				foreach($results as $result)
 				{
-					if ($last_modified < ($ts = egw_time::to($result['modified'], 'ts')))
+					if ($last_modified < ($ts = Api\DateTime::to($result['modified'], 'ts')))
 					{
 						$last_modified = $ts;
 					}
@@ -2295,7 +2298,7 @@ class ranking_export extends ranking_result_bo
 			'categorys' => $categorys,
 		);
 		// calculate expiration date based on date of ranking and duration of last competition
-		$date_ts = egw_time::to($data['end'], 'ts');
+		$date_ts = Api\DateTime::to($data['end'], 'ts');
 		//error_log(__METHOD__."() comp=".array2string($date_comp)." (time()=".time()." - date_ts=$date_ts)/86400 = ".(time()-$date_ts)/86400);
 		if (substr($data['end'], -6) == '-12-31' || (time()-$date_ts)/86400 > $date_comp['duration'])
 		{
@@ -2311,7 +2314,7 @@ class ranking_export extends ranking_result_bo
 		if ($data['expires'] == self::EXPORT_RANKING_OLD_TTL && $cup &&
 			($next_comp = $this->comp->next_comp($date_comp['datum'], $cat['rkey'], $date_comp['nation'], $cup['SerId'], true, false)))
 		{
-			$next_comp_ts = egw_time::to($next_comp['datum'], 'ts');
+			$next_comp_ts = Api\DateTime::to($next_comp['datum'], 'ts');
 
 			if (time() > $next_comp_ts)	// waiting for next result
 			{

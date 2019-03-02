@@ -8,7 +8,7 @@
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
-8 */
+ */
 
 class uiranking extends ranking_bo
 {

@@ -7,9 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2013-15 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2013-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * Calculate diverse rankings:
@@ -100,7 +101,7 @@ class ranking_calculation
 		{
 			if (!($cup = $this->bo->cup->read($_cup)))
 			{
-				throw new egw_exception_wrong_parameter("Cup '$_cup' NOT found!");
+				throw new Api\Exception\WrongParameter("Cup '$_cup' NOT found!");
 			}
 
 			// get all comps of a serie
@@ -113,11 +114,11 @@ class ranking_calculation
 		}
 		if (!($comp = $this->bo->comp->read($_comp)))
 		{
-			throw new egw_exception_wrong_parameter("Competition '$_comp' NOT found!");
+			throw new Api\Exception\WrongParameter("Competition '$_comp' NOT found!");
 		}
 		if (!$comp['quota'])
 		{
-			throw new egw_exception_wrong_parameter("No quota set for competition $comp[name]!");
+			throw new Api\Exception\WrongParameter("No quota set for competition $comp[name]!");
 		}
 
 		if (!$cup)
@@ -154,7 +155,7 @@ class ranking_calculation
 		}
 		if (!$cats_found)
 		{
-			throw new egw_exception_wrong_parameter("No results yet!");
+			throw new Api\Exception\WrongParameter("No results yet!");
 		}
 
 		foreach($valid_cats as $name => $vcats)
@@ -323,7 +324,7 @@ class ranking_calculation
 		{
 			if (!($date_comp = $this->bo->comp->read($filter['WetId'])))
 			{
-				throw new egw_exception_wrong_parameter ("Competition '$filter[WetId]' NOT found!");
+				throw new Api\Exception\WrongParameter ("Competition '$filter[WetId]' NOT found!");
 			}
 			$date = $date_comp['datum'];
 		}
@@ -343,7 +344,7 @@ class ranking_calculation
 		{
 			if (!($date_comp = $this->bo->comp->read($date)))
 			{
-				throw new egw_exception_wrong_parameter ("Competition '$date' NOT found!");
+				throw new Api\Exception\WrongParameter ("Competition '$date' NOT found!");
 			}
 		}
 
@@ -641,8 +642,8 @@ class ranking_calculation
 
 		if ($overall)
 		{
-			if (!$cup) throw new egw_exception_assertion_failed('Overall ranking only defined for cups!');
-			if ((int)$stand >= 2018 && empty($cup['nation'])) throw new egw_exception_assertion_failed('Overall ranking 2018+ requires 2 competitions per discipline (and is not yet implemented)!');
+			if (!$cup) throw new Api\Exception\AssertionFailed('Overall ranking only defined for cups!');
+			if ((int)$stand >= 2018 && empty($cup['nation'])) throw new Api\Exception\AssertionFailed('Overall ranking 2018+ requires 2 competitions per discipline (and is not yet implemented)!');
 			// international combined ranking, no longer uses $min_disciplines
 			if ((int)$stand >= 2017 || !empty($cup['nation']))
 			{

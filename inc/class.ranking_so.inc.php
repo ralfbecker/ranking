@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -150,7 +149,7 @@ class ranking_so
 	{
 		if (is_null($config))
 		{
-			$config = config::read('ranking');
+			$config = Api\Config::read('ranking');
 		}
 		if ($config['ranking_db_host'] || $config['ranking_db_name'])
 		{
@@ -166,7 +165,6 @@ class ranking_so
 				$config['ranking_db_port'],$config['ranking_db_user'],$config['ranking_db_pass']);
 
 			if (!$config['ranking_db_charset']) $db->Link_ID->SetCharSet($GLOBALS['egw_info']['server']['system_charset']);
-
 		}
 		else
 		{
@@ -193,7 +191,7 @@ class ranking_so
 		static $cats=null,$global_parent=null,$rkey2id=null;
 		if (is_null($cats))
 		{
-			$cats = new categories(categories::GLOBAL_ACCOUNT,categories::GLOBAL_APPNAME);
+			$cats = new Api\Categories(categories::GLOBAL_ACCOUNT, Api\Categories::GLOBAL_APPNAME);
 			$global_parent = $cats->name2id(self::PARENT_CAT_NAME);
 			if (!$global_parent)
 			{
@@ -203,7 +201,7 @@ class ranking_so
 					'description' => 'Do NOT change the name!',
 				));
 			}
-			$rkey2id =& egw_cache::getSession(__CLASS__, 'rkey2id', function() { return array(); });
+			$rkey2id =& Api\Cache::getSession(__CLASS__, 'rkey2id', function() { return array(); });
 		}
 		if ($rkey === 'parent')
 		{
@@ -250,7 +248,7 @@ class ranking_so
 		{
 			if (!isset(self::$sub_classes[$name]))
 			{
-				throw new egw_exception_wrong_parameter("NO sub-class '$name'!");
+				throw new Api\Exception\WrongParameter("NO sub-class '$name'!");
 			}
 			$class = self::$sub_classes[$name];
 

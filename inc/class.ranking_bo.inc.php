@@ -10,26 +10,35 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
-/**
- * Editing athletes data is mapped to EGW_ACL_ADD
- *
- * @var int 2
- */
-define('EGW_ACL_ATHLETE',EGW_ACL_ADD);
-/**
- * @var int 64
- */
-define('EGW_ACL_REGISTER',EGW_ACL_CUSTOM_1);
-/**
- * @var int 4|64=68
- */
-define('EGW_ACL_RESULT',EGW_ACL_EDIT|EGW_ACL_REGISTER);
+use EGroupware\Api;
+use EGroupware\Api\Acl;
 
 /**
  * ranking business object/logic
  */
 class ranking_bo extends ranking_so
 {
+	const ACL_READ = Acl::READ;
+	const ACL_EDIT = Acl::EDIT;
+	/**
+	 * ACL to edit athletes
+	 *
+	 * @var int 2
+	 */
+	const ACL_ATHLETE = Acl::ADD;
+	/**
+	 * ACL to register athletes
+	 *
+	 * @var int 64
+	 */
+	const ACL_REGISTER = Acl::CUSTOM1;
+	/**
+	 * ACL to edit results
+	 *
+	 * @var int 4|64=68
+	 */
+	const ACL_RESULT = self::ACL_EDIT|Acl::CUSTOM1;
+
 	var $split_by_places = array(
 		'no' => 'No never',
 		'only_counting' => 'Only if competition is counting',
@@ -182,17 +191,8 @@ class ranking_bo extends ranking_so
 		// hack to give the ranking translation of 'Top' to 'Top' precedence over the etemplate one 'Oben'
 		if ($GLOBALS['egw_info']['user']['preferences']['common']['lang'] == 'de')
 		{
-			if ((float)$GLOBALS['egw_info']['apps']['phpgwapi']['version'] < 1.7)
-			{
-				$GLOBALS['egw']->translation->lang_arr['top'] = 'Top';
-				$GLOBALS['egw']->translation->lang_arr['Time'] = 'Zeit';
-			}
-			else
-			{
-				translation::add_app('etemplate');
-				translation::$lang_arr['top'] = 'Top';
-				translation::$lang_arr['Time'] = 'Zeit';
-			}
+			Api\Translation::$lang_arr['top'] = 'Top';
+			Api\Translation::$lang_arr['Time'] = 'Zeit';
 		}
 		parent::__construct();	// calling the parent constructor
 
@@ -215,13 +215,13 @@ class ranking_bo extends ranking_so
 			if ($location[0] == ranking_federation::ACL_LOCATION_PREFIX) $location = substr($location,1);
 
 			foreach(array(
-				'read_rights'     => EGW_ACL_READ,
-				'edit_rights'     => EGW_ACL_EDIT,
-				'athlete_rights'  => EGW_ACL_ATHLETE,
-				'register_rights' => EGW_ACL_REGISTER,
+				'read_rights'     => self::ACL_READ,
+				'edit_rights'     => self::ACL_EDIT,
+				'athlete_rights'  => self::ACL_ATHLETE,
+				'register_rights' => self::ACL_REGISTER,
 			) as $var => $right)
 			{
-				if (($data['rights'] & $right) && !in_array($location,$this->$var) && (!is_numeric($location) || $right == EGW_ACL_EDIT))
+				if (($data['rights'] & $right) && !in_array($location,$this->$var) && (!is_numeric($location) || $right == self::ACL_EDIT))
 				{
 					$this->{$var}[] = $location;
 				}
@@ -306,14 +306,14 @@ class ranking_bo extends ranking_so
 	/**
 	 * Checks if the user is admin or has ACL-settings for a required right and a nation
 	 *
-	 * Having EGW_ACL_ATHLETE or EGW_ACL_REGISTER for NULL=international, is equivalent to having that right for ANY nation.
-	 * EGW_ACL_RESULT requires _both_ EGW_ACL_EDIT or EGW_ACL_REGISTER (for the nation of the calendar/competition)
+	 * Having self::ACL_ATHLETE or self::ACL_REGISTER for NULL=international, is equivalent to having that right for ANY nation.
+	 * self::ACL_RESULT requires _both_ ACL::EDIT or self::ACL_REGISTER (for the nation of the calendar/competition)
 	 *
-	 * Competition specific rights are checked for EGW_ACL_(REGISTER|RESULT), if $comp given, and
+	 * Competition specific rights are checked for self::ACL_(REGISTER|RESULT), if $comp given, and
 	 * route specific ones, if $route given.
 	 *
 	 * @param string $nation iso 3-char nation-code or 'NULL'=international
-	 * @param int $required EGW_ACL_{READ|EDIT|ADD|REGISTER|RESULT}
+	 * @param int $required self::ACL_{READ|EDIT|ATHLETE|REGISTER|RESULT}
 	 * @param array|int $comp =null competition array or id, default null
 	 * @param boolean $allow_before =false grant judge-rights unlimited time before the competition
 	 * @param array $route =null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
@@ -328,29 +328,29 @@ class ranking_bo extends ranking_so
 		if ($this->is_admin) return true;
 
 		// for ATHLETE rights check $this->athlete_rights, as they also contain rights gained as judge
-		if ($required == EGW_ACL_ATHLETE && in_array($nation, $use_no_judge ? $this->athlete_rights_no_judge : $this->athlete_rights))
+		if ($required == self::ACL_ATHLETE && in_array($nation, $use_no_judge ? $this->athlete_rights_no_judge : $this->athlete_rights))
 		{
 			return true;
 		}
 		if (!isset($acl_cache[$nation][$required]))
 		{
-			// Result ACL requires _both_ EDIT AND REGISTER rights, acl::check cant check both at once!
-			if($required == EGW_ACL_RESULT)
+			// Result ACL requires _both_ EDIT AND REGISTER rights, Acl::check cant check both at once!
+			if($required == self::ACL_RESULT)
 			{
-				$acl_cache[$nation][$required] = $this->acl_check($nation,EGW_ACL_EDIT) &&
-					$this->acl_check($nation,EGW_ACL_REGISTER|1024);	// |1024 prevents int. registrations rights to be sufficent for national calendars
+				$acl_cache[$nation][$required] = $this->acl_check($nation,self::ACL_EDIT) &&
+					$this->acl_check($nation,self::ACL_REGISTER|1024);	// |1024 prevents int. registrations rights to be sufficent for national calendars
 			}
 			else
 			{
 				$location = is_numeric($nation) ? ranking_federation::ACL_LOCATION_PREFIX.$nation :
 					($nation ? $nation : 'NULL');
 				$acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($location,$required,'ranking') ||
-					($required == EGW_ACL_ATHLETE || $required == EGW_ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
+					($required == self::ACL_ATHLETE || $required == self::ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
 			}
 		}
 		$granted = $acl_cache[$nation][$required] ||
 			// check competition specific judges rights for REGISTER and RESULT too
-			$comp && in_array($required, array(EGW_ACL_REGISTER, EGW_ACL_RESULT)) &&
+			$comp && in_array($required, array(self::ACL_REGISTER, self::ACL_RESULT)) &&
 				$this->is_judge($comp, $allow_before, $route);
 		//error_log(__METHOD__."('$nation', $required, ".array2string($comp).') returning '.array2string($granted));
 		return $granted;
@@ -360,12 +360,12 @@ class ranking_bo extends ranking_so
 	 * Check athlete ACL, which uses the nation ACL above, or the federation (and it's parents)
 	 *
 	 * @param array|int $athlete athlete id or data, or array with values for keys 'nation' and 'fed_id'
-	 * @param int $required =EGW_ACL_ATHLETE EGW_ACL_{ATHLETE|REGISTER|RESULT}
+	 * @param int $required =self::ACL_ATHLETE self::ACL_{ATHLETE|REGISTER|RESULT}
 	 * @param array|int $comp =null competition array or id, default null
 	 * @param string $license =null nation for which a license should be applied for, default null=no license (NULL for international)
 	 * @return boolean true if access is granted, false otherwise
 	 */
-	function acl_check_athlete($athlete,$required=EGW_ACL_ATHLETE,$comp=null,$license=null)
+	function acl_check_athlete($athlete,$required=self::ACL_ATHLETE,$comp=null,$license=null)
 	{
 		static $fed_grants = null;
 
@@ -391,7 +391,7 @@ class ranking_bo extends ranking_so
 			$which = 'national ACL grants access';
 		}
 		// national edit rights allow to register foreing athlets for national competition
-		elseif($comp['nation'] && $required == EGW_ACL_REGISTER && in_array($comp['nation'],$this->edit_rights))
+		elseif($comp['nation'] && $required == self::ACL_REGISTER && in_array($comp['nation'],$this->edit_rights))
 		{
 			$check = true;
 			$which = 'national edit rights allow to register foreign athlets for national competitions';
@@ -424,7 +424,7 @@ class ranking_bo extends ranking_so
 				{
 					if (is_numeric($fed_id) && !isset($fed_grants[$fed_id]))
 					{
-						$fed_grants[$fed_id] |= EGW_ACL_ATHLETE;
+						$fed_grants[$fed_id] |= self::ACL_ATHLETE;
 						$grants[] = $fed_id;
 					}
 				}
@@ -433,7 +433,7 @@ class ranking_bo extends ranking_so
 				{
 					foreach($children as $child)
 					{
-						$fed_grants[$child['fed_id']] |= EGW_ACL_ATHLETE;
+						$fed_grants[$child['fed_id']] |= self::ACL_ATHLETE;
 					}
 				}
 			}
@@ -462,9 +462,9 @@ class ranking_bo extends ranking_so
 	 */
 	function is_selfservice($set=null)
 	{
-		$ret = !is_null($set) ? egw_cache::setSession('ranking', 'selfservice', $set) :
-			($GLOBALS['egw']->session->session_flags == 'A' ? egw_cache::getSession('ranking', 'selfservice') : null);
-		//error_log(__METHOD__.'('.array2string($set).') returning '.array2string($ret)." (egw_cache::getSession('ranking', 'selfservice')=".array2string(egw_cache::getSession('ranking', 'selfservice')).')');
+		$ret = !is_null($set) ? Api\Cache::setSession('ranking', 'selfservice', $set) :
+			($GLOBALS['egw']->session->session_flags == 'A' ? Api\Cache::getSession('ranking', 'selfservice') : null);
+		//error_log(__METHOD__.'('.array2string($set).') returning '.array2string($ret)." (Api\Cache::getSession('ranking', 'selfservice')=".array2string(Api\Cache::getSession('ranking', 'selfservice')).')');
 		return $ret;
 	}
 
@@ -476,8 +476,8 @@ class ranking_bo extends ranking_so
 	 */
 	function acl_check_comp(array $comp)
 	{
-		return $this->is_admin || $this->acl_check($comp['nation'],EGW_ACL_EDIT) ||
-			$comp['fed_id'] && $this->acl_check($comp['fed_id'],EGW_ACL_EDIT);
+		return $this->is_admin || $this->acl_check($comp['nation'],self::ACL_EDIT) ||
+			$comp['fed_id'] && $this->acl_check($comp['fed_id'],self::ACL_EDIT);
 	}
 
 	/**
@@ -556,7 +556,7 @@ class ranking_bo extends ranking_so
 			// days after competition-end (start+duration) <= judge_right_days
 			$distance < 0 && abs($distance) <= $this->judge_right_days+$comp['duration']) ||
 			// treat national result-rights like being a judge of every competition
-			$this->acl_check($comp['nation'], EGW_ACL_RESULT);
+			$this->acl_check($comp['nation'], self::ACL_RESULT);
 
 		if (!$is_judge && $route && (is_array($route) && isset($route['route_judges']) ||
 			($route = $this->route->read($route))) && $route['route_judges'] &&
@@ -649,9 +649,9 @@ class ranking_bo extends ranking_so
 			($this->is_admin || $this->is_judge($comp, true) ||     // user is an admin OR a judge of the comp OR
 				$this->acl_check_comp($comp) ||                     // user has edit rights for the competition
 				in_array($comp['nation'],$this->register_rights) || // user has national registration rights OR
-				(($this->acl_check_athlete($athlete, EGW_ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
+				(($this->acl_check_athlete($athlete, self::ACL_REGISTER)) &&	// ( user has the necessary registration rights for $nation AND
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
-						 $this->acl_check($comp['nation'],EGW_ACL_RESULT))));						//   user has result-rights for that calendar ] ) }
+						 $this->acl_check($comp['nation'],self::ACL_RESULT))));						//   user has result-rights for that calendar ] ) }
 
 		//error_log(__METHOD__."(".array2string($comp).", ".array2string($athlete).", $cat) returning ".array2string($ret));
 		return $ret;
@@ -704,7 +704,7 @@ class ranking_bo extends ranking_so
 
 			if (!is_array($prequalified))
 			{
-				list($prequal_comp,$prequalified) = egw_cache::getSession('ranking', 'prequalified');
+				list($prequal_comp,$prequalified) = Api\Cache::getSession('ranking', 'prequalified');
 
 				if (!$prequal_comp || $prequal_comp !== $comp)	// no cached object or $comp changed
 				{
@@ -760,7 +760,7 @@ class ranking_bo extends ranking_so
 						}
 					}
 				}
-				egw_cache::setSession('ranking', 'prequalified', array($comp,$prequalified));
+				Api\Cache::setSession('ranking', 'prequalified', array($comp,$prequalified));
 			}
 		}
 		//echo "prequalifed($comp[rkey],$do_cat$do_cat[rkey]) ="; _debug_array($prequalified);
@@ -822,22 +822,22 @@ class ranking_bo extends ranking_so
 	 * @param int|array $cat
 	 * @param int|array $comp
 	 * @param boolean $register =true true: user tries to register, false: other operation
-	 * @throws egw_exception_wrong_parameter if $athlete, $cat or $comp are not found
+	 * @throws Api\Exception\WrongParameter if $athlete, $cat or $comp are not found
 	 * @return string translated error-message or null
 	 */
 	function error_register($athlete, $cat, $comp, $register=true)
 	{
 		if (!is_array($athlete) && !($athlete = $this->athlete->read($athlete)))
 		{
-			throw new egw_exception_wrong_parameter(lang('Athlete NOT found !!!'));
+			throw new Api\Exception\WrongParameter(lang('Athlete NOT found !!!'));
 		}
 		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
-			throw new egw_exception_wrong_parameter(lang('Category NOT found !!!'));
+			throw new Api\Exception\WrongParameter(lang('Category NOT found !!!'));
 		}
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
-			throw new egw_exception_wrong_parameter(lang('Competition NOT found !!!'));
+			throw new Api\Exception\WrongParameter(lang('Competition NOT found !!!'));
 		}
 		$error = null;
 		if ($comp && !($this->is_admin || $this->is_judge($comp)) &&
@@ -883,8 +883,8 @@ class ranking_bo extends ranking_so
 	 * @param int $mode =ranking_registration::REGISTERED ::DELETED, ::PREQUALIFIED, ::CONFIRMED
 	 * @param string& $msg =null on return over quota message for admins or jury
 	 * @param string $prequal_reason =null reason why athlete is prequalified
-	 * @throws egw_exception_wrong_userinput with error message for not matching agegroup or over quota
-	 * @throws egw_exception_wrong_parameter for other errors
+	 * @throws Api\Exception\WrongUserinput with error message for not matching agegroup or over quota
+	 * @throws Api\Exception\WrongParameter for other errors
 	 * @return boolean true of everythings ok, false on error
 	 */
 	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null, $prequal_reason=null)
@@ -907,13 +907,13 @@ class ranking_bo extends ranking_so
 		// prequalify and confirm needs competition rights
 		if (in_array($mode, array('prequalify', 'confirm')) && !$this->acl_check_comp($comp))
 		{
-			throw new egw_exception_wrong_userinput(lang('Permission denied !!!'));
+			throw new Api\Exception\WrongUserinput(lang('Permission denied !!!'));
 		}
 
 		// check if all conditions for registration are met
 		if (($error = $this->error_register($athlete, $cat, $comp, $mode == ranking_registration::REGISTERED)))
 		{
-			throw new egw_exception_wrong_userinput($error);
+			throw new Api\Exception\WrongUserinput($error);
 		}
 
 		switch($mode)
@@ -936,7 +936,7 @@ class ranking_bo extends ranking_so
 				}
 				// fall through
 			case ranking_registration::CONFIRMED:
-				if (!$data) throw new egw_exception_wrong_parameter("Athlete is not registered!");
+				if (!$data) throw new Api\Exception\WrongParameter("Athlete is not registered!");
 				break;
 
 			case ranking_registration::REGISTERED:
@@ -976,7 +976,7 @@ class ranking_bo extends ranking_so
 
 						if (!$this->is_admin && !$this->is_judge($comp))
 						{
-							throw new egw_exception_wrong_userinput($msg);
+							throw new Api\Exception\WrongUserinput($msg);
 						}
 					}
 					// check total quota for combined plus single discipline registration, if one is set
@@ -988,7 +988,7 @@ class ranking_bo extends ranking_so
 
 						if (!$this->is_admin && !$this->is_judge($comp))
 						{
-							throw new egw_exception_wrong_userinput($msg);
+							throw new Api\Exception\WrongUserinput($msg);
 						}
 					}
 
@@ -1002,7 +1002,7 @@ class ranking_bo extends ranking_so
 				break;
 
 			default:
-				throw new egw_exception_wrong_parameter(__METHOD__."($comp, $cat, , '$mode') unknown mode '$mode'!");
+				throw new Api\Exception\WrongParameter(__METHOD__."($comp, $cat, , '$mode') unknown mode '$mode'!");
 		}
 
 		$this->registration->init($data);
@@ -1031,7 +1031,7 @@ class ranking_bo extends ranking_so
 	 * @param array $athlete
 	 * @param string& $info on return information message eg. registration changed to a combined one
 	 * @return string error-message or null if registration is ok
-	 * @throws egw_exception_wrong_userinput for things even admin or judges are not allowed
+	 * @throws Api\Exception\WrongUserinput for things even admin or judges are not allowed
 	 *	eg. register in single cat when already registered in combined
 	 */
 	function check_combined_registration(array $comp, array $cat, array $keys, array $athlete, &$info)
@@ -1056,7 +1056,7 @@ class ranking_bo extends ranking_so
 				'reg_registered IS NOT NULL AND reg_deleted IS NULL'
 			)))
 			{
-				throw new egw_exception_wrong_userinput(lang('Already registered for combined, no single category registration allowed!'));
+				throw new Api\Exception\WrongUserinput(lang('Already registered for combined, no single category registration allowed!'));
 			}
 			$cats_to_check[] = array($combined, $cat['GrpId']);
 		}
@@ -1064,7 +1064,7 @@ class ranking_bo extends ranking_so
 		{
 			return null;	// not a combined cat, eg. TOF
 		}
-		// checks need to take into account that athletes might be registered in single categories
+		// checks need to take into account that athletes might be registered in single Api\Categories
 		$exceeding = array();
 		foreach($cats_to_check as $cats)
 		{
@@ -1525,17 +1525,17 @@ class ranking_bo extends ranking_so
 		//echo "<p>".__METHOD__."(calendar='$calendar',comp=$comp,cat=$cat) menuaction=$_GET[menuaction]</p>\n";
 		foreach(array('registration','result','import') as $type)
 		{
-			$data = egw_cache::getSession('ranking', $type);
+			$data = Api\Cache::getSession('ranking', $type);
 			foreach(array('calendar','comp','cat') as $name)
 			{
 				if (!is_null($$name)) $data[$name] = $$name;
 			}
-			egw_cache::setSession('ranking', $type, $data);
+			Api\Cache::setSession('ranking', $type, $data);
 		}
 		// only store our menuaction, specially not eTemplate2 home.etemplate_new.ajax_process_exec.etemplate!
 		if (strpos($_GET['menuaction'], 'ranking.') === 0 && strpos($_GET['menuaction'], '.ajax_') === false)
 		{
-			egw_cache::setSession('ranking', 'menuaction', $_GET['menuaction']);
+			Api\Cache::setSession('ranking', 'menuaction', $_GET['menuaction']);
 		}
 		unset($calendar, $comp, $cat);	// used as $$name above, quitens IDE warnings
 	}
@@ -1595,7 +1595,7 @@ class ranking_bo extends ranking_so
 	{
 		if (!$keys['WetId'] || !$keys['GrpId'] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) || // permission denied
+			!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp) || // permission denied
 			$comp['serie'] && !($cup = $this->cup->read($comp['serie'])))
 		{
 			return false;
@@ -1747,7 +1747,7 @@ class ranking_bo extends ranking_so
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
 			!($cat = $this->cats->read($keys['GrpId'])) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)) // permission denied
+			!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp)) // permission denied
 		{
 			return lang('Permission denied !!!');
 		}
@@ -2021,3 +2021,10 @@ class ranking_bo extends ranking_so
 		return similar_text($first,$second)/$length >= $min;
 	}
 }
+
+/**
+ * Some deprecated defines
+ */
+define('EGW_ACL_ATHLETE', ranking_bo::ACL_ATHLETE);
+define('EGW_ACL_REGISTER', ranking_bo::ACL_REGISTER);
+define('EGW_ACL_RESULT', ranking_bo::ACL_RESULT);
