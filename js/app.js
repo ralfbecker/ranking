@@ -6,8 +6,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2007-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 /**
@@ -147,7 +146,7 @@ app.classes.ranking = AppJS.extend(
 			var fragment = '<iframe src="'+location.protocol+'//'+location.host+url+
 				'" scrolling="auto" frameborder="0" width="%width%" height="%height%" allowfullscreen></iframe>';
 
-			jQuery.get('http://'+display.getValue()+'/pushURL', { url: fragment, embed: 1}, function()
+			jQuery.get('https://'+display.getValue()+'/pushURL', { url: fragment, embed: 1}, function()
 			{
 				egw.message('URL pushed');
 			});

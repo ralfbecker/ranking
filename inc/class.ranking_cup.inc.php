@@ -7,8 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -16,7 +15,7 @@ use EGroupware\Api;
 /**
  * cup object
  */
-class ranking_cup extends so_sql
+class ranking_cup extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 	/**
@@ -46,7 +45,7 @@ class ranking_cup extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 
 		foreach(array(
 				'cats'  => 'ranking_category',
@@ -76,7 +75,7 @@ class ranking_cup extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->source_charset);
 		}
 		if ($data['gruppen'])
 		{
@@ -194,7 +193,7 @@ class ranking_cup extends so_sql
 	/**
 	 * Search for cups
 	 *
-	 * reimplmented from so_sql to exclude some cols from search and to calc. year from rkey
+	 * reimplmented from Api\Storage\Base to exclude some cols from search and to calc. year from rkey
 	 */
 	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
 	{
@@ -208,6 +207,7 @@ class ranking_cup extends so_sql
 
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? array($extra_cols) : array();
 		$extra_cols[] = 'IF(LEFT(rkey,2)>80,1900,2000)+LEFT(rkey,2) AS year';
+		$extra_cols[] = '(SELECT COUNT(*) FROM Wettkaempfe WHERE SerId=serie) AS num_comps';
 
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 	}

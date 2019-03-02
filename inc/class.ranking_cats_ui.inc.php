@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-17 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -67,7 +67,7 @@ class ranking_cats_ui extends ranking_bo
 				$this->cats->data['mgroups'] = $this->cats->query_list('rkey', 'GrpId', array('GrpId' => $_content['mgroups']));
 			}
 
-			list($button) = @each($_content['button']);
+			$button = key($_content['button']);
 			//error_log(__METHOD__."() button=$button, cats->data=".array2string($this->cats->data));
 
 			if (in_array($button, array('save', 'apply', 'delete')) && !$this->is_admin)

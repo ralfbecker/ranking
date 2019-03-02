@@ -5,12 +5,13 @@
 	<template id="ranking.cup.list.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
-				<column/>
+				<column width="100"/>
 				<column width="50%"/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column width="100"/>
+				<column width="100"/>
+				<column width="100"/>
+				<column width="150"/>
+				<column width="150"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -18,25 +19,18 @@
 					<nextmatch-sortheader label="Name" id="name"/>
 					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..."/>
 					<nextmatch-sortheader align="center" label="Key" id="rkey"/>
+					<nextmatch-sortheader align="center" label="Competitions" id="num_comps"/>
 					<nextmatch-sortheader label="Last modified" id="modified"/>
-					<description align="center" value="Action"/>
+					<nextmatch-header label="Modifier" id="modifier"/>
 				</row>
-				<row class="row">
+				<row class="row $row_cont[class]">
 					<description align="center" id="${row}[year]" no_lang="1"/>
 					<html id="${row}[name]" no_lang="1" class="ml10"/>
 					<description align="center" id="${row}[nation]" no_lang="1"/>
 					<description align="center" id="${row}[rkey]" no_lang="1"/>
-					<vbox options="0,0">
-						<date-time id="${row}[modified]" readonly="true"/>
-						<menulist>
-							<menupopup type="select-account" id="${row}[modifier]" readonly="true"/>
-						</menulist>
-					</vbox>
-					<hbox align="center">
-						<button statustext="View this cup" label="View" id="view[$row_cont[SerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.view&amp;SerId=$row_cont[SerId]'),'_blank','dependent=yes,width=800,height=420,scrollbars=yes,status=yes'); return false;" image="view"/>
-						<button statustext="Edit this cup" label="Edit" id="edit[$row_cont[SerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.edit&amp;SerId=$row_cont[SerId]'),'_blank','dependent=yes,width=800,height=420,scrollbars=yes,status=yes'); return false;" image="edit"/>
-						<button align="center" statustext="Delete this cup" label="Delete" id="delete[$row_cont[SerId]]" onclick="return confirm('Delete this cup');" image="delete"/>
-					</hbox>
+					<integer align="center" id="${row}[num_comps]" readonly="true"/>
+					<date-time id="${row}[modified]" readonly="true"/>
+					<select-account id="${row}[modifier]" readonly="true"/>
 				</row>
 			</rows>
 		</grid>
@@ -44,31 +38,10 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
+	<template id="ranking.cup.left" template="" lang="" group="0" version="1.9.001">
+		<buttononly statustext="Add" id="add" onclick="egw.open_link('ranking.ranking_cup_ui.edit',false,'660x400');"/>
+	</template>
 	<template id="ranking.cup.list" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%">
-			<columns>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-			</columns>
-			<rows>
-				<row disabled="!@msg">
-					<description id="msg" no_lang="1" span="all" class="redItalic"/>
-					<description/>
-					<description/>
-					<description/>
-					<description/>
-				</row>
-				<row>
-					<nextmatch align="center" id="nm" template="ranking.cup.list.rows" span="all"/>
-				</row>
-				<row>
-					<button statustext="Add a cup" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_cup_ui.edit'),'_blank','dependent=yes,width=800,height=350,scrollbars=yes,status=yes'); return false;"/>
-					<description/>
-				</row>
-			</rows>
-		</grid>
+		<nextmatch align="center" id="nm" template="ranking.cup.list.rows" span="all" header_left="ranking.cup.left"/>
 	</template>
 </overlay>

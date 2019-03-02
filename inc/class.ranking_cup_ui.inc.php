@@ -7,9 +7,11 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
+use EGroupware\Api\Acl;
 
 class ranking_cup_ui extends ranking_bo
 {
@@ -38,7 +40,7 @@ class ranking_cup_ui extends ranking_bo
 	 */
 	function edit($_content=null,$msg='',$view=false)
 	{
-		$tmpl = new etemplate('ranking.cup.edit');
+		$tmpl = new Api\Etemplate('ranking.cup.edit');
 
 		if (($_GET['rkey'] || $_GET['SerId']) && !$this->cup->read($_GET))
 		{
@@ -61,7 +63,11 @@ class ranking_cup_ui extends ranking_bo
 		}
 		else
 		{
-			$view = $_content['view'] && !($_content['edit'] && $this->acl_check_comp($this->cup->data));
+			//echo "<br>ranking_cup_ui::edit: content ="; _debug_array($_content);
+			$button = key($_content['button']);
+			unset($_content['button']);
+
+			$view = $_content['view'] && !($button === 'edit' && $this->acl_check_comp($this->cup->data));
 
 			if (!$view && $this->only_nation_edit)
 			{
@@ -79,14 +85,13 @@ class ranking_cup_ui extends ranking_bo
 					}
 				}
 			}
-			//echo "<br>ranking_cup_ui::edit: content ="; _debug_array($_content);
 			$this->cup->data = $_content['cup_data'];
 			unset($_content['cup_data']);
 			$this->cup->data_merge($_content);
 
 			//echo "<br>ranking_cup_ui::edit: cup->data ="; _debug_array($this->cup->data);
 
-			if (!$view && ($_content['save'] || $_content['apply']) && $this->acl_check_comp($this->cup->data))
+			if (!$view && in_array($button, ['save','apply']) && $this->acl_check_comp($this->cup->data))
 			{
 				if (!$this->cup->data['rkey'])
 				{
@@ -99,39 +104,26 @@ class ranking_cup_ui extends ranking_bo
 				elseif ($this->cup->save())
 				{
 					$msg .= lang('Error: while saving !!!');
+					$button = 'apply';
 				}
 				else
 				{
 					$msg .= lang('%1 saved',lang('Cup'));
-
-					if ($_content['save']) $_content['cancel'] = true;	// leave dialog now
 				}
-				$link = egw::link('/index.php',array(
-					'menuaction' => 'ranking.ranking_cup_ui.index',
-					'msg' => $msg,
-				));
-				$js = "window.opener.location='$link';";
+				Api\Framework::refresh_opener($msg, 'ranking', $this->cup->data['SerId'], $_content['SerId'] ? 'edit' : 'add');
+				if ($button === 'save') Api\Framework::window_close();
 			}
-			if ($_content['delete'] && $this->acl_check_comp($this->cup->data))
+			if ($button === 'delete' && $this->acl_check_comp($this->cup->data))
 			{
-				$link = egw::link('/index.php',array(
-					'menuaction' => 'ranking.ranking_cup_ui.index',
-					'delete' => $this->cup->data['SerId'],
-				));
-				$js = "window.opener.location='$link';";
+				Api\Framework::refresh_opener(lang('Cup delted.'), 'ranking', $this->cup->data['SerId'], 'delete');
+				Api\Framework::window_close();
 			}
-			if ($_content['copy'])
+			if ($button === 'copy')
 			{
 				unset($this->cup->data['SerId']);
 				unset($this->cup->data['rkey']);
 				$msg .= lang('Entry copied - edit and save the copy now.');
 			}
-			if ($_content['save'] || $_content['delete'])
-			{
-				echo "<html><head><script>\n$js;\nwindow.close();\n</script></head></html>\n";
-				common::egw_exit();
-			}
-			if (!empty($js)) egw_framework::set_onload($js);
 		}
 		$content = $this->cup->data + array(
 			'msg' => $msg,
@@ -165,23 +157,28 @@ class ranking_cup_ui extends ranking_bo
 		$content['presets']['quali_preselected'][] = array('cat' => '');
 		$content['average_ex_aquo'] = $content['presets']['average_ex_aquo'];
 
+		// select a category parent fitting to the nation
+		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
+		$content['cat_parent_name'] = ($content['nation']? $content['nation'] : 'Int.').' '.lang('Competitions');
+
 		if ($view)
 		{
 			$readonlys = array(
 				'__ALL__' => true,
-				'cancel' => false,
+				'button[cancel]' => false,
+				'button[edit]'   => !$this->acl_check($content['nation'],Acl::EDIT),
 			);
 		}
 		else
 		{
 			$readonlys = array(
-				'delete' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]],
+				'button[delete]' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]],
 				'nation' => !!$this->only_nation_edit,
 				'fed_id' => is_numeric($this->only_nation_edit),
-				'edit'   => !($view && $this->acl_check($content['nation'],EGW_ACL_EDIT)),
+				'button[edit]'   => true,
 			);
 			// if only federation rights (no national rights), switch of ranking tab, to not allow changes there
-			if (!$this->acl_check($this->comp->data['nation'], EGW_ACL_EDIT))
+			if (!$this->acl_check($this->comp->data['nation'], Acl::EDIT))
 			{
 				$readonlys['tabs'] = array('presets' => true);
 				$readonlys['max_rang'] = true;
@@ -202,11 +199,11 @@ class ranking_cup_ui extends ranking_bo
 	 *
 	 * @param array $query
 	 * @param array &$rows returned rows/cups
-	 * @param array &$readonlys eg. to disable buttons based on acl
+	 * @param array &$readonlys eg. to disable buttons based on Acl
 	 */
 	function get_rows($query,&$rows,&$readonlys)
 	{
-		$GLOBALS['egw']->session->appsession('ranking','cup_state',$query);
+		Api\Cache::setSession('cup_state', 'ranking', $query);
 
 		if (!$this->is_admin && !in_array($query['col_filter']['nation'],$this->read_rights))
 		{
@@ -223,17 +220,12 @@ class ranking_cup_ui extends ranking_bo
 		$total = $this->cup->get_rows($query,$rows,$readonlys);
 
 		$readonlys = array();
-		foreach($rows as $row)
+		foreach($rows as &$row)
 		{
-			if (!$this->acl_check_comp($row))
+			if ($row['num_comps'] || !$this->acl_check_comp($row))
 			{
-				$readonlys["edit[$row[SerId]]"] = $readonlys["delete[$row[SerId]]"] = true;
+				$row['class'] = 'NoDelete';
 			}
-		}
-		if ($this->debug)
-		{
-			echo "<p>ranking_cup_ui::get_rows(".print_r($query,true).") rows ="; _debug_array($rows);
-			_debug_array($readonlys);
 		}
 		return $total;
 	}
@@ -246,53 +238,31 @@ class ranking_cup_ui extends ranking_bo
 	 */
 	function index($_content=null,$msg='')
 	{
-		$tmpl = new etemplate('ranking.cup.list');
+		$tmpl = new Api\Etemplate('ranking.cup.list');
 
-		$cont = $_content['nm']['rows'];
-
-		if ($cont['view'] || $cont['edit'] || $cont['delete'])
+		if ($_content && $_content['nm']['action'] && $_content['nm']['selected'])
 		{
-			foreach(array('view','edit','delete') as $action)
+			foreach($_content['nm']['selected'] as $id)
 			{
-				if ($cont[$action])
+				switch($_content['nm']['action'])
 				{
-					list($id) = each($cont[$action]);
-					break;
+					case 'delete':
+						if (!$this->cup->read(array('SerId' => $id)) || !$this->acl_check_comp($this->cup->data))
+						{
+							$msg = lang('Permission denied !!!');
+						}
+						else
+						{
+							$msg = $this->cup->delete(array('SerId' => $id)) ?
+								lang('%1 deleted',lang('Cup')) : lang('Error: deleting %1 !!!',lang('Cup'));
+						}
+						break;
 				}
-			}
-			//echo "<p>ranking::competitions() action='$action', id='$id'</p>\n";
-			switch($action)
-			{
-				case 'view':
-					$tmpl->location(array(
-						'menuaction' => 'ranking.ranking_cup_ui.view',
-						'SerId'      => $id,
-					));
-					break;
-
-				case 'edit':
-					$tmpl->location(array(
-						'menuaction' => 'ranking.ranking_cup_ui.edit',
-						'SerId'      => $id,
-					));
-					break;
-
-				case 'delete':
-					if (!$this->cup->read(array('SerId' => $id)) || !$this->acl_check_comp($this->cup->data))
-					{
-						$msg = lang('Permission denied !!!');
-					}
-					else
-					{
-						$msg = $this->cup->delete(array('SerId' => $id)) ?
-							lang('%1 deleted',lang('Cup')) : lang('Error: deleting %1 !!!',lang('Cup'));
-					}
-					break;
 			}
 		}
 		$content = array();
 
-		if (!is_array($content['nm'])) $content['nm'] = $GLOBALS['egw']->session->appsession('ranking','cup_state');
+		if (!is_array($content['nm'])) $content['nm'] = Api\Cache::getSession('cup_state', 'ranking');
 
 		if (!is_array($content['nm']))
 		{
@@ -305,6 +275,8 @@ class ranking_cup_ui extends ranking_bo
 				'order'          =>	'year',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
+				'actions'        => $this->get_actions(),
+				'row_id'         => 'SerId',
 			);
 			// do not consider "XYZ" when setting a default filter
 			$read_rights = array_values(array_diff($this->read_rights, array('XYZ')));
@@ -314,10 +286,47 @@ class ranking_cup_ui extends ranking_bo
 			}
 		}
 		$content['msg'] = $msg;
+		$this->set_ui_state();
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('cups');
 		$tmpl->exec('ranking.ranking_cup_ui.index',$content,array(
 			'nation' => $this->ranking_nations,
 		));
+	}
+
+	/**
+	 * Return actions for cup list
+	 *
+	 * @return array
+	 */
+	function get_actions()
+	{
+		$actions =array(
+			'edit' => array(
+				'caption' => 'Edit',
+				'default' => true,
+				'allowOnMultiple' => false,
+				'url' => 'menuaction=ranking.ranking_cup_ui.edit&SerId=$id',
+				'popup' => '660x400',
+				'group' => $group=0,
+			),
+			'add' => array(
+				'caption' => 'Add',
+				'url' => 'menuaction=ranking.ranking_cup_ui.edit',
+				'popup' => '660x400',
+				'disabled' => $this->is_admin,
+				'group' => $group,
+			),
+			'delete' => array(
+				'caption' => 'Delete',
+				'disableClass' => 'noDelete',	// checks has result
+				'allowOnMultiple' => false,
+				'confirm' => 'Delete this cup',
+				'disableClass' => 'NoDelete',
+				'group' => $group=5,
+			),
+		);
+
+		return $actions;
 	}
 }

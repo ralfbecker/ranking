@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.cup.edit.general" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="200" overflow="auto">
+		<grid width="100%" height="250" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -16,7 +16,7 @@
 		</grid>
 	</template>
 	<template id="ranking.cup.edit.ranking" template="" lang="" group="0" version="14.3.001">
-		<grid width="100%" height="200" overflow="auto">
+		<grid width="100%" height="250" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -95,7 +95,7 @@
 		<textbox multiline="true" cols="100" id="comment" rows="14" class="fullWidth"/>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%" height="210" overflow="auto">
+		<grid width="100%" height="250" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
@@ -132,7 +132,7 @@
 		</grid>
 	</template>
 	<template id="ranking.cup.edit.presets" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%" height="200" overflow="scroll">
+		<grid width="100%" height="250" overflow="auto">
 			<columns>
 				<column width="15%"/>
 				<column/>
@@ -143,7 +143,7 @@
 				</row>
 				<row class="row">
 					<description for="presets[name]" value="Competition name"/>
-					<textbox id="presets[name]" no_lang="1" size="100" maxlength="100"/>
+					<textbox id="presets[name]" no_lang="1" size="80" maxlength="100"/>
 				</row>
 				<row>
 					<description value="Display athlete" for="presets[display_athlete]"/>
@@ -197,9 +197,7 @@
 				</row>
 				<row class="row">
 					<description value="Category"/>
-					<menulist>
-						<menupopup type="select-cat" id="presets[cat_id]" options="$cont[cat_parent_name],,,,$cont[cat_parent]"/>
-					</menulist>
+					<select-cat id="presets[cat_id]" empty_label="$cont[cat_parent_name]" options=",,,,$cont[cat_parent]"/>
 					<description for="continent" value="Continent"/>
 					<menulist>
 						<menupopup id="continent" options="All"/>
@@ -221,16 +219,16 @@
 						</tabpanels>
 					</tabbox>
 				</row>
-				<row>
+				<row class="dialogFooterToolbar">
 					<hbox span="2">
-						<button statustext="Edit this cup" label="Edit" id="edit"/>
-						<button statustext="saves the changes made" label="Save" id="save"/>
-						<button statustext="apply the changes made" label="Apply" id="apply"/>
-						<button statustext="aborts without saving changes" label="Cancel" id="cancel" onclick="window.close();"/>
+						<button statustext="Edit this cup" label="Edit" id="button[edit]"/>
+						<button statustext="saves the changes made" label="Save" id="button[save]"/>
+						<button statustext="apply the changes made" label="Apply" id="button[apply]"/>
+						<button statustext="aborts without saving changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
 					<hbox span="2">
-						<button align="center" label="Copy" id="copy"/>
-						<button align="right" statustext="deletes this cup" label="Delete" id="delete" onclick="return confirm('deletes this cup');"/>
+						<button align="center" label="Copy" id="button[copy]"/>
+						<button align="right" statustext="deletes this cup" label="Delete" id="button[delete]" onclick="return confirm('deletes this cup');"/>
 					</hbox>
 				</row>
 			</rows>
