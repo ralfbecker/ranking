@@ -172,7 +172,8 @@ class ranking_cup_ui extends ranking_bo
 		else
 		{
 			$readonlys = array(
-				'button[delete]' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]],
+				'button[delete]' => !$this->cup->data[$this->cup->db_key_cols[$this->cup->autoinc_id]] ||
+					$this->cup->data['num_comps'],
 				'nation' => !!$this->only_nation_edit,
 				'fed_id' => is_numeric($this->only_nation_edit),
 				'button[edit]'   => true,
@@ -247,7 +248,9 @@ class ranking_cup_ui extends ranking_bo
 				switch($_content['nm']['action'])
 				{
 					case 'delete':
-						if (!$this->cup->read(array('SerId' => $id)) || !$this->acl_check_comp($this->cup->data))
+						if (!$this->cup->read(array('SerId' => $id)) ||
+							$this->cup->data['num_comps'] ||
+							!$this->acl_check_comp($this->cup->data))
 						{
 							$msg = lang('Permission denied !!!');
 						}

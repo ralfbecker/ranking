@@ -301,6 +301,13 @@ class ranking_cup extends Api\Storage\Base
 		{
 			$keys = is_numeric($keys) ? array('SerId' => (int) $keys) : array('rkey' => $keys);
 		}
+		if (!is_array($extra_cols))
+		{
+			$extra_cols = $extra_cols ? explode(',', $extra_cols) : array();
+		}
+		$extra_cols[] = 'IF(LEFT(rkey,2)>80,1900,2000)+LEFT(rkey,2) AS year';
+		$extra_cols[] = '(SELECT COUNT(*) FROM Wettkaempfe WHERE SerId=serie) AS num_comps';
+
 		return parent::read($keys,$extra_cols,$join);
 	}
 
