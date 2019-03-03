@@ -104,10 +104,18 @@ class ranking_cup_ui extends ranking_bo
 				Api\Framework::refresh_opener($msg, 'ranking', $this->cup->data['SerId'], $_content['SerId'] ? 'edit' : 'add');
 				if ($button === 'save') Api\Framework::window_close();
 			}
-			if ($button === 'delete' && $this->acl_check_comp($this->cup->data))
+			if ($button === 'delete' && $this->acl_check_comp($this->cup->data) &&
+				!$this->cup->data['num_comps'])
 			{
-				Api\Framework::refresh_opener(lang('Cup deleted.'), 'ranking', $this->cup->data['SerId'], 'delete');
-				Api\Framework::window_close();
+				if ($this->cup->delete(array('SerId' => $this->cup->data['SerId'])))
+				{
+					Api\Framework::refresh_opener(lang('%1 deleted', lang('Cup')), 'ranking', $this->cup->data['SerId'], 'delete');
+					Api\Framework::window_close();
+				}
+				else
+				{
+					$msg = lang('Error: deleting %1 !!!', lang('Cup'));
+				}
 			}
 			if ($button === 'copy')
 			{

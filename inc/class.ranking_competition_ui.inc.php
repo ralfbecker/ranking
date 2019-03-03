@@ -196,10 +196,18 @@ class ranking_competition_ui extends ranking_bo
 					if ($button === 'save') Api\Framework::window_close();
 				}
 			}
-			if ($button === 'delete')
+			if ($button === 'delete' && $this->acl_check_comp($this->comp->data) &&
+				!$this->comp->has_results($this->comp->data['WetId']))
 			{
-				Api\Framework::refresh_opener(lang('Competition deleted.'), 'ranking', $this->comp->data['WetId'], 'delete');
-				Api\Framework::window_close();
+				if ($this->comp->delete(array('WetId' => $this->comp->data['WetId'])))
+				{
+					Api\Framework::refresh_opener(lang('%1 deleted',lang('Competition')), 'ranking', $this->comp->data['WetId'], 'delete');
+					Api\Framework::window_close();
+				}
+				else
+				{
+					$msg = lang('Error: deleting %1 !!!',lang('Competition'));
+				}
 			}
 			if ($button === 'copy')
 			{
@@ -211,7 +219,7 @@ class ranking_competition_ui extends ranking_bo
 
 			if ($_content['remove'] && $this->acl_check_comp($this->comp->data))
 			{
-				list($type) = each($_content['remove']);
+				$type = key($_content['remove']);
 
 				$msg .= $this->comp->remove_attachment($type) ?
 					lang('Removed the %1',$this->attachment_type[$type]) :
