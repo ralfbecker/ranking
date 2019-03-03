@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<!-- $Id$ -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
 <overlay>
 	<template id="ranking.athlete.edit.contact" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" height="210">
@@ -126,9 +126,7 @@
 			<rows>
 				<row class="row" valign="top">
 					<description for="acl" value="Access"/>
-					<menulist>
-						<menupopup statustext="deny public display of the checked information" id="acl" onchange="1"/>
-					</menulist>
+					<select statustext="deny public display of the checked information" id="acl" onchange="1"/>
 					<description for="custom_acl" value="deny public access to"/>
 					<listbox statustext="deny public display of the checked information" id="custom_acl" rows="7"/>
 					<description/>
@@ -224,29 +222,20 @@
 					<description for="vorname" value="First name"/>
 					<textbox statustext="First name of the athlete in Latin chars! Accents and umlauts are ok" id="vorname" needed="1" size="20" maxlength="40"/>
 					<hbox align="right">
-						<menulist>
-							<menupopup id="license_nation" onchange="1"/>
-						</menulist>
+						<select id="license_nation" onchange="1"/>
 						<description value="License" id="license_year" no_lang="1"/>
-						<menulist>
-							<menupopup id="license"/>
-						</menulist>
+						<select id="license"/>
 					</hbox>
 				</row>
 				<row class="row">
 					<description for="sex" value="Gender"/>
-					<menulist>
-						<menupopup statustext="gender of the athlete" id="sex" needed="1" options="Select one"/>
-					</menulist>
+					<select statustext="gender of the athlete" id="sex" needed="1" options="Select one"/>
 					<description for="nation" value="Nation"/>
-					<menulist>
-						<menupopup statustext="nation the athlete is competing for" id="nation" needed="1" no_lang="1" onchange="1" options="Select one"/>
-					</menulist>
+					<select statustext="nation the athlete is competing for" id="nation" needed="1" no_lang="1" onchange="1" options="Select one"/>
 					<hbox align="right">
-						<menulist>
-							<menupopup statustext="|category license is applied for, does NOT limit athletes to compete in that category only" id="license_cat" options="Athlete license"/>
-						</menulist>
-						<button statustext="|Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license" onclick="return confirm('$cont[license_msg]');"/>
+						<select statustext="|category license is applied for, does NOT limit athletes to compete in that category only" id="license_cat" options="Athlete license"/>
+						<button statustext="|Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="button[apply_license]"
+							onclick="et2_dialog.confirm(widget,'$cont[license_msg]','Athlete license');"/>
 					</hbox>
 				</row>
 				<row class="row">
@@ -257,13 +246,9 @@
 				</row>
 				<row>
 					<description for="verband" value="Federation"/>
-					<menulist span="2">
-						<menupopup class="selectboxFullWidth" id="fed_id"/>
-					</menulist>
+					<select class="selectboxFullWidth" id="fed_id" span="2"/>
 					<description value="since" id="a2f_start"/>
-					<menulist>
-						<menupopup id="acl_fed_id[fed_id]" options="Administrated by: parent federation" class="selectboxFullWidth"/>
-					</menulist>
+					<select id="acl_fed_id[fed_id]" options="Administrated by: parent federation" class="selectboxFullWidth"/>
 				</row>
 				<row>
 					<tabbox id="tabs" span="all">
@@ -287,17 +272,18 @@
 						</tabpanels>
 					</tabbox>
 				</row>
-				<row>
+				<row class="dialogFooterToolbar">
 					<hbox span="2">
-						<button statustext="Saves the changes made" label="Save" id="save"/>
-						<button statustext="Applies the changes made" label="Apply" id="apply"/>
-						<button statustext="exists without saving the changes" label="Cancel" id="cancel" onclick="window.close();"/>
+						<button statustext="Saves the changes made" label="Save" id="button[save]"/>
+						<button statustext="Applies the changes made" label="Apply" id="button[apply]"/>
+						<button statustext="exists without saving the changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
 					<hbox align="right" span="all">
-						<button statustext="|Send EMail to set password to athlete" label="Password EMail" id="pw_mail"/>
-						<link-entry id="merge_to" options="ranking"/>
-						<button statustext="|Merges this entry into the selected one." label="Merge" id="merge" onclick="return confirm('ATTENTION: merging can NOT be undone! Really want to merge?');"/>
-						<button statustext="Delete this athlete" label="Delete" id="delete" onclick="return confirm('Delete this athlete');"/>
+						<button statustext="|Send EMail to set password to athlete" label="Password EMail" id="button[pw_mail]"/>
+						<link-entry id="merge_to" options="ranking" width="10em"/>
+						<button statustext="|Merges this entry into the selected one." label="Merge" id="button[merge]"
+							onclick="et2_dialog.confirm(widget,'ATTENTION: merging can NOT be undone! Really want to merge?','Merge');"/>
+						<button statustext="Delete this athlete" label="Delete" id="button[delete]" onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
 					</hbox>
 				</row>
 			</rows>

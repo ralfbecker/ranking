@@ -1,110 +1,79 @@
-<?xml version="1.0"?>
-<!-- $Id$ -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
 <overlay>
 	<template id="ranking.athlete.index.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
-				<column width="7%"/>
-				<column width="10%"/>
-				<column width="10%"/>
-				<column width="7%"/>
-				<column width="10%"/>
+				<column width="60"/>
+				<column width="20%"/>
+				<column width="15%"/>
+				<column width="70"/>
+				<column width="90"/>
 				<column width="15%"/>
 				<column width="25%"/>
-				<column/>
-				<column/>
-				<column disabled="@no_license"/>
-				<column/>
-				<column/>
+				<column width="50"/>
+				<column width="90"/>
+				<column disabled="@no_license" width="80"/>
+				<column width="120"/>
 			</columns>
 			<rows>
 				<row class="th">
-					<vbox options="0,0">
+					<vbox>
 						<nextmatch-sortheader label="License" id="PerId"/>
 						<nextmatch-filterheader id="nation" no_lang="1" options="Nation..."/>
 					</vbox>
-					<vbox options="0,0">
+					<vbox>
 						<nextmatch-sortheader label="Last name" id="_nachname"/>
 						<nextmatch-filterheader id="nachname" no_lang="1" options="All" class="selectboxFullWidth"/>
 					</vbox>
-					<vbox options="0,0">
+					<vbox>
 						<nextmatch-sortheader label="First name" id="_vorname"/>
 						<nextmatch-filterheader id="vorname" no_lang="1" options="All" class="selectboxFullWidth"/>
 					</vbox>
 					<nextmatch-filterheader align="center" id="sex" options="Gender..."/>
 					<nextmatch-sortheader align="center" label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="City" id="ort"/>
-					<vbox options="0,0">
+					<vbox>
 						<nextmatch-sortheader label="Federation" id="verband"/>
 						<nextmatch-filterheader id="fed_id" options="All" class="selectboxFullWidth"/>
 					</vbox>
 					<nextmatch-sortheader label="Squad" id="kader"/>
 					<nextmatch-sortheader label="Last competition" id="last_comp"/>
-					<vbox no_lang="1" options="0,0">
-						<menulist>
-							<menupopup id="license_nation" readonly="true"/>
-						</menulist>
+					<vbox>
+						<select id="license_nation" readonly="true" no_lang="1"/>
 						<description value="License" id="license_year" no_lang="1"/>
 					</vbox>
 					<nextmatch-sortheader label="Last modified" id="modified"/>
-					<description align="center" value="Action"/>
 				</row>
-				<row class="row">
-					<description align="center" value="$row_cont[nation]" id="${row}[PerId]" no_lang="1"/>
+				<row class="row $row_cont[class]">
+					<description value="$row_cont[nation]" id="${row}[PerId]" no_lang="1"/>
 					<description id="${row}[nachname]" no_lang="1" class="lastname leftPad5"/>
 					<description id="${row}[vorname]" no_lang="1" class="ml10 leftPad5"/>
-					<menulist>
-						<menupopup align="center" id="${row}[sex]" readonly="true"/>
-					</menulist>
-					<date align="center" id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
+					<select id="${row}[sex]" readonly="true"/>
+					<date id="${row}[geb_date]" no_lang="1" readonly="true" options="Y-m-d"/>
 					<description id="${row}[ort]" no_lang="1"/>
 					<description id="${row}[verband]" no_lang="1"/>
 					<description id="${row}[kader]"/>
 					<date id="${row}[last_comp]" readonly="true" options="Y-m-d"/>
-					<vbox options="0,0">
-						<hbox options="0,0">
-							<menulist>
-								<menupopup id="${row}[license]" readonly="true"/>
-							</menulist>
-							<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="apply_license[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;apply_license=1&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]&amp;license_cat=$cont[license_cat]'),'_blank','dependent=yes,width=900,height=470,scrollbars=yes,status=yes'); return false;" class="small"/>
-						</hbox>
-						<menulist>
-							<menupopup id="${row}[license_cat]" readonly="true"/>
-						</menulist>
+					<vbox>
+						<select id="${row}[license]" readonly="true"/>
+						<select id="${row}[license_cat]" readonly="true"/>
 					</vbox>
-					<vbox options="0,0">
+					<vbox>
 						<date-time id="${row}[modified]" readonly="true"/>
-						<menulist>
-							<menupopup type="select-account" id="${row}[modifier]" readonly="true"/>
-						</menulist>
+						<select-account id="${row}[modifier]" readonly="true"/>
 					</vbox>
-					<hbox options="0,0">
-						<button statustext="Edit this athlete" label="Edit" id="edit[$row_cont[PerId]]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=$row_cont[PerId]&amp;license_nation=$cont[license_nation]&amp;license_year=$cont[license_year]'),'_blank','dependent=yes,width=900,height=470,scrollbars=yes,status=yes'); return false;" image="edit"/>
-						<button statustext="Delete this athlete" label="Delete" id="delete[$row_cont[PerId]]" onclick="return confirm('Delete this athlete');" image="delete"/>
-					</hbox>
 				</row>
 			</rows>
 		</grid>
 		<styles>
-			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
+			.ml10 { margin-left: 10px; }
 		</styles>
 	</template>
+	<template id="ranking.athlete.left" template="" lang="" group="0" version="1.9.001">
+		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_athlete_ui.edit',false,'900x470');"/>
+	</template>
 	<template id="ranking.athlete.index" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%">
-			<columns>
-				<column/>
-			</columns>
-			<rows>
-				<row disabled="!@msg">
-					<description align="center" id="msg" no_lang="1" class="redItalic"/>
-				</row>
-				<row>
-					<nextmatch id="nm" template="ranking.athlete.index.rows"/>
-				</row>
-				<row>
-					<button statustext="add a new athlete" label="Add" id="nm[rows][edit][0]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit'),'_blank','dependent=yes,width=900,height=470,scrollbars=yes,status=yes'); return false;"/>
-				</row>
-			</rows>
-		</grid>
+		<nextmatch id="nm" template="ranking.athlete.index.rows" header_left="ranking.athlete.left"/>
 	</template>
 </overlay>

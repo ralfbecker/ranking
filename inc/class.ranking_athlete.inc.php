@@ -7,13 +7,15 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * Athlete object
  */
-class ranking_athlete extends so_sql
+class ranking_athlete extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 	const ATHLETE_TABLE = 'Personen';
@@ -165,7 +167,7 @@ class ranking_athlete extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 
 		foreach(array(
 				'cats'  => 'ranking_category',
@@ -178,7 +180,7 @@ class ranking_athlete extends so_sql
 			}
 			$this->$var =& $GLOBALS['egw']->$egw_name;
 		}
-		$config = config::read('ranking');
+		$config = Api\Config::read('ranking');
 		$this->picture_path = empty($config['picture_path']) ? $_SERVER['DOCUMENT_ROOT'].'/jpgs' : $config['picture_path'];
 		$this->consent_docs = empty($config['athlete_consent_docs']) ? 'ranking/athlete-consent-docs' : $config['athlete_consent_docs'];
 		if ($this->consent_docs[0] !== '/') $this->consent_docs = $GLOBALS['egw_info']['server']['files_dir'].'/'.$this->consent_docs;
@@ -219,7 +221,7 @@ class ranking_athlete extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->source_charset);
 		}
 		if ($data['practice'] && $data['practice'] > 100)
 		{
@@ -323,14 +325,14 @@ class ranking_athlete extends so_sql
 		// hash password and reset recovery hash, time and failed login count
 		if (!empty($data['password']) && stripos($data['password'], '{crypt}$') !== 0)
 		{
-			$data['password'] = auth::encrypt_ldap($data['password'], 'blowfish_crypt');
+			$data['password'] = Api\Auth::encrypt_ldap($data['password'], 'blowfish_crypt');
 			$data['recover_pw_hash'] = $data['recover_pw_time'] = null;
 			$data['login_failed'] = 0;
 			error_log(__METHOD__."() password hashed ".array2string($data));
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->charset,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->charset,$this->source_charset);
 		}
 		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
 	}
@@ -380,7 +382,7 @@ class ranking_athlete extends so_sql
 	 * @param string $op ='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
 	 * @param mixed $start =false if != false, return only maxmatch rows begining with start, or array($start,$num)
 	 * @param array $filter =null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
-	 * @param mixed $join =true sql to do a join (as so_sql::search), default true = add join for latest result
+	 * @param mixed $join =true sql to do a join (as Api\Storage\Base::search), default true = add join for latest result
 	 *	if numeric a special join is added to only return athlets competed in the given category (GrpId).
 	 * @return array of matching rows (the row is an array of the cols) or False
 	 */
@@ -594,7 +596,7 @@ class ranking_athlete extends so_sql
 			'ć' => 'c', 'Ć' => 'C', 'ĉ' => 'c', 'Ĉ' => 'C',
 		);
 		$data['rkey'] = mb_convert_encoding(strtoupper(str_replace(array_keys($to_ascii),array_values($to_ascii),$data['rkey'])),
-			'7bit',translation::charset());
+			'7bit',Api\Translation::charset());
 
 		$rkey = $data['rkey'];
 		$n = 0;
@@ -868,11 +870,11 @@ class ranking_athlete extends so_sql
 	}
 
 	/**
-	 * deletes athlete(s), see so_sql
+	 * deletes athlete(s), see Api\Storage\Base
 	 *
 	 * reimplemented to delete the picture too, works only if one athlete (specified by rkey or internal data) is deleted!
 	 *
-	 * @param array $keys =null see so_sql
+	 * @param array $keys =null see Api\Storage\Base
 	 * @return int deleted rows or 0 on error
 	 */
 	function delete($keys=null)
@@ -913,7 +915,7 @@ class ranking_athlete extends so_sql
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
 	 * @param string|array $_extra_cols string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $join numeric year, adds a license-column or sql to do a join, see so_sql::read()
+	 * @param string $join numeric year, adds a license-column or sql to do a join, see Api\Storage\Base::read()
 	 * @param string $nation =null nation for license-data
 	 * @return array/boolean data if row could be retrived else False
 	 */
@@ -1311,7 +1313,7 @@ class ranking_athlete extends so_sql
 				$titles[$athlete['id']] = $this->link_title($athlete);
 			}
 		}
-		// we assume all not returned contacts are not readable for the user (as we report all deleted contacts to egw_link)
+		// we assume all not returned contacts are not readable for the user (as we report all deleted contacts to Link)
 		foreach($ids as $id)
 		{
 			if (!isset($titles[$id]))
@@ -1399,7 +1401,7 @@ class ranking_athlete extends so_sql
 					$geb = $athlete['geb_year'];
 					if ($athlete['geb_date'])
 					{
-						$geb = egw_time::to($athlete['geb_date'], true);
+						$geb = Api\DateTime::to($athlete['geb_date'], true);
 					}
 				}
 				$result[$athlete['PerId']] = $this->link_title($athlete, true);

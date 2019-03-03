@@ -29,7 +29,7 @@ class ranking_hooks
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
 
 			$links = array(
-				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index')),
+				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index','ajax' => 'true')),
 				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
 				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index','ajax' => 'true')),
 				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index','ajax' => 'true')),

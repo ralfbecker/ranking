@@ -7,9 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 $GLOBALS['egw_info'] = array(
 	'flags' => array(
@@ -19,35 +20,32 @@ $GLOBALS['egw_info'] = array(
 ));
 include('../header.inc.php');
 
-if (!($view = $GLOBALS['egw']->session->appsession('menuaction','ranking')) &&
+if (!($view = Api\Cache::getSession('ranking', 'menuaction')) &&
 	!($view = $GLOBALS['egw_info']['user']['preferences']['ranking']['default_view']))
 {
 	$view = 'ranking.uiranking.index';
 }
 // fix old class-names stored in user prefs
-$old2new = array(
-	'ranking.uicompetitions.index' => 'ranking.ranking_competition_ui.index',
-	'ranking.uicups.index' => 'ranking.ranking_cup_ui.index',
-	'ranking.uiathletes.index' => 'ranking.ranking_athlete_ui.index',
-	'ranking.uiresult.index' => 'ranking.ranking_result_ui.index',
-	'ranking.uiregistration.index' => 'ranking.ranking_registration_ui.index',
-	'ranking.uiregistration.result' => 'ranking.ranking_registration_ui.result',
-);
-if (isset($old2new[$view])) $view = $old2new[$view];
-
-// urls which should run top-level need a redirect
-if (in_array($view, array(
-	'ranking.ranking_result_ui.index',
-	'ranking.ranking_registration_ui.index',
-	'ranking.ranking_registration_ui.result',
-)))
+if (substr($view, 0, 10) === 'ranking.ui' && $view !== 'ranking.uiranking.index')
 {
-	egw::redirect_link('/index.php', array(
-		'menuaction' => $view,
-		'ajax' => 'true',
-	), 'ranking');
+	list($app, $class, $method) = explode('.');
+	$view = 'ranking.ranking_'.substr($class, 2, substr($class, -1) === 's' ? -1 : 99).'_ui'.$method;
 }
 
-ExecMethod($view);
+// urls which still need to run in iframe (NOT top-level)
+if (in_array($view, array(
+	'ranking.ranking_federation_ui.index',
+	'ranking.uiranking.index',
+	'ranking.ranking_accounting.index',
+)))
+{
+	ExecMethod($view);
+	echo $GLOBALS['egw']->framework->footer();
+	exit;
+}
 
-common::egw_footer();
+// redirect to currently active view incl. ajax=true
+Api\Egw::redirect_link('/index.php', array(
+	'menuaction' => $view,
+	'ajax' => 'true',
+), 'ranking');
