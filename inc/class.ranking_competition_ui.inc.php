@@ -46,14 +46,14 @@ class ranking_competition_ui extends ranking_bo
 	 */
 	function edit($_content=null,$msg='',$view=false)
 	{
-		if (($_GET['rkey'] || $_GET['WetId']) && !$this->comp->read($_GET))
+		if (($_GET['rkey'] || $_GET['WetId'] || $_GET['copy']) && !$this->comp->read(!empty($_GET['copy']) ? $_GET['copy'] : $_GET))
 		{
 			Api\Framework::window_close(lang('Entry not found !!!'));
 		}
 		// set and enforce nation ACL
 		if (!is_array($_content))	// new call
 		{
-			if (!$_GET['WetId'] && !$_GET['rkey'])
+			if (!$_GET['WetId'] && !$_GET['rkey'] && !$_GET['copy'])
 			{
 				$this->check_set_nation_fed_id($this->comp->data);
 
@@ -209,14 +209,6 @@ class ranking_competition_ui extends ranking_bo
 					$msg = lang('Error: deleting %1 !!!',lang('Competition'));
 				}
 			}
-			if ($button === 'copy')
-			{
-				unset($this->comp->data['WetId']);
-				unset($this->comp->data['rkey']);
-				unset($this->comp->data['datum']);
-				$msg .= lang('Entry copied - edit and save the copy now.');
-			}
-
 			if ($_content['remove'] && $this->acl_check_comp($this->comp->data))
 			{
 				$type = key($_content['remove']);
@@ -226,6 +218,22 @@ class ranking_competition_ui extends ranking_bo
 					lang('Error: removing the %1 !!!',$this->attachment_type[$type]);
 			}
 		}
+		if ($button === 'copy' || !empty($_GET['copy']))
+		{
+			unset($this->comp->data['WetId']);
+			unset($this->comp->data['datum']);
+			$old_rkey = $this->comp->data['rkey'];
+			// replace year in various fields
+			foreach(['name', 'dru_bez', 'rkey'] as $name)
+			{
+				$this->comp->data[$name] = preg_replace('/([, \']+(20)?)\d{2}(,| |$)/',
+					'${1}'.date('y').'${3}', $this->comp->data[$name]);
+			}
+			// remove rkey, if identical to old
+			if ($old_rkey === $this->comp->data['rkey']) unset($this->comp->data['rkey']);
+			$msg .= lang('Entry copied - edit and save the copy now.');
+		}
+
 		$content = $this->comp->data + array(
 			'msg'  => $msg,
 			'tabs' => $_content['tabs'],
@@ -471,6 +479,13 @@ class ranking_competition_ui extends ranking_bo
 				'url' => 'menuaction=ranking.ranking_competition_ui.edit',
 				'popup' => '900x500',
 				'disabled' => !$this->edit_rights && !$this->is_admin,
+				'group' => $group,
+			),
+			'copy' => array(
+				'caption' => 'Copy',
+				'allowOnMultiple' => false,
+				'url' => 'menuaction=ranking.ranking_competition_ui.edit&copy=$id',
+				'popup' => '900x500',
 				'group' => $group,
 			),
 			'delete' => array(

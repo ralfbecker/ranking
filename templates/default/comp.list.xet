@@ -60,7 +60,7 @@
 		</styles>
 	</template>
 	<template id="ranking.comp.left" template="" lang="" group="0" version="1.9.001">
-		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_comp_ui.edit',false,'900x500');"/>
+		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_competition_ui.edit',false,'900x500');"/>
 	</template>
 	<template id="ranking.comp.list" template="" lang="" group="0" version="1.9.001">
 		<nextmatch id="nm" template="ranking.comp.list.rows" span="all" header_left="ranking.comp.left"/>

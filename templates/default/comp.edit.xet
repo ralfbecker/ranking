@@ -18,7 +18,7 @@
 				</row>
 				<row class="row" valign="top" height="100">
 					<description for="gruppen" value="Cathegories"/>
-					<listbox statustext="which cathegories are competing" id="gruppen" no_lang="1" rows="6"/>
+					<taglist statustext="which cathegories are competing" id="gruppen" no_lang="1" multiple="true"/>
 					<description for="discipline" value="Discipline"/>
 					<select id="discipline" options="set by category"/>
 				</row>
@@ -307,10 +307,11 @@
 						<button statustext="saves the changes made" label="Apply" id="button[apply]"/>
 						<button statustext="aborts without saving changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
-					<hbox span="3">
-						<button align="center" label="Copy" id="button[copy]"/>
-						<button align="right" statustext="Delete this competition" label="Delete" id="button[delete]" onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
-					</hbox>
+					<!-- hbox span="3">
+						<button align="center" label="Copy" id="button[copy]"/ -->
+						<button align="right" statustext="Delete this competition" label="Delete" id="button[delete]"
+							onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');" span="3"/>
+					<!-- /hbox -->
 				</row>
 			</rows>
 		</grid>
