@@ -141,35 +141,6 @@
 			</rows>
 		</grid>
 	</template>
-	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%" height="240" overflow="auto">
-			<columns>
-				<column width="15%"/>
-				<column width="20%"/>
-				<column width="7%"/>
-				<column/>
-			</columns>
-			<rows>
-				<row class="row">
-					<description for="pkte" value="Pointalocation"/>
-					<select statustext="defines how many points gets awarded for each place in the ranking (not cup)" id="pkte" no_lang="1"/>
-					<description for="pkt_bis" value="til place"/>
-					<select-percent statustext="how many athlets of the field gets points, eg. 50% (defaults to all if empty)" id="pkt_bis"/>
-				</row>
-				<row class="row">
-					<description for="faktor" value="Factor"/>
-					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor"/>
-					<checkbox label="Ex aquo get average points rounded down" id="average_ex_aquo" span="all"/>
-				</row>
-				<row class="row">
-					<description for="feld_pkte" value="Fieldfactorpoints"/>
-					<select statustext="which Pointalocation should be used to calculate the fieldfactor, usualy CUWR or none if no fieldfactor used" id="feld_pkte" no_lang="1"/>
-					<description for="feld_bis" value="til place"/>
-					<select-percent statustext="how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%" id="feld_bis"/>
-				</row>
-			</rows>
-		</grid>
-	</template>
 	<template id="ranking.comp.edit.files" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" height="240" overflow="auto">
 			<columns>
