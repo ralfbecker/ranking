@@ -38,7 +38,7 @@
 		</styles>
 	</template>
 	<template id="ranking.cup.left" template="" lang="" group="0" version="1.9.001">
-		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_cup_ui.edit',false,'660x400');"/>
+		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_cup_ui.edit',false,'720x450');"/>
 	</template>
 	<template id="ranking.cup.list" template="" lang="" group="0" version="1.9.001">
 		<nextmatch align="center" id="nm" template="ranking.cup.list.rows" span="all" header_left="ranking.cup.left"/>

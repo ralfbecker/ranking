@@ -33,14 +33,14 @@ class ranking_cup_ui extends ranking_bo
 	{
 		$tmpl = new Api\Etemplate('ranking.cup.edit');
 
-		if (($_GET['rkey'] || $_GET['SerId']) && !$this->cup->read($_GET))
+		if (($_GET['rkey'] || $_GET['SerId'] || $_GET['copy']) && !$this->cup->read(!empty($_GET['copy']) ? $_GET['copy'] : $_GET))
 		{
 			Api\Framework::window_close(lang('Entry not found !!!'));
 		}
 		// set and enforce nation ACL
 		if (!is_array($_content))	// new call
 		{
-			if (!$_GET['SerId'] && !$_GET['rkey'])
+			if (!$_GET['SerId'] && !$_GET['rkey'] && !$_GET['copy'])
 			{
 				$this->check_set_nation_fed_id($this->cup->data);
 
@@ -117,12 +117,14 @@ class ranking_cup_ui extends ranking_bo
 					$msg = lang('Error: deleting %1 !!!', lang('Cup'));
 				}
 			}
-			if ($button === 'copy')
-			{
-				unset($this->cup->data['SerId']);
-				unset($this->cup->data['rkey']);
-				$msg .= lang('Entry copied - edit and save the copy now.');
-			}
+		}
+		if ($button === 'copy' || !empty($_GET['copy']))
+		{
+			unset($this->cup->data['SerId']);
+			$this->cup->data['name'] = preg_replace('/\d{4}/', date('Y'), $this->cup->data['name']);
+			$this->cup->data['rkey'] = preg_replace('/\d{2}/', date('y'), $old_rkey=$this->cup->data['rkey']);
+			if ($old_rkey === $this->cup->data['rkey']) unset($this->cup->data['rkey']);
+			$msg .= lang('Entry copied - edit and save the copy now.');
 		}
 		$content = $this->cup->data + array(
 			'msg' => $msg,
@@ -307,13 +309,20 @@ class ranking_cup_ui extends ranking_bo
 				'default' => true,
 				'allowOnMultiple' => false,
 				'url' => 'menuaction=ranking.ranking_cup_ui.edit&SerId=$id',
-				'popup' => '660x400',
+				'popup' => '720x450',
 				'group' => $group=0,
 			),
 			'add' => array(
 				'caption' => 'Add',
 				'url' => 'menuaction=ranking.ranking_cup_ui.edit',
-				'popup' => '660x400',
+				'popup' => '720x450',
+				'disabled' => !$this->edit_rights && !$this->is_admin,
+				'group' => $group,
+			),
+			'copy' => array(
+				'caption' => 'Copy',
+				'url' => 'menuaction=ranking.ranking_cup_ui.edit&copy=$id',
+				'popup' => '720x450',
 				'disabled' => !$this->edit_rights && !$this->is_admin,
 				'group' => $group,
 			),

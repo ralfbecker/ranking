@@ -10,7 +10,7 @@
 			<rows>
 				<row class="row" valign="top" height="115">
 					<description value="Categories" for="gruppen"/>
-					<listbox id="gruppen" no_lang="1" rows="9"/>
+					<taglist id="gruppen" no_lang="1"/>
 				</row>
 			</rows>
 		</grid>
@@ -80,7 +80,7 @@
 	</template>
 	<template id="ranking.cup.edit.comment" template="" lang="" group="0" version="14.3.001">
 		<description value="Comment is displayed in &quot;See also&quot; list below ranking"/>
-		<textbox multiline="true" cols="100" id="comment" rows="14" class="fullWidth"/>
+		<textbox multiline="true" cols="100" id="comment" rows="14" class="et2_fullWidth"/>
 	</template>
 	<template id="ranking.comp.edit.ranking" template="" lang="" group="0" version="1.9.002">
 		<grid width="100%" height="250" overflow="auto">
@@ -152,7 +152,8 @@
 					<description for="name" value="Name"/>
 					<hbox span="all">
 						<textbox statustext="full cup name (must not be empty)" id="name" needed="1" size="64" maxlength="64" span="all"/>
-						<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'" label="Key" id="rkey" size="10" maxlength="8"/>
+						<textbox statustext="unique (internal) key, in the form: 'YY_CC' or 'YYCCC' YY=Year, CCC=Cup, eg. '02_WC', '02EYC'"
+							label="Key" id="rkey" size="10" maxlength="8" align="right"/>
 					</hbox>
 				</row>
 				<row class="row">
@@ -190,10 +191,11 @@
 						<button statustext="apply the changes made" label="Apply" id="button[apply]"/>
 						<button statustext="aborts without saving changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
-					<hbox span="2">
-						<button align="center" label="Copy" id="button[copy]"/>
-						<button align="right" statustext="deletes this cup" label="Delete" id="button[delete]" onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
-					</hbox>
+					<!-- hbox span="2">
+						<button align="center" label="Copy" id="button[copy]"/ -->
+						<button align="right" statustext="deletes this cup" label="Delete" id="button[delete]"
+							onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
+					<!-- /hbox -->
 				</row>
 			</rows>
 		</grid>
