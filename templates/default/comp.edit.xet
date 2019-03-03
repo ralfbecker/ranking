@@ -182,25 +182,25 @@
 				<row class="row">
 					<description value="Information PDF" for="upload_info"/>
 					<image statustext="click to view" label="@files[info][file]" src="files[info][icon]" no_lang="1" href="@files[info][link]" extra_link_target="_blank"/>
-					<button label="Remove the attached PDF" id="remove[info]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<button label="Remove the attached PDF" id="remove[info]" onclick="et2_dialog.confirm(widget,'Remove the attached PDF','Delete');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_info"/>
 				</row>
 				<row>
 					<description value="2. PDF" for="upload_info2"/>
 					<image statustext="click to view" label="@files[info2][file]" src="files[info2][icon]" no_lang="1" href="@files[info2][link]" extra_link_target="_blank"/>
-					<button label="Remove the attached PDF" id="remove[info2]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<button label="Remove the attached PDF" id="remove[info2]" onclick="et2_dialog.confirm(widget,'Remove the attached PDF','Delete');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_info2"/>
 				</row>
 				<row class="row">
 					<description value="Startlist PDF" for="upload_startlist"/>
 					<image statustext="click to view" label="@files[startlist][file]" src="files[startlist][icon]" href="@files[startlist][link]" extra_link_target="_blank"/>
-					<button label="Remove the attached PDF" id="remove[startlist]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<button label="Remove the attached PDF" id="remove[startlist]" onclick="et2_dialog.confirm(widget,'Remove the attached PDF','Delete');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_startlist"/>
 				</row>
 				<row class="row">
 					<description value="Result PDF" for="upload_result"/>
 					<image statustext="click to view" label="@files[result][file]" src="files[result][icon]" href="@files[result][link]" extra_link_target="_blank"/>
-					<button label="Remove the attached PDF" id="remove[result]" onclick="return confirm('Remove the attached PDF');" image="delete"/>
+					<button label="Remove the attached PDF" id="remove[result]" onclick="et2_dialog.confirm(widget,'Remove the attached PDF','Delete');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_result"/>
 				</row>
 				<row class="th">
@@ -209,13 +209,13 @@
 				<row class="row">
 					<description value="Competition logo"/>
 					<image label="@files[logo][file]" src="files[logo][icon]" class="previewImage"/>
-					<button label="Remove the grafic" id="remove[logo]" onclick="return confirm('Remove the grafic');" image="delete"/>
+					<button label="Remove the grafic" id="remove[logo]" onclick="et2_dialog.confirm(widget,'Remove the grafic','Delete');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_logo"/>
 				</row>
 				<row class="row">
 					<description value="Sponsor logos"/>
 					<image label="@files[sponsors][file]" src="files[sponsors][icon]" class="previewImage"/>
-					<button label="Remove the grafic" id="remove[sponsors]" onclick="return confirm('Remove the grafic');" image="delete"/>
+					<button label="Remove the grafic" id="remove[sponsors]" onclick="et2_dialog.confirm(widget,'Remove the grafic','Delete');" image="delete"/>
 					<file statustext="each new upload will overwrite the previous one" id="upload_sponsors"/>
 				</row>
 			</rows>
@@ -309,7 +309,7 @@
 					</hbox>
 					<hbox span="3">
 						<button align="center" label="Copy" id="button[copy]"/>
-						<button align="right" statustext="Delete this competition" label="Delete" id="button[delete]" onclick="return confirm('Delete this competition');"/>
+						<button align="right" statustext="Delete this competition" label="Delete" id="button[delete]" onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
 					</hbox>
 				</row>
 			</rows>

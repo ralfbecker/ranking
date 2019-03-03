@@ -65,7 +65,8 @@
 						<button statustext="Applies the changes made" label="Apply" id="button[apply]"/>
 						<button statustext="exists without saving the changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
-					<button align="right" statustext="Delete this category" label="Delete" id="button[delete]" onclick="return confirm('Delete this category');"/>
+					<button align="right" statustext="Delete this category" label="Delete" id="button[delete]"
+						onclick="et2_dialog.confirm(widget,'Delete this category','Delete');"/>
 				</row>
 			</rows>
 		</grid>

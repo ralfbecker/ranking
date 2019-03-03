@@ -192,7 +192,7 @@
 					</hbox>
 					<hbox span="2">
 						<button align="center" label="Copy" id="button[copy]"/>
-						<button align="right" statustext="deletes this cup" label="Delete" id="button[delete]" onclick="return confirm('deletes this cup');"/>
+						<button align="right" statustext="deletes this cup" label="Delete" id="button[delete]" onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
 					</hbox>
 				</row>
 			</rows>

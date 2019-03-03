@@ -141,7 +141,7 @@
 								<vfs-mime id="$row"/>
 								<vfs id="$row" readonly="true"/>
 								<vfs-size id="$row"/>
-								<button label="Delete" id="delete[$row_cont]" onclick="return confirm('Delete this topo');" image="delete"/>
+								<button label="Delete" id="delete[$row_cont]" onclick="et2_dialog.confirm(widget,'Delete this topo','Delete');" image="delete"/>
 							</row>
 						</rows>
 					</grid>
@@ -267,7 +267,8 @@
 						<button statustext="Cannel without saving" label="Cancel" id="button[cancel]" onclick="window.close();"/>
 						<html id="js"/>
 					</hbox>
-					<button align="right" statustext="Delete this heat including all results" label="Delete" id="button[delete]" onclick="return confirm('Delete this heat including all results');"/>
+					<button align="right" statustext="Delete this heat including all results" label="Delete" id="button[delete]"
+						onclick="et2_dialog.confirm(widget,'Delete this heat including all results','Delete');"/>
 				</row>
 			</rows>
 		</grid>
