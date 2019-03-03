@@ -1951,7 +1951,8 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param int|array $from entry to merge
 	 * @param int|array $to entry to merge into
-	 * @return number of merged results
+	 * @return int number of merged results
+	 * @throws Exeception with error message
 	 */
 	function merge_athlete($from,$to)
 	{

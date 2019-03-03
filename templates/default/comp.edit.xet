@@ -12,7 +12,7 @@
 			<rows>
 				<row class="row" height="30" valign="top">
 					<description for="datum" value="Startdate" class="et2_fullWidth"/>
-					<date statustext="startdate (first heat, not registration) of the competition (must not be empty)" id="datum" needed="1" options="Y-m-d"/>
+					<date statustext="startdate (first heat, not registration) of the competition (must not be empty)" id="datum" class="et2_required" options="Y-m-d"/>
 					<description for="duration" value="Duration or textual date"/>
 					<textbox statustext="duration in days or textual competition-date like 'mid July'" id="duration" size="15"/>
 				</row>
@@ -232,7 +232,7 @@
 				</row>
 				<row class="row">
 					<description for="name" value="Name"/>
-					<textbox statustext="full competition name (must not be empty)" id="name" needed="1" size="100" maxlength="100" class="et2_fullWidth" span="all"/>
+					<textbox statustext="full competition name (must not be empty)" id="name" size="100" maxlength="100" class="et2_required et2_fullWidth" span="all"/>
 				</row>
 				<row class="row">
 					<description for="dru_bez" value="Shortcut"/>

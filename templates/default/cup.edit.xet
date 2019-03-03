@@ -19,8 +19,8 @@
 		<grid width="100%" height="250" overflow="auto">
 			<columns>
 				<column width="15%"/>
+				<column width="200"/>
 				<column/>
-				<column width="50%"/>
 			</columns>
 			<rows>
 				<row class="row" valign="top">
@@ -54,18 +54,18 @@
 				</row>
 				<row class="row">
 					<description for="pkte" value="Pointalocation"/>
-					<select statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
-					<checkbox statustext="edit via preset tab" label="Ex aquo get average points rounded down" id="average_ex_aquo" readonly="true"/>
+					<hbox span="all">
+						<select statustext="defines how many points gets awarded for each place in the cup (not ranking)" id="pkte" no_lang="1"/>
+						<checkbox statustext="edit via preset tab" label="Ex aquo get average points rounded down" id="average_ex_aquo" readonly="true"/>
+					</hbox>
 				</row>
 				<row class="row">
 					<description for="faktor" value="Factor"/>
 					<textbox type="float" statustext="all points gets multiplicated with this factor, eg. for different competition types" id="faktor"/>
-					<description/>
-				</row>
-				<row class="row">
-					<description for="split_by_places" value="Better result splits ties"/>
-					<select statustext="Use better result to break ties in the ranking" id="split_by_places"/>
-					<description/>
+					<hbox>
+						<description for="split_by_places" value="Better result splits ties"/>
+						<select statustext="Use better result to break ties in the ranking" id="split_by_places"/>
+					</hbox>
 				</row>
 				<row class="row">
 					<description for="max_rang" value="counting for rankings"/>
@@ -80,7 +80,7 @@
 	</template>
 	<template id="ranking.cup.edit.comment" template="" lang="" group="0" version="14.3.001">
 		<description value="Comment is displayed in &quot;See also&quot; list below ranking"/>
-		<textbox multiline="true" cols="100" id="comment" rows="14" class="et2_fullWidth"/>
+		<textbox multiline="true" cols="100" id="comment" height="230" rows="14" class="et2_fullWidth"/>
 	</template>
 	<template id="ranking.cup.edit.presets" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">

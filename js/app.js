@@ -113,6 +113,14 @@ app.classes.ranking = AppJS.extend(
 					this.egw.lang("To remove already registered athletes:\nright click on them in list and choose 'delete' from context menu"),
 					'no_registration_hint');
 				break;
+
+			case 'ranking.athlete.edit':
+				var license_data = location.search.match(/(\?|&)license_(nation|year|cat)=/g);
+				if (license_data && license_data.length === 3)
+				{
+					this.et2.getWidgetById('button[apply_license]').click();
+				}
+				break;
 		}
 	},
 

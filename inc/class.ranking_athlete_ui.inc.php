@@ -198,14 +198,6 @@ class ranking_athlete_ui extends ranking_bo
 			{
 				$view = true;
 			}
-			$matches = null;
-			$content['referer'] = preg_match('/menuaction=([^&]+)/',$_SERVER['HTTP_REFERER'],$matches) ?
-				$matches[1] : 'ranking.ranking_athlete_ui.index';
-
-			if ($content['referer'] == 'ranking.ranking_registration_ui.add' || $_GET['apply_license'])
-			{
-				$js = "document.getElementById('exec[apply_license]').click();";
-			}
 			if ($this->athlete->data['license'] == 's')
 			{
 				$msg = lang('Athlete is suspended !!!');
@@ -418,14 +410,7 @@ class ranking_athlete_ui extends ranking_bo
 							// download form
 							if (file_exists($this->license_form_name($content['license_nation'],$content['license_year'])) && !$required_missing)
 							{
-								$link = $GLOBALS['egw']->link('/index.php',array(
-									'menuaction' => 'ranking.ranking_athlete_ui.licenseform',
-									'PerId' => $this->athlete->data['PerId'],
-									'license_year' => $content['license_year'],
-									'license_nation' => $content['license_nation'],
-									'license_cat' => $content['license_cat'],
-								));
-								$js .= "window.location='$link';";
+								$this->licenseform($content['license_nation'], $content['license_year'], $content['license_cat']);
 							}
 						}
 						// change of license status, requires athlete rights for the license-nation
@@ -443,14 +428,6 @@ class ranking_athlete_ui extends ranking_bo
 				else
 				{
 					$msg .= lang('Permission denied !!!').' ('.$this->athlete->data['nation'].')';
-				}
-				$link = $GLOBALS['egw']->link('/index.php',array(
-					'menuaction' => $content['referer'],//'ranking.ranking_athlete_ui.index',
-					'msg' => $msg,
-				)+($content['row'] ? array('row['.$content['row'].']' => $this->athlete->data['PerId']) : array()));
-				if (!$required_missing && $this->is_selfservice() != $this->athlete->data['PerId'])
-				{
-					$js = "window.opener.location='$link'; $js";
 				}
 			}
 			if ($button === 'pw_mail')
@@ -487,33 +464,6 @@ class ranking_athlete_ui extends ranking_bo
 				}
 				Framework::window_close();
 			}
-			if ($button === 'merge' && $this->athlete->data['PerId'])
-			{
-				$to = is_array($content['merge_to']) ? $content['merge_to']['current'] : $content['merge_to'];
-				if (!(int)$to)
-				{
-					$msg = lang('You need to select an other athlete first!');
-				}
-				else
-				{
-					try {
-						$msg = lang('Athlete including %1 results merged.',$this->merge_athlete($this->athlete->data['PerId'],$to));
-						$this->athlete->read($to);	// show the athlete we merged too
-						// read the athletes results
-						$this->athlete->data['comp'] = $this->result->read(array('PerId' => $this->athlete->data['PerId'],'platz > 0'));
-						if ($this->athlete->data['comp']) array_unshift($this->athlete->data['comp'],false);	// reindex with 1
-						$link = $GLOBALS['egw']->link('/index.php',array(
-							'menuaction' => $content['referer'],//'ranking.ranking_athlete_ui.index',
-							'msg' => $msg,
-						));
-						$js = "window.opener.location='$link';";
-						unset($content['merge_to']);
-					}
-					catch(Exception $e) {
-						$msg = $e->getMessage();
-					}
-				}
-			}
 		}
 		$shown_msg = null;
 		if (true) $content = array(
@@ -528,8 +478,6 @@ class ranking_athlete_ui extends ranking_bo
 			'license_year' => $content['license_year'],
 			'license_nation' => $content['license_nation'],
 			'license_cat' => $content['license_cat'],
-			'referer' => $content['referer'],
-			'merge_to' => $content['merge_to'],
 		);
 		// give explicit message if profile is hidden or why it is shown
 		if (empty($content['profile_status']))
@@ -613,17 +561,12 @@ Continuer';
 			'kader'=> !$this->acl_check($content['license_nation'],self::ACL_ATHLETE,null,false,null,true),	// true=no judge rights
 			// for now disable merge, if user is no admin: !$this->is_admin || (can be removed later)
 			'button[merge]' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
-			'merge_to' => !$this->is_admin || !$edit_rights || !$this->athlete->data['PerId'],
 			'custom_acl' => !($this->is_admin || $edit_rights || !$this->athlete->data['PerId']) || $content['acl'] !== 'custom',
 			'download_consent' => !$this->athlete->data['PerId'] || !$edit_rights && !$this->is_admin || !$this->athlete->consent_document(),
 		);
 		// only allow to set license-category when applying or having rights to change license
 		$readonlys['license_cat'] = $readonlys['apply_license'] && $readonlys['license'];
 
-		if (!$readonlys['merge_to'] && !$content['merge_to'])
-		{
-			$content['merge_to']['query'] = $content['sex'][0].':'.$content['nation'].':!'.$content['PerId'].': '.$content['nachname'];
-		}
 		if (count($license_nations) == 1)	// no selectbox, if no selection
 		{
 			$readonlys['license_nation'] = true;
@@ -682,7 +625,6 @@ Continuer';
 			$sel_options,$readonlys,array(
 				'athlete_data' => $this->athlete->data,
 				'view' => $view,
-				'referer' => $content['referer'],
 				'row' => (int)$_GET['row'] ? (int)$_GET['row'] : $content['row'],
 				'license_year' => $content['license_year'],
 				'license_nation' => $content['license_nation'],
@@ -823,32 +765,49 @@ Continuer';
 	{
 		if ($_content && $_content['nm']['action'] && $_content['nm']['selected'])
 		{
-			foreach($_content['nm']['selected'] as $id)
-			{
-				switch($_content['nm']['action'])
+			try {
+				foreach($_content['nm']['selected'] as $id)
 				{
-					case 'delete':
-						if (!$this->is_admin && $this->athlete->read(array('PerId' => $id)) && !$this->acl_check_athlete($this->athlete->data))
-						{
-							$msg = lang('Permission denied !!!');
-						}
-						elseif ($this->athlete->has_results($id))
-						{
-							$msg = lang('You need to delete the results first !!!');
-						}
-						else
-						{
-							$msg = $this->athlete->delete(array('PerId' => $id)) ?
-								lang('%1 deleted',lang('Athlete')) : lang('Error: deleting %1 !!!',lang('Athlete'));
-						}
-						break;
+					switch($_content['nm']['action'])
+					{
+						case 'delete':
+							if (!$this->is_admin && $this->athlete->read(array('PerId' => $id)) && !$this->acl_check_athlete($this->athlete->data))
+							{
+								throw new Execption(lang('Permission denied !!!'));
+							}
+							if ($this->athlete->has_results($id))
+							{
+								throw new Execption(lang('You need to delete the results first !!!'));
+							}
+							if (!$this->athlete->delete(array('PerId' => $id)))
+							{
+								throw new Exception(lang('Error: deleting %1 !!!',lang('Athlete')));
+							}
+							$msg = count($_content['nm']['selected']).' '.lang('%1 deleted', lang('Athlete'));
+							break;
+
+						case 'merge':
+							if (!$this->is_admin)
+							{
+								throw new Execption(lang('Permission denied !!!'));
+							}
+							if (count($_content['nm']['selected']) !== 2)
+							{
+								throw new Exception(lang('Merges TWO athletes in the first selected one!'));
+							}
+							$msg = lang('Athlete including %1 results merged.',
+								$this->merge_athlete($_content['nm']['selected'][1], $id));
+							break 2;
+					}
 				}
 			}
+			catch (Exception $ex) {
+				Api\Framework::message($ex->getMessage(), 'error');
+			}
 		}
-		$content = array(
-			'msg' => $msg ? $msg : $_GET['msg'],
-		);
-		if (!is_array($content['nm'])) $content['nm'] = Api\Cache::getSession('athlete_state', 'ranking');
+		if (!empty($msg)) Api\Framework::message($msg);
+
+		$content = ['nm' => Api\Cache::getSession('athlete_state', 'ranking')];
 
 		if (!is_array($content['nm']))
 		{
@@ -896,27 +855,18 @@ Continuer';
 				$content['nm']['col_filter']['nation'] = array_pop($fed_nations);
 			}
 		}
-		if (($readonlys['nm[rows][edit][0]'] = !count($this->athlete_rights)) && ($grants = $this->federation->get_user_grants()))
-		{
-			foreach($grants as $rights)
-			{
-				if ($rights & self::ACL_ATHLETE)
-				{
-					$readonlys['nm[rows][edit][0]'] = false;
-					break;
-				}
-			}
-		}
+
 		$tmpl = new Api\Etemplate('ranking.athlete.index');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
 		$this->set_ui_state();
+
 		$tmpl->exec('ranking.ranking_athlete_ui.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'filter2'=> array('' => 'All')+$this->license_labels,
 			'license'=> $this->license_labels,
 			'license_cat' => $this->cats->names(array(), 0),
-		),$readonlys);
+		));
 	}
 
 	/**
@@ -946,14 +896,21 @@ Continuer';
 			'license' => array(
 				'caption' => 'Apply for license',
 				'allowOnMultiple' => false,
-				'url' => "menuaction=ranking.ranking_athlete_ui.edit&PerId=\$id&apply_license=1&license_nation=$cont[license_nation]&license_year=$cont[license_year]&license_cat=$cont[license_cat]",
+				'url' => "menuaction=ranking.ranking_athlete_ui.edit&PerId=\$id&license_nation=$cont[license_nation]&license_year=$cont[license_year]&license_cat=$cont[license_cat]",
 				'popup' => '900x470',
 				'enableClass' => 'ApplyLicense',
 				'group' => $group,
 			),
+			'merge' => array(
+				'caption' => 'Merge',
+				'allowOnMultiple' => true,
+				'disabled' => !$this->is_admin,
+				'hint' => 'Merges TWO athletes in the first selected one!',
+				'confirm' => 'ATTENTION: merging can NOT be undone! Really want to merge?',
+				'group' => $group=4,
+			),
 			'delete' => array(
 				'caption' => 'Delete',
-				'disableClass' => 'noDelete',	// checks has result
 				//'allowOnMultiple' => false,
 				'confirm' => 'Delete this athlete',
 				'enableClass' => 'AllowDelete',
@@ -997,16 +954,19 @@ Continuer';
 	 * @param string $nation =null
 	 * @param int $year =null defaults to $this->license_year
 	 * @param int $GrpId =null category to apply for
+	 * @param array $keys =null
 	 */
-	function licenseform($nation=null,$year=null,$GrpId=null)
+	function licenseform($nation=null,$year=null,$GrpId=null,array $keys=null)
 	{
 		if (is_null($year)) $year = $_GET['license_year'] ? $_GET['license_year'] : $this->license_year;
 		if (is_null($nation) && $_GET['license_nation']) $nation = $_GET['license_nation'];
 		if (is_null($GrpId) && $_GET['license_cat']) $GrpId = $_GET['license_cat'];
+		if (is_null($keys)) $keys = $_GET;
 
 		if (!$this->athlete->read($_GET) ||
 			!($form = file_get_contents($this->license_form_name($nation,$year,$GrpId))))
 		{
+			header('HTTP/1.1 204 No Content');
 			exit();
 		}
 		$egw_charset = Api\Translation::charset();
@@ -1017,7 +977,7 @@ Continuer';
 			// the rtf seems to use iso-8859-1
 			$replace['$$'.$name.'$$'] = $value = Api\Translation::convert($value,$egw_charset,'iso-8859-1');
 		}
-		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
+		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.txt';//'.rtf';
 		Api\Header\Content::type($file,'text/rtf');
 		echo str_replace(array_keys($replace),array_values($replace),$form);
 		exit();
