@@ -10,27 +10,25 @@
 				<column/>
 			</columns>
 			<rows>
-				<row class="row">
-					<description for="datum" value="Startdate"/>
+				<row class="row" height="30" valign="top">
+					<description for="datum" value="Startdate" class="et2_fullWidth"/>
 					<date statustext="startdate (first heat, not registration) of the competition (must not be empty)" id="datum" needed="1" options="Y-m-d"/>
 					<description for="duration" value="Duration or textual date"/>
 					<textbox statustext="duration in days or textual competition-date like 'mid July'" id="duration" size="15"/>
 				</row>
-				<row class="row" valign="top" height="100">
-					<description for="gruppen" value="Cathegories"/>
-					<taglist statustext="which cathegories are competing" id="gruppen" no_lang="1" multiple="true"/>
-					<description for="discipline" value="Discipline"/>
-					<select id="discipline" options="set by category"/>
-				</row>
-				<row class="row">
+				<row class="row" height="30" valign="top">
 					<description for="homepage" value="Homepage"/>
 					<textbox statustext="used to preset a link in rankings and competition-calendar" id="homepage" size="100" maxlength="128" span="all"/>
 				</row>
-				<row class="row">
+				<row class="row" height="30" valign="top">
+					<description for="discipline" value="Discipline"/>
+					<select id="discipline" options="set by category" class="et2_fullWidth"/>
 					<description for="display_athlete" value="Display athlete"/>
-					<select id="display_athlete"/>
-					<description/>
-					<description/>
+					<select id="display_athlete" class="et2_fullWidth"/>
+				</row>
+				<row class="row" valign="top">
+					<description for="gruppen" value="Cathegories"/>
+					<taglist statustext="which cathegories are competing" id="gruppen" no_lang="1" multiple="true" span="all"/>
 				</row>
 			</rows>
 		</grid>
@@ -44,19 +42,20 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Registration deadline" for="deadline"/>
+					<description value="Registration deadline" for="deadline" span="2"/>
 					<date statustext="Until which date (incl.) are registrations allowed" id="deadline" options="Y-m-d"/>
-					<checkbox label="No complimentary list (over quota)" id="no_complimentary"/>
 				</row>
 				<row class="row">
-					<vbox class="quotaLabel">
-						<description value="Quota" for="quota"/>
-						<description value="Total per discipline" for="total_per_disciplin"/>
-					</vbox>
-					<vbox>
-						<select-number id="quota" options="Select one,1,12,1"/>
-						<select-number id="total_per_discipline" options="None,1,20"/>
-					</vbox>
+					<description value="Quota" for="quota"/>
+					<select-number id="quota" options="Select one,1,12,1" class="et2_fullWidth"/>
+					<checkbox label="No complimentary list (over quota)" id="no_complimentary"/>
+				</row>
+				<row>
+
+					<description value="Total per discipline" for="total_per_disciplin"/>
+					<select-number id="total_per_discipline" options="None,1,20"/>
+				</row>
+				<row>
 					<grid spacing="0" padding="1" id="quota_extra">
 						<columns>
 							<column/>
@@ -74,16 +73,30 @@
 				</row>
 				<row class="row">
 					<description value="Host quota" for="host_quota"/>
-					<select-number id="host_quota" options="None,1,20,1"/>
+					<select-number id="host_quota" options="None,1,20,1" class="et2_fullWidth"/>
 					<select label="Host nation" id="host_nation" no_lang="1" options="Select one"/>
 				</row>
 				<row class="row">
 					<description for="selfregister" value="Selfregister"/>
-					<select statustext="Allow athletes to register themself for this competition" id="selfregister"/>
+					<select statustext="Allow athletes to register themself for this competition" id="selfregister" class="et2_fullWidth"/>
 					<checkbox label="no license required for registration" id="no_license" span="all"/>
 				</row>
+			</rows>
+		</grid>
+		<styles>
+			table.quotaLabel&gt;tbody&gt;tr {height: 18pt}
+		</styles>
+	</template>
+	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.002">
+		<grid width="100%" height="240" overflow="auto">
+			<columns>
+				<column width="20%"/>
+				<column width="15%"/>
+				<column/>
+			</columns>
+			<rows>
 				<row class="th">
-					<description value="Prequalified competitiors" span="2"/>
+					<description value="Prequalified competitiors for registration" span="2"/>
 					<button align="right" statustext="Only necessary, if you change something, after registration started." label="Update registration" id="update_prequal"/>
 				</row>
 				<row class="row">
@@ -105,23 +118,10 @@
 				<row class="row" valign="top">
 					<description value="from other competitions" for="prequal_comps"/>
 					<select-number id="prequal_comp" options="None,1,10"/>
-					<listbox id="prequal_comps" no_lang="1" rows="3" options="max-width:100%"/>
+					<taglist id="prequal_comps" no_lang="1" rows="3" multiple="true" class="et2_fullWidth"/>
 				</row>
-			</rows>
-		</grid>
-		<styles>
-			table.quotaLabel&gt;tbody&gt;tr {height: 18pt}
-		</styles>
-	</template>
-	<template id="ranking.comp.edit.startlist" template="" lang="" group="0" version="1.9.002">
-		<grid width="100%" height="240" overflow="auto">
-			<columns>
-				<column width="15%"/>
-				<column/>
-			</columns>
-			<rows>
 				<row class="th">
-					<description value="Prequalified competitiors" span="all"/>
+					<description value="Prequalified competitiors for startlist" span="all"/>
 				</row>
 				<row class="row" valign="top">
 					<description for="quali_preselected" value="Qualification"/>
@@ -230,7 +230,7 @@
 			<rows>
 				<row class="row" valign="top">
 					<description value="Judges" for="judges"/>
-					<select-account statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition" id="judges" rows="9"/>
+					<taglist-account statustext="Judges have the right to create startlists and results 2 weeks befor and after the competition" id="judges" multiple="true" rows="9"/>
 				</row>
 			</rows>
 		</grid>
@@ -240,6 +240,7 @@
 			<columns>
 				<column width="15%"/>
 				<column width="20%"/>
+				<column width="10"/>
 				<column width="7%"/>
 				<column/>
 			</columns>
@@ -249,43 +250,46 @@
 					<description/>
 					<description/>
 					<description/>
+					<description/>
 				</row>
 				<row class="th">
 					<description for="nation" value="Nation"/>
-					<select statustext="nation if national competition or internatinal" id="nation" no_lang="1" onchange="1"/>
+					<select statustext="nation if national competition or internatinal" id="nation" no_lang="1" onchange="1" class="et2_fullWidth"/>
+					<description/>
 					<description for="serie" value="Cup"/>
-					<select id="serie" no_lang="1" onchange="1" span="all"/>
+					<select id="serie" no_lang="1" onchange="1" span="all" class="et2_fullWidth"/>
 				</row>
 				<row class="row">
 					<description for="name" value="Name"/>
-					<textbox statustext="full competition name (must not be empty)" id="name" needed="1" size="100" maxlength="100" span="all"/>
+					<textbox statustext="full competition name (must not be empty)" id="name" needed="1" size="100" maxlength="100" class="et2_fullWidth" span="all"/>
 				</row>
 				<row class="row">
 					<description for="dru_bez" value="Shortcut"/>
-					<textbox statustext="short for display in rankings / tables" id="dru_bez" size="20" maxlength="20"/>
+					<textbox statustext="short for display in rankings / tables" id="dru_bez" size="20" maxlength="20" class="et2_fullWidth"/>
+					<description/>
 					<description for="rkey" value="Key"/>
-					<textbox statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " id="rkey" size="8" maxlength="8" span="all"/>
+					<textbox statustext="unique (internal) key, in the form: 'YY_CC_LL' or 'YYCCC_LL' YY=Year, CCC=Cup, LL=Location " id="rkey" size="8" maxlength="8" class="et2_fullWidth" span="all"/>
 				</row>
 				<row class="row">
 					<description for="open_comp" value="Open comp."/>
-					<select id="open_comp"/>
-					<description value="Federation"/>
-					<select id="fed_id" options="national federation" class="selectboxFullWidth" span="all"/>
+					<select id="open_comp" class="et2_fullWidth"/>
 					<description/>
+					<description value="Federation"/>
+					<select id="fed_id" options="national federation" class="et2_fullWidth" span="all"/>
 				</row>
 				<row class="row">
 					<description for="cat_id" value="Category"/>
 					<select-cat id="cat_id" empty_label="$cont[cat_parent_name]" options=",,,,$cont[cat_parent]" class="selectboxFullWidth"/>
-					<description value="Continent" for="continent"/>
-					<select id="continent" options="All"/>
 					<description/>
+					<description value="Continent" for="continent"/>
+					<select id="continent" options="All" class="et2_fullWidth"/>
 				</row>
 				<row>
 					<tabbox id="tabs" span="all">
 						<tabs>
 							<tab id="general" label="General"/>
 							<tab id="registration" label="Registration"/>
-							<tab id="startlist" label="Startlist"/>
+							<tab id="startlist" label="Prequalified"/>
 							<tab id="ranking" label="Ranking"/>
 							<tab id="files" label="Files"/>
 							<tab id="judges" label="Judges"/>
@@ -301,17 +305,14 @@
 					</tabbox>
 				</row>
 				<row class="dialogFooterToolbar">
-					<hbox span="2">
+					<hbox span="all">
 						<button statustext="Edit this competition" label="Edit" id="button[edit]"/>
 						<button statustext="saves the changes made" label="Save" id="button[save]"/>
 						<button statustext="saves the changes made" label="Apply" id="button[apply]"/>
 						<button statustext="aborts without saving changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
-					</hbox>
-					<!-- hbox span="3">
-						<button align="center" label="Copy" id="button[copy]"/ -->
 						<button align="right" statustext="Delete this competition" label="Delete" id="button[delete]"
-							onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');" span="3"/>
-					<!-- /hbox -->
+							onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
+					</hbox>
 				</row>
 			</rows>
 		</grid>
