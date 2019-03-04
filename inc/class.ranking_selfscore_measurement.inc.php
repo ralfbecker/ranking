@@ -11,6 +11,9 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Api\Framework;
+use EGroupware\Api\Etemplate;
+
 
 /**
  * Measurement plugin for selfscore boulder competitions
@@ -24,23 +27,23 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 * @param array &$sel_options
 	 * @param array %$readonlys
 	 */
-	public static function measurement(array &$content, array &$sel_options, array &$readonlys, Api\Etemplate $tmpl)
+	public static function measurement(array &$content, array &$sel_options, array &$readonlys, Etemplate $tmpl)
 	{
-		//error_log(__METHOD__."() user_agent=".html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
-		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
+		//error_log(__METHOD__."() user_agent=".Api\Html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
+		if (Api\Header\UserAgent::mobile()) $GLOBALS['egw_info']['flags']['java_script'] .=
 			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
 
-		// egw_framework::validate_file|includeCSS does not work if template was submitted
-		if (egw_json_response::isJSONResponse())
+		// Framework::validate_file|includeCSS does not work if template was submitted
+		if (Api\Json\Response::isJSONResponse())
 		{
-			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_api.js');
-			egw_json_response::get()->includeCSS($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_list.css');
+			Api\Json\Response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_api.js');
+			Api\Json\Response::get()->includeCSS($GLOBALS['egw_info']['server']['webserver_url'].'/ranking/sitemgr/digitalrock/dr_list.css');
 		}
 		else
 		{
 			// init protocol
-			egw_framework::validate_file('/ranking/sitemgr/digitalrock/dr_api.js');
-			egw_framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
+			Framework::includeJS('/ranking/sitemgr/digitalrock/dr_api.js');
+			Framework::includeCSS('/ranking/sitemgr/digitalrock/dr_list.css');
 		}
 
 		if ($_SERVER['REQUEST_METHOD'] == 'GET' && (int)$_GET['athlete'] > 0)
@@ -80,7 +83,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 					{
 						for($c=0; $c < $num_cols; ++$c)
 						{
-							$col = Api\Etemplate::num2chrs($c-1);
+							$col = Etemplate::num2chrs($c-1);
 							if ($n++ < $num_problems)
 							{
 								$score[$r.$col] = array(
@@ -110,7 +113,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		}
 		if (!self::update_allowed($content['comp'], $content['nm']['route_data'], $content['nm']['PerId']))
 		{
-			egw_framework::set_extra('ranking', 'readonly', true);
+			Framework::set_extra('ranking', 'readonly', true);
 		}
 		// do not allow to select no category for athlets
 		if ($GLOBALS['egw_info']['user']['account_lid'] == 'anonymous')
@@ -171,7 +174,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		$comp = null;
 		$query =& self::get_check_session($comp, $state);
 
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
 		$keys = self::query2keys($query);
 		//$response->alert(__METHOD__."($PerId, ".array2string($update).") ".array2string($keys));
@@ -260,7 +263,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		$comp = null;
 		$query =& self::get_check_session($comp,$state);
 
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
 		//$response->alert(__METHOD__."($PerId) ".array2string(self::query2keys($query)));
 		$keys = self::query2keys($query);
@@ -270,7 +273,7 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 		{
 			if (!($route = ranking_result_bo::$instance->route->read($keys)))
 			{
-				throw new egw_exception_wrong_parameter('Route not found!');
+				throw new Api\Exception\WrongParameter('Route not found!');
 			}
 			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
 		}

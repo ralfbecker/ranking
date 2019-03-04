@@ -1,15 +1,19 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - lead measurement
+ * EGroupware digital ROCK Rankings - lead measurement
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-15 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
+use EGroupware\Api\Framework;
+use EGroupware\Api\Egw;
+use EGroupware\Api\Vfs;
 
 /**
  * Measurement plugin for lead competitions
@@ -25,15 +29,15 @@ class ranking_measurement extends ranking_boulder_measurement
 	 */
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
 	{
-		// egw_framework::validate_file|includeCSS does not work if template was submitted
-		if (egw_json_response::isJSONResponse())
+		// Framework::validate_file|includeCSS does not work if template was submitted
+		if (Api\Json\Response::isJSONResponse())
 		{
-			egw_json_response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].
+			Api\Json\Response::get()->includeScript($GLOBALS['egw_info']['server']['webserver_url'].
 				'/ranking/js/jquery.scrollIntoView.min.js');
 		}
 		else
 		{
-			egw_framework::validate_file('/ranking/js/jquery.scrollIntoView.min.js');
+			Framework::includeJS('/ranking/js/jquery.scrollIntoView.min.js');
 		}
 		//echo "<p>nm[topo]=".array2string($content['nm']['topo'])."</p>\n";
 		foreach(self::get_topos($content) as $n => $path)
@@ -84,7 +88,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		}
 		if ($content['nm']['topo'])
 		{
-			$content['transparent'] = egw::link(egw_vfs::download_url($content['nm']['topo']));
+			$content['transparent'] = Egw::link(Vfs::download_url($content['nm']['topo']));
 			$content['holds'] = self::get_holds(self::query2keys($content['nm']));
 		}
 	}
@@ -93,13 +97,13 @@ class ranking_measurement extends ranking_boulder_measurement
 	 * Store a hold on server-side
 	 *
 	 * @param array $hold
-	 * @throws egw_exception_wrong_parameter
+	 * @throws Api\Exception\WrongParameter
 	 */
 	public static function ajax_save_hold(array $hold)
 	{
 		$query =& self::get_check_session();
 
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
 		if (!($hold = self::save_hold(array_merge($hold,self::query2keys($query)))))
 		{
@@ -115,7 +119,7 @@ class ranking_measurement extends ranking_boulder_measurement
 	 * Store a hold on server-side
 	 *
 	 * @param array $hold
-	 * @throws egw_exception_wrong_parameter
+	 * @throws Api\Exception\WrongParameter
 	 */
 	public static function ajax_renumber_holds(array $hold)
 	{
@@ -124,7 +128,7 @@ class ranking_measurement extends ranking_boulder_measurement
 
 		$last_height = $hold['height'];
 		$query =& self::get_check_session();
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 		foreach(self::get_holds(self::query2keys($query)) as $h)
 		{
 			if ($h['height'] >= $hold['height'] && $h['hold_id'] != $hold['hold_id'])
@@ -145,7 +149,7 @@ class ranking_measurement extends ranking_boulder_measurement
 	 * Delete hold on server-side
 	 *
 	 * @param int $hold
-	 * @throws egw_exception_wrong_parameter
+	 * @throws Api\Exception\WrongParameter
 	 */
 	public static function ajax_delete_hold($hold)
 	{
@@ -153,7 +157,7 @@ class ranking_measurement extends ranking_boulder_measurement
 
 		if (!(int)$hold || !self::delete_hold(array_merge(self::query2keys($query),array('hold_id' => $hold))))
 		{
-			$response = egw_json_response::get();
+			$response = Api\Json\Response::get();
 			$response->alert(lang('Error deleting handhold!'));
 		}
 	}
@@ -165,9 +169,9 @@ class ranking_measurement extends ranking_boulder_measurement
 	 */
 	public static function ajax_load_topo($path)
 	{
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
-		$query =& egw_cache::getSession('ranking', 'result');
+		$query =& Api\Cache::getSession('ranking', 'result');
 		$query['topo'] = $path;
 
 		$holds = self::get_holds(self::query2keys($query));
@@ -183,7 +187,7 @@ class ranking_measurement extends ranking_boulder_measurement
 	protected static function query2keys(array $query)
 	{
 		$keys = parent::query2keys($query);
-		$keys['hold_topo'] = (int)substr(egw_vfs::basename($query['topo']),1);
+		$keys['hold_topo'] = (int)substr(Vfs::basename($query['topo']),1);
 
 		return $keys;
 	}
@@ -284,15 +288,15 @@ class ranking_measurement extends ranking_boulder_measurement
 	public static function save_topo(array $route, $topo, &$file=null)
 	{
 		$dir = self::get_topo_dir($route,true,true);	// true = check judge perms
-		$name = egw_vfs::basename(is_array($topo) ? $topo['name'] : $topo);
+		$name = Vfs::basename(is_array($topo) ? $topo['name'] : $topo);
 		$num = 0;
 		foreach(self::get_topos($route) as $path)
 		{
-			if (($n=(int)substr(egw_vfs::basename($path),1)) >= $num) $num = $n+1;
+			if (($n=(int)substr(Vfs::basename($path),1)) >= $num) $num = $n+1;
 		}
 		$file = $dir.'/'.(int)$route['route_order'].$num.'_'.$name;
 
-		return egw_vfs::copy_uploaded($topo, $file, null, false);
+		return Vfs::copy_uploaded($topo, $file, null, false);
 	}
 
 	/**
@@ -303,37 +307,37 @@ class ranking_measurement extends ranking_boulder_measurement
 	 * @param boolean $check_perms =true check if user has necessary permissions to upload/delete topo - is a judge or admin
 	 * @param array &$comp=null on return competition array
 	 * @param array &$cat=null on return category array
-	 * @throws egw_exception_wrong_userinput
-	 * @throws egw_exception_wrong_parameter
+	 * @throws Api\Exception\WrongUserinput
+	 * @throws Api\Exception\WrongParameter
 	 * @return string|boolean vfs directory name or false if directory does not exists and !$create
 	 */
 	public static function get_topo_dir(array $route, $create=true, $check_perms=true, &$comp=null, &$cat=null)
 	{
 		$dir = ranking_result_bo::$instance->config['vfs_topo_dir'];
-		if ($dir[0] != '/' || !egw_vfs::file_exists($dir) || !egw_vfs::is_dir($dir))
+		if ($dir[0] != '/' || !Vfs::file_exists($dir) || !Vfs::is_dir($dir))
 		{
-			throw new egw_exception_wrong_userinput(lang('Wrong or NOT configured VFS directory').': '.$dir);
+			throw new Api\Exception\WrongUserinput(lang('Wrong or NOT configured VFS directory').': '.$dir);
 		}
 		if (!($comp = ranking_result_bo::$instance->comp->read($route['WetId'])))
 		{
-			throw new egw_exception_wrong_parameter("Competition $route[WetId] NOT found!");
+			throw new Api\Exception\WrongParameter("Competition $route[WetId] NOT found!");
 		}
 		if ($check_perms && !ranking_result_bo::$instance->is_admin && !ranking_result_bo::$instance->is_judge($comp, true, $route))
 		{
-			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
+			throw new Api\Exception\WrongParameter(lang('Permission denied!'));
 		}
 		if (!($cat = ranking_result_bo::$instance->cats->read($route['GrpId'])))
 		{
-			throw new egw_exception_wrong_parameter("Category $route[GrpId] NOT found!");
+			throw new Api\Exception\WrongParameter("Category $route[GrpId] NOT found!");
 		}
 		$dir .= '/'.(int)$comp['datum'].'/'.$comp['rkey'].'/'.$cat['rkey'];
-		if (!egw_vfs::file_exists($dir))
+		if (!Vfs::file_exists($dir))
 		{
 			if (!$create) return false;
 
-			if (!egw_vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
+			if (!Vfs::mkdir($dir,0777,STREAM_MKDIR_RECURSIVE))
 			{
-				throw new egw_exception_wrong_userinput(lang('Can NOT create topo directory %1!',$dir));
+				throw new Api\Exception\WrongUserinput(lang('Can NOT create topo directory %1!',$dir));
 			}
 		}
 		return $dir;
@@ -354,7 +358,7 @@ class ranking_measurement extends ranking_boulder_measurement
 
 		if (($dir = self::get_topo_dir($route,false, $check_perms, $comp, $cat)))
 		{
-			$topos = egw_vfs::find($dir,$p=array(
+			$topos = Vfs::find($dir,$p=array(
 				'maxdepth' => 1,
 				'name' => $route['route_order'].'?_*',
 				'mime' => 'image',
@@ -382,7 +386,7 @@ class ranking_measurement extends ranking_boulder_measurement
 				'route_order' => $route['route_order'],
 				'hold_topo' => (int)substr(basename($topo),1),
 			));
-			return egw_vfs::unlink($topo);
+			return Vfs::unlink($topo);
 		}
 		return false;
 	}

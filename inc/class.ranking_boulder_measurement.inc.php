@@ -1,15 +1,17 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - boulder measurement
+ * EGroupware digital ROCK Rankings - boulder measurement
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
+use EGroupware\Api\Framework;
 
 /**
  * Measurement plugin for boulder competitions
@@ -26,8 +28,8 @@ class ranking_boulder_measurement
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
 	{
 		unset($readonlys);
-		//error_log(__METHOD__."() user_agent=".html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
-		if (html::$ua_mobile) $GLOBALS['egw_info']['flags']['java_script'] .=
+		//error_log(__METHOD__."() user_agent=".Api\Html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
+		if (Api\Header\UserAgent::mobile()) $GLOBALS['egw_info']['flags']['java_script'] .=
 			'<meta name="viewport" content="width=525; user-scalable=false" />'."\n";
 
 		foreach(array(
@@ -37,16 +39,16 @@ class ranking_boulder_measurement
 		) as $file)
 		{
 			$cache_buster = '?'.filemtime(EGW_SERVER_ROOT.$file);
-			// egw_framework::validate_file|includeCSS does not work if template was submitted
-			if (egw_json_response::isJSONResponse())
+			// Framework::validate_file|includeCSS does not work if template was submitted
+			if (Api\Json\Response::isJSONResponse())
 			{
 				$method = substr($file, -3) == '.js' ? 'includeScript' : 'includeCSS';
-				egw_json_response::get()->$method($GLOBALS['egw_info']['server']['webserver_url'].$file.$cache_buster);
+				Api\Json\Response::get()->$method($GLOBALS['egw_info']['server']['webserver_url'].$file.$cache_buster);
 			}
 			else
 			{
 				$method = substr($file, -3) == '.js' ? 'validate_file' : 'includeCSS';
-				egw_framework::$method($file.$cache_buster);
+				Framework::$method($file.$cache_buster);
 			}
 		}
 		$keys = self::query2keys($content['nm']);
@@ -89,7 +91,7 @@ class ranking_boulder_measurement
 		$comp = null;
 		$query =& self::get_check_session($comp,$state);
 
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
 		$keys = self::query2keys($query);
 		//$response->alert(__METHOD__."($PerId, ".array2string($update).", $set_current) ".array2string($keys));
@@ -211,10 +213,10 @@ class ranking_boulder_measurement
 				'stored' => true,
 			);
 		}
-		egw_json_request::isJSONRequest(false);	// switch regular json_response handling off
+		Api\Json\Request::isJSONRequest(false);	// switch regular json_response handling off
 		Header('Content-Type: application/json; charset=utf-8');
 		echo json_encode($response);
-		common::egw_exit();
+		exit();
 	}
 
 	/**
@@ -231,7 +233,7 @@ class ranking_boulder_measurement
 		$comp = null;
 		$query =& self::get_check_session($comp,$state);
 
-		$response = egw_json_response::get();
+		$response = Api\Json\Response::get();
 
 		//$response->alert(__METHOD__."($PerId) ".array2string(self::query2keys($query)));
 		$keys = self::query2keys($query);
@@ -241,7 +243,7 @@ class ranking_boulder_measurement
 		{
 			if (!($route = ranking_result_bo::$instance->route->read($keys)))
 			{
-				throw new egw_exception_wrong_parameter('Route not found!');
+				throw new Api\Exception\WrongParameter('Route not found!');
 			}
 			$keys += array_intersect_key($route, array_flip(array('route_type', 'discipline', 'quali_preselected')));
 		}
@@ -267,7 +269,7 @@ class ranking_boulder_measurement
 			$athlete = ranking_result_bo::$instance->athlete->read($PerId);
 			if (!($data['profile_url'] = ranking_result_bo::$instance->athlete->picture_url($athlete->rkey)))
 			{
-				$data['profile_url'] = common::image('ranking', 'transparent');
+				$data['profile_url'] = Api\Image::find('ranking', 'transparent');
 			}
 
 			if ($update)
@@ -302,12 +304,12 @@ class ranking_boulder_measurement
 	 *
 	 * @param array& $comp =null on return competition array
 	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
-	 * @throws egw_exception_wrong_parameter
+	 * @throws Api\Exception\WrongParameter
 	 * @return array reference to ranking result session array
 	 */
 	public static function &get_check_session(&$comp=null,array $state=null)
 	{
-		$query =& egw_cache::getSession('ranking', 'result');
+		$query =& Api\Cache::getSession('ranking', 'result');
 
 		if ($state)	// merge optional state
 		{
@@ -319,12 +321,12 @@ class ranking_boulder_measurement
 
 		if (!($comp = ranking_result_bo::$instance->comp->read($query['comp'])))
 		{
-			throw new egw_exception_wrong_parameter("Competition $query[comp] NOT found!");
+			throw new Api\Exception\WrongParameter("Competition $query[comp] NOT found!");
 		}
 		if (!ranking_result_bo::$instance->is_admin && !ranking_result_bo::$instance->is_judge($comp, false, self::query2keys($query)) &&
 			$query['discipline'] != 'selfscore')
 		{
-			throw new egw_exception_wrong_parameter(lang('Permission denied!'));
+			throw new Api\Exception\WrongParameter(lang('Permission denied!'));
 		}
 		return $query;
 	}
