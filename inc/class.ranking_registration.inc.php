@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2016-18 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2016-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -198,7 +198,7 @@ class ranking_registration extends Api\Storage\Base
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = translation::convert($data,$this->charset,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}

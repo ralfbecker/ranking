@@ -7,9 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 class ranking_registration_ui extends ranking_bo
 {
@@ -47,7 +48,7 @@ class ranking_registration_ui extends ranking_bo
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['nation'] = $query['nation'];
 
-		egw_cache::setSession('ranking', 'registration', $state=array(
+		Api\Cache::setSession('ranking', 'registration', $state=array(
 			'calendar' => $query['calendar'],
 			'comp'     => $query['comp'],
 			'nation'   => $query['nation'],
@@ -153,8 +154,8 @@ class ranking_registration_ui extends ranking_bo
 						$row['class'] .= ' is'.ucfirst($state);
 					}
 					$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
-					$row['state_changed'] .= egw_time::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
-						($modifier ? lang('by').' '.common::grab_owner_name($modifier).' ' : '')."\n".
+					$row['state_changed'] .= Api\DateTime::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
+						($modifier ? lang('by').' '.Api\Accounts::username($modifier).' ' : '')."\n".
 						($state == 'prequalified' ? $row['reg_prequal_reason'] : '');
 				}
 			}
@@ -189,11 +190,11 @@ class ranking_registration_ui extends ranking_bo
 		$query['actions'] = self::get_actions($comp_rights || $this->is_judge($comp, true));
 
 		// let client-side know which rights current user has for selected competition
-		egw_json_response::get()->call('app.ranking.competition_rights', (int)$comp['WetId'], 0,
-			($comp_rights ? EGW_ACL_EDIT : 0) |
+		Api\Json\Response::get()->call('app.ranking.competition_rights', (int)$comp['WetId'], 0,
+			($comp_rights ? self::ACL_EDIT : 0) |
 			($comp_rights || $this->is_judge($comp, true) || $this->registration_check($comp, $query['nation']) ||
 			// if no nation/federation filter is given, check if current user has registration rights for anything
-			!$query['nation'] && ($this->register_rights || $this->federation->get_grants(null,EGW_ACL_REGISTER)) ? EGW_ACL_REGISTER : 0) |
+			!$query['nation'] && ($this->register_rights || $this->federation->get_grants(null, self::ACL_REGISTER)) ? self::ACL_REGISTER : 0) |
 			($this->is_judge($comp, true) ? 512 : 0));
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Registration').($comp ? ' - '.$comp['name'] : '');
@@ -207,7 +208,7 @@ class ranking_registration_ui extends ranking_bo
 	public function ajax_search()
 	{
 		try {
-			$state = egw_cache::getSession('ranking', 'registration');
+			$state = Api\Cache::getSession('ranking', 'registration');
 
 			// show already registered first, then prequalified, then rest of category, then matches with error
 			$results = array(
@@ -256,7 +257,7 @@ class ranking_registration_ui extends ranking_bo
 					'license_year' => (int)$comp['datum'],
 				);
 			}
-			$links = egw_link::query('ranking', $_REQUEST['query'], $options);
+			$links = Api\Link::query('ranking', $_REQUEST['query'], $options);
 			foreach($links as $id => $label)
 			{
 				if (($sort = (string)$label['error']))
@@ -300,7 +301,7 @@ class ranking_registration_ui extends ranking_bo
 			)));
 		}
 		 // switch regular JSON response handling off
-		egw_json_request::isJSONRequest(false);
+		Api\Json\Request::isJSONRequest(false);
 
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(call_user_func_array('array_merge', $results));
@@ -382,20 +383,20 @@ class ranking_registration_ui extends ranking_bo
 					($registered && $msg ? "\n\n".$msg : '');
 
 				// tell client-side how many successful registered and therefore to remove from selection
-				if ($registered) egw_json_response::get()->data(array(
+				if ($registered) Api\Json\Response::get()->data(array(
 					'registered' => $registered,
 				));
 			}
-			egw_json_response::get()->call('egw.message', $error, 'error');
+			Api\Json\Response::get()->call('egw.message', $error, 'error');
 		}
 		else
 		{
-			if ($registered) egw_json_response::get()->call('egw.refresh', $msg, 'ranking',
+			if ($registered) Api\Json\Response::get()->call('egw.refresh', $msg, 'ranking',
 				null, null, null, null, null, $msg_type);
 
 			// tell client-side how many successful registered and therefore to remove from selection,
 			// plus evtl. question and concerned athlete
-			egw_json_response::get()->data(array(
+			Api\Json\Response::get()->data(array(
 				'registered' => $registered,
 			)+(!isset($question) || $question === true ? array() : array(
 				'question'  => $question,
@@ -415,7 +416,7 @@ class ranking_registration_ui extends ranking_bo
 	 */
 	function index($_content=null)
 	{
-		$tmpl = new etemplate_new('ranking.registration');
+		$tmpl = new Api\Etemplate('ranking.registration');
 
 		if (!is_array($_content))
 		{
@@ -437,7 +438,7 @@ class ranking_registration_ui extends ranking_bo
 			}
 			else
 			{
-				$state = (array)egw_cache::getSession('ranking', 'registration');
+				$state = (array)Api\Cache::getSession('ranking', 'registration');
 			}
 			$state += array(
 				'get_rows'       =>	'ranking.ranking_registration_ui.get_rows',
@@ -508,7 +509,7 @@ class ranking_registration_ui extends ranking_bo
 			{
 				foreach($this->federation->get_user_grants() as $n => $r)
 				{
-					if ($r & EGW_ACL_REGISTER)
+					if ($r & self::ACL_REGISTER)
 					{
 						$nation = $n;
 						break;
@@ -600,7 +601,7 @@ class ranking_registration_ui extends ranking_bo
 		{
 			if (empty($data[$key]))
 			{
-				egw_json_response::get()->call('egw.message', lang('Required information missing').': '.lang($key), 'error');
+				Api\Json\Response::get()->call('egw.message', lang('Required information missing').': '.lang($key), 'error');
 				return;
 			}
 		}
@@ -671,7 +672,7 @@ class ranking_registration_ui extends ranking_bo
 			$preferences->add('ranking', 'mail_defaults', $data);
 			$preferences->save_repository();
 		}
-		egw_json_response::get()->call('egw.message', lang('Mail to %1 participants send, %2 had no email-address, %3 failed.',
+		Api\Json\Response::get()->call('egw.message', lang('Mail to %1 participants send, %2 had no email-address, %3 failed.',
 			$success, $no_email, $errors.($e ? ' ('.$e->getMessage().')' : '')), $errors ? 'error' : 'info');
 	}
 
@@ -706,7 +707,7 @@ class ranking_registration_ui extends ranking_bo
 	 */
 	function result($content=null,$msg='',$show='result')
 	{
-		$tmpl = new etemplate_new('ranking.register.lists');
+		$tmpl = new Api\Etemplate('ranking.register.lists');
 
 		if ($tmpl->sitemgr && !count($this->ranking_nations))
 		{
@@ -723,7 +724,7 @@ class ranking_registration_ui extends ranking_bo
 			}
 			else
 			{
-				$content = egw_cache::getSession('ranking', 'registration');
+				$content = Api\Cache::getSession('ranking', 'registration');
 			}
 		}
 		elseif ($content['old_calendar'] && $content['old_calendar'] != $content['calendar'])
@@ -782,7 +783,7 @@ class ranking_registration_ui extends ranking_bo
 
 			if ($content['download'] && $starters && count($starters))
 			{
-				html::content_header($comp['rkey'].'.csv','text/comma-separated-values');
+				Api\Header\Content::type($comp['rkey'].'.csv','text/comma-separated-values');
 				$name2csv = array(
 					'WetId'    => 'comp',
 					'GrpId'    => 'cat',
@@ -799,7 +800,7 @@ class ranking_registration_ui extends ranking_bo
 					'ranking-points',
 				);
 				echo implode(';',$name2csv)."\n";
-				$charset = translation::charset();
+				$charset = Api\Translation::charset();
 				$c['GrpId'] = 0;
 				foreach($starters as $athlete)
 				{
@@ -851,7 +852,7 @@ class ranking_registration_ui extends ranking_bo
 					// convert by default to iso-8859-1, as this seems to be the default of excel
 					$csv_charset = $GLOBALS['egw_info']['user']['preferences']['common']['csv_charset'];
 					if (empty($csv_charset)) $csv_charset = 'iso-8859-1';
-					echo translation::convert(implode(';',$values), $charset, $csv_charset)."\n";
+					echo Api\Translation::convert(implode(';',$values), $charset, $csv_charset)."\n";
 				}
 				exit;
 			}
@@ -897,10 +898,10 @@ class ranking_registration_ui extends ranking_bo
 			'rows'     => $rows,
 			'msg'      => $msg,
 			'result'   => $athlete['platz'] > 0,
-			'no_upload' => !$comp || !$cat || !$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp),
+			'no_upload' => !$comp || !$cat || !$this->acl_check($comp['nation'],self::ACL_RESULT,$comp),
 		);
 		// save calendar, competition & cat between calls in the session
-		egw_cache::setSession('ranking', 'registration', $preserv);
+		Api\Cache::setSession('ranking', 'registration', $preserv);
 		$this->set_ui_state($preserv['calendar'],$preserv['comp'],$preserv['cat']);
 
 		$select_options = array(
@@ -945,7 +946,7 @@ class ranking_registration_ui extends ranking_bo
 	{
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
+			!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp))
 		{
 			return lang('Permission denied !!!');
 		}
