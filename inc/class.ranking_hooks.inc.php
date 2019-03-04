@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Api\Egw;
 
 /**
  * Rankings - Hooks: diverse static methods to be called as hooks
@@ -29,16 +30,16 @@ class ranking_hooks
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
 
 			$links = array(
-				'Athletes'      => egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index','ajax' => 'true')),
-				'Federations'   => egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
-				'Competitions'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index','ajax' => 'true')),
-				'Cups'          => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index','ajax' => 'true')),
-				'Categories'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index','ajax' => 'true')),
-				'Registration'  => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index','ajax' => 'true')),
-				'Resultservice' => egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index','ajax' => 'true')),
-				'Results'       => egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.result','ajax' => 'true')),
-				'Ranking'       => egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
-				'Accounting'    => egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index')),
+				'Athletes'      => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index','ajax' => 'true')),
+				'Federations'   => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index')),
+				'Competitions'  => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index','ajax' => 'true')),
+				'Cups'          => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index','ajax' => 'true')),
+				'Categories'    => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index','ajax' => 'true')),
+				'Registration'  => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index','ajax' => 'true')),
+				'Resultservice' => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index','ajax' => 'true')),
+				'Results'       => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.result','ajax' => 'true')),
+				'Ranking'       => Egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
+				'Accounting'    => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index')),
 			);
 			if ($location == 'return_ranking_views') return $links;
 			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$links);
@@ -65,7 +66,7 @@ class ranking_hooks
 			$file = array();
 			$file[] = array(
 				'text' => lang('Beamer / videowalls'),
-				'link' => "javascript:egw_openWindowCentered2('".egw::link('/index.php',array(
+				'link' => "javascript:egw_openWindowCentered2('".Egw::link('/index.php',array(
 					'menuaction' => 'ranking.ranking_beamer.beamer',
 				),false)."','beamer',1024,768,'yes')",
 				'no_lang' => true,
@@ -85,7 +86,7 @@ class ranking_hooks
 					{
 						$file[] = array(
 							'text' => $dsp_name,
-							'link' => "javascript:egw_openWindowCentered2('".egw::link('/index.php',array(
+							'link' => "javascript:egw_openWindowCentered2('".Egw::link('/index.php',array(
 								'menuaction' => 'ranking.ranking_display_ui.index',
 								'dsp_id' => $dsp_id,
 							),false)."','display$dsp_id',700,580,'yes')",
@@ -96,7 +97,7 @@ class ranking_hooks
 			}
 			if ($GLOBALS['egw_info']['user']['apps']['admin'])
 			{
-				$file['Add'] = "javascript:egw_openWindowCentered2('".egw::link('/index.php',array(
+				$file['Add'] = "javascript:egw_openWindowCentered2('".Egw::link('/index.php',array(
 					'menuaction' => 'ranking.ranking_display_ui.display',
 				),false)."','display$dsp_id',640,480,'yes')";
 			}
@@ -106,13 +107,13 @@ class ranking_hooks
 		if ($GLOBALS['egw_info']['user']['apps']['admin'] && $location != 'preferences')
 		{
 			$file = Array(
-				'Site configuration' => egw::link('/index.php',array(
+				'Site configuration' => Egw::link('/index.php',array(
 					'menuaction' => 'admin.admin_config.index',
 					'appname'    => 'ranking',
 					'ajax'       => 'true',
 				 )),
-				'Nation ACL' => egw::link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
-				'Import' => egw::link('/index.php',array(
+				'Nation ACL' => Egw::link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
+				'Import' => Egw::link('/index.php',array(
 					'menuaction' => 'ranking.ranking_import.index' )),
 			);
 			if ($location == 'admin')
