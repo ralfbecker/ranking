@@ -112,7 +112,7 @@ class ranking_result_ui extends ranking_result_bo
 			$content['add_cat'] = $this->cats->get_combined($cat['GrpId'], $comp['gruppen']);
 		}
 		// check if user has NO edit rights
-		if (($view = !$this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp, false,
+		if (($view = !$this->acl_check($comp['nation'], self::ACL_RESULT, $comp, false,
 			// allow register button for selfscore and route-judges
 			$discipline == 'selfscore' ? $content : null)))
 		{
@@ -344,7 +344,7 @@ class ranking_result_ui extends ranking_result_bo
 				case 'register':
 					// check judge right or for selfscore route-judge rights
 					if ($content['route_status'] == STATUS_RESULT_OFFICIAL ||
-						!$this->acl_check($comp['nation'], EGW_ACL_RESULT, $comp, false,
+						!$this->acl_check($comp['nation'], self::ACL_RESULT, $comp, false,
 							$content['discipline'] == 'selfscore' ? $content : null))
 					{
 						//error_log(__METHOD__.__LINE__."() route_status=$content[route_status], route_judges=".array2string($content['route_judges']).", comp=".array2string($comp).", is_judge()=".array2string($this->is_judge($comp, false)));
@@ -624,7 +624,7 @@ class ranking_result_ui extends ranking_result_bo
 		$tmpl->disableElement('slist_order', $disable_compl);
 
 		// no judge rights --> make everything readonly and disable all buttons but cancel
-		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))
+		if (!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp))
 		{
 			$readonlys = array('__ALL__' => true, 'tabs' => $readonlys['tabs']);
 			$readonlys['button[cancel]'] = false;
@@ -1493,7 +1493,7 @@ class ranking_result_ui extends ranking_result_bo
 					{
 						$msg = $this->has_results($keys+array($this->route_result->id_col => $id)) ?
 							lang('Has already a result!') : lang('Permission denied !!!');
-						//error_log(__METHOD__."() id=$id, acl_check('$comp[nation], EGW_ACL_RESULT, \$comp)=".array2string($this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp)));
+						//error_log(__METHOD__."() id=$id, acl_check('$comp[nation], self::ACL_RESULT, \$comp)=".array2string($this->acl_check($comp['nation'],self::ACL_RESULT,$comp)));
 					}
 					else
 					{
@@ -1602,7 +1602,7 @@ class ranking_result_ui extends ranking_result_bo
 		$readonlys['button[download]'] = !($this->has_startlist($keys) || $keys['route_order'] == -1 && $this->has_startlist(array('route_order'=>0)+$keys));
 		$content['no_route_selection'] = !$cat; 	// no cat selected
 		$onclick = "egw.open_link('ranking.ranking_result_ui.route&comp={$content['nm']['comp']}&cat={$content['nm']['cat']}','result_route','700x500','ranking')";
-		if (!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp))	// no judge
+		if (!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp))	// no judge
 		{
 			$readonlys['button[new]'] = true;
 			$readonlys['button[edit]'] = !$this->is_judge($comp, false, $route);
@@ -1676,7 +1676,7 @@ class ranking_result_ui extends ranking_result_bo
 		// no startlist, no rights at all or result offical -->disable all update possebilities
 		if (($readonlys['button[apply]'] =
 			!($content['nm']['discipline'] == 'speedrelay' && !$keys['route_order']) && !$this->has_startlist($keys) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp,false,$route) &&
+			!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp,false,$route) &&
 			!($content['nm']['discipline'] == 'selfscore' && $this->is_selfservice() && $content['nm']['show_result'] == 4) ||
 			$route['route_status'] == STATUS_RESULT_OFFICIAL ||
 			$content['nm']['route'] < 0 || $content['nm']['show_result'] > 1 && $content['nm']['show_result'] != 4))

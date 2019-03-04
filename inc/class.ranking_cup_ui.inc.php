@@ -11,7 +11,6 @@
  */
 
 use EGroupware\Api;
-use EGroupware\Api\Acl;
 
 class ranking_cup_ui extends ranking_bo
 {
@@ -167,7 +166,7 @@ class ranking_cup_ui extends ranking_bo
 			$readonlys = array(
 				'__ALL__' => true,
 				'button[cancel]' => false,
-				'button[edit]'   => !$this->acl_check($content['nation'],Acl::EDIT),
+				'button[edit]'   => !$this->acl_check($content['nation'],self::ACL_EDIT),
 			);
 		}
 		else
@@ -180,7 +179,7 @@ class ranking_cup_ui extends ranking_bo
 				'button[edit]'   => true,
 			);
 			// if only federation rights (no national rights), switch of ranking tab, to not allow changes there
-			if (!$this->acl_check($this->comp->data['nation'], Acl::EDIT))
+			if (!$this->acl_check($this->comp->data['nation'], self::ACL_EDIT))
 			{
 				$readonlys['tabs'] = array('presets' => true);
 				$readonlys['max_rang'] = true;

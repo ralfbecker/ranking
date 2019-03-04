@@ -12,7 +12,6 @@
 
 use EGroupware\Api;
 use EGroupware\Api\Egw;
-use EGroupware\Api\Acl;
 
 class ranking_competition_ui extends ranking_bo
 {
@@ -300,7 +299,7 @@ class ranking_competition_ui extends ranking_bo
 				'button[copy]'   => !$this->comp->data[$this->comp->db_key_cols[$this->comp->autoinc_id]],
 			);
 			// if only federation rights (no national rights), switch of ranking tab, to not allow changes there
-			if (!$this->acl_check($this->comp->data['nation'], Acl::EDIT))
+			if (!$this->acl_check($this->comp->data['nation'], self::ACL_EDIT))
 			{
 				$readonlys['tabs'] = array('ranking' => true);
 				// ToDo: limit category to state category(s)

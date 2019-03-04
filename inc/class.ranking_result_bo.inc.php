@@ -292,7 +292,7 @@ class ranking_result_bo extends ranking_bo
 			'route_order' => $route_order,
 		);
 		if (!$comp || !$cat || !is_numeric($route_order) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||	// permission denied
+			!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp) ||	// permission denied
 			!$this->route->read($keys))		// route already has a result
 		{
 			throw new Api\Exception\WrongUserinput(lang('entry not found !!!'));
@@ -1400,7 +1400,7 @@ class ranking_result_bo extends ranking_bo
 
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!$this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) &&
+			!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp) &&
 			!$this->is_judge($comp, false, $keys) &&	// check additionally for route_judges
 			!($discipline == 'selfscore' && count($results) == 1 && isset($results[$this->is_selfservice()])))
 		{
@@ -1671,7 +1671,7 @@ class ranking_result_bo extends ranking_bo
 	{
 		if (!$keys['WetId'] || !$keys[$this->route_result->id_col] ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!($this->acl_check($comp['nation'],EGW_ACL_RESULT,$comp) ||
+			!($this->acl_check($comp['nation'],self::ACL_RESULT,$comp) ||
 				// route-judges are allowed to delete participants for selfscore
 				($route = $this->route->read($keys)) && $route['discipline'] == 'selfscore' &&
 					$this->is_judge($comp, false, $route)) ||
