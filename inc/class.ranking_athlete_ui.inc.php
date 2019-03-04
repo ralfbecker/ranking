@@ -642,8 +642,9 @@ Continuer';
 	 * @param array &$query_in
 	 * @param array &$rows returned rows/cups
 	 * @param array &$readonlys eg. to disable buttons based on acl
+	 * @param boolean $ids_only =false true: return only ids, not full rows
 	 */
-	function get_rows(&$query_in,&$rows,&$readonlys)
+	function get_rows(&$query_in, &$rows, &$readonlys, $ids_only=false)
 	{
 		//echo "ranking_athlete_ui::get_rows() query="; _debug_array($query_in);
 		if (!$query_in['csv_export'])	// only store state if NOT called as csv export
@@ -706,7 +707,8 @@ Continuer';
 		}
 		$query['col_filter']['license_nation'] = $license_nation;
 
-		$total = $this->athlete->get_rows($query,$rows,$readonlys,(int)$query['filter'] ? (int)$query['filter'] : true);
+		$total = $this->athlete->get_rows($query, $rows, $readonlys,
+			(int)$query['filter'] ? (int)$query['filter'] : true, false, $ids_only);
 
 		//_debug_array($rows);
 
@@ -717,6 +719,11 @@ Continuer';
 		$readonlys = array();
 		foreach($rows as &$row)
 		{
+			if ($ids_only)
+			{
+				$row = $row['PerId'];
+				continue;
+			}
 			if (!$row['last_comp'] && $this->acl_check_athlete($row))
 			{
 				$row['class'] = 'AllowDelete';
@@ -735,6 +742,8 @@ Continuer';
 				$row['sex'] = lang($row['sex']);
 			}
 		}
+		if ($ids_only) return $total;
+
 		$sel_options['license_nation'] = $this->license_nations;
 		$rows['sel_options'] =& $sel_options;
 		$rows['license_nation'] = !$license_nation ? 'NULL' : $license_nation;
@@ -761,45 +770,12 @@ Continuer';
 	 * @param array $_content =null
 	 * @param string $msg =''
 	 */
-	function index($_content=null,$msg='')
+	function index($_content=null, $msg='')
 	{
-		if ($_content && $_content['nm']['action'] && $_content['nm']['selected'])
+		if ($_content && $_content['nm']['action'] && ($_content['nm']['selected'] || $_content['nm']['select_all']))
 		{
 			try {
-				foreach($_content['nm']['selected'] as $id)
-				{
-					switch($_content['nm']['action'])
-					{
-						case 'delete':
-							if (!$this->is_admin && $this->athlete->read(array('PerId' => $id)) && !$this->acl_check_athlete($this->athlete->data))
-							{
-								throw new Execption(lang('Permission denied !!!'));
-							}
-							if ($this->athlete->has_results($id))
-							{
-								throw new Execption(lang('You need to delete the results first !!!'));
-							}
-							if (!$this->athlete->delete(array('PerId' => $id)))
-							{
-								throw new Exception(lang('Error: deleting %1 !!!',lang('Athlete')));
-							}
-							$msg = count($_content['nm']['selected']).' '.lang('%1 deleted', lang('Athlete'));
-							break;
-
-						case 'merge':
-							if (!$this->is_admin)
-							{
-								throw new Execption(lang('Permission denied !!!'));
-							}
-							if (count($_content['nm']['selected']) !== 2)
-							{
-								throw new Exception(lang('Merges TWO athletes in the first selected one!'));
-							}
-							$msg = lang('Athlete including %1 results merged.',
-								$this->merge_athlete($_content['nm']['selected'][1], $id));
-							break 2;
-					}
-				}
+				$msg = $this->action($_content['nm']['action'], $_content['nm']['selected'], $_content['nm']['select_all']);
 			}
 			catch (Exception $ex) {
 				Api\Framework::message($ex->getMessage(), 'error');
@@ -824,27 +800,6 @@ Continuer';
 				'dataStorePrefix' => 'ranking_athlete',
 				'row_id'         => 'PerId',
 			);
-			// only enable csv export, if user has at least for one nation athlete rights or federation / LV rights
-			if (count($this->athlete_rights) || $this->federation->get_user_grants())
-			{
-				$content['nm']['csv_fields'] = array(
-					'nachname' => lang('Name'),
-					'vorname'  => lang('First name'),
-					'geb_date' => lang('Birthday'),
-					'sex'      => lang('Gender'),
-					'plz'      => lang('Zip Code'),
-					'ort'      => lang('City'),
-					'strasse'  => lang('Street'),
-					'email'    => lang('Email'),
-					'tel'      => lang('Phone'),
-					'mobil'    => lang('Cellphone'),
-					'verband'  => lang('Sektion'),
-					'regionalzentrum' => lang('Regionalzentrum'),
-					'PerId'    => lang('License'),
-					'license_status' => lang('Status'),
-					'last_comp' => lang('Last competition'),
-				);
-			}
 			if ($this->only_nation_athlete)
 			{
 				$content['nm']['col_filter']['nation'] = $this->only_nation_athlete;
@@ -870,6 +825,82 @@ Continuer';
 	}
 
 	/**
+	 * Run given action on selected athletes
+	 *
+	 * @param string $action action to run
+	 * @param array $selected PerId's
+	 * @param boolean $select_all true: use all rows from current state/session
+	 * @return string success message
+	 * @throws Exception with error message
+	 */
+	protected function action($action, array $selected, $select_all)
+	{
+		$success = $failed = 0;
+		if ($select_all && $action !== 'export')
+		{
+			// get the whole selection
+			$query = Api\Cache::getSession('athlete_state', 'ranking');
+
+			@set_time_limit(0);			// switch off the execution time limit, as it's for big selections to small
+			$query['num_rows'] = -1;	// all
+			$query['csv_export'] = true;
+			$readonlys = null;
+			$this->get_rows($query, $selected, $readonlys, true);	// true = only return the id's
+		}
+		foreach($selected as $id)
+		{
+			switch($action)
+			{
+				case 'delete':
+					if ($this->athlete->read(array('PerId' => $id)) &&
+						!$this->acl_check_athlete($this->athlete->data))
+					{
+						++$failed;
+					}
+					elseif ($this->athlete->has_results($id))
+					{
+						++$failed;
+					}
+					elseif (!$this->athlete->delete(array('PerId' => $id)))
+					{
+						++$failed;
+					}
+					else
+					{
+						++$success;
+					}
+					$action_msg = lang('deleted');
+					break;
+
+				case 'merge':
+					if (!$this->is_admin)
+					{
+						throw new Execption(lang('Permission denied !!!'));
+					}
+					if (count($selected) !== 2)
+					{
+						throw new Exception(lang('Merges TWO athletes in the first selected one!'));
+					}
+					return lang('Athlete including %1 results merged.',
+						$this->merge_athlete($selected[1], $id));
+
+				case 'export';
+					if (!($this->is_admin || count($this->athlete_rights) || $this->federation->get_user_grants()))
+					{
+						throw new Execption(lang('Permission denied !!!'));
+					}
+					$this->export($selected, $select_all);
+			}
+		}
+		if ($failed)
+		{
+			throw new Exception(lang('%1 athlete(s) %2, %3 failed because of missing permissions or existing results!',
+				$success, $action_msg, $failed));
+		}
+		return lang('%1 athlete(s) %2', $success, $action_msg);
+	}
+
+	/**
 	 * Return actions for cup list
 	 *
 	 * @param array $cont values for keys license_(nation|year|cat)
@@ -890,7 +921,7 @@ Continuer';
 				'caption' => 'Add',
 				'url' => 'menuaction=ranking.ranking_athlete_ui.edit',
 				'popup' => '900x470',
-				'disabled' => $this->is_admin && !$this->athlete_rights && !$this->federation->get_user_grants(),
+				'disabled' => !$this->is_admin && !$this->athlete_rights && !$this->federation->get_user_grants(),
 				'group' => $group,
 			),
 			'license' => array(
@@ -901,9 +932,17 @@ Continuer';
 				'enableClass' => 'ApplyLicense',
 				'group' => $group,
 			),
+			'export' => array(
+				'caption' => 'CSV Export',
+				'allowOnMultiple' => true,
+				'disabled' => !$this->is_admin && !$this->athlete_rights && !$this->federation->get_user_grants(),
+				'hint' => 'Download a CSV with selected athletes',
+				'postSubmit' => true,	// download needs post submit (not Ajax) to work
+				'group' => $group=3,
+			),
 			'merge' => array(
 				'caption' => 'Merge',
-				'allowOnMultiple' => true,
+				'allowOnMultiple' => 2,
 				'disabled' => !$this->is_admin,
 				'hint' => 'Merges TWO athletes in the first selected one!',
 				'confirm' => 'ATTENTION: merging can NOT be undone! Really want to merge?',
@@ -919,6 +958,73 @@ Continuer';
 		);
 
 		return $actions;
+	}
+
+	/**
+	 * Download selected athletes as CSV file
+	 *
+	 * @param array $selected
+	 * @param boolean $select_all =false true: download whole selection
+	 */
+	function export(array $selected, $select_all=false)
+	{
+		// get the whole selection
+		$query = Api\Cache::getSession('athlete_state', 'ranking');
+		@set_time_limit(0);			// switch off the execution time limit, as it's for big selections to small
+
+		$csv_fields = array(
+			'nachname' => lang('Name'),
+			'vorname'  => lang('First name'),
+			'geb_date' => lang('Birthday'),
+			'sex'      => lang('Gender'),
+			'plz'      => lang('Zip Code'),
+			'ort'      => lang('City'),
+			'strasse'  => lang('Street'),
+			'email'    => lang('Email'),
+			'tel'      => lang('Phone'),
+			'mobil'    => lang('Cellphone'),
+			'verband'  => lang('Sektion'),
+			'regionalzentrum' => lang('Regionalzentrum'),
+			'PerId'    => lang('License'),
+			'license_status' => lang('Status'),
+			'last_comp' => lang('Last competition'),
+		);
+		$charset = Api\Translation::charset();
+		$csv_charset = $GLOBALS['egw_info']['user']['preferences']['common']['csv_charset'];
+		if (empty($csv_charset)) $csv_charset = 'iso-8859-1';
+
+		Api\Header\Content::type('athletes.csv','text/comma-separated-values');
+		echo Api\Translation::convert(implode(';', $csv_fields), $charset, $csv_charset)."\n";
+
+		$query['csv_export'] = true;	// to not store state;
+		if (!$select_all)
+		{
+			$query['col_filter']['PerId'] = $selected;
+		}
+		$rows = $readonlys = null;
+		$query['start'] = 0;
+		$query['num_rows'] = 2;
+		do {
+			$total = $this->get_rows($query, $rows, $readonlys);
+			foreach($rows as $key => $row)
+			{
+				if (!is_int($key)) continue;
+
+				$values = [];
+				foreach(array_keys($csv_fields) as $name)
+				{
+					$values[$name] = (string)$row[$name];
+					if (strpos($values[$name], ';') !== false)
+					{
+						$values[$name] = '"'.str_replace('"', '""', $values[$name]).'"';
+					}
+				}
+				echo Api\Translation::convert(implode(';', $values), $charset, $csv_charset)."\n";
+				$query['start']++;
+			}
+		}
+		while ($query['start'] < $total);
+		exit;
 	}
 
 	/**

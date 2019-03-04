@@ -172,7 +172,7 @@
 				<row valign="top">
 					<description value="Action picture"/>
 					<image src="foto2"/>
-					<file statustext="Upload a portrait picture for the profile" id="foto2"/>
+					<file id="foto2"/>
 				</row>
 			</rows>
 		</grid>
@@ -230,7 +230,7 @@
 					<hbox align="right">
 						<select statustext="Category license is applied for, does NOT limit athletes to compete in that category only" id="license_cat" options="Athlete license"/>
 						<button statustext="Applies for the license and downloads the necessary form to mail to the office" label="Apply for" id="button[apply_license]"
-							onclick="et2_dialog.confirm(widget,'$cont[license_msg]', 'Athlete license', true)"/>
+							onclick="et2_dialog.confirm(widget,'$cont[license_msg]', 'Apply for license', true)"/>
 					</hbox>
 				</row>
 				<row class="row">

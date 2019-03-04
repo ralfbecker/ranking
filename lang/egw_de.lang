@@ -54,6 +54,7 @@ administrated by: parent federation	ranking	de	Verwaltet von: übergeordnetem Ve
 age	ranking	de	Alter
 all above	ranking	de	Alle darüber
 all complimentary	ranking	de	Alle zusätzlichen
+all lists no longer contain input fields or buttons:	ranking	de	Alle Listen enthalten keine Eingabefelder oder Buttons mehr:
 all participants	ranking	de	Alle Teilnehmer
 all points gets multiplicated with this factor, eg. for different competition types	ranking	de	Alle Punkte werden mit diesem Faktor multipliziert, zB. für verschiedene Typen von Wettkämpfen
 all: profile and name	ranking	de	Alles: Profil und Name
@@ -67,6 +68,7 @@ applied	ranking	de	beantragt
 applied for a %1 license	ranking	de	%1 Lizenz beantragt
 applies for the license and downloads the necessary form to mail to the office	ranking	de	Beantragt eine Lizenz und lädt das notwendige Forumlar herunter damit es an das Büro geschickt werden kann
 apply for	ranking	de	Beantragen
+apply for license	ranking	de	Lizenz beantragen
 apply modifications below to all selected federations	ranking	de	Wende Änderungen darunter auf alle ausgewählten Verbände an
 apply the changes made	ranking	de	vorgenommene Änderungen anwenden
 apply the changes of this athlete only	ranking	de	Nur Änderungen an diesem Athleten anwenden
@@ -204,6 +206,7 @@ display saved	ranking	de	Anzeige gespeichert
 display this message again next time?	ranking	de	Diese Nachricht beim nächsten mal wieder anzeigen?
 displays	ranking	de	Anzeigen
 do you want to use a day-license?	ranking	de	Wollen Sie eine Tageslizenz verwenden?
+double-click on a row to view or edit it, or right click for more options.	ranking	de	Mit Doppelklick auf eine Zeile kann diese angezeigt oder bearbeitet werden, oder Rechtsklick für mehr Optionen per Kontextmenü.
 down	ranking	de	Nach unten
 download	ranking	de	Herunterladen
 download all	ranking	de	Alle herunterladen
@@ -470,6 +473,8 @@ postalcode	ranking	de	Postleitzahl
 prefix for the following page names (default none)	ranking	de	Prefix für die folgenden Seitennamen (Vorgabe keines)
 prequalified	ranking	de	vorqualifiziert
 prequalified competitiors	ranking	de	Vorqualifizierte Teilnehmer
+prequalified competitiors for registration	ranking	de	Vorqualifizierte Teilnehmer für die Registrierung
+prequalified competitiors for startlist	ranking	de	Vorqualifizierte Teilnehmer für die Startliste
 prequalify	ranking	de	Vorqualifizieren
 presets	ranking	de	Voreinstellungen
 presets for competitions	ranking	de	Voreinstellungen für die Wettkämpfe
@@ -618,6 +623,7 @@ time measured	ranking	de	Zeit gemessen
 time measurement	ranking	de	Zeitmessung
 to confirm	ranking	de	Zu bestätigen
 to remove already registered athletes:\nright click on them in list and choose 'delete' from context menu	ranking	de	Um bereits registrierte Athleten zu löschen:\nklick rechts auf diese in der Liste und im Kontextmenü 'Löschen' auswählen
+to select multiple rows use ctrl (cmd for mac) or shift to select ranges.	ranking	de	Verwenden Sie Strg (Cmd für Mac) um mehrere Zeilen zu markieren oder Umschalttaste für Bereiche.
 to year	ranking	de	bis Jahr
 top	ranking	de	Top
 top: number of tries	ranking	de	Top: Anzahl Versuche

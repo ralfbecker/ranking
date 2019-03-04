@@ -55,6 +55,7 @@ administrated by: parent federation	ranking	en	Administrated by: parent federati
 age	ranking	en	Age
 all above	ranking	en	all above
 all complimentary	ranking	en	All complimentary
+all lists no longer contain input fields or buttons:	ranking	en	All lists no longer contain input fields or buttons:
 all participants	ranking	en	All participants
 all points gets multiplicated with this factor, eg. for different competition types	ranking	en	all points gets multiplicated with this factor, eg. for different competition types
 all: profile and name	ranking	en	all: profile and name
@@ -69,6 +70,7 @@ applied	ranking	en	applied
 applied for a %1 license	ranking	en	Applied for a %1 license
 applies for the license and downloads the necessary form to mail to the office	ranking	en	Applies for the license and downloads the necessary form to mail to the office
 apply for	ranking	en	Apply for
+apply for license	ranking	en	Apply for license
 apply modifications below to all selected federations	ranking	en	Apply modifications below to all selected federations
 apply the changes made	ranking	en	apply the changes made
 apply the changes of this athlete only	ranking	en	Apply the changes of this athlete only
@@ -210,6 +212,7 @@ display saved	ranking	en	Display saved
 display this message again next time?	ranking	en	Display this message again next time?
 displays	ranking	en	Displays
 do you want to use a day-license?	ranking	en	Do you want to use a day-license?
+double-click on a row to view or edit it, or right click for more options.	ranking	en	Double-click on a row to view or edit it, or right click for more options.
 down	ranking	en	Down
 download	ranking	en	Download
 download all	ranking	en	Download all
@@ -483,6 +486,8 @@ postalcode	ranking	en	Postalcode
 prefix for the following page names (default none)	ranking	en	Prefix for the following page names (default none)
 prequalified	ranking	en	prequalified
 prequalified competitiors	ranking	en	Prequalified competitiors
+prequalified competitiors for registration	ranking	en	Prequalified competitiors for registration
+prequalified competitiors for startlist	ranking	en	Prequalified competitiors for startlist
 prequalify	ranking	en	Prequalify
 presets	ranking	en	Presets
 presets for competitions	ranking	en	Presets for competitions
@@ -633,6 +638,7 @@ time measured	ranking	en	Time measured
 time measurement	ranking	en	Time measurement
 to confirm	ranking	en	To confirm
 to remove already registered athletes:\nright click on them in list and choose 'delete' from context menu	ranking	en	To remove already registered athletes:\nright click on them in list and choose 'delete' from context menu
+to select multiple rows use ctrl (cmd for mac) or shift to select ranges.	ranking	en	To select multiple rows use Ctrl (Cmd for Mac) or Shift to select ranges.
 to year	ranking	en	to year
 top	ranking	en	Top
 top: number of tries	ranking	en	Top: number of tries

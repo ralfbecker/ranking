@@ -121,6 +121,17 @@ app.classes.ranking = AppJS.extend(
 					this.et2.getWidgetById('button[apply_license]').click();
 				}
 				break;
+
+			case 'ranking.athlete.index':
+			case 'ranking.competitions.list':
+			case 'ranking.cup.list':
+			case 'ranking.cats.list':
+				this.show_hint(this.egw.lang("How to use EGroupware"),
+					this.egw.lang("All lists no longer contain input fields or buttons:")+"\n"+
+					this.egw.lang("Double-click on a row to view or edit it, or right click for more options.")+"\n"+
+					this.egw.lang("To select multiple rows use Ctrl (Cmd for Mac) or Shift to select ranges."),
+					'no_general_ui_hint');
+				break;
 		}
 	},
 
