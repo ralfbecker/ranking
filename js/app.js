@@ -257,6 +257,29 @@ app.classes.ranking = AppJS.extend(
 		}
 	},
 
+	/**
+	 * Handle links to not reload nextmatch, if index page should be refreshed (eg. Sidebox Header clicked)
+	 *
+	 * @param {string} url
+	 * @returns {boolean} True if we could handle the link internally, false to let framework handle it
+	 */
+	linkHandler: function(url)
+	{
+		// if we are on our index page, check if current view contains nextmatch and refresh (applyFilter) it
+		if (this.et2 && (url == '/egroupware/index.php?menuaction=ranking.ranking_ui.index&ajax=true' || url == '/ranking/index.php'))
+		{
+			var nextmatch_found = false;
+
+			this.et2.iterateOver(function(_widget) {
+				_widget.applyFilters();
+				nextmatch_found = true;
+			}, this, et2_nextmatch);
+
+			return nextmatch_found;
+		}
+		return false;
+	},
+
 	/***************************************************************************
 	 * Resultservice
 	 **************************************************************************/
