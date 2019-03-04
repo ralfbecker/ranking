@@ -266,7 +266,7 @@ app.classes.ranking = AppJS.extend(
 	linkHandler: function(url)
 	{
 		// if we are on our index page, check if current view contains nextmatch and refresh (applyFilter) it
-		if (this.et2 && (url == '/egroupware/index.php?menuaction=ranking.ranking_ui.index&ajax=true' || url == '/ranking/index.php'))
+		if (this.et2 && url.match(/(\/ranking\/(index\.php)?|\/index\.php\?menuaction=ranking\.ranking_ui\.index&ajax=true)$/))
 		{
 			var nextmatch_found = false;
 
