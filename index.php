@@ -29,7 +29,7 @@ if (!($view = Api\Cache::getSession('ranking', 'menuaction')) &&
 if (substr($view, 0, 10) === 'ranking.ui' && $view !== 'ranking.uiranking.index')
 {
 	list($app, $class, $method) = explode('.', $view);
-	$view = 'ranking.ranking_'.substr($class, 2, substr($class, -1) === 's' ? -1 : 99).'_ui'.$method;
+	$view = 'ranking.ranking_'.substr($class, 2, substr($class, -1) === 's' ? -1 : 99).'_ui.'.$method;
 }
 
 // urls which still need to run in iframe (NOT top-level)
