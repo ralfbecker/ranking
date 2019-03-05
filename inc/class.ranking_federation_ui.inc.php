@@ -7,9 +7,10 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008-14 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2008-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 class ranking_federation_ui extends ranking_bo
 {
@@ -20,7 +21,126 @@ class ranking_federation_ui extends ranking_bo
 	 */
 	var $public_functions = array(
 		'index' => true,
+		'edit' => true,
 	);
+
+	/**
+	 * Edit a federation
+	 *
+	 * @param array $content =null
+	 * @param type $msg =''
+	 */
+	function edit(array $content=null, $msg='')
+	{
+		//$this->is_admin = false;
+
+		if (!is_array($content))
+		{
+			if (empty($_GET['fed_id']))
+			{
+				$content = array();
+			}
+			elseif(strpos($_GET['fed_id'], ',') === false)
+			{
+				if (!($content = $this->federation->read($_GET['fed_id'])))
+				{
+					Api\Framework::window_close(lang('Entry not found !!!'));
+				}
+				$content['grants'] = $this->federation->get_grants();
+			}
+			// edit multiple ones
+			else
+			{
+				$content = array(
+					'fed_ids' => explode(',', $_GET['fed_id']),
+				);
+				Api\Framework::message('Apply modifications below to all selected federations', 'info');
+			}
+		}
+		// changes are only allowed for admins
+		elseif($this->is_admin)
+		{
+			$button = key($content['button']);
+			unset($content['button']);
+
+			switch($button)
+			{
+				case 'save':
+				case 'apply':
+					// editing of multiple federations
+					if (!empty($content['fed_ids']))
+					{
+						$msg = lang('Changes applied to %1 federations.',
+							$this->federation->apply(array_diff_key($content, ['fed_ids' => true]),
+								$content['fed_ids']));
+					}
+					elseif (empty($content['nation']) || empty($content['verband']))
+					{
+						$msg = lang('Field must not be empty !!!');
+						foreach(array('nation','verband') as $name)
+						{
+							if (empty($content[$name]))
+							{
+								Api\Etemplate::set_validation_error($name, 'Field must not be empty !!!');
+							}
+						}
+						$button = '';
+					}
+					elseif ($this->federation->save($content) == 0)
+					{
+						$this->federation->set_grants($content['grants']);
+						$msg = lang('Federation saved.');
+						// update content, in case save() set defaults
+						$content = $this->federation->data;
+						$content['grants'] = $this->federation->get_grants();
+					}
+					else
+					{
+						$msg = lang('Error saving federation!');
+						$button = '';
+					}
+					Api\Framework::refresh_opener($msg, 'ranking', $this->federation->data['fed_id'], $content['fed_id'] ? 'edit' : 'add');
+					if ($button === 'save') Api\Framework::window_close();
+					break;
+
+				case 'delete':
+					if (!$this->is_admin || !$content['fed_id'] || $content['num_children'] || $content['num_athletes'])
+					{
+						$msg = lang('Permission denied!');
+					}
+					else
+					{
+						$msg = $this->federation->delete($content['fed_id']) ?
+							lang('Federation deleted.') : lang('Error deleting federation!');
+					}
+					break;
+			}
+			Api\Framework::message($msg);
+		}
+
+		if (!$this->is_admin)
+		{
+			$readonlys = ['__ALL__' => true, 'button[cancel]' => false];
+		}
+		elseif ($content['num_children'] || $content['num_athletes'])
+		{
+			$readonlys['button[delete]'] = true;
+		}
+
+		$fed_parents = empty($content['nation']) ? array() :
+			$this->federation->query_list('verband', 'fed_id', array(
+				'nation' => $content['nation'],
+				'fed_id != '.(int)$content['fed_id'],
+			), ranking_federation::FEDERATION_CHILDREN.' DESC, verband ASC');
+
+		$tpl = new Api\Etemplate('ranking.federation.edit');
+		$tpl->exec('ranking.ranking_federation_ui.edit',$content, array(
+			'nation' => $this->athlete->distinct_list('nation'),
+			'fed_continent' => ranking_federation::$continents,
+			'fed_parent' => $fed_parents,
+			'fed_parent_since' => $fed_parents,
+		), $readonlys, $content, 2);
+	}
 
 	/**
 	 * query federations for nextmatch
@@ -32,10 +152,9 @@ class ranking_federation_ui extends ranking_bo
 	function get_rows($query,&$rows,&$readonlys)
 	{
 		//echo __METHOD__.'()'; _debug_array($query);
-		$GLOBALS['egw']->session->appsession('ranking','feds_state',$query);
+		Api\Cache::setSession('feds_state', 'ranking', $query);
 
 		$total = $this->federation->get_rows($query,$rows,$readonlys);
-
 		//_debug_array($rows);
 
 		$readonlys = $parent_ids = array();
@@ -50,7 +169,10 @@ class ranking_federation_ui extends ranking_bo
 				$parent_ids[$n] = $fed['fed_parent'];
 			}
 			// wont delete federation with athletes or children!
-			$readonlys['delete['.$fed['fed_id'].']'] = !$this->is_admin || $fed['num_athletes'] > 0 || $fed['num_children'] > 0;
+			if (!$this->is_admin || $fed['num_athletes'] > 0 || $fed['num_children'] > 0)
+			{
+				$fed['class'] = 'noDelete';
+			}
 		}
 		if ($parent_ids)
 		{
@@ -72,14 +194,46 @@ class ranking_federation_ui extends ranking_bo
 	 * @param array $content
 	 * @param string $msg
 	 */
-	function index($content=null,$msg='')
+	function index($content=null)
 	{
-		$tpl = new etemplate('ranking.federation.index');
-
-		//$this->is_admin = false;
-		if (!is_array($content))
+		if (is_array($content))
 		{
-			$content['nm'] = $GLOBALS['egw']->session->appsession('ranking','feds_state');
+			// multi-actions are only for admins
+			if ($this->is_admin && $content['nm']['action'] && $content['nm']['selected'])
+			{
+				foreach($content['nm']['selected'] as $id)
+				{
+					switch($content['nm']['action'])
+					{
+						case 'delete':
+							if (!$this->is_admin || !($fed = $this->federation->read($id)) ||
+								$fed['num_children'] || $fed['num_athletes'])
+							{
+								$msg = lang('Permission denied!');
+								break 2;
+							}
+							if (!$this->federation->delete($id))
+							{
+								$msg = lang('Error deleting federation!');
+								break 2;
+							}
+							$msg = count($content['nm']['action']).' '.lang('Federation deleted.');
+							break;
+
+						case 'merge':
+							array_shift($content['nm']['selected']);
+							$msg = lang('%1 federation(s) deleted after merge.',
+								$this->federation->merge($id, $content['nm']['selected']));
+							break 2;
+					}
+				}
+				Api\Framework::message($msg);
+				unset($content['nm']['action'], $content['nm']['selected']);
+			}
+		}
+		else
+		{
+			$content['nm'] = Api\Cache::getSession('feds_state', 'ranking');
 
 			if (!is_array($content['nm']))
 			{
@@ -91,7 +245,9 @@ class ranking_federation_ui extends ranking_bo
 					'order'       => 'nation',// IO name of the column to sort after (optional for the sortheaders)
 					'sort'        => 'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 					'csv_fields'  => false,
-					'default_cols' => '!fed_id',
+					'default_cols'=> '!fed_id',
+					'dataStorePrefix' => 'ranking_feds',
+					'row_id'      => 'fed_id',
 				);
 				if ($this->only_nation_athlete)
 				{
@@ -103,135 +259,64 @@ class ranking_federation_ui extends ranking_bo
 					$content['nm']['col_filter']['nation'] = array_pop($fed_nations);
 				}
 			}
+			$content['nm']['actions'] = $this->get_actions();
 		}
-		else
-		{
-			//_debug_array($content);
-			if($content['nm']['rows']['edit'])
-			{
-				list($fed_id) = each($content['nm']['rows']['edit']);
-				$content['fed'] = $this->federation->read($fed_id);
-				$content['fed']['grants'] = $this->federation->get_grants();
-			}
-			elseif ($this->is_admin && $content['nm']['rows']['delete'])
-			{
-				list($fed_id) = each($content['nm']['rows']['delete']);
-				$msg = $this->federation->delete($fed_id) ? lang('Federation deleted.') :
-					lang('Error deleting federation!');
-			}
-			elseif($content['button'])
-			{
-				list($button) = each($content['button']);
-				unset($content['button']);
-				switch($button)
-				{
-					case 'save':
-					case 'apply':
-						if (!$content['fed']['nation'] || !$content['fed']['verband'])
-						{
-							$msg = lang('Field must not be empty !!!');
-							foreach(array('nation','verband') as $name)
-							{
-								if (!$content['fed'][$name])
-								{
-									$tpl->set_validation_error("fed[$name]",'Field must not be empty !!!');
-								}
-							}
-							$button = '';
-						}
-						elseif ($this->is_admin && $this->federation->save($content['fed']) == 0)
-						{
-							$this->federation->set_grants($content['fed']['grants']);
-							$content['fed'] = $this->federation->data + array('grants' => $content['fed']['grants']);
-							$msg = lang('Federation saved.');
-						}
-						else
-						{
-							$msg = lang('Error saving federation!');
-							$button = '';
-						}
-						if ($button != 'save') break;
-						// fall through for save
-					case 'cancel':
-						$content['fed'] = array();
-						break;
-				}
-			}
-			elseif($this->is_admin && $content['action'])
-			{
-				if (!($checked = $content['nm']['rows']['checked']))
-				{
-					$msg = lang('You need to select some federations first!');
-				}
-				else
-				{
-					$fed = $content['fed'];
-					switch($content['action'])
-					{
-						case 'merge':
-							if (!$fed['fed_id'])
-							{
-								$msg = lang('No federation selected to edit!');
-							}
-							else
-							{
-								$msg = lang('%1 federations merged.',
-									$this->federation->merge($fed['fed_id'],$checked));
-							}
-							break;
-						case 'apply':
-							if(!$fed['nation'] && !$fed['fed_parent'] && !$fed['fed_shortcut'] && !$fed['fed_parent'])
-							{
-								$msg = lang('Nothing to apply!');
-							}
-							else
-							{
-								$msg = lang('Changes applied to %1 federations.',
-									$this->federation->apply($fed,$checked));
-							}
-							break;
-						case 'parent':
-							if (!$fed['fed_id'])
-							{
-								$msg = lang('No federation selected to edit!');
-							}
-							else
-							{
-								$msg = lang('%1 federations added to parent federation.',
-									$this->federation->apply(array('fed_parent' => $fed['fed_id']),$checked));
-							}
-							break;
-					}
-				}
-				unset($content['action']);
-			}
-			unset($content['nm']['rows']);
-		}
-		$content['msg'] = $msg ? $msg : $_GET['msg'];
-		$content['is_admin'] = $this->is_admin;
-		$readonlys['button[save]'] = $readonlys['button[apply]'] = !$this->is_admin;
-
-		if (!$content['fed']) $content['fed']['nation'] = $content['nm']['col_filter']['nation'];
-
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nations and Federations');
+
 		$fed_parents = !$content['fed']['nation'] ? array() :
 				$this->federation->query_list('verband','fed_id',array(
 					'nation' => $content['fed']['nation'],
 					'fed_id != '.(int)$content['fed']['fed_id'],
 				),ranking_federation::FEDERATION_CHILDREN.' DESC,verband ASC');
+
+		$this->set_ui_state();
+		$tpl = new Api\Etemplate('ranking.federation.index');
 		$tpl->exec('ranking.ranking_federation_ui.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
-			'action' => array(
-				'apply' => lang('Apply modifications below to all selected federations'),
-				'merge' => lang('Merge selected federations with the one opened for editing'),
-				'parent' => lang('Add to parent federation opened for editing'),
-			),
 			'fed_continent' => ranking_federation::$continents,
 			'fed_parent' => $fed_parents,
 			'fed_parent_since' => $fed_parents,
-		),$readonlys,array(
-			'fed' => array('fed_id' => $content['fed']['fed_id']),
-			'nm'  => $content['nm'],
-		));
+		), [], $content);
+	}
+
+	/**
+	 * Return actions for cup list
+	 *
+	 * @return array
+	 */
+	function get_actions()
+	{
+		$actions =array(
+			'edit' => array(
+				'caption' => 'Edit',
+				'default' => true,
+				'allowOnMultiple' => $this->is_admin,	// allow admin to edit multiples ones
+				'url' => 'menuaction=ranking.ranking_federation_ui.edit&fed_id=$id',
+				'popup' => '900x500',
+				'group' => $group=0,
+			),
+			'add' => array(
+				'caption' => 'Add',
+				'url' => 'menuaction=ranking.ranking_federation_ui.edit',
+				'popup' => '900x500',
+				'disabled' => !$this->is_admin,
+				'group' => $group,
+			),
+			'merge' => array(
+				'caption' => 'Merge',
+				'hint' => 'Merge selected federations in the first one',
+				'disable' => !$this->is_admin,
+				'allowOnMultiple' => 'only',
+				'confirm' => 'Merge selected federations in the first one',
+				'group' => $group=5,
+			),
+			'delete' => array(
+				'caption' => 'Delete',
+				'disableClass' => 'noDelete',	// checks children and athletes
+				'confirm' => 'Delete this entry',
+				'group' => $group=5,
+			),
+		);
+		return $actions;
 	}
 }

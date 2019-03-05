@@ -1,53 +1,41 @@
-<?xml version="1.0"?>
-<!-- $Id$ -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
 <overlay>
 	<template id="ranking.federation.index.rows" template="" lang="" group="0" version="1.5.001">
 		<grid width="100%">
 			<columns>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column width="60"/>
+				<column width="120"/>
+				<column width="60"/>
+				<column width="30%"/>
+				<column width="100"/>
+				<column width="50"/>
+				<column width="30%"/>
+				<column width="50"/>
+				<column width="60"/>
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..."/>
+					<nextmatch-filterheader id="nation" no_lang="1" empty_label="Nation..."/>
 					<nextmatch-sortheader label="Nationname" id="fed_nationname"/>
-					<nextmatch-filterheader id="fed_continent" options="Continent"/>
+					<nextmatch-filterheader id="fed_continent" empty_label="Continent"/>
 					<nextmatch-sortheader label="Name" id="verband"/>
 					<nextmatch-sortheader label="Shortcut" id="fed_shortcut"/>
 					<nextmatch-sortheader align="center" label="Athletes" id="num_athletes"/>
 					<nextmatch-sortheader label="Parent federation" id="fed_parent"/>
 					<nextmatch-sortheader align="center" label="Children" id="num_children"/>
 					<nextmatch-sortheader align="center" label="Key" id="fed_id"/>
-					<hbox align="center">
-						<description align="center" value="Action"/>
-						<button align="right" statustext="Check all" label="Check all" id="check_all" needed="1" onclick="toggle_all(this.form,form::name('checked[]')); return false;" image="check"/>
-					</hbox>
 				</row>
 				<row class="row">
-					<description align="center" id="${row}[nation]" no_lang="1"/>
+					<description id="${row}[nation]" no_lang="1"/>
 					<description id="${row}[fed_nationname]"/>
-					<menulist>
-						<menupopup id="${row}[fed_continent]" readonly="true"/>
-					</menulist>
+					<select id="${row}[fed_continent]" readonly="true"/>
 					<description id="${row}[verband]" no_lang="1" href="$row_cont[fed_url]" extra_link_target="_blank"/>
 					<description id="${row}[fed_shortcut]"/>
 					<description align="center" id="${row}[num_athletes]"/>
 					<description id="${row}[parent_name]"/>
 					<description align="center" id="${row}[num_children]"/>
 					<description align="center" id="${row}[fed_id]" no_lang="1"/>
-					<hbox align="center">
-						<button statustext="Edit this competition" label="Edit" id="edit[$row_cont[fed_id]]" image="edit"/>
-						<button align="center" statustext="Delete this federation" label="Delete" id="delete[$row_cont[fed_id]]" onclick="return confirm('Delete this federation');" image="delete"/>
-						<checkbox align="right" statustext="Select multiple federations for a further action" id="checked[]" options="$row_cont[fed_id]"/>
-					</hbox>
 				</row>
 			</rows>
 		</grid>
@@ -55,89 +43,10 @@
 			.ml10 { margin-left: 10px; }\r\n.nmh { font-weight: bold; }
 		</styles>
 	</template>
+	<template id="ranking.federation.index.left" template="" lang="" group="0" version="1.9.001">
+		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_federation_ui.edit',false,'640x480');"/>
+	</template>
 	<template id="ranking.federation.index" template="" lang="" group="0" version="1.9.001">
-		<grid width="100%">
-			<columns>
-				<column/>
-			</columns>
-			<rows>
-				<row disabled="!@msg">
-					<description align="center" id="msg" no_lang="1" class="redItalic"/>
-				</row>
-				<row>
-					<nextmatch id="nm" template="ranking.federation.index.rows"/>
-				</row>
-				<row disabled="!@is_admin">
-					<hbox align="right">
-						<menulist>
-							<menupopup id="action" onchange="1" options="Select an action"/>
-						</menulist>
-						<button statustext="Check all" label="Check all" id="check_all" needed="1" onclick="toggle_all(this.form,form::name('nm[rows][checked][]')); return false;" image="arrow_ltr" class="checkAllArrow"/>
-					</hbox>
-				</row>
-				<row>
-					<groupbox>
-						<caption label="Edit"/>
-						<grid id="fed">
-							<columns>
-								<column/>
-								<column/>
-							</columns>
-							<rows>
-								<row>
-									<description value="Nation" for="nation"/>
-									<hbox options="0,0">
-										<textbox id="nation" onchange="1" size="3" maxlength="3" class="inputRequired"/>
-										<textbox id="fed_nationname" size="60" maxlength="80" class="leftPad5"/>
-										<menulist>
-											<menupopup id="fed_continent" options="Select one" class="leftPad5"/>
-										</menulist>
-									</hbox>
-								</row>
-								<row>
-									<description value="Name"/>
-									<hbox options="0,0">
-										<textbox id="verband" size="80" maxlength="80" class="inputRequired"/>
-										<textbox statustext="Shortcut" id="fed_shortcut" size="10" maxlength="20" class="leftPad5"/>
-									</hbox>
-								</row>
-								<row>
-									<description value="Website" for="fed_url"/>
-									<textbox id="fed_url" size="95" maxlength="128"/>
-								</row>
-								<row>
-									<description value="Parent federation" for="fed_parent"/>
-									<hbox>
-										<menulist>
-											<menupopup id="fed_parent" options="None"/>
-										</menulist>
-										<textbox type="integer" label="since" id="fed_since"/>
-										<menulist>
-											<menupopup id="fed_parent_since" options="None"/>
-										</menulist>
-									</hbox>
-								</row>
-								<row valign="top">
-									<description value="Rechte" font_style="3" activate_links="0" for="0"/>
-									<hbox options="0,0">
-										<listbox type="select-account" label="Edit athlete" id="grants[athletes]" rows="5" options="both"/>
-										<listbox type="select-account" label="registration" id="grants[register]" rows="5" options="both" class="leftPad5"/>
-										<listbox type="select-account" label="Edit competition" id="grants[edit]" rows="5" options="both" class="leftPad5"/>
-										<listbox type="select-account" label="Read competition" id="grants[read]" rows="5" options="both" class="leftPad5"/>
-									</hbox>
-								</row>
-							</rows>
-						</grid>
-					</groupbox>
-				</row>
-				<row>
-					<hbox>
-						<button label="Save" id="button[save]"/>
-						<button label="Apply" id="button[apply]"/>
-						<button label="Cancel" id="button[cancel]"/>
-					</hbox>
-				</row>
-			</rows>
-		</grid>
+		<nextmatch id="nm" template="ranking.federation.index.rows" header_left="ranking.federation.index.left"/>
 	</template>
 </overlay>

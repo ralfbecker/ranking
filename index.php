@@ -34,7 +34,6 @@ if (substr($view, 0, 10) === 'ranking.ui' && $view !== 'ranking.uiranking.index'
 
 // urls which still need to run in iframe (NOT top-level)
 if (in_array($view, array(
-	'ranking.ranking_federation_ui.index',
 	'ranking.uiranking.index',
 	'ranking.ranking_accounting.index',
 )))

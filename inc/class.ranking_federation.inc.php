@@ -7,14 +7,15 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2008-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * Federation object
  */
-class ranking_federation extends so_sql
+class ranking_federation extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 	const APPLICATION = 'ranking';
@@ -50,7 +51,7 @@ class ranking_federation extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = $GLOBALS['egw']->translation->charset();
+		$this->charset = Api\Translation::charset();
 	}
 
 	/**
@@ -66,7 +67,7 @@ class ranking_federation extends so_sql
 		}
 		if (isset($data['fed_url']) && $data['fed_url'] && substr($data['fed_url'],0,4) != 'http')
 		{
-			$data['fed_url'] = 'http://'.$data['fed_url'];
+			$data['fed_url'] = 'https://'.$data['fed_url'];
 		}
 		return parent::data2db($data);
 	}
@@ -107,6 +108,26 @@ class ranking_federation extends so_sql
 			$feds[$fed['fed_id']] = (!$nation ? $fed['nation'].': ' : '').$fed[$show];
 		}
 		return $feds;
+	}
+
+	/**
+	 * reads row matched by key and puts all cols in the data array
+	 *
+	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key
+	 * @param string|array $extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $join ='' sql to do a join, added as is after the table-name, eg. ", table2 WHERE x=y" or
+	 * @return array|boolean data if row could be retrived else False
+	 */
+	function read($keys, $extra_cols='', $join='')
+	{
+		if (!is_array($extra_cols))
+		{
+			$extra_cols = empty($extra_cols) ? array() : explode(',', $extra_cols);
+		}
+		$extra_cols[] = self::FEDERATION_ATHLETES.' AS num_athletes';
+		$extra_cols[] = self::FEDERATION_CHILDREN.' AS num_children';
+
+		return parent::read($keys, $extra_cols, $join);
 	}
 
 	/**
@@ -284,10 +305,10 @@ class ranking_federation extends so_sql
 	 * @var array
 	 */
 	static $grant_types = array(
-		'athletes' => EGW_ACL_ATHLETE,	// edit athletes
-		'register' => EGW_ACL_REGISTER,	// register athletes for national competitions
-		'edit' => EGW_ACL_EDIT,		// edit competitions
-		'read' => EGW_ACL_READ,		// read competitions
+		'athletes' => ranking_bo::ACL_ATHLETE,	// edit athletes
+		'register' => ranking_bo::ACL_REGISTER,	// register athletes for national competitions
+		'edit' => ranking_bo::ACL_EDIT,		// edit competitions
+		'read' => ranking_bo::ACL_READ,		// read competitions
 	);
 
 	/**
@@ -443,7 +464,7 @@ class ranking_federation extends so_sql
 		static $comp_feds = null;
 		//echo "<p>get_competition_federations($nation,".array2string($register_rights).")</p>\n";
 		if ($nation == 'NULL') $nation = null;
-		if (is_null($comp_feds) && !($comp_feds = $GLOBALS['egw']->session->appsession('comp_feds','ranking'))) $comp_feds = array();
+		if (is_null($comp_feds) && !($comp_feds = Api\Cache::getSession('ranking', 'comp_feds'))) $comp_feds = array();
 
 		if (!isset($comp_feds[(string)$nation]))
 		{
@@ -466,7 +487,7 @@ class ranking_federation extends so_sql
 			}
 			// store result in cache and cache in session, to not query it again from DB
 			$comp_feds[(string)$nation] = $feds;
-			$GLOBALS['egw']->session->appsession('comp_feds','ranking',$comp_feds);
+			Api\Cache::setSession('ranking', 'comp_feds', $comp_feds);
 		}
 		else
 		{
@@ -476,7 +497,7 @@ class ranking_federation extends so_sql
 		{
 			foreach($this->get_user_grants() as $fed_id => $rights)
 			{
-				if ($rights & EGW_ACL_REGISTER)
+				if ($rights & ranking_bo::ACL_REGISTER)
 				{
 					$register_rights[$fed_id] = $fed_id;
 				}

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
+<overlay>
+	<template id="ranking.federation.edit" template="" lang="" group="0" version="1.9.001">
+		<grid width="100%">
+			<columns>
+				<column width="150"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<description value="Nation" for="nation"/>
+					<hbox>
+						<textbox id="nation" onchange="1" size="5" maxlength="3" class="inputRequired marginRight"/>
+						<textbox id="fed_nationname" size="60" maxlength="80"/>
+						<select id="fed_continent" label="Continent" empty_label="Select one" align="right"/>
+					</hbox>
+				</row>
+				<row class="row">
+					<description value="Name"/>
+					<textbox id="verband" maxlength="80" class="inputRequired et2_fullWidth"/>
+				</row>
+				<row class="row">
+					<description value="Shortcut"/>
+					<textbox id="fed_shortcut" size="20" maxlength="20"/>
+				</row>
+				<row class="row">
+					<description value="Website" for="fed_url"/>
+					<textbox id="fed_url" maxlength="128" class="et2_fullWidth"/>
+				</row>
+				<row class="row">
+					<description value="Parent federation" for="fed_parent"/>
+					<select id="fed_parent" empty_lable="None" class="et2_fullWidth"/>
+				</row>
+				<row class="row">
+					<description value="Since" for="fed_since"/>
+					<hbox>
+						<textbox type="integer" id="fed_since" class="marginRight"/>
+						<select id="fed_parent_since" empty_label="None"/>
+					</hbox>
+				</row>
+				<row class="th" height="20px" valign="bottom">
+					<description/>
+					<description value="Rechte"/>
+				</row>
+				<row class="row">
+					<description value="Edit athlete" for="grants[athletes]"/>
+					<taglist-account id="grants[athletes]" options="both"/>
+				</row>
+				<row class="row">
+					<description value="Registration" for="grants[register]"/>
+					<taglist-account id="grants[register]" options="both"/>
+				</row>
+				<row class="row">
+					<description value="Edit compeitition" for="grants[edit]"/>
+					<taglist-account id="grants[edit]" options="both"/>
+				</row>
+				<row class="row">
+					<description value="Read competition" for="grants[read]"/>
+					<taglist-account id="grants[read]" options="both"/>
+				</row>
+				<row class="dialogFooterToolbar">
+					<hbox>
+						<button label="Save" id="button[save]"/>
+						<button label="Apply" id="button[apply]"/>
+						<button label="Cancel" id="button[cancel]" onclick="window.close();"/>
+						<button align="right" label="Delete" id="button[delete]"
+							onclick="et2_dialog.confirm(widget,'Delete this entry','Delete');"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
