@@ -1244,6 +1244,13 @@ class ranking_athlete extends Api\Storage\Base
 		unset($extra_where);	// not used, but required by function signature
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
 
+		// we need to get the old values to update the links in customfields and for the tracking
+		if ($this->data['PerId'])
+		{
+			$current = $this->data;
+			$old = $this->read($this->data['PerId'], false);
+			$this->data = $current;
+		}
 		// get fed_id from national federation, if fed_id is not given but nation
 		if (!$this->data['fed_id'] && $this->data['nation'] &&
 			($feds = $this->federations($this->data['nation'],true)))
@@ -1256,6 +1263,15 @@ class ranking_athlete extends Api\Storage\Base
 		if (!($err = parent::save()) && $this->data['fed_id'])
 		{
 			$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']);
+
+			// send email notifications and do the history logging
+			if (!is_object($this->tracking))
+			{
+				$this->tracking = new ranking_tracking($this);
+			}
+
+			$this->tracking->track($this->data,$old);
+
 		}
 		return $err;
 	}

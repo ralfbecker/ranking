@@ -963,6 +963,12 @@ Continuer';
 			),
 		);
 
+		$prefs =& $GLOBALS['egw_info']['user']['preferences']['ranking'];
+		$actions['documents'] = ranking_merge::document_action(
+			$prefs['document_dir'], ++$group, 'Insert in document', 'document_',
+			$prefs['default_document']
+		);
+
 		return $actions;
 	}
 

@@ -61,6 +61,7 @@ class ranking_hooks
 				'link'   => 'https://github.com/ralfbecker/ranking/commits/master',
 				'target' => 'changelog',
 			);
+			$docs['Placeholders'] = Egw::link('/index.php','menuaction=ranking.ranking_merge.show_replacements');
 			display_sidebox($appname, lang('Documentation'), $docs);
 
 			$file = array();
@@ -142,7 +143,7 @@ class ranking_hooks
 			$ranking_views[preg_replace('/^.*menuaction=([^&]+).*/', '$1', $url)] = $label;
 		}
 
-		return array(
+		$settings = array(
 			'default_view' => array(
 				'type'   => 'select',
 				'label'  => 'Default ranking view',
@@ -153,6 +154,45 @@ class ranking_hooks
 				'admin'  => False,
 			),
 		);
+		$settings[] = array(
+			'type'  => 'section',
+			'title' => lang('Data exchange settings'),
+			'no_lang'=> true,
+			'xmlrpc' => False,
+			'admin'  => False
+		);
+
+		// Merge print
+		if ($GLOBALS['egw_info']['user']['apps']['filemanager'])
+		{
+			$settings['default_document'] = array(
+				'type'   => 'vfs_file',
+				'size'   => 60,
+				'label'  => 'Default document to insert entries',
+				'name'   => 'default_document',
+				'help'   => lang('If you specify a document (full vfs path) here, %1 displays an extra document icon for each entry. That icon allows to download the specified document with the data inserted.',lang('infolog')).' '.
+					lang('The document can contain placeholder like {{%1}}, to be replaced with the data.','info_subject').' '.
+					lang('The following document-types are supported:').implode(', ', ranking_merge::get_file_extensions()),
+				'run_lang' => false,
+				'xmlrpc' => True,
+				'admin'  => False,
+			);
+			$settings['document_dir'] = array(
+				'type'   => 'vfs_dirs',
+				'size'   => 60,
+				'label'  => 'Directory with documents to insert entries',
+				'name'   => 'document_dir',
+				'help'   => lang('If you specify a directory (full vfs path) here, %1 displays an action for each document. That action allows to download the specified document with the data inserted.',lang('ranking')).' '.
+					lang('The document can contain placeholder like {{%1}}, to be replaced with the data.','nachname').' '.
+					lang('The following document-types are supported:').implode(', ', ranking_merge::get_file_extensions()),
+				'run_lang' => false,
+				'xmlrpc' => True,
+				'admin'  => False,
+				'default' => '/templates/ranking',
+			);
+		}
+
+		return $settings;
 	}
 
 	/**
