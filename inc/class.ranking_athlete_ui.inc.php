@@ -108,11 +108,6 @@ class ranking_athlete_ui extends ranking_bo
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
-		// selfservice needs old idots mobile support currently, so disable new 16.1 mobile support
-		if ($this->is_selfservice())
-		{
-			$GLOBALS['egw_info']['flags']['deny_mobile'] = true;
-		}
 		if ($_GET['rkey'] || $_GET['PerId'])
 		{
 			if (!in_array($license_nation = strip_tags($_GET['license_nation']),$this->license_nations))
@@ -554,7 +549,7 @@ Continuer';
 			'nation' => !!$this->only_nation_athlete,
 			'pw_mail'=> !$content['email'],
 			// show apply license only if status is 'n' or 'a' AND user has right to apply for license
-			'apply_license' => in_array($content['license'],array('s','c')) ||
+			'button[apply_license]' => in_array($content['license'],array('s','c')) ||
 				!$this->acl_check_athlete($this->athlete->data,self::ACL_ATHLETE,null,$content['license_nation']),
 			// to simply set the license field, you need athlete rights for the nation of the license
 			'license'=> !$this->acl_check($content['license_nation'],self::ACL_ATHLETE,null,false,null,true),	// true=no judge rights
@@ -584,7 +579,7 @@ Continuer';
 				$readonlys[$name] = true;
 			}
 			$readonlys['acl_fed_id[fed_id]'] = $readonlys['foto'] = $readonlys['foto2'] =
-				$readonlys['delete'] = $readonlys['save'] = $readonlys['apply'] = true;
+				$readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] = true;
 		}
 		else
 		{
@@ -621,6 +616,17 @@ Continuer';
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$tmpl = new Api\Etemplate('ranking.athlete.edit');
+		// selfservice needs old idots mobile support currently, so disable new 16.1 mobile support
+		if ($this->is_selfservice())
+		{
+			$GLOBALS['egw_info']['flags']['deny_mobile'] = true;
+
+			// need everything (eg. images), as we have no main-window running
+			$GLOBALS['egw_info']['flags']['js_link_registry'] = true;
+
+			// for self-service, do NOT close the window, but submit the form, which redirects back to athlete.php
+			Api\Etemplate::setElementAttribute('button[cancel]', 'onclick', 'return true;');	// '' does NOT work
+		}
 		$tmpl->exec('ranking.ranking_athlete_ui.edit',$content,
 			$sel_options,$readonlys,array(
 				'athlete_data' => $this->athlete->data,
