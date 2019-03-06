@@ -613,6 +613,7 @@ Continuer';
 				// 'til we have some kind of review mechanism
 				$readonlys['tabs']['pictures'] = true;
 			}
+			$this->setup_history($content, $sel_options, $readonlys);
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
 		$tmpl = new Api\Etemplate('ranking.athlete.edit');
@@ -1099,5 +1100,52 @@ Continuer';
 		Api\Header\Content::type($file,'text/rtf');
 		echo str_replace(array_keys($replace),array_values($replace),$form);
 		exit();
+	}
+
+	protected function setup_history(&$content, &$sel_options, &$readonlys)
+	{
+		if (!$content['PerId'])
+		{
+			$readonlys['tabs']['history'] = true;
+			return;
+		}
+
+		$content['history'] = array(
+			'id'  => $content['PerId'],
+			'app' => 'ranking',
+			'status-widgets' => array(
+				'sex' => $this->genders,
+				'tel' => 'url-phone',
+				'fax' => 'url-phone',
+				'geb_date' => 'date',
+				'email' => 'url-email',
+				'homepage' => 'url',
+				'mobil' => 'url-phone',
+				'acl' => 'acl',
+				'freetext' => 'freetext',
+				'modified' => 'modified',
+				'modifier' => 'modifier',
+				'password' => 'password',
+				'recover_pw_hash' => 'recover_pw_hash',
+				'recover_pw_time' => 'recover_pw_time',
+				'last_login' => 'last_login',
+				'login_failed' => 'login_failed',
+				'facebook' => 'facebook',
+				'twitter' => 'twitter',
+				'instagram' => 'instagram',
+				'youtube' => 'youtube',
+				'video_iframe' => 'video_iframe',
+				'consent_time' => 'consent_time',
+				'consent_ip' => 'consent_ip',
+			),
+		);
+		$history_stati = array();
+		$tracking = new ranking_tracking($this);
+		foreach($tracking->field2history as $field => $history)
+		{
+			$history_stati[$history] = $tracking->field2label[$field];
+		}
+		unset($tracking);
+		$sel_options['status'] = $history_stati;
 	}
 }

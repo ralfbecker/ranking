@@ -201,6 +201,9 @@
 			</rows>
 		</grid>
 	</template>
+	<template id="ranking.athlete.edit.history" template="" lang="" group="0" version="1.9.003">
+		<historylog id="history" width="100%"/>
+	</template>
 	<template id="ranking.athlete.edit" template="" lang="" group="0" version="1.9.003">
 		<grid width="100%">
 			<columns>
@@ -255,6 +258,7 @@
 							<tab id="other" label="Access" statustext="access control, key"/>
 							<tab id="pictures" label="Picture" statustext="Picture"/>
 							<tab id="results" label="Results" statustext="Competition results"/>
+							<tab id="history" label="History" statustext="Change history"/>
 						</tabs>
 						<tabpanels>
 							<template id="ranking.athlete.edit.contact"/>
@@ -264,6 +268,7 @@
 							<template id="ranking.athlete.edit.other"/>
 							<template id="ranking.athlete.edit.pictures"/>
 							<template id="ranking.athlete.edit.results"/>
+							<template id="ranking.athlete.edit.history"/>
 						</tabpanels>
 					</tabbox>
 				</row>

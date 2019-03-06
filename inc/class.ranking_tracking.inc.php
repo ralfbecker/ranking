@@ -97,28 +97,28 @@ class ranking_tracking extends Api\Storage\Tracking
 	 * @var array
 	 */
 	var $field2label = array(
-		'PerId' => 'PerId',
-		'rkey' => 'rkey',
-		'nachname' => 'nachname',
-		'vorname' => 'vorname',
-		'sex' => 'sex',
-		'strasse' => 'strasse',
-		'plz' => 'plz',
-		'ort' => 'ort',
-		'tel' => 'tel',
-		'fax' => 'fax',
-		'geb_ort' => 'geb_ort',
-		'geb_date' => 'geb_date',
-		'practice' => 'practice',
-		'groesse' => 'groesse',
-		'gewicht' => 'gewicht',
-		'lizenz' => 'lizenz',
-		'kader' => 'kader',
-		'anrede' => 'anrede',
-		'bemerkung' => 'bemerkung',
+		'PerId' => 'Athlete ID',
+		'rkey' => 'Key',
+		'nachname' => 'Last name',
+		'vorname' => 'First name',
+		'sex' => 'Gender',
+		'strasse' => 'Street',
+		'plz' => 'Postalcode',
+		'ort' => 'City',
+		'tel' => 'Phone',
+		'fax' => 'Fax',
+		'geb_ort' => 'Place of birth',
+		'geb_date' => 'Birthdate',
+		'practice' => 'climbing since (years)',
+		'groesse' => 'Height (cm)',
+		'gewicht' => 'Weight (kg)',
+		'lizenz' => 'License number',
+		'kader' => 'Squad',
+		'anrede' => 'Title',
+		'bemerkung' => 'Notice',
 		'hobby' => 'hobby',
 		'sport' => 'sport',
-		'profi' => 'profi',
+		'profi' => 'Professional',
 		'email' => 'email',
 		'homepage' => 'homepage',
 		'mobil' => 'mobil',
@@ -139,7 +139,7 @@ class ranking_tracking extends Api\Storage\Tracking
 		'consent_time' => 'consent_time',
 		'consent_ip' => 'consent_ip',
 		// custom fields
-		'custom'             => 'custom fields'
+		//'custom'             => 'custom fields'
 	);
 
 	/**
