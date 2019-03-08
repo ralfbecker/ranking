@@ -405,7 +405,8 @@ class ranking_athlete_ui extends ranking_bo
 							// download form
 							if (file_exists($this->license_form_name($content['license_nation'],$content['license_year'])) && !$required_missing)
 							{
-								$this->licenseform($content['license_nation'], $content['license_year'], $content['license_cat']);
+								$this->licenseform($content['license_nation'], $content['license_year'],
+									$content['license_cat'], $this->athlete->data['PerId']);
 							}
 						}
 						// change of license status, requires athlete rights for the license-nation
@@ -1073,16 +1074,16 @@ Continuer';
 	 * @param string $nation =null
 	 * @param int $year =null defaults to $this->license_year
 	 * @param int $GrpId =null category to apply for
-	 * @param array $keys =null
+	 * @param int $PerId =null PerId
 	 */
-	function licenseform($nation=null,$year=null,$GrpId=null,array $keys=null)
+	function licenseform($nation=null, $year=null, $GrpId=null, $PerId=null)
 	{
 		if (is_null($year)) $year = $_GET['license_year'] ? $_GET['license_year'] : $this->license_year;
 		if (is_null($nation) && $_GET['license_nation']) $nation = $_GET['license_nation'];
 		if (is_null($GrpId) && $_GET['license_cat']) $GrpId = $_GET['license_cat'];
-		if (is_null($keys)) $keys = $_GET;
+		if (is_null($PerId)) $PerId = $_GET['PerId'];
 
-		if (!$this->athlete->read($_GET) ||
+		if (!$this->athlete->read($PerId) ||
 			!($form = file_get_contents($this->license_form_name($nation,$year,$GrpId))))
 		{
 			header('HTTP/1.1 204 No Content');
@@ -1096,7 +1097,7 @@ Continuer';
 			// the rtf seems to use iso-8859-1
 			$replace['$$'.$name.'$$'] = $value = Api\Translation::convert($value,$egw_charset,'iso-8859-1');
 		}
-		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.txt';//'.rtf';
+		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
 		Api\Header\Content::type($file,'text/rtf');
 		echo str_replace(array_keys($replace),array_values($replace),$form);
 		exit();
