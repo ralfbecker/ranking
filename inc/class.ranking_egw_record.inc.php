@@ -1,6 +1,6 @@
 <?php
 /**
- * eGroupWare - Ranking - importexport
+ * EGroupware - Ranking - importexport
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
@@ -24,8 +24,7 @@ class ranking_egw_record implements importexport_iface_egw_record
 
 	// Used in conversions
 	static $types = array(
-		'select' => array('nation', 'license_nation', 'sex', 'license', 'acl', 'custom_acl', 'fed_id'),
-		'select-cat' => array('license_cat'),
+		'select' => array('nation', 'license_nation', 'sex', 'license', 'acl', 'custom_acl', 'fed_id', 'license_cat'),
 		'select-account' => array('modifier'),
 		'date-time' => array(
 			'modified',
@@ -43,10 +42,14 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 * @param string $_identifier
 	 */
-	public function __construct( $_identifier='' ){
+	public function __construct( $_identifier='' )
+	{
 		$this->identifier = $_identifier;
+
 		if(self::$bo == null) self::$bo = ranking_bo::getInstance()->athlete;
-		if($_identifier) {
+
+		if($_identifier)
+		{
 			$rec = self::$bo->read($this->identifier);
 			if (is_array($rec)) $this->set_record($rec);
 		}
@@ -57,7 +60,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 * @param string $_attribute_name
 	 */
-	public function __get($_attribute_name) {
+	public function __get($_attribute_name)
+	{
 		return $this->record[$_attribute_name];
 	}
 
@@ -67,7 +71,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 * @param string $_attribute_name
 	 * @param data $data
 	 */
-	public function __set($_attribute_name, $data) {
+	public function __set($_attribute_name, $data)
+	{
 		$this->record[$_attribute_name] = $data;
 	}
 
@@ -79,7 +84,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 * @return array complete record as associative array
 	 */
-	public function get_record_array() {
+	public function get_record_array()
+	{
 		return $this->record;
 	}
 
@@ -88,7 +94,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 *@return string tiltle
 	 */
-	public function get_title() {
+	public function get_title()
+	{
 		return self::$bo->link_title($this->record);
 	}
 
@@ -97,7 +104,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 * @return void
 	 */
-	public function set_record(array $_record){
+	public function set_record(array $_record)
+	{
 		$this->record = $_record;
 	}
 
@@ -106,7 +114,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 * @return string identifier of current record
 	 */
-	public function get_identifier() {
+	public function get_identifier()
+	{
 		return $this->identifier;
 	}
 
@@ -116,8 +125,9 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 * @return string Full URL of an icon, or appname/icon_name
 	 */
-	public function get_icon() {
-		return 'infolog/navbar';
+	public function get_icon()
+	{
+		return 'ranking/navbar';
 	}
 
 	/**
@@ -125,7 +135,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 *
 	 * @return string identifier
 	 */
-	public function save ( $_dst_identifier ) {
+	public function save ( $_dst_identifier )
+	{
 		$data = $this->record;
 		if ($_dst_identifier)
 		{
@@ -140,8 +151,9 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 * @param string $_dst_identifier
 	 * @return string dst_identifier
 	 */
-	public function copy ( $_dst_identifier ) {
-
+	public function copy ( $_dst_identifier )
+	{
+		unset($_dst_identifier);	// not used, but required by function signature
 	}
 
 	/**
@@ -151,15 +163,17 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 * @param string $_dst_identifier
 	 * @return string dst_identifier
 	 */
-	public function move ( $_dst_identifier ) {
-
+	public function move ( $_dst_identifier )
+	{
+		unset($_dst_identifier);	// not used, but required by function signature
 	}
 
 	/**
 	 * delets current record from backend
 	 *
 	 */
-	public function delete () {
+	public function delete ()
+	{
 
 	}
 
@@ -167,8 +181,8 @@ class ranking_egw_record implements importexport_iface_egw_record
 	 * destructor
 	 *
 	 */
-	public function __destruct() {
-	}
+	public function __destruct()
+	{
 
-} // end of egw_addressbook_record
-?>
+	}
+}

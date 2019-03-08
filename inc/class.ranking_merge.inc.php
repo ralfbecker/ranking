@@ -7,13 +7,12 @@
  * @author Ralf Becker <RalfBecker-AT-outdoor-training.de>
  * @author Nathan Gray
  * @package ranking
- * @copyright (c) 2007-16 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
+ * @copyright (c) 2007-19 by Ralf Becker <RalfBecker-AT-outdoor-training.de>
  * @copyright 2011-19 Nathan Gray
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  */
 
 use EGroupware\Api;
-use EGroupware\Api\Link;
 
 /**
  * Document merge object for athletes
@@ -57,7 +56,7 @@ class ranking_merge extends Api\Storage\Merge
 		$this->bo = ranking_bo::getInstance();
 
 		$this->date_fields += ranking_egw_record::$types['date-time'] +
-				ranking_egw_record::$types['date'] + array('last_comp');
+			ranking_egw_record::$types['date'] + array('last_comp');
 
 		$this->selects = array(
 			'nation' => $this->bo->athlete->distinct_list('nation'),
@@ -65,15 +64,12 @@ class ranking_merge extends Api\Storage\Merge
 			'acl'    => ranking_athlete_ui::$acl_labels,
 			'custom_acl' => ranking_athlete_ui::$acl_deny_labels,
 			'license'=> $this->bo->license_labels,
-			'fed_id' => $this->bo->athlete->federations($content['nation'],false,array()),
+			'fed_id' => $this->bo->athlete->federations(null, false, []),
 			'license_nation' => $this->bo->license_nations,
-			'license_cat' => $this->bo->cats->names(array(
-				'sex' => $content['sex'] ? ($content['sex']=='male'?'!female':'!male') : null,
-				'nation' => $content['license_nation'] != 'NULL' ? $content['license_nation'] : null,
-			),0),
+			'license_cat' => $this->bo->cats->names([], 0),
 		);
 
-		// switch of handling of Api\Html formated content, if Api\Html is not used
+		// switch off handling of Api\Html formated content, if Api\Html is not used
 		$this->parse_html_styles = Api\Storage\Customfields::use_html('ranking');
 	}
 
@@ -100,7 +96,7 @@ class ranking_merge extends Api\Storage\Merge
 	 * @param string $prefix='' prefix like eg. 'erole'
 	 * @return array|boolean
 	 */
-	public function athlete_replacements($id,$prefix='', &$content = '')
+	public function athlete_replacements($id, $prefix='', &$content = '')
 	{
 		$record = new ranking_egw_record($id);
 		$entry = array();
@@ -163,7 +159,7 @@ class ranking_merge extends Api\Storage\Merge
 		{
 			$entry+=$this->get_app_replacements($array['info_link']['app'], $array['info_link']['id'], $content, 'info_contact');
 		}
-		 * 
+		 *
 		 */
 
 

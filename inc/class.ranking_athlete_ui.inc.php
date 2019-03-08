@@ -403,7 +403,7 @@ class ranking_athlete_ui extends ranking_bo
 									lang('international') : $content['license_nation']));
 							}
 							// download form
-							if (file_exists($this->license_form_name($content['license_nation'],$content['license_year'])) && !$required_missing)
+							if (!$required_missing && $this->license_form_name($content['license_nation'], $content['license_year']))
 							{
 								$this->licenseform($content['license_nation'], $content['license_year'],
 									$content['license_cat'], $this->athlete->data['PerId']);
@@ -1042,30 +1042,62 @@ Continuer';
 	}
 
 	/**
+	 * Supported extensions for merge of athlete-license-form
+	 *
+	 * @var array[string]
+	 */
+	protected static $merge_extensions = ['.odt', '.docx', '.rtf'];
+
+	/**
+	 * Checks if a file with a supported extension for merge exists
+	 *
+	 * @param string $path without extension
+	 * @param string|array $extensions =null default all allowed self::$merge_extensions
+	 * @param string& $ext =null on return: extension for returned path
+	 * @return full path incl. extension or null
+	 */
+	static function merge_file_exists($path, $extensions=null, &$ext=null)
+	{
+		foreach($extensions ? (array)$extensions : self::$merge_extensions as $ext)
+		{
+			if (file_exists($path.$ext)) return $path.$ext;
+		}
+		return null;
+	}
+
+	/**
 	 * Get the name of the license form, depending on nation and year
 	 *
 	 * Licenseforms are in PDF directory under following names:
-	 * - $year/license_$year$nation_$catrkey.rtf (highest priority)
-	 * - $year/license_$year$nation.rtf
+	 * - $year/license_$year$nation_$catrkey.(odt|docx|rtf) (highest priority)
+	 * - $year/license_$year$nation_youth.(odt|docx|rtf) (only for youth cats!)
+	 * - $year/license_$year$nation.(odt|docx|rtf)
 	 *
 	 * @param string $nation =null
 	 * @param int $year =null defaults to $this->license_year
 	 * @param int $GrpId =null category to apply for
-	 * @return string path on server
+	 * @param string|array $extensions =null default all allowed self::$merge_extensions
+	 * @param boolean $vfs_prefix =true return Vfs::PREFIX, default yes
+	 * @param string& $ext =null on return: extension for returned path
+	 * @return string|null full path on server or null if none found
 	 */
-	function license_form_name($nation=null, $year=null, $GrpId=null)
+	function license_form_name($nation=null, $year=null, $GrpId=null, $extensions=null, $vfs_prefix=true, &$ext=null)
 	{
 		if (is_null($year)) $year = $this->license_year;
 		if ($nation == 'NULL') $nation = null;
 
 		$base = Vfs::PREFIX.$this->comp->vfs_pdf_dir;
 
+		$from_year = $to_year = 0;
 		if (!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
-			!file_exists($file = $base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'].'.rtf'))
+			!self::merge_file_exists($file = $base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'], $extensions, $ext) ||
+			$this->cats->age_group($cat, $year, $from_year, $to_year) && $to_year &&
+				!self::merge_file_exists($file = $base.'/'.$year.'/license_'.$year.$nation.'_youth', $extensions, $ext))
 		{
-			$file = $base.'/'.$year.'/license_'.$year.$nation.'.rtf';
+			$file = self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation, $extensions, $ext);
 		}
-		return $file;
+		//error_log(__METHOD__."('$nation', $year, $GrpId, ".array2string($extensions).') ext=$ext, returning '.array2string($file));
+		return $vfs_prefix ? $file : substr($file, strlen(Vfs::PREFIX));
 	}
 
 	/**
@@ -1083,23 +1115,18 @@ Continuer';
 		if (is_null($GrpId) && $_GET['license_cat']) $GrpId = $_GET['license_cat'];
 		if (is_null($PerId)) $PerId = $_GET['PerId'];
 
-		if (!$this->athlete->read($PerId) ||
-			!($form = file_get_contents($this->license_form_name($nation,$year,$GrpId))))
+		$ext = null;
+		if ($this->athlete->read($PerId) &&
+			($vfs_path = $this->license_form_name($nation, $year, $GrpId, null, false, $ext)))
 		{
-			header('HTTP/1.1 204 No Content');
-			exit();
+			$merge = new ranking_merge();
+			$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.
+				$this->athlete->data['nachname'].$ext;
+			// does NOT return, unless there is an error
+			$err = $merge->download($vfs_path, $this->athlete->data['PerId'], $file);
 		}
-		$egw_charset = Api\Translation::charset();
-		$replace = array();
-		foreach($this->athlete->data as $name => $value)
-		{
-			if (is_array($value)) continue;
-			// the rtf seems to use iso-8859-1
-			$replace['$$'.$name.'$$'] = $value = Api\Translation::convert($value,$egw_charset,'iso-8859-1');
-		}
-		$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.$this->athlete->data['nachname'].'.rtf';
-		Api\Header\Content::type($file,'text/rtf');
-		echo str_replace(array_keys($replace),array_values($replace),$form);
+		header('HTTP/1.1 204 No Content');
+		error_log(__METHOD__."('$nation', $year, $GrpId, $PerId) vfs_path=$vfs_path, merge-error: $err");
 		exit();
 	}
 
