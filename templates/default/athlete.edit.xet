@@ -112,7 +112,7 @@
 		</grid>
 	</template>
 	<template id="ranking.athlete.edit.freetext" template="" lang="" group="0" version="1.9.001">
-		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="200px" width="100%" expand_toolbar="true"/>
+		<htmlarea statustext="This text will be shown in the profil on the website." id="freetext" mode="extended" height="240px" width="100%" expand_toolbar="true"/>
 	</template>
 	<template id="ranking.athlete.edit.other" template="" lang="" group="0" version="1.3.001">
 		<grid width="100%" height="210">
@@ -249,7 +249,7 @@
 					<select id="acl_fed_id[fed_id]" options="Administrated by: parent federation" class="selectboxFullWidth" span="all"/>
 				</row>
 				<row>
-					<tabbox id="tabs" span="all">
+					<tabbox id="tabs" span="all" tab_height="250px">
 						<tabs>
 							<tab id="contact" label="Contact" statustext="telephone, email, city, ..."/>
 							<tab id="profile" label="Profile" statustext="Weight, size, hobbies, ..."/>
