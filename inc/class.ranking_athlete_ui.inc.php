@@ -1090,9 +1090,9 @@ Continuer';
 
 		$from_year = $to_year = 0;
 		if (!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
-			!self::merge_file_exists($file = $base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'], $extensions, $ext) ||
+			!($file=self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'], $extensions, $ext)) ||
 			$this->cats->age_group($cat, $year, $from_year, $to_year) && $to_year &&
-				!self::merge_file_exists($file = $base.'/'.$year.'/license_'.$year.$nation.'_youth', $extensions, $ext))
+				!($file=self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation.'_youth', $extensions, $ext)))
 		{
 			$file = self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation, $extensions, $ext);
 		}
