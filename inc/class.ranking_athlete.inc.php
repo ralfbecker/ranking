@@ -133,7 +133,7 @@ class ranking_athlete extends Api\Storage\Base
 	 * @var array
 	 */
 	static $social_links = array(
-		'homepage',
+		'homepage', 'video_iframe',
 	);
 
 	/**

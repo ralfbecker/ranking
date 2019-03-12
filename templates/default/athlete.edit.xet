@@ -90,19 +90,19 @@
 				</row>
 				<row class="row">
 					<description value="Facebook" for="facebook"/>
-					<url id="facebook" options="64,64"/>
+					<textbox id="facebook" options="64,64"/>
 				</row>
 				<row class="row">
 					<description value="Twitter" for="twitter"/>
-					<url id="twitter" options="64,64"/>
+					<textbox id="twitter" options="64,64"/>
 				</row>
 				<row class="row">
 					<description value="Instagram" for="instagram"/>
-					<url id="instagram" options="64,64" span="all"/>
+					<textbox id="instagram" options="64,64" span="all"/>
 				</row>
 				<row class="row">
 					<description value="YouTube" for="youtube"/>
-					<url id="youtube" options="64,64" span="all"/>
+					<textbox id="youtube" options="64,64" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Video iframe" for="video_iframe"/>
