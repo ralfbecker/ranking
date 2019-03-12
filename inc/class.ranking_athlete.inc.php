@@ -1255,7 +1255,7 @@ class ranking_athlete extends Api\Storage\Base
 		if (!$this->data['fed_id'] && $this->data['nation'] &&
 			($feds = $this->federations($this->data['nation'],true)))
 		{
-			list($this->data['fed_id']) = each($feds);
+			$this->data['fed_id'] = key($feds);
 		}
 		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 		$this->data['modified'] = $this->now;

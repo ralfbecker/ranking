@@ -492,7 +492,7 @@ class ranking_registration_ui extends ranking_bo
 		}
 		else
 		{
-			list($calendar) = each($this->ranking_nations);
+			$calendar = key($this->ranking_nations);
 		}
 		if (!isset($nation))
 		{
@@ -753,7 +753,7 @@ class ranking_registration_ui extends ranking_bo
 		}
 		else
 		{
-			list($calendar) = each($this->ranking_nations);
+			$calendar = key($this->ranking_nations);
 		}
 		if ($comp && $cat && (!($cat = $this->cats->read($cat)) || !in_array($cat['rkey'],$comp['gruppen'])))
 		{

@@ -54,6 +54,9 @@ button.small {
 .rightPad5 {
   padding-right: 5px;
 }
+.marginRight {
+  margin-right: 5px !important;
+}
 .height {
   text-align: right;
 }

@@ -1,15 +1,16 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - display user interface
+ * EGroupware digital ROCK Rankings - display user interface
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2007-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2007-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 class ranking_display_ui extends ranking_display_bo
 {
@@ -43,8 +44,9 @@ class ranking_display_ui extends ranking_display_bo
 
 			if (isset($_content['rows']['action']))
 			{
-				list($action,$data) = each($_content['rows']['action']);
-				list($frm_id) = each($data);
+				$action = key($_content['rows']['action']);
+				$data = current($_content['rows']['action']);
+				$frm_id = key($data);
 				//echo "<p>action='$action', frm_id=$frm_id</p>\n";
 				switch($action)
 				{
@@ -99,7 +101,7 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		elseif(!$this->display->check_access())
 		{
-			$this->popup_die();
+			Api\Framework::window_close(lang('Permission denied !!!'));
 		}
 		else
 		{
@@ -327,7 +329,7 @@ class ranking_display_ui extends ranking_display_bo
 			}
 			elseif(!$this->display->check_access())
 			{
-				$this->popup_die();
+				Api\Framework::window_close(lang('Permission denied !!!'));
 			}
 			else
 			{
@@ -347,7 +349,7 @@ class ranking_display_ui extends ranking_display_bo
 			unset($frm['button']);
 			$dsp_id = $frm['dsp_id'];
 
-			list($button) = each($content['button']);
+			$button = key($content['button']);
 
 			switch($button)
 			{
@@ -437,7 +439,7 @@ class ranking_display_ui extends ranking_display_bo
 	 */
 	function display($_content=null)
 	{
-		if (!$GLOBALS['egw_info']['user']['apps']['admin']) $this->popup_die();
+		if (!$GLOBALS['egw_info']['user']['apps']['admin']) Api\Framework::window_close(lang('Permission denied !!!'));
 
 		if (!is_array($_content))
 		{
@@ -446,9 +448,9 @@ class ranking_display_ui extends ranking_display_bo
 				$msg = lang('Display #%1 not found!!!',$_GET['dsp_id']);
 			}
 		}
-		else
+		elseif (!empty($_content['button']))
 		{
-			list($button) = @each($_content['button']);
+			$button = key($_content['button']);
 			unset($_content['button']);
 
 			switch($button)
@@ -489,18 +491,5 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		$tpl = new etemplate('ranking.display.display');
 		$tpl->exec('ranking.ranking_display_ui.display',$content,$sel_options,array(),array('dsp_id'=>$this->display->dsp_id),2);
-	}
-
-	/**
-	 * Displays an alert with a message and closes the popup after the confirmation
-	 *
-	 * Does NOT return!
-	 *
-	 * @param string $msg ='Permission denied !!!'
-	 */
-	function popup_die($msg='Permission denied !!!')
-	{
-		echo "<html><head><script>\nalert('".addslashes(lang($msg))."'); window.close();\n</script></head></html>\n";
-		$GLOBALS['egw']->common->egw_exit();
 	}
 }

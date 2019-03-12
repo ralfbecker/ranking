@@ -1,20 +1,21 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - rls (rang-listen-systeme) storage object
+ * EGroupware digital ROCK Rankings - rls (rang-listen-systeme) storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-14 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * rls_system object, a rls defines how the ranking is calculated
  */
-class ranking_rls_system extends so_sql
+class ranking_rls_system extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 
@@ -27,13 +28,13 @@ class ranking_rls_system extends so_sql
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
-		$this->charset = translation::charset();
+		$this->charset = Api\Translation::charset();
 	}
 
 	/**
 	 * changes the data from the db-format to our work-format
 	 *
-	 * @param array $data=null if given works on that array and returns result, else works on internal data-array
+	 * @param array $data =null if given works on that array and returns result, else works on internal data-array
 	 */
 	function db2data($data=null)
 	{
@@ -43,7 +44,7 @@ class ranking_rls_system extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->source_charset);
 		}
 		return $data;
 	}
@@ -51,7 +52,7 @@ class ranking_rls_system extends so_sql
 	/**
 	 * changes the data from our work-format to the db-format
 	 *
-	 * @param array $data=null if given works on that array and returns result, else works on internal data-array
+	 * @param array $data =null if given works on that array and returns result, else works on internal data-array
 	 */
 	function data2db($data=null)
 	{
@@ -61,7 +62,7 @@ class ranking_rls_system extends so_sql
 		}
 		if (count($data) && $this->source_charset)
 		{
-			$data = $GLOBALS['egw']->translation->convert($data,$this->charset,$this->source_charset);
+			$data = Api\Translation::convert($data,$this->charset,$this->source_charset);
 		}
 		return $data;
 	}
@@ -79,7 +80,7 @@ class ranking_rls_system extends so_sql
 			return array();
 
 		$arr = array();
-		while (list($key,$data) = each($all))
+		foreach($all as $data)
 		{
 			$arr[$data['RlsId']] = $data['rkey'].': '.$data['name'];
 		}

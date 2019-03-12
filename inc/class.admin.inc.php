@@ -1,14 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - administration
+ * EGroupware digital ROCK Rankings - administration
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-8 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 /**
@@ -79,7 +78,7 @@ class admin
 
 			if ($content['save'] || $content['apply'] || $content['delete'])
 			{
-				list($delete) = @each($content['delete']);
+				$delete = !empty($content['delete']) ? key($content['delete']) : null;
 				// saving the content
 				foreach(array_merge($content['nations'],array('***new***')) as $n => $nation)
 				{
@@ -169,7 +168,7 @@ class admin
 		{
 			$nations = array_merge(array_intersect($nations,array_keys($rights)),array_diff($nations,array_keys($rights)));
 		}
-		$nations = $preserve['nations'] = array_values($nations);
+		if (true) $nations = $preserve['nations'] = array_values($nations);
 		$n = 1;
 		foreach($nations as $nation)
 		{

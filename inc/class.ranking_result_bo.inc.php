@@ -2335,10 +2335,10 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * For existing routes we only check the (read) permissions and read comp and cat.
 	 *
-	 * @param array &$content on call at least keys WetId, GrpId, route_order, on return initialised route
-	 * @param array &$comp on call competition array or null, on return competition array
-	 * @param array &$cat  on call category array or null, on return category array
-	 * @param string &$discipline on return discipline of route: 'lead', 'speed' or 'boulder'
+	 * @param array& $content on call at least keys WetId, GrpId, route_order, on return initialised route
+	 * @param array& $comp on call competition array or null, on return competition array
+	 * @param array& $cat on call category array or null, on return category array
+	 * @param string& $discipline on return discipline of route: 'lead', 'speed' or 'boulder'
 	 * @return boolean|string true on success, false if permission denied or string with message (eg. 'No quota set in previous heat!')
 	 */
 	function init_route(array &$content,&$comp,&$cat,&$discipline)

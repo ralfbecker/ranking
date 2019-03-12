@@ -207,7 +207,8 @@ class ranking_calculation
 			if (!$valid)	// no cats ==> use first valid
 			{
 				reset($valid_cats);
-				list($name, $valid) = each($valid_cats);
+				$name = key($valid_cats);
+				$valid = current($valid_cats);
 			}
 		}
 		foreach($valid as $key => $c)

@@ -43,7 +43,7 @@ class uiranking extends ranking_bo
 		$nation = $this->only_nation ? $this->only_nation : $_content['nation'];
 		if (!$nation)
 		{
-			list($nation) = each($this->ranking_nations);	// use the first nation
+			$nation = key($this->ranking_nations);	// use the first nation
 		}
 		if ($this->only_nation) $tmpl->set_cell_attribute('nation','readonly',true);
 
@@ -70,7 +70,7 @@ class uiranking extends ranking_bo
 		if (!$cat || $nation != ($cat['nation'] ? $cat['nation'] : 'NULL') ||
 			$cup && !in_array($cat['rkey'],$cup['gruppen']) && array_intersect($cat['mgroups'], $cup['gruppen']) != $cat['mgroups'])
 		{
-			list($cat) = each($select_options['cat']);	// use the first cat
+			$cat = key($select_options['cat']);	// use the first cat
 			if ($cat) $cat = $this->cats->read($cat);
 		}
 		// reset the stand, if nation or cup changed

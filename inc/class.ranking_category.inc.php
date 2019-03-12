@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -191,14 +191,23 @@ class ranking_category extends Api\Storage\Base
 		}
 		if ($this->cache)
 		{
-			switch (count($criteria)+count($filter))
+			switch ((int)!empty($criteria) + (int)!empty($filter))
 			{
 				case 0:
 					return $this->cache;
 
 				case 1:
 					$ret = false;
-					list($key,$val) = count($criteria) ? each($criteria) : each($filter);
+					if (is_array($criteria) && count($criteria))
+					{
+						$key = key($criteria);
+						$val = current($criteria);
+					}
+					else
+					{
+						$key = key($filter);
+						$val = current($filter);
+					}
 					foreach($this->cache as $cat)
 					{
 						if (is_array($val) && in_array($cat[$key],$val) ||
@@ -214,7 +223,7 @@ class ranking_category extends Api\Storage\Base
 
 		$ret =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
 
-		if (!$this->cache && count($criteria)+count($filter) == 0)
+		if (!$this->cache && empty($criteria) && empty($filter))
 		{
 			$this->cache =& $ret;
 		}
@@ -253,7 +262,8 @@ class ranking_category extends Api\Storage\Base
 		}
 		if (!$extra_cols && !$join && $this->cache && count($keys) == 1 && ($keys['GrpId'] || $keys['rkey']))
 		{
-			list($key,$val) = each($keys);
+			$key = key($keys);
+			$val = current($keys);
 			foreach($this->cache as $cat)
 			{
 				if ($cat[$key] == $val)

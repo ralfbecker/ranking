@@ -1,21 +1,22 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - pktsystem storage object
+ * EGroupware digital ROCK Rankings - pktsystem storage object
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2006-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
+
+use EGroupware\Api;
 
 /**
  * pktsystem object
  *
  */
-class ranking_pktsystem extends so_sql
+class ranking_pktsystem extends Api\Storage\Base
 {
 	var $pkte_table = 'PktSystemPkte';
 
@@ -38,10 +39,11 @@ class ranking_pktsystem extends so_sql
 		$all = $this->search(array(),False,'rkey');
 
 		if (!$all)
+		{
 			return array();
-
+		}
 		$arr = array();
-		while (list($key,$data) = each($all))
+		foreach($all as $data)
 		{
 			$arr[$data['PktId']] = $data['rkey'].': '.$data['name'];
 		}

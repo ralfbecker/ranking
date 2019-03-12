@@ -1,14 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - import UI
+ * EGroupware digital ROCK Rankings - import UI
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2008-14 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2008-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 class ranking_import extends ranking_result_bo
@@ -44,8 +43,8 @@ class ranking_import extends ranking_result_bo
 	/**
 	 * Import a csv file
 	 *
-	 * @param array $content=null
-	 * @param string $msg=''
+	 * @param array $content =null
+	 * @param string $msg =''
 	 */
 	function index($content=null,$msg='')
 	{
@@ -106,7 +105,7 @@ class ranking_import extends ranking_result_bo
 		}
 		else
 		{
-			list($calendar) = each($this->ranking_nations);
+			$calendar = key($this->ranking_nations);
 		}
 		if (!$comp || ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
 		{
@@ -134,7 +133,7 @@ class ranking_import extends ranking_result_bo
 
 		if($content['button'])
 		{
-			list($button) = @each($content['button']);
+			$button = key($content['button']);
 			unset($content['button']);
 			try {
 				switch($button)
@@ -265,10 +264,10 @@ class ranking_import extends ranking_result_bo
 	 * Handle the file upload
 	 *
 	 * @param string $fname
-	 * @param string $charset='iso-8859-1'
-	 * @param string $delimiter=','
-	 * @param string $nation=null nation to use if not set in imported data
-	 * @param string $sex=null gender to use if not set in imported data: 'male' or 'female'
+	 * @param string $charset ='iso-8859-1'
+	 * @param string $delimiter =','
+	 * @param string $nation =null nation to use if not set in imported data
+	 * @param string $sex =null gender to use if not set in imported data: 'male' or 'female'
 	 * @return string success message
 	 */
 	private function do_upload($fname,$charset,$delimiter,$nation=null,$sex=null)
@@ -303,9 +302,9 @@ class ranking_import extends ranking_result_bo
 	 * Import a csv file into an array
 	 *
 	 * @param string $fname name of uploaded file
-	 * @param string $charset='iso-8859-1' or eg. 'utf-8'
-	 * @param string $delimiter=','
-	 * @param string $enclosure='"'
+	 * @param string $charset ='iso-8859-1' or eg. 'utf-8'
+	 * @param string $delimiter =','
+	 * @param string $enclosure ='"'
 	 * @return array with lines and columns or string with error message
 	 */
 	private function csv_import($fname,$charset='iso-8859-1',$delimiter=',',$enclosure='"')
@@ -342,7 +341,7 @@ class ranking_import extends ranking_result_bo
 	 * detect the columns
 	 *
 	 * @param array $headers
-	 * @param int $first=1 number of first column
+	 * @param int $first =1 number of first column
 	 * @return array column number => name pairs
 	 */
 	private function detect_columns(array $headers,$first=1)
@@ -371,10 +370,10 @@ class ranking_import extends ranking_result_bo
 	 *
 	 * @param array &$import result in $import['athlete']
 	 * @param array $col2name column number => name pairs
-	 * @param string $nation=null nation to use if not set in imported data
-	 * @param string $sex=null should we only search for a certain gender
-	 * @param string $license=null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
-	 * @param int $license_year=null default this->license_year
+	 * @param string $nation =null nation to use if not set in imported data
+	 * @param string $sex =null should we only search for a certain gender
+	 * @param string $license =null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
+	 * @param int $license_year =null default this->license_year
 	 */
 	private function detect_athletes(array &$import,array $col2name,$nation=null,$sex=null,$license=null,$license_year=null)
 	{
@@ -387,8 +386,8 @@ class ranking_import extends ranking_result_bo
 		$id_col        = array_search('PerId',$col2name);
 		//error_log(__METHOD__."(,".array2string($col2name).",$nation,$sex) firstname_col=$firstname_col, lastname_col=$lastname_col, nation_col=$nation_col, id_col=$id_col");
 
+		$import['detection'] = array();
 		$detection =& $import['detection'];
-		$detection = array();
 		foreach($import as $n => &$data)
 		{
 			if ($n < 2 ) continue;	// not an athelete col
@@ -542,9 +541,9 @@ class ranking_import extends ranking_result_bo
 	 *
 	 * @param array $import athlete rows with numerical id's starting with 2, plus values for 'as' and 'athlete' keys
 	 * @param array $keys values for keys 'comp', 'cat', 'route' (0..N, 'athlete' or 'ranking'
-	 * @param string $license=null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
-	 * @param string $license_nation=null nation of the license
-	 * @param int $license_year=null default this->license_year
+	 * @param string $license =null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
+	 * @param string $license_nation =null nation of the license
+	 * @param int $license_year =null default this->license_year
 	 * @return int number of imported athletes
 	 */
 	private function do_import(array &$import,array $keys,$license=null,$license_nation=null,$license_year=null)
@@ -637,21 +636,21 @@ class ranking_import extends ranking_result_bo
 	 * Import results from an other ranking instance via their SiteMgr module
 	 *
 	 * @param int|string|array $comp WetId, rkey or array of competition to import into
-	 * @param array|string $cats=null default all categories
-	 * @param int $route_type=null
-	 * @param int $comp2import=null default $WetId
-	 * @param string $baseurl=null from ranking config "import_url"
+	 * @param array|string $cats =null default all categories
+	 * @param int $route_type =null
+	 * @param int $comp2import =null default $WetId
+	 * @param string $baseurl =null from ranking config "import_url"
 	 * @param boolean $add_athletes true=import missing athletes
-	 * @param int $set_status=STATUS_RESULT_OFFICAL or STATUS_STARTLIST or STATUS_UNPUBLISHED
-	 * @param boolean $import_ranking=true true=import into ranking
-	 * @param string $download_dir=null stop after downloading files into given directory
-	 * @param int $debug=0 debug level: 0: echo some messages while import is running, 2, 3, 4 ... more verbose messages
-	 * @param string $charset=null
+	 * @param int $set_status =STATUS_RESULT_OFFICAL or STATUS_STARTLIST or STATUS_UNPUBLISHED
+	 * @param boolean $import_ranking =true true=import into ranking
+	 * @param boolean $only_download =false true: stop after downloading files
+	 * @param int $debug =0 debug level: 0: echo some messages while import is running, 2, 3, 4 ... more verbose messages
+	 * @param string $charset =null
 	 * @return string messages, if run by webserver
 	 * @throws Exception on error
 	 */
 	public function from_url($comp, $cats=null, $route_type=null, $comp2import=null, $baseurl=null,
-		$add_athletes=true, $set_status=STATUS_RESULT_OFFICIAL, $import_ranking=true, $download_dir=null, $debug=0, $charset='iso-8859-1')
+		$add_athletes=true, $set_status=STATUS_RESULT_OFFICIAL, $import_ranking=true, $only_download=false, $debug=0, $charset='iso-8859-1')
 	{
 		if (isset($_SERVER['HTTP_HOST']))
 		{
@@ -768,6 +767,7 @@ class ranking_import extends ranking_result_bo
 					list($headers,$download) = explode("\r\n\r\n",$download,2);
 					if ($debug > 3) echo "Headers ".__LINE__.":\n".$headers."\n";
 				}
+				$matches = null;
 				if (!preg_match('/attachment; filename="([^"]+)"/m',$headers,$matches))
 				{
 					if ($route == 1) continue;	// me might not have a 2. quali
@@ -810,7 +810,7 @@ class ranking_import extends ranking_result_bo
 						$quali1 = $this->parse_csv($content,fopen('global://download','r'),false,$add_athletes,(int)$comp2import);
 						if (!is_array($quali1)) die($quali1."\n");
 						$content['route_order'] = 1;
-						$download = $downloads[1];
+						if (true) $download = $downloads[1];
 						$quali2 = $this->parse_csv($content,fopen('global://download','r'),false,$add_athletes,(int)$comp2import);
 						if (!is_array($quali2)) die($quali2."\n");
 						foreach($quali1 as $n => $athlete)
@@ -833,6 +833,7 @@ class ranking_import extends ranking_result_bo
 						'GrpId' => $cat['GrpId'],
 						'route_order' => $route,
 					);
+					$discipline = null;
 					if (!$this->init_route($content,$comp,$cat,$discipline))
 					{
 						throw new Exception(lang('Permission denied !!!'),9);
@@ -914,6 +915,7 @@ class ranking_import extends ranking_result_bo
 
 	private static function get_exec_id($html, $debug=null)
 	{
+		$matches = null;
 		if (!preg_match('/name="etemplate_exec_id" value="([^"]+)"/m',$html,$matches))
 		{
 			throw new Exception("Error: etemplate_exec_id not found!",6);

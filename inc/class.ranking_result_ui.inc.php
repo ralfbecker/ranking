@@ -123,7 +123,7 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			if ($content['topos']['delete'])
 			{
-				list($topo) = each($content['topos']['delete']);
+				$topo = key($content['topos']['delete']);
 				unset($content['topos']);
 				$button = 'delete_topo';
 			}
@@ -132,9 +132,9 @@ class ranking_result_ui extends ranking_result_bo
 				$button = 'register';
 				unset($content['athlete']['register']);
 			}
-			else
+			elseif(!empty($content['button']))
 			{
-				list($button) = each($content['button']);
+				$button = key($content['button']);
 				unset($content['button']);
 			}
 			// reload the parent window
@@ -1346,7 +1346,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		else
 		{
-			list($calendar) = each($this->ranking_nations);
+			$calendar = key($this->ranking_nations);
 		}
 		$tmpl->disableElement('nm[calendar]', $disable_calendar);
 		if (!$comp || ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
@@ -1420,11 +1420,11 @@ class ranking_result_ui extends ranking_result_bo
 		//echo "<p>calendar='$calendar', comp={$content['nm']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['nm']['route']}</p>\n";
 
 		// check if user pressed a button and react on it
-		list($button) = @each($content['button']);
+		$button = !empty($content['button']) ? key($content['button']) : null;
 		unset($content['button']);
 		if (!$button && $content['nm']['rows']['delete'])
 		{
-			list($id) = @each($content['nm']['rows']['delete']);
+			$id = key($content['nm']['rows']['delete']);
 			$button = 'delete';
 		}
 		if (!$button && $content['nm']['action'] && $content['nm']['selected'])
@@ -1435,7 +1435,7 @@ class ranking_result_ui extends ranking_result_bo
 		// Apply button in a result-row pressed --> only update that row
 		if(!$button && isset($content['nm']['rows']['apply']))
 		{
-			list($PerId) = @each($content['nm']['rows']['apply']);
+			$PerId = key($content['nm']['rows']['apply']);
 			$content['nm']['rows']['set'] = array(
 				$PerId => $content['nm']['rows']['set'][$PerId],
 			);
@@ -1578,7 +1578,7 @@ class ranking_result_ui extends ranking_result_bo
 			// if general result is suppressed, go for first in list, as that is what is displayed to user anyway
 			if (!isset($sel_options['route'][$content['nm']['route']]))
 			{
-				list($content['nm']['route']) = each($sel_options['route']);
+				$content['nm']['route'] = key($sel_options['route']);
 			}
 		}
 		elseif ($content['nm']['route'] == -1)	// general result with only one heat --> show quali if exist

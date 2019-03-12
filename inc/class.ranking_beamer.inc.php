@@ -1,14 +1,13 @@
 <?php
 /**
- * eGroupWare digital ROCK Rankings - beamer / videowall support
+ * EGroupware digital ROCK Rankings - beamer / videowall support
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2011-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 use EGroupware\Api;
@@ -71,7 +70,7 @@ class ranking_beamer
 		}
 		else
 		{
-			list($calendar) = each(ranking_result_bo::$instance->ranking_nations);
+			$calendar = key(ranking_result_bo::$instance->ranking_nations);
 		}
 		if (!$comp || ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
 		{
