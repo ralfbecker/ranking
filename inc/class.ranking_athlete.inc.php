@@ -772,8 +772,11 @@ class ranking_athlete extends Api\Storage\Base
 	 * Age / year of last result before which profiles are hidden by default,
 	 * if there is no explicit athlete consent
 	 * In 2018: 2018-2 = 2016 --> no result or registration in 2016 or newer
+	 *
+	 * Currently set to 9999, to NOT hide historic profiles.
+	 * There seems to be no need to do that, according to data-security officer from DAV.
 	 */
-	const PROFILE_DEFAULT_HIDDEN_AGE = 2;
+	const PROFILE_DEFAULT_HIDDEN_AGE = 9999;
 
 	/**
 	 * Check if athlete profile is hidden
