@@ -428,7 +428,6 @@ class ranking_competition_ui extends ranking_bo
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
 				'default_cols'   => '!status',
-				'actions'        => $this->get_actions(),
 				'dataStorePrefix' => 'ranking_comp',
 				'row_id'         => 'WetId',
 			);
@@ -444,6 +443,9 @@ class ranking_competition_ui extends ranking_bo
 				$content['nm']['cat_parent'] = ranking_so::cat_rkey2id('parent');
 			}
 		}
+		// actions are NOT stored in session
+		$content['nm']['actions'] = $this->get_actions();
+
 		$content['msg'] = $msg ? $msg : $_GET['msg'];
 		$this->set_ui_state();
 

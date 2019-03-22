@@ -274,7 +274,6 @@ class ranking_cup_ui extends ranking_bo
 				'order'          =>	'year',// IO name of the column to sort after (optional for the sortheaders)
 				'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
 				'csv_fields'     => false,
-				'actions'        => $this->get_actions(),
 				'dataStorePrefix' => 'ranking_cup',
 				'row_id'         => 'SerId',
 			);
@@ -285,6 +284,9 @@ class ranking_cup_ui extends ranking_bo
 				$content['nm']['col_filter']['nation'] = $read_rights[0];
 			}
 		}
+		// actions are NOT stored in session
+		$content['nm']['actions'] = $this->get_actions();
+
 		$content['msg'] = $msg;
 		$this->set_ui_state();
 
