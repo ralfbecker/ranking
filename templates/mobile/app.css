@@ -488,11 +488,9 @@ img#foto2 {
 #ranking-result-index-rows_boulder-edit .name td {
   padding-bottom: 8px;
 }
-#ranking-result-index_measurement_template,
-#ranking-result-index_measurement_template div.popupMainDiv,
-form#ranking-result-index {
-  background-color: #f0f0f0;
-}
+/*#ranking-result-index_measurement_template, #ranking-result-index_measurement_template div.popupMainDiv, form#ranking-result-index {
+	background-color: #f0f0f0;
+}*/
 form#ranking-result-index .resultHeaderBottom {
   border-bottom: 1px solid silver;
 }

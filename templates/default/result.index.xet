@@ -181,12 +181,12 @@
 				<row class="noPrint resultHeader">
 					<hbox>
 						<select class="rightPad5" statustext="Select calendar" id="nm[calendar]" no_lang="1" onchange="1"/>
-						<select id="nm[comp]" no_lang="1" onchange="1" empty_label="Select competition"/>
+						<select id="nm[comp]" no_lang="1" onchange="1" empty_label="Select competition" search="true"/>
 					</hbox>
 				</row>
 				<row class="noPrint resultHeader catSelectionMsg" disabled="!@nm[comp]">
 					<hbox>
-						<select class="bold" id="nm[cat]" no_lang="1" onchange="1" empty_label="Select category"/>
+						<select class="bold" id="nm[cat]" no_lang="1" onchange="1" empty_label="Select category" search="true" width="250px"/>
 						<hidden id="comp[WetId]"/>
 						<description id="msg" class="message"/>
 					</hbox>
