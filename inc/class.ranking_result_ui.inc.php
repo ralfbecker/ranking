@@ -778,7 +778,7 @@ class ranking_result_ui extends ranking_result_bo
 		unset($query_in['return']);	// no need to save
 		$query = $query_in;
 		unset($query['rows']);		// no need to save, can not unset($query_in['rows']), as this is $rows !!!
-		egw_cache::setSession('ranking', 'result', $query);
+		Api\Cache::setSession('ranking', 'result', $query);
 
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['GrpId'] = $query['cat'];
@@ -827,7 +827,7 @@ class ranking_result_ui extends ranking_result_bo
 			if ($query['discipline'] == 'combined')
 			{
 				$query['col_filter']['route_order'] = -6;
-				$num_first_final = 6;
+				$num_first_final = self::COMBINED_FINAL_QUOTA;
 				$skip = 0;
 			}
 			$query['num_rows'] = $num_first_final;	// dont need further quali-participants
@@ -979,7 +979,7 @@ class ranking_result_ui extends ranking_result_bo
 						if ($row['PerId_'.$i] > 0) $PerIds[$row['PerId_'.$i]] = $row['PerId_'.$i];
 					}
 					if (count($PerIds) < 3) $titles[''] = lang('None');
-					if ($PerIds) $titles += egw_link::titles('ranking',$PerIds);
+					if ($PerIds) $titles += Api\Link::titles('ranking',$PerIds);
 					$rows['sel_options']['set['.$row['team_id'].'][PerId_1]'] =
 						$rows['sel_options']['set['.$row['team_id'].'][PerId_2]'] =
 						$rows['sel_options']['set['.$row['team_id'].'][PerId_3]'] = $titles;
@@ -1029,7 +1029,7 @@ class ranking_result_ui extends ranking_result_bo
 		$rows['no_start_number'] = !$need_start_number && $query['route_status'] == STATUS_RESULT_OFFICIAL;
 
 		// report the set-values at time of display back to index() for calling ranking_result_bo::save_result
-		egw_cache::setSession('ranking', 'set_'.$query['comp'].'_'.$query['cat'].'_'.$query['route'], $rows['set']);
+		Api\Cache::setSession('ranking', 'set_'.$query['comp'].'_'.$query['cat'].'_'.$query['route'], $rows['set']);
 
 		// show previous heat only if it's counting
 		$rows['no_prev_heat'] = $query['route'] < 2+(int)($query['route_type']==TWO_QUALI_HALF) ||
@@ -1278,7 +1278,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		if (!is_array($content))
 		{
-			$content = array('nm' => egw_cache::getSession('ranking', 'result'));
+			$content = array('nm' => Api\Cache::getSession('ranking', 'result'));
 			if (!is_array($content['nm']) || !$content['nm']['get_rows'])
 			{
 				if (!is_array($content['nm'])) $content['nm'] = array();
@@ -1457,7 +1457,7 @@ class ranking_result_ui extends ranking_result_bo
 			switch($button)
 			{
 				case 'apply':
-					$old = egw_cache::getSession('ranking', 'set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route']);
+					$old = Api\Cache::getSession('ranking', 'set_'.$content['nm']['comp'].'_'.$content['nm']['cat'].'_'.$content['nm']['route']);
 					if (is_array($content['nm']['rows']['set']) &&
 						$this->save_result($keys,$content['nm']['rows']['set'],$content['nm']['route_type'],$content['nm']['discipline'],$old,
 							$this->comp->quali_preselected($content['nm']['cat'], $comp['quali_preselected']),
@@ -1562,7 +1562,7 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			if ($type == 'logo' || $type == 'sponsors')
 			{
-				$content['nm']['comp_'.$type] = substr($linkdata, 0, 4) == 'http' ? $linkdata : egw::link($linkdata);
+				$content['nm']['comp_'.$type] = substr($linkdata, 0, 4) == 'http' ? $linkdata : Api\Egw::link($linkdata);
 				// check if images are directly reachable from the docroot --> use them direct
 				if (file_exists($_SERVER['DOCUMENT_ROOT'].$docroot_base_path.basename($linkdata)))
 				{
@@ -1657,7 +1657,7 @@ class ranking_result_ui extends ranking_result_bo
 					break;
 			}
 			// measurement need to store nm, as it does NOT call get_rows!
-			egw_cache::setSession('ranking', 'result', $content['nm']);
+			Api\Cache::setSession('ranking', 'result', $content['nm']);
 		}
 		elseif ($content['nm']['show_result'] || $content['nm']['route'] < 0)
 		{
@@ -1722,7 +1722,7 @@ class ranking_result_ui extends ranking_result_bo
 		// do we show the start- or result-list?
 		$content['no_list'] = (string)$content['nm']['route'] === '' || $content['nm']['show_result'] == 4;
 		$content['nm']['template'] = $this->_template_name($content['nm']['show_result'],
-			$content['nm']['discipline'], $content['discipline']);
+			$content['nm']['discipline'], $content['discipline'], $comp['datum']);
 		// quota, to get a quota line for _official_ result-lists --> get_rows sets css-class quota_line on the table-row _below_
 		$content['nm']['route_quota'] = $content['nm']['show_result'] && $route['route_status'] == STATUS_RESULT_OFFICIAL ? $route['route_quota'] : 0;
 
@@ -1887,7 +1887,7 @@ class ranking_result_ui extends ranking_result_bo
 			$route['discipline'] = $this->combined_order2discipline($route['route_order'], $route['route_type']);
 			$combined = true;
 		}
-		$query = egw_cache::getSession('ranking', 'result');
+		$query = Api\Cache::getSession('ranking', 'result');
 		// set query by $parametes, if we have no session, eg. just a json request to set data
 		if (empty($query) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') === 0)
 		{
@@ -1971,14 +1971,15 @@ class ranking_result_ui extends ranking_result_bo
 	 * @param int $show_result 0=startlist, 1=result, 2=general result
 	 * @param string $discipline 'lead', 'boulder', 'speed'
 	 * @param string $discipline2 'combined' even if heat has single discipline
+	 * @param string $date =null competition date (currently used to distinguish 2018 combined system from 2019+ one)
 	 * @return string
 	 */
-	function _template_name($show_result, $discipline='lead', $discipline2=null)
+	function _template_name($show_result, $discipline='lead', $discipline2=null, $date=null)
 	{
 		if ($show_result == 3)
 		{
-			return $discipline2 == 'combined' ? 'ranking.result.index.speed_graph6' :
-				'ranking.result.index.speed_graph';
+			return $discipline2 !== 'combined' ? 'ranking.result.index.speed_graph' :
+				((int)$date > 2018 ? 'ranking.result.index.speed_graph8' : 'ranking.result.index.speed_graph6');
 		}
 		if ($show_result == 2)
 		{
@@ -2025,7 +2026,7 @@ class ranking_result_ui extends ranking_result_bo
 		//$start = microtime(true);
 		$response = Api\Json\Response::get();
 
-		if (!($request =& etemplate_request::read($request_id)))
+		if (!($request =& Api\Etemplate\Request::read($request_id)))
 		{
 			$response->alert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
 			return $this->_stop_time_measurement($response);
@@ -2281,7 +2282,7 @@ class ranking_result_ui extends ranking_result_bo
 		return $this->_stop_time_measurement($response,lang('Time measured'));
 	}
 
-	function _update_ranks(array $keys,Api\Json\Response $response,etemplate_request $request)
+	function _update_ranks(array $keys, Api\Json\Response $response, Api\Etemplate\Request $request)
 	{
 		//error_log("content[order]=".$request->content['nm']['order'].", changes[order]=".$request->changes['nm']['order']);
 		$order = $request->changes['nm']['order'] ? $request->changes['nm']['order'] : $request->content['nm']['order'];

@@ -900,7 +900,7 @@ class ranking_result_bo extends ranking_bo
 			2 => 5, 7 => 6,
 			3 => 7, 6 => 8,
 		),
-		// combined format final with 6, but with reversed result!
+		// 2018 combined format final with 6, but with reversed result!
 		6 => array(
 			/*1*/6 => 1, /*6*/1 => 2,
 			/*2*/5 => 3, /*5*/2 => 4,
@@ -911,6 +911,11 @@ class ranking_result_bo extends ranking_bo
 			2 => 3, 3 => 4,
 		),
 	);
+
+	/**
+	 * New 2019 combined final quota
+	 */
+	const COMBINED_FINAL_QUOTA = 8;
 
 	/**
 	 * Generate a startlist from the result of a previous heat
@@ -1081,10 +1086,10 @@ class ranking_result_bo extends ranking_bo
 		$starters =& $this->route_result->search('',$cols,$order_by,'','',false,'AND',false,$prev_keys,$join);
 		unset($starters['route_names']);
 
-		// combined speed & lead final uses general result --> fixed quota of 6
+		// combined speed & lead final uses general result --> fixed quota of 8
 		if ($discipline == 'combined' && in_array($keys['route_order'], array(7, 3)))
 		{
-			$starters = array_slice($starters, -($quota=6));
+			$starters = array_slice($starters, -($quota=self::COMBINED_FINAL_QUOTA));
 
 			// sort speed final by speed (was overall qualification)
 			if ($keys['route_order'] == 3)
@@ -1122,7 +1127,8 @@ class ranking_result_bo extends ranking_bo
 			if ($ko_system && $keys['route_order'] == 2 ||
 				$discipline == 'combined' && $keys['route_order'] == 3)
 			{
-				if (!isset(self::$ko_start_order[$quota]) || ($quota == 6) !== ($discipline == 'combined'))
+				if (!isset(self::$ko_start_order[$quota]) ||
+					($quota == self::COMBINED_FINAL_QUOTA) !== ($discipline == 'combined'))
 				{
 					throw new Api\Exception\WrongUserinput(lang('Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or 6 for combined)!', $quota));
 				}
@@ -1214,8 +1220,9 @@ class ranking_result_bo extends ranking_bo
 		// combined integrates fastest loosers in 1/2-final and small final in final
 		if ($discipline == 'combined')
 		{
-			$prev_keys[] = 'result_rank <= 4';
 			$cols[] = 'result_rank';
+			/* 2018 combined speed final
+			$prev_keys[] = 'result_rank <= 4';
 			// treat fastest looser like winner of 4th pairing
 			if ($keys['route_order'] == 4)
 			{
@@ -1227,6 +1234,16 @@ class ranking_result_bo extends ranking_bo
 			else
 			{
 				$order_by = 'result_rank=1,start_order';
+			}*/
+			// 2019+ combined speed 1/2-final
+			if ($keys['route_order'] == 4)
+			{
+				$order_by = 'result_rank=1,start_order';
+			}
+			// 2019+ combined speed final
+			else
+			{
+				$order_by = 'result_rank<=4,result_rank IN (1,5),start_order';
 			}
 		}
 		elseif ($prev_route['route_quota'] == 2)	// small final
@@ -1244,10 +1261,11 @@ class ranking_result_bo extends ranking_bo
 		}
 		// which column get propagated to next heat
 		$cols = $this->route_result->startlist_cols();
+		$join = '';//'JOIN Personen USING(PerId)'; $cols[] = 'Nachname'; $cols[] = 'Vorname';
 		$cols[] = 'start_order';
 		$cols[] = 'result_detail AS detail';	// AS detail to not automatically unserialize (we only want false_start)
-		$starters =& $this->route_result->search('',$cols,
-			$order_by,'','',false,'AND',false,$prev_keys);
+		$starters =& $this->route_result->search('', $cols,
+			$order_by, '', '', false, 'AND', false, $prev_keys, $join);
 		//error_log(__METHOD__."('','$cols','$order_by','','',false,'AND',false,".array2string($prev_keys).") starters = ".array2string($starters));
 
 		// reindex by _new_ start_order
@@ -1263,6 +1281,7 @@ class ranking_result_bo extends ranking_bo
 
 			if ($discipline == 'combined')
 			{
+				/* 2018 combined speed final
 				switch ($keys['route_order'])
 				{
 					case 4: // startorder for 1/2-final
@@ -1282,10 +1301,32 @@ class ranking_result_bo extends ranking_bo
 					case 5: // startorder for final: small final (loosers), then final
 						if ($starter['result_rank'] == 1)
 						{
-							$new_start_order = $new_start_order+2;
+							$new_start_order += 2;
+						}
+						break;
+				}*/
+				// 2019+ combined speed final
+				switch ($keys['route_order'])
+				{
+					case 4: // startorder for 1/2-final: loosers first, then winners
+						if ($starter['result_rank'] == 1)
+						{
+							$new_start_order += 4;
+						}
+						break;
+					case 5: // startorder for final
+						if ($starter['result_rank'] <= 4)
+						{
+							$new_start_order += $starter['result_rank'] == 1 ? 4 : 2;
+						}
+						elseif($starter['result_rank'] == 5)
+						{
+							$new_start_order += 2;
 						}
 						break;
 				}
+				// setting it here, so judges dont need to
+				$prev_route['route_quota'] = count($starters);
 			}
 			$starters_by_startorder[$new_start_order] =& $starter;
 			unset($starter['result_rank']);
@@ -1709,7 +1750,7 @@ class ranking_result_bo extends ranking_bo
 				// ignore "No ranking defined" exception eg. for combined
 				_egw_log_exception($e);
 			}
-			html::content_header($cat['name'].' - '.$route['route_name'].'.csv','text/comma-separated-values');
+			Api\Header\Content::type($cat['name'].' - '.$route['route_name'].'.csv','text/comma-separated-values');
 			$name2csv = array(
 				'WetId'    => 'comp',
 				'GrpId'    => 'cat',
@@ -1772,7 +1813,7 @@ class ranking_result_bo extends ranking_bo
 					}
 			}
 			echo implode(';',$name2csv)."\n";
-			$charset = translation::charset();
+			$charset = Api\Translation::charset();
 			foreach($athletes as $athlete)
 			{
 				if (!$athlete['PerId']) continue;	// general results contain such a (wrong) entry ...
@@ -1810,9 +1851,9 @@ class ranking_result_bo extends ranking_bo
 				// convert by default to iso-8859-1, as this seems to be the default of excel
 				$csv_charset = $GLOBALS['egw_info']['user']['preferences']['common']['csv_charset'];
 				if (empty($csv_charset)) $csv_charset = 'iso-8859-1';
-				echo translation::convert(implode(';',$values), $charset, $csv_charset)."\n";
+				echo Api\Translation::convert(implode(';',$values), $charset, $csv_charset)."\n";
 			}
-			common::egw_exit();
+			exit();
 		}
 	}
 
@@ -2472,7 +2513,7 @@ class ranking_result_bo extends ranking_bo
 					$keys['route_judge'] = array();
 					foreach($comp['judges'] as $uid)
 					{
-						$keys['route_judge'][] = common::grab_owner_name($uid);
+						$keys['route_judge'][] = Api\Accounts::username($uid);
 					}
 					$keys['route_judge'] = implode(', ',$keys['route_judge']);
 				}
@@ -2510,7 +2551,7 @@ class ranking_result_bo extends ranking_bo
 	 *
 	 * @param string $route_order
 	 * @param int& $route_type on return route/quali-type
-	 * @param boolean $return_boulder =false true: return "boulder" instead of "boulder2018" eg. for translation
+	 * @param boolean $return_boulder =false true: return "boulder" instead of "boulder2018" eg. for Api\Translation
 	 * @return string
 	 */
 	static public function combined_order2discipline($route_order, &$route_type=null, $return_boulder=false)

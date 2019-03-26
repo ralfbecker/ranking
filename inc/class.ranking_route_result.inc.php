@@ -77,8 +77,12 @@ class ranking_route_result extends Api\Storage\Base
 	var $rank_boulder = 'CASE WHEN result_top IS NULL AND result_zone IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND (RouteResults.result_top < r.result_top OR RouteResults.result_top = r.result_top AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NULL AND RouteResults.result_zone < r.result_zone OR RouteResults.result_top IS NULL AND r.result_top IS NOT NULL)) END';
 	var $rank_speed_quali = 'CASE WHEN result_time IS NULL THEN NULL ELSE (SELECT 1+COUNT(*) FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.result_time > r.result_time) END';
 	var $rank_speed_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 1+(SELECT RouteResults.result_time > r.result_time FROM RouteResults r WHERE RouteResults.WetId=r.WetId AND RouteResults.GrpId=r.GrpId AND RouteResults.route_order=r.route_order AND RouteResults.start_order != r.start_order AND (RouteResults.start_order-1) DIV 2 = (r.start_order-1) DIV 2) END';
-	// (combined) speed final incl. small final in first 2 starters (return 3 for final and 2 for small final, all non-winners (!=1) are then sorted by time)
-	var $rank_speed_combi_final = 'CASE WHEN result_time IS NULL THEN NULL WHEN (start_order-1)DIV 2 THEN 2 ELSE 4 END';
+	// 2918 combined speed final incl. small final in first 2 starters (return 3 for final and 2 for small final, all non-winners (!=1) are then sorted by time)
+	//var $rank_speed_combi_final = 'CASE WHEN result_time IS NULL THEN NULL WHEN (start_order-1)DIV 2 THEN 2 ELSE 4 END';
+	// 2019+ combined 1/2-final offset for loosers, gets added to $rank_speed_final
+	var $rank_speed_combi_semi_final = 'CASE WHEN result_time IS NULL THEN NULL WHEN (start_order-1)DIV 4 THEN 0 ELSE 4 END';
+	// 2019+ combined final offset for loosers, gets added to $rank_speed_final
+	var $rank_speed_combi_final = 'CASE WHEN result_time IS NULL THEN NULL ELSE 6-2*((start_order-1)DIV 2) END';
 
 	/**
 	 * Discipline only set by ranking_result_bo->save_result, to be used in data2db
@@ -1602,11 +1606,19 @@ class ranking_route_result extends Api\Storage\Base
 				}
 				else
 				{
-					// combined final include small final as first 2 starters
+					/* 2018 combined final include small final as first 2 starters
 					// (could also be used for speed to save one column in general result)
 					if ($route && $route['discipline'] == 'combined' && $keys['route_order'] == 5)
 					{
 						$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_combi_final);
+						$order_by = "result_time IS NULL,$mode,result_time";
+					}*/
+					// 2019+ combined final (including loosers in all heats)
+					if ($route && $route['discipline'] == 'combined' && $keys['route_order'] > 3)
+					{
+						$mode = '('.str_replace('RouteResults', $this->table_name,
+							($keys['route_order'] == 5 ? $this->rank_speed_combi_final : $this->rank_speed_combi_semi_final)).
+							'+'.str_replace('RouteResults', $this->table_name, $this->rank_speed_final).')';
 						$order_by = "result_time IS NULL,$mode,result_time";
 					}
 					else
@@ -1695,8 +1707,9 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected) extra_cols=".array2string($extra_cols).", order_by=$order_by");
 		$this->db->transaction_begin();
+		$join = '';//'JOIN Personen USING(PerId)'; $extra_cols[] = 'Nachname'; $extra_cols[] = 'Vorname';
 		$result = $this->search($keys, $this->id_col.',result_rank,result_detail AS detail',
-			'ORDER BY '.$order_by.' FOR UPDATE', $extra_cols);
+			'ORDER BY '.$order_by.' FOR UPDATE', $extra_cols, '', false, 'AND', false, null, $join);
 
 		if (in_array($route_type, array(TWO_QUALI_ALL,TWO_QUALI_ALL_NO_COUNTBACK)) && $keys['route_order'] < 2 ||		// calculate the points
 			$route_type == TWOxTWO_QUALI && $keys['route_order'] < 4)
@@ -1758,7 +1771,7 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				if ($data['eliminated']) $data['time_sum'] = self::ELIMINATED_TIME;
 				$new_speed_rank = $data['new_rank'];
-				if ($data['new_rank'] > 1)	// all winners must have rank=1(!)
+				if (!($data['new_rank'] & 1))	// all winners must have rank=1(!)
 				{
 					$data['new_rank'] = !$old_time || $old_time < $data['time_sum'] ||
 						 $old_speed_rank < $new_speed_rank ? $i+1 : $old_rank;
