@@ -2,20 +2,60 @@
 <!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
 <!-- $Id$ -->
 <overlay>
-	<template id="ranking.result.index.speed_graph.cell" template="" lang="" group="0" version="14.2.001">
+	<template id="ranking.result.index.speed_graph.cellspeed" template="" lang="" group="0" version="14.2.001">
 		<grid width="100%" class="speed_athlete">
 			<columns>
+				<column/>
 				<column/>
 				<column/>
 			</columns>
 			<rows>
 				<row>
 					<description no_lang="1" id="nachname" class="lastname leftPad5"/>
+					<textbox type="hidden" id="id" value="$cont[WetId]:$cont[GrpId]:$cont[route_order]:$cont[PerId]"/>
 					<description no_lang="1" align="right" id="nation"/>
 				</row>
 				<row>
-					<description no_lang="1" id="vorname" class="leftPad5"/>
+					<description no_lang="1" id="vorname" class="leftPad5" span="2"/>
 					<description align="right" no_lang="1" id="result"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index.speed_graph.edit" template="" lang="" group="0" version="1.9.004" class="ranking_view">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column/>
+				<column width="100"/>
+			</columns>
+			<rows>
+				<row>
+					<box align="center">
+						<hbox align="center" class="avatar">
+							<image src="profile_url"/>
+						</hbox>
+					</box>
+				</row>
+				<row class="name row" height="50px">
+					<description align="left" id="result_rank" class="place"/>
+					<hbox align="center">
+						<description id="nachname" no_lang="1" class="lastname"/>
+						<description id="vorname" no_lang="1" />
+						<description id="nation" no_lang="1" />
+						<description id="start_number" label="(%s)"/>
+					</hbox>
+					<description align="right" id="time_sum"/>
+				</row>
+				<row class="row" height="50px">
+					<description label="Time"/>
+					<float id="result_time" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<select id="eliminated" onchange="app.ranking.eliminated_changed" align="right"/>
+				</row>
+				<row class="row" valign="top" height="40px" disabled="!@nm[rows][show_second_lane]">
+					<description label="Lane B"/>
+					<float id="result_time_r" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<select id="eliminated_r" onchange="app.ranking.eliminated_changed" align="right"/>
 				</row>
 			</rows>
 		</grid>

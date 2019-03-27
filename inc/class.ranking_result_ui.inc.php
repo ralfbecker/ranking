@@ -931,10 +931,21 @@ class ranking_result_ui extends ranking_result_bo
 			{
 				for($suffix=2; $suffix <= 6; ++$suffix)
 				{
+					// create pseudo row from general result to allow editing in pairing list
+					$r = array_intersect_key($row, array_flip(['WetId','GrpId','PerId','nation','vorname','nachname','start_number','verband']));
+					$r += [
+						'route_order' => $suffix,
+						'result' => $row['result'.$suffix],
+						'start_order' => isset($row['start_order'.$suffix]) ? $row['start_order'.$suffix] : $row['start_order'],
+						'result_rank' => $row['result_rank'.$suffix],
+						//'row' => $row,
+					] + json_decode($row['result_detail'.(isset($row['result_detail'.$suffix]) ? $suffix : '')], true);
+					$r['result_time'] = $r['result_time_l']; unset($r['result_time_l']);
+					$r['eliminated'] = $r['eliminated_l']; unset($r['eliminated_l']);
+
 					if (isset($row['start_order'.$suffix]))
 					{
-						$row['result'] = $row['result'.$suffix];
-						$rows['heat'.($suffix+$skip)][$row['start_order'.$suffix]] = $row;
+						$rows['heat'.($suffix+$skip)][$row['start_order'.$suffix]] = $r;
 						unset($rows[$k]['result']);	// only used for winner and 3. place
 						// make final or small final winners availible as winner1 and winner3
 						if ($suffix+$skip >= 5 && $row['result'.$suffix] && in_array($rank=$row['result_rank'.$suffix], array(1, 3)))
@@ -946,8 +957,7 @@ class ranking_result_ui extends ranking_result_bo
 					}
 					elseif($suffix == 3 && $query['discipline'] == 'combined')
 					{
-						$row['result'] = $row['result'.$suffix];
-						$rows['heat'.($suffix+$skip)][$row['start_order']] = $row;
+						$rows['heat'.($suffix+$skip)][$row['start_order']] = $r;
 					}
 				}
 				// we dont need original rows for speed-graph, in fact they confuse autorepeating in et2
@@ -1906,7 +1916,11 @@ class ranking_result_ui extends ranking_result_bo
 		if (!preg_match('/^[a-z0-9_]+ (asc|desc)$/i', $order_by)) $order_by = 'start_order ASC';
 
 		//error_log(__METHOD__."(".array2string($keys).", $PerId, ".array2string($set).", $update_checked) order_by=$order_by");
-		if ($this->save_result($keys, array($PerId => $set), $route['route_type'],  $route['discipline'], null,
+		if ($route['route_status'] == STATUS_RESULT_OFFICIAL)
+		{
+			$msg = lang('Result already official!');
+		}
+		elseif ($this->save_result($keys, array($PerId => $set), $route['route_type'],  $route['discipline'], null,
 			$this->comp->quali_preselected($keys['GrpId'], $comp['quali_preselected']), $update_checked, $order_by))
 		{
 			// search filter needs route_type to not give SQL error
