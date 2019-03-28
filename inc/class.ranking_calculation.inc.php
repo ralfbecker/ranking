@@ -431,6 +431,11 @@ class ranking_calculation
 						$url = '';
 						break;
 					case 'acl_fed_id':
+						// SUI Regionalzentrumswertung should NOT include results from athletes NOT in one
+						if (empty($result['acl_fed_id']))
+						{
+							continue 2;
+						}
 						if (!isset($rzs))
 						{
 							$rzs = $this->bo->federation->federations('SUI');
