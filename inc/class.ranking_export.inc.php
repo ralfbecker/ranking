@@ -1561,7 +1561,7 @@ class ranking_export extends ranking_result_bo
 		{
 			$num = count($cats_by_id) <= 2 ? 8 : 3;
 		}
-		$result_filter = 'platz <= '.(int)$num;
+		$result_filter = '(0 < platz && platz <= '.(int)$num.')';
 		if ($nation)
 		{
 			$result_filter = '('.$result_filter.' OR nation='.$this->db->quote($nation).')';
@@ -1806,7 +1806,9 @@ class ranking_export extends ranking_result_bo
 		}
 		// Dt. Landesmeisterschaft --> Landeswertung verlinken
 		if ($type !== 'result' && $comp['nation'] == 'GER' &&
-			($fed = $this->federation->read($comp['fed_id'])) && $fed['fed_parent'] == 1)
+			// LVs are no longer direct below DAV, but below the 3 Regions (West, Northeast and South)
+			($regions = $this->federation->query_list('fed_id', 'fed_id', array('fed_parent' => 1))) &&
+			($fed = $this->federation->read($comp['fed_id'])) && in_array($fed['fed_parent'], $regions))
 		{
 			$see_also[] = array(
 				'name' => 'Wertung '.$fed['verband'],

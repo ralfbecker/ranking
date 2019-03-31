@@ -75,8 +75,10 @@ class ranking_federation extends Api\Storage\Base
 	/**
 	 * Return a list of federation names indexed by fed_id, evtl. of a given nation only
 	 *
-	 * @param string $nation =null string to limit result to a given nation
-	 * @param bool $only_direct_children =false true to return only direct children of given nation federation(s)
+	 * @param string|array|int $nation =null string to limit result to a given nation
+	 *  or (multiple) fed_id's
+	 * @param bool|int $only_direct_children =false true to return only direct children of given nation federation(s)
+	 *  or integer number of levels eg. 2 for GER to get regions and states (> 2 is not supported!)
 	 * @param string $show ='verband' could also be 'fed_shortcut'
 	 * @return array
 	 */
@@ -86,10 +88,15 @@ class ranking_federation extends Api\Storage\Base
 		$where = $nation ? array('nation' => $nation) : array();
 		if ($only_direct_children)
 		{
-			if ($nation)
+			$national_feds = 'SELECT fed_id FROM '.self::FEDERATIONS_TABLE.' WHERE nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
+			if ($nation === 'GER' && $only_direct_children !== 1 || $only_direct_children === 2)
 			{
-				$nations_feds = 'SELECT fed_id FROM '.self::FEDERATIONS_TABLE.' WHERE nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
-				$where[] = "fed_parent IN ($nations_feds)";
+				$where[] = "fed_parent IN ($national_feds UNION SELECT fed_id FROM ".
+					self::FEDERATIONS_TABLE." WHERE fed_parent IN ($national_feds))";
+			}
+			elseif ($nation)
+			{
+				$where[] = "fed_parent IN ($national_feds)";
 			}
 			else
 			{

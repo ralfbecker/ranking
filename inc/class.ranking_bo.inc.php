@@ -1618,14 +1618,14 @@ class ranking_bo extends ranking_so
 		if ($cup)
 		{
 			// 2006+ EYS counts only european nations
-			if ((int)$comp['datum'] >= 2006 && preg_match('/_(EYC|EYS)$/',$cup['rkey']))
+			if (empty($comp['nation']) && (int)$comp['datum'] >= 2006 && preg_match('/_(EYC|EYS)$/',$cup['rkey']))
 			{
 				$allowed_nations = $this->federation->continent_nations(ranking_federation::EUROPE);
 			}
 			$this->pkte->get_pkte($cup['pkte'],$cup_pkte);
 		}
-		// only import ceratain continets nations
-		if ($cup && $cup['continent'] || $comp['continent'])
+		// only import given continet's nations (only international competitions)
+		if (empty($comp['nation']) && ($cup && $cup['continent'] || $comp['continent']))
 		{
 			$allowed_nations = $this->federation->continent_nations($comp['continent'] ?
 				$comp['continent'] : $cup['continent']);
@@ -1665,6 +1665,9 @@ class ranking_bo extends ranking_so
 				}
 				elseif($cup)
 				{
+					// if we already have a cup_place set, use it
+					if (isset($result[$PerId]['cup_place'])) $place = $result[$PerId]['cup_place'];
+
 					++$cup_ex_aquos[$place];
 				}
 			}

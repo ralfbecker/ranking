@@ -30,7 +30,7 @@
 				</row>
 				<row class="row">
 					<description value="Parent federation" for="fed_parent"/>
-					<select id="fed_parent" empty_lable="None" class="et2_fullWidth"/>
+					<select id="fed_parent" empty_lable="None" class="et2_fullWidth" search="true"/>
 				</row>
 				<row class="row">
 					<description value="Since" for="fed_since"/>
@@ -45,19 +45,19 @@
 				</row>
 				<row class="row">
 					<description value="Edit athlete" for="grants[athletes]"/>
-					<taglist-account id="grants[athletes]" options="both"/>
+					<taglist-account id="grants[athletes]" account_type="both"/>
 				</row>
 				<row class="row">
 					<description value="Registration" for="grants[register]"/>
-					<taglist-account id="grants[register]" options="both"/>
+					<taglist-account id="grants[register]" account_type="both"/>
 				</row>
 				<row class="row">
 					<description value="Edit compeitition" for="grants[edit]"/>
-					<taglist-account id="grants[edit]" options="both"/>
+					<taglist-account id="grants[edit]" account_type="both"/>
 				</row>
 				<row class="row">
 					<description value="Read competition" for="grants[read]"/>
-					<taglist-account id="grants[read]" options="both"/>
+					<taglist-account id="grants[read]" account_type="both"/>
 				</row>
 				<row class="dialogFooterToolbar">
 					<hbox>

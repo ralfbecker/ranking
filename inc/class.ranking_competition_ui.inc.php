@@ -89,7 +89,7 @@ class ranking_competition_ui extends ranking_bo
 			{
 				foreach((array)$this->cup->data['presets']+array('gruppen' => $this->cup->data['gruppen']) as $key => $val)
 				{
-					$_content[$key] = $val;
+					if ((string)$val !== '') $_content[$key] = $val;
 				}
 			}
 			$this->comp->data_merge($_content);
@@ -257,7 +257,11 @@ class ranking_competition_ui extends ranking_bo
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
 			'serie'     => array(0 => lang('none')) + $this->cup->names(array(
 				'nation'=> $this->comp->data['nation'],
-				'fed_id'=> $this->comp->data['fed_id'])),
+				'fed_id'=> $this->is_admin || $this->edit_rights($this->comp->data['nation']) ?
+					'' : $this->comp->data['fed_id'],
+				'rkey LIKE '.$this->db->quote(($this->comp->data['datum'] ?
+					substr($this->comp->data['datum'], 2, 2) : date('y')).'%'),
+			)),
 			'nation'    => $this->ranking_nations,
 			'fed'       => $this->federation->get_competition_federations($this->comp->data['nation']),
 			'gruppen'   => $this->cats->names(array('nation' => $this->comp->data['nation'])),
@@ -276,6 +280,11 @@ class ranking_competition_ui extends ranking_bo
 			'prequal_type' => $this->comp->prequal_types,
 			'continent'    => ranking_federation::$continents,
 		);
+		// if cup is not in sel_options, try reading it without filters
+		if (!empty($content['serie']) && !isset($sel_options['serie'][$content['serie']]))
+		{
+			$sel_options['serie'] += $this->cup->names(['SerId' => $content['serie']]);
+		}
 		// select a category parent fitting to the nation
 		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
 		$content['cat_parent_name'] = ($content['nation']? $content['nation'] : 'Int.').' '.lang('Competitions');

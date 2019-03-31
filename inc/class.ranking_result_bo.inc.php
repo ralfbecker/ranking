@@ -2150,8 +2150,17 @@ class ranking_result_bo extends ranking_bo
 				$filter_nation = $import_comp['fed_id'] ? $import_comp['fed_id'] : $import_comp['nation'];
 			}
 		}
+		// check if comp belongs to a state-federation, but cup is national or an other federation
+		// --> cup result should use its federation to skip non-members
+		if (($comp = $this->comp->read($keys['WetId'])) && $comp['fed_id'] && $comp['serie'] &&
+			($cup = $this->cup->read($comp['serie'])) && $cup['fed_id'] != $comp['fed_id'])
+		{
+			$cup_filter = $this->federation->query_list('fed_id', 'fed_id', array('fed_parent' => $cup['fed_id']));
+		}
 		$skipped = $last_rank = $ex_aquo = 0;
 		$rank = 1;
+		$cup_last_rank = $cup_ex_aquo = 0;
+		$cup_rank = 1;
 		foreach($this->route_result->search('',false,'result_rank','','',false,'AMD',false,array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
@@ -2164,17 +2173,43 @@ class ranking_result_bo extends ranking_bo
 			//error_log('row='.array2string($row));
 			if ($row['result_rank'])
 			{
-				if ($filter_nation && (!is_numeric($filter_nation) && $row['nation'] != $filter_nation ||
-					is_numeric($filter_nation) && $row['fed_id'] != $filter_nation && $row['fed_parent'] != $filter_nation))
-				{
-					$skipped++;
-					continue;
-				}
 				if ($import_cat && !$this->cats->in_agegroup($row['geb_date'], $import_cat))
 				{
 					$skipped++;
 					continue;
 				}
+				// if requested filter by nation or federation
+				$org_rank = $row['result_rank'];
+				if ($filter_nation && (!is_numeric($filter_nation) && $row['nation'] != $filter_nation ||
+					is_numeric($filter_nation) && $row['fed_id'] != $filter_nation && $row['fed_parent'] != $filter_nation))
+				{
+					$skipped++;
+					// if we have a cup_filter, only really skip, if it does not match
+					if (empty($cup_filter) || !in_array($row['fed_parent'], $cup_filter))
+					{
+						continue;
+					}
+					// otherwise just set place to 0, but record
+					$row['result_rank'] = 0;
+				}
+				// re-rank cup result
+				if ($cup_last_rank === (int)$org_rank)
+				{
+					++$cup_ex_aquo;
+				}
+				else
+				{
+					$cup_ex_aquo = 0;
+				}
+				$cup_last_rank = (int)$org_rank;
+				$row['cup_place'] = $cup_rank++ - $cup_ex_aquo;
+				$result[$row['PerId']] = $row;
+				//error_log(__METHOD__."() $row[cup_place]. $row[nachname] $row[vorname] ($row[PerId]) result_rank=$row[result_rank]");
+
+				// no regular, but cup result
+				if (!$row['result_rank']) continue;
+
+				// re-rank regular result
 				if ($last_rank === (int)$row['result_rank'])
 				{
 					++$ex_aquo;
