@@ -337,7 +337,10 @@ class ranking_federation extends Api\Storage\Base
 		{
 			if (!$filter || ($right & $filter))
 			{
-				$grants[$name] = $GLOBALS['egw']->acl->get_ids_for_location($location,$right,self::APPLICATION);
+				if (($grants[$name] = $GLOBALS['egw']->acl->get_ids_for_location($location,$right,self::APPLICATION)) === false)
+				{
+					$grants[$name] = [];
+				}
 			}
 		}
 		//error_log(__METHOD__."('$fed_id') returning ".array2string($grants));
