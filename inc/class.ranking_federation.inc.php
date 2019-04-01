@@ -118,6 +118,20 @@ class ranking_federation extends Api\Storage\Base
 	}
 
 	/**
+	 * Get regions / direct children of national federation
+	 *
+	 * @param $nation ='GER'
+	 * @return array fed_id => name pairs
+	 */
+	function regions($nation='GER')
+	{
+		return $this->query_list('verband', 'fed_id', [
+				"fed_parent IN (SELECT fed_id FROM ".self::FEDERATIONS_TABLE." WHERE fed_parent IS NULL AND nation=".
+					$this->db->quote($nation).')',
+			], 'verband');
+	}
+
+	/**
 	 * reads row matched by key and puts all cols in the data array
 	 *
 	 * @param array $keys array with keys in form internalName => value, may be a scalar value if only one key

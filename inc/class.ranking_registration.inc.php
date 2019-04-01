@@ -410,8 +410,9 @@ class ranking_registration extends Api\Storage\Base
 		{
 			$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
 
-			// use fed_id, if there is not fed_parent
-			$fed_parent = 'CASE WHEN fed_parent IS NULL THEN Federations.fed_id ELSE fed_parent END';
+			// use fed_id, if there is no fed_parent or a German region
+			$ger_regions = implode(',', array_keys(ranking_bo::getInstance()->federation->regions('GER')));
+			$fed_parent = "CASE WHEN fed_parent IS NULL OR fed_parent IN ($ger_regions) THEN Federations.fed_id ELSE fed_parent END";
 			$extra_cols = str_replace('fed_parent', $fed_parent.' AS fed_parent',
 				array_merge($extra_cols ? explode(',', $extra_cols) : array(),
 					explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
@@ -438,9 +439,12 @@ class ranking_registration extends Api\Storage\Base
 							!is_numeric($val) ? 'nation' : 'fed_parent' => $val,
 						));
 						// for numeric ids / state federations also check SUI Regionalzentrum acl.fed_id
-						if (is_numeric($val)) $f = '('.$f.$this->db->expression(ranking_athlete::FEDERATIONS_TABLE,' OR acl.',array(
-							'fed_id' => $val,
-						),')');
+						if (is_numeric($val))
+						{
+							$f = '('.$f.$this->db->expression(ranking_athlete::FEDERATIONS_TABLE,
+								' OR '.ranking_athlete::FEDERATIONS_TABLE.'.', ['fed_id' => $val],
+								' OR acl.', ['fed_id' => $val]).')';
+						}
 						$filter[] = $f;
 					}
 					unset($filter[$col]);
