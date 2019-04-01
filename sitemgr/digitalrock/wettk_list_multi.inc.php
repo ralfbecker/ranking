@@ -266,7 +266,7 @@ if ($mode != 2)
 {
 	$last_s_year = $year;
 
-	if (!defined(DR_PATH))	// not running in SiteMgr
+	if (!defined('DR_PATH'))	// not running in SiteMgr
 	{
 		echo "<script>
 	jQuery(document).ready(function(){
