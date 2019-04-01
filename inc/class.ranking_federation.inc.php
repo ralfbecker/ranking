@@ -481,11 +481,7 @@ class ranking_federation extends Api\Storage\Base
 			$feds = array();
 			if ($nation)
 			{
-				$nations_feds = 'SELECT fed_id FROM '.self::FEDERATIONS_TABLE.' WHERE nation='.$this->db->quote($nation).' AND fed_parent IS NULL';
-				foreach($this->search(array('nation' => $nation,"fed_parent IN ($nations_feds)"),'fed_id,verband','verband') as $fed)
-				{
-					$feds[$fed['fed_id']] = $nation.': '.$fed['verband'];
-				}
+				$feds = $this->federations($nation, true);
 				$feds[$nation] = $nation;	// show nation itself, directly under the national feds, above the international ones
 			}
 			foreach($this->search(array('fed_parent IS NULL'),'DISTINCT nation,verband,fed_nationname,fed_continent','nation') as $fed)
