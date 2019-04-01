@@ -257,7 +257,7 @@ class ranking_competition_ui extends ranking_bo
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
 			'serie'     => array(0 => lang('none')) + $this->cup->names(array(
 				'nation'=> $this->comp->data['nation'],
-				'fed_id'=> $this->is_admin || $this->edit_rights($this->comp->data['nation']) ?
+				'fed_id'=> $this->is_admin || $this->edit_rights[$this->comp->data['nation']] ?
 					'' : $this->comp->data['fed_id'],
 				'rkey LIKE '.$this->db->quote(($this->comp->data['datum'] ?
 					substr($this->comp->data['datum'], 2, 2) : date('y')).'%'),
