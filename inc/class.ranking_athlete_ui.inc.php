@@ -404,7 +404,9 @@ class ranking_athlete_ui extends ranking_bo
 									lang('international') : $content['license_nation']));
 							}
 							// download form
-							if (!$required_missing && $this->license_form_name($content['license_nation'], $content['license_year']))
+							if (!$required_missing && $this->license_form_name(
+								$content['license_nation'], $content['license_year'],
+								$content['license_cat'], $this->athlete->data['PerId']))
 							{
 								$this->licenseform($content['license_nation'], $content['license_year'],
 									$content['license_cat'], $this->athlete->data['PerId']);
@@ -1099,14 +1101,14 @@ Continuer';
 			//error_log(__METHOD__."('$nation', $year, $GrpId, $PerId) birthdate={$this->athlete->data['geb_date']} --> age=$age --> minor=".array2string($minor));
 		}
 
-		if (!(!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
+		if ((!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
 				!($file=self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'], $extensions, $ext))) &&
 			(!$minor || !($file=self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation.'_minor', $extensions, $ext))))
 		{
 			$file = self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation, $extensions, $ext);
 		}
 		//error_log(__METHOD__."('$nation', $year, $GrpId, minor=$minor, ".array2string($extensions).") ext=$ext, returning ".array2string($file));
-		return $vfs_prefix ? $file : substr($file, strlen(Vfs::PREFIX));
+		return !isset($file) || $vfs_prefix ? $file : substr($file, strlen(Vfs::PREFIX));
 	}
 
 	/**
