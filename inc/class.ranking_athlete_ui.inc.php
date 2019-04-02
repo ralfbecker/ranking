@@ -407,7 +407,7 @@ class ranking_athlete_ui extends ranking_bo
 							if (!$required_missing && $this->license_form_name($content['license_nation'], $content['license_year']))
 							{
 								$this->licenseform($content['license_nation'], $content['license_year'],
-									$content['license_cat'], $this->athlete->data['PerId'], $this->athlete->data['geb_date']);
+									$content['license_cat'], $this->athlete->data['PerId']);
 							}
 						}
 						// change of license status, requires athlete rights for the license-nation
@@ -1062,6 +1062,7 @@ Continuer';
 		foreach($extensions ? (array)$extensions : self::$merge_extensions as $ext)
 		{
 			if (file_exists($path.$ext)) return $path.$ext;
+			//error_log(__METHOD__."('$path', ".array2string($extensions).") $path$ext NOT found");
 		}
 		return null;
 	}
@@ -1077,18 +1078,26 @@ Continuer';
 	 * @param string $nation =null
 	 * @param int $year =null defaults to $this->license_year
 	 * @param int $GrpId =null category to apply for
-	 * @param bool $minor =false true: athlete is a minor
+	 * @param int $PerId =null optional PerId to use minor-form
 	 * @param string|array $extensions =null default all allowed self::$merge_extensions
 	 * @param boolean $vfs_prefix =true return Vfs::PREFIX, default yes
 	 * @param string& $ext =null on return: extension for returned path
 	 * @return string|null full path on server or null if none found
 	 */
-	function license_form_name($nation=null, $year=null, $GrpId=null, $minor=false, $extensions=null, $vfs_prefix=true, &$ext=null)
+	function license_form_name($nation=null, $year=null, $GrpId=null, $PerId=null, $extensions=null, $vfs_prefix=true, &$ext=null)
 	{
 		if (is_null($year)) $year = $this->license_year;
 		if ($nation == 'NULL') $nation = null;
 
 		$base = Vfs::PREFIX.$this->comp->vfs_pdf_dir;
+
+		// if we have a PerId, check if athlete is a minor (to prefer minor-form over general/adult one)
+		if (!empty($PerId) && ($PerId == $this->athlete->data['PerId'] || $this->athlete->read($PerId)))
+		{
+			$age = ranking_athlete::age($this->athlete->data['geb_date']);
+			$minor = !empty($age) && $age < 18;
+			//error_log(__METHOD__."('$nation', $year, $GrpId, $PerId) birthdate={$this->athlete->data['geb_date']} --> age=$age --> minor=".array2string($minor));
+		}
 
 		if (!(!(int)$GrpId || !($cat = $this->cats->read($GrpId)) ||
 				!($file=self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation.'_'.$cat['rkey'], $extensions, $ext))) &&
@@ -1096,7 +1105,7 @@ Continuer';
 		{
 			$file = self::merge_file_exists($base.'/'.$year.'/license_'.$year.$nation, $extensions, $ext);
 		}
-		//error_log(__METHOD__."('$nation', $year, $GrpId, minor=$minor, ".array2string($extensions).2) ext=$ext, returning ".array2string($file));
+		//error_log(__METHOD__."('$nation', $year, $GrpId, minor=$minor, ".array2string($extensions).") ext=$ext, returning ".array2string($file));
 		return $vfs_prefix ? $file : substr($file, strlen(Vfs::PREFIX));
 	}
 
@@ -1116,19 +1125,14 @@ Continuer';
 		if (is_null($PerId)) $PerId = $_GET['PerId'];
 
 		$ext = null;
-		if ($this->athlete->read($PerId))
+		if ($this->athlete->read($PerId) &&
+			($vfs_path = $this->license_form_name($nation, $year, $GrpId, $PerId, null, false, $ext)))
 		{
-			$age = ranking_athlete::age($this->athlete->data['geb_date']);
-
-			if (($vfs_path = $this->license_form_name($nation, $year, $GrpId,
-				!empty($age) && $age < 18, null, false, $ext)))
-			{
-				$merge = new ranking_merge();
-				$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.
-					$this->athlete->data['nachname'].$ext;
-				// does NOT return, unless there is an error
-				$err = $merge->download($vfs_path, $this->athlete->data['PerId'], $file);
-			}
+			$merge = new ranking_merge();
+			$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.
+				$this->athlete->data['nachname'].$ext;
+			// does NOT return, unless there is an error
+			$err = $merge->download($vfs_path, $this->athlete->data['PerId'], $file);
 		}
 		header('HTTP/1.1 204 No Content');
 		error_log(__METHOD__."('$nation', $year, $GrpId, $PerId) vfs_path=$vfs_path, merge-error: $err");
