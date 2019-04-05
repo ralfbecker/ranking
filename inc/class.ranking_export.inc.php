@@ -4,8 +4,8 @@
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
- * @link http://www.egroupware.org
- * @link http://www.digitalROCK.de
+ * @link https://www.egroupware.org
+ * @link https://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
  * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
@@ -16,7 +16,7 @@ use EGroupware\Api\Egw;
 /**
  * XML/JSON export logic
  *
- * @link http://www.digitalrock.de/egroupware/ranking/README
+ * @link https://www.digitalrock.de/egroupware/ranking/README
  *
  * Exported data is cached in a configurable cache specified by Install-ID in ranking configuration
  * to allow two instances to share a ranking database.
@@ -123,6 +123,11 @@ class ranking_export extends ranking_result_bo
 	const IFSC_BASE_PAGE = '/index.php/world-competition';
 
 	/**
+	 * Protocol and host for IFSC urls
+	 */
+	const IFSC_SITE = 'https://www.ifsc-climbing.org';
+
+	/**
 	 * Return base url
 	 *
 	 * @param boolean $use_egw =false do we need egroupware or website
@@ -161,7 +166,7 @@ class ranking_export extends ranking_result_bo
 		if (is_null($base))
 		{
 			$base = self::base_url();
-			if ($base == 'http://www.ifsc-climbing.org')
+			if ($base == self::IFSC_SITE)
 			{
 				$base .= self::IFSC_BASE_PAGE.'#!comp=';
 			}
@@ -190,7 +195,7 @@ class ranking_export extends ranking_result_bo
 		if (is_null($base))
 		{
 			$base = self::base_url();
-			if ($base == 'http://www.ifsc-climbing.org')
+			if ($base == self::IFSC_SITE)
 			{
 				//$base .= self::IFSC_BASE_PAGE.'#!person=';
 				$base .= '/index.php?option=com_ifsc&view=athlete&id=';
@@ -221,7 +226,7 @@ class ranking_export extends ranking_result_bo
 		if (is_null($base))
 		{
 			$base = self::base_url();
-			if ($base == 'http://www.ifsc-climbing.org')
+			if ($base == self::IFSC_SITE)
 			{
 				$base .= self::IFSC_BASE_PAGE.'#!type=ranking&cat=';
 			}
