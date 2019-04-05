@@ -266,7 +266,7 @@ class ranking_export extends ranking_result_bo
 	 *
 	 * @var int
 	 */
-	const EXPORT_ROUTE_RUNNING_EXPIRES = 10;
+	const EXPORT_ROUTE_RUNNING_EXPIRES = 5;
 	/**
 	 * Expires header time for proxys/cdn on a recently offical result
 	 *
@@ -315,7 +315,10 @@ class ranking_export extends ranking_result_bo
 	{
 		if (!isset(self::$cache_level)) self::set_cache_level();
 
-		return Api\Cache::setCache(self::$cache_level, 'ranking', $location, $data, $expiration);
+		// dont cache anything for longer to limit used cache
+		if (!$expiration || $expiration > 900) $expiration = 900;
+
+	   return Api\Cache::setCache(self::$cache_level, 'ranking', $location, $data, $expiration);
 	}
 
 	/**
@@ -2225,11 +2228,12 @@ class ranking_export extends ranking_result_bo
 		}
 		$filter = null;
 		$location = self::export_aggregated_location($type, $date, $comp, $cup, $cat, $filter);
+		/* disable caching of aggregated rankings for now, as we don't invalidate :(
 		if (!in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) &&
 			($data = self::getCache($location)))
 		{
 			return $data;
-		}
+		}*/
 
 		switch($type)
 		{
