@@ -124,8 +124,9 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 	#ranking-result-index_comp_logo {
 		margin-right: 10px;
 	}
-	#ranking-result-index_sponsor_logos {
-
+	#ranking-result-index_ranking-result-footer td.comp_sponsors > img.comp_sponsors {
+		width: 100%;
+		height: auto;
 	}
 }
 .half_down { position: relative; top: 1.3em; }
