@@ -294,6 +294,10 @@ class ranking_competition extends Api\Storage\Base
 			}
 			$data['quali_preselected'] = implode(',', $to_store);
 		}
+		if ($data['prequal_comps'])
+		{
+			$data['prequal_comps'] = implode(',', $data['prequal_comps']);
+		}
 		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
 	}
 
