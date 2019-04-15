@@ -1741,7 +1741,9 @@ class ranking_route_result extends Api\Storage\Base
 		// final with 2018+ boulder rules --> apply tie breaking
 		if ($discipline === 'boulder2018' && !$route['route_quota'])
 		{
-			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
+			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems'],
+				// for regular boulder final (and previous heat is on one route), we have to do countback to previous heat first
+				!($route && $route['discipline'] === 'combined') && ($route['route_order'] > 2 || $route['route_type'] == ONE_QUALI));
 		}
 		// speed final tie breaking by countback to speed qualification
 		if ($discipline == 'speed' && $keys['route_order'] >= 2)
@@ -1926,12 +1928,29 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param array& $results on return new_rank and detail[attempts] might be changed (and need storing)
 	 * @param array $keys
 	 * @param int $num_problems
+	 * @param boolean $countback_first =true regular boulder final, false: combined boulder final
+	 *
+	 * According to Tim Hatch:
+	 * In the boulder World Cup, in the final (rule 8.20.B):
+	 *
+	 * 1/	Rank using T (DESC) then Z (DESC) then TA (ASC) then ZA (ASC)
+	 * 2/	If tied after 1/, then countback to the previous round (unless the previous round had 2 groups)
+	 * 3/	If tied after 2/, then compare best results (tops)
+	 * 4/	If tied after 3/, then compare best results (zones)
+	 *
+	 * For the final boulder "stage” in a Combined discipline competition, the procedure is modified as follow (rule 11.10.B):
+	 *
+	 * 1/	Rank using T (DESC) then Z (DESC) then TA (ASC) then ZA (ASC)
+	 * 2/	If tied after 1/, then compare best results (tops)
+	 * 3/	If tied after 2/, then compare best results (zones)
+	 * 4/	If tied after 3/, then countback to the qualification boulder “stage"
 	 */
-	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems)
+	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems, $countback_first=true)
 	{
 		// remove "old" attempts, in case they get not written again
 		$old_attempts = array();
-		foreach($results as &$result)
+		$last_result = null;
+		foreach($results as $i => &$result)
 		{
 			if (is_string($result['detail']))
 			{
@@ -1939,6 +1958,14 @@ class ranking_route_result extends Api\Storage\Base
 				$old_attempts[$result['PerId']] = $result['detail']['attempts'];
 				unset($result['detail']['attempts']);
 			}
+			// for regular (not combined) boulder final, we have to do the countback to 1/2-final first
+			if ($countback_first &&
+				$result['new_rank'] == $last_result['new_rank'] &&
+				$result['rank_prev_heat'] != $last_result['rank_prev_heat'])
+			{
+				$result['new_rank'] = $i+1;
+			}
+			$last_result = $result;
 		}
 		$input = $results;
 
