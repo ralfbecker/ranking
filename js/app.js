@@ -105,6 +105,10 @@ app.classes.ranking = AppJS.extend(
 						this.egw.lang("Start- and result-lists no longer contain input fields or buttons:\ndouble-click on an athlete to enter his result, or right click for more options."),
 						'no_resultservice_hint');
 				}
+				if (this.content.nm.template.match(/^ranking.result.index.speed_graph/))
+				{
+					jQuery('#ranking-result-index').on('dblclick', 'table.speed_athlete', jQuery.proxy(this.edit_pairing, this));
+				}
 				break;
 
 			case 'ranking.registration':
@@ -1575,12 +1579,34 @@ app.classes.ranking = AppJS.extend(
 	},
 
 	/**
+	 * Edit double-clicked speed pairing cell
+	 *
+	 * @param {jQuery.event} event
+	 */
+	edit_pairing: function(event)
+	{
+		var id = jQuery(event.currentTarget).find('input[type=hidden]').val();
+		var parts = id ? id.split(/:/) : [];	// WetId:GrpId:route_order:PerId
+		var content = this.et2.getArrayMgr('content');
+		if (id.length < 4 || !parseInt(parts[2]) || !parts[3] ||
+			!content || !content.getEntry('nm[is_judge]') ||
+			content.getEntry('nm[result_official]'))
+		{
+			return;
+		}
+		this.action_edit({}, [{id: parts[3]}], 'heat'+parts[2],
+			!!content.getEntry('nm[rows][heat'+(parseInt(parts[2])+1)+']'));
+	},
+
+	/**
 	 * Function to create edit dialog for athlete from the result list
 	 *
 	 * @param {object} _action egw action object
 	 * @param {object} _selected selected action from the grid
+	 * @param {string} _heat additional index into nm.rows or undefined
+	 * @param {bool}   _ro do NOT allow updates
 	 */
-	action_edit: function (_action,_selected)
+	action_edit: function (_action, _selected, _heat, _ro)
 	{
 		var PerId = _selected[0].id;
 		var template = 'ranking.result.index.rows_boulder.edit';
@@ -1593,7 +1619,7 @@ app.classes.ranking = AppJS.extend(
 		{
 			var template = nm.template+'.edit';
 			if (typeof this.et2._inst.templates[template] == 'undefined') return;	// no edit template found
-			var row = this.getRowById(nm.rows, PerId);
+			var row = this.getRowById(_heat ? nm.rows[_heat] : nm.rows, PerId);
 			var entry = jQuery.extend(row.data, {nm: nm});
 
 			// remove not existing boulders, to not show autorepeated rows
@@ -1604,7 +1630,7 @@ app.classes.ranking = AppJS.extend(
 		}
 		var buttons = [];
 		var width = 480;
-		if (!nm.result_official)
+		if (!nm.result_official && !_ro)
 		{
 			buttons.push({button_id: 'update', text: this.egw.lang('Update'), id: 'update', image: 'apply', default: true, disabled: !!entry.checked});
 
@@ -1641,7 +1667,7 @@ app.classes.ranking = AppJS.extend(
 						self.update_result_row.call(self, _button, entry, _values, function(_data)
 						{
 							// reopen dialog with changed content
-							self.action_edit({},[{id: PerId}]);
+							self.action_edit({}, [{id: PerId}], _heat, _ro);
 							// ToDo: update dialog with returned values and not reopen it
 							//var row = this.getRowById(_data.content, PerId);
 							//dialog.options.value = jQuery.extend(dialog.options.value, row.data);
@@ -1653,10 +1679,10 @@ app.classes.ranking = AppJS.extend(
 						//return false;
 						break;
 					case 'next':
-						self.action_edit({},[{id: row.next}]);
+						self.action_edit({}, [{id: row.next}], _heat, _ro);
 						break;
 					case 'previous':
-						self.action_edit({},[{id: row.prev}]);
+						self.action_edit({}, [{id: row.prev}], _heat, _ro);
 						break;
 					default:
 						alert('Not yet ;-)');

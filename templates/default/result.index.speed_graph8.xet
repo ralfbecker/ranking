@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
+<!-- combinded speed final pairing (2019+ rules with everyone participating in all heats) -->
+<overlay>
+	<template id="ranking.result.index.speed_graph.cell" template="" lang="" group="0" version="17.1.001">
+		<grid width="100%" class="speed_athlete">
+			<columns>
+				<column/>
+				<column/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<description no_lang="1" id="nachname" class="lastname leftPad5"/>
+					<textbox type="hidden" id="id" value="$cont[WetId]:$cont[GrpId]:$cont[route_order]:$cont[PerId]"/>
+					<description no_lang="1" align="right" id="nation"/>
+				</row>
+				<row>
+					<description no_lang="1" id="vorname" class="leftPad5" span="2"/>
+					<description align="right" no_lang="1" id="result"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index.speed_graph8.edit" template="" lang="" group="0" version="1.9.004" class="ranking_view">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column/>
+				<column width="100"/>
+			</columns>
+			<rows>
+				<row>
+					<box align="center">
+						<hbox align="center" class="avatar">
+							<image src="profile_url"/>
+						</hbox>
+					</box>
+				</row>
+				<row class="name row" height="50px">
+					<description align="left" id="result_rank" class="place"/>
+					<hbox align="center">
+						<description id="nachname" no_lang="1" class="lastname"/>
+						<description id="vorname" no_lang="1" />
+						<description id="nation" no_lang="1" />
+						<description id="start_number" label="(%s)"/>
+					</hbox>
+					<description align="right" id="time_sum"/>
+				</row>
+				<row class="row" height="50px">
+					<description label="Time"/>
+					<float id="result_time" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<select id="eliminated" onchange="app.ranking.eliminated_changed" align="right"/>
+				</row>
+				<row class="row" valign="top" height="40px" disabled="!@nm[rows][show_second_lane]">
+					<description label="Lane B"/>
+					<float id="result_time_r" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<select id="eliminated_r" onchange="app.ranking.eliminated_changed" align="right"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+	<template id="ranking.result.index.speed_graph8" template="" lang="" group="0" version="17.1.001">
+		<grid width="99%" id="nm[rows]">
+			<columns>
+				<column width="10"/>
+				<column width="30%"/> <!-- 1/4-final: heat3 -->
+				<column width="10"/>
+				<column width="30%"/> <!-- 1/2-final: heat4 -->
+				<column width="10"/>
+				<column width="30%"/> <!-- final: heat5 -->
+			</columns>
+			<rows>
+				<row>
+					<description value="1"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[1]"/>
+					<description value="5" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[1]"/>
+					<description value="9" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[1]"/>
+				</row>
+				<row>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[2]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[2]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[2]"/>
+				</row>
+				<row>
+					<description value="2"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[3]"/>
+					<description value="6" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[3]"/>
+					<description value="10" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[3]"/>
+				</row>
+				<row>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[4]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[4]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[4]"/>
+				</row>
+				<row>
+					<description value="3"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[5]"/>
+					<description value="7" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[5]"/>
+					<description value="11" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[5]"/>
+				</row>
+				<row>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[6]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[6]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[6]"/>
+				</row>
+				<row>
+					<description value="4"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[7]"/>
+					<description value="8" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[7]"/>
+					<description value="12" align="right"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[7]"/>
+				</row>
+				<row>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat3[8]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[8]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[8]"/>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>
