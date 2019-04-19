@@ -238,7 +238,7 @@
 				</row>
 				<row class="row">
 					<description for="geb_date" value="Birthdate"/>
-					<date statustext="use access control to deny display on the website" id="geb_date" data_format="Y-m-d" year_range="-40:-3"/>
+					<date statustext="{use access control to deny display on the website}&lt;br>{years outside selectable range can allways be typed in manually, using the date-format from your preferences}" statustext_html="true" id="geb_date" data_format="Y-m-d" year_range="-40:-3"/>
 					<description for="geb_ort" value="Place of birth"/>
 					<textbox statustext="where is the athlete born (incl. nation)" id="geb_ort" size="35" maxlength="60" span="all"/>
 				</row>
