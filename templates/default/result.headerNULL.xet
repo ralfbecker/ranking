@@ -10,7 +10,7 @@
 			</columns>
 			<rows>
 				<row>
-					<image src="comp_logo"/>
+					<image src="comp_logo" class="fed_logo"/>
 					<vbox>
 						<description id="comp_name" no_lang="1"/>
 						<description id="comp_date" no_lang="1"/>
@@ -42,7 +42,7 @@
 }
 
 .fed_logo img {
- 
+
 }
 
 #comp_logo {
