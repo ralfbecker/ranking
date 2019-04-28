@@ -1972,7 +1972,7 @@ class ranking_route_result extends Api\Storage\Base
 				unset($result['detail']['attempts']);
 			}
 			// for regular (not combined) boulder final, we have to do the countback to 1/2-final first
-			if ($countback_first &&
+			if ($countback_first && !empty($result['new_rank']) &&	// but only if competitor has climbed in final!
 				$result['new_rank'] == $last_result['new_rank'] &&
 				$result['rank_prev_heat'] != $last_result['rank_prev_heat'])
 			{
