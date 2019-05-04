@@ -40,7 +40,10 @@
 					<select-cat id="${row}[cat_id]" readonly="true"/>
 					<select id="${row}[discipline]" readonly="true"/>
 					<textbox type="integer" align="center" id="${row}[quota]" readonly="true"/>
-					<date id="${row}[deadline]" readonly="true" options="Y-m-d"/>
+					<vbox>
+						<date id="${row}[deadline]" readonly="true" options="Y-m-d"/>
+						<date id="${row}[replace_deadline]" readonly="true" options="Y-m-d"/>
+					</vbox>
 					<select-account id="${row}[judges]" readonly="true"/>
 					<description id="${row}[rkey]" no_lang="1"/>
 					<vbox>

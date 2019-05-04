@@ -633,9 +633,11 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param int|array $comp WetId or complete competition array
 	 * @param int|string|array $athlete ='' whole athlete array, nation of the athlets to register or (acl_)fed_id, if empty do a general check independent of nation
-	 * @param int GrpId=null if set check only for a given cat
+	 * @param int GrpId =null if set check only for a given cat
+	 * @param bool& $replace =null on return: true, if name-replace is allowed
+	 * @return bool true if registration is allowed, false if not
 	 */
-	function registration_check($comp,$athlete=null,$cat=null)
+	function registration_check($comp, $athlete=null, $cat=null, &$replace=null)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
@@ -653,6 +655,12 @@ class ranking_bo extends ranking_so
 					(!$this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']) ||	// [ deadline (else comp-date) is NOT over OR
 						 $this->acl_check($comp['nation'],self::ACL_RESULT))));						//   user has result-rights for that calendar ] ) }
 
+		// if we have (no more) rights, but a replace-only deadline --> check that too
+		if (!($replace = $ret) && !empty($comp['replace_deadline']))
+		{
+			$replace = $this->acl_check_athlete($athlete, self::ACL_REGISTER) &&
+				!$this->date_over($comp['replace_deadline']);
+		}
 		//error_log(__METHOD__."(".array2string($comp).", ".array2string($athlete).", $cat) returning ".array2string($ret));
 		return $ret;
 	}
@@ -821,11 +829,11 @@ class ranking_bo extends ranking_so
 	 * @param int|array $athlete
 	 * @param int|array $cat
 	 * @param int|array $comp
-	 * @param boolean $register =true true: user tries to register, false: other operation
+	 * @param string $mode =ranking_registration::REGISTERED or eg. "replace"
 	 * @throws Api\Exception\WrongParameter if $athlete, $cat or $comp are not found
 	 * @return string translated error-message or null
 	 */
-	function error_register($athlete, $cat, $comp, $register=true)
+	function error_register($athlete, $cat, $comp, $mode=ranking_registration::REGISTERED)
 	{
 		if (!is_array($athlete) && !($athlete = $this->athlete->read($athlete)))
 		{
@@ -839,13 +847,15 @@ class ranking_bo extends ranking_so
 		{
 			throw new Api\Exception\WrongParameter(lang('Competition NOT found !!!'));
 		}
-		$error = null;
+		$error = $replace = null;
 		if ($comp && !($this->is_admin || $this->is_judge($comp)) &&
-			($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum'])))
+			($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum'])) &&
+			($mode !== 'replace' || empty($comp['replace_deadline']) || $this->date_over($comp['replace_deadline'])))
 		{
 			$error = lang('Registration for this competition is over!');
 		}
-		elseif (!$this->registration_check($comp, $athlete, $cat['GrpId']))
+		elseif (!$this->registration_check($comp, $athlete, $cat['GrpId'], $replace) &&
+			($mode !== 'replace' || !$replace))
 		{
 			$error = lang('Missing registration rights!');
 		}
@@ -863,11 +873,11 @@ class ranking_bo extends ranking_so
 		{
 			$error = lang('Invalid age for age-group of category');
 		}
-		elseif ($register && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
+		elseif ($mode == ranking_registration::REGISTERED && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
 		{
 			$error = lang('This athlete has NO license!');
 		}
-		elseif ($register && $athlete['license'] == 's')
+		elseif ($mode == ranking_registration::REGISTERED && $athlete['license'] == 's')
 		{
 			$error = lang('Athlete is suspended !!!');
 		}
@@ -883,11 +893,12 @@ class ranking_bo extends ranking_so
 	 * @param int $mode =ranking_registration::REGISTERED ::DELETED, ::PREQUALIFIED, ::CONFIRMED
 	 * @param string& $msg =null on return over quota message for admins or jury
 	 * @param string $prequal_reason =null reason why athlete is prequalified
+	 * @param int $replace PerId of athlete to replace or null
 	 * @throws Api\Exception\WrongUserinput with error message for not matching agegroup or over quota
 	 * @throws Api\Exception\WrongParameter for other errors
 	 * @return boolean true of everythings ok, false on error
 	 */
-	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null, $prequal_reason=null)
+	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null, $prequal_reason=null, $replace=null)
 	{
 		if (!is_array($athlete)) $athlete = $this->athlete->read($athlete);
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
@@ -911,9 +922,27 @@ class ranking_bo extends ranking_so
 		}
 
 		// check if all conditions for registration are met
-		if (($error = $this->error_register($athlete, $cat, $comp, $mode == ranking_registration::REGISTERED)))
+		if (($error = $this->error_register($athlete, $cat, $comp, $replace ? 'replace' : $mode)))
 		{
 			throw new Api\Exception\WrongUserinput($error);
+		}
+
+		// check athlete to replace is registed
+		if ($replace)
+		{
+			list($replace) = $this->registration->search(array(), false, '', '', '*', false, 'AND', false, [
+					'PerId' => $r=$replace,
+				]+$keys+array('reg_deleted IS NULL'));
+
+			if (!$replace)
+			{
+				throw new Api\Exception\WrongParameter("Athlete to replace (#$r) not registered!");
+			}
+			// do not allow to replace with an other registed athlete, as that would implicitly just delete the one to replace
+			if ($data && isset($data[ranking_registration::PREFIX.ranking_registration::REGISTERED]))
+			{
+				throw new Api\Exception\WrongUserinput(lang('Athlete to replace with is already registered!'));
+			}
 		}
 
 		switch($mode)
@@ -953,6 +982,12 @@ class ranking_bo extends ranking_so
 						$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED] = $this->registration->now;
 					}
 				}
+				// check if athlete to replace was not prequalified or new one is too
+				if ($replace && (!isset($replace[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]) ||
+					isset($data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED])))
+				{
+					break;	// --> no quota check necessary (might fail, as to replace one is not yet deleted!)
+				}
 				// check quota, if athlete is not prequalified and no complimentary list
 				if ($comp['no_complimentary'] &&
 					!isset($prequalified[is_array($cat) ? $cat['GrpId'] : $cat][$athlete['PerId']]) &&
@@ -974,6 +1009,10 @@ class ranking_bo extends ranking_so
 					{
 						$msg = lang('No complimentary list (over quota)').' quota='.(int)$max_quota.'!';
 
+						if ($replace && isset($replace[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]))
+						{
+							$msg .= "\n".lang('Athlete to replace was prequalied!');
+						}
 						if (!$this->is_admin && !$this->is_judge($comp))
 						{
 							throw new Api\Exception\WrongUserinput($msg);
@@ -1006,10 +1045,21 @@ class ranking_bo extends ranking_so
 		}
 
 		$this->registration->init($data);
-		return !$this->registration->save(array(
+		$ret = !$this->registration->save(array(
 			ranking_registration::PREFIX.$mode => $this->registration->now,
 			ranking_registration::PREFIX.$mode.ranking_registration::ACCOUNT_POSTFIX => $this->user,
 		));
+
+		// if sucessful registed and we replace --> delete to replace one now
+		if ($ret && $replace)
+		{
+			$this->registration->init($replace);
+			$this->registration->save(array(
+				ranking_registration::PREFIX.ranking_registration::DELETED => $this->registration->now,
+				ranking_registration::PREFIX.ranking_registration::DELETED.ranking_registration::ACCOUNT_POSTFIX => $this->user,
+			));
+		}
+		return $ret;
 	}
 
 	/**

@@ -90,6 +90,8 @@ athlete is not in the age-group of that category	ranking	en	Athlete is NOT in th
 athlete is suspended !!!	ranking	en	Athlete is suspended !!!
 athlete not found !!!	ranking	en	Athlete NOT found !!!
 athlete scorecard already checked, update denied!	ranking	en	Athlete scorecard already checked, update denied!
+athlete to replace was prequalied!	ranking	en	Athlete to replace was prequalied!
+athlete to replace with is already registered!	ranking	en	Athlete to replace with is already registered!
 athletes	ranking	en	Athletes
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	en	Athlets need to be at least %1 years old! Maybe wrong date format.
 attention: merging can not be undone! really want to merge?	ranking	en	ATTENTION: merging can NOT be undone! Really want to merge?
@@ -672,6 +674,7 @@ unknown mode="%1"!	ranking	en	Unknown Mode="%1"!
 unknown type	ranking	en	Unknown type
 unpublished	ranking	en	unpublished
 until which date (incl.) are registrations allowed	ranking	en	Until which date (incl.) are registrations allowed
+until which date (incl.) are replacements allowed	ranking	en	Until which date (incl.) are replacements allowed
 up	ranking	en	Up
 update result	ranking	en	Update Result
 update time	ranking	en	update time

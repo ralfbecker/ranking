@@ -54,7 +54,8 @@ $phpgw_baseline = array(
 			'continent' => array('type' => 'int','precision' => '1','comment' => '1=Europe, 2=Asia, 4=America, 8=Africa, 16=Oceania'),
 			'average_ex_aquo' => array('type' => 'bool','default' => '1','comment' => '0: ex aquo get full points, 1: ex aquo get average points rounded down'),
 			'total_per_discipline' => array('type' => 'int','precision' => '1','comment' => 'total quota (combined+discipline)'),
-			'no_license' => array('type' => 'bool','default' => '0','comment' => '0: license required, 1: no license')
+			'no_license' => array('type' => 'bool','default' => '0','comment' => '0: license required, 1: no license'),
+			'replace_deadline' => array('type' => 'date','comment' => 'allow to replace athletes, but no new registration')
 		),
 		'pk' => array('WetId'),
 		'fk' => array(),

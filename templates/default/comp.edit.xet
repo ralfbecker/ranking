@@ -42,8 +42,10 @@
 			</columns>
 			<rows>
 				<row class="row">
-					<description value="Registration deadline" for="deadline" span="2"/>
-					<date statustext="Until which date (incl.) are registrations allowed" id="deadline" options="Y-m-d"/>
+					<hbox span="all">
+						<date label="Registration deadline" statustext="Until which date (incl.) are registrations allowed" id="deadline" options="Y-m-d"/>
+						<date label="Replace" statustext="Until which date (incl.) are replacements allowed" id="replace_deadline" options="Y-m-d"/>
+					</hbox>
 				</row>
 				<row class="row">
 					<description value="Quota" for="quota"/>

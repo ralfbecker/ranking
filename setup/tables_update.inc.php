@@ -2092,3 +2092,14 @@ function ranking_upgrade17_1_002()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.003';
 }
 
+
+function ranking_upgrade17_1_003()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','replace_deadline',array(
+		'type' => 'date',
+		'comment' => 'allow to replace athletes, but no new registration'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.004';
+}
+

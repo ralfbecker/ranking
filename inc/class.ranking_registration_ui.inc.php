@@ -165,9 +165,10 @@ class ranking_registration_ui extends ranking_bo
 				$row['state_changed'] .= "\n".$row['reg_prequal_reason'];
 
 			}
-			if ($comp_rights || $this->registration_check($comp, $row['nation']) ||
-				$comp['nation'] && ($this->registration_check($comp, $row['fed_parent']) ||
-					$this->registration_check($comp, $row['acl_fed_id'])))
+			$replace = false;
+			if ($comp_rights || $this->registration_check($comp, $row['nation'], null, $replace) ||
+				$comp['nation'] && ($this->registration_check($comp, $row['fed_parent'], null, $replace) ||
+					$this->registration_check($comp, $row['acl_fed_id'], null, $replace)))
 			{
 				if ($row['state'] == ranking_registration::PREQUALIFIED)
 				{
@@ -178,6 +179,11 @@ class ranking_registration_ui extends ranking_bo
 				{
 					$row['class'] .= ' allowDelete';
 				}
+			}
+			// if we have just replace rights
+			elseif($replace && ($row['state'] == ranking_registration::REGISTERED || $row['state'] == ranking_registration::CONFIRMED))
+			{
+				$row['class'] .= ' allowDelete';
 			}
 			if ($comp_rights && $row['state'] == ranking_registration::REGISTERED)
 			{
@@ -190,12 +196,14 @@ class ranking_registration_ui extends ranking_bo
 		$query['actions'] = self::get_actions($comp_rights || $this->is_judge($comp, true));
 
 		// let client-side know which rights current user has for selected competition
+		$replace = false;
 		Api\Json\Response::get()->call('app.ranking.competition_rights', (int)$comp['WetId'], 0,
 			($comp_rights ? self::ACL_EDIT : 0) |
-			($comp_rights || $this->is_judge($comp, true) || $this->registration_check($comp, $query['nation']) ||
+			($comp_rights || $this->is_judge($comp, true) || $this->registration_check($comp, $query['nation'], null, $replace) ||
 			// if no nation/federation filter is given, check if current user has registration rights for anything
 			!$query['nation'] && ($this->register_rights || $this->federation->get_grants(null, self::ACL_REGISTER)) ? self::ACL_REGISTER : 0) |
-			($this->is_judge($comp, true) ? 512 : 0));
+			($this->is_judge($comp, true) ? 512 : 0) |
+			($replace ? 8192 : 0));	// fake replace only rights
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('Registration').($comp ? ' - '.$comp['name'] : '');
 
@@ -323,6 +331,7 @@ class ranking_registration_ui extends ranking_bo
 			'register'   => ranking_registration::REGISTERED,
 			'prequalify' => ranking_registration::PREQUALIFIED,
 			'confirm'    => ranking_registration::CONFIRMED,
+			'replace'    => ranking_registration::REGISTERED,
 		);
 
 		$registered = 0;
@@ -355,7 +364,7 @@ class ranking_registration_ui extends ranking_bo
 			}
 			// register the user
 			try {
-				if ($this->register($comp, $cat, $athlete, $mode2ts[$params['mode']], $msg, $params['reason']))
+				if ($this->register($comp, $cat, $athlete, $mode2ts[$params['mode']], $msg, $params['reason'], $params['replace']))
 				{
 					$registered++;
 					if ($msg) break;	// stop, if over quota warning for admins/jury
@@ -365,6 +374,7 @@ class ranking_registration_ui extends ranking_bo
 					$error = lang('Error: registration');
 					break;
 				}
+				if ($params['replace']) break;	// replace can only be one
 			}
 			catch(Exception $e) {
 				$error = $e->getMessage();
@@ -398,6 +408,7 @@ class ranking_registration_ui extends ranking_bo
 			// plus evtl. question and concerned athlete
 			Api\Json\Response::get()->data(array(
 				'registered' => $registered,
+				'replace'   => $params['replace'],
 			)+(!isset($question) || $question === true ? array() : array(
 				'question'  => $question,
 				'PerId'     => $athlete['PerId'],
@@ -558,6 +569,14 @@ class ranking_registration_ui extends ranking_bo
 				'allowOnMultiple' => false,
 				'group' => $group,
 				'default' => true,
+			),
+			'replace' => array(
+				'caption' => 'Replace',
+				'icon' => 'edit',
+				'onExecute' => 'javaScript:app.ranking.replace_action',
+                'enableClass' => 'allowDelete',
+				'allowOnMultiple' => false,
+				'group' => $group,
 			),
 			'confirm' => array(
 				'caption' => 'Confirm',

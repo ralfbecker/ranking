@@ -1778,6 +1778,7 @@ app.classes.ranking = AppJS.extend(
 	ACL_EDIT: 4,
 	ACL_REGISTER: 64,
 	ACL_JUDGE: 512,
+	ACL_REPLACE: 8192,
 
 	_comp_rights: {},
 
@@ -1813,7 +1814,7 @@ app.classes.ranking = AppJS.extend(
 	{
 		app.ranking._register.call(app.ranking, _ev, _widget, _node);
 	},
-	_register: function(_ev, _widget, _node)
+	_register: function(_ev, _widget, _node, _replace)
 	{
 		var nm = this.register_nm = _widget.getRoot().getWidgetById('nm');
 		var filters = nm.getValue();
@@ -1823,14 +1824,14 @@ app.classes.ranking = AppJS.extend(
 			et2_dialog.alert(this.egw.lang('You need to select a competition first!', this.egw.lang('Registration')));
 			return;
 		}
-		if (!this.competition_rights(filters.comp, this.ACL_REGISTER))
+		if (!(this.competition_rights(filters.comp, this.ACL_REGISTER) ||
+			_replace && this.competition_rights(filters.comp, this.ACL_REPLACE)))
 		{
 			et2_dialog.alert(this.egw.lang('Missing registration rights!', this.egw.lang('Registration')));
 			return;
-
 		}
-		var cats = _widget.getParent().getArrayMgr('sel_options').getEntry('GrpId') ||
-			_widget.getRoot().getArrayMgr('sel_options').getEntry('GrpId');
+		var cats = _widget.getRoot().getArrayMgr('sel_options').getEntry('GrpId');
+		var replace = _replace;
 
 		var callback = jQuery.proxy(function(button_id, value, confirmed)
 		{
@@ -1852,12 +1853,13 @@ app.classes.ranking = AppJS.extend(
 			}
 			var filter = this.register_nm.getValue();
 			this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
-				WetId: filter.comp,
-				GrpId: value.GrpId,
+				WetId: replace ? replace.WetId : filter.comp,
+				GrpId: replace ? replace.GrpId : value.GrpId,
 				PerId: athletes,
 				mode: button_id,
 				reason: value.prequal_reason,
-				confirmed: confirmed
+				confirmed: confirmed,
+				replace: replace ? replace.PerId : undefined
 			}], this.register_callback, null, false, this).sendRequest();
 
 			// keep dialog open by returning false
@@ -1868,6 +1870,10 @@ app.classes.ranking = AppJS.extend(
 		if (this.competition_rights(filters.comp, this.ACL_EDIT))
 		{
 			buttons.push({text: this.egw.lang("Prequalify"), id: 'prequalify', image: 'bullet'});
+		}
+		if (_replace)
+		{
+			buttons = [{text: this.egw.lang("Replace"), id: "replace", image: 'check', class: "ui-priority-primary", default: true}];
 		}
 		buttons.push({text: this.egw.lang("Close"), id: "close", click: function() {
 			// If you override, 'this' will be the dialog DOMNode.
@@ -1880,22 +1886,28 @@ app.classes.ranking = AppJS.extend(
 			// If you use a template, the second parameter will be the value of the template, as if it were submitted.
 			callback: callback,
 			buttons: buttons,
-			title: this.egw.lang('Register athlets for this competition'),
+			title: _replace ? this.egw.lang('Replace')+' '+_replace.nachname+', '+_replace.vorname+' ('+_replace.nation+')':
+				this.egw.lang('Register athlets for this competition'),
 			template: "ranking.registration.add",
 			value: {
 				content: {
-					GrpId: filters.col_filter.GrpId || cats[0].value
+					GrpId: _replace ? _replace.GrpId : (filters.col_filter.GrpId || cats[0].value)
 				},
 				sel_options: {
 					GrpId: cats
+				},
+				readonlys: {
+					GrpId: typeof _replace !== 'undefined'
 				}
-			}
+			},
+			width: '480px'
 		});
 		dialog.template.widgetContainer.getWidgetById('PerId').set_autocomplete_params({
-			GrpId: filters.col_filter.GrpId || cats[0].value,
-			nation: filters.nation,
-			sex: filters.col_filter.sex
+			GrpId: _replace ? _replace.GrpId : (filters.col_filter.GrpId || cats[0].value),
+			nation: _replace ? _replace.nation : filters.nation,
+			sex: _replace ? _replace.sex : filters.col_filter.sex
 		});
+		if (_replace) dialog.template.widgetContainer.getWidgetById('PerId').set_multiple(false);
 	},
 
 	/**
@@ -1933,11 +1945,17 @@ app.classes.ranking = AppJS.extend(
 						GrpId: _data.GrpId,
 						PerId: _data.PerId,
 						mode: _data.mode,
+						replace: _data.replace,
 						confirmed: true
 					}], this.register_callback, null, false, this).sendRequest();
 				}
 			}, this), _data.question, _data.athlete, null, et2_dialog.BUTTON_YES_NO,
 			et2_dialog.QUESTION_MESSAGE, undefined, this.egw);
+		}
+		// if we replaced, close the dialog
+		else if (_data.replace && this.register_dialog)
+		{
+			this.register_dialog.destroy();
 		}
 	},
 
@@ -1968,6 +1986,26 @@ app.classes.ranking = AppJS.extend(
 			nation: filters.nation,
 			sex: filters.col_filter.sex
 		});
+	},
+
+	/**
+	 * Replace a registered athlete with an other one the user has to choose
+	 *
+	 * @param {egw_action} _action id: "replace"
+	 * @param {array} _selected eg. ["ranking::1638:5:1772"]
+	 */
+	replace_action: function(_action, _selected)
+	{
+		var data = this.egw.dataGetUIDdata(_selected[0].id);
+
+		this._register(null, this.et2, null, data.data);
+
+		/*this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+			WetId: data.data.WetId,
+			GrpId: data.data.GrpId,
+			PerId: data.data.PerId,
+			mode: _action.id
+		}], this.register_callback, null, false, this).sendRequest();*/
 	},
 
 	/**

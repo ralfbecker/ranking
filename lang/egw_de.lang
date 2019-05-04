@@ -85,6 +85,8 @@ athlete is not in the age-group of that category	ranking	de	Athlet hat NICHT den
 athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
 athlete not found !!!	ranking	de	Athlet NICHT gefunden !!!
 athlete scorecard already checked, update denied!	ranking	de	Die Scorecard des Athleten wurde bereits geprüft, update verweigert!
+athlete to replace was prequalied!	ranking	de	Zu ersetzender Athlete war vorqualifiziert!
+athlete to replace with is already registered!	ranking	de	Athlete mit dem ersetzt werden soll ist bereits registriert!
 athletes	ranking	de	Athleten
 athlets need to be at least %1 years old! maybe wrong date format.	ranking	de	Athleten müssen mindestens %1 Jahre alt sein! Eventuell falsches Datumsformat.
 attention: merging can not be undone! really want to merge?	ranking	de	ACHTUNG: Vereinigen kann NICHT rückgänig gemacht werden! Wollen Sie die beiden Athleten wirklich vereinigen?
@@ -657,6 +659,7 @@ unknown mode="%1"!	ranking	de	Unbekannter Modus="%1"!
 unknown type	ranking	de	Unbekannter Typ
 unpublished	ranking	de	unveröffentlicht
 until which date (incl.) are registrations allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Registrierung erlaubt
+until which date (incl.) are replacements allowed	ranking	de	Bis zu welchem Datum (einschl.) ist eine Ersetzung erlaubt
 up	ranking	de	Nach oben
 update result	ranking	de	Ergebnis aktualisieren
 update time	ranking	de	Zeit aktualisieren
