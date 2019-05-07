@@ -177,13 +177,13 @@ class ranking_registration_ui extends ranking_bo
 				}
 				elseif ($row['state'] == ranking_registration::REGISTERED || $row['state'] == ranking_registration::CONFIRMED)
 				{
-					$row['class'] .= ' allowDelete';
+					$row['class'] .= ' allowDelete allowReplace';
 				}
 			}
 			// if we have just replace rights
 			elseif($replace && ($row['state'] == ranking_registration::REGISTERED || $row['state'] == ranking_registration::CONFIRMED))
 			{
-				$row['class'] .= ' allowDelete';
+				$row['class'] .= ' allowReplace';
 			}
 			if ($comp_rights && $row['state'] == ranking_registration::REGISTERED)
 			{
@@ -574,7 +574,7 @@ class ranking_registration_ui extends ranking_bo
 				'caption' => 'Replace',
 				'icon' => 'edit',
 				'onExecute' => 'javaScript:app.ranking.replace_action',
-                'enableClass' => 'allowDelete',
+                'enableClass' => 'allowReplace',
 				'allowOnMultiple' => false,
 				'group' => $group,
 			),
