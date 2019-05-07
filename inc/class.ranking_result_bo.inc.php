@@ -1901,7 +1901,7 @@ class ranking_result_bo extends ranking_bo
 		}
 		if ($discipline === 'combined')
 		{
-			$discipline = $keys['discipline'] = $this->combined_order2discipline($keys['route_orkder'], $route_type);
+			$discipline = $keys['discipline'] = $this->combined_order2discipline($keys['route_order'], $route_type);
 		}
 		if (is_resource($file))
 		{

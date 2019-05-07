@@ -1990,8 +1990,32 @@ class ranking_bo extends ranking_so
 				}
 				break;
 
+			case 'boulder2018': // NTMz n m
+				if (preg_match('/^(\d+)T(\d+)z\s(\d+)\s(\d+)$/', $str, $matches))
+				{
+					list(, $top, $zone, $top_tries, $zone_tries) = $matches;
+					$result['result_top'] = $top ? 100 * $top - $top_tries : null;
+					$result['result_zone'] = 100 * $zone - $zone_tries;
+					for($i = 1; $i <= 8 && array_key_exists('boulder'.$i, $arr); ++$i)
+					{
+						$result['top'.$i] = '';
+						$result['zone'.$i] = strpos($str,'0z') !== false ? '0' : '';	// we need to differ between 0b and not climbed!
+						if (!($boulder = $arr['boulder'.$i])) continue;
+						if ($boulder[0] == 't')
+						{
+							$result['top'.$i] = (int) substr($boulder,1);
+							$boulder = strstr($boulder,'z');
+						}
+						$result['zone'.$i] = (int) substr($boulder,1);
+					}
+				}
+				else
+				{
+					$result = array();
+				}
+				break;
+
 			case 'boulder':	// #t# #b#
-			case 'boulder2018':
 				if (($bonus_pos = strpos($str,'b')) !== false)	// we split the string on the position of 'b' minus one char, as num of bonus is always 1 digit
 				{
 					list($top,$top_tries) = explode('t',substr($str,0,$bonus_pos-1));
