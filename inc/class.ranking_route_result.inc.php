@@ -1600,6 +1600,7 @@ class ranking_route_result extends Api\Storage\Base
 			case 'speedrelay':
 			case 'speed':
 				$order_by = 'result_time IS NULL,new_rank ASC';
+				$extra_cols[] = 'result_time';
 				if ($keys['route_order'] < 2)
 				{
 					$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_quali);
@@ -1628,7 +1629,6 @@ class ranking_route_result extends Api\Storage\Base
 						//$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
 						$order_by = "result_time IS NULL,CASE ($mode) WHEN 1 THEN 0 ELSE result_time END ASC";
 					}
-					$extra_cols[] = 'result_time';
 
 					// speed final used time(s) from speed qualification
 					$extra_cols[] = '('.str_replace('result_detail','result_time',
@@ -1764,7 +1764,7 @@ class ranking_route_result extends Api\Storage\Base
 			$this->speed_final_tie_breaking($result, $keys, $route && $route['discipline'] === 'combined');
 		}
 		// speed quali tie breaking by using 2. time
-		if ($discipline == 'speed' && $keys['route_order'] == 0 && $route_type == TWO_QUALI_SPEED)
+		if ($discipline == 'speed' && $keys['route_order'] == 0)
 		{
 			$this->speed_quali_tie_breaking($result, $keys);
 		}
@@ -2227,6 +2227,64 @@ class ranking_route_result extends Api\Storage\Base
 			error_log(__METHOD__."() logged input and results to ".realpath($path));
 		}*/
 		unset($keys, $input);	// suppress warning for not used parameters
+	}
+
+	/**
+	 * 2019+ tie breaking of speed qualification using 2. time (2019 rule 9.17.A.1.b)
+	 *
+	 * @param array& $results
+	 */
+	protected function speed_quali_tie_breaking(array &$results)
+	{
+		foreach($results as $n => &$result)
+		{
+			if (empty($result['new_rank'])) break;
+
+			$result['detail'] = self::unserialize($result['detail']);
+			$result['result_time2'] = $result['detail']['result_time_l'] == $result['result_time'] ?
+				$result['detail']['result_time_r'] : $result['detail']['result_time_l'];
+		}
+
+		// we need to do this in 2 steps to kope with more than 2 ex aquo with different or no 2. time!
+		// 1. step: sort them by new rank and 2. time
+		usort($results, function($a, $b)
+		{
+			if (!isset($a['new_rank'])) $a['new_rank'] = 99999;
+			if (!isset($b['new_rank'])) $b['new_rank'] = 99999;
+
+			if ($a['new_rank'] != $b['new_rank'] || $a['new_rank'] == 99999 && $b['new_rank'] == 99999)
+			{
+				return $a['new_rank'] - $b['new_rank'];
+			}
+
+			// $a has better 2. time than $b
+			if ($a['result_time2'] && (empty($b['result_time2']) || $a['result_time2'] < $b['result_time2']))
+			{
+				return -1;
+			}
+			// $b has better 2. time than $a
+			if ($b['result_time2'] && (empty($a['result_time2']) || $b['result_time2'] < $a['result_time2']))
+			{
+				return 1;
+			}
+			return 0;
+		});
+
+		// 2. step: now ex. aquo are ordered correctly fix new_rank
+		$last_new_rank = $last_time2 = null;
+		foreach($results as $n => &$result)
+		{
+			if ($last_new_rank && $last_new_rank == $result['new_rank'] &&
+				$last_time2 && (empty($result['result_time2']) || $last_time2 < $result['result_time2']))
+			{
+				$result['new_rank'] = $n+1;
+			}
+			else
+			{
+				$last_new_rank = $result['new_rank'];
+			}
+			$last_time2 = $result['result_time2'];
+		}
 	}
 
 	/**
