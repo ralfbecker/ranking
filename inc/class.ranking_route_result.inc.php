@@ -1233,7 +1233,7 @@ class ranking_route_result extends Api\Storage\Base
 						else
 						{
 							$data['eliminated_l'] = ranking_result_bo::ELIMINATED_FALSE_START;
-							$data['eliminated'] = 2;
+							$data['eliminated'] = ranking_result_bo::ELIMINATED_FALSE_START;
 							$data['result'] = $data['time_sum'];
 							$data['result_time'] = null;
 						}
@@ -1244,7 +1244,7 @@ class ranking_route_result extends Api\Storage\Base
 						{
 							if ($data['result_time'] == 1000*self::ELIMINATED_TIME)
 							{
-								$data['eliminated'] = 1;
+								$data['eliminated'] = ranking_result_bo::FALL;
 								$data['result_time'] = null;
 								$data['result'] = lang('fall');
 								if (!isset($data['time_sum'])) $data['time_sum'] = $data['result'];
@@ -1763,6 +1763,11 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			$this->speed_final_tie_breaking($result, $keys, $route && $route['discipline'] === 'combined');
 		}
+		// speed quali tie breaking by using 2. time
+		if ($discipline == 'speed' && $keys['route_order'] == 0 && $route_type == TWO_QUALI_SPEED)
+		{
+			$this->speed_quali_tie_breaking($result, $keys);
+		}
 		$modified = 0;
 		$old_time = $old_prev_rank = null;
 		$old_rank = $old_speed_rank = null;
@@ -2141,12 +2146,12 @@ class ranking_route_result extends Api\Storage\Base
 				{
 					// already fixed above for last final heat
 				}
-				// do result have a have a wildcard
+				// do result have a wildcard
 				elseif (!isset($result['result_time']) && !$result['eliminated'])
 				{
 					$results[$n-1]['new_rank']++;
 				}
-				// do last have a have a wildcard
+				// do last have a wildcard
 				elseif (!isset($last['result_time']) && !$last['eliminated'])
 				{
 					$result['new_rank']++;

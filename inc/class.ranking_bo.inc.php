@@ -1804,7 +1804,14 @@ class ranking_bo extends ranking_so
 		{
 			return lang('Permission denied !!!');
 		}
-		$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		if (!empty($keys['discipline']))
+		{
+			$discipline = $keys['discipline'];
+		}
+		else
+		{
+			$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		}
 
 		if (!($fp = is_resource($file) ? $file : fopen($file,'rb')) || !($labels = fgetcsv($fp,null,';')) || count($labels) <= 1)
 		{
@@ -1950,6 +1957,9 @@ class ranking_bo extends ranking_so
 				break;
 
 			case 'speed':
+				$false_start_preg = '/^(\d. )?(false start|'.preg_quote(lang('false start'), '$/').')/i';
+				$fall_preg = '/^(fall|'.preg_quote(lang('fall'), '/').')$/i';
+				//$wildcard_preg = '/^(wildcard|'.preg_quote(lang('wildcard'), '/').')$/i';
 				foreach(isset($arr['time-left']) ? array('' => 'time-left','_r' => 'time-right') : array('' => 'result') as $postfix => $name)
 				{
 					if (is_numeric($arr[$name]))
@@ -1960,17 +1970,28 @@ class ranking_bo extends ranking_so
 					else
 					{
 						$result['result_time'.$postfix] = '';
-						$result['eliminated'.$postfix] = $arr[$name] && !preg_match('/^(\d). ?false ?start$/', $arr[$name]) ?
-							(int) !in_array(strtolower($arr[$name]),array('wildcard')) : '';
+						if (preg_match($fall_preg, $arr[$name]))
+						{
+							$result['eliminated'.$postfix] = ranking_result_bo::FALL;
+						}
+						elseif (preg_match($false_start_preg))
+						{
+							$result['eliminated'.$postfix] = ranking_result_bo::ELIMINATED_FALSE_START;
+						}
+						else
+						{
+							$result['eliminated'.$postfix] = '';
+						}
 					}
 				}
-				if (preg_match('/^(\d). ?false ?start$/', $arr['result'], $matches))
+				if (preg_match($false_start_preg, $arr['result'], $matches))
 				{
-					$result['false_start'] = (int)$matches[1];
+					$result['false_start'] = max(1, (int)$matches[1]);
 				}
 				break;
 
 			case 'boulder':	// #t# #b#
+			case 'boulder2018':
 				if (($bonus_pos = strpos($str,'b')) !== false)	// we split the string on the position of 'b' minus one char, as num of bonus is always 1 digit
 				{
 					list($top,$top_tries) = explode('t',substr($str,0,$bonus_pos-1));

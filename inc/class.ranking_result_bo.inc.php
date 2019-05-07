@@ -144,13 +144,17 @@ class ranking_result_bo extends ranking_bo
 	);
 
 	/**
+	 * Eliminated value for fall in UI
+	 */
+	const FALL = 1;
+	/**
 	 * Eliminated value for false start in UI
 	 */
 	const ELIMINATED_FALSE_START = 2;
 
 	var $eliminated_labels = array(
 		''=> ' ',
-		1 => 'fall',
+		self::FALL => 'fall',
 		self::ELIMINATED_FALSE_START => 'false start',
 		0 => 'wildcard',
 	);
@@ -1735,7 +1739,10 @@ class ranking_result_bo extends ranking_bo
 			($comp = $this->comp->read($keys['WetId'])))
 		{
 			$keys['route_type'] = $route['route_type'];
-			$keys['discipline'] = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+			if (($keys['discipline'] = $route['discipline']) === 'combined')
+			{
+				$keys['discipline'] = $this->combined_order2discipline($keys['route_order'], $route['route_type']);
+			}
 			$result = $this->has_results($keys);
 			$keys['comp_nation'] = $comp['nation'];
 			$athletes =& $this->route_result->search('',false,$result ? 'result_rank' : 'start_order','','',false,'AND',false,$keys);
@@ -1794,6 +1801,7 @@ class ranking_result_bo extends ranking_bo
 			switch($keys['discipline'])
 			{
 				case 'boulder':
+				case 'boulder2018':
 					for ($i = 1; $i <= $route['route_num_problems']; ++$i)
 					{
 						$name2csv['boulder'.$i] = 'boulder'.$i;
@@ -1890,6 +1898,10 @@ class ranking_result_bo extends ranking_bo
 			$comp = $this->comp->read($keys['WetId']);
 			if (!$comp['dicipline']) $cat = $this->cats->read($keys['GrpId']);
 			$discipline = $comp['discipline'] ? $comp['discipline'] : $cat['discipline'];
+		}
+		if ($discipline === 'combined')
+		{
+			$discipline = $keys['discipline'] = $this->combined_order2discipline($keys['route_orkder'], $route_type);
 		}
 		if (is_resource($file))
 		{
