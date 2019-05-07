@@ -718,9 +718,9 @@ class ranking_route_result extends Api\Storage\Base
 				"p.route_order=0 AND $this->table_name.$this->id_col=p.$this->id_col";
 		}
 		// 3 qualifications or finals (combined only)
-		elseif ($route_type == THREE_QUALI_ALL_NO_STAGGER && in_array($route_order, array(3, -6)))
+		elseif ($route_type == THREE_QUALI_ALL_NO_STAGGER && in_array($route_order, array(2, 3, -6)))
 		{
-			$result = $route_order == 3 ? array('r1','r2','r3') : array('r5','r6','r7');
+			$result = $route_order != -6 ? array('r1','r2','r3') : array('r5','r6','r7');
  			// points for place r with c ex aquo: p(r,c) = (c+2r-1)/2
 			$c1 = $this->_count_ex_aquo($result[0]);//'r1'
 			$c2 = $this->_count_ex_aquo($result[1]);//'r2'
@@ -753,6 +753,13 @@ class ranking_route_result extends Api\Storage\Base
 						}
 					}
 				}
+			}
+			elseif ($route_order == 2)
+			{
+				return "SELECT ((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2) FROM $this->table_name r1".
+					" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.$this->id_col=r2.$this->id_col".
+					" WHERE $this->table_name.WetId=r1.WetId AND $this->table_name.GrpId=r1.GrpId AND r1.route_order=0".
+					" AND $this->table_name.$this->id_col=r1.$this->id_col";
 			}
 
 			return "SELECT ((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2 * (($c3)+2*$r3-1)/2) FROM $this->table_name r1".
@@ -893,7 +900,7 @@ class ranking_route_result extends Api\Storage\Base
 
 			if (ranking_result_bo::is_two_quali_all($route_type) && ($route_order == 1 ||
 				$quali_overall == 2 && $route_order == 3) ||	// Group B
-				$route_type == THREE_QUALI_ALL_NO_STAGGER && $route_order == 2)
+				$route_type == THREE_QUALI_ALL_NO_STAGGER && $route_order <= 2)
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order, $route_type, $quali_overall).')';
