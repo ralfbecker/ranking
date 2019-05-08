@@ -71,7 +71,7 @@ var dr_translations = {
 		de: 'Vorqualifiziert' },
 	'calculation of this ranking': {
 		de: 'Berechnung dieser Rangliste' },
-	'complete result': {
+	'Complete Results': {
 		de: 'komplettes Ergebnis' },
 	'previous heat': {
 		de: 'vorherige Runde' },

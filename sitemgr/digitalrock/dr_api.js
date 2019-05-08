@@ -435,7 +435,7 @@ var DrTable = (function() {
 					{
 						var a = jQuery(document.createElement('a'));
 						a.attr('href', data.url);
-						a.text(this.lang('complete result'));
+						a.text(this.lang('Complete Results'));
 						if (this.navigateTo || typeof data.click != 'undefined') a.click(this.navigateTo || data.click);
 						th.append(a);
 					}
