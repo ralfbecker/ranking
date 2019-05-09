@@ -333,7 +333,7 @@ class ranking_result_bo extends ranking_bo
 		}
 
 		// combined startlist from separate qualification competition
-		if ($discipline == 'combined' && $route_order < 3 && $comb_quali !== '')
+		if ($discipline == 'combined' && $route_order < 3 && $comb_quali)
 		{
 			return $this->_combined_startlist($comp, $cat, $route_order, $comb_quali);
 		}
