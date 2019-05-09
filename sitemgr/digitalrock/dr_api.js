@@ -2508,8 +2508,7 @@ var Competitions = (function() {
 		{
 			// need to delay scrolling a bit, layout seems to need some time
 			window.setTimeout(function() {
-				closest.scrollIntoView();		// scrolls competition div AND whole document to show closest
-				window.scrollTo(0,0);			// scrolls whole document back up
+				closest.parentElement.scrollTop = closest.offsetTop + closest.parentElement.offsetTop;
 			}, 100);
 		}
 	};
