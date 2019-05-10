@@ -2170,7 +2170,9 @@ class ranking_export extends ranking_result_bo
 				'vorname'  => $pattern.'*',
 			),
 			array('PerId', 'vorname', 'nachname', ranking_athlete::FEDERATIONS_TABLE.'.nation'),
-			'nachname, vorname', '', '', false, 'OR', array(0, 50)) as $row)
+			'nachname, vorname', '', '', false, 'OR', array(0, 50), [
+				ranking_athlete::FEDERATIONS_TABLE.".nation != 'XYZ'",	// do not return test federation
+			]) as $row)
 		{
 			$found[] = array(
 				'value' => (int)$row['PerId'],
