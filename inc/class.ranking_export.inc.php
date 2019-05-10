@@ -693,8 +693,6 @@ class ranking_export extends ranking_result_bo
 				$row['result0'] = $row['result'];
 				unset($row['result']);
 			}
-			// use english names
-			$row += self::athlete_attributes($row, $comp['nation'], $cat['GrpId']);
 
 			if ($ranking)	// add ranking to athlete
 			{
@@ -821,7 +819,7 @@ class ranking_export extends ranking_result_bo
 			if ($heat != -1 && !isset($row['result'])) $row['result'] = '';
 
 			// remove not needed attributes
-			$row = array_diff_key($row,array_flip(array(
+			$row = self::athlete_attributes($row, $comp['nation'], $cat['GrpId']) + array_diff_key($row,array_flip(array(
 				// remove keys, they are already in route
 				'GrpId','WetId','route_order','route_type','discipline','acl_fed',
 				'geb_date',	// we still have birthyear
@@ -2377,12 +2375,36 @@ class ranking_export extends ranking_result_bo
 	 */
 	protected static function athlete_attributes($athlete, $nation, $cat)
 	{
+		static $feds_with_subs=null;
+
+		if (!isset($feds_with_subs))
+		{
+			$feds_with_subs = [];
+			// do NOT show sub-feds (sektion etc) for IFSC site
+			if (self::base_url() == self::IFSC_SITE)
+			{
+				foreach(ranking_bo::getInstance()->federation->search(null,
+					['fed_id', 'verband', 'fed_url', 'nation'], '', '', '', False, 'AND', false, [
+						"nation IN ('GER','SUI')",
+						'fed_parent' => NULL,
+				]) as $fed)
+				{
+					$feds_with_subs[$fed['nation']] = [
+						'fed_id'     => $fed['fed_id'],
+						'federation' => $fed['verband'],
+						'fed_url'    => $fed['fed_url'],
+					];
+				}
+			}
+		}
+
 		$data = array(
 			'PerId' => $athlete['PerId'],
 			'firstname' => $athlete['vorname'],
 			'lastname' => $athlete['nachname'],
 			'birthyear' => substr($athlete['geb_date'], 0, 4),
 			'nation' => $athlete['nation'],
+			'fed_id' => $athlete['fed_id'],
 			'federation' => $athlete['verband'],
 			'city' => $athlete['ort'],
 			'fed_url' => $athlete['fed_url'],
@@ -2406,6 +2428,10 @@ class ranking_export extends ranking_result_bo
 					$data['rgz'] = preg_replace('/^SAC-Regionalzentrum /', '', $rgzs[$athlete['acl_fed_id']]);
 				}
 				break;
+		}
+		if (isset($feds_with_subs[$data['nation']]))
+		{
+			$data = array_merge($data, $feds_with_subs[$data['nation']]);
 		}
 		if (is_array($athlete['acl']) ? in_array(ranking_athlete::ACL_DENY_ALL, $athlete['acl']) : $athlete['acl'] & ranking_athlete::ACL_DENY_ALL)
 		{
