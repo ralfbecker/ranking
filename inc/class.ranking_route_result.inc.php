@@ -671,10 +671,9 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param int $quali_overal =0 1: Group A, 2: Group B, 3: Overal qualification, 0: other
 	 * @param array $route_names =null
 	 * @param array $keys =null WetId and GrpId for combined final checks
-	 * @param string $discipline =null 'lead', 'speed', 'boulder', 'speedrelay' or 'combined'
 	 * @return string
 	 */
-	private function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0, array $route_names=null, array $keys=null, $discipline=null)
+	private function _sql_rank_prev_heat($route_order, $route_type, $quali_overal=0, array $route_names=null, array $keys=null)
 	{
 		if ($route_order == 2 && $route_type == TWO_QUALI_ALL_SUM)
 		{
@@ -755,8 +754,12 @@ class ranking_route_result extends Api\Storage\Base
 					}
 				}
 			}
-			// combined quali after boulder (just two or three qualis)
-			elseif ($route_order == 2 && $discipline === 'combined')
+			// just two of three qualis done
+			elseif ($route_order == 2 && $keys && !$this->get_count(array(
+				'WetId' => $keys['WetId'],
+				'GrpId' => $keys['GrpId'],
+				'route_order' => $route_order,
+			), 'result_rank'))
 			{
 				return "SELECT ((($c1)+2*$r1-1)/2 * (($c2)+2*$r2-1)/2) FROM $this->table_name r1".
 					" JOIN $this->table_name r2 ON r1.WetId=r2.WetId AND r1.GrpId=r2.GrpId AND r2.route_order=1 AND r1.$this->id_col=r2.$this->id_col".
@@ -905,7 +908,7 @@ class ranking_route_result extends Api\Storage\Base
 				$route_type == THREE_QUALI_ALL_NO_STAGGER && $route_order <= 2)
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
-				$product = '('.$this->_sql_rank_prev_heat(1+$route_order, $route_type, $quali_overall, null, null, $discipline).')';
+				$product = '('.$this->_sql_rank_prev_heat(1+$route_order, $route_type, $quali_overall, null, $keys).')';
 				$extra_cols[] = "$product AS quali_points";
 				$order_bys = array('quali_points');
 				if ($route_type == TWO_QUALI_ALL_SUM) $order_bys[0] .= ' DESC';
