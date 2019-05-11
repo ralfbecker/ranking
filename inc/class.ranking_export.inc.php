@@ -2385,7 +2385,7 @@ class ranking_export extends ranking_result_bo
 			{
 				foreach(ranking_bo::getInstance()->federation->search(null,
 					['fed_id', 'verband', 'fed_url', 'nation'], '', '', '', False, 'AND', false, [
-						"nation IN ('GER','SUI')",
+						"nation IN ('GER','SUI', 'JPN')",
 						'fed_parent' => NULL,
 				]) as $fed)
 				{
