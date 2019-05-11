@@ -1763,12 +1763,17 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			self::calc_selfscore_points($result, $selfscore_points);
 		}
-		// final with 2018+ boulder rules --> apply tie breaking
-		if ($discipline === 'boulder2018' && !$route['route_quota'])
+		// 2019+ combined boulder quali and final --> apply tie breaking to all places
+		if ($discipline === 'boulder2018' && $route['discipline'] === 'combined')
 		{
-			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems'],
+			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems'], false, null);
+		}
+		// final with 2018+ boulder rules --> apply tie breaking
+		elseif ($discipline === 'boulder2018' && !$route['route_quota'])
+		{
+			$this->boulder2018_final_tie_breaking($result, $keys, $route['route_num_problems']);
 				// for regular boulder final (and previous heat is on one route), we have to do countback to previous heat first
-				!($route && $route['discipline'] === 'combined') && ($route['route_order'] > 2 || $route['route_type'] == ONE_QUALI));
+				//!($route && $route['discipline'] === 'combined') && ($route['route_order'] > 2 || $route['route_type'] == ONE_QUALI));
 		}
 		// speed final tie breaking by countback to speed qualification
 		if ($discipline == 'speed' && $keys['route_order'] >= 2)
@@ -1959,6 +1964,7 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param array $keys
 	 * @param int $num_problems
 	 * @param boolean $countback_first =true regular boulder final, false: combined boulder final
+	 * @param int $max_place =3 3: apply only to podium (2018+ boulder, 2018 combined) or null: apply to all places (2019+ combined)
 	 *
 	 * According to Tim Hatch:
 	 * In the boulder World Cup, in the final (rule 8.20.B):
@@ -1975,7 +1981,7 @@ class ranking_route_result extends Api\Storage\Base
 	 * 3/	If tied after 2/, then compare best results (zones)
 	 * 4/	If tied after 3/, then countback to the qualification boulder “stage"
 	 */
-	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems, $countback_first=true)
+	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems, $countback_first=true, $max_place=3)
 	{
 		// remove "old" attempts, in case they get not written again
 		$old_attempts = array();
@@ -1999,8 +2005,9 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		$input = $results;
 
-		// split only podium
-		for($place=1; $place <= 3; ++$place)
+		// split only podium or all
+		if (!isset($max_place)) $max_place = count($results);
+		for($place=1; $place <= $max_place; ++$place)
 		{
 			$last_result = null;
 			foreach(array('top', 'zone') as $what)
