@@ -42,7 +42,7 @@
 }
 
 .fed_logo img {
-
+	width: 180px;
 }
 
 #comp_logo {
