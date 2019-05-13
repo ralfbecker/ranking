@@ -76,7 +76,7 @@ class ranking_registration_ui extends ranking_bo
 				'nation' => $query['calendar'],
 				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
 				'gruppen IS NOT NULL',
-			),0,'datum ASC'),
+			), 3, 'datum ASC'),
 			'nation' => !$comp ? array() : $this->federation->get_competition_federations($query['calendar'],
 				$allow_register_everyone ? null : $this->register_rights),
 			'GrpId' => $comp && $comp['gruppen'] ? $this->cats->names(array('rkey' => $comp['gruppen']),0) : array(lang('No categories defined!')),
@@ -85,7 +85,7 @@ class ranking_registration_ui extends ranking_bo
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']]))
 		{
-			$sel_options['comp'][$comp['WetId']] = $comp['name'];
+			$sel_options['comp'][$comp['WetId']] = Api\DateTime($comp['datum'], true).': '.$comp['name'];
 		}
 
 		$matches = null;
@@ -535,7 +535,7 @@ class ranking_registration_ui extends ranking_bo
 				'nation' => $calendar,
 				'datum >= '.$this->db->quote(date('Y-m-d',time()-2*24*60*60)),	// all events starting 2 days ago or further in future
 				'gruppen IS NOT NULL',
-			),0,'datum ASC'),
+			), 3, 'datum ASC'),
 			'sex' => $this->genders,
 			'state' => ranking_registration::$state_filters,
 		);

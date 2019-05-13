@@ -53,7 +53,7 @@
 	<template id="ranking.registration.header" template="" lang="" group="0" version="1.9.001">
 		<buttononly id="add" label="Register" onclick="app.ranking.register" statustext="Register athlets for this competition"/>
 		<select id="calendar"/>
-		<select id="comp" empty_label="Select a competition"/>
+		<select id="comp" empty_label="Select a competition" search="true" width="60%"/>
 		<select id="nation" empty_label="Select a federation"/>
 	</template>
 	<template id="ranking.registration.buttons" template="" lang="" group="0" version="1.9.001">

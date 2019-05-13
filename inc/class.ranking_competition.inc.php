@@ -557,7 +557,7 @@ class ranking_competition extends Api\Storage\Base
 	 * get the names of all or certain competitions, eg. to use in a selectbox
 	 *
 	 * @param array $keys array with col => value pairs to limit name-list, like for so_sql.search
-	 * @param int $rkeys =0 0: WetId=>name, 1: rkey=>name, 2: rkey=>rkey: name
+	 * @param int $rkeys =0 0: WetId=>name, 1: rkey=>name, 2: rkey=>rkey: name, 3: WetId=>date: name
 	 * @param string $sort ='datum DESC'
 	 * @return array with comp-names as specified in $rkeys
 	 */
@@ -566,10 +566,19 @@ class ranking_competition extends Api\Storage\Base
 		if (!preg_match('/^[a-z]+ ?(asc|desc)?$/i',$sort)) $sort = 'datum DESC';
 
 		$names = array();
-		foreach((array) $this->search(array(),'WetId,rkey,name',$sort,'','',false,'AND',false,$keys) as $data)
+		foreach((array) $this->search(array(),'WetId,rkey,name,datum',$sort,'','',false,'AND',false,$keys) as $data)
 		{
-			$names[$rkeys ? $data['rkey'] : $data['WetId']] = ($rkeys == 2 ? $data['rkey'].': ' : '').
-				strip_tags($data['name']);
+			$name = strip_tags($data['name']);
+			switch($rkeys)
+			{
+				case 2:
+					$name = $data['rkey'].': '.$name;
+					break;
+				case 3:
+					$name = Api\DateTime::to($data['datum'], true).': '.$name;
+					break;
+			}
+			$names[in_array($rkeys, [1, 2]) ? $data['rkey'] : $data['WetId']] = $name;
 		}
 		return $names;
 	}

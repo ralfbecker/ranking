@@ -30,14 +30,25 @@ button.small { font-size: 80%; padding-top: 0; padding-bottom: 0; }
 .speed_athlete { border: 1px solid black; margin: 3px; background-color: silver; height: 7ex; }
 .max_compl { width: 45px; white-space: nowrap !important; }
 
+li.active-result {
+	white-space: nowrap;
+}
+
 /**
  * New registration using NM
  */
+#ranking-registration_calendar {
+	width: 58px;
+}
 #ranking-registration_ranking-registration-header {
 	width: 85%;
 }
-#ranking-registration_comp, #ranking-registration_nation {
-	width: 35%;
+#ranking-registration_comp {
+	width: 60%;
+}
+#ranking-registration_nation {
+	width: 17%;
+	margin-left: 3px;
 }
 #ranking-registration_search {
 	display: none;

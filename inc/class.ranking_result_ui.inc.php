@@ -1523,7 +1523,7 @@ class ranking_result_ui extends ranking_result_bo
 				'datum < '.$this->db->quote(date('Y-m-d',time()+23*24*3600)),	// starting 23 days from now
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
-			),0,'datum DESC'),
+			), 3, 'datum DESC'),
 			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
 			'route'    => $comp && $cat ? $this->route->query_list('route_name','route_order',array(
 				'WetId' => $comp['WetId'],

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOST=dev
+HOST=dev.egroupware.org
 DB=egw_www_digitalr
 MYSQL=mysql
 
