@@ -1130,7 +1130,7 @@ class ranking_result_bo extends ranking_bo
 				$discipline == 'combined' && $keys['route_order'] == 3)
 			{
 				if (!isset(self::$ko_start_order[$quota]) ||
-					($quota == self::COMBINED_FINAL_QUOTA) !== ($discipline == 'combined'))
+					$discipline == 'combined' && $quota !== self::COMBINED_FINAL_QUOTA)
 				{
 					throw new Api\Exception\WrongUserinput(lang('Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!', $quota, self::COMBINED_FINAL_QUOTA));
 				}
