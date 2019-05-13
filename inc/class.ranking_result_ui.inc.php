@@ -939,7 +939,7 @@ class ranking_result_ui extends ranking_result_bo
 						'start_order' => isset($row['start_order'.$suffix]) ? $row['start_order'.$suffix] : $row['start_order'],
 						'result_rank' => $row['result_rank'.$suffix],
 						//'row' => $row,
-					] + json_decode($row['result_detail'.(isset($row['result_detail'.$suffix]) ? $suffix : '')], true);
+					] + (array)json_decode($row['result_detail'.(isset($row['result_detail'.$suffix]) ? $suffix : '')], true);
 					$r['result_time'] = $r['result_time_l']; unset($r['result_time_l']);
 					$r['eliminated'] = $r['eliminated_l']; unset($r['eliminated_l']);
 

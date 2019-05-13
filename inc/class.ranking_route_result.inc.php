@@ -2251,6 +2251,11 @@ class ranking_route_result extends Api\Storage\Base
 	/**
 	 * 2019+ tie breaking of speed qualification using 2. time (2019 rule 9.17.A.1.b)
 	 *
+	 * Doublicates some code in ranking_result_bo::sort_by_result_times()!
+	 *
+	 * Comparing string times in json (result_time_l/r) to float times in result_time
+	 * does not always work, they are not always equal --> casting everything to int
+	 *
 	 * @param array& $results
 	 */
 	protected function speed_quali_tie_breaking(array &$results)
@@ -2260,8 +2265,8 @@ class ranking_route_result extends Api\Storage\Base
 			if (empty($result['new_rank'])) break;
 
 			$result['detail'] = self::unserialize($result['detail']);
-			$result['result_time2'] = $result['detail']['result_time_l'] == $result['result_time'] ?
-				$result['detail']['result_time_r'] : $result['detail']['result_time_l'];
+			$result['result_time2'] = (int)(1000*$result['detail']['result_time_l']) == (int)(1000*$result['result_time']) ?
+				(int)(1000*$result['detail']['result_time_r']) : (int)(1000*$result['detail']['result_time_l']);
 		}
 
 		// we need to do this in 2 steps to kope with more than 2 ex aquo with different or no 2. time!
@@ -2277,12 +2282,12 @@ class ranking_route_result extends Api\Storage\Base
 			}
 
 			// $a has better 2. time than $b
-			if ($a['result_time2'] && (empty($b['result_time2']) || $a['result_time2'] < $b['result_time2']))
+			if ($a['result_time2'] && (!$b['result_time2'] || $a['result_time2'] < $b['result_time2']))
 			{
 				return -1;
 			}
 			// $b has better 2. time than $a
-			if ($b['result_time2'] && (empty($a['result_time2']) || $b['result_time2'] < $a['result_time2']))
+			if ($b['result_time2'] && (!$a['result_time2'] || $b['result_time2'] < $a['result_time2']))
 			{
 				return 1;
 			}

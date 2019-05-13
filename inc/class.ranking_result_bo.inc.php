@@ -905,11 +905,11 @@ class ranking_result_bo extends ranking_bo
 			3 => 7, 6 => 8,
 		),
 		// 2018 combined format final with 6, but with reversed result!
-		6 => array(
-			/*1*/6 => 1, /*6*/1 => 2,
-			/*2*/5 => 3, /*5*/2 => 4,
-			/*3*/4 => 5, /*4*/3 => 6,
-		),
+		//6 => array(
+		//	/*1*/6 => 1, /*6*/1 => 2,
+		//	/*2*/5 => 3, /*5*/2 => 4,
+		//	/*3*/4 => 5, /*4*/3 => 6,
+		//),
 		4 => array(
 			1 => 1, 4 => 2,
 			2 => 3, 3 => 4,
@@ -1066,6 +1066,7 @@ class ranking_result_bo extends ranking_bo
 				if ($discipline == 'combined' && $keys['route_order'] == 3)
 				{
 					$cols[] = $this->route_result->table_name.'.result_time AS result_time';
+					$cols[] = $this->route_result->table_name.'.result_detail AS detail';
 				}
 			}
 			else
@@ -1098,10 +1099,7 @@ class ranking_result_bo extends ranking_bo
 			// sort speed final by speed (was overall qualification)
 			if ($keys['route_order'] == 3)
 			{
-				usort($starters, function($a, $b)
-				{
-					return $b['result_time']-$a['result_time'];
-				});
+				self::sort_by_result_times($starters);
 			}
 		}
 
@@ -1134,7 +1132,7 @@ class ranking_result_bo extends ranking_bo
 				if (!isset(self::$ko_start_order[$quota]) ||
 					($quota == self::COMBINED_FINAL_QUOTA) !== ($discipline == 'combined'))
 				{
-					throw new Api\Exception\WrongUserinput(lang('Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or 6 for combined)!', $quota));
+					throw new Api\Exception\WrongUserinput(lang('Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!', $quota, self::COMBINED_FINAL_QUOTA));
 				}
 				if ($max_rank)
 				{
@@ -1198,6 +1196,47 @@ class ranking_result_bo extends ranking_bo
 			}
 		}
 		return $start_order-1;
+	}
+
+	/**
+	 * Sort given starters by result-times (using 2nd time to break ties in best time)
+	 *
+	 * Doublicates some code from ranking_route_result::speed_quali_tie_breaking()!
+	 *
+	 * Comparing string times in json (result_time_l/r) to float times in result_time
+	 * does not always work, they are not always equal --> casting everything to int
+	 *
+	 * @param array $starters
+	 */
+	private static function sort_by_result_times(array &$starters)
+	{
+		usort($starters, function($a, $b)	// has to return int, NOT float!
+		{
+			$a_time = (int)(1000*$a['result_time']);
+			$b_time = (int)(1000*$b['result_time']);
+			if ($a_time != $b_time)
+			{
+				return $a_time - $b_time;
+			}
+			// breaking the tie with 2nd time
+			$a['detail'] = ranking_route_result::unserialize($a['detail']);
+			$a_time2 = $a_time == (int)(1000*$a['detail']['result_time_l']) ?
+				(int)(1000*$a['detail']['result_time_r']) : (int)(1000*$a['detail']['result_time_l']);
+			$b['detail'] = ranking_route_result::unserialize($b['detail']);
+			$b_time2 = $b_time == (int)(1000*$b['detail']['result_time_l']) ?
+				(int)(1000*$b['detail']['result_time_r']) : (int)(1000*$b['detail']['result_time_l']);
+			// $a has better 2. time than $b
+			if ($a_time2 && (!$b_time2 || $a_time2 < $b_time2))
+			{
+				return -1;
+			}
+			// $b has better 2. time than $a
+			if ($b_time2 && (!$a_time2 || $b_time2 < $a_time2))
+			{
+				return 1;
+			}
+			return 0;
+		});
 	}
 
 	/**

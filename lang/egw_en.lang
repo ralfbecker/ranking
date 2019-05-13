@@ -721,7 +721,7 @@ wrong mode="%1" for discipline "%2"!	ranking	en	Wrong Mode="%1" for discipline "
 wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	en	Wrong Mode="%1" for this heat (qualification - final mismatch)!
 wrong nationality	ranking	en	Wrong Nationality
 wrong or not configured vfs directory	ranking	en	Wrong or NOT configured VFS directory
-wrong quota of %1 for co-system (use 16, 8 or 4 for speed or 6 for combined)!	ranking	en	Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or 6 for combined)!
+wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!	ranking	en	Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!
 xml file uses unknown schema (format)!	ranking	en	XML file uses unknown schema (format)!
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
 you are not allowed to register for %1!	ranking	en	You are not allowed to register for %1!
