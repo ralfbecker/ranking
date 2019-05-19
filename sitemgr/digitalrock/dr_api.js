@@ -982,6 +982,7 @@ var Startlist = (function() {
 				this.table = new DrTable(_data.participants,this.columns,this.sort,true,
 					_data.route_result ? _data.route_quota : null,this.navigateTo,
 					_data.discipline == 'ranking' && (detail || !_data.participants[0].result_rank));
+				if (_data.participants[0].result_rank) jQuery(this.table.dom).addClass(_data.discipline);
 				jQuery(this.container).append(this.table.dom);
 			}
 
@@ -3106,7 +3107,7 @@ function align_td_nbsp(elems)
 		if (parts.length == 1) return jQuery(this).clone();
 		var prefix = '<div class="tdAlign'+parts.length+'">';
 		var postfix = '</div>';
-		return jQuery('<td>'+prefix+parts.join(postfix+prefix)+postfix+'</td>');
+		return jQuery('<td>'+prefix+parts.join(postfix+prefix)+postfix+'</td>').addClass(this.className);
 	});
 }
 

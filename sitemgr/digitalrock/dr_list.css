@@ -50,6 +50,9 @@ table.DrTable tbody th a {
 	padding-left: 10px;
 	font-weight: normal;
 }
+table.DrTable.boulder2018 tbody td[class^="result"] {
+	min-width: 8em;
+}
 /**
  * alignment of multiple values in a column by align_td_nbsp function
  */
