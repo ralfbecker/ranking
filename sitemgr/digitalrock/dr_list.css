@@ -51,7 +51,10 @@ table.DrTable tbody th a {
 	font-weight: normal;
 }
 table.DrTable.boulder2018 tbody td[class^="result"] {
-	min-width: 8em;
+	min-width: 6em;
+}
+table.DrTable.boulder2018 tbody td.result_rank {
+	min-width: 0;
 }
 /**
  * alignment of multiple values in a column by align_td_nbsp function
