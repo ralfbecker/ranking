@@ -1983,6 +1983,21 @@ class ranking_route_result extends Api\Storage\Base
 	 */
 	public function boulder2018_final_tie_breaking(array &$results, array $keys, $num_problems, $countback_first=true, $max_place=3)
 	{
+		if ($countback_first && $keys['route_order'] >= 2)
+		{
+			// sql is not doing countback and countback code below requires correct order by previous heat for ex aquos
+			usort($results, function($a, $b)
+			{
+				if (!isset($a['new_rank'])) $a['new_rank'] = 99999;
+				if (!isset($b['new_rank'])) $b['new_rank'] = 99999;
+
+				if ($a['new_rank'] != $b['new_rank'])
+				{
+					return $a['new_rank'] - $b['new_rank'];
+				}
+				return $a['rank_prev_heat'] - $b['rank_prev_heat'];
+			});
+		}
 		// remove "old" attempts, in case they get not written again
 		$old_attempts = array();
 		$last_result = null;
@@ -1996,7 +2011,7 @@ class ranking_route_result extends Api\Storage\Base
 			}
 			// for regular (not combined) boulder final, we have to do the countback to 1/2-final first
 			if ($countback_first && !empty($result['new_rank']) &&	// but only if competitor has climbed in final!
-				$result['new_rank'] == $last_result['new_rank'] &&
+				$last_result && $result['new_rank'] <= $last_result['new_rank'] &&
 				$result['rank_prev_heat'] != $last_result['rank_prev_heat'])
 			{
 				$result['new_rank'] = $i+1;
