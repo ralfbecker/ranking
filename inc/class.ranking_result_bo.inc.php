@@ -1358,13 +1358,9 @@ class ranking_result_bo extends ranking_bo
 						}
 						break;
 					case 5: // startorder for final
-						if ($starter['result_rank'] <= 4)
+						if ($starter['result_rank'] <= 6)
 						{
 							$new_start_order += $starter['result_rank'] == 1 ? 4 : 2;
-						}
-						elseif($starter['result_rank'] == 5)
-						{
-							$new_start_order += 2;
 						}
 						break;
 				}

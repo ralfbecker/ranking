@@ -13,11 +13,11 @@
 				<row>
 					<description no_lang="1" id="nachname" class="lastname leftPad5"/>
 					<textbox type="hidden" id="id" value="$cont[WetId]:$cont[GrpId]:$cont[route_order]:$cont[PerId]"/>
-					<description no_lang="1" align="right" id="nation"/>
+					<description no_lang="1" align="center" id="nation"/>
 				</row>
 				<row>
 					<description no_lang="1" id="vorname" class="leftPad5" span="2"/>
-					<description align="right" no_lang="1" id="result"/>
+					<description align="center" no_lang="1" id="result"/>
 				</row>
 			</rows>
 		</grid>
@@ -45,17 +45,17 @@
 						<description id="nation" no_lang="1" />
 						<description id="start_number" label="(%s)"/>
 					</hbox>
-					<description align="right" id="time_sum"/>
+					<description align="center" id="time_sum"/>
 				</row>
 				<row class="row" height="50px">
 					<description label="Time"/>
 					<float id="result_time" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
-					<select id="eliminated" onchange="app.ranking.eliminated_changed" align="right"/>
+					<select id="eliminated" onchange="app.ranking.eliminated_changed" align="center"/>
 				</row>
 				<row class="row" valign="top" height="40px" disabled="!@nm[rows][show_second_lane]">
 					<description label="Lane B"/>
 					<float id="result_time_r" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
-					<select id="eliminated_r" onchange="app.ranking.eliminated_changed" align="right"/>
+					<select id="eliminated_r" onchange="app.ranking.eliminated_changed" align="center"/>
 				</row>
 			</rows>
 		</grid>
@@ -63,79 +63,186 @@
 	<template id="ranking.result.index.speed_graph8" template="" lang="" group="0" version="17.1.001">
 		<grid width="99%" id="nm[rows]">
 			<columns>
-				<column width="10"/>
-				<column width="30%"/> <!-- 1/4-final: heat3 -->
-				<column width="10"/>
-				<column width="30%"/> <!-- 1/2-final: heat4 -->
-				<column width="10"/>
-				<column width="30%"/> <!-- final: heat5 -->
+				<column width="15"/>
+				<column width="23%"/> <!-- 1/4-final: heat3 -->
+				<column width="15"/>
+				<column width="23%"/> <!-- 1/2-final: heat4 -->
+				<column width="15"/>
+				<column width="23%"/> <!-- final: heat5 -->
+				<column width="5"/>
+				<column width="23%"/> <!-- winners -->
 			</columns>
 			<rows>
+				<row class="onlyPrint" part="header" height="150px" valign="top">
+					<template id="ranking.result.header$cont[calendar]" span="all"/>
+				</row>
 				<row>
 					<description value="1"/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[1]"/>
-					<description value="5" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[1]"/>
-					<description value="9" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[1]"/>
+					<description value="7" align="center" class="half_down"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[5]" class="half_down"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[2]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[2]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[2]"/>
+					<description value="12" align="center" class="half_down"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[7]" class="half_down"/>
+					<description/>
+					<description/>
 				</row>
 				<row>
 					<description value="2"/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[3]"/>
-					<description value="6" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[3]"/>
-					<description value="10" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[3]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[6]" class="half_down"/>
+					<description/>
+					<description/>
+					<description/>
+					<description value="1. place" align="center" class="half_down"/>
 				</row>
 				<row>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[4]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[4]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[4]"/>
+					<description/>
+					<description/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="winner1" class="half_down winner"/>
 				</row>
 				<row>
 					<description value="3"/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[5]"/>
-					<description value="7" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[5]"/>
-					<description value="11" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[5]"/>
+					<description value="8" align="center" class="half_down"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[7]" class="half_down"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[6]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[6]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[6]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[8]" class="half_down"/>
+					<description/>
+					<description/>
 				</row>
 				<row>
 					<description value="4"/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[7]"/>
-					<description value="8" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[7]"/>
-					<description value="12" align="right"/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[7]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[8]" class="half_down"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
 				</row>
 				<row>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell" content="heat3[8]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat4[8]"/>
 					<description/>
-					<template id="ranking.result.index.speed_graph.cell" content="heat5[8]"/>
+					<description/>
+					<description/>
+					<description/>
+					<description value="3. place" class="half_down" align="center"/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description value="11" align="center"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[5]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" class="half_down winner" content="winner3"/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description/>
+					<description value="Looser-pairings" class="looserHeader"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[6]"/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description value="5" align="center"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[1]"/>
+					<description value="10" align="center" class="half_down"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[3]" class="half_down"/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[2]"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description value="6" align="center"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[3]"/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[4]" class="half_down"/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat4[4]"/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description value="9" align="center"/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[1]"/>
+					<description/>
+					<description/>
+				</row>
+				<row>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<description/>
+					<template id="ranking.result.index.speed_graph.cell" content="heat5[2]"/>
+					<description/>
+					<description/>
 				</row>
 			</rows>
 		</grid>
+		<styles>
+			.looserHeader { font-size: 120%; }
+			div#ranking-result-index_rows_template td[align=center] > span {
+				padding-left: 5px;
+			}
+		</styles>
 	</template>
 </overlay>

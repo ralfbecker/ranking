@@ -70,6 +70,9 @@
 				<column width="20%"/>
 			</columns>
 			<rows>
+				<row class="onlyPrint" part="header">
+					<template id="ranking.result.header$cont[calendar]" span="all"/>
+				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[1]"/>
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[1]"/>
