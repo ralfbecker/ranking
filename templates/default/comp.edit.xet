@@ -99,7 +99,7 @@
 			<rows>
 				<row class="th">
 					<description value="Prequalified competitiors for registration" span="2"/>
-					<button align="right" statustext="Only necessary, if you change something, after registration started." label="Update registration" id="update_prequal"/>
+					<button align="right" statustext="Only necessary, if you change something, after registration started." label="Update registration" id="button[update_prequal]"/>
 				</row>
 				<row class="row">
 					<select label="ranking" id="prequal_type"/>
