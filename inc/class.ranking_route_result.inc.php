@@ -905,7 +905,7 @@ class ranking_route_result extends Api\Storage\Base
 
 			if (ranking_result_bo::is_two_quali_all($route_type) && ($route_order == 1 ||
 				$quali_overall == 2 && $route_order == 3) ||	// Group B
-				$route_type == THREE_QUALI_ALL_NO_STAGGER && $route_order <= 2)
+				$route_type == THREE_QUALI_ALL_NO_STAGGER && 0 < $route_order && $route_order <= 2)
 			{
 				// only order are the quali-points, same SQL as for the previous "heat" of route_order=2=Final
 				$product = '('.$this->_sql_rank_prev_heat(1+$route_order, $route_type, $quali_overall, null, $keys).')';
