@@ -61,7 +61,7 @@
 		</grid>
 	</template>
 	<template id="ranking.result.index.speed_graph" template="" lang="" group="0" version="14.2.001">
-		<grid width="100%" id="nm[rows]">
+		<grid width="99.5%" id="nm[rows]">
 			<columns>
 				<column width="20%" disabled="!@heat2"/>
 				<column width="20%" disabled="!$cont[heat2]$cont[heat3]"/>
@@ -120,7 +120,7 @@
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[4]"/>
 					<description/>
 					<description/>
-					<description value="1. place" align="center"/>
+					<description value="1. place" align="center" class="half_down"/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[8]"/>
@@ -134,7 +134,7 @@
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat3[5]"/>
 					<description/>
 					<description/>
-					<description align="center"/>
+					<description/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[10]"/>
@@ -168,8 +168,8 @@
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[14]"/>
 					<description/>
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" class="half_down" content="heat4[4]"/>
-					<description value="Small final" class="leftPad5"/>
-					<description value="3. place" align="center"/>
+					<description value="Small final" class="leftPad5 third_down"/>
+					<description value="3. place" align="center" class="half_down"/>
 				</row>
 				<row>
 					<template id="ranking.result.index.speed_graph.cell$cont[discipline]" content="heat2[15]"/>

@@ -1605,8 +1605,9 @@ app.classes.ranking = AppJS.extend(
 		{
 			heat++;
 		}
+		var next = content.getEntry('nm[rows][heat'+(heat+1)+']');
 		this.action_edit({}, [{id: parts[3]}], 'heat'+heat,
-			!!content.getEntry('nm[rows][heat'+(heat+1)+']'));
+			next && next[1].result_rank);
 	},
 
 	/**

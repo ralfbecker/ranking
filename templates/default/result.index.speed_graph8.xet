@@ -13,11 +13,11 @@
 				<row>
 					<description no_lang="1" id="nachname" class="lastname leftPad5"/>
 					<textbox type="hidden" id="id" value="$cont[WetId]:$cont[GrpId]:$cont[route_order]:$cont[PerId]"/>
-					<description no_lang="1" align="center" id="nation"/>
+					<description no_lang="1" align="right" id="nation"/>
 				</row>
 				<row>
 					<description no_lang="1" id="vorname" class="leftPad5" span="2"/>
-					<description align="center" no_lang="1" id="result"/>
+					<description align="right" no_lang="1" id="result"/>
 				</row>
 			</rows>
 		</grid>

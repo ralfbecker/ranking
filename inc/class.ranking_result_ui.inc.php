@@ -138,13 +138,15 @@ class ranking_result_ui extends ranking_result_bo
 				unset($content['button']);
 			}
 			// reload the parent window
+			$current = Api\Cache::getSession('ranking', 'result');
 			$param = array(
 				'menuaction' => 'ranking.ranking_result_ui.index',
 				'ajax'  => 'true',		// avoid iframe
 				'refresh' => time(),	// force a refresh (content-browser does not refresh same url)
 				'comp'  => $content['WetId'],
 				'cat'   => $content['GrpId'],
-				'route' => $content['route_order'],
+				// stay on pairing list for (combined) speed finals
+				'route' => $current['route'] == -2 ? -2 : $content['route_order'],
 			);
 			if ($content['new_route'] || $button == 'startlist')
 			{
@@ -954,6 +956,7 @@ class ranking_result_ui extends ranking_result_bo
 						{
 							// regular speed has small final in own heat, therefore are both on $row['result_rank'.$suffix] == 1
 							if ($rank == 1 && isset($rows['winner'.$rank])) $rank = $row['result_rank'];
+							if ($query['discipline'] !== 'combined' && $suffix == $last-1) $rank = 3;	// otherwise small final winner shown as 1st
 							$rows['winner'.$rank] = $row;
 							unset($rows['winner'.$rank]['PerId']);	// to disable editing
 							unset($rows['winner'.$rank]['result']); // remove (wrong) time from winners

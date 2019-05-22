@@ -1249,7 +1249,6 @@ class ranking_result_bo extends ranking_bo
 	 */
 	private function _startlist_from_ko_heat($keys, $discipline)
 	{
-		//echo "<p>".__METHOD__."(".print_r($keys,true).")</p>\n";
 		$prev_keys = array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['GrpId'],
@@ -1260,6 +1259,8 @@ class ranking_result_bo extends ranking_bo
 			throw new Api\Exception\WrongUserinput(lang('Previous round not found!'));
 		}
 		$order_by = 'start_order';
+		// false start do NOT eliminate in combined speed final, nor in regular small final
+		$max_false_starts = 999;
 		// combined integrates fastest loosers in 1/2-final and small final in final
 		if ($discipline == 'combined')
 		{
@@ -1301,6 +1302,8 @@ class ranking_result_bo extends ranking_bo
 				throw new Api\Exception\WrongUserinput(lang('Previous round not found!'));
 			}
 			$prev_keys[] = 'result_rank = 1';
+			// before small final false start eliminates athlete
+			if ($prev_route['route_quota']) $max_false_starts = ranking_route_result::MAX_FALSE_STARTS;
 		}
 		// which column get propagated to next heat
 		$cols = $this->route_result->startlist_cols();
@@ -1373,7 +1376,7 @@ class ranking_result_bo extends ranking_bo
 		for($start_order=1; $start_order <= $prev_route['route_quota']; ++$start_order)
 		{
 			$data = $starters_by_startorder[$start_order];
-			if (!isset($data) || $data[$this->route_result->id_col] <= 0 || $data['false_start'] > ranking_route_result::MAX_FALSE_STARTS)
+			if (!isset($data) || $data[$this->route_result->id_col] <= 0 || $data['false_start'] > $max_false_starts)
 			{
 				// no starter --> wildcard for co
 				$this->_create_wildcard_co($keys,$start_order,array('result_rank' => 2));
@@ -1382,12 +1385,13 @@ class ranking_result_bo extends ranking_bo
 			{
 				// check if our co is a regular starter, as we otherwise have a wildcard
 				$co = $starters_by_startorder[$start_order & 1 ? $start_order+1 : $start_order-1];
-				if (!isset($co) || $co[$this->route_result->id_col] <= 0 || $co['false_start'] > ranking_route_result::MAX_FALSE_STARTS)
+				if (!isset($co) || $co[$this->route_result->id_col] <= 0 || $co['false_start'] > $max_false_starts)
 				{
 					$data['result_time'] = WILDCARD_TIME;
 					$data['result_rank'] = 1;
 				}
 				$data['start_order'] = $start_order;
+				unset($data['false_start']);
 
 				$this->route_result->init($keys);
 				$this->route_result->save($data);
@@ -2583,6 +2587,10 @@ class ranking_result_bo extends ranking_bo
 					$keys['route_quota'] = '';
 					$keys['route_name'] = lang('Small final');
 				}
+			}
+			elseif(isset($e) && $keys['route_name'] == lang('Final'))
+			{
+				unset($msg);	// suppress no quota set message for speed final
 			}
 			if ($previous && $previous['route_judge'])
 			{
