@@ -1588,14 +1588,25 @@ app.classes.ranking = AppJS.extend(
 		var id = jQuery(event.currentTarget).find('input[type=hidden]').val();
 		var parts = id ? id.split(/:/) : [];	// WetId:GrpId:route_order:PerId
 		var content = this.et2.getArrayMgr('content');
-		if (id.length < 4 || !parseInt(parts[2]) || !parts[3] ||
+		var route = parseInt(parts[2]);
+		if (id.length < 4 || !route || !parts[3] ||
 			!content || !content.getEntry('nm[is_judge]') ||
 			content.getEntry('nm[result_official]'))
 		{
 			return;
 		}
-		this.action_edit({}, [{id: parts[3]}], 'heat'+parts[2],
-			!!content.getEntry('nm[rows][heat'+(parseInt(parts[2])+1)+']'));
+		// speed finals with less then 16 participants renumber heats in content
+		// to use same template hiding first columns!
+		var rows = content.getEntry('nm[rows]');
+		var heat = route;
+		while (heat < 6 && (typeof rows['heat'+heat] == 'undefined' ||
+			// in case of a wildcard rows['heat'+heat][1] might not exist!
+			rows['heat'+heat][typeof rows['heat'+heat][1] == 'undefined' ? 2 : 1].route_order < route))
+		{
+			heat++;
+		}
+		this.action_edit({}, [{id: parts[3]}], 'heat'+heat,
+			!!content.getEntry('nm[rows][heat'+(heat+1)+']'));
 	},
 
 	/**
@@ -1693,7 +1704,7 @@ app.classes.ranking = AppJS.extend(
 			value: {
 				content: entry || {},
 				sel_options: sel_options.data || {},
-				readonlys: entry.checked || nm.result_official ? { __ALL__: true} : {}
+				readonlys: entry.checked || nm.result_official || _ro ? { __ALL__: true} : {}
 			},
 			template: template,
 			class: "update_result",

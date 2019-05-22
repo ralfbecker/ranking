@@ -49,12 +49,12 @@
 				</row>
 				<row class="row" height="50px">
 					<description label="Time"/>
-					<float id="result_time" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<float id="result_time" precision="3" size="6" onchange="app.ranking.time_changed" align="center"/>
 					<select id="eliminated" onchange="app.ranking.eliminated_changed" align="right"/>
 				</row>
 				<row class="row" valign="top" height="40px" disabled="!@nm[rows][show_second_lane]">
 					<description label="Lane B"/>
-					<float id="result_time_r" precision="2" size="4" onchange="app.ranking.time_changed" align="center"/>
+					<float id="result_time_r" precision="3" size="6" onchange="app.ranking.time_changed" align="center"/>
 					<select id="eliminated_r" onchange="app.ranking.eliminated_changed" align="right"/>
 				</row>
 			</rows>
@@ -67,7 +67,7 @@
 				<column width="20%" disabled="!$cont[heat2]$cont[heat3]"/>
 				<column width="20%"/>
 				<column width="20%"/>
-				<column width="20%"/>
+				<column width="18%"/>
 			</columns>
 			<rows>
 				<row class="onlyPrint" part="header">

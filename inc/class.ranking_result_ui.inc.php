@@ -878,7 +878,6 @@ class ranking_result_ui extends ranking_result_bo
 		$need_start_number = false;
 		$need_lead_time_column = false;
 		$quota_line = false;
-		//$unranked = array();
 		foreach($rows as $k => $row)
 		{
 			if (!is_int($k)) continue;
@@ -929,7 +928,9 @@ class ranking_result_ui extends ranking_result_bo
 			if ($query['route'] == -2 && strstr($query['template'],'speed_graph') &&
 				(substr($query['discipline'],0,5) == 'speed' || $query['discipline'] == 'combined'))
 			{
-				for($suffix=2; $suffix <= 6; ++$suffix)
+				$first = $query['discipline'] === 'combined' ? 3 : 2;
+				$last  = $query['discipline'] === 'combined' ? 5 : 6-$skip;
+				for($suffix = $first; $suffix <= $last; ++$suffix)
 				{
 					// create pseudo row from general result to allow editing in pairing list
 					$r = array_intersect_key($row, array_flip(['WetId','GrpId','PerId','nation','vorname','nachname','start_number','verband']));
@@ -939,9 +940,10 @@ class ranking_result_ui extends ranking_result_bo
 						'start_order' => isset($row['start_order'.$suffix]) ? $row['start_order'.$suffix] : $row['start_order'],
 						'result_rank' => $row['result_rank'.$suffix],
 						//'row' => $row,
-					] + (array)json_decode($row['result_detail'.(isset($row['result_detail'.$suffix]) ? $suffix : '')], true);
-					$r['result_time'] = $r['result_time_l']; unset($r['result_time_l']);
-					$r['eliminated'] = $r['eliminated_l']; unset($r['eliminated_l']);
+					] + (array)json_decode($row['result_detail'.($suffix == $first && !isset($row['result_detail'.$suffix]) ? '' : $suffix)], true);
+					$r['result_time'] = $r['result_time_l'] ? $r['result_time_l'] : null; unset($r['result_time_l']);
+					$r['eliminated'] = $r['false_start'] ? ranking_result_bo::ELIMINATED_FALSE_START : $r['eliminated_l'];
+					unset($r['eliminated_l'], $r['false_start']);
 
 					if (isset($row['start_order'.$suffix]))
 					{
@@ -953,6 +955,8 @@ class ranking_result_ui extends ranking_result_bo
 							// regular speed has small final in own heat, therefore are both on $row['result_rank'.$suffix] == 1
 							if ($rank == 1 && isset($rows['winner'.$rank])) $rank = $row['result_rank'];
 							$rows['winner'.$rank] = $row;
+							unset($rows['winner'.$rank]['PerId']);	// to disable editing
+							unset($rows['winner'.$rank]['result']); // remove (wrong) time from winners
 						}
 					}
 					elseif($suffix == 3 && $query['discipline'] == 'combined')
