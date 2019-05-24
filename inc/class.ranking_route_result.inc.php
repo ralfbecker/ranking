@@ -1719,7 +1719,7 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected) extra_cols=".array2string($extra_cols).", order_by=$order_by");
 		$this->db->transaction_begin();
-		$join = '';//'JOIN Personen USING(PerId)'; $extra_cols[] = 'Nachname'; $extra_cols[] = 'Vorname';
+		$join = '';//'JOIN Personen USING(PerId)'; $extra_cols[] = 'nachname'; $extra_cols[] = 'vorname';
 		$result = $this->search($keys, $this->id_col.',result_rank,result_detail AS detail',
 			'ORDER BY '.$order_by.' FOR UPDATE', $extra_cols, '', false, 'AND', false, null, $join);
 
@@ -2007,7 +2007,7 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				$result['detail'] = self::unserialize($result['detail']);
 				$old_attempts[$result['PerId']] = $result['detail']['attempts'];
-				unset($result['detail']['attempts']);
+				unset($result['detail']['attempts'], $result['detail']['last_attempts']);
 			}
 			// for regular (not combined) boulder final, we have to do the countback to 1/2-final first
 			if ($countback_first && !empty($result['new_rank']) &&	// but only if competitor has climbed in final!
@@ -2034,7 +2034,7 @@ class ranking_route_result extends Api\Storage\Base
 					foreach($results as &$result)
 					{
 						if ($result['new_rank'] < $place) continue;	// keep attempts!
-						unset($result['detail']['attempts']);
+						$result['detail']['attempts'] = $result['detail']['last_attempts'];
 						if ($result['new_rank'] > $place || $attempt == self::MAX_ATTEMPTS) continue;
 
 						// calculate how many $what (top/zone) are archived in $attempt try
@@ -2049,7 +2049,7 @@ class ranking_route_result extends Api\Storage\Base
 					// check if we need tie-breaking on given $place --> continue to zone or next place if not
 					if (count($to_split) < 2)
 					{
-						unset($to_split[0]['detail']['attempts']);
+						$to_split[0]['detail']['attempts'] = $to_split[0]['detail']['last_attempts'];
 						break 1;
 					}
 					else
@@ -2065,52 +2065,61 @@ class ranking_route_result extends Api\Storage\Base
 						 * c) last split, eg:  0: 1, 1: 1, 2: 0 --> write last with $place+=$n
 						 * z) none split, eg:  0: 1, 1: 1, 2: 1 --> continue with higher attempt
 						 */
-						$last_num_attempt = null;
 						$split = 0;
+						$rank = $to_split[0]['new_rank'];
+						$last_num_attempt = (int)$to_split[0]['detail']['attempts'];
+						$last_rank = null;
 						foreach($to_split as $n => &$result)
 						{
-							// current one is split from next or in case last from the one before --> write it
-							if ($n < count($to_split)-1 ?
-									(int)$result['detail']['attempts'] !== (int)$to_split[1+$n]['detail']['attempts'] :
-									$last_num_attempt !== (int)$result['detail']['attempts'])
+							if ($last_rank)
 							{
-								$result['new_rank'] += $n;
-								$split++;
-								$last_num_attempt = (int)$result['detail']['attempts'];
+								// current one has less attempts then one before --> split
+								if ($last_num_attempt > (int)$result['detail']['attempts'])
+								{
+									$result['new_rank'] = $rank;
+									$last_num_attempt = (int)$result['detail']['attempts'];
+									++$split;
+								}
+								// current one has equal attempts then one before --> same rank as one before
+								else
+								{
+									$result['new_rank'] = $last_rank;
+								}
 							}
-							// loosers have their place incremented by number of split ones
-							else
-							{
-								$result['new_rank'] += $split;
-								$last_num_attempt = (int)$result['detail']['attempts'];
-								unset($result['detail']['attempts']);
-							}
-
+							$rank++;
+							$last_rank = $result['new_rank'];
+						}
+						// move results back to split
+						foreach($to_split as $n => &$result)
+						{
 							foreach($results as &$r)
 							{
 								if ($r['PerId'] == $result['PerId'])
 								{
 									$r['new_rank'] = $result['new_rank'];
+									// if we split, remember why, in case next try to split leeds to nothing
+									if ($split)
+									{
+										$result['detail']['last_attempts'] = $result['detail']['attempts'];
+									}
+									else
+									{
+										$result['detail']['attempts'] = $result['detail']['last_attempts'];
+									}
 									$r['detail'] = $result['detail'];
 									break;
 								}
 							}
 						}
-						// todo: this is not yet correct for case c)!
-						if ($split) $place += $split-1;
-						// check how many are split
-						switch($split)
+						// all split --> continue to next place
+						if ($split === count($to_split)-1)
 						{
-							case 0:	// none split --> continue with higher attempt
-								break;
-							case count($to_split):	// all split --> continue to next place
-							default:	// some, but not all split --> continue with higher attempt (and maybe different place)
-								break 3;
+							$place += count($to_split);
+							break 2;
 						}
 					}
 				}
 			}
-			// no tie-break archived --> remove detail "attempts"
 		}
 
 		// sort by new rank
@@ -2132,6 +2141,7 @@ class ranking_route_result extends Api\Storage\Base
 				//error_log(__METHOD__."() attempts changed from '{$old_attempts[$result['PerId']]}' to '{$result['detail']['attempts']}'");
 				if (!isset($result['detail']['attempts'])) $result['detail']['attempts'] = null;	// need to force update by update_ranking
 			}
+			unset($result['detail']['last_attempts']);	// no need to store, only used in this method
 		}
 		/* dump results for writing tests, if not running the test ;)
 		if ($keys['WetId'])
