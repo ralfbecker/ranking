@@ -85,7 +85,7 @@ class ranking_registration_ui extends ranking_bo
 		);
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']]))
 		{
-			$sel_options['comp'][$comp['WetId']] = Api\DateTime($comp['datum'], true).': '.$comp['name'];
+			$sel_options['comp'][$comp['WetId']] = Api\DateTime::to($comp['datum'], true).': '.$comp['name'];
 		}
 
 		$matches = null;
