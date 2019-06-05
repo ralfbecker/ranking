@@ -24,7 +24,7 @@ You can use a few GET parameters to influence what information you get:
 a) comp: This is the Id of the competition (1287 in case of Arco
 Rockmaster 2010). Other competitions id's can be found the the url's of
 eg. [competition calendar](http://www.ifsc-climbing.org/index.php/world-competition/calendar)
-or [latest result page](http://www.ifsc-climbing.org/index.php/world-competition/results)
+or [latest result page](http://www.ifsc-climbing.org/index.php/world-competition/last-result)
 
 b) cat: This is id of the category and discipline:
 ```
