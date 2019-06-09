@@ -83,15 +83,24 @@ button.small {
   width: 45px;
   white-space: nowrap !important;
 }
+li.active-result {
+  white-space: nowrap;
+}
 /**
  * New registration using NM
  */
+#ranking-registration_calendar {
+  width: 58px;
+}
 #ranking-registration_ranking-registration-header {
   width: 85%;
 }
-#ranking-registration_comp,
+#ranking-registration_comp {
+  width: 60%;
+}
 #ranking-registration_nation {
-  width: 35%;
+  width: 17%;
+  margin-left: 3px;
 }
 #ranking-registration_search {
   display: none;
@@ -338,9 +347,6 @@ table.buttonBox {
 }
 #ranking-result-index_resultlist h1 {
   display: none;
-}
-body #egw_fw_main #egw_fw_tabs {
-  background-color: white;
 }
 #ranking-result-index_ranking-result-boulder_measurement {
   background-color: white;
