@@ -873,13 +873,16 @@ class ranking_bo extends ranking_so
 		{
 			$error = lang('Invalid age for age-group of category');
 		}
-		elseif ($mode == ranking_registration::REGISTERED && $athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
+		elseif (in_array($mode, [ranking_registration::REGISTERED, 'replace']))
 		{
-			$error = lang('This athlete has NO license!');
-		}
-		elseif ($mode == ranking_registration::REGISTERED && $athlete['license'] == 's')
-		{
-			$error = lang('Athlete is suspended !!!');
+			if ($athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
+			{
+				$error = lang('This athlete has NO license!');
+			}
+			elseif ($athlete['license'] == 's')
+			{
+				$error = lang('Athlete is suspended !!!');
+			}
 		}
 		return $error;
 	}
