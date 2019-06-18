@@ -2249,6 +2249,11 @@ class ranking_result_bo extends ranking_bo
 		{
 			$cup_filter = $this->federation->query_list('fed_id', 'fed_id', array('fed_parent' => $cup['fed_id']));
 		}
+		// for numeric fed_id check if it is a region, in which case we need to get the state-federations which are parents of the sections
+		if (is_numeric($filter_nation))
+		{
+			$feds = $this->federation->query_list('fed_id', 'fed_id', array('fed_parent' => $filter_nation));
+		}
 		$skipped = $last_rank = $ex_aquo = 0;
 		$rank = 1;
 		$cup_last_rank = $cup_ex_aquo = 0;
@@ -2273,7 +2278,8 @@ class ranking_result_bo extends ranking_bo
 				// if requested filter by nation or federation
 				$org_rank = $row['result_rank'];
 				if ($filter_nation && (!is_numeric($filter_nation) && $row['nation'] != $filter_nation ||
-					is_numeric($filter_nation) && $row['fed_id'] != $filter_nation && $row['fed_parent'] != $filter_nation))
+					is_numeric($filter_nation) && $row['fed_id'] != $filter_nation && $row['fed_parent'] != $filter_nation) &&
+						(empty($feds) || !in_array($row['fed_parent'], $feds)))
 				{
 					$skipped++;
 					// if we have a cup_filter, only really skip, if it does not match
