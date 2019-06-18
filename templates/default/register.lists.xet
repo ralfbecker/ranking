@@ -12,20 +12,14 @@
 				<row class="th">
 					<description options=",,,comp" value="Competition"/>
 					<hbox>
-						<menulist>
-							<menupopup id="calendar" onchange="1" no_lang="1"/>
-						</menulist>
-						<menulist>
-							<menupopup id="comp" onchange="1" options="Select one" no_lang="1"/>
-						</menulist>
+						<select id="calendar" onchange="1" no_lang="1"/>
+						<select id="comp" onchange="1" options="Select one" search="true" no_lang="1"/>
 					</hbox>
 				</row>
 				<row class="th" disabled="!@comp">
 					<description value="Category" options=",,,cat"/>
 					<hbox>
-						<menulist>
-							<menupopup id="cat" no_lang="1" onchange="1" options="All"/>
-						</menulist>
+						<select id="cat" no_lang="1" onchange="1" options="All"/>
 						<button label="Download" id="download" onclick="widget.getInstanceManager().postSubmit()"/>
 					</hbox>
 				</row>

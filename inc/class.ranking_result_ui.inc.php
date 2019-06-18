@@ -1550,8 +1550,10 @@ class ranking_result_ui extends ranking_result_bo
 			),
 			'try' => array(0 => ' '),
 		);
-		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
-
+		if ($comp && !isset($sel_options['comp'][$comp['WetId']]))
+		{
+			$sel_options['comp'][$comp['WetId']] = Api\DateTime::to($comp['datum'], true).': '.$comp['name'];
+		}
 		if ($content['nm']['route'] < 2) unset($sel_options['eliminated'][0]);
 		unset($sel_options['eliminated_r'][0]);
 		if (is_array($route)) $content += $route;
