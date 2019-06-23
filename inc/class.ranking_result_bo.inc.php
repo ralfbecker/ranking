@@ -284,7 +284,7 @@ class ranking_result_bo extends ranking_bo
 	 *  &4  reverse ranking or cup (--> unranked first)
 	 *  &8  use ranking/cup for distribution only, order is random
 	 * @param int $add_cat =null additional category to add registered atheletes from
-	 * @param int $comb_quali =null (additional) combined qualification competition (WetId)
+	 * @param int $comb_quali =null (additional) combined qualification competition (WetId) or '' to use registration
 	 * @return int|boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 * @throws Api\Exception\WrongUserinput with translated error-message
 	 */
@@ -333,7 +333,7 @@ class ranking_result_bo extends ranking_bo
 		}
 
 		// combined startlist from separate qualification competition
-		if ($discipline == 'combined' && $route_order < 3 && $comb_quali)
+		if ($discipline == 'combined' && $route_order < 3 && $comb_quali !== '')
 		{
 			return $this->_combined_startlist($comp, $cat, $route_order, $comb_quali);
 		}
