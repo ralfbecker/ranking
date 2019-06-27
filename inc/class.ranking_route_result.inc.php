@@ -631,7 +631,7 @@ class ranking_route_result extends Api\Storage\Base
 				"<?php\n\n\$input = ".var_export($input, true).";\n\$quali_overall = $quali_overall;\n\$qualification = ".var_export($qualification, true).";\n\$results = ".var_export($results, true).";\n");
 			error_log(__METHOD__."() logged input and results to ".realpath($path));
 		}
-}
+	}
 
 	/**
 	 * Do a head to head comparison for two results and given heats
@@ -1333,8 +1333,6 @@ class ranking_route_result extends Api\Storage\Base
 				}
 				break;
 		}
-		$this->_shorten_name($data['nachname']);
-		$this->_shorten_name($data['vorname']);
 
 		if ($data['geb_date']) $data['birthyear'] = (int)$data['geb_date'];
 
@@ -1352,31 +1350,6 @@ class ranking_route_result extends Api\Storage\Base
 	public static function unserialize($data)
 	{
 		return !$data ? array() : ($data[0] == '{' ? json_decode($data, true) : unserialize($data));
-	}
-
-	/**
-	 * Appriviate the name to make it better printable
-	 *
-	 * @param string &$name
-	 * @param int $max =12 maximum length
-	 */
-	private function _shorten_name(&$name,$max=13)
-	{
-		if (strlen($name) <= $max) return;
-
-		// add a space after each dash or comma, if there's none already
-		if (true) $name = preg_replace('/([-,]+ *)/','\\1 ',$name);
-
-		// check all space separated parts for their length
-		$parts = explode(' ',$name);
-		foreach($parts as &$part)
-		{
-			if (strlen($part) > $max)
-			{
-				$part = substr($part,0,$max-1).'.';
-			}
-		}
-		$name = implode(' ',$parts);
 	}
 
 	/**
