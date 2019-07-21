@@ -2254,6 +2254,8 @@ class ranking_route_result extends Api\Storage\Base
 	 * Comparing string times in json (result_time_l/r) to float times in result_time
 	 * does not always work, they are not always equal --> casting everything to int
 	 *
+	 * All eliminated climbers - false-start or fall - must be tied on last place.
+	 *
 	 * @param array& $results
 	 */
 	protected function speed_quali_tie_breaking(array &$results)
@@ -2293,10 +2295,12 @@ class ranking_route_result extends Api\Storage\Base
 		});
 
 		// 2. step: now ex. aquo are ordered correctly fix new_rank
-		$last_new_rank = $last_time2 = null;
+		$last_new_rank = $last_time = $last_time2 = null;
 		foreach($results as $n => &$result)
 		{
 			if ($last_new_rank && $last_new_rank == $result['new_rank'] &&
+				// both are NOT eliminated (false-start or fall) --> otherwise keep them tied
+				isset($last_time) && isset($result['result_time']) &&
 				$last_time2 && (empty($result['result_time2']) || $last_time2 < $result['result_time2']))
 			{
 				$result['new_rank'] = $n+1;
@@ -2305,6 +2309,7 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				$last_new_rank = $result['new_rank'];
 			}
+			$last_time = $result['result_time'];
 			$last_time2 = $result['result_time2'];
 		}
 	}
