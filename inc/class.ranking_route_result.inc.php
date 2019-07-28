@@ -1269,8 +1269,7 @@ class ranking_route_result extends Api\Storage\Base
 							}
 							else
 							{
-								$data['result_time'] *= 0.001;
-								$data['time_sum'] = $data['result'] = sprintf('%4.3lf',$data['result_time']);
+								$data['result_time'] = $data['time_sum'] = $data['result'] = sprintf('%4.3lf', 0.001*$data['result_time']);
 							}
 						}
 						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
@@ -2173,9 +2172,15 @@ class ranking_route_result extends Api\Storage\Base
 				{
 					$result['new_rank']++;
 				}
-				elseif ($result['quali_time'] > $last['quali_time'])
+				// check if current one has no or a bigger quali time
+				elseif (!$result['quali_time'] && $last['quali_time'] || $result['quali_time'] > $last['quali_time'])
 				{
 					$result['new_rank']++;
+				}
+				// check if last one has no or a bigger quali time
+				elseif (!$last['quali_time'] && $result['quali_time'] || $last['quali_time'] > $result['quali_time'])
+				{
+					$results[$n-1]['new_rank']++;
 				}
 				elseif ($result['quali_time'] == $last['quali_time'])
 				{
