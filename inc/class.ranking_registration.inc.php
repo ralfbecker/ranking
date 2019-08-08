@@ -456,7 +456,39 @@ class ranking_registration extends Api\Storage\Base
 				}
 			}
 		}
-		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+		if (($rows = parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join)))
+		{
+			foreach($rows as &$row)
+			{
+				// add one of "is(Deleted|Confirmed|Registered|Preregisted)" classes
+				foreach(ranking_registration::$states as $state)
+				{
+					if (!empty($row[ranking_registration::PREFIX.$state]))
+					{
+						if (!isset($row['state']))
+						{
+							$row['class'] .= ' is'.ucfirst($state);
+							$row['state'] = $state;
+						}
+						// we allways want prequalified class, to show registered ones also as prequalified (italics)
+						elseif($state == 'prequalified')
+						{
+							$row['class'] .= ' is'.ucfirst($state);
+						}
+						$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
+						$row['state_changed'] .= Api\DateTime::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
+							($modifier ? lang('by').' '.Api\Accounts::username($modifier).' ' : '')."\n".
+							($state == 'prequalified' ? $row['reg_prequal_reason'] : '');
+					}
+				}
+				// always add prequal reason, as it contains also a note when it got removed
+				if (empty($row[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]) && !empty($row['reg_prequal_reason']))
+				{
+					$row['state_changed'] .= "\n".$row['reg_prequal_reason'];
+				}
+			}
+		}
+		return $rows;
 	}
 
 	/**

@@ -138,33 +138,6 @@ class ranking_registration_ui extends ranking_bo
 				$row['verband'] = $matches[1];
 			}
 
-			// add one of "is(Deleted|Confirmed|Registered|Preregisted)" classes
-			foreach(ranking_registration::$states as $state)
-			{
-				if (!empty($row[ranking_registration::PREFIX.$state]))
-				{
-					if (!isset($row['state']))
-					{
-						$row['class'] .= ' is'.ucfirst($state);
-						$row['state'] = $state;
-					}
-					// we allways want prequalified class, to show registered ones also as prequalified (italics)
-					elseif($state == 'prequalified')
-					{
-						$row['class'] .= ' is'.ucfirst($state);
-					}
-					$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
-					$row['state_changed'] .= Api\DateTime::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
-						($modifier ? lang('by').' '.Api\Accounts::username($modifier).' ' : '')."\n".
-						($state == 'prequalified' ? $row['reg_prequal_reason'] : '');
-				}
-			}
-			// always add prequal reason, as it contains also a note when it got removed
-			if (empty($row[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]) && !empty($row['reg_prequal_reason']))
-			{
-				$row['state_changed'] .= "\n".$row['reg_prequal_reason'];
-
-			}
 			$replace = false;
 			if ($comp_rights || $this->registration_check($comp, $row['nation'], null, $replace) ||
 				$comp['nation'] && ($this->registration_check($comp, $row['fed_parent'], null, $replace) ||
@@ -818,6 +791,16 @@ class ranking_registration_ui extends ranking_bo
 					'ranking',
 					'ranking-points',
 				);
+				if ($show != 'result')
+				{
+					$name2csv += [
+						'reg_prequal_reason' => 'prequalified',
+						'reg_registered' => 'registered',
+						'reg_confirmed'  => 'confirmed',
+						'reg_deleted'    => 'deleted',
+						'state_changed'  => 'changed',
+					];
+				}
 				echo implode(';',$name2csv)."\n";
 				$charset = Api\Translation::charset();
 				$c['GrpId'] = 0;
@@ -856,13 +839,16 @@ class ranking_registration_ui extends ranking_bo
 							case 'ranking':
 								$val = $ranking[$athlete['PerId']]['platz'];
 								break;
+							case 'changed':
+								$val = trim($athlete[$name]);
+								break;
 							case 'ranking-points':
 								$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2lf',$ranking[$athlete['PerId']]['pkt']) : '';
 								break;
 							default:
 								$val = $athlete[$name];
 						}
-						if (strchr($val,';') !== false)
+						if (strchr($val,';') !== false || strchr($val, "\n") !== false)
 						{
 							$val = '"'.str_replace('"','',$val).'"';
 						}

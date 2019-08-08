@@ -17,6 +17,7 @@
 				<column width="25%"/>
 				<column width="20%"/>
 				<column width="100"/>
+				<column width="120"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -32,6 +33,7 @@
 					<nextmatch-sortheader label="Federation" id="verband" class="hideOnMobile"/>
 					<nextmatch-sortheader label="Regionalzentrum" id="acl_fed_id" class="hideOnMobile"/>
 					<nextmatch-filterheader id="state"/>
+					<nextmatch-sortheader label="Registered" id="reg_registered"/>
 				</row>
 				<row class="row $row_cont[class]">
 					<description id="${row}[reg_fed]" no_lang="1"/>
@@ -46,6 +48,7 @@
 					<description id="${row}[verband]" no_lang="1" class="hideOnMobile"/>
 					<select id="${row}[acl_fed_id]" no_lang="1" readonly="true" class="hideOnMobile"/>
 					<description id="${row}[state]" statustext="$row_cont[state_changed]"/>
+					<date-time id="${row}[reg_registered]" readonly="true"/>
 				</row>
 			</rows>
 		</grid>
