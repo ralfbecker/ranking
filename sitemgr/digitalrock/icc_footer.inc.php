@@ -1,10 +1,10 @@
 <?php if (!function_exists('mailto')) require_once('open_db.inc.php'); ?>
-<p>Resultservice and rankings provided by <a href="http://www.digitalROCK.de" target=_blank>
+<p>Resultservice and rankings provided by <a href="https://www.digitalROCK.de" target=_blank>
 digital ROCK</A>, (c) 1990-<?php echo date('Y'); ?> by <?php echo mailto('RalfBecker@digitalROCK.de',
 'Ralf Becker'); ?>.</p>
 
 <p>Digital ROCK is contracted by
-<a href="http://www.ifsc-climbing.org" target="_blank">IFSC - International Federation of Sport Climbing</a>
+<a href="https://www.ifsc-climbing.org" target="_blank">IFSC - International Federation of Sport Climbing</a>
 to provide services for athlete registration,<br/>
 on-site results-service and rankings for the various competition they run and to host their website.<br/>
 
