@@ -1637,6 +1637,7 @@ class ranking_route_result extends Api\Storage\Base
 		if ($quali_preselected && $keys['route_order'] == 2 || $route_type == TWO_QUALI_ALL_NO_COUNTBACK ||
 			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] == 4 ||
 			$route_type == TWO_QUALI_GROUPS && $keys['route_order'] < 4 ||
+			$route_type == THREE_QUALI_ALL_NO_STAGGER && $keys['route_order'] < 3 ||
 			$route && $route['discipline'] == 'combined' && $keys['route_order'] < 3)
 		{
 			// no countback to quali, if we use preselected athletes or TWO_QUALI_ALL_NO_COUNTBACK
