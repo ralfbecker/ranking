@@ -2876,6 +2876,11 @@ var DrWidget = (function() {
 			delete _widget.update_handle;
 		}
 		delete this.prevent_initial_pop;
+		// check if we have an ordinary link without hash or query, eg. result PDF
+		if (!_params.match(/(#|\?)/))
+		{
+			document.location = _params;
+		}
 		var params = '!'+_params.replace(/^.*(#!|#|\?)/, '');
 
 		// update location hash, to reflect current page-content

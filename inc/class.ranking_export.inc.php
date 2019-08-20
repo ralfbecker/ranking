@@ -454,6 +454,13 @@ class ranking_export extends ranking_result_bo
 					}
 				}
 			}
+
+			// add see-also links for general result
+			if ($heat == -1 && ($competition = $instance->comp->read($comp)))
+			{
+				$data += $instance->see_also_result($competition, $cat);
+			}
+
 			// setting expires depending on result offical and how long it is offical
 			$data['expires'] = !$data['participants'] ? self::EXPORT_ROUTE_NO_STARTLIST :	// no startlist yet
 				(!isset($data['route_result']) ? self::EXPORT_ROUTE_RUNNING_EXPIRES :
@@ -1821,6 +1828,17 @@ class ranking_export extends ranking_result_bo
 				'url' => self::result_url($comp['WetId'], $cat['GrpId']).'&type=result',
 			);
 		}
+
+		// add result PDF, if there is one
+		if (($attachments = $this->comp->attachments($comp, false, true, self::base_url(true))) &&
+			!empty($attachments['result']))
+		{
+			$see_also[] = array(
+				'url' => $attachments['result'],
+				'name' => 'Additional result PDF',
+			);
+		}
+
 		return $see_also ? array('see_also' => $see_also) : array();
 	}
 
