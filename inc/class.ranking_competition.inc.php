@@ -724,7 +724,7 @@ class ranking_competition extends Api\Storage\Base
 	 * 	or string with url to prefix it, eg. http://example.com (without trailing slash!)
 	 * @return boolean/array links for the keys: info, startlist, result or false on error
 	 */
-	function attachments(array $data=null,$return_link=false,$only_pdf=true,$add_host=false)
+	function attachments($data=null,$return_link=false,$only_pdf=true,$add_host=false)
 	{
 		unset($return_link);
 		if (!$data) $data =& $this->data;
