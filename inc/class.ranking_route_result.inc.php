@@ -1043,7 +1043,7 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			default:
 			case 'lead':
-				if ($data['result_height'] || $data['result_height1'] || $data['result_height2'] ||	// lead result
+				if (isset($data['result_height']) || $data['result_height1'] || $data['result_height2'] ||	// lead result
 					$data['general_result'] && in_array($data['route_type'], array(TWO_QUALI_GROUPS,THREE_QUALI_ALL_NO_STAGGER)))
 				{
 					// commented as combined produces without sqrt bigger numbers, not sure why it was in here anyway
@@ -1073,7 +1073,7 @@ class ranking_route_result extends Api\Storage\Base
 							$data['result_plus'.$to_suffix]   = self::TOP_PLUS;
 							$data['result'.$to_suffix] = lang('Top');
 						}
-						elseif ($data['result_height'.$suffix])
+						elseif (isset($data['result_height'.$suffix]))
 						{
 							$data['result_height'.$to_suffix] = 0.001 * $data['result_height'.$suffix];
 							//$data['result'.$to_suffix] = sprintf('%4.2lf',$data['result_height'.$suffix]).

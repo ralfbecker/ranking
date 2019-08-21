@@ -160,7 +160,7 @@
 					<label align="right" value="Time"/>
 				</row>
 				<row class="row" height="50px">
-					<float id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="1"/>
+					<float id="result_height" onkeypress="app.ranking.height_keypress" size="5" min="0"/>
 					<select align="center" id="result_plus" no_lang="1"/>
 					<float id="result_time" align="right"/>
 				</row>
