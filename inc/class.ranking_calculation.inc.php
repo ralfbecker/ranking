@@ -646,7 +646,8 @@ class ranking_calculation
 		}
 		if ($this->debug) error_log(__METHOD__.": stand='$stand', comp='$comp[rkey]'");
 
-		if ($overall)
+		// internation combined (GER combined eg. Westdeutsche 2019 uses min_disciplines=3 below)
+		if ($overall && empty($comp['nation']))
 		{
 			if (!$cup) throw new Api\Exception\AssertionFailed('Overall ranking only defined for cups!');
 			if ((int)$stand >= 2018 && empty($cup['nation'])) throw new Api\Exception\AssertionFailed('Overall ranking 2018+ requires 2 competitions per discipline (and is not yet implemented)!');
