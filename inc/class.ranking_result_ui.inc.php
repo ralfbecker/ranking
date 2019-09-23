@@ -86,13 +86,10 @@ class ranking_result_ui extends ranking_result_bo
 				}
 				catch (Api\Exception\WrongUserinput $ex) {
 					unset($ex);
-					if (($comb_qualis = $this->combined_quali_comps($comp, $cat)))
-					{
-						$sel_options['comb_quali'] = array(
-							'' => 'Select combined qualification or use registration'
-						)+$comb_qualis;
-						$tmpl->disableElement('comb_quali', false);
-					}
+					$sel_options['comb_quali'] = array(
+						'' => 'Select combined qualification or use registration'
+					)+$this->combined_quali_comps($comp, $cat);
+					$tmpl->disableElement('comb_quali', false);
 				}
 			}
 			foreach($this->order_nums as $n => $label)
