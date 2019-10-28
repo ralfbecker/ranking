@@ -20,6 +20,12 @@ $GLOBALS['egw_info'] = array(
 ));
 include('../header.inc.php');
 
+// do NOT allow anonymous access
+if ($GLOBALS['egw']->session->session_flags === 'A')
+{
+	throw new Api\Exception\Redirect(Api\Egw::link('/logout.php'));
+}
+
 if (!($view = Api\Cache::getSession('ranking', 'menuaction')) &&
 	!($view = $GLOBALS['egw_info']['user']['preferences']['ranking']['default_view']))
 {
