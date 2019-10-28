@@ -603,7 +603,7 @@ class ranking_selfservice extends ranking_bo
 		{
 			// create and store recovery hash and time
 			$this->athlete->update(array(
-				'recover_pw_hash' => md5(microtime(true).$_COOKIE['sessionid']),
+				'recover_pw_hash' => Api\Auth::randomstring(32),
 				'recover_pw_time' => $this->athlete->now,
 			));
 			$link = Egw::link('/ranking/athlete.php', array(
