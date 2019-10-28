@@ -27,12 +27,11 @@ include('../header.inc.php');
  */
 function check_anon_access(&$anon_account)
 {
-	$anon_account = array(
-		'login'  => 'anonymous',
-		'passwd' => 'anonymous',
-		'passwd_type' => 'text',
-	);
-	return true;
+	$anon_account = null;
+
+	// create session without checking auth: create(..., false, false)
+	return $GLOBALS['egw']->session->create('anonymous@'.$GLOBALS['egw_info']['user']['domain'],
+		'', 'text', false, false);
 }
 
 // allow to switch cat and route
