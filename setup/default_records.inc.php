@@ -12,6 +12,8 @@
 
 use EGroupware\Api;
 
+if (empty($GLOBALS['egw_setup'])) die('STOP');
+
 $db_backup = new Api\Db\Backup();
 if (($f = $db_backup->fopen_backup(__DIR__.'/db_backup-ranking.bz2', True)))
 {
