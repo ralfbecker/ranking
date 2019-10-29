@@ -13,7 +13,7 @@
 
 $GLOBALS['egw_info'] = array(
 	'flags' => array(
-		'currentapp'	=> 'sitemgr-link',	// anonymous should have NO ranking access
+		'currentapp'	=> 'ranking',
 		'nonavbar'		=> True,
 		'autocreate_session_callback' => 'check_anon_access',
 ));
