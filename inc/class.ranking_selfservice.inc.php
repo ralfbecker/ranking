@@ -263,7 +263,7 @@ class ranking_selfservice extends ranking_bo
 			// check available Api\Categories (matching sex and evtl. agegroup) and if athlete is already registered
 			if (!($cats = $this->matching_cats($comp, $athlete)))
 			{
-				echo "<p class='error'>".lang('Competition has no Api\Categories you are allowed to register for!')."</p>\n";
+				echo "<p class='error'>".lang('Competition has no categories you are allowed to register for!')."</p>\n";
 				$error = true;
 			}
 			asort($cats);
@@ -302,7 +302,7 @@ class ranking_selfservice extends ranking_bo
 			}
 			if (!$error)
 			{
-				echo "<p>".lang('Please check the Api\Categories you want to register for:')."</p>\n";
+				echo "<p>".lang('Please check the categories you want to register for:')."</p>\n";
 				echo "<form method='POST'>\n<table><tr valign='bottom'>\n";
 				echo '<td>'.Api\Html::checkbox_multiselect('GrpId', $registered, $cats)."</td>\n";
 				echo '<td>'.Api\Html::input('',lang('Register'),'submit')."</td>\n";

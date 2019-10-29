@@ -248,6 +248,7 @@ error saving format!	ranking	en	Error saving format!
 error storing handhold!	ranking	en	Error storing handhold!
 error uploading topo!	ranking	en	Error uploading topo!
 error writing to display!!!	ranking	en	Error writing to display!!!
+error: all athlete data is public available, please change access settings!	ranking	en	Error: all athlete data is public available, please change access settings!
 error: attaching '%1' as %2 (%3) !!!	ranking	en	Error: attaching '%1' as %2 (%3) !!!
 error: dataline %1 contains %2 instead of %3 columns !!!	ranking	en	Error: dataline %1 contains %2 instead of %3 columns !!!
 error: dataline %1 contains not existing athlete id #%2 !!!	ranking	en	Error: dataline %1 contains not existing athlete id #%2 !!!
@@ -255,6 +256,7 @@ error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!	ranking	en	Error:
 error: dataline %1, athlete %2 has wrong gender '%3' !!!	ranking	en	Error: dataline %1, athlete %2 has wrong gender '%3' !!!
 error: deleting %1 !!!	ranking	en	Error: deleting %1 !!!
 error: deleting the heat!!!	ranking	en	Error: deleting the round!!!
+error: following athlete data is public available	ranking	en	Error: following athlete data is public available
 error: generating startlist!!!	ranking	en	Error: generating startlist!!!
 error: heat already has a result!!!	ranking	en	Error: round already has a result!!!
 error: key '%1' exists already, it has to be unique !!!	ranking	en	Error: Key '%1' exists already, it has to be unique !!!
@@ -268,6 +270,7 @@ error: required column %1 not found !!!	ranking	en	Error: required column %1 not
 error: route already has a result!!!	ranking	en	Error: route already has a result!!!
 error: saving the heat!!!	ranking	en	Error: saving the round!!!
 error: while saving !!!	ranking	en	Error: while saving !!!
+everything public	ranking	en	Everything public
 exists without saving the changes	ranking	en	exists without saving the changes
 factor	ranking	en	Factor
 fall	ranking	en	fall
@@ -366,7 +369,6 @@ key of the category	ranking	en	Key of the category
 key of the competition	ranking	en	Key of the competition
 key of the cup	ranking	en	Key of the cup
 key of the person	ranking	en	Key of the Person
-landesverband	ranking	en	Landesverband
 lane a	ranking	en	Lane A
 last competition	ranking	en	Last competition
 lead	ranking	en	lead
@@ -375,10 +377,11 @@ license number	ranking	en	License number
 license should be removed when federation was changed!	ranking	en	License should be removed when federation was changed!
 line	ranking	en	Line
 login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too many unsuccessful tries!
-mail	ranking	en	Mail
 mail participants	ranking	en	Mail participants
 mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	en	Mail to %1 participants send, %2 had no email-address, %3 failed.
+makes all your contact data public available!	ranking	en	Makes all your contact data public available!
 male	ranking	en	male
+mark items you want to deny public access, nothing marked means everything is public!	ranking	en	Mark items you want to deny public access, nothing marked means everything is public!
 max	ranking	en	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	en	maximum number of competition counting for the ranking (empty for all)
 maybe you have a different one registered. try looking it up by using "edit profile" on your profile page.	ranking	en	Maybe you have a different one registered. Try looking it up by using "Edit profile" on your profile page.
@@ -520,7 +523,6 @@ rankings - categories	ranking	en	Rankings - Categories
 rankings - cathegories	ranking	en	Rankings - Cathegories
 rankingsystem	ranking	en	Rankingsystem
 read competition	ranking	en	Read competition
-regionalzentrum	ranking	en	Regionalzentrum
 register	ranking	en	Register
 register athlets for this competition	ranking	en	Register athlets for this competition
 register for	ranking	en	Register for
@@ -556,7 +558,6 @@ routejudges	ranking	en	Routejudges
 routes	ranking	en	Routes
 rows	ranking	en	Rows
 saves the changes made	ranking	en	saves the changes made
-sektion	ranking	en	Sektion
 select a category to additionally add to startlist (eg. juniors to men)	ranking	en	Select a category to additionally add to startlist (eg. juniors to men)
 select a competition	ranking	en	Select a competition
 select a cup for a cup-ranking	ranking	en	Select a cup for a cup-ranking

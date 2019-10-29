@@ -50,7 +50,14 @@ class ranking_athlete_ui extends ranking_bo
 			'label' => 'Hide all: name and profile page',
 			'title' => 'Name will not be shown to website visitors and they will be told that athlete asked to no longer show his profile page.'
 		),*/
-		'custom' => 'custom ACL right',
+		'custom' => array (
+			'label' => 'custom ACL right',
+			'title' => 'Mark items you want to deny public access, nothing marked means everything is public!',
+		),
+		0 => array(
+			'label' => 'Everything public',
+			'title' => 'Makes all your contact data public available!',
+		),
 	);
 
 	/**
@@ -300,6 +307,12 @@ class ranking_athlete_ui extends ranking_bo
 					{
 						$msg .= lang('Error: while saving !!!');
 					}
+					// do not allow to save, if contact data is public
+					elseif (($acl_msg = self::check_acl($content['acl'], $content['custom_acl'])))
+					{
+						$msg .= $acl_msg;
+						unset($button);
+					}
 					else
 					{
 						// we have no edit-rights for that nation, but were allowed to add it as judge
@@ -423,6 +436,10 @@ class ranking_athlete_ui extends ranking_bo
 							}
 						}
 					}
+					if (!$this->is_selfservice() && !empty($button))
+					{
+						Api\Framework::refresh_opener($msg, 'ranking', $this->athlete->data['PerId']);
+					}
 				}
 				else
 				{
@@ -446,7 +463,7 @@ class ranking_athlete_ui extends ranking_bo
 			{
 				if ($this->athlete->delete(array('PerId' => $this->athlete->data['WetId'])))
 				{
-					Api\Framework::refresh_opener(lang('%1 deleted', lang('Athlete')), 'ranking', $this->cup->data['SerId'], 'delete');
+					Api\Framework::refresh_opener(lang('%1 deleted', lang('Athlete')), 'ranking', $this->athlete->data['PerId'], 'delete');
 					Api\Framework::window_close();
 				}
 				else
@@ -509,6 +526,12 @@ class ranking_athlete_ui extends ranking_bo
 			{
 				$content['acl'] = 'custom';
 			}
+		}
+		// give a warning to user for not recommended public visibility of athlete data via custom ACL settings
+		if (($msg = self::check_acl($content['acl'], $content['custom_acl'])))
+		{
+			$content['msg'] = $msg;
+			$content['tabs'] = 'other';
 		}
 		if ($this->athlete->data['password'] == $content['password'])
 		{
@@ -648,6 +671,39 @@ Continuer';
 	}
 
 	/**
+	 * Check ACL for not recommended public visible data
+	 *
+	 * @param int|string $acl
+	 * @param array $custom_acl array with bits
+	 * @return string|null error message or null
+	 */
+	static function check_acl($acl, $custom_acl)
+	{
+		if (!$custom_acl) $acl = 0;
+
+		switch ($acl)
+		{
+			case '0':
+				return lang('Error: all athlete data is public available, please change access settings!');
+
+			case 'custom':
+				$data = [];
+				for($i=1; $i < ranking_athlete::ACL_DENY_PROFILE; $i <<= 1)
+				{
+					if (($i & ranking_athlete::ACL_DEFAULT) && !in_array($i, $custom_acl))
+					{
+						$data[] = lang(self::$acl_deny_labels[$i]);
+					}
+				}
+				if ($data)
+				{
+					return lang('Error: following athlete data is public available').
+						': '.implode(', ', $data);
+				}
+		}
+	}
+
+	/**
 	 * query athlets for nextmatch in the athlets list
 	 *
 	 * @param array &$query_in
@@ -718,6 +774,24 @@ Continuer';
 		}
 		$query['col_filter']['license_nation'] = $license_nation;
 
+		// handle ACL filter
+		if ($query['col_filter']['acl'] === '')
+		{
+			unset($query['col_filter']['acl']);
+		}
+		elseif ($query['col_filter']['acl'] == ranking_athlete::ACL_DENY_PROFILE)
+		{
+			$query['col_filter'][] = "(acl & ".ranking_athlete::ACL_DENY_PROFILE.")";
+			unset($query['col_filter']['acl']);
+		}
+		elseif ($query['col_filter']['acl'] === 'custom')
+		{
+			$query['col_filter'][] = $this->db->expression(ranking_athlete::ATHLETE_TABLE,
+				'NOT ((acl & '.ranking_athlete::ACL_DENY_PROFILE.') OR ',
+				['acl' => array_filter(array_keys(self::$acl_labels), function($key){return $key !== 'custom';})], ')');
+			unset($query['col_filter']['acl']);
+		}
+
 		$total = $this->athlete->get_rows($query, $rows, $readonlys,
 			(int)$query['filter'] ? (int)$query['filter'] : true, false, $ids_only);
 
@@ -735,6 +809,14 @@ Continuer';
 				$row = $row['PerId'];
 				continue;
 			}
+			// ACL is an array with values of 2^N eg. [1, 2, 8]
+			$row['acl'] = $row['acl'] ? array_sum($row['acl']) : '0';
+			// only show deny profile, more is not possible anyway
+			if ($row['acl'] & ranking_athlete::ACL_DENY_PROFILE)
+			{
+				$row['acl'] = ranking_athlete::ACL_DENY_PROFILE;
+			}
+
 			if (!$row['last_comp'] && $this->acl_check_athlete($row))
 			{
 				$row['class'] = 'AllowDelete';
@@ -832,6 +914,7 @@ Continuer';
 			'filter2'=> array('' => 'All')+$this->license_labels,
 			'license'=> $this->license_labels,
 			'license_cat' => $this->cats->names(array(), 0),
+			'acl' => self::$acl_labels,
 		));
 	}
 

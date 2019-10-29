@@ -15,6 +15,7 @@
 				<column width="90"/>
 				<column disabled="@no_license" width="80"/>
 				<column width="120"/>
+				<column width="120"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -43,6 +44,7 @@
 						<select id="license_nation" readonly="true" no_lang="1"/>
 						<description value="License" id="license_year" no_lang="1"/>
 					</vbox>
+					<nextmatch-filterheader id="acl" options="Access" class="selectboxFullWidth"/>
 					<nextmatch-sortheader label="Last modified" id="modified"/>
 				</row>
 				<row class="row $row_cont[class]">
@@ -59,6 +61,7 @@
 						<select id="${row}[license]" readonly="true"/>
 						<select id="${row}[license_cat]" readonly="true"/>
 					</vbox>
+					<select id="${row}[acl]" readonly="true"/>
 					<vbox>
 						<date-time id="${row}[modified]" readonly="true"/>
 						<select-account id="${row}[modifier]" readonly="true"/>

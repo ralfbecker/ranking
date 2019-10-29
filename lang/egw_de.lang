@@ -242,6 +242,7 @@ error saving format!	ranking	de	Fehler beim Speichern des Formats!
 error storing handhold!	ranking	de	Fehler beim Speichern des Griffs!
 error uploading topo!	ranking	de	Fehler beim Hochladen des Topo!
 error writing to display!!!	ranking	de	Fehler beim Schreiben zur Anzeige!!!
+error: all athlete data is public available, please change access settings!	ranking	de	Fehler: alle Athletendaten sind öffentlich verfügbar, bitte Einstellungen ändern!
 error: attaching '%1' as %2 (%3) !!!	ranking	de	Fehler: beim Anhängen von '%1' als %2 (%3) !!!
 error: dataline %1 contains %2 instead of %3 columns !!!	ranking	de	Fehler: Datenzeile %1 enthält %2 statt %3 Spalten !!!
 error: dataline %1 contains not existing athlete id #%2 !!!	ranking	de	Fehler: Datenzeile %1 enthält nicht existierende Athleten Id #%2 !!!
@@ -249,6 +250,7 @@ error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!	ranking	de	Fehler
 error: dataline %1, athlete %2 has wrong gender '%3' !!!	ranking	de	Fehler: Datenzeile %1, Athlete %2 hat falsches Geschlecht '%3' !!!
 error: deleting %1 !!!	ranking	de	Fehler: beim Löschen des %1 !!!
 error: deleting the heat!!!	ranking	de	Fehler: beim Löschen der Runde !!!
+error: following athlete data is public available	ranking	de	Fehler: die folgenden Athletendaten sind öffentlich verfügbar
 error: generating startlist!!!	ranking	de	Fehler: beim Erzeugen der Startliste !!!
 error: heat already has a result!!!	ranking	de	Fehler: die Runde hat bereits ein Ergebnis !!!
 error: key '%1' exists already, it has to be unique !!!	ranking	de	Fehler: Schlüssel '%1' existiert bereits, er muß eindeutig sein !!!
@@ -262,6 +264,7 @@ error: required column %1 not found !!!	ranking	de	Fehler: benötigte Splaten %1
 error: route already has a result!!!	ranking	de	Fehler: die Route hat bereits ein Ergebnis !!!
 error: saving the heat!!!	ranking	de	Fehler: beim Speichern der Runde !!!
 error: while saving !!!	ranking	de	Fehler: beim Speichern !!!
+everything public	ranking	de	Alles veröffentlicht
 exists without saving the changes	ranking	de	Abbruch ohne Speichern der Änderungen
 factor	ranking	de	Faktor
 fall	ranking	de	Sturz
@@ -368,7 +371,9 @@ line	ranking	de	Zeile
 login suspended, too many unsuccessful tries!	ranking	de	Login ausgesetzt, zu viele erfolglosen Versuche!
 mail participants	ranking	de	Teilnehmer anmailen
 mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	de	Mail an %1 Teilnehmer gesendet, %2 hatten keine EMail Adresse, %3 sind fehlgeschlagen.
+makes all your contact data public available!	ranking	de	Veröffentlicht alle Deine Kontaktdaten!
 male	ranking	de	männlich
+mark items you want to deny public access, nothing marked means everything is public!	ranking	de	Markier wozu Du den öffentlichen Zugriff verbieten willst, nichts markiert bedeutet alles ist veröffentlicht!
 max	ranking	de	Max
 maximum number of competition counting for the ranking (empty for all)	ranking	de	maximale Anzahl Wettkämpfe die für die Rangliste zählen (leer für alle)
 maybe you have a different one registered. try looking it up by using "edit profile" on your profile page.	ranking	de	Eventuell hast Du eine andere registriert. Versuch es über "Profil bearbeiten" in Deinem Profil.
