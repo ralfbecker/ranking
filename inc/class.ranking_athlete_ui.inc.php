@@ -508,10 +508,9 @@ class ranking_athlete_ui extends ranking_bo
 		$content['custom_acl'] = $this->athlete->data['acl'];
 		if ($content['acl'] !== 'custom')
 		{
-			$content['acl'] = 0;
-			foreach($this->athlete->data['acl'] as $acl)
+			if (is_array($content['acl']))
 			{
-				$content['acl'] |= $acl;
+				$content['acl'] = array_sum($content['acl']);
 			}
 			if (in_array(ranking_athlete::ACL_DENY_ALL, $content['custom_acl']))
 			{
