@@ -71,6 +71,24 @@ class ranking_merge extends Api\Storage\Merge
 
 		// switch off handling of Api\Html formated content, if Api\Html is not used
 		$this->parse_html_styles = Api\Storage\Customfields::use_html('ranking');
+
+		// overwrite contacts call with own implementation
+		$this->contacts = new class {
+			function read($id)
+			{
+				$bo = ranking_bo::getInstance();
+				if (($athlete = $bo->athlete->read($id)))
+				{
+					return [
+						'email' => $athlete['email'],
+						'n_fn'  => $athlete['vorname'].' '.$athlete['nachname'],
+						'n_given' => $athlete['vorname'],
+						'n_family' => $athlete['nachname'],
+					];
+				}
+				return false;
+			}
+		};
 	}
 
 	/**
@@ -141,6 +159,7 @@ class ranking_merge extends Api\Storage\Merge
 		 */
 
 		// Add markers
+		$array['n_fn'] = $array['vorname'].' '.$array['nachname'];
 		foreach($array as $key => &$value)
 		{
 			if(!$value)
