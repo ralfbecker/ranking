@@ -256,11 +256,11 @@ class ranking_competition_ui extends ranking_bo
 			'pkte'      => $this->pkt_names,
 			'feld_pkte' => array(0 => lang('none')) + $this->pkt_names,
 			'serie'     => array(0 => lang('none')) + $this->cup->names(array(
-				'nation'=> $this->comp->data['nation'],
+				'nation'=> $this->comp->data['nation'] ? $this->comp->data['nation'] : null,
 				'fed_id'=> $this->is_admin || in_array($this->comp->data['nation'], $this->edit_rights) ?
 					'' : $this->comp->data['fed_id'],
-				'rkey LIKE '.$this->db->quote(($this->comp->data['datum'] ?
-					substr($this->comp->data['datum'], 2, 2) : date('y')).'%'),
+				(empty($this->comp->data['datum']) ? 'SUBSTRING(rkey, 1, 2) < 80 AND 2000+SUBSTRING(rkey, 1, 2) >= YEAR(NOW())' :
+					'rkey LIKE '.$this->db->quote(substr($this->comp->data['datum'], 2, 2).'%')),
 			)),
 			'nation'    => $this->ranking_nations,
 			'fed'       => $this->federation->get_competition_federations($this->comp->data['nation']),
