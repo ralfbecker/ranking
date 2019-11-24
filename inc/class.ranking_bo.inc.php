@@ -1330,12 +1330,13 @@ class ranking_bo extends ranking_so
 			}
 		}
 		// index starters with their PerId
+		$starters_by_id = [];
 		foreach($starters as $k => $athlete)
 		{
 			$athlete['GrpId'] = $cat['GrpId'];	// could be $add_cat
-			unset($starters[$k]);
-			$starters[$athlete['PerId']] = $athlete;
+			$starters_by_id[$athlete['PerId']] = $athlete;
 		}
+		if (true) $starters = $starters_by_id;
 
 		$reset_data = 1;
 		$ranked = array();
