@@ -441,7 +441,7 @@ class ranking_federation extends Api\Storage\Base
 				foreach($children as $child)
 				{
 					$parent = $child['fed_since'] >= date('Y') ? $child['fed_parent_since'] : $child['fed_parent'];
-					$grants[$child['fed_id']] = $grants[$parent];
+					$grants[$child['fed_id']] |= $grants[$parent];
 				}
 			}
 		}
