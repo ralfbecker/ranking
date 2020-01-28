@@ -44,11 +44,11 @@ class ranking_topo
 	/**
 	 * Render topo image
 	 *
-	 * @param int|string $comp
-	 * @param int|string $cat
-	 * @param int $route
-	 * @param int $place=1
-	 * @param int $num=8
+	 * @param int|string $comp competition
+	 * @param int|string $cat category
+	 * @param int $route route
+	 * @param int $place=1 show from place $place on
+	 * @param int $num=8 number of places to show (current participant not counted)
 	 * @param int $width=1024
 	 * @param int $height=null 4/3 ratio of $width
 	 * @param int $margin=50 >0: distance of text from left or right page-border (incl. line to name), <0: distance from hold (no line!)

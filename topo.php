@@ -51,7 +51,7 @@ $height = (int)$_GET['height'] > 0 ? (int)$_GET['height'] : null;	// null = 4/3 
 $topo = isset($_GET['topo']) ? (int)$_GET['topo'] : 0;
 $margin = is_numeric($_GET['margin']) ? (int)$_GET['margin'] : 50;
 $src = (int)$_GET['src'];
-$icon = $_GET['icon'] ? basename($_GET['icon']) : 'griff32blau';
+$icon = $_GET['icon'] ? basename($_GET['icon']) : 'griff32';
 $png = isset($_GET['png']) ? (boolean) $png : $src == 3;
 ranking_topo::$fontsize = (int)$_GET['fontsize'] > 0 ? (int)$_GET['fontsize'] : 18;
 ranking_topo::$fontfile = '/Library/Fonts/Arial Bold.ttf';
