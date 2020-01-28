@@ -1,16 +1,10 @@
 EGroupware ranking or result-service
 ====================================
-[![Build Status](https://travis-ci.org/ralfbecker/ranking.svg?branch=master)](https://travis-ci.org/ralfbecker/ranking)
 
-**ranking** is an [EGroupware](http://www.egroupware.org/) module allowing sport federations to manage sub-federations, athletes, cups, competitions, results and rankings.
+**ranking** is an [EGroupware](https://www.egroupware.org/) application allowing sport federations to manage sub-federations, athletes, cups, competitions, results and rankings.
 result-service allows to interactiv enter results / judge competitions on desktop or mobile devices.
 
 Following documents content of public JSON and/or XML feeds.
-
-Please note:
------------
-- https://www.digitalrock.de uses "/egroupware", while http://egw.ifsc-climbing.org uses "/egw"!
-- Only use CDN domain https://ifsc-egw.wavecdn.net or http://egw.ifsc-climbing.org (http only!) and NOT https://ifsc.egroupware.net/ for any public access!
 
 Result data via XML or JSON
 ===========================
@@ -23,8 +17,8 @@ You can use a few GET parameters to influence what information you get:
 
 a) comp: This is the Id of the competition (1287 in case of Arco
 Rockmaster 2010). Other competitions id's can be found the the url's of
-eg. [competition calendar](http://www.ifsc-climbing.org/index.php/world-competition/calendar)
-or [latest result page](http://www.ifsc-climbing.org/index.php/world-competition/last-result)
+eg. [DAV](https://www.digitalrock.de/dav_calendar.php?no_dav=1) or [SAC](https://www.digitalrock.de/sac_calendar.php)
+competition calendar or [DAV](https://www.digitalrock.de/egw/ranking/sitemgr/digitalrock/results.html?nation=GER) or [SAC](https://www.digitalrock.de/egw/ranking/sitemgr/digitalrock/results.html?nation=SUI) competition calendar
 
 b) cat: This is id of the category and discipline:
 ```
@@ -58,77 +52,77 @@ this contains the filtered result, with result-service contains the full result.
 Examples:
 --------
 1) lead competition general result:
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&debug=1)
 
 2) lead competition 1. qualification:
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=0),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=0),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=0),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=0&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=0),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=0),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=0),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=0&debug=1)
 
 3) lead competition 2. qualification:
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=1),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=1),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=1),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=1&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=1),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=1),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=1),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=1&debug=1)
 
 4) lead competition 1/2-final:
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=2),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=2),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=2),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=2&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=2),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=2),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=2),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=2&debug=1)
 
 5) lead competition final:
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=3),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=3),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=3),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=3&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1204&cat=1&route=3),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1204&cat=1&route=3),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=3),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1204&cat=1&route=3&debug=1)
 
 6) boulder competition general result (1 qualification):
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1247&cat=5),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1247&cat=5),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1247&cat=5),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1247&cat=5&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1247&cat=5),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1247&cat=5),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1247&cat=5),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1247&cat=5&debug=1)
 
 7) boulder competition general result (2 qualification):
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1258&cat=5),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1258&cat=5),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1258&cat=5),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1258&cat=5),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5&debug=1)
 
 8) boulder competition 1. qualification
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1258&cat=5&route=0),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1258&cat=5&route=0),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5&route=0),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5&route=0&debug=1),
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1258&cat=5&route=0),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1258&cat=5&route=0),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5&route=0),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1258&cat=5&route=0&debug=1),
 further heats replace route=0 in URL with 1, 2, ...
 
 9) speed competition general result:
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1254&cat=23),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1254&cat=23),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1254&cat=23),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1254&cat=23),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23&debug=1)
 
 10) speed qualification:
-[HTML](http://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1254&cat=23&route=0),
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=1254&cat=23&route=0),
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23&route=0),
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23&route=0&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1254&cat=23&route=0),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1254&cat=23&route=0),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23&route=0),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=1254&cat=23&route=0&debug=1)
 (In case of a 2. qualification route, xml contains additional result_l
 and result_r attributes, with the sum in result)
 
 11) speed final heats: replace route=0 in above URL with route=2, 3, 4, ...
 
 12) speedrelay general result:
-[HTML](http://www.digitalrock.de/egroupware/ranking/result.php?comp=991&cat=70)
+[HTML](https://www.digitalrock.de/egroupware/ranking/result.php?comp=991&cat=70)
 Please note the changed HTML url, as eliste.html does not yet support
 it. There can by either 2 (mixed) or 3 team members!
-[XML](http://www.digitalrock.de/egroupware/ranking/xml.php?comp=991&cat=70)
-[JSON](http://www.digitalrock.de/egroupware/ranking/json.php?comp=991&cat=70)
-[JSON pretty-print](http://www.digitalrock.de/egroupware/ranking/json.php?comp=991&cat=70&debug=1)
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?comp=991&cat=70)
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?comp=991&cat=70)
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?comp=991&cat=70&debug=1)
 Participants array/hierarchy contains now teams, with in turn contain an
 athletes hierarchy with the team-members and their single results.
 
@@ -263,17 +257,17 @@ You can use similar code / widgets to display rankings as you use for results.
 Examples:
 --------
 1. Current worldranking MEN lead:
-[HTML](http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=1),
-[HTML with results](http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=1&detail=1),
-[XML](http://egw.ifsc-climbing.org/egw/ranking/xml.php?cat=1),
-[JSON](http://egw.ifsc-climbing.org/egw/ranking/json.php?cat=1),
-[JSON pretty-print](http://egw.ifsc-climbing.org/egw/ranking/json.php?cat=1&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?cat=1),
+[HTML with results](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?cat=1&detail=1),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?cat=1),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?cat=1),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?cat=1&debug=1)
 2. 2015 WorldCup WOMEN lead:
-[HTML](http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=2&cup=15_wc),
-[HTML with results](http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/eliste.html?cat=2&cup=15_wc&detail=1),
-[XML](http://egw.ifsc-climbing.org/egw/ranking/xml.php?cat=2&cup=15_wc),
-[JSON](http://egw.ifsc-climbing.org/egw/ranking/json.php?cat=2&cup=15_wc),
-[JSON pretty-print](http://egw.ifsc-climbing.org/egw/ranking/json.php?cat=1&debug=1)
+[HTML](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?cat=2&cup=15_wc),
+[HTML with results](https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html?cat=2&cup=15_wc&detail=1),
+[XML](https://www.digitalrock.de/egroupware/ranking/xml.php?cat=2&cup=15_wc),
+[JSON](https://www.digitalrock.de/egroupware/ranking/json.php?cat=2&cup=15_wc),
+[JSON pretty-print](https://www.digitalrock.de/egroupware/ranking/json.php?cat=1&debug=1)
 
 (Latest) competition results from all categories via XML or JSON
 ================================================================
@@ -282,9 +276,9 @@ It contains first N climbers (plus additionally all from a given nation) of ALL 
 
 Examples:
 --------
-- HTML: http://egw.ifsc-climbing.org/ifsc-results.html?comp=1316
-- XML:  http://egw.ifsc-climbing.org/egw/ranking/xml.php?comp=1316
-- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?comp=1316
+- HTML: https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/eliste.html#comp=1316
+- XML:  https://www.digitalrock.de/egroupware/ranking/xml.php?comp=1316
+- JSON: https://www.digitalrock.de/egroupware/ranking/json.php?comp=1316
 
 Feed supports the following parameters:
 - comp: numeric competition id, or "." for latest international comp. or 3-char calendar nation eg. "GER" for latest German comp.
@@ -315,9 +309,9 @@ Registration aka Starters from a competiton via XML or JSON
 ===========================================================
 
 Examples:
-- HTML: http://egw.ifsc-climbing.org/ifsc-starters.html?comp=1494
-- XML:  http://egw.ifsc-climbing.org/egw/ranking/xml.php?comp=1494&type=starters
-- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?comp=1494&type=starters
+- HTML: https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/starters.html#comp=9241
+- JSON: https://www.digitalrock.de/egroupware/ranking/json.php?comp=9241&type=starters&debug=1
+- XML:  https://www.digitalrock.de/egroupware/ranking/xml.php?comp=9241&type=starters
 
 Only supported parameter is comp=<numeric competition id>.
 You always need to add &type=starters, as otherwise you request a (not yet existing) result and get an error!
@@ -340,10 +334,10 @@ An array with registering federations, if not an intl. competition, with followi
 Athlete profile via XML JSON
 ============================
 
-- HTML: http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
-- Template: view-source:http://egw.ifsc-climbing.org/egw/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
-- XML:  http://egw.ifsc-climbing.org/egw/ranking/xml.php?person=6933&cat=6
-- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?person=6933&cat=6
+- HTML: https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
+- Template: view-source:https://www.digitalrock.de/egroupware/ranking/sitemgr/digitalrock/pstambl.html?person=6933&cat=6
+- XML:  https://www.digitalrock.de/egroupware/ranking/xml.php?person=6933&cat=6
+- JSON: https://www.digitalrock.de/egroupware/ranking/json.php?person=6933&cat=6
 
 Required parameter is person (numeric athlete id) and optional cat (nummeric category id).
 Optional category is required to display rank of athlete in current and older rankings of that category.
@@ -385,8 +379,8 @@ Search for athletes via XML / JSON
 ==================================
 
 Example for searching atheletes with first or last name starting with "ralf":
-- XML:  http://egw.ifsc-climbing.org/egw/ranking/xml.php?term=ralf
-- JSON: http://egw.ifsc-climbing.org/egw/ranking/json.php?term=ralf
+- XML:  https://www.digitalrock.de/egroupware/ranking/xml.php?term=ralf
+- JSON: https://www.digitalrock.de/egroupware/ranking/json.php?term=ralf
 
 Returns array of objects with attributes "value" (PerId) and "label" like "BECKER Ralf (GER)".
 Can be used directly with jQueryUI autocomplete.

@@ -68,12 +68,12 @@ if (!isset($_GET['debug']) || !$_GET['debug'])
 	if (isset($_SERVER['HTTP_IF_MATCH']) && $_SERVER['HTTP_IF_MATCH'] === $result['etag'])
 	{
 		header('HTTP/1.1 304 Not Modified');
-		common::egw_exit();
+		exit();
 	}
 }
 else
 {
-	header('Content-Type: text/html; charset='.$encoding);
+	header('Content-Type: application/json; charset='.$encoding);
 }
 
 /**
@@ -101,15 +101,7 @@ $json = json_encode($result=remove_empty($result));
 
 if (isset($_GET['debug']) && $_GET['debug'])
 {
-	switch($_GET['debug'])
-	{
-		case 2:
-			echo "<pre>".print_r($result,true)."</pre>\n";
-			// fall through
-		default:
-			echo "<pre>".htmlspecialchars(json_encode($result, JSON_PRETTY_PRINT))."</pre>\n";
-			break;
-	}
+	echo json_encode($result, JSON_PRETTY_PRINT);
 }
 // jsonp callback
 elseif ($_GET['callback'])
