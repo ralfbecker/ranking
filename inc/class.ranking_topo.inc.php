@@ -27,7 +27,7 @@ class ranking_topo
 	 *
 	 * @var string
 	 */
-	public static $fontfile = '/Library/Fonts/Arial Bold.ttf';
+	public static $fontfile = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 	/**
 	 * Size of font in px
 	 *

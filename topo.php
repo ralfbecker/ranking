@@ -54,7 +54,7 @@ $src = (int)$_GET['src'];
 $icon = $_GET['icon'] ? basename($_GET['icon']) : 'griff32';
 $png = isset($_GET['png']) ? (boolean) $png : $src == 3;
 ranking_topo::$fontsize = (int)$_GET['fontsize'] > 0 ? (int)$_GET['fontsize'] : 18;
-ranking_topo::$fontfile = '/Library/Fonts/Arial Bold.ttf';
+ranking_topo::$fontfile = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 
 try
 {
