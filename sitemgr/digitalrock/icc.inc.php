@@ -2,8 +2,8 @@
 
 /* $Id$ */
 
-$extra_header[2020] = '<font color=red>provisional</font>';
 $extra_header[2021] = '<font color=red>provisional</font>';
+$extra_header[2022] = '<font color=red>provisional</font>';
 
 // IFSC specific
 $results_since  = 1991;
