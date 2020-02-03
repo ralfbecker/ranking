@@ -39,6 +39,7 @@ before_script:
       yes "" | pecl install apcu;
       phpenv config-rm xdebug.ini;
       composer require 'phpunit/phpunit:~6';
+      ;;
     *)
       yes "" | pecl install apcu;
       phpenv config-rm xdebug.ini;
