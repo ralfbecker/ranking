@@ -50,8 +50,8 @@ if (!include_once '.db_rang.php')
 	throw new Exception(".db_rang.php NOT found!".' cwd='.getcwd());
 }
 
-if (!$url_drock) $url_drock='http://www.digitalROCK.de';
-if (!$url_icc_info) $url_icc_info='http://www.ifsc-climbing.org';
+if (!$url_drock) $url_drock='https://www.digitalROCK.de';
+if (!$url_icc_info) $url_icc_info='https://www.ifsc-climbing.org';
 
 if (defined('DR_PATH'))	// running inside sitemgr
 {
