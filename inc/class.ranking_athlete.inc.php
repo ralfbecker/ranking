@@ -355,15 +355,21 @@ class ranking_athlete extends Api\Storage\Base
 	 * @param int $year =null year or sql expression for year to use
 	 * @param string $per_table ='Personen' table for athletes
 	 * @param string $f ='Federations' table for federations
+	 * @param boolean $left_join =false true: use LEFT JOIN
 	 * @return string sql with join
 	 */
-	static function fed_join($year=null, $per_table=self::ATHLETE_TABLE, $f=self::FEDERATIONS_TABLE)
+	static function fed_join($year=null, $per_table=self::ATHLETE_TABLE, $f=self::FEDERATIONS_TABLE, $left_join=false)
 	{
 		$join = strtr(self::FEDERATIONS_JOIN, array(
 			self::ATHLETE_TABLE => $per_table ?: self::ATHLETE_TABLE,
 			'a2f.a2f_end=9999' => empty($year) ? 'a2f.a2f_end=9999' : "a2f.a2f_end >= $year AND $year >= a2f.a2f_start",
 			self::FEDERATIONS_TABLE => $f ?: self::FEDERATIONS_TABLE,
 		));
+
+		if ($left_join)
+		{
+			$join = str_replace('LEFT LEFT', 'LEFT', str_replace('JOIN', 'LEFT JOIN', $join));
+		}
 		//error_log(__METHOD__."('$per_table', '$year', '$f') returning '$join'");
 		return $join;
 	}
