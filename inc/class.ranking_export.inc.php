@@ -573,6 +573,7 @@ class ranking_export extends ranking_result_bo
 
 		if (!($result = $this->route_result->search(array(),false,$query['order'].' '.$query['sort'],'','',false,'AND',false,$filter=array(
 			'WetId' => $comp['WetId'],
+			'year'  => (int)$comp['datum'],
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $heat,
 			'discipline'  => $discipline,
@@ -1724,6 +1725,7 @@ class ranking_export extends ranking_result_bo
 		$results = array();
 		foreach($this->result->read(array(
 			'WetId' => $comp['WetId'],
+			'year'  => (int)$comp['datum'],
 			'GrpId' => $cat['GrpId'],
 			'platz > 0',
 		)) as $result)

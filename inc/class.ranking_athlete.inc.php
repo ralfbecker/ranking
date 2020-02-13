@@ -357,7 +357,7 @@ class ranking_athlete extends Api\Storage\Base
 	 * @param string $f ='Federations' table for federations
 	 * @return string sql with join
 	 */
-	function fed_join($per_table='Personen',$year=null,$f='Federations')
+	static function fed_join($per_table='Personen',$year=null,$f='Federations')
 	{
 		$join = strtr(self::FEDERATIONS_JOIN, array(
 			'Personen' => $per_table,
