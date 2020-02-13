@@ -210,7 +210,8 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			if (!$this->isRelay)
 			{
-				$join = ' LEFT JOIN Personen USING(PerId) '.str_replace('JOIN', 'LEFT JOIN', ranking_athlete::fed_join('Personen', $year)).
+				$join = ' LEFT JOIN Personen USING(PerId) '.
+					str_replace('JOIN', 'LEFT JOIN', ranking_athlete::fed_join($year)).
 					($join && is_string($join) ? "\n".$join : '');
 
 				$extra_cols = array_merge($extra_cols, array(

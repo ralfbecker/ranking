@@ -382,7 +382,7 @@ class ranking_calculation
 		$join .= ' JOIN '.$this->bo->cats->table_name.' USING(GrpId)';
 		$join .= ' JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)';
 		$join .= str_replace('USING(fed_id)','ON a2f.fed_id='.ranking_athlete::FEDERATIONS_TABLE.
-			'.fed_id', ranking_athlete::fed_join('Personen','YEAR(Wettkaempfe.datum)'));
+			'.fed_id', ranking_athlete::fed_join('YEAR(Wettkaempfe.datum)'));
 		$extra_cols = $this->bo->comp->table_name.'.name AS comp_name,'.
 			$this->bo->comp->table_name.'.dru_bez AS comp_short,'.
 			$this->bo->comp->table_name.'.datum AS comp_date,'.

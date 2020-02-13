@@ -110,7 +110,7 @@ class ranking_result extends Api\Storage\Base
 				}
 				unset($filter['year'], $keys['year']);
 
-				$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::fed_join('Personen', $year);
+				$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::fed_join($year);
 
 				if (!$extra_cols)
 				{
@@ -350,7 +350,7 @@ class ranking_result extends Api\Storage\Base
 		foreach($this->db->query("SELECT $this->athlete_table.*,acl.fed_id AS acl_fed_id,".
 			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,COALESCE(r.cup_platz,r.platz) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline".
 			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".
-			ranking_athlete::jed_join('Peronsen', $year).
+			ranking_athlete::fed_join($year).
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND COALESCE(r.cup_platz,r.platz) > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND r.GrpID=c.GrpId'.
@@ -380,7 +380,7 @@ class ranking_result extends Api\Storage\Base
 		foreach($this->db->query($sql="SELECT $this->athlete_table.*,acl.fed_id AS acl_fed_id,".
 			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline'.
 			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".
-			ranking_athlete::fed_join('Personen', (int)$stand).
+			ranking_athlete::fed_join((int)$stand).
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
 			' AND r.GrpId '.(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND r.GrpID=c.GrpId'.
