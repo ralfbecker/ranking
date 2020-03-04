@@ -1373,10 +1373,10 @@ class ranking_athlete extends Api\Storage\Base
 			elseif(in_array($name, array('nation', 'fed_parent')))
 			{
 				$f = $this->db->expression(self::FEDERATIONS_TABLE, self::FEDERATIONS_TABLE.'.', array($name => $value));
-				// for numeric ids / state federations also check SUI Regionalzentrum acl.fed_id
+				// for numeric ids / state federations also check SUI Regionalzentrum acl.fed_id and federation itself
 				if ($name == 'fed_parent' && is_numeric($value))
 				{
-					$f = '('.$f.' OR acl.fed_id='.(int)$value.')';
+					$f = '('.$f.' OR acl.fed_id='.(int)$value.' OR '.self::FEDERATIONS_TABLE.'.fed_id='.(int)$value.')';
 				}
 				$filter[] = $f;
 			}
