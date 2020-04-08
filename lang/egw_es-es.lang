@@ -15,7 +15,10 @@
 %1, %2 deleted for category %3	ranking	es-es	%1, %2 suprimido para la categoría %3
 %1, %2 registered for category %3	ranking	es-es	%1, %2 registrado para la categoría %3
 %1. heat	ranking	es-es	%1. Ronda
+1. display	ranking	es-es	1. Mostrar
 1. january	ranking	es-es	1. Enero
+2. display	ranking	es-es	2. Mostrar
+aborts without saving changes	ranking	es-es	abortar sin grabar los cambios
 access control, key	ranking	es-es	control de acceso, clave
 accounting	ranking	es-es	Cuentas
 actions	ranking	es-es	Acciones
@@ -77,12 +80,13 @@ deadline	ranking	es-es	Fecha tope
 delete all rights for this nation	ranking	es-es	Suprimir todos los derechos a esta nación
 delete result	ranking	es-es	suprimir resultado
 delete this athlete	ranking	es-es	Suprimir este atleta
-delete this category	ranking	es-es	borrar esta categoría
+delete this category	ranking	es-es	Suprimir esta categoría
 delete this competition	ranking	es-es	Suprimir esta competencia
 delete this cup	ranking	es-es	Suprimir esta copa
 delete this federation	ranking	es-es	Suprimir esta federación
 deleted	ranking	es-es	suprimido
 deletes this cup	ranking	es-es	suprimir esta copa
+discipline	ranking	es-es	Disciplina
 display	ranking	es-es	Mostrar
 display athlete	ranking	es-es	Mostrar atleta
 display cup	ranking	es-es	Mostrar copa
