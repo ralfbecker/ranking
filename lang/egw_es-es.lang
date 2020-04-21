@@ -14,10 +14,13 @@
 %1 years, since %2	ranking	es-es	%1 años, desde %2
 %1, %2 deleted for category %3	ranking	es-es	%1, %2 suprimido para la categoría %3
 %1, %2 registered for category %3	ranking	es-es	%1, %2 registrado para la categoría %3
+%1. false start	ranking	es-es	%1. falso inicio
 %1. heat	ranking	es-es	%1. Ronda
 1. display	ranking	es-es	1. Mostrar
 1. january	ranking	es-es	1. Enero
 2. display	ranking	es-es	2. Mostrar
+2. qualification	ranking	es-es	2. Calificación
+3. place	ranking	es-es	3. lugar
 aborts without saving changes	ranking	es-es	abortar sin grabar los cambios
 access control, key	ranking	es-es	control de acceso, clave
 accounting	ranking	es-es	Cuentas
@@ -56,7 +59,7 @@ birthday	ranking	es-es	Día de nacimiento
 birthyear	ranking	es-es	Año de nacimiento
 category not found !!!	ranking	es-es	¡¡¡Categoría NO encontrada!!!
 cathegories	ranking	es-es	Categorías
-cellphone	ranking	es-es	Teléfono celular
+cellphone	ranking	es-es	Teléfono móvil
 check all	ranking	es-es	Marcar todo
 checked	ranking	es-es	Marcado
 children	ranking	es-es	Hijos
@@ -103,6 +106,8 @@ edit this cup	ranking	es-es	Editar esta copa
 edit this heat	ranking	es-es	Editar esta ronda
 end	ranking	es-es	Fin
 error: while saving !!!	ranking	es-es	¡¡Error al guardar!!
+false start	ranking	es-es	Inicio falso
+false start %1: %2	ranking	es-es	Inicio falso %1: %2
 fax	ranking	es-es	Fax
 federation	ranking	es-es	Federación
 federation deleted.	ranking	es-es	Federación suprimida.
@@ -132,8 +137,11 @@ ignore	ranking	es-es	Ignorar
 import	ranking	es-es	Importar
 import as	ranking	es-es	Importar como
 import file	ranking	es-es	Importar fichero
+in kilogram	ranking	es-es	en kilogramos
 judge	ranking	es-es	Juez
 judges	ranking	es-es	Jueces
+last competition	ranking	es-es	Última competición
+license number	ranking	es-es	Número de licencia
 male	ranking	es-es	Masculino
 more	ranking	es-es	Más
 narrow your search	ranking	es-es	Reduce tu búsqueda
