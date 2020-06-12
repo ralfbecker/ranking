@@ -143,9 +143,13 @@ judges	ranking	es-es	Jueces
 last competition	ranking	es-es	Última competición
 license number	ranking	es-es	Número de licencia
 male	ranking	es-es	Masculino
+max	ranking	es-es	Max
+measurement	ranking	es-es	Medición
 more	ranking	es-es	Más
+name(s)	ranking	es-es	nombres(s)
 narrow your search	ranking	es-es	Reduce tu búsqueda
 nation	ranking	es-es	Nación
+national federation	ranking	es-es	Federación nacional
 nations and federations	ranking	es-es	Naciones y Federaciones
 not allowed	ranking	es-es	No permitido
 not deleted	ranking	es-es	No suprimido
@@ -156,7 +160,10 @@ permission denied !!!	ranking	es-es	¡¡¡Permiso denegado!!!
 phone	ranking	es-es	Teléfono
 picture	ranking	es-es	Imagen
 picture attached	ranking	es-es	Imagen adjuntada
-port	admin	es-es	puerto
+place	ranking	es-es	Lugar
+place of birth	ranking	es-es	Lugar de nacimiento
+port	admin	es-es	Puerto
+postalcode	ranking	es-es	Código postal
 prequalified	ranking	es-es	precalificado
 prequalified competitiors	ranking	es-es	competidores precalificados
 professional	ranking	es-es	Profesional
@@ -183,6 +190,7 @@ select competition	ranking	es-es	Seleccionar una competencia
 select heat	ranking	es-es	Seleccionar una ronda
 selected category	ranking	es-es	Categoría seleccionada
 selected participants	ranking	es-es	participantes seleccionados
+show password	ranking	es-es	mostrar contraseña
 size (cm)	ranking	es-es	Tamaño (cm)
 speed	ranking	es-es	velocidad
 start	ranking	es-es	Inicio
