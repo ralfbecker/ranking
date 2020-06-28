@@ -64,6 +64,7 @@ check all	ranking	es-es	Marcar todo
 checked	ranking	es-es	Marcado
 children	ranking	es-es	Hijos
 city	ranking	es-es	Ciudad
+click to view	ranking	es-es	click para ver
 columns	ranking	es-es	Columnas
 comments	ranking	es-es	Comentarios
 competition	ranking	es-es	Competencia
@@ -105,6 +106,8 @@ edit this competition	ranking	es-es	Editar esta competencia
 edit this cup	ranking	es-es	Editar esta copa
 edit this heat	ranking	es-es	Editar esta ronda
 end	ranking	es-es	Fin
+error deleting federation!	ranking	es-es	¡Error al suprimir la federación!
+error deleting format!	ranking	es-es	¡Error al suprimir el formato!
 error: while saving !!!	ranking	es-es	¡¡Error al guardar!!
 false start	ranking	es-es	Inicio falso
 false start %1: %2	ranking	es-es	Inicio falso %1: %2
@@ -126,6 +129,7 @@ gender	ranking	es-es	Género
 gender of the athlete	ranking	es-es	género del atleta
 gender...	ranking	es-es	Género...
 general	ranking	es-es	General
+general result	ranking	es-es	Resultado general
 go	ranking	es-es	Ir
 heat	ranking	es-es	Ronda
 heat deleted	ranking	es-es	Ronda suprimida
