@@ -44,7 +44,7 @@ function boulderProtocol(_webserverUrl, _set_msg, _get_athlete)
  */
 boulderProtocol.prototype.set_msg = function(_set_msg)
 {
-	this.msg = _set_msg || jQuery('#msg').text;
+	this.msg = _set_msg || jQuery('#ranking-result-index_msg').text.bind(jQuery('#ranking-result-index_msg'));
 };
 
 /**
@@ -76,7 +76,7 @@ boulderProtocol.prototype.record = function(r)
 	// update history, check if try already recored
 	if (!r.clicked || r.clicked == 'apply')
 	{
-		store.history += (store.history?' ':'')+(r.top?'t'+r.top:'')+(r.bonus?'b'+r.bonus:'0');
+		store.history += (store.history?' ':'')+(r.top?'t'+r.top:'')+(r.bonus?'z'+r.bonus:'0');
 	}
 	else
 	{
@@ -87,10 +87,10 @@ boulderProtocol.prototype.record = function(r)
 			last_try = ''+(!r['try'] ? Math.max(r.top, r.bonus) : r['try']);
 			store.history += (store.history ? ' ' : '')+last_try;
 		}
-		if ((r.clicked == 'bonus' || r.clicked == 'top') &&
-			last_try.indexOf(r.clicked[0]) == -1)
+		if ((r.clicked === 'bonus' || r.clicked === 'top') &&
+			last_try.indexOf(r.clicked === 'bonus' ? 'z' : r.clicked[0]) == -1)
 		{
-			store.history += r.clicked ? r.clicked[0] : (r.bonus ? 'b'+(r.top ? 't' : '') : '');
+			store.history += r.clicked ? (r.clicked === 'bonus' ? 'z' : r.clicked[0]) : (r.bonus ? 'z'+(r.top ? 't' : '') : '');
 		}
 	}
 	store.try = r.try;
@@ -414,7 +414,7 @@ boulderProtocol.prototype.update = function(_data)
 					td.text(_data.updated.toLocaleTimeString().replace(/[ a-zA-Z]+$/,''));
 					break;
 				case 'result':
-					td.text((_data.top ? 't'+_data.top+' ' : '')+(_data.bonus ? 'b'+_data.bonus : ''));
+					td.text((_data.top ? 't'+_data.top+' ' : '')+(_data.bonus ? 'z'+_data.bonus : ''));
 					break;
 				default:
 					td.text(_data[name]);
