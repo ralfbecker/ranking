@@ -116,9 +116,19 @@
 					</hbox>
 				</row>
 				<row class="row" valign="top">
-					<description value="Routejudges" for="route_judges"/>
-					<listbox type="select-account" id="route_judges" rows="5"/>
-					<description/>
+					<description value="Routejudges"/>
+					<grid id="judges" width="100%" span="all">
+						<columns>
+							<column width="10" disabled="!@boulder"/>
+							<column/>
+						</columns>
+						<rows>
+							<row>
+								<description id="${row}[num]"/>
+								<taglist-account id="${row}[ids]" empty_label="@note" class="et2_fullWidth"/>
+							</row>
+						</rows>
+					</grid>
 				</row>
 				<row class="row" disabled="@no_upload">
 					<description value="Upload topo" for="topo_upload"/>

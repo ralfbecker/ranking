@@ -173,7 +173,7 @@ boulderProtocol.prototype.send = function(_filter, _clear_resend)
 					record.stored = typeof data.stored == 'undefined' ? true : data.stored;
 					this.set(record);
 					this.update(record);
-					this.msg(data.msg+(record.stored!==true?' ('+record.stored+')':''));
+					this.msg(data.msg+(typeof record.stored==='string'? ' ('+record.stored+')':''));
 				}
 			}
 			// reset timeout to default of 1

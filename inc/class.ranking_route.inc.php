@@ -33,6 +33,49 @@ class ranking_route extends Api\Storage\Base
 	}
 
 	/**
+	 * changes the data from the db-format to your work-format
+	 *
+	 * @param array $data =null if given works on that array and returns result, else works on internal data-array
+	 * @return array
+	 */
+	function db2data($data=null)
+	{
+		if (($intern = !is_array($data)))
+		{
+			$data = &$this->data;
+		}
+
+		if (isset($data['route_judges']))
+		{
+			$data['route_judges'] = $data['route_judges'][0] === '[' ?
+				json_decode($data['route_judges'], true) :	// new json-encoded format
+				[explode(',', $data['route_judges'])];	// old comma-separated format
+		}
+
+		return parent::db2data($intern ? null : $data);
+	}
+
+	/**
+	 * changes the data from your work-format to the db-format
+	 *
+	 * @param array $data =null if given works on that array and returns result, else works on internal data-array
+	 * @return array
+	 */
+	function data2db($data=null)
+	{
+		if (($intern = !is_array($data)))
+		{
+			$data = &$this->data;
+		}
+
+		if (isset($data['route_judges']))
+		{
+			$data['route_judges'] = json_encode(array_diff($data['route_judges'], [null]));
+		}
+		return parent::data2db($intern ? null : $data);
+	}
+
+	/**
 	 * Determine the highest existing route_order for $comp and $cat
 	 *
 	 * @param int $comp WetId
@@ -159,10 +202,6 @@ class ranking_route extends Api\Storage\Base
 				$this->data['current_'.$i] = $this->data['next_'.$i] = null;
 			}
 			$this->data['boulder_started'] = null;
-		}
-		if (isset($this->data['route_judges']) && is_array($this->data['route_judges']))
-		{
-			$this->data['route_judges'] = implode(',',$this->data['route_judges']);
 		}
 		$this->data['route_modified'] = time();
 		$this->data['route_modifier'] = $GLOBALS['egw_info']['user']['account_id'];

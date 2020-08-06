@@ -76,6 +76,10 @@ class ranking_boulder_measurement
 				$sel_options['PerId'][$row['PerId']] = ranking_result_bo::athlete2string($row, false);
 			}
 		}
+		if (!ranking_result_bo::$instance->is_judge($content['comp'], false, $keys, $content['nm']['boulder_n']))
+		{
+			Api\Json\Response::get()->call('app.ranking.no_measurement', true);
+		}
 	}
 
 	/**
@@ -142,7 +146,7 @@ class ranking_boulder_measurement
 			($frm_id=ranking_result_bo::$instance->route->data['frm_id']))
 		{
 			// add display update(s)
-			$display = new ranking_display($this->db);
+			$display = new ranking_display(ranking_result_bo::$instance->db);
 			$display->activate($frm_id,$id,$dsp_id,$keys['GrpId'],$keys['route_order']);
 		}
 		//$response->alert(__METHOD__."($PerId, $height, '$plus', $set_current) $msg");
@@ -187,7 +191,8 @@ class ranking_boulder_measurement
 					'zone'.$record['boulder'] => is_numeric($record['bonus']) ? (int)$record['bonus'] : '',
 				),
 			);
-			if (ranking_result_bo::$instance->save_result($keys, $update, $query['route_type'], $query['discipline']))
+			if (ranking_result_bo::$instance->save_result($keys, $update, $query['route_type'], $query['discipline'],
+				null, 0, false, 'start_order ASC', $record['boulder']))
 			{
 				// search filter needs route_type to not give SQL error
 				$filter = $keys+array(
@@ -204,13 +209,17 @@ class ranking_boulder_measurement
 						'b'.$record['bonus'].': '.$msg;
 				}
 			}
+			elseif (ranking_result_bo::$instance->error === false)
+			{
+				$msg = lang('Permission denied!');
+			}
 			else
 			{
 				$msg = lang('Nothing to update');
 			}
 			$response[] = $record + array(
 				'msg' => $msg,
-				'stored' => true,
+				'stored' => ranking_result_bo::$instance->error !== false,
 			);
 		}
 		Api\Json\Request::isJSONRequest(false);	// switch regular json_response handling off
@@ -279,6 +288,7 @@ class ranking_boulder_measurement
 			else
 			{
 				$data['athlete'] = ranking_result_bo::athlete2string($data);
+				$data['is_judge'] = ranking_result_bo::$instance->is_judge($comp, false, $keys, $state['boulder_n']);
 				$response->data($data);
 			}
 		}

@@ -576,7 +576,7 @@ app.classes.ranking = AppJS.extend(
 			var WetId = this.et2.getWidgetById('comp[WetId]').get_value();
 			var GrpId = this.et2.getWidgetById('nm[cat]').get_value();
 			var route_order = this.et2.getWidgetById('nm[route]').get_value();
-			var keys = {WetId: WetId, GrpId: GrpId, route_order: route_order};
+			var keys = {WetId: WetId, GrpId: GrpId, route_order: route_order, boulder_n: n};
 
 			this.egw.json('ranking_boulder_measurement::ajax_load_athlete',
 				[PerId, {},	// {} = send data back
@@ -589,8 +589,18 @@ app.classes.ranking = AppJS.extend(
 					this.try_num(_data['try'+n]);
 
 					this.message(_data.athlete);
+
+					// disable UI, if user is no judge for the given problem
+					if (typeof _data.is_judge !== 'undefined')
+					{
+						this.no_measurement(!_data.is_judge);
+					}
 				},
 				null, false, this).sendRequest();
+		}
+		else
+		{
+			this.no_measurement(true);
 		}
 
 		jQuery('#ranking-result-index_button\\[update\\],#ranking-result-index_button\\[try\\],#ranking-result-index_button\\[bonus\\],#ranking-result-index_button\\[top\\]')
@@ -652,6 +662,22 @@ app.classes.ranking = AppJS.extend(
 				window.protocol.get_athlete(jQuery.proxy(this.get_athlete, this));
 			}
 		}
+	},
+
+	/**
+	 * Disable boulder measurement to not allow sending updates
+	 *
+	 * @param {boolean} _ro
+	 */
+	no_measurement: function(_ro)
+	{
+		if (!this.et2 && _ro)
+		{
+			return window.setTimeout(this.no_measurement.bind(this, _ro), 100)
+		}
+
+		['button[update]','button[try]','button[bonus]','button[top]']
+			.forEach(name => this.et2.getWidgetById(name).set_readonly(_ro));
 	},
 
 	/**

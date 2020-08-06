@@ -1475,17 +1475,18 @@ class ranking_result_bo extends ranking_bo
 	 * @param int $quali_preselected =0 preselected participants for quali --> no countback to quali, if set!
 	 * @param boolean $update_checked =false false: do NOT update checked value, true: also update checked value
 	 * @param string $order_by ='start_order ASC' ordering of list for setting start-numbers
+	 * @param int $problem =null for which boulder to check (1, 2, ...), or default null for all route-judges
 	 * @return boolean|int number of changed results or false on error
 	 */
-	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false,$order_by='start_order ASC')
+	function save_result($keys,$results,$route_type,$discipline,$old_values=null,$quali_preselected=0,$update_checked=false,$order_by='start_order ASC',$problem=null)
 	{
 		//error_log(__METHOD__."(".array2string($keys).", results=".array2string($results).", route_type=$route_type, discipline='$discipline', old_values=".array2string($old_values).", quali_preselected=$quali_preselected, update_checked=$update_checked)");
 		$this->error = array();
 
 		if (!$keys || !$keys['WetId'] || !$keys['GrpId'] || !is_numeric($keys['route_order']) ||
 			!($comp = $this->comp->read($keys['WetId'])) ||
-			!$this->acl_check($comp['nation'],self::ACL_RESULT,$comp) &&
-			!$this->is_judge($comp, false, $keys) &&	// check additionally for route_judges
+			!$this->acl_check($comp['nation'],self::ACL_RESULT, $comp, false, null, false, $problem) &&
+			!$this->is_judge($comp, false, $keys, $problem) &&	// check additionally for route_judges
 			!($discipline == 'selfscore' && count($results) == 1 && isset($results[$this->is_selfservice()])))
 		{
 			return $this->error = false;	// permission denied

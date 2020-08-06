@@ -40,21 +40,33 @@ class ranking_result_ui extends ranking_result_bo
 				'route_order' => $_GET['route'] == '-2' ? -1 : $_GET['route'],	// -2 pairing speed --> show general result
 			);
 		}
-		elseif ($content['discipline'] == 'selfscore')
+		else
 		{
-			$matches = null;
-			if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:([0-9]+))?(b?t?f?)?$/', $content['selfscore_mode'], $matches) ||
-				!($matches[1] > 0))
+			if ($content['discipline'] == 'selfscore')
 			{
-				Api\Etemplate::set_validation_error('selfscore_mode', 'Wrong format!');
-				unset($content['button']);
+				$matches = null;
+				if (!preg_match('/^([0-9]+)(\/([0-9]+))?(:([0-9]+))?(b?t?f?)?$/', $content['selfscore_mode'], $matches) ||
+					!($matches[1] > 0))
+				{
+					Api\Etemplate::set_validation_error('selfscore_mode', 'Wrong format!');
+					unset($content['button']);
+				}
+				else
+				{
+					$content['route_num_problems'] = (int)$matches[1];
+					$content['selfscore_num'] = $matches[3] > 0 ? (int)$matches[3] : 10;
+					$content['selfscore_points'] = !empty($matches[5]) ? (int)$matches[5] : null;
+					$content['selfscore_use'] = $matches[6];
+				}
 			}
-			else
+
+			if (isset($content['judges']))
 			{
-				$content['route_num_problems'] = (int)$matches[1];
-				$content['selfscore_num'] = $matches[3] > 0 ? (int)$matches[3] : 10;
-				$content['selfscore_points'] = !empty($matches[5]) ? (int)$matches[5] : null;
-				$content['selfscore_use'] = $matches[6];
+				$content['route_judges'] = [];
+				foreach($content['judges'] as $n => $data)
+				{
+					$content['route_judges'][$n] = $data['ids'];
+				}
 			}
 		}
 		// read $comp, $cat, $discipline and check the permissions
@@ -180,8 +192,8 @@ class ranking_result_ui extends ranking_result_bo
 					if ($content['topo_upload'])
 					{
 						$topo_path = null;
-						$msg .= "\n".ranking_measurement::save_topo($content, $content['topo_upload'], $topo_path) ?
-							lang('Topo uploaded as %1.', $topo_path) : lang('Error uploading topo!');
+						$msg .= ranking_measurement::save_topo($content, $content['topo_upload'], $topo_path) ?
+							"\n".lang('Topo uploaded as %1.', $topo_path) : "\n".lang('Error uploading topo!');
 					}
 					$refresh = true;
 
@@ -728,6 +740,15 @@ class ranking_result_ui extends ranking_result_bo
 					}
 					if (!$content['max_line'.$num]) $content['max_line'.$num] = 1;
 				}
+			}
+			$content['judges'] = [
+				'boulder' => strpos($content['discipline'], 'boulder') === 0 && $content['route_num_problems'] > 1,
+				'note' => strpos($content['discipline'], 'boulder') === 0 && $content['route_num_problems'] > 1 ?
+					lang('Setting judges only on the first boulder gives them rights for all boulders!') : null,
+			];
+			for($i = 0, $n = max(1, $content['route_num_problems']); $i < $n; $i++)
+			{
+				$content['judges'][] = ['num' => $i+1, 'ids' => $content['route_judges'][$i] ?? ''];
 			}
 		}
 

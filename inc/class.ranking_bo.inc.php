@@ -319,9 +319,10 @@ class ranking_bo extends ranking_so
 	 * @param array $route =null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
 	 * 	if route judges should be checked too, default null=no route judges
 	 * @param boolean $use_no_judge =false true: do NOT use judge-rights for athletes eg. confirming licenses
+	 * @param int $problem =null for which boulder problem to check (1, 2, 3, ...) or null for all route-judges
 	 * @return boolean true if access is granted, false otherwise
 	 */
-	function acl_check($nation,$required,$comp=null,$allow_before=false,$route=null,$use_no_judge=false)
+	function acl_check($nation,$required,$comp=null,$allow_before=false,$route=null,$use_no_judge=false,$problem=null)
 	{
 		static $acl_cache = array();
 
@@ -351,7 +352,7 @@ class ranking_bo extends ranking_so
 		$granted = $acl_cache[$nation][$required] ||
 			// check competition specific judges rights for REGISTER and RESULT too
 			$comp && in_array($required, array(self::ACL_REGISTER, self::ACL_RESULT)) &&
-				$this->is_judge($comp, $allow_before, $route);
+				$this->is_judge($comp, $allow_before, $route, $problem);
 		//error_log(__METHOD__."('$nation', $required, ".array2string($comp).') returning '.array2string($granted));
 		return $granted;
 	}
@@ -536,9 +537,10 @@ class ranking_bo extends ranking_so
 	 * @param boolean $allow_before =false grant judge-rights unlimited time before the competition
 	 * @param array $route =null array with values for keys 'WetId', 'GrpId', 'route_order' and optional 'route_judges',
 	 * 	if route judges should be checked too, default null=no route judges
+	 * @param int $problem =null to check for judges of a certain problem (1, 2, ...) or default null to allow route-judges of all boulders
 	 * @return boolean
 	 */
-	function is_judge($comp,$allow_before=false,$route=null)
+	function is_judge($comp, $allow_before=false, $route=null, $problem=null)
 	{
 		if (!is_array($comp) && !($comp = $this->comp->read($comp)))
 		{
@@ -558,13 +560,15 @@ class ranking_bo extends ranking_so
 			// treat national result-rights like being a judge of every competition
 			$this->acl_check($comp['nation'], self::ACL_RESULT);
 
+		// check for route judge rights, if not already a judge
 		if (!$is_judge && $route && (is_array($route) && isset($route['route_judges']) ||
 			($route = $this->route->read($route))) && $route['route_judges'] &&
 			$route['route_status'] != STATUS_RESULT_OFFICIAL &&			// only 'til result is offical
 			$distance < 1 && abs($distance) <= $this->judge_right_days+$comp['duration'])	// and one day before competition started
 		{
-			$is_judge = in_array($this->user, is_array($route['route_judges']) ?
-				$route['route_judges'] : explode(',', $route['route_judges']));
+			$is_judge = (bool)in_array($this->user, isset($problem) && count($route['route_judges']) > 1 ?
+				$route['route_judges'][$problem-1] :	// allow only judges from a specific boulder
+				call_user_func_array('array_merge', $route['route_judges']));	// allow judges from all boulders
 		}
 		//if (!$is_judge) error_log(__METHOD__."(#$comp[WetId]=$comp[rkey], $allow_before, ".array2string($route).") distance=$distance, route_judges=$route[route_judges] returning ".array2string($is_judge).' '.function_backtrace());
 		return $is_judge;
