@@ -1656,7 +1656,7 @@ app.classes.ranking = AppJS.extend(
 		if (nm)
 		{
 			var template = nm.template+'.edit';
-			if (typeof this.et2._inst.templates[template] == 'undefined') return;	// no edit template found
+			if (typeof etemplate2.templates[template] == 'undefined') return;	// no edit template found
 			var row = this.getRowById(_heat ? nm.rows[_heat] : nm.rows, PerId);
 			var entry = jQuery.extend(row.data, {nm: nm});
 
