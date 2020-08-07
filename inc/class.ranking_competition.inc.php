@@ -204,13 +204,20 @@ class ranking_competition extends Api\Storage\Base
 		{
 			if (isset($data[$name]) && $data[$name])
 			{
-				$extra = array();
-				foreach(explode(',',$data[$name]) as $pair)
+				if (in_array($data[$name][0], ['[','{']))
 				{
-					list($cat,$num,$fed) = explode(':',$pair);
-					$extra[] = array('cat' => $cat,'num' => $num,'fed' => $fed);
+					$data[$name] = json_decode($data[$name], true);
 				}
-				$data[$name] = $extra;
+				else
+				{
+					$extra = array();
+					foreach(explode(',', $data[$name]) as $pair)
+					{
+						list($cat,$num,$fed) = explode(':',$pair);
+						$extra[] = array('cat' => $cat,'num' => $num,'fed' => $fed);
+					}
+					$data[$name] = $extra;
+				}
 			}
 		}
 
@@ -262,16 +269,10 @@ class ranking_competition extends Api\Storage\Base
 		{
 			if (isset($data[$name]) && is_array($data[$name]))
 			{
-				$extra = array();
-				foreach($data[$name] as $pair)
+				$data[$name] = json_encode(array_values(array_filter($data[$name], function($pair)
 				{
-
-					if (($pair['fed'] || $pair['cat']) && $pair['num'])
-					{
-						$extra[] = $pair['cat'].':'.$pair['num'].($pair['fed']?':'.$pair['fed']:'');
-					}
-				}
-				$data[$name] = $extra ? implode(',',$extra) : null;
+					return ($pair['fed'] || $pair['cat']) && $pair['num'];
+				})));
 			}
 		}
 		if (isset($data['serie']) && (string)$data['serie'] === '0') $data['serie'] = null;
@@ -297,6 +298,20 @@ class ranking_competition extends Api\Storage\Base
 		if ($data['prequal_comps'])
 		{
 			$data['prequal_comps'] = implode(',', $data['prequal_comps']);
+		}
+		foreach(['prequal_extra','quota_extra','gruppen'] as $name)
+		{
+			if (strlen($data[$name]) > $this->db->get_column_attribute($name, $this->table_name, $this->app, 'precision'))
+			{
+				if ($intern)	// change internal data back, before throwing
+				{
+					parent::data2db(null);
+					$this->db2data();
+				}
+				throw new Api\Exception\WrongUserinput(lang("Too much data for column '%1' (%2)!", $name,
+					$name === 'prequal_extra' ? lang('Prequalified competitiors for startlist') :
+						($name === 'gruppen' ? lang('Catgories') : lang('Quota by federation or category'))));
+			}
 		}
 		return parent::data2db($intern ? null : $data);	// important to use null, if $intern!
 	}
@@ -330,10 +345,12 @@ class ranking_competition extends Api\Storage\Base
 	 * @param int|string $fed integer fed_id or string 3-char nation
 	 * @param int $cat integer GrpId
 	 * @param array $comp =null competition data, default use $this->data
+	 * @param array|null &$multi_cat on return matching rules for multiple categories: [{fed:$fed,cat:[$c1,$c2,...],num:$quota}, ...]
 	 * @return integer
 	 */
-	function quota($fed=null,$cat=null,array $comp=null)
+	function quota($fed=null,$cat=null,array $comp=null, array &$multi_cat=null)
 	{
+		$multi_cat = [];
 		if (is_null($comp))
 		{
 			$comp =& $this->data;
@@ -342,6 +359,15 @@ class ranking_competition extends Api\Storage\Base
 		{
 			foreach($comp['quota_extra'] as $data)
 			{
+				if (is_array($data['cat']))
+				{
+					if (count($data['cat']) > 1)
+					{
+						if ($cat && in_array($cat, $data['cat'], false)) $multi_cat[] = $data;
+						continue;
+					}
+					$data['cat'] = $data['cat'][0];
+				}
 				if ($fed == $data['fed'] && $cat == $data['cat'])
 				{
 					$quota = $data['num'];

@@ -53,22 +53,22 @@
 					<checkbox label="No complimentary list (over quota)" id="no_complimentary"/>
 				</row>
 				<row>
-
 					<description value="Total per discipline" for="total_per_disciplin"/>
 					<select-number id="total_per_discipline" options="None,1,20"/>
+					<label value="Multiple categories check their sum against the quota, not each one!" align="right"/>
 				</row>
 				<row>
-					<grid spacing="0" padding="1" id="quota_extra">
+					<grid spacing="0" padding="1" id="quota_extra" width="99%">
 						<columns>
-							<column/>
-							<column/>
+							<column width="33%"/>
+							<column width="60%"/>
 							<column/>
 						</columns>
 						<rows>
 							<row>
-								<select class="selectboxFullWidth" id="${row}[fed]" options="Federation"/>
-								<select class="selectboxFullWidth" id="${row}[cat]" options="Category"/>
-								<select-number id="${row}[num]" options="None,1,20"/>
+								<select id="${row}[fed]" empty_label="Federation" class="et2_fullWidth"/>
+								<taglist id="${row}[cat]" empty_label="Category" multiple="toggle" rows="1" class="et2_fullWidth" allowFreeEntries="false"/>
+								<integer id="${row}[num]" step="1"/>
 							</row>
 						</rows>
 					</grid>

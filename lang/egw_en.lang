@@ -125,6 +125,7 @@ can't open connection to displays at %1 !!!	ranking	en	Can't open connection to 
 can't open connection to timy at %1 !!!	ranking	en	Can't open connection to Timy at %1 !!!
 can't open control port (%1) %2 !!!	ranking	en	Can't open control port (%1) %2 !!!
 cannel without saving	ranking	en	Cannel without saving
+categories	ranking	en	Categories
 category license is applied for, does not limit athletes to compete in that category only	ranking	en	category license is applied for, does NOT limit athletes to compete in that category only
 category not found !!!	ranking	en	Category NOT found !!!
 cathegories	ranking	en	Cathegories
@@ -295,6 +296,7 @@ file is not an image (%1)	ranking	en	File is not an image (%1)
 filesystem path for upload of athlete pictures	admin	en	Filesystem path for upload of athlete pictures
 final	ranking	en	Final
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	en	First name of the athlete in Latin chars! Accents and umlauts are ok
+for categories %1 together only a total of %2 registrations allowed!	ranking	en	For categories %1 together only a total of %2 registrations allowed!
 for internal use, not shown on the website.	ranking	en	For internal use, not shown on the website.
 format	ranking	en	Format
 format #%1 not found!	ranking	en	Format #%1 not found!
@@ -394,6 +396,7 @@ minimum disciplines	ranking	en	Minimum disciplines
 minus	ranking	en	minus
 missing registration rights!	ranking	en	Missing registration rights!
 more	ranking	en	More
+multiple categories check their sum against the quota, not each one!	ranking	en	Multiple categories check their sum against the quota, not each one!
 name(s)	ranking	en	name(s)
 narrow your search	ranking	en	Narrow your search
 nation	ranking	en	Nation
@@ -510,6 +513,7 @@ provisional result	ranking	en	provisional result
 qualification	ranking	en	Qualification
 qualification, 1/2-final, ...	ranking	en	Qualification, 1/2-Final, ...
 quota	ranking	en	Quota
+quota by federation or category	ranking	en	Quota by federation or category
 random (distribution cup)	ranking	en	random (distribution cup)
 random (distribution ranking)	ranking	en	random (distribution ranking)
 random (keep existing startorder!)	ranking	en	random (keep existing startorder!)
@@ -643,6 +647,7 @@ to confirm	ranking	en	To confirm
 to remove already registered athletes:\nright click on them in list and choose 'delete' from context menu	ranking	en	To remove already registered athletes:\nright click on them in list and choose 'delete' from context menu
 to select multiple rows use ctrl (cmd for mac) or shift to select ranges.	ranking	en	To select multiple rows use Ctrl (Cmd for Mac) or Shift to select ranges.
 to year	ranking	en	to year
+too much data for column '%1' (%2)!	ranking	en	Too much data for column '%1' (%2)!
 top	ranking	en	Top
 top: number of tries	ranking	en	Top: number of tries
 top: number of tries or no	ranking	en	Top: number of tries or no

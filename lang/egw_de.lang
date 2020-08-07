@@ -62,6 +62,7 @@ allow athletes to register themself for this competition	ranking	de	Erlaubt Athl
 allowed without extra confirmation	ranking	de	Erlaubt ohne extra Bestätigung
 allows athletes to register themself for this competition	ranking	de	Erlaubt Athleten sich selbst für diesen Wettkampf zu registrieren
 already registered	ranking	de	Bereits registriert
+already registered for combined, no single category registration allowed!	ranking	de	Bereits für Combinded registriert, damit ist keine Registrierung in einer Einzelkategorie mehr erlaubt!
 an email with instructions how to (re-)set the password has been sent.	ranking	de	Eine EMail mit Anleitung, wie das Passwort (zurück) gesetzt wird, wurde versandt.
 an error happend, while storing your password!	ranking	de	Ein Fehler passierte, beim Speichern Deines Passwortes!
 applied	ranking	de	beantragt
@@ -120,6 +121,7 @@ can't open connection to displays at %1 !!!	ranking	de	Kann keine Verbindung zu 
 can't open connection to timy at %1 !!!	ranking	de	Kann keine Verbindung zu Timy unter %1 aufbauen!!!
 can't open control port (%1) %2 !!!	ranking	de	Kann Kontroll Port (%1) %2 nicht öffnen !!!
 cannel without saving	ranking	de	Abbrechen ohne zu Speichern
+categories	ranking	de	Kategorien
 category license is applied for, does not limit athletes to compete in that category only	ranking	de	Kategorie, für die die Lizenz beantragt wird, schränkt Athleten NICHT auf diese Kategorie ein
 category not found !!!	ranking	de	Kategorie NICHT gefunden !!!
 cathegories	ranking	de	Kategorien
@@ -171,6 +173,7 @@ cup (unranked last)	ranking	de	Cup (nicht gelistet zuletzt)
 cup not found!!!	ranking	de	Cup nicht gefunden!!!
 cuppattern	ranking	de	Muster des Cups
 cups	ranking	de	Cups
+current registration in %1 category(s) were deleted.	ranking	de	Aktuelle Registrierung in %1 Kategorie(n) wurde gelöscht.
 custom acl right	ranking	de	Detaillierte Zugriffsrechte
 database	admin	de	Datenbank
 dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	de	Datenzeile %1 hat eine andere Anzahl Spalten (%2) als die Kopfzeile (%3)!
@@ -289,6 +292,7 @@ file is not an image (%1)	ranking	de	Datei ist kein Bild (%1)
 filesystem path for upload of athlete pictures	admin	de	Dateisystempfad für das Hochladen von Bildern von Athleten
 final	ranking	de	Finale
 first name of the athlete in latin chars! accents and umlauts are ok	ranking	de	Vorname des Athleten in lateinischen Buchstaben! Akzente und Umlaute sind ok
+for categories %1 together only a total of %2 registrations allowed!	ranking	de	Für die Kategorien %1 zusammen sind nur insgesamt %2 Registrierungen erlaubt!
 for internal use, not shown on the website.	ranking	de	Zur internen Benutzung, wird nicht auf der Webseite angezeigt.
 format	ranking	de	Format
 format #%1 not found!	ranking	de	Format #%1 nicht gefunden!
@@ -386,6 +390,7 @@ minimum disciplines	ranking	de	Minimalzahl Diziplinen
 minus	ranking	de	minus
 missing registration rights!	ranking	de	Fehlende Registrierungsrechte!
 more	ranking	de	Mehr
+multiple categories check their sum against the quota, not each one!	ranking	de	Mehreren Kategorien werden in Summe gegen die Quote geprüft, nicht jede einzelne!
 name(s)	ranking	de	Namen
 narrow your search	ranking	de	Schränken Sie Ihre Suche weiter ein
 nation	ranking	de	Nation
@@ -411,11 +416,14 @@ no federation selected to edit!	ranking	de	Kein Verband zum bearbeiten ausgewäh
 no license required for registration	ranking	de	Registrierung erfordert keine Lizenz
 no participant with startnumber "%1"!	ranking	de	Kein Teilnehmer mit Startnummer '%1'!
 no participants yet!	ranking	de	Noch keine Teilnehmer!
+no previous heat (%1) found!	ranking	de	Keiner vorherige Runde (%1) gefunden!
 no quota set in the previous heat!!!	ranking	de	Keine Quote in der vorherigen Runde angegeben!!!
 no ranking defined or no results yet for category %1 !!!	ranking	de	Keine Rangliste definiert oder noch keine Ergebnisse für Kategorie %1 !!!
+no result for discipline %1 found!	ranking	de	Kein Ergebnis für die Disziplin %1 gefunden!
 no result imported, need to select all athletes first!	ranking	de	Keine Ergebnisse importiert, ALLE Athleten müssen ausgewählt werden!
 no result yet !!!	ranking	de	Noch kein Ergebnis !!!
 no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	de	Keine Rechte an irgendeiner Nation, der Administrator muß Leserechte für die Wettkämpfe von mindestens einer Nation geben!
+no route with discipline %1 found!	ranking	de	Keine Route für die Diszilplin %1 gefunden!
 no starters yet !!!	ranking	de	Noch keine Starter !!!
 no startlist or result yet!	ranking	de	Bisher keine Startliste oder Ergebnis!
 not allowed	ranking	de	Nicht erlaubt
@@ -499,6 +507,7 @@ provisional result	ranking	de	provisorisches Ergebnis
 qualification	ranking	de	Qualifikation
 qualification, 1/2-final, ...	ranking	de	Qualifikation, 1/2-Finale, ...
 quota	ranking	de	Quote
+quota by federation or category	ranking	de	Quota nach Verband oder Kategorie
 random (distribution cup)	ranking	de	gelost (Verteilung Cup)
 random (distribution ranking)	ranking	de	gelost (Verteilung Rangliste)
 random (keep existing startorder!)	ranking	de	gelost (bereits geloste behalten!)
@@ -632,6 +641,7 @@ to confirm	ranking	de	Zu bestätigen
 to remove already registered athletes:\nright click on them in list and choose 'delete' from context menu	ranking	de	Um bereits registrierte Athleten zu löschen:\nklick rechts auf diese in der Liste und im Kontextmenü 'Löschen' auswählen
 to select multiple rows use ctrl (cmd for mac) or shift to select ranges.	ranking	de	Verwenden Sie Strg (Cmd für Mac) um mehrere Zeilen zu markieren oder Umschalttaste für Bereiche.
 to year	ranking	de	bis Jahr
+too much data for column '%1' (%2)!	ranking	de	Zu viele Daten für die Spalte '%1' (%2)!
 top	ranking	de	Top
 top: number of tries	ranking	de	Top: Anzahl Versuche
 top: number of tries or no	ranking	de	Top: Anzahl Versuche oder Nein

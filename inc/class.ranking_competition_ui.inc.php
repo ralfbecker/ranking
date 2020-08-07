@@ -120,79 +120,86 @@ class ranking_competition_ui extends ranking_bo
 				{
 					$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->comp->data['rkey']);
 				}
-				if ($this->comp->save())
+				try
 				{
-					$msg .= lang('Error: while saving !!!');
+					if ($this->comp->save())
+					{
+						$msg .= lang('Error: while saving !!!');
+					}
+					else
+					{
+						$msg .= lang('%1 saved', lang('Competition'));
+
+						//echo "<p>renaming attachments from '?$old_rkey' to '?".$this->comp->data['rkey']."'</p>\n";
+						if ($old_rkey && $this->comp->data['rkey'] != $old_rkey &&
+							!$this->comp->rename_attachments($old_rkey))
+						{
+							$msg .= ', ' . lang("Error: renaming the attachments !!!");
+						}
+						foreach (array_keys($this->comp->attachment_prefixes) as $type)
+						{
+							$file = $_content['upload_' . $type];
+							if (is_array($file) && $file['tmp_name'] && $file['name'])
+							{
+								//echo $type; _debug_array($file);
+								if ($type != 'logo' && $type != 'sponsors')
+								{
+									$extension = '.pdf';
+									$error_msg = $file['type'] != 'application/pdf' &&
+									strtolower(substr($file['name'], -4)) != $extension ?
+										lang('File is not a PDF') : false;
+								}
+								else
+								{
+									$error_msg = ($extension = ranking_competition::is_image($file['name'], $file['type'])) ? false :
+										lang('File is not an image (%1)', str_replace(array('\\', '$'), '', implode(', ', ranking_competition::$image_types)));
+								}
+								if (!$error_msg && $this->comp->attach_files(array($type => $file['tmp_name']), $error_msg, null, $extension))
+								{
+									$msg .= ",\n" . lang("File '%1' successful attached as %2", $file['name'], $this->attachment_type[$type]);
+								}
+								else
+								{
+									$msg .= ",\n" . lang("Error: attaching '%1' as %2 (%3) !!!", $file['name'], $this->attachment_type[$type], $error_msg);
+								}
+							}
+						}
+						if ($button === 'update_prequal')
+						{
+							$deleted = $unprequalified = $changed = null;
+							$prequalified = $this->registration->update_prequalified($this->comp->data['WetId'], $deleted, $unprequalified, $changed);
+							if ($prequalified === false)
+							{
+								$msg .= "\n" . lang('Prequalified will be generated automatic on January 1st, no need for a manual update.');
+							}
+							else
+							{
+								$msg .= "\n" . lang('%1 prequalified athletes in registration, %2 changed or added.',
+										$prequalified, $changed);
+							}
+							if ($deleted)
+							{
+								$msg .= "\n" . lang('%1 no longer prequalified athletes (without registration) deleted.', $deleted);
+							}
+							if ($unprequalified)
+							{
+								$msg .= "\n" . lang('%1 no longer prequalified athletes with registration, you need to check quota!',
+										count(call_user_func_array('array_merge', $unprequalified)));
+								$names = $this->cats->names(array('GrpId' => array_keys($unprequalified)), 0);
+								foreach ($unprequalified as $GrpId => $athletes)
+								{
+									$msg .= "\n" . $names[$GrpId] . ': ' . implode(', ', $athletes);
+								}
+							}
+
+						}
+						Api\Framework::refresh_opener($msg, 'ranking', $this->comp->data['WetId'], $_content['WetId'] ? 'edit' : 'add');
+						if ($button === 'save') Api\Framework::window_close();
+					}
 				}
-				else
-				{
-					$msg .= lang('%1 saved',lang('Competition'));
-
-					//echo "<p>renaming attachments from '?$old_rkey' to '?".$this->comp->data['rkey']."'</p>\n";
-					if ($old_rkey && $this->comp->data['rkey'] != $old_rkey &&
-						!$this->comp->rename_attachments($old_rkey))
-					{
-						$msg .= ', '.lang("Error: renaming the attachments !!!");
-					}
-					foreach(array_keys($this->comp->attachment_prefixes) as $type)
-					{
-						$file = $_content['upload_'.$type];
-						if (is_array($file) && $file['tmp_name'] && $file['name'])
-						{
-							//echo $type; _debug_array($file);
-							if ($type != 'logo' && $type != 'sponsors')
-							{
-								$extension = '.pdf';
-								$error_msg = $file['type'] != 'application/pdf' &&
-									strtolower(substr($file['name'],-4)) != $extension ?
-									lang('File is not a PDF') : false;
-							}
-							else
-							{
-								$error_msg = ($extension=ranking_competition::is_image($file['name'],$file['type'])) ? false :
-									lang('File is not an image (%1)',str_replace(array('\\','$'),'',implode(', ',ranking_competition::$image_types)));
-							}
-							if (!$error_msg && $this->comp->attach_files(array($type => $file['tmp_name']),$error_msg,null,$extension))
-							{
-								$msg .= ",\n".lang("File '%1' successful attached as %2",$file['name'],$this->attachment_type[$type]);
-							}
-							else
-							{
-								$msg .= ",\n".lang("Error: attaching '%1' as %2 (%3) !!!",$file['name'],$this->attachment_type[$type],$error_msg);
-							}
-						}
-					}
-					if ($button === 'update_prequal')
-					{
-						$deleted = $unprequalified = $changed = null;
-						$prequalified = $this->registration->update_prequalified($this->comp->data['WetId'], $deleted, $unprequalified, $changed);
-						if ($prequalified === false)
-						{
-							$msg .= "\n".lang('Prequalified will be generated automatic on January 1st, no need for a manual update.');
-						}
-						else
-						{
-							$msg .= "\n".lang('%1 prequalified athletes in registration, %2 changed or added.',
-								$prequalified, $changed);
-						}
-						if ($deleted)
-						{
-							$msg .= "\n".lang('%1 no longer prequalified athletes (without registration) deleted.', $deleted);
-						}
-						if ($unprequalified)
-						{
-							$msg .= "\n".lang('%1 no longer prequalified athletes with registration, you need to check quota!',
-								count(call_user_func_array('array_merge', $unprequalified)));
-							$names = $this->cats->names(array('GrpId' => array_keys($unprequalified)), 0);
-							foreach($unprequalified as $GrpId => $athletes)
-							{
-								$msg .= "\n".$names[$GrpId].': '.implode(', ', $athletes);
-							}
-						}
-
-					}
-					Api\Framework::refresh_opener($msg, 'ranking', $this->comp->data['WetId'], $_content['WetId'] ? 'edit' : 'add');
-					if ($button === 'save') Api\Framework::window_close();
+				catch(Exception $e) {
+					$msg = lang('Error').': '.$e->getMessage();
+					unset($button);
 				}
 			}
 			if ($button === 'delete' && $this->acl_check_comp($this->comp->data) &&

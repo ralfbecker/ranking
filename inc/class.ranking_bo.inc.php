@@ -1011,8 +1011,8 @@ class ranking_bo extends ranking_so
 						$keys[!$athlete['acl_fed_id'] ? 'fed_parent' : 'acl_fed_id'] = $nat_fed;
 					}
 					$this->registration->search(array(), true, 'reg_id', '', '', false, 'AND', array(0, 1), $keys);
-					$max_quota = $this->comp->quota($nat_fed, $keys['GrpId'], $comp);
-					if ($max_quota <= $this->registration->total)
+					$max_quota = $this->comp->quota($nat_fed, $keys['GrpId'], $comp, $multi_cat);
+					if ($max_quota && $max_quota <= $this->registration->total)
 					{
 						$msg = lang('No complimentary list (over quota)').' quota='.(int)$max_quota.'!';
 
@@ -1020,10 +1020,11 @@ class ranking_bo extends ranking_so
 						{
 							$msg .= "\n".lang('Athlete to replace was prequalied!');
 						}
-						if (!$this->is_admin && !$this->is_judge($comp))
-						{
-							throw new Api\Exception\WrongUserinput($msg);
-						}
+					}
+					// check multi-category quota(s), if not just replacing athletes
+					if (!$replace && $multi_cat && ($msgs = $this->check_multi_cat_quota($keys, $multi_cat)))
+					{
+						$msg .= ($msg ? "\n\n" : '').lang('No complimentary list (over quota)').': '.implode("\n", $msgs);
 					}
 					// check total quota for combined plus single discipline registration, if one is set
 					$info = null;
@@ -1037,7 +1038,11 @@ class ranking_bo extends ranking_so
 							throw new Api\Exception\WrongUserinput($msg);
 						}
 					}
-
+					// only judges or admins are allowed to ignore set quota
+					if (!empty($msg) && !$this->is_admin && !$this->is_judge($comp))
+					{
+						throw new Api\Exception\WrongUserinput($msg);
+					}
 					if ($info) $msg .= ($msg?"\n\n":'').$info;
 				}
 				break;
@@ -1067,6 +1072,45 @@ class ranking_bo extends ranking_so
 			));
 		}
 		return $ret;
+	}
+
+	/**
+	 * Check if current registration would violate any multi-category quota
+	 *
+	 * @param array $keys values for WetId, GrpId and nation or federation
+	 * @param array $multi_cat
+	 * @return array of error messages
+	 */
+	private function check_multi_cat_quota(array $keys, array $multi_cat)
+	{
+		$msgs = [];
+		foreach($multi_cat as $data)
+		{
+			$keys['GrpId'] = $data['cat'];
+			if (empty($data['fed']))
+			{
+				unset($keys['nation'], $keys['fed_parent'], $keys['acl_fed_id']);
+			}
+			elseif (!is_numeric($data['fed']))
+			{
+				$keys['nations'] = $data['fed'];
+			}
+			elseif(isset($keys['fed_parent']))
+			{
+				$keys['fed_parent'] = $data['fed'];
+			}
+			elseif(isset($keys['fed_parent']))
+			{
+				$keys['acl_fed_id'] = $data['fed'];
+			}
+			$this->registration->search(array(), true, 'reg_id', '', '', false, 'AND', array(0, 1), $keys);
+			if ($this->registration->total >= $data['num'])
+			{
+				$msgs[] = lang('For categories %1 together only a total of %2 registrations allowed!',
+					implode(', ', $this->cats->names(['GrpId' => $data['cat']], 0)), $data['num']);
+			}
+		}
+		return $msgs;
 	}
 
 	/**
