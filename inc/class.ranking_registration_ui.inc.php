@@ -770,7 +770,7 @@ class ranking_registration_ui extends ranking_bo
 			{
 				$order = 'GrpId,nation,reg_id,nachname,vorname';
 				$keys['state'] = ranking_registration::REGISTERED;
-				$starters =& $this->registration->read($keys,'',true,$order);
+				$starters =& $this->registration->read($keys,'+plz,strasse,tel,mobil',true,$order);
 			}
 
 			if ($content['download'] && $starters && count($starters))
@@ -794,6 +794,11 @@ class ranking_registration_ui extends ranking_bo
 				if ($show != 'result')
 				{
 					$name2csv += [
+						'ort' => 'city',
+						'plz' => 'postcode',
+						'strasse' => 'street',
+						'tel' => 'telephone',
+						'mobil' => 'mobile',
 						'reg_prequal_reason' => 'prequalified',
 						'reg_registered' => 'registered',
 						'reg_confirmed'  => 'confirmed',

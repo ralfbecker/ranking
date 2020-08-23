@@ -128,11 +128,12 @@ class ranking_registration extends Api\Storage\Base
 			{
 				$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
 
-				if (!$extra_cols)
+				if (!$extra_cols || is_string($extra_cols) && $extra_cols[0] === '+')
 				{
 					$extra_cols = "nachname,vorname,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
 						".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,acl,reg_id,email,".
-						ranking_athlete::ATHLETE_TABLE.".PerId AS PerId";
+						ranking_athlete::ATHLETE_TABLE.".PerId AS PerId".
+						($extra_cols ? ','.substr($extra_cols, 1) : '');
 				}
 				else
 				{
