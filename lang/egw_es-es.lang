@@ -19,8 +19,11 @@
 1. display	ranking	es-es	1. Mostrar
 1. january	ranking	es-es	1. Enero
 2. display	ranking	es-es	2. Mostrar
+2. lane	ranking	es-es	2. Línea
 2. qualification	ranking	es-es	2. Calificación
+2. time	ranking	es-es	2. Tiempo.
 3. place	ranking	es-es	3. lugar
+ability	ranking	es-es	Habilidad
 aborts without saving changes	ranking	es-es	abortar sin grabar los cambios
 access control, key	ranking	es-es	control de acceso, clave
 accounting	ranking	es-es	Cuentas
@@ -57,6 +60,7 @@ before	ranking	es-es	Antes
 birthdate	ranking	es-es	Fecha de nacimiento
 birthday	ranking	es-es	Día de nacimiento
 birthyear	ranking	es-es	Año de nacimiento
+birthyears from	ranking	es-es	Años de nacimiento desde
 category not found !!!	ranking	es-es	¡¡¡Categoría NO encontrada!!!
 cathegories	ranking	es-es	Categorías
 cellphone	ranking	es-es	Teléfono móvil
