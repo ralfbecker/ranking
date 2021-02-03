@@ -1,25 +1,42 @@
+#	ranking	fr	#
+%1 $row_cont[start_number]	ranking	fr	%1 $row_cont[start_number]
+%1 athlete(s) %2	ranking	fr	%1 athlete(s) %2
 %1 athletes imported.	ranking	fr	%1 athlète(s) importé(s).
 %1 deleted	ranking	fr	%1 supprimé(s).
+%1 federation(s) deleted after merge.	ranking	fr	%1 fédération(s) supprimé après fusion.
 %1 federations added to parent federation.	ranking	fr	%1 fédérations fusionnées ajoutée à la fédération mère
 %1 federations merged.	ranking	fr	%1 fédérations fusionnées.
+%1 is already registered!	ranking	fr	%1 déjà enregistré !
 %1 is an admin and has therefor all rights!	ranking	fr	%1 est administrateur et dispose donc de tous les droits !
 %1 lines read from file.	ranking	fr	%1 lignes lues du fichier
 %1 participants imported	ranking	fr	%1 participants importés
+%1 registered.	ranking	fr	%1 enregistré.
 %1 saved	ranking	fr	%1 enregistré
 %1, %2 deleted for category %3	ranking	fr	%1, %2 supprimés de la catégorie %3
 %1, %2 registered for category %3	ranking	fr	%1, %2 supprimés dans la catégorie %3
 %1. false start	ranking	fr	%1. Mauvais départ
 %1. heat	ranking	fr	%1. Tour
+%1. topo	ranking	fr	%1. topo
 %1. try	ranking	fr	%1. Essai
+%s ($cont[team_nation])	ranking	fr	%s ($cont[team_nation])
+%s ($row_cont[age])	ranking	fr	%s ($row_cont[age])
+%s (&lt;0 age from)	ranking	fr	%s (<0 âge de)
+%s (&lt;0 age to)	ranking	fr	%s (<0 âge a)
+%s (<0 age from)	ranking	fr	%s (<0 âge de)
+%s (<0 age to)	ranking	fr	%s (<0 âge a)
+&gt;&gt;	ranking	fr	>>
 '%1' does not exist or is not readable by the webserver !!!	ranking	fr	'%1' n'existe pas ou est non trouvé par le serveur web !!!
 1. display	ranking	fr	1. Afficha
 1. january	ranking	fr	1. Janvier
 1. place	ranking	fr	1. place
 2. display	ranking	fr	2. Affichage
 2. lane	ranking	fr	2. Ligne
+2. pdf	ranking	fr	2. PDF
 2. qualification	ranking	fr	2. Qualification
 2. time	ranking	fr	2. Temps
 3. place	ranking	fr	3. Place
+>>	ranking	fr	>>
+ab 20 jahre	ranking	fr	à partir de 20 ans
 accounting	ranking	fr	Comptabilité
 actions	ranking	fr	Actions
 add a cup	ranking	fr	Ajouter une coupe
@@ -31,35 +48,66 @@ add a new heat	ranking	fr	Ajouter un nouveau tour
 add athletes	ranking	fr	Ajouter des athlètes
 add heat	ranking	fr	Aouter un tour
 add new athlete with the given data	ranking	fr	Ajouter un nouvel athlète avec ces données
+additional category	ranking	fr	Catégorie additionnelle
 admin rights required!	ranking	fr	Droits administrateur requis !
 administrated by: parent federation	ranking	fr	Administré par : la fédération mère
+after	ranking	fr	après
+age	ranking	fr	Age
+agegroup	ranking	fr	Groupe d'âge
+all above	ranking	fr	tout ci-dessus
+all participants	ranking	fr	Tous les participants
+already registered	ranking	fr	Déjà enregistré
+applied	ranking	fr	appliqué
+apply for	ranking	fr	Appliquer pour
+apply the changes made	ranking	fr	appliquer les changements effectués
+as of	ranking	fr	A partir de
 athlete	ranking	fr	Athlète
+athlete #1	ranking	fr	Athlète #1
+athlete #2	ranking	fr	Athlète #2
+athlete #3	ranking	fr	Athlète #3
 athlete %1 not found!	ranking	fr	Athlète %1 non trouvé !
 athlete 1	ranking	fr	Athlète 1
 athlete 2	ranking	fr	Athlète 2
 athlete 3	ranking	fr	Athlète 3
+athlete fields:	ranking	fr	Champ athlète
 before	ranking	fr	Avant
 birthdate	ranking	fr	Date de naisance
 birthday	ranking	fr	Anniversaire
 birthyear	ranking	fr	Année de naissance
-zone	ranking	fr	Zone
+bonus	ranking	fr	Bonus
+categories	ranking	fr	Catégories
 cellphone	ranking	fr	Portable
 check all	ranking	fr	Vérifier tout
 children	ranking	fr	Enfants
 city	ranking	fr	Ville
+click to view	ranking	fr	cliquer pour voir
+clone of	ranking	fr	Clone de
+closes	ranking	fr	ferme
 columns	ranking	fr	Colonnes
 comments	ranking	fr	Commentaires
 competition logo	ranking	fr	Logo de la compétiton
 competition name	ranking	fr	Nom de la compétition
+competition not found !!!	ranking	fr	Compétition non trouvée !!!
+competition not found!	ranking	fr	Compétition non trouvée !
+competition results	ranking	fr	Résultats des compétitions
 competitions	ranking	fr	Compétitions
 confirmed	ranking	fr	Confirmé
 contact	ranking	fr	Contact
+continent	ranking	fr	Continent
 cup	ranking	fr	Coupe
 cups	ranking	fr	Coupes
 database	admin	fr	Base de données
 deadline	ranking	fr	Date limite
+delete result	ranking	fr	Supprimer le résultat
+delete this athlete	ranking	fr	Supprimer cet athlète
 delete this category	ranking	fr	Supprimer cette catégorie
+delete this competition	ranking	fr	Supprimer cette compétition
+delete this cup	ranking	fr	Supprimer cette coupe
+delete this federation	ranking	fr	Supprimer cette fédération
+delete this participant (can not be undone)	ranking	fr	Supprimer ce participant (définitif)
+deleted	ranking	fr	supprimé
 delimiter	ranking	fr	Délimiteur
+detect athletes	ranking	fr	Détecter les athlètes
 discipline	ranking	fr	Discipline
 display	ranking	fr	Afficher
 down	ranking	fr	Bas
@@ -76,23 +124,82 @@ edit this cup	ranking	fr	Modifier cette coupe
 edit this heat	ranking	fr	Modifier ce tour
 eliminated	ranking	fr	éliminé
 email address not found!	ranking	fr	Adresse email non trouvée !
+encoding	ranking	fr	Encodage
 end	ranking	fr	Fin
 entry not found !!!	ranking	fr	Entrée non trouvée !!!
 error: while saving !!!	ranking	fr	Erreur: lors de l'enregistrement !!!
+event website	ranking	fr	Site web de l'événement
+extra	ranking	fr	Extra
+facebook	ranking	fr	Facebook
+factor	ranking	fr	Facteur
+false start	ranking	fr	Faux départ
+false start %1: %2	ranking	fr	Faux départ %1 : %2
 fax	ranking	fr	Fax
+federation	ranking	fr	Fédération
+federation and parent	ranking	fr	Fédération et parent
+federation deleted.	ranking	fr	Fédération supprimée
+federation needs to confirm	ranking	fr	La fédération doit confirmer
+federation or nationality	ranking	fr	Fédération ou nationalité
+federation saved.	ranking	fr	Fédération sauvegardée
+federations	ranking	fr	Fédérations
+fees	ranking	fr	Frais
 female	ranking	fr	Féminin
+file is not a pdf	ranking	fr	Le fichier n'est un PDF
+final	ranking	fr	Final
+flash	ranking	fr	Flash
+format	ranking	fr	Format
+format #%1 not found!	ranking	fr	Format #1 non trouvé !
+format deleted	ranking	fr	Format supprimé
+format saved	ranking	fr	Format enregistré
 from	ranking	fr	Depuis
-gender	ranking	fr	Sexe
+f|m	ranking	fr	F|M
+gender	ranking	fr	Genre
+gender of the athlete	ranking	fr	genre de l'athlète
+gender...	ranking	fr	Genre...
 general	ranking	fr	Général
+general result	ranking	fr	Résultat général
+generate all startlists together	ranking	fr	Générer toutes les grilles de départ
+generate startlist	ranking	fr	Générer la grille de départ
 go	ranking	fr	Allez
 header	ranking	fr	En-tête
+heat	ranking	fr	Tour
+heat deleted	ranking	fr	Tour suprimé
+heat saved	ranking	fr	Tour enregistré
+heat updated	ranking	fr	Tour mis à jour
+hobbies	ranking	fr	Hobbies
+homepage	ranking	fr	Page d'accueil
+homepage, facebook, ...	ranking	fr	Page d'accueil, Facebook, ...
+host	admin	fr	Höte
+host nation	ranking	fr	Pays hôte
+host quota	ranking	fr	Quota de l'hôte
+host/ip	ranking	fr	Hôte/IP
+how to use egroupware	ranking	fr	Comment utiliser EGroupware
 id	ranking	fr	Id
 ignore	ranking	fr	Ignorer
 import	ranking	fr	Importation
+import as	ranking	fr	Importer en tant que
+import charset	ranking	fr	Charset d'import
 import file	ranking	fr	Importer le fichier
+import from url	ranking	fr	Importer depuis l'URL
+import into ranking	ranking	fr	Import dans le ranking
+import url	ranking	fr	Importer URL
+in kilogram	ranking	fr	en kilogramme
+infolog	ranking	fr	infolog
+instagram	ranking	fr	Instagram
+judge	ranking	fr	Juge-arbite
+judges	ranking	fr	Juges-arbites
+line	ranking	fr	Ligne
+mail	ranking	fr	Email
 mail all participants	ranking	fr	envoyer un email à tous les participants
 male	ranking	fr	Masculin
+max	ranking	fr	Max
+minus	ranking	fr	moins
 more	ranking	fr	Plus
+nation	ranking	fr	Nation
+nation acl	common	fr	ACL Nation
+nation...	ranking	fr	Nation...
+national federation	ranking	fr	Fédération nationale
+no birthdate	ranking	fr	pas de date de naissance
 not allowed	ranking	fr	Pas autorisé
 or	ranking	fr	ou
 other sports	ranking	fr	autres sports
@@ -100,21 +207,50 @@ other sports practiced	ranking	fr	autres sports pratiqués
 permission denied !!!	ranking	fr	Autorisation refusée !!!
 phone	ranking	fr	Appel téléphonique
 picture	ranking	fr	Image
+picture attached	ranking	fr	Image attachée
+place of birth	ranking	fr	Ville de naissance
+please enter your new password:	ranking	fr	Veuillez entrer votre nouveau mot de passe
+plus	ranking	fr	plus
 port	admin	fr	port
+postalcode	ranking	fr	Code postal
+profile	ranking	fr	Profil
+protocol	ranking	fr	Protocole
+quali	ranking	fr	Quali
+quali.	ranking	fr	Quali.
+qualification	ranking	fr	Qualification
+qualification, 1/2-final, ...	ranking	fr	Qualification, 1/2-Finale, ...
+quota	ranking	fr	Quota
 registration	ranking	fr	Enregistrement
 remark	ranking	fr	Remarque
+remove the attached pdf	ranking	fr	Supprimer le PDF attaché
+result	ranking	fr	Résultat
+results	ranking	fr	Résultats
+route	ranking	fr	Route
+routes	ranking	fr	Routes
 rows	ranking	fr	Lignes
 saves the changes made	ranking	fr	enregistre les modifications
+select a competition	ranking	fr	Chosir une compétition
+select a federation	ranking	fr	Chosir une fédération
+select a nation first	ranking	fr	Chosir une nation en premier
 select an action	ranking	fr	Sélectionner une action
+select another competition ...	ranking	fr	Chosir une autre compétition
+since	ranking	fr	depuis
+size (cm)	ranking	fr	Taille (cm)
 start	ranking	fr	Début
 startdate	ranking	fr	Date de départ
 street	ranking	fr	Rue
 sum	ranking	fr	Somme
+top	ranking	fr	Top
 try	ranking	fr	Essayer
+twitter	ranking	fr	Twitter
 unpublished	ranking	fr	non publié
 up	ranking	fr	Haut
 view this athlete	ranking	fr	Voir cet athlète
 website	ranking	fr	Site Web
 wrong admin-account or -password !!!	ranking	fr	Compte ou mot de passe admin incorrect !
 you need to select a file first!	ranking	fr	Sélectionner d'abord un fichier !
+your new password is now active.	ranking	fr	Votre nouveau mot de passe est maintenant actif
+youtube	ranking	fr	YouTube
 zip code	ranking	fr	Code postal
+zone	ranking	fr	Zone
+✔	ranking	fr	✔
