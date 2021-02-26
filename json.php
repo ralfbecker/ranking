@@ -60,6 +60,7 @@ if (!isset($_GET['debug']) || !$_GET['debug'])
 		header('Content-Type: application/json; charset='.$encoding);
 	}
 	egw_session::cache_control(isset($result['expires']) ? $result['expires'] : ranking_export::EXPORT_DEFAULT_EXPIRES);
+	header('Access-Control-Allow-Origin: *');
 	if (isset($result['etag']))
 	{
 		if ($result['etag'][0] != '"') $result['etag'] = '"'.$result['etag'].'"';
