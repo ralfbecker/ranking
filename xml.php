@@ -20,6 +20,8 @@
  * @copyright 2010-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Api;
+
 $GLOBALS['egw_info'] = array(
 	'flags' => array(
 		'currentapp'	=> 'ranking',
@@ -46,7 +48,7 @@ function check_anon_access(&$anon_account)
 }
 
 $result = ranking_export::export($root_tag);
-$encoding = translation::charset();
+$encoding = Api\Translation::charset();
 
 $xml = new XMLWriter();
 if (empty($_GET['debug']))
@@ -55,7 +57,7 @@ if (empty($_GET['debug']))
 	ini_set('zlib.output_compression', 0);
 
 	header('Content-Type: application/xml; charset='.$encoding);
-	egw_session::cache_control(isset($result['expires']) ? $result['expires'] : ranking_export::EXPORT_DEFAULT_EXPIRES);
+	Api\Session::cache_control(isset($result['expires']) ? $result['expires'] : ranking_export::EXPORT_DEFAULT_EXPIRES);
 
 	if (isset($result['etag']))
 	{
@@ -65,7 +67,7 @@ if (empty($_GET['debug']))
 	if (isset($_SERVER['HTTP_IF_MATCH']) && $_SERVER['HTTP_IF_MATCH'] === $result['etag'])
 	{
 		header('HTTP/1.1 304 Not Modified');
-		common::egw_exit();
+		exit();
 	}
 }
 else

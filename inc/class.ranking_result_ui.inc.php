@@ -212,7 +212,7 @@ class ranking_result_ui extends ranking_result_bo
 							$param['show_result'] = 1;
 						}
 						elseif (is_numeric($content['route_order']) &&
-							($num = $this->generate_startlist($comp, $cat, $content['route_order'],
+							($num = $this->generateStartlist($comp, $cat, $content['route_order'],
 								$content['route_type'], $content['discipline'],
 								$content['max_compl'] !== '' ? $content['max_compl'] : 999,
 								$content['slist_order'], $content['add_cat'], $content['comb_quali'])))
@@ -2068,7 +2068,7 @@ class ranking_result_ui extends ranking_result_bo
 		//$start = microtime(true);
 		$response = Api\Json\Response::get();
 
-		if (!($request =& Api\Etemplate\Request::read($request_id)))
+		if (!($request = Api\Etemplate\Request::read($request_id)))
 		{
 			$response->alert(lang('Result form is timed out, please reload the form by clicking on the application icon.'));
 			return $this->_stop_time_measurement($response);
@@ -2215,7 +2215,7 @@ class ranking_result_ui extends ranking_result_bo
 			switch($event)
 			{
 				case 'start':
-					if (!$side && $event_side == 'l') continue;	// ignore 2. start event
+					if (!$side && $event_side == 'l') break;	// ignore 2. start event
 					if (is_object($display))
 					{
 						$display->activate($frm_id,$PerId,$dsp_id,$keys['GrpId'],$keys['route_order']);

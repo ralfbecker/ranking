@@ -10,6 +10,8 @@
  * @copyright 2008-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Api;
+
 class ranking_import extends ranking_result_bo
 {
 	/**
@@ -50,31 +52,27 @@ class ranking_import extends ranking_result_bo
 	{
 		if (!$GLOBALS['egw_info']['user']['apps']['admin'])
 		{
-			// for eGW 1.4
-			$GLOBALS['egw']->framework->render(lang('Admin rights required!'));
-			$GLOBALS['egw']->exit();
-			// for eGW 1.5+
-			//throw new egw_exception_no_permission_admin();
+			throw new Api\Exception\NoPermission\Admin();
 		}
-		$tmpl = new etemplate('ranking.import');
+		$tmpl = new Api\Etemplate('ranking.import');
 
-		$config = config::read('ranking');
+		$config = Api\Config::read('ranking');
 		$import_url = $config['import_url'];
 
-		if ($tmpl->sitemgr && !count($this->ranking_nations))
+		if ($tmpl->sitemgr && empty($this->ranking_nations))
 		{
 			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
 		}
 		//_debug_array($content);
 		if (!is_array($content))
 		{
-			$content = array('keys' => $GLOBALS['egw']->session->appsession('import','ranking'));
+			$content = array('keys' => Api\Cache::getSession('ranking', 'import'));
 			if ($_GET['calendar']) $content['keys']['calendar'] = $_GET['calendar'];
 			if ($_GET['comp']) $content['keys']['comp'] = $_GET['comp'];
 			if ($_GET['cat']) $content['keys']['cat'] = $_GET['cat'];
 			if (is_numeric($_GET['route'])) $content['keys']['route'] = $_GET['route'];
 			if ($_GET['msg']) $msg = $_GET['msg'];
-			$content['import'] = $GLOBALS['egw']->session->appsession('pending_import','ranking');
+			$content['import'] = Api\Cache::getSession('ranking', 'pending_import');
 
 			if ($_GET['row'] && is_array($_GET['row']))
 			{
@@ -252,7 +250,7 @@ class ranking_import extends ranking_result_bo
 
 		$content['msg'] = $msg;
 
-		$GLOBALS['egw']->session->appsession('pending_import','ranking',$content['import']);
+		Api\Cache::setSession('ranking', 'pending_import', $content['import']);
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/lang('Import').' '.
 			($cat ? (isset($sel_options['route'][$content['keys']['route']]) ? $sel_options['route'][$content['keys']['route']].' ' : '').$cat['name'] : '');

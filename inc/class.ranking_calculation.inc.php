@@ -675,7 +675,8 @@ class ranking_calculation
 			//error_log(__METHOD__."(".array2string(func_get_args()).") max_comp=$max_comp, min_disciplines=$min_disciplines");
 			if ((int) $stand >= 2000 && !in_array($cat['rkey'],(array)$cup['gruppen']))
 			{
-				return false;			// no cup (ranking) defined for that group
+				$ret = false;			// no cup (ranking) defined for that group
+				return $ret;
 			}
 		}
 		else
@@ -685,7 +686,8 @@ class ranking_calculation
 
 			if (!$rls || !($rls = $this->bo->rls->read(array('RlsId' => $rls))))
 			{
-				return false; 		// no (valid) ranking definiert
+				$ret = false;			// no valid ranking defined
+				return $ret;
 			}
 			$max_comp = $rls['best_wettk'];
 
@@ -703,7 +705,8 @@ class ranking_calculation
 					$cats = $rls['window_type'] == 'wettk' ? $cat['GrpIds'] : false;
 					if (!($first_comp = $this->bo->comp->last_comp($stand,$cats,$cat['nation'],0,$rls['window_anz'])))
 					{
-						return false;	// not enough competitions
+						$ret = false;	// not enough competitions
+						return $ret;
 					}
 					$start = $first_comp['datum'];
 					unset($first_comp);

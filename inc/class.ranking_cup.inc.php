@@ -37,7 +37,6 @@ class ranking_cup extends Api\Storage\Base
 	 *
 	 * @param string $source_charset
 	 * @param Api\Db $db
-	 * @return cup
 	 */
 	function __construct($source_charset='',$db=null)
 	{
@@ -195,7 +194,7 @@ class ranking_cup extends Api\Storage\Base
 	 *
 	 * reimplmented from Api\Storage\Base to exclude some cols from search and to calc. year from rkey
 	 */
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
+	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='',$need_full_no_count=false)
 	{
 		if (is_array($criteria))
 		{
@@ -209,7 +208,7 @@ class ranking_cup extends Api\Storage\Base
 		$extra_cols[] = 'IF(LEFT(rkey,2)>80,1900,2000)+LEFT(rkey,2) AS year';
 		$extra_cols[] = '(SELECT COUNT(*) FROM Wettkaempfe WHERE SerId=serie) AS num_comps';
 
-		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 
 	/**

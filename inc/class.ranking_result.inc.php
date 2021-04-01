@@ -69,7 +69,7 @@ class ranking_result extends Api\Storage\Base
 	 * @param string $order ='' order clause or '' for the default order depending on the keys given
 	 * @return array/boolean data if row could be retrived else False
 	 */
-	function &read($keys,$extra_cols='',$join=true,$order='')
+	function read($keys,$extra_cols='',$join=true,$order='')
 	{
 		//echo "<p>result::read(".print_r($keys,true).",'$extra_cols','$join','$order')</p>\n";
 		if ($order && !preg_match('/^[a-z_,. ]+$/i',$order)) $order = '';
@@ -472,16 +472,17 @@ class ranking_result extends Api\Storage\Base
 	 * reimplemented to set a modifier (modified timestamp is set automatically by the database anyway)
 	 *
 	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
 	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
-	function save($keys=null)
+	function save($keys=null,$extra_where=null)
 	{
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
 
 		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 		$this->data['modified'] = time();
 
-		return parent::save();
+		return parent::save(null, $extra_where);
 	}
 
 	/**

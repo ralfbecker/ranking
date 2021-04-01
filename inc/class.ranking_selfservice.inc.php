@@ -268,7 +268,7 @@ class ranking_selfservice extends ranking_bo
 			}
 			asort($cats);
 
-			$registered =& $this->registration->read(array(
+			$registered = $this->registration->read(array(
 				'WetId' => $WetId,
 				'PerId' => $athlete['PerId'],
 			));//,'',true,$comp['nation'] ? 'nation,acl_fed_id,fed_parent,acl.fed_id,GrpId,reg_nr' : 'nation,GrpId,reg_nr');

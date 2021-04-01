@@ -131,7 +131,7 @@ class ranking_route_result extends Api\Storage\Base
 	 *	"LEFT JOIN table2 ON (x=y AND z=o)", Note: there's no quoting done on $join, you are responsible for it!!!
 	 * @return boolean|array of matching rows (the row is an array of the cols) or False
 	 */
-	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
+	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='',$need_full_no_count=false)
 	{
 		//error_log(__METHOD__."(crit=".array2string($criteria).",only_keys=".array2string($only_keys).",order_by=$order_by,extra_cols=".array2string($extra_cols).",$wildcard,$empty,$op,$start,filter=".array2string($filter).",join=$join)");
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
@@ -478,7 +478,7 @@ class ranking_route_result extends Api\Storage\Base
 		{
 			$extra_cols[] = $this->table_name.'.'.$this->id_col.' AS '.$this->id_col;
 		}
-		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 
 	/**
@@ -1125,7 +1125,7 @@ class ranking_route_result extends Api\Storage\Base
 						$detail = json_decode($data['result_detail'], true);
 						$data['route_order'] += 5;	// -4/-5 --> 0/1
 						if (!($suffix = $data['route_order'])) $suffix = '';
-						$data['result'.$suffix] = $data['result_rank'].'. ['.sprintf('%4.2lf',$detail['quali_points']).']';
+						$data['result'.$suffix] = $data['result_rank'].'. ['.sprintf('%4.2f',$detail['quali_points']).']';
 						if ($suffix !== '')
 						{
 							$data['result_rank'.$suffix] = $data['result_rank'];
@@ -1140,7 +1140,7 @@ class ranking_route_result extends Api\Storage\Base
 				}
 				if ($data['qoints'] && $data['result_rank'] && !$data['general_result'])
 				{
-					$data['result'] .= "\u{00A0}\u{00A0}".sprintf('%4.2lf',$data['qoints']);
+					$data['result'] .= "\u{00A0}\u{00A0}".sprintf('%4.2f',$data['qoints']);
 				}
 				if ($data['other_detail'])
 				{
@@ -1149,7 +1149,7 @@ class ranking_route_result extends Api\Storage\Base
 				if ($data['rank_prev_heat'] && $data['route_type'] == TWOxTWO_QUALI && in_array($data['route_order'],array(2,3)))
 				{
 					$data['rank_prev_heat'] = self::unserialize($data['rank_prev_heat']);
-					$data['rank_prev_heat'] = sprintf('%4.2lf',$data['rank_prev_heat']['qoints']);
+					$data['rank_prev_heat'] = sprintf('%4.2f',$data['rank_prev_heat']['qoints']);
 				}
 				if ($data['ability_percent'] && $data['result_height'])
 				{
@@ -1174,7 +1174,7 @@ class ranking_route_result extends Api\Storage\Base
 						$data['result'.$suffix] = $data_boulder['result'.$suffix] . "\u{00A0}\u{00A0}".$data['result_rank'.$suffix].'.';
 					}
 				}
-				if (isset($data['final_points'])) $data['final_points'] = sprintf('%4.2lf', $data['final_points']);
+				if (isset($data['final_points'])) $data['final_points'] = sprintf('%4.2f', $data['final_points']);
 				break;
 
 			case 'selfscore':
@@ -1241,7 +1241,7 @@ class ranking_route_result extends Api\Storage\Base
 					$col = 'result_time_'.$i;
 					if ((string)$data[$col] != '')
 					{
-						$data[$col] = sprintf('%4.2lf',$data[$col]*0.001);
+						$data[$col] = sprintf('%4.2f',$data[$col]*0.001);
 					}
 				}
 				// fall through
@@ -1283,7 +1283,7 @@ class ranking_route_result extends Api\Storage\Base
 							}
 							else
 							{
-								$data['result_time'] = $data['time_sum'] = $data['result'] = sprintf('%4.3lf', 0.001*$data['result_time']);
+								$data['result_time'] = $data['time_sum'] = $data['result'] = sprintf('%4.3f', 0.001*$data['result_time']);
 							}
 						}
 						if ($data['result_time_r'] || isset($data['eliminated_r']))	// speed with two goes
@@ -1291,7 +1291,7 @@ class ranking_route_result extends Api\Storage\Base
 							// do not overwrite false start for final or quali on single route
 							if ($data['false_start'] <= self::MAX_FALSE_STARTS || $data['result_time_l'] && (string)$data['eliminated_l'] === '')
 							{
-								$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.3lf',$data['result_time_l']) :
+								$data['result'] = (string)$data['eliminated_l'] === '' ? sprintf('%4.3f',$data['result_time_l']) :
 									($data['eliminated_l'] ? lang('fall') : lang('Wildcard'));
 							}
 							$data['result_time'] = $data['result_time_l'];
@@ -1299,7 +1299,7 @@ class ranking_route_result extends Api\Storage\Base
 							switch((string)$data['eliminated_r'])
 							{
 								case '':
-									$data['result_r'] = $data['result_time_r'] ? sprintf('%4.3lf',$data['result_time_r']) : '';
+									$data['result_r'] = $data['result_time_r'] ? sprintf('%4.3f',$data['result_time_r']) : '';
 									break;
 								case ranking_result_bo::ELIMINATED_FALSE_START:
 									$data['result_r'] = $data['time_sum'];
@@ -1332,7 +1332,7 @@ class ranking_route_result extends Api\Storage\Base
 								}
 								else
 								{
-									$data['result'.$suffix] = sprintf('%4.3lf',$data['result_time'.$suffix]);
+									$data['result'.$suffix] = sprintf('%4.3f',$data['result_time'.$suffix]);
 								}
 							}
 							++$suffix;
@@ -1724,7 +1724,7 @@ class ranking_route_result extends Api\Storage\Base
 				$data['new_qoints'] = ($places[$data['new_rank']] + 2*$data['new_rank'] - 1)/2;
 				if ($data['other_detail'])
 				{
-					$data['new_quali_points'] = $data['new_qoints'] ? sprintf('%4.2lf',round(sqrt($data['other_detail']['qoints'] * $data['new_qoints']),2)) :
+					$data['new_quali_points'] = $data['new_qoints'] ? sprintf('%4.2f',round(sqrt($data['other_detail']['qoints'] * $data['new_qoints']),2)) :
 						$data['other_detail']['qoints']+10000;
 				}
 			}

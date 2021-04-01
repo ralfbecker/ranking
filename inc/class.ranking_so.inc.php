@@ -191,7 +191,7 @@ class ranking_so
 		static $cats=null,$global_parent=null,$rkey2id=null;
 		if (is_null($cats))
 		{
-			$cats = new Api\Categories(categories::GLOBAL_ACCOUNT, Api\Categories::GLOBAL_APPNAME);
+			$cats = new Api\Categories(Api\Categories::GLOBAL_ACCOUNT, Api\Categories::GLOBAL_APPNAME);
 			$global_parent = $cats->name2id(self::PARENT_CAT_NAME);
 			if (!$global_parent)
 			{

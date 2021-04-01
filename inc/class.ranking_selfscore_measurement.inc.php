@@ -372,11 +372,11 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 						if (!ranking_result_bo::$instance->has_results($keys))
 						{
 							if ($route['route_order']) continue;	// only add automatic to qualification
-							$start_order = count($this->route_result->search(array_diff_key($keys, array('PerId'=>0)), true))+1;
-							$this->route_result->init($keys+array(
+							$start_order = count(ranking_result_bo::$instance->route_result->search(array_diff_key($keys, array('PerId'=>0)), true))+1;
+							ranking_result_bo::$instance->route_result->init($keys+array(
 								'start_order' => $start_order,
 							));
-							$this->route_result->save();
+							ranking_result_bo::$instance->route_result->save();
 							if (!ranking_result_bo::$instance->has_results($keys)) continue;	// was not added
 						}
 						$found[] = array_merge($comp, $route);

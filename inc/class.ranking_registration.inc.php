@@ -96,7 +96,7 @@ class ranking_registration extends Api\Storage\Base
 	 * @param string $order ='' order clause or '' for the default order depending on the keys given
 	 * @return array|boolean data if row could be retrived else False
 	 */
-	function &read($keys,$extra_cols='',$join=true,$order='')
+	function read($keys,$extra_cols='',$join=true,$order='')
 	{
 		//echo "<p>result::read(".print_r($keys,true).",'$extra_cols','$join','$order')</p>\n";
 		if ($order && !preg_match('/^[a-z_,. ]+$/i',$order)) $order = '';
@@ -158,7 +158,7 @@ class ranking_registration extends Api\Storage\Base
 		}
 		elseif($this->WetId && $this->PerId && !$this->GrpId)
 		{
-			return $this->search(array(),$cols,$order ? $order : self::TABLE.'.GrpId,reg_id,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
+			return $this->search(array(), false,$order ? $order : self::TABLE.'.GrpId,reg_id,nachname,vorname',$extra_cols,'',false,'AND',false,$filter,$join);
 
 		}
 		// result of single person
@@ -356,13 +356,14 @@ class ranking_registration extends Api\Storage\Base
 	 *	"LEFT JOIN table2 ON (x=y)", Note: there's no quoting done on $join!
 	 * @return array of matching rows (the row is an array of the cols) or False
 	 */
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
+	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true,$need_full_no_count=false)
 	{
 		// we require either a competition or reg_id's
 		if (empty($filter['WetId']) && empty($filter['reg_id']))
 		{
 			$this->total = 0;
-			return array();
+			$ret = [];
+			return $ret;
 		}
 		switch($filter['state'])
 		{

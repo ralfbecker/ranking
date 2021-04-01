@@ -28,7 +28,7 @@ class ranking_federation_ui extends ranking_bo
 	 * Edit a federation
 	 *
 	 * @param array $content =null
-	 * @param type $msg =''
+	 * @param string $msg =''
 	 */
 	function edit(array $content=null, $msg='')
 	{

@@ -101,15 +101,16 @@ class ranking_category extends Api\Storage\Base
 	 * deletes row representing keys in internal data or the supplied $keys if != null
 	 *
 	 * @param array|int $keys =null if given array with col => value pairs to characterise the rows to delete, or integer autoinc id
-	 * @return int|boolean affected rows, should be 1 if ok, 0 if an error, false if not found or category has results
+	 * @param boolean $only_return_query =false return $query of delete call to db object, but not run it (used by so_sql_cf!)
+	 * @return int|array affected rows, should be 1 if ok, 0 if an error or array with id's if $only_return_ids
 	 */
-	function delete($keys=null)
+	function delete($keys=null,$only_return_query=false)
 	{
 		if (!$this->read($keys,array($this->results_col)) || $this->data['results'])
 		{
 			return false;	// not found or permission denied as Grp has results
 		}
-		return parent::delete($keys);
+		return parent::delete($keys, $only_return_query);
 	}
 
 	/**
@@ -180,7 +181,7 @@ class ranking_category extends Api\Storage\Base
 	 *
 	 * reimplmented from so_sql to exclude some cols from search and do some caching
 	 */
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null)
+	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='',$need_full_no_count=false)
 	{
 		//echo "<p>".__METHOD__."(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
@@ -221,7 +222,7 @@ class ranking_category extends Api\Storage\Base
 		}
 		$filter[] = "rkey NOT LIKE 'X\\_%'";	// dont show old dR internal cats
 
-		$ret =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter);
+		$ret =& parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 
 		if (!$this->cache && empty($criteria) && empty($filter))
 		{

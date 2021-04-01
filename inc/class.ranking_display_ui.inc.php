@@ -181,7 +181,7 @@ class ranking_display_ui extends ranking_display_bo
 		$GLOBALS['egw_info']['flags']['include_xajax'] = true;
 
 		//_debug_array($content);
-		$tpl = new etemplate('ranking.display.index');
+		$tpl = new Api\Etemplate('ranking.display.index');
 		$tpl->exec('ranking.ranking_display_ui.index',$content,$sel_options,$readonlys,$preserv,2);
 	}
 
@@ -231,7 +231,7 @@ class ranking_display_ui extends ranking_display_bo
 		}
 		$script .= 'document.eTemplate.submit();';
 
-		$response = new egw_json_response();
+		$response = Api\Json\Response::get();
 		$response->addScript($script);
 	}
 
@@ -246,7 +246,7 @@ class ranking_display_ui extends ranking_display_bo
 	{
 		$GLOBALS['egw']->session->commit_session();		// stop this session from blocking other requests
 
-		$response = new egw_json_response();
+		$response = Api\Json\Response::get();
 
 		if (is_null($display) && ($display = $this->display) && !$display->read($dsp_id))
 		{
@@ -288,7 +288,7 @@ class ranking_display_ui extends ranking_display_bo
 
 		if (!$this->display->read($dsp_id))
 		{
-			$response = new egw_json_response();
+			$response = Api\Json\Response::get();
 			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes(lang('Display #%1 not found!!!',$dsp_id))."';");
 			return;
 		}
@@ -298,7 +298,7 @@ class ranking_display_ui extends ranking_display_bo
 			'frm_line' => $line,
 		)))
 		{
-			$response = new egw_json_response();
+			$response = Api\Json\Response::get();
 			$response->addScript("document.getElementById('exec[display][dsp_current]').value='".addslashes(lang('Format #%1 not found!',$line))."';");
 			return;
 		}
@@ -428,7 +428,7 @@ class ranking_display_ui extends ranking_display_bo
 		$GLOBALS['egw_info']['flags']['app_header'] = $this->display->dsp_name.
 			($this->display->ip ? ' ('.$this->display->ip.($this->display->dsp_port?':'.$this->display->dsp_port:'').')' : '');
 
-		$tpl = new etemplate('ranking.display.edit');
+		$tpl = new Api\Etemplate('ranking.display.edit');
 		$tpl->exec('ranking.ranking_display_ui.edit',$content,array('frm_heat'=>$this->get_heats($frm['WetId'])),$readonlys,$preserv,2);
 	}
 
@@ -489,7 +489,7 @@ class ranking_display_ui extends ranking_display_bo
 			$GLOBALS['egw_info']['flags']['app_header'] = $this->display->dsp_name.
 				($this->display->ip ? ' ('.$this->display->ip.($this->display->dsp_port?':'.$this->display->dsp_port:'').')' : '');
 		}
-		$tpl = new etemplate('ranking.display.display');
+		$tpl = new Api\Etemplate('ranking.display.display');
 		$tpl->exec('ranking.ranking_display_ui.display',$content,$sel_options,array(),array('dsp_id'=>$this->display->dsp_id),2);
 	}
 }

@@ -173,7 +173,7 @@ class ranking_federation extends Api\Storage\Base
 	 * @param boolean $need_full_no_count =false If true an unlimited query is run to determine the total number of rows, default false
 	 * @return boolean/array of matching rows (the row is an array of the cols) or False
 	 */
-	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
+	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='',$need_full_no_count=false)
 	{
 		if (!is_array($extra_cols))
 		{
@@ -200,7 +200,7 @@ class ranking_federation extends Api\Storage\Base
 			unset($criteria['fed_parent']);
 		}
 
-		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 
 	/**
@@ -255,10 +255,15 @@ class ranking_federation extends Api\Storage\Base
 	 * Delete reimplemented to delete the grants in the ACL table too
 	 *
 	 * @param array $keys if given array with col => value pairs to characterise the rows to delete
-	 * @return int affected rows, should be 1 if ok, 0 if an error
+	 * @param boolean $only_return_query =false return $query of delete call to db object, but not run it (used by so_sql_cf!)
+	 * @return int|array affected rows, should be 1 if ok, 0 if an error or array with id's if $only_return_ids
 	 */
-	function delete($keys=null)
+	function delete($keys=null,$only_return_query=false)
 	{
+		if ($only_return_query)
+		{
+			return parent::delete($keys, $only_return_query);
+		}
 		if (!$keys) return 0;
 
 		// get the fed_id's from the keys
@@ -405,7 +410,7 @@ class ranking_federation extends Api\Storage\Base
 			$rights = 0;
 			foreach(self::$grant_types as $name => $right)
 			{
-				if (in_array($account,$grants[$name])) $rights |= $right;
+				if (in_array($account, (array)$grants[$name])) $rights |= $right;
 			}
 			if ($rights)	// only write rights if there are some
 			{

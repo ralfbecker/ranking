@@ -200,7 +200,7 @@ class ranking_registration_ui extends ranking_bo
 				'' => array(),
 			);
 
-			// complile array of prequalified
+			// compile array of prequalified
 			$prequalified = $registered = array();
 			if ($state['comp'] && (int)$_REQUEST['GrpId'] > 0)
 			{
@@ -285,7 +285,7 @@ class ranking_registration_ui extends ranking_bo
 		Api\Json\Request::isJSONRequest(false);
 
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode(call_user_func_array('array_merge', $results));
+		echo json_encode(array_merge(...array_values($results)));
 		exit;
 	}
 
@@ -764,13 +764,13 @@ class ranking_registration_ui extends ranking_bo
 				$show = 'result';
 				$keys[] = 'platz > 0';
 				$order = 'GrpId,platz,nachname,vorname';
-				$starters =& $this->result->read($keys,'',true,$order);
+				$starters = $this->result->read($keys,'',true,$order);
 			}
 			else	// sort by nation
 			{
 				$order = 'GrpId,nation,reg_id,nachname,vorname';
 				$keys['state'] = ranking_registration::REGISTERED;
-				$starters =& $this->registration->read($keys,'+plz,strasse,tel,mobil',true,$order);
+				$starters = $this->registration->read($keys,'+plz,strasse,tel,mobil',true,$order);
 			}
 
 			if ($content['download'] && $starters && count($starters))
@@ -848,7 +848,7 @@ class ranking_registration_ui extends ranking_bo
 								$val = trim($athlete[$name]);
 								break;
 							case 'ranking-points':
-								$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2lf',$ranking[$athlete['PerId']]['pkt']) : '';
+								$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2f',$ranking[$athlete['PerId']]['pkt']) : '';
 								break;
 							default:
 								$val = $athlete[$name];
@@ -870,7 +870,7 @@ class ranking_registration_ui extends ranking_bo
 			{
 				$msg = $this->upload(array('WetId'=>$content['comp'],'GrpId'=>$content['cat']),$content['file']['tmp_name']);
 				// re-read the starters
-				$starters =& $this->result->read($keys,'',true,$order);
+				$starters = $this->result->read($keys,'',true,$order);
 			}
 			if (!$show || !$starters || !count($starters))
 			{

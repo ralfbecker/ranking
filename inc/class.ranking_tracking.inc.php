@@ -145,7 +145,7 @@ class ranking_tracking extends Api\Storage\Tracking
 	/**
 	 * Instance of the class calling us
 	 *
-	 * @var bo
+	 * @var ranking_bo
 	 */
 	private $bo;
 
@@ -155,11 +155,11 @@ class ranking_tracking extends Api\Storage\Tracking
 	 * @param ranking_bo $bo
 	 * @return tracker_tracking
 	 */
-	function __construct(&$bo)
+	function __construct($bo)
 	{
 		parent::__construct('ranking');	// add custom fields from infolog
 
-		$this->bo =& $bo;
+		$this->bo = $bo;
 	}
 
 	/**

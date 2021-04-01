@@ -10,6 +10,8 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Api;
+
 /**
  * Editing athletes data is mapped to EGW_ACL_ADD
  *
@@ -36,7 +38,7 @@ class admin
 	 */
 	var $nations = array();
 	/**
-	 * @var acl-object $acl referenze to the global acl object, $GLOBALS['egw']->acl
+	 * @var Api\Acl $acl reference to the global acl object, $GLOBALS['egw']->acl
 	 */
 	var $acl;
 
@@ -47,13 +49,9 @@ class admin
 	{
 		if (!$GLOBALS['egw_info']['user']['apps']['admin'])
 		{
-			$GLOBALS['egw']->common->egw_header();
-			echo parse_navbar();
-			echo lang('permission denied !!!');
-			$GLOBALS['egw']->common->egw_footer();
-			$GLOBALS['egw']->common->egw_exit();
+			throw new Api\Exception\NoPermission\Admin();
 		}
-		$this->acl =& $GLOBALS['egw']->acl;
+		$this->acl = $GLOBALS['egw']->acl;
 	}
 
 	/**
@@ -120,17 +118,12 @@ class admin
 			}
 			if ($content['save'] || $content['cancel'])
 			{
-				if ($content['referer'])
-				{
-					$GLOBALS['egw']->redirect($content['referer']);
-				}
-				else
-				{
-					$GLOBALS['egw']->redirect_link('/admin/index.php');
-				}
+				Api\Framework::redirect_link('/index.php', array(
+					'menuaction' => 'admin.admin_ui.index',
+					'ajax' => 'true'
+				), 'admin');
 			}
 			$preserve = array(
-				'referer'    => $content['referer'],
 				'account_id' => $content['account_id'],
 				'admin_menu' => $content['admin_menu'],
 			);
@@ -138,7 +131,6 @@ class admin
 		else
 		{
 			$preserve = array(
-				'referer'    => $_SERVER['HTTP_REFERER'],
 				'account_id' => $account_id,
 				'admin_menu' => (int) $_GET['account_id'] ? ExecMethod('admin.uimenuclass.createHTMLCode','edit_user') : false,
 			);
@@ -209,10 +201,10 @@ class admin
 		}
 		$readonlys['delete['.$n.']'] = true;
 
-		$tmpl =& CreateObject('etemplate.etemplate',$account_id ? 'ranking.admin.user_acl' : 'ranking.admin.acl');
+		$tmpl = new Api\Etemplate($account_id ? 'ranking.admin.user_acl' : 'ranking.admin.acl');
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Nation ACL').
 			($account_id ? ': '.$GLOBALS['egw']->common->grab_owner_name($account_id) : '');
-		$tmpl->exec('ranking.admin.acl',$content,false,$readonlys,$preserve);
+		$tmpl->exec('ranking.admin.acl', $content,null, $readonlys, $preserve);
 	}
 
 	/**
@@ -225,7 +217,7 @@ class admin
 		$menuData[] = array(
 			'description'   => 'nation ACL',
 			'url'           => '/index.php',
-			'extradata'     => 'menuaction=ranking.admin.acl'
+			'extradata'     => 'menuaction=ranking.admin.acl&ajax=true'
 		);
 	}
 }

@@ -25,7 +25,7 @@ class ranking_competition extends Api\Storage\Base
 	/**
 	 * reference to the category object
 	 *
-	 * @var category
+	 * @var ranking_category
 	 */
 	var $cats;
 	/**
@@ -451,7 +451,7 @@ class ranking_competition extends Api\Storage\Base
 	 *
 	 * reimplmented from Api\Storage\Base unset/not use some columns in the search
 	 */
-	function search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='')
+	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='',$need_full_no_count=false)
 	{
 		if (is_array($criteria))
 		{
@@ -462,7 +462,7 @@ class ranking_competition extends Api\Storage\Base
 			if ($criteria['rkey']) $criteria['rkey'] = strtoupper($criteria['rkey']);
 		}
 		//$this->debug = 1;
-		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 
 	/**

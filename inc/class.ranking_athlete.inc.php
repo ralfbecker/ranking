@@ -392,7 +392,7 @@ class ranking_athlete extends Api\Storage\Base
 	 *	if numeric a special join is added to only return athlets competed in the given category (GrpId).
 	 * @return array of matching rows (the row is an array of the cols) or False
 	 */
-	function &search($criteria,$only_keys=True,$order_by='',$_extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true)
+	function &search($criteria,$only_keys=True,$order_by='',$_extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true,$need_full_no_count=false)
 	{
 		//echo "<p>ranking_athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
@@ -512,7 +512,7 @@ class ranking_athlete extends Api\Storage\Base
 			}
 			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// LEFT JOIN'ed Results.PerId is NULL if there's no result
 		}
-		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join);
+		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 
 	/**
@@ -884,11 +884,17 @@ class ranking_athlete extends Api\Storage\Base
 	 * reimplemented to delete the picture too, works only if one athlete (specified by rkey or internal data) is deleted!
 	 *
 	 * @param array $keys =null see Api\Storage\Base
-	 * @return int deleted rows or 0 on error
+	 * @param boolean $only_return_query =false return $query of delete call to db object, but not run it (used by so_sql_cf!)
+	 * @return int|array affected rows, should be 1 if ok, 0 if an error or array with id's if $only_return_ids
 	 */
-	function delete($keys=null)
+	function delete($keys=null,$only_return_query=false)
 	{
-		$Ok = parent::delete($keys);
+		$Ok = parent::delete($keys,$only_return_query);
+
+		if ($only_return_query)
+		{
+			return $Ok;
+		}
 
 		if ($Ok && (is_null($keys) || $keys['rkey']))
 		{

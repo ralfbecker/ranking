@@ -78,13 +78,6 @@ class ranking_athlete_ui extends ranking_bo
 	);
 
 	/**
-	 * Instance of etemplate
-	 *
-	 * @var etemplate
-	 */
-	var $tmpl;
-
-	/**
 	 * Minimum age for athletes
 	 *
 	 * @var int
@@ -96,13 +89,6 @@ class ranking_athlete_ui extends ranking_bo
 	 */
 	const MAX_PORTRAIT_HEIGHT = 250;
 	const MAX_ACTION_HEIGHT = 417;
-
-	function __construct()
-	{
-		parent::__construct();
-
-		$this->tmpl = new etemplate;
-	}
 
 	/**
 	 * Edit an athlete
@@ -745,7 +731,7 @@ Continuer';
 				{
 					$filter['sex'] = $query['col_filter']['sex'];
 				}
-				$sel_options[$name] =& $this->athlete->distinct_list($name,$filter);
+				$sel_options[$name] = $this->athlete->distinct_list($name,$filter);
 			}
 			else
 			{

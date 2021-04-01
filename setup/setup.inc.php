@@ -60,17 +60,5 @@ $setup_info['ranking']['hooks']['calendar_search_union']  = 'ranking_calendar_in
 /* Dependacies for this app to work */
 $setup_info['ranking']['depends'][] = array(
 	 'appname' => 'api',
-	 'versions' => Array('16.1')
+	 'versions' => Array('20.1')
 );
-$setup_info['ranking']['depends'][] = array(
-	 'appname' => 'phpgwapi',
-	 'versions' => Array('14.1')
-);
-$setup_info['ranking']['depends'][] = array(
-	'appname' => 'etemplate',
-	'versions' => Array('14.1')
-);
-
-
-
-

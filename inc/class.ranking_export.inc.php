@@ -1827,7 +1827,7 @@ class ranking_export extends ranking_result_bo
 		{
 			$see_also[] = array(
 				'name' => 'Wertung '.$fed['verband'],
-				'url' => self::result_url($comp['WetId'], $cat['GrpId']).'&type=result',
+				'url' => self::result_url($comp['WetId'], is_array($cat) ? $cat['GrpId'] : $cat).'&type=result',
 			);
 		}
 

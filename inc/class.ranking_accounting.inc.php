@@ -11,6 +11,8 @@
  * @version $Id$
  */
 
+use EGroupware\Api;
+
 class ranking_accounting extends ranking_result_bo
 {
 	/**
@@ -38,7 +40,7 @@ class ranking_accounting extends ranking_result_bo
 		unset($query_in['return']);	// no need to save
 		$query = $query_in;
 		unset($query['rows']);		// no need to save, can not unset($query_in['rows']), as this is $rows !!!
-		$GLOBALS['egw']->session->appsession('accounting','ranking',$query);
+		Api\Cache::setSession('ranking', 'accounting', $query);
 
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['route_order'] = 0;//array(0,1);
@@ -164,12 +166,12 @@ class ranking_accounting extends ranking_result_bo
 	 */
 	function index($content=null)
 	{
-		$tmpl = new etemplate('ranking.accounting.index');
+		$tmpl = new Api\Etemplate('ranking.accounting.index');
 
 		//_debug_array($content);exit;
 		if (!is_array($content))
 		{
-			$content = array('nm' => $GLOBALS['egw']->session->appsession('accounting','ranking'));
+			$content = array('nm' => Api\Cache::getSession('ranking', 'accounting'));
 			if (!is_array($content['nm']) || !$content['nm']['get_rows'])
 			{
 				if (!is_array($content['nm'])) $content['nm'] = array();

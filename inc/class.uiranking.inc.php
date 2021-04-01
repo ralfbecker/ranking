@@ -10,6 +10,8 @@
  * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Api;
+
 class uiranking extends ranking_bo
 {
 	/**
@@ -27,7 +29,7 @@ class uiranking extends ranking_bo
 	 */
 	function index($_content=null,$msg='')
 	{
-		$tmpl = new etemplate('ranking.ranking');
+		$tmpl = new Api\Etemplate('ranking.ranking');
 
 		if (!is_array($_content))
 		{

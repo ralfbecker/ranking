@@ -288,7 +288,7 @@ class ranking_result_bo extends ranking_bo
 	 * @return int|boolean number of starters, if startlist has been successful generated AND saved, false otherwise
 	 * @throws Api\Exception\WrongUserinput with translated error-message
 	 */
-	function generate_startlist($comp,$cat,$route_order,$route_type=ONE_QUALI,$discipline='lead',$max_compl=999,$order=null,$add_cat=null,$comb_quali=null)
+	function generateStartlist($comp, $cat, $route_order, $route_type=ONE_QUALI, $discipline='lead', $max_compl=999, $order=null, $add_cat=null, $comb_quali=null)
 	{
 		$keys = array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
@@ -337,7 +337,7 @@ class ranking_result_bo extends ranking_bo
 		{
 			return $this->_combined_startlist($comp, $cat, $route_order, $comb_quali);
 		}
-		// depricated startlist stored in the result
+		// deprecated startlist stored in the result
 		if ($this->result->has_startlist(array(
 			'WetId' => $keys['WetId'],
 			'GrpId' => $keys['Grpid'],
@@ -346,7 +346,7 @@ class ranking_result_bo extends ranking_bo
 			// delete existing starters
 			$this->route_result->delete($keys);
 
-			$starters =& $this->result->read(array(
+			$starters = $this->result->read(array(
 				'WetId' => $keys['WetId'],
 				'GrpId' => $keys['Grpid'],
 				'platz=0 AND pkt > 64'
@@ -362,7 +362,7 @@ class ranking_result_bo extends ranking_bo
 			if ($starter['PerId']) $old_startlist[$starter['PerId']] = $starter;
 		}
 		// generate a startlist, without storing it in the result store
-		$starters =& parent::generate_startlist($comp,$cat,
+		$starters = parent::generate_startlist($comp,$cat,
 			in_array($route_type, array(ONE_QUALI,TWO_QUALI_ALL,TWO_QUALI_ALL_NO_STAGGER,THREE_QUALI_ALL_NO_STAGGER,TWO_QUALI_SPEED,TWO_QUALI_BESTOF,TWO_QUALI_ALL_NO_COUNTBACK)) ?
 				1 : ($route_type == TWO_QUALI_GROUPS ? 4 : 2), $max_compl,
 			(string)$order === '' ? self::quali_startlist_default($discipline,$route_type,$comp['nation']) : $order,// ordering of quali startlist
@@ -1878,7 +1878,7 @@ class ranking_result_bo extends ranking_bo
 							$val = $ranking[$athlete['PerId']]['platz'];
 							break;
 						case 'ranking-points':
-							$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2lf',$ranking[$athlete['PerId']]['pkt']) : '';
+							$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2f',$ranking[$athlete['PerId']]['pkt']) : '';
 							break;
 						case 'route':
 							$val = $route['route_name'];

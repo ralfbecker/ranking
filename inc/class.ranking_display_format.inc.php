@@ -13,7 +13,7 @@
 
 use EGroupware\Api;
 
-class ranking_display_format extends so_sql2
+class ranking_display_format extends Api\Storage\Base2
 {
 	/**
 	 * Reference to the global ranking_result_bo object
@@ -287,7 +287,7 @@ class ranking_display_format extends so_sql2
 	function _get_value($type,$len,&$athlete)
 	{
 		//echo "<p>ranking_display_format::_get_value('$type',$len,$PerId)</p>\n";
-		switch($type{0})
+		switch($type[0])
 		{
 			case 'D':	// Date
 				$format = $GLOBALS['egw_info']['user']['preferences']['common']['dateformat'];
@@ -368,7 +368,7 @@ class ranking_display_format extends so_sql2
 		{
 			return false;
 		}
-		switch($type{0})
+		switch($type[0])
 		{
 			case 'W':	// comp long
 				return $comp['name'];
@@ -396,7 +396,7 @@ class ranking_display_format extends so_sql2
 		{
 			return false;
 		}
-		switch($type{0})
+		switch($type[0])
 		{
 			case 'R':	// heat category
 				$str = $route['route_name'].' ';
@@ -451,7 +451,7 @@ class ranking_display_format extends so_sql2
 			's' => 'start_order',
 		);
 		// try reading athlete from the result, if $type contains result data and only an id is given or the array contains no result data
-		if ($athlete && in_array($type{0},array('P','p','Q','h','H','S','t')) && (!is_array($athlete) || !isset($athlete['start_order'])))
+		if ($athlete && in_array($type[0],array('P','p','Q','h','H','S','t')) && (!is_array($athlete) || !isset($athlete['start_order'])))
 		{
 			if (($a = $this->_get_athlete('start_order',0,true,$athlete))) $athlete = $a;
 		}
@@ -460,7 +460,7 @@ class ranking_display_format extends so_sql2
 		{
 			return false;
 		}
-		switch($type{0})
+		switch($type[0])
 		{
 			case 'V':
 			case 'N':
@@ -472,20 +472,20 @@ class ranking_display_format extends so_sql2
 				$firstname = $athlete['vorname'];
 				if (strlen($lastname)+strlen($firstname) >= $len)
 				{
-					$firstname = $firstname{0}.'.';
+					$firstname = $firstname[0].'.';
 				}
-				$str = $type{0} == 'V' ? $firstname.' '.$lastname : $lastname.', '.$firstname;
+				$str = $type[0] == 'V' ? $firstname.' '.$lastname : $lastname.', '.$firstname;
 				if (strlen($str) == $len+1) $str_replace(array('. ',', '),array('.',','),$str);
 				return $str;
 
 			case 'h':
 			case 'H':
 				if (!$athlete['result_rank']) return '';
-				return $athlete['result_plus'] == TOP_PLUS ? 'Top' : sprintf($type{0}=='H'?'%5.2lf%s':'%s%s',
+				return $athlete['result_plus'] == TOP_PLUS ? 'Top' : sprintf($type[0]=='H'?'%5.2lf%s':'%s%s',
 					$athlete['result_height'],$athlete['result_plus'] ? ($athlete['result_plus']==1?'+':'-'):'');
 
 			case 't':
-				switch($type{1})
+				switch($type[1])
 				{
 					case '1':
 					case 'l':
@@ -649,7 +649,7 @@ class ranking_display_format extends so_sql2
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 */
-	function db2data(array $data=null)
+	function db2data($data=null)
 	{
 		if (!is_array($data))
 		{
@@ -674,7 +674,7 @@ class ranking_display_format extends so_sql2
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 */
-	function data2db(array $data=null)
+	function data2db($data=null)
 	{
 		if ($intern = !is_array($data))
 		{

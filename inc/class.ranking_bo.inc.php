@@ -1308,7 +1308,7 @@ class ranking_bo extends ranking_so
 	 * @param array $old_startlist =null old start order which should be preserved PerId => array (with start_number,route_order) pairs in start_order
 	 * @param int $quali_preselected =null number of preselected from cup or ranking, returned last, rest is randomized
 	 * @param int $add_cat =null additional category to add registered atheletes from
-	 * @return boolean/array true or array with starters (if is_array($old_startlist)) if the startlist has been successful generated AND saved, false otherwise
+	 * @return boolean|array true or array with starters (if is_array($old_startlist)) if the startlist has been successful generated AND saved, false otherwise
 	 */
 	function generate_startlist($comp,$cat,$num_routes=1,$max_compl=999,$order=0,$stagger=false,$old_startlist=null,$quali_preselected=null,$add_cat=null)
 	{
@@ -1835,7 +1835,7 @@ class ranking_bo extends ranking_so
 		// invalidate results and ranking feeds
 		ranking_export::delete_results_cache($comp, $keys['GrpId']);
 
-		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2lf',$feldfactor));
+		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2f',$feldfactor));
 	}
 	/**
 	 * Parse a csv file

@@ -21,7 +21,6 @@ class ranking_display extends Api\Storage\Base2
 	 * Constructor
 	 *
 	 * @param Api\Db $db =null
-	 * @return display
 	 */
 	function __construct(Api\Db $db=null)
 	{
@@ -164,7 +163,8 @@ class ranking_display extends Api\Storage\Base2
 			$this->dsp_athletes = $dsp['dsp_athletes'];
 		}
 		$showtime = null;
-		$dsp['dsp_current'] = $format->get_content($showtime,$line=0,false,$this->dsp_athletes[$format->GrpId][$format->route_order],
+		$line = 0;
+		$dsp['dsp_current'] = $format->get_content($showtime,$line,false,$this->dsp_athletes[$format->GrpId][$format->route_order],
 			$GrpId,$route_order,$this->dsp_cols,$this->dsp_rows);
 		$dsp['dsp_timeout'] = microtime(true) + $showtime;
 		$dsp['dsp_line']    = $line;
@@ -213,7 +213,7 @@ class ranking_display extends Api\Storage\Base2
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 */
-	function db2data(array $data=null)
+	function db2data($data=null)
 	{
 		if (!is_array($data))
 		{
@@ -238,7 +238,7 @@ class ranking_display extends Api\Storage\Base2
 	 *
 	 * @param array $data if given works on that array and returns result, else works on internal data-array
 	 */
-	function data2db(array $data=null)
+	function data2db($data=null)
 	{
 		if (($intern = !is_array($data)))
 		{
@@ -259,14 +259,15 @@ class ranking_display extends Api\Storage\Base2
 	 * Reimplemented to always increment a column 'dsp_etag' as modification counter
 	 *
 	 * @param array $keys =null
-	 * @return int 0 on success, errno != 0 otherwise
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
 	 */
-	function save($keys=null)
+	function save($keys=null,$extra_where=null)
 	{
 		if (!$keys) $keys = array();
 		$keys[] = 'dsp_etag=dsp_etag+1';
 
-		return parent::save($keys);
+		return parent::save($keys,$extra_where);
 	}
 
 	/**

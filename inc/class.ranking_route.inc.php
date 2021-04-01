@@ -96,16 +96,17 @@ class ranking_route extends Api\Storage\Base
 	 * deletes row representing keys in internal data or the supplied $keys if != null
 	 *
 	 * @param array $keys if given array with col => value pairs to characterise the rows to delete
-	 * @return int affected rows, should be 1 if ok, 0 if an error
+	 * @param boolean $only_return_query =false return $query of delete call to db object, but not run it (used by so_sql_cf!)
+	 * @return int|array affected rows, should be 1 if ok, 0 if an error or array with id's if $only_return_ids
 	 */
-	function delete($keys=null)
+	function delete($keys=null,$only_return_query=false)
 	{
 		if (is_null($keys)) $keys = array_intersect_key($this->data,array('WetId'=>0,'GrpId'=>0,'route_order'=>0));
 
 		// when deleting 1. quali, delete everything (specially general result!)
 		if (!$keys['route_order']) unset($keys['route_order']);
 
-		if (($ret = parent::delete($keys)))
+		if (($ret = parent::delete($keys, $only_return_query)) && $only_return_query)
 		{
 			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
 			$this->db->delete('RelayResults',$keys,__LINE__,__FILE__);
@@ -125,8 +126,9 @@ class ranking_route extends Api\Storage\Base
 	 * @param boolean $split_two_quali_all =false should the diverse TWO_QUALI_ALL* types be read as they are or all as TWO_QUALI_ALL
 	 * @return array/boolean data if row could be retrived else False
 	 */
-	function read($keys,$split_two_quali_all=false)
+	function read($keys,$split_two_quali_all=false,$join='')
 	{
+		if (!is_bool($split_two_quali_all)) throw new TypeError();
 		if (is_array($keys) && isset($keys['route_order']) && !is_null($keys['route_order']))
 		{
 			$keys['route_order'] = (string) $keys['route_order'];
