@@ -166,13 +166,14 @@ app.classes.ranking = AppJS.extend(
 		// readonly/hidden display for anonymous session has no getValue method
 		if (display && display.getValue && display.getValue())
 		{
-			var fragment = '<iframe src="'+location.protocol+'//'+location.host+url+
+			var fragment = '<iframe src="http://'+location.host+url+
 				'" scrolling="auto" frameborder="0" width="%width%" height="%height%" allowfullscreen></iframe>';
 
-			jQuery.get('https://'+display.getValue()+'/pushURL', { url: fragment, embed: 1}, function()
-			{
-				egw.message('URL pushed');
-			});
+			let push_url = 'http://'+display.getValue()+'/pushURL?url='+encodeURIComponent(fragment)+'&embed=1';
+			let win = window.open(push_url, '_blank', 'width=640,height=480');
+			window.setTimeout(function() {
+				win.close();
+			}, 100);
 		}
 		else
 		{
