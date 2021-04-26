@@ -672,6 +672,7 @@ Continuer';
 				return lang('Error: all athlete data is public available, please change access settings!');
 
 			case 'custom':
+				if ($custom_acl >= ranking_athlete::ACL_DENY_PROFILE) break;
 				$data = [];
 				for($i=1; $i < ranking_athlete::ACL_DENY_PROFILE; $i <<= 1)
 				{
