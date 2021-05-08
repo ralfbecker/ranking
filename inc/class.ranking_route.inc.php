@@ -106,7 +106,7 @@ class ranking_route extends Api\Storage\Base
 		// when deleting 1. quali, delete everything (specially general result!)
 		if (!$keys['route_order']) unset($keys['route_order']);
 
-		if (($ret = parent::delete($keys, $only_return_query)) && $only_return_query)
+		if (($ret = parent::delete($keys, $only_return_query)) && !$only_return_query)
 		{
 			$this->db->delete('RouteResults',$keys,__LINE__,__FILE__);
 			$this->db->delete('RelayResults',$keys,__LINE__,__FILE__);
