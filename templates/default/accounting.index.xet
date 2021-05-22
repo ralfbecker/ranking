@@ -5,21 +5,21 @@
 	<template id="ranking.accounting.index.rows" template="" lang="" group="0" version="1.9.001">
 		<grid width="100%">
 			<columns>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
-				<column/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
+				<column width="10%"/>
 			</columns>
 			<rows>
 				<row class="th" part="header">
@@ -39,7 +39,8 @@
 					<nextmatch-header align="right" label="Total"/>
 					<nextmatch-header align="right" label="Federation"/>
 				</row>
-				<row class="th" disabled="!@total" part="footer">
+				<!-- stalls new column-selection
+				row class="th" disabled="!@total" part="footer">
 					<description value="Sum"/>
 					<description/>
 					<description/>
@@ -53,14 +54,12 @@
 					<description/>
 					<description/>
 					<description/>
-					<textbox type="float" align="right" id="total" readonly="true" precision="2"/>
-					<textbox type="float" align="right" id="fed" readonly="true" precision="2"/>
-				</row>
+					<float align="right" id="total" readonly="true" precision="2"/>
+					<float align="right" id="fed" readonly="true" precision="2"/>
+				</row-->
 				<row class="row">
 					<description align="center" value="$row_cont[start_order]" id="${row}[start_number]"/>
-					<menulist>
-						<menupopup id="${row}[GrpId]" readonly="true"/>
-					</menulist>
+					<select id="${row}[GrpId]" readonly="true"/>
 					<description id="${row}[nachname]"/>
 					<description id="${row}[vorname]"/>
 					<description id="${row}[strasse]"/>
@@ -68,21 +67,18 @@
 					<description id="${row}[ort]"/>
 					<date label="%s ($row_cont[age])" id="${row}[geb_date]" readonly="true" options="Y-m-d"/>
 					<description id="${row}[verband]" readonly="true"/>
-					<menulist>
-						<menupopup id="${row}[acl_fed_id]" readonly="true"/>
-					</menulist>
-					<menulist>
-						<menupopup id="${row}[fed_parent]" readonly="true"/>
-					</menulist>
-					<menulist>
-						<menupopup id="${row}[license]" readonly="true"/>
-					</menulist>
+					<select id="${row}[acl_fed_id]" readonly="true"/>
+					<select id="${row}[fed_parent]" readonly="true"/>
+					<select id="${row}[license]" readonly="true"/>
 					<url-email id="${row}[email]" readonly="true"/>
-					<textbox type="float" align="right" id="${row}[total]" readonly="true" precision="2"/>
-					<textbox type="float" align="right" id="${row}[fed]" readonly="true" precision="2"/>
+					<float align="right" id="${row}[total]" readonly="true" precision="2"/>
+					<float align="right" id="${row}[fed]" readonly="true" precision="2"/>
 				</row>
 			</rows>
 		</grid>
+	</template>
+	<template id="ranking.accounting.index.header_right" template="" lang="" group="0" version="1.9.001">
+		<buttononly id="download" statustext="Export" onclick="widget.getInstanceManager().postSubmit()" image="download" background_image="true"/>
 	</template>
 	<template id="ranking.accounting.index" template="" lang="" group="0" version="1.9.001">
 		<grid>
@@ -91,17 +87,13 @@
 			</columns>
 			<rows>
 				<row>
-					<hbox onchange="1" options="0,0" class="noPrint">
-						<menulist>
-							<menupopup id="nm[calendar]" onchange="1"/>
-						</menulist>
-						<menulist>
-							<menupopup id="nm[comp]" onchange="1" options="Select competition" class="noPrint"/>
-						</menulist>
+					<hbox class="noPrint">
+						<select id="nm[calendar]" onchange="1"/>
+						<select id="nm[comp]" onchange="1" options="Select competition" class="noPrint"/>
 					</hbox>
 				</row>
 				<row disabled="!@nm[comp]">
-					<nextmatch id="nm" template="ranking.accounting.index.rows" span="all"/>
+					<nextmatch id="nm" template="ranking.accounting.index.rows" header_right="ranking.accounting.index.header_right" span="all"/>
 				</row>
 				<row disabled="!@nm[comp]">
 					<groupbox align="center" class="fees">
@@ -124,17 +116,17 @@
 								</row>
 								<row class="row">
 									<description value="bis 19 Jahre"/>
-									<textbox type="float" align="center" id="member_til19"/>
-									<textbox type="float" align="center" id="non_til19"/>
-									<textbox type="float" align="center" id="entry_til19"/>
-									<textbox type="float" align="center" id="fed_til19"/>
+									<float align="center" id="member_til19"/>
+									<float align="center" id="non_til19"/>
+									<float align="center" id="entry_til19"/>
+									<float align="center" id="fed_til19"/>
 								</row>
 								<row class="row">
 									<description value="ab 20 Jahre"/>
-									<textbox type="float" align="center" id="member_20plus"/>
-									<textbox type="float" align="center" id="non_20plus"/>
-									<textbox type="float" align="center" id="entry_20plus"/>
-									<textbox type="float" align="center" id="fed_20plus"/>
+									<float align="center" id="member_20plus"/>
+									<float align="center" id="non_20plus"/>
+									<float align="center" id="entry_20plus"/>
+									<float align="center" id="fed_20plus"/>
 								</row>
 							</rows>
 						</grid>

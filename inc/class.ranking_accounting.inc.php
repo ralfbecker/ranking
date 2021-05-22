@@ -40,7 +40,11 @@ class ranking_accounting extends ranking_result_bo
 		unset($query_in['return']);	// no need to save
 		$query = $query_in;
 		unset($query['rows']);		// no need to save, can not unset($query_in['rows']), as this is $rows !!!
-		Api\Cache::setSession('ranking', 'accounting', $query);
+
+		if (empty($query['csv_export']))
+		{
+			Api\Cache::setSession('ranking', 'accounting', $query);
+		}
 
 		$query['col_filter']['WetId'] = $query['comp'];
 		$query['col_filter']['route_order'] = 0;//array(0,1);
@@ -51,6 +55,7 @@ class ranking_accounting extends ranking_result_bo
 				$query['order'] = ranking_category::sui_cat_sort(ranking_route_result::RESULT_TABLE.'.GrpId').',start_order';
 				break;
 		}
+		if (!is_string($query['sort'])) $query['sort'] = 'ASC';
 		$comp = $this->comp->read($query['comp']);
 
 		// unset GrpId filter, if none (= 0) selected
@@ -184,30 +189,36 @@ class ranking_accounting extends ranking_result_bo
 					'order'      => 'start_order',
 					'sort'       => 'ASC',
 					'show_result'=> 1,
-					'csv_fields' => array(
-						'start_order'  => array('label' => lang('Startorder'),  'type' => 'int'),
-						'start_number' => array('label' => lang('Startnumber'), 'type' => 'int'),
-						'GrpId'        => array('label' => lang('Category'),    'type' => 'select'),
-						'nachname'     => array('label' => lang('Lastname'),    'type' => 'text'),
-						'vorname'      => array('label' => lang('Firstname'),   'type' => 'text'),
-						'strasse'      => array('label' => lang('Street'),      'type' => 'text'),
-						'plz'          => array('label' => lang('Postalcode'),  'type' => 'text'),
-						'ort'          => array('label' => lang('City'),        'type' => 'text'),
-						'geb_date'     => array('label' => lang('Birthdate'),   'type' => 'date'),
-						'verband'      => array('label' => lang('Sektion'),     'type' => 'text'),
-						'acl_fed_id'   => array('label' => lang('Regionalzentrum'),'type' => 'select'),
-						'fed_parent'   => array('label' => lang('Landesverband'),'type' => 'select'),
-						'license'      => array('label' => lang('License'),     'type' => 'select'),
-						'email'        => array('label' => lang('EMail'),       'type' => 'text'),
-						'total'        => array('label' => lang('Total'),       'type' => 'float', 'size' => '2'),
-						'fed'          => array('label' => lang('Federation'),  'type' => 'float', 'size' => '2'),
-					)
+					'csv_fields' => false,
 				);
 			}
 		}
 		if ($content['save'])
 		{
 			self::save_fees($content['fees'], $content['nm']['calendar']);
+		}
+		// do CSV export using old nextmatch widget
+		elseif ($content['nm']['rows']['download'] && class_exists('nextmatch_widget'))
+		{
+			$content['nm']['csv_fields'] = [
+				'start_order'  => array('label' => lang('Startorder'),  'type' => 'int'),
+				'start_number' => array('label' => lang('Startnumber'), 'type' => 'int'),
+				'GrpId'        => array('label' => lang('Category'),    'type' => 'select'),
+				'nachname'     => array('label' => lang('Lastname'),    'type' => 'text'),
+				'vorname'      => array('label' => lang('Firstname'),   'type' => 'text'),
+				'strasse'      => array('label' => lang('Street'),      'type' => 'text'),
+				'plz'          => array('label' => lang('Postalcode'),  'type' => 'text'),
+				'ort'          => array('label' => lang('City'),        'type' => 'text'),
+				'geb_date'     => array('label' => lang('Birthdate'),   'type' => 'date'),
+				'verband'      => array('label' => lang('Sektion'),     'type' => 'text'),
+				'acl_fed_id'   => array('label' => lang('Regionalzentrum'),'type' => 'select'),
+				'fed_parent'   => array('label' => lang('Landesverband'),'type' => 'select'),
+				'license'      => array('label' => lang('License'),     'type' => 'select'),
+				'email'        => array('label' => lang('EMail'),       'type' => 'text'),
+				'total'        => array('label' => lang('Total'),       'type' => 'float', 'size' => '2'),
+				'fed'          => array('label' => lang('Federation'),  'type' => 'float', 'size' => '2'),
+			];
+			nextmatch_widget::csv_export($content['nm']);
 		}
 		elseif ($content['nm']['calendar'])
 		{
