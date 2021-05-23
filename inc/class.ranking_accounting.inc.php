@@ -198,7 +198,7 @@ class ranking_accounting extends ranking_result_bo
 			self::save_fees($content['fees'], $content['nm']['calendar']);
 		}
 		// do CSV export using old nextmatch widget
-		elseif ($content['nm']['rows']['download'] && class_exists('nextmatch_widget'))
+		elseif ($content['nm']['rows']['download'])
 		{
 			$content['nm']['csv_fields'] = [
 				'start_order'  => array('label' => lang('Startorder'),  'type' => 'int'),
@@ -218,7 +218,7 @@ class ranking_accounting extends ranking_result_bo
 				'total'        => array('label' => lang('Total'),       'type' => 'float', 'size' => '2'),
 				'fed'          => array('label' => lang('Federation'),  'type' => 'float', 'size' => '2'),
 			];
-			nextmatch_widget::csv_export($content['nm']);
+			Api\Etemplate\Export::csv($content['nm']);
 		}
 		elseif ($content['nm']['calendar'])
 		{
