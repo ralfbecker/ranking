@@ -141,6 +141,9 @@
 				</row>
 			</rows>
 		</grid>
-		<styles>.fees { display: inline; }</styles>
+		<styles>
+			.fees { display: initial; }
+			#ranking-accounting-index {width: 99%;}
+		</styles>
 	</template>
 </overlay>
