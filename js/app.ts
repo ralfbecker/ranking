@@ -13,11 +13,6 @@
 	/api/js/jsapi/egw_app.js
  */
 
-import 'jquery';
-import 'jqueryui';
-import '../jsapi/egw_global';
-import '../etemplate/et2_types';
-
 import { EgwApp } from '../../api/js/jsapi/egw_app';
 import {et2_nextmatch, et2_nextmatch_sortheader} from "../../api/js/etemplate/et2_extension_nextmatch";
 import {et2_button} from "../../api/js/etemplate/et2_widget_button";
