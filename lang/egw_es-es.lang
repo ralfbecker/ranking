@@ -16,6 +16,7 @@
 %1, %2 registered for category %3	ranking	es-es	%1, %2 registrado para la categoría %3
 %1. false start	ranking	es-es	%1. falso inicio
 %1. heat	ranking	es-es	%1. Ronda
+%1. try	ranking	es-es	%1. intento
 1. display	ranking	es-es	1. Mostrar
 1. january	ranking	es-es	1. Enero
 1. place	ranking	es-es	1. Lugar
@@ -52,8 +53,11 @@ allow athletes to register themself for this competition	ranking	es-es	Permitir 
 allowed without extra confirmation	ranking	es-es	Permitido sin confirmación adicional
 allows athletes to register themself for this competition	ranking	es-es	Permitir a los atletas registrarse ellos mismos para esta competencia
 already registered	ranking	es-es	Ya registrado
+an error happend, while storing your password!	ranking	es-es	¡Ocurrió un error al almacenar su contraseña!
 applied	ranking	es-es	aplicado
 applied for a %1 license	ranking	es-es	Aplicado a %1 licencias
+apply for	ranking	es-es	Solicitar
+apply for license	ranking	es-es	Solicitar licencia
 apply modifications below to all selected federations	ranking	es-es	Aplicar las modificaciones siguientes a todas las federaciones seleccionadas
 apply the changes made	ranking	es-es	aplicar los cambios realizados
 apply the changes of this athlete only	ranking	es-es	Aplicar los cambios de este deportista únicamente
@@ -68,10 +72,14 @@ athlete is suspended !!!	ranking	es-es	¡¡¡El atleta está suspendido!!!
 athlete not found !!!	ranking	es-es	¡¡¡Atleta NO encontrado!!!
 athletes	ranking	es-es	Atletas
 before	ranking	es-es	Antes
+best of	ranking	es-es	Mejor de
+best of two (record format)	ranking	es-es	mejor de dos (formato de grabación)
 birthdate	ranking	es-es	Fecha de nacimiento
 birthday	ranking	es-es	Día de nacimiento
+birthday, shows only the year	ranking	es-es	cumpleaños, muestra solo el año
 birthyear	ranking	es-es	Año de nacimiento
 birthyears from	ranking	es-es	Años de nacimiento desde
+categories	ranking	es-es	Categorías
 category not found !!!	ranking	es-es	¡¡¡Categoría NO encontrada!!!
 cathegories	ranking	es-es	Categorías
 cellphone	ranking	es-es	Teléfono móvil
@@ -80,6 +88,7 @@ checked	ranking	es-es	Marcado
 children	ranking	es-es	Hijos
 city	ranking	es-es	Ciudad
 click to view	ranking	es-es	click para ver
+clone of	ranking	es-es	Clon de
 columns	ranking	es-es	Columnas
 comments	ranking	es-es	Comentarios
 competition	ranking	es-es	Competencia
@@ -111,7 +120,7 @@ display athlete	ranking	es-es	Mostrar atleta
 display cup	ranking	es-es	Mostrar copa
 down	ranking	es-es	Abajo
 download	ranking	es-es	Descargar
-edit %1	ranking	es-es	Editar %1
+edit %1	ranking	es-es	editar %1
 edit athlete	ranking	es-es	Editar atleta
 edit competition	ranking	es-es	Editar competencia
 edit heat	ranking	es-es	Editar ronda
@@ -241,6 +250,6 @@ wrong gender	ranking	es-es	Género equivocado
 wrong nationality	ranking	es-es	Nacionalidad equivocada
 you have not yet a password set!	ranking	es-es	¡Aún no tienes una contraseña establecida!
 you need to delete the results first !!!	ranking	es-es	¡¡¡Necesitas suprimir los resultados primero!!!
-you need to select a file first!	ranking	es-es	¡Necesita seleccionar un fichero antes!
+you need to select a file first!	ranking	es-es	¡Necesita seleccionar un archivo antes!
 zip code	ranking	es-es	Código postal
 zone	ranking	es-es	Zona
