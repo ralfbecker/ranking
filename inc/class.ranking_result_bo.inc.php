@@ -376,7 +376,7 @@ class ranking_result_bo extends ranking_bo
 			unset($starter);
 			foreach($starters[1] as &$starter)
 			{
-				// Example for 21 starters: 1. in Lane A will be 11. in LaneB
+				// Example for 21 starters: 1. in Lane A will be 12. in LaneB
 				$starter['start_order2n'] = self::stagger($starter['start_order'], count($starters[1]));
 			}
 		}

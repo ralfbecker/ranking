@@ -1503,7 +1503,7 @@ class ranking_bo extends ranking_so
 			}
 			else
 			{
-				$startlist[1] = $startlist[2] = array_merge($startlist[1],$startlist[2]);
+				$startlist[1] = $startlist[2] = array_merge($startlist[1], $startlist[2]);
 			}
 		}
 		// reverse the startlist if neccessary
@@ -1553,7 +1553,8 @@ class ranking_bo extends ranking_so
 	/**
 	 * Get staggered startorder for $anz participants
 	 *
-	 * Example for 21 starters: 1. in Lane A will be 11. in Lane B
+	 * Change from 2020 on: first group is bigger than second (for an odd number)
+	 * Example for 21 starters: 1. in Lane A will be 12. in Lane B
 	 *
 	 * @param int $start_order on lane A
 	 * @param int $anz
@@ -1562,7 +1563,7 @@ class ranking_bo extends ranking_so
 	static function stagger($start_order, $anz)
 	{
 		//error_log(__METHOD__."($start_order, $anz) returning ".(1+((floor($anz/2)+$start_order-1) % $anz)));
-		return 1+((floor($anz/2)+$start_order-1) % $anz);
+		return 1+((floor(($anz+1)/2)+$start_order-1) % $anz);
 	}
 
 	/**
