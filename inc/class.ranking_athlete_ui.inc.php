@@ -447,7 +447,7 @@ class ranking_athlete_ui extends ranking_bo
 			if ($button === 'delete' && $this->acl_check_athlete($this->athlete->data) &&
 				!$this->athlete->has_results($this->athlete->data['WetId']))
 			{
-				if ($this->athlete->delete(array('PerId' => $this->athlete->data['WetId'])))
+				if ($this->athlete->delete(array('PerId' => $this->athlete->data['PerId'])))
 				{
 					Api\Framework::refresh_opener(lang('%1 deleted', lang('Athlete')), 'ranking', $this->athlete->data['PerId'], 'delete');
 					Api\Framework::window_close();
