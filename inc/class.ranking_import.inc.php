@@ -190,8 +190,11 @@ class ranking_import extends ranking_result_bo
 				$row['presets'] = '';
 				foreach($content['import']['as'] as $c => $name)
 				{
-					if ($name && $name !== 'PerId' && $row[$c]) $row['presets'] .= '&preset['.$name.']='.$row[$c].
-						($name === 'geb_date' && is_numeric($row[$c]) ? '-01-01' : '');
+					if ($name && !in_array($name, ['PerId','rank','result']) && $row[$c])
+					{
+						$row['presets'] .= '&preset['.$name.']='.
+							urlencode($row[$c].($name === 'geb_date' && is_numeric($row[$c]) ? '-01-01' : ''));
+					}
 				}
 				if ($calendar && $calendar != 'NULL' && !in_array('nation',$content['import']['as']))
 				{
@@ -632,24 +635,31 @@ class ranking_import extends ranking_result_bo
 			$need_update = !empty($license);
 			foreach($col2name as $c => $name)
 			{
-				if ($add_missing && !isset($athletes[$n]) ||
+				if ($add_missing && !isset($athletes[$n]) && $name !== 'PerId' ||
 					$detection[$n][$c] && (!isset($update[$n][$c]) || $update[$n][$c]))
 				{
-					$athlete[$name] = $row[$c];
 					$need_update = true;
 					// extra handling for federations, athletes store only fed_id, they get only created, if they are explicitly marked for update!
-					if ($name === 'verband')
+					switch ($name)
 					{
-						if (!($athlete['fed_id'] = $this->federation->get_federation($row[$c],$nation_col?$row[$nation_col]:null,true)) &&
-							// only allow admins to create new federations
-							$this->is_admin && $update[$n][$c] && $row[$nation_col])
-						{
-							$this->federation->init(['verband' => $row[$c]]);
-							if ($this->federation->save($nation_col && $row[$nation_col] ? ['nation' => $row[$nation_col]] : null) == 0)
+						case 'verband':
+							if (!($athlete['fed_id'] = $this->federation->get_federation($row[$c],$nation_col?$row[$nation_col]:null,true)) &&
+								// only allow admins to create new federations
+								$this->is_admin && $update[$n][$c] && $row[$nation_col])
 							{
-								$athlete['fed_id'] = $this->federation->data['fed_id'];
+								$this->federation->init(['verband' => $row[$c]]);
+								if ($this->federation->save($nation_col && $row[$nation_col] ? ['nation' => $row[$nation_col]] : null) == 0)
+								{
+									$athlete['fed_id'] = $this->federation->data['fed_id'];
+								}
 							}
-						}
+							break;
+						case 'sex':
+							$athlete['sex'] = strtolower($row[$c][0]) === 'm' ? 'male' : 'female';
+							break;
+						default:
+							$athlete[$name] = $row[$c];
+							break;
 					}
 				}
 			}
@@ -666,6 +676,10 @@ class ranking_import extends ranking_result_bo
 					// show already imported athletes
 					if ($n > 2) $this->detect_athletes($import, $col2name, $keys['calendar'], $sex, $license, $license_year);
 					throw new Api\Exception\WrongUserinput(lang('No athlete federation or missing rights to create or update the athlete!'));
+				}
+				if (empty($athlete['sex']))
+				{
+					throw new Api\Exception\WrongUserinput(lang('Athlete require a gender, either by selecting a category or having a gender-column!'));
 				}
 				if ($this->athlete->save($athlete) === 0)
 				{
