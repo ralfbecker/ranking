@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "http://www.egroupware.org/etemplate2.dtd">
-<!-- $Id$ -->
 <overlay>
 	<template id="ranking.result.isolation" template="" lang="" group="0" version="1.7.001">
-		<groupbox cols="1" rows="1" class="extra_startlist">
+		<groupbox class="extra_startlist">
 			<caption label="Isolation zone and starting time"/>
 			<grid padding="5">
 				<columns>
@@ -14,17 +13,17 @@
 				<rows>
 					<row>
 						<description value="Isolation zone"/>
-						<description value="opens" id="route_iso_open" no_lang="1"/>
-						<description value="closes" id="route_iso_close" no_lang="1"/>
+						<description value="opens" id="route_iso_open" no_lang="true"/>
+						<description value="closes" id="route_iso_close" no_lang="true"/>
 					</row>
 					<row>
 						<description value="Starting time"/>
-						<description id="route_start" no_lang="1" span="all"/>
+						<description id="route_start" no_lang="true" span="all"/>
 					</row>
 					<row>
 						<description value="Observation time"/>
-						<description id="route_observation_time" no_lang="1"/>
-						<description value="Climbing time" id="route_climbing_time" no_lang="1"/>
+						<description id="route_observation_time" no_lang="true"/>
+						<description value="Climbing time" id="route_climbing_time" no_lang="true"/>
 					</row>
 				</rows>
 			</grid>
@@ -34,7 +33,7 @@
 		</styles>
 	</template>
 	<template id="ranking.result.official" template="" lang="" group="0" version="1.7.001">
-		<groupbox cols="1" rows="1" class="extra_result">
+		<groupbox class="extra_result">
 			<caption label="Result official"/>
 			<grid>
 				<columns>
@@ -42,10 +41,10 @@
 				</columns>
 				<rows>
 					<row>
-						<description id="route_result" no_lang="1"/>
+						<description id="route_result" no_lang="true"/>
 					</row>
 					<row>
-						<description id="route_judge" no_lang="1"/>
+						<description id="route_judge" no_lang="true"/>
 					</row>
 				</rows>
 			</grid>
@@ -64,83 +63,115 @@
 					<description id="msg" class="redItalic"/>
 				</row>
 				<row class="noPrint">
-					<hbox options="0,0">
-						<menulist class="rightPad5">
-							<menupopup statustext="Select calendar" id="keys[calendar]" no_lang="1" onchange="1"/>
-						</menulist>
-						<menulist>
-							<menupopup id="keys[comp]" no_lang="1" onchange="1" options="Select competition"/>
-						</menulist>
+					<hbox>
+						<select statustext="Select calendar" id="keys[calendar]" no_lang="true" onchange="1"/>
+						<select id="keys[comp]" no_lang="true" onchange="1" empty_label="Select competition"/>
 					</hbox>
 				</row>
 				<row class="noPrint" disabled="!@keys[comp]">
-					<menulist class="bold">
-						<menupopup id="keys[cat]" no_lang="1" onchange="1" options="Select category"/>
-					</menulist>
+					<select id="keys[cat]" no_lang="true" onchange="1" empty_label="Select category"/>
 				</row>
 				<row>
-					<menulist>
-						<menupopup label="Import" id="keys[route]"/>
-					</menulist>
+					<hbox>
+						<select label="Import" id="keys[route]"/>
+						<select label="Federation" id="keys[fed_id]" empty_label="Select a default to use"/>
+					</hbox>
 				</row>
 				<row disabled="!@import_url">
 					<hbox>
-						<menulist>
-							<menupopup id="quali_type" options="Type of qualification: automatic"/>
-						</menulist>
+						<select id="quali_type" empty_label="Type of qualification: automatic"/>
 						<description value="WetId" for="comp2import"/>
 						<textbox type="integer" id="comp2import"/>
 						<button label="Import from URL" id="button[url]"/>
 					</hbox>
 				</row>
-				<row disabled="!@import">
-					<grid id="import">
+				<row disabled="@import[as]">
+					<hbox>
+						<description value="CSV Import"/>
+						<select label="Delimiter" id="delimiter"/>
+						<select label="Import Charset" id="charset"/>
+						<file id="file" onchange="1"/>
+					</hbox>
+				</row>
+				<row disabled="!@import[2]">
+					<grid id="import" class="importGrid egwGridView_grid">
 						<columns>
-							<column width="170"/>
-							<column/>
+							<column width="240"/>
+							<column width="150"/>
+							<column width="150" disabled="!@header[2]"/>
+							<column width="150" disabled="!@header[3]"/>
+							<column width="150" disabled="!@header[4]"/>
+							<column width="150" disabled="!@header[5]"/>
+							<column width="150" disabled="!@header[6]"/>
+							<column width="150" disabled="!@header[7]"/>
+							<column width="150" disabled="!@header[8]"/>
+							<column width="150" disabled="!@header[9]"/>
+							<column width="150" disabled="!@header[10]"/>
+							<column width="150" disabled="!@header[11]"/>
+							<column width="150" disabled="!@header[12]"/>
 						</columns>
 						<rows>
 							<row class="th">
 								<description value="Header"/>
-								<description value="$c:" id="header[$c]"/>
+								<description id="header[1]"/>
+								<description id="header[2]"/>
+								<description id="header[3]"/>
+								<description id="header[4]"/>
+								<description id="header[5]"/>
+								<description id="header[6]"/>
+								<description id="header[7]"/>
+								<description id="header[8]"/>
+								<description id="header[9]"/>
+								<description id="header[10]"/>
+								<description id="header[11]"/>
+								<description id="header[12]"/>
 							</row>
 							<row class="th">
 								<description value="Import as"/>
-								<menulist>
-									<menupopup id="as[$c]" options="Ignore"/>
-								</menulist>
+								<select id="as[1][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[2][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[3][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[4][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[5][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[6][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[7][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[8][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[9][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[10][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[11][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[12][as]" empty_label="Ignore" class="et2_fullWidth"/>
 							</row>
 							<row class="row {$cont[detection][$row][row]}">
-								<hbox options="0,0">
-									<link-entry id="athlete[$row]" options="ranking"/>
-									<buttononly align="right" disabled="true" statustext="Add new athlete with the given data" label="Add" id="add[$row]" onclick="window.open(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit$row_cont[presets]'),'_blank','dependent=yes,width=850,height=450,scrollbars=yes,status=yes'); return false;" options="new"/>
-									<buttononly align="right" statustext="Edit athlete" label="Edit" id="edit[$row]" onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=')+document.getElementById(form::name('athlete[$row][id]')).value, '_blank', '850', '450', 'yes'); return false;" options="edit"/>
+								<hbox>
+									<link-entry id="athlete[$row]" only_app="ranking" width="185"
+										onchange="widget.getRoot().getWidgetById('button[apply]').click();"/>
+									<buttononly readonly="true" statustext="Add new athlete with the given data" label="Add" id="add[$row]" image="add"
+										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit$row_cont[presets]'),'_blank', 850, 480, 'yes'); return false;"/>
+									<buttononly statustext="Edit athlete" label="Edit" id="edit[$row]" image="edit"
+										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=')+widget.getParent().getChildren()[0].getValue(), '_blank', 850, 480, 'yes'); return false;"/>
 								</hbox>
-								<checkbox statustext="@detection[$row][help-$c]" label="@{$row}[$c]" id="replace[$row][$c]" readonly="true" class="{$cont[detection][$row][$c]}"/>
+								<checkbox statustext="@detection[$row][help-1]" label="@{$row}[1]" id="replace[$row][1]" readonly="true" class="{$cont[detection][$row][1]}"/>
+								<checkbox statustext="@detection[$row][help-2]" label="@{$row}[2]" id="replace[$row][2]" readonly="true" class="{$cont[detection][$row][2]}"/>
+								<checkbox statustext="@detection[$row][help-3]" label="@{$row}[3]" id="replace[$row][3]" readonly="true" class="{$cont[detection][$row][3]}"/>
+								<checkbox statustext="@detection[$row][help-4]" label="@{$row}[4]" id="replace[$row][4]" readonly="true" class="{$cont[detection][$row][4]}"/>
+								<checkbox statustext="@detection[$row][help-5]" label="@{$row}[5]" id="replace[$row][5]" readonly="true" class="{$cont[detection][$row][5]}"/>
+								<checkbox statustext="@detection[$row][help-6]" label="@{$row}[6]" id="replace[$row][6]" readonly="true" class="{$cont[detection][$row][6]}"/>
+								<checkbox statustext="@detection[$row][help-7]" label="@{$row}[7]" id="replace[$row][7]" readonly="true" class="{$cont[detection][$row][7]}"/>
+								<checkbox statustext="@detection[$row][help-8]" label="@{$row}[8]" id="replace[$row][8]" readonly="true" class="{$cont[detection][$row][8]}"/>
+								<checkbox statustext="@detection[$row][help-9]" label="@{$row}[9]" id="replace[$row][9]" readonly="true" class="{$cont[detection][$row][9]}"/>
+								<checkbox statustext="@detection[$row][help-10]" label="@{$row}[10]" id="replace[$row][10]" readonly="true" class="{$cont[detection][$row][10]}"/>
+								<checkbox statustext="@detection[$row][help-11]" label="@{$row}[11]" id="replace[$row][11]" readonly="true" class="{$cont[detection][$row][11]}"/>
+								<checkbox statustext="@detection[$row][help-12]" label="@{$row}[12]" id="replace[$row][12]" readonly="true" class="{$cont[detection][$row][12]}"/>
 							</row>
 						</rows>
 					</grid>
 				</row>
-				<row disabled="@import">
-					<hbox options="0,0">
-						<file id="file"/>
-						<button label="Upload" id="button[upload]" onclick="if(document.getElementById(form::name('file')).value) return true; alert('You need to select a file first!'); return false;" class="leftPad5"/>
-						<menulist class="leftPad5">
-							<menupopup label="Delimiter" id="delimiter"/>
-						</menulist>
-						<menulist class="leftPad5">
-							<menupopup label="Import Charset" id="charset"/>
-						</menulist>
-					</hbox>
-				</row>
-				<row class="noPrint" disabled="!@import">
+				<row class="noPrint" disabled="!@import[2]">
 					<hbox>
-						<menulist>
-							<menupopup id="license" options="Set license to"/>
-						</menulist>
-						<button label="Import" id="button[import]"/>
-						<button statustext="Apply the changes made" label="Update" id="button[apply]"/>
-						<button label="Detect athletes" id="button[detect]"/>
+						<select id="license" empty_label="Set license to"/>
+						<checkbox label="Add missing athletes" id="add_missing"/>
+						<button label="Import" id="button[import]" image="save" background_image="true"/>
+						<button statustext="Apply the changes made" label="Update" id="button[apply]" image="edit" background_image="true"/>
 						<button label="Cancel" id="button[cancel]"/>
 					</hbox>
 				</row>
@@ -157,9 +188,12 @@
 		</grid>
 		<styles>
 			.ajax-loader { display: none; }
-.noAthlete { background-color: #ffffd0; }
-.conflictData { background-color: #ffffd0; font-weight: bold; }
-.newData { font-weight: bold; font-style: italic; }
+			.noAthlete { background-color: #ffffd0; }
+			.conflictData { background-color: #ffffd0; font-weight: bold; }
+			.newData { font-weight: bold; font-style: italic; }
+			table.importGrid { width: auto; margin-left: 0 !important; margin-top: 10px; margin-bottom: 5px }
+			table.importGrid td { padding-right: 5px !important; padding-left: 5px !important }
+			table.importGrid tr > td, table.importGrid tr > td *, table.importGrid tr.th > td { vertical-align: middle !important }
 		</styles>
 	</template>
 </overlay>

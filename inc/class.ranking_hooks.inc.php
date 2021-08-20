@@ -38,9 +38,15 @@ class ranking_hooks
 				'Registration'  => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index','ajax' => 'true')),
 				'Resultservice' => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index','ajax' => 'true')),
 				'Results'       => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.result','ajax' => 'true')),
-				'Ranking'       => Egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index')),
-				'Accounting'    => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index')),
+				'Ranking'       => Egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index','ajax' => 'true')),
+				'Accounting'    => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index','ajax' => 'true')),
 			);
+			// show import only if user has more than read rights
+			$bo = ranking_bo::getInstance();
+			if (!empty($bo->edit_rights) || !empty($bo->athlete_rights) || !empty($bo->register_rights))
+			{
+				$links['Import'] = Egw::link('/index.php',array('menuaction' => 'ranking.ranking_import.index','ajax' => 'true'));
+			}
 			if ($location == 'return_ranking_views') return $links;
 			display_sidebox($appname,$GLOBALS['egw_info']['apps']['ranking']['title'].' '.lang('Menu'),$links);
 
@@ -114,8 +120,6 @@ class ranking_hooks
 					'ajax'       => 'true',
 				 )),
 				'Nation ACL' => Egw::link('/index.php',array('menuaction' => 'ranking.admin.acl' )),
-				'Import' => Egw::link('/index.php',array(
-					'menuaction' => 'ranking.ranking_import.index' )),
 			);
 			if ($location == 'admin')
 			{

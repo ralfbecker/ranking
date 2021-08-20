@@ -137,46 +137,7 @@ class ranking_athlete_ui extends ranking_bo
 				{
 					$this->athlete->data['fed_id'] = $this->federation->get_federation($_GET['preset']['verband'],$_GET['preset']['nation'],true);
 				}
-				// if user is judge on a LV competition, give him just here rights for whole nation
-				if (is_numeric($this->only_nation_athlete) && ($fed = $this->federation->read($this->only_nation_athlete)))
-				{
-					$this->only_nation_athlete = $fed['nation'];
-				}
-				if ($this->only_nation_athlete) $this->athlete->data['nation'] = $this->only_nation_athlete;
-				if (!in_array('NULL',$this->athlete_rights)) $nations = array_intersect_key($nations,array_flip($this->athlete_rights));
-				//using athlete_rights_no_judge (and NOT athlete_rights) to check if we should look for federation rights, as otherwise judges loose their regular federation rights
-				if (!$this->is_admin && !$this->athlete_rights_no_judge &&
-					($grants = $this->federation->get_user_grants()))
-				{
-					$feds_with_grants = array();
-					foreach($grants as $fed_id => $rights)
-					{
-						if ($rights & self::ACL_ATHLETE)
-						{
-							$feds_with_grants[] = $fed_id;
-						}
-					}
-					if ($feds_with_grants)
-					{
-						// if we have a/some feds the user is responsible for get the first (and only) nation
-						$nations = $this->federation->query_list('nation','nation',array('fed_id' => $feds_with_grants));
-						if (count($nations) != 1) throw new Api\Exception\AssertionFailed('Fed grants only implemented for a single nation!');
-						$this->only_nation_athlete = key($nations);
-						$this->athlete->data['nation'] = $this->only_nation_athlete;
-						// SUI Regionalzentren
-						if ($this->only_nation_athlete == 'SUI' && count($feds_with_grants) == 1)
-						{
-							list($this->athlete->data['acl_fed_id']) = $feds_with_grants;
-							$this->athlete->data['fed_id'] = key($this->athlete->federations($this->only_nation_athlete,true));	// set the national federation
-							unset($feds_with_grants);
-						}
-						// everyone else (eg. GER Landesverbände)
-						else
-						{
-							list($this->athlete->data['fed_id']) = $feds_with_grants;
-						}
-					}
-				}
+				$this->presetFederation($this->athlete->data, $nations, $feds_with_grants);
 			}
 			if (!$nations)
 			{

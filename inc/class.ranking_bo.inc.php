@@ -470,7 +470,7 @@ class ranking_bo extends ranking_so
 	}
 
 	/**
-	 * Check if curent user has edit rights for a competition
+	 * Check if current user has edit rights for a competition
 	 *
 	 * @parm array $comp competition or cup data
 	 * @return boolean
@@ -633,7 +633,7 @@ class ranking_bo extends ranking_so
 	}
 
 	/**
-	 * Check if user is allowed to register athlets for $comp and $nation
+	 * Check if user is allowed to register athletes for $comp and $nation
 	 *
 	 * @param int|array $comp WetId or complete competition array
 	 * @param int|string|array $athlete ='' whole athlete array, nation of the athlets to register or (acl_)fed_id, if empty do a general check independent of nation
@@ -903,7 +903,7 @@ class ranking_bo extends ranking_so
 	 * @param int $replace PerId of athlete to replace or null
 	 * @throws Api\Exception\WrongUserinput with error message for not matching agegroup or over quota
 	 * @throws Api\Exception\WrongParameter for other errors
-	 * @return boolean true of everythings ok, false on error
+	 * @return boolean true of everything is ok, false on error
 	 */
 	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null, $prequal_reason=null, $replace=null)
 	{
@@ -945,7 +945,7 @@ class ranking_bo extends ranking_so
 			{
 				throw new Api\Exception\WrongParameter("Athlete to replace (#$r) not registered!");
 			}
-			// do not allow to replace with an other registed athlete, as that would implicitly just delete the one to replace
+			// do not allow to replace with an other registered athlete, as that would implicitly just delete the one to replace
 			if ($data && isset($data[ranking_registration::PREFIX.ranking_registration::REGISTERED]))
 			{
 				throw new Api\Exception\WrongUserinput(lang('Athlete to replace with is already registered!'));
@@ -1062,7 +1062,7 @@ class ranking_bo extends ranking_so
 			ranking_registration::PREFIX.$mode.ranking_registration::ACCOUNT_POSTFIX => $this->user,
 		));
 
-		// if sucessful registed and we replace --> delete to replace one now
+		// if successful registered and we replace --> delete to replace one now
 		if ($ret && $replace)
 		{
 			$this->registration->init($replace);
@@ -1692,7 +1692,7 @@ class ranking_bo extends ranking_so
 	 *
 	 * @param array $keys WetId, GrpId
 	 * @param array $result PerId => platz pairs
-	 * @return string message
+	 * @return string|false success message or false on error
 	 */
 	function import_ranking($keys,$result)
 	{
@@ -2171,6 +2171,58 @@ class ranking_bo extends ranking_so
 		$length = (strlen($first)+strlen($second)) / 2;
 
 		return similar_text($first,$second)/$length >= $min;
+	}
+
+	/**
+	 * Set athlete nation and (acl_)fed_id from users rights
+	 *
+	 * @param array &$athlete on return nation, (acl_)fed_id
+	 * @param array &$nations =null on return nations user has rights to
+	 * @param array &$feds_with_grants =null on return federations user has rights to
+	 * @throws Api\Exception\AssertionFailed
+	 */
+	public function presetFederation(array &$athlete, array &$nations=null, array &$feds_with_grants = null)
+	{
+		// if user is judge on a LV competition, give him just here rights for whole nation
+		if (is_numeric($this->only_nation_athlete) && ($fed = $this->federation->read($this->only_nation_athlete)))
+		{
+			$this->only_nation_athlete = $fed['nation'];
+		}
+		if ($this->only_nation_athlete) $athlete['nation'] = $this->only_nation_athlete;
+		if (!in_array('NULL', $this->athlete_rights)) $nations = array_intersect_key($nations, array_flip($this->athlete_rights));
+		//using athlete_rights_no_judge (and NOT athlete_rights) to check if we should look for federation rights, as otherwise judges loose their regular federation rights
+		if (!$this->is_admin && !$this->athlete_rights_no_judge &&
+			($grants = $this->federation->get_user_grants()))
+		{
+			$feds_with_grants = [];
+			foreach ($grants as $fed_id => $rights)
+			{
+				if ($rights & self::ACL_ATHLETE)
+				{
+					$feds_with_grants[] = $fed_id;
+				}
+			}
+			if ($feds_with_grants)
+			{
+				// if we have a/some feds the user is responsible for get the first (and only) nation
+				$nations = $this->federation->query_list('nation', 'nation', array('fed_id' => $feds_with_grants));
+				if (count($nations) != 1) throw new Api\Exception\AssertionFailed('Fed grants only implemented for a single nation!');
+				$this->only_nation_athlete = key($nations);
+				$athlete['nation'] = $this->only_nation_athlete;
+				// SUI Regionalzentren
+				if ($this->only_nation_athlete == 'SUI' && count($feds_with_grants) == 1)
+				{
+					list($athlete['acl_fed_id']) = $feds_with_grants;
+					$athlete['fed_id'] = key($this->athlete->federations($this->only_nation_athlete, true));    // set the national federation
+					unset($feds_with_grants);
+				}
+				// everyone else (eg. GER Landesverbände)
+				else
+				{
+					list($athlete['fed_id']) = $feds_with_grants;
+				}
+			}
+		}
 	}
 }
 

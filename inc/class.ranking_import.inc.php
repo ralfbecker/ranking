@@ -17,9 +17,9 @@ class ranking_import extends ranking_result_bo
 	/**
 	 * @var array $public_functions functions callable via menuaction
 	 */
-	var $public_functions = array(
+	var $public_functions = [
 		'index' => true,
-	);
+	];
 
 	/**
 	 * Import columns, first array value is the label
@@ -27,19 +27,24 @@ class ranking_import extends ranking_result_bo
 	 * @var array
 	 */
 	static $import_columns = array(
-		'nachname' => array('name','nachname','lastname'),
-		'vorname'  => array('firstname','vorname','surname'),
-		'nation'   => array('nation','land','match' => 'exact'),
-		'strasse'  => array('street','strasse'),
-		'ort'      => array('city','ort','stadt','label'),
-		'plz'      => array('postalcode','zip','postcode','plz'),
-		'sex'      => array('gender','geschlecht','sex'),
-		'geb_date' => array('birthdate','geburtstag','jahrgang','agegroup'),
-		'verband'  => array('federation','verband','sektion'),
-		'PerId'    => array('id','athlete'),
-		'license'  => array('license','lizenz'),
-		'rank'     => array('rank','platz','rang','place'),
-		'result'   => array('result','ergebnis'),
+		'rank'     => ['rank','platz','rang','place'],
+		'nachname' => ['name','nachname','lastname'],
+		'vorname'  => ['firstname','vorname','surname'],
+		'nation'   => ['nation','land','match' => 'exact'],
+		'strasse'  => ['street','strasse'],
+		'ort'      => ['city','ort','stadt','label'],
+		'plz'      => ['postalcode','zip','postcode','plz'],
+		'sex'      => ['gender','geschlecht','sex'],
+		'geb_date' => ['birthdate','geburtstag','jahrgang','agegroup'],
+		'verband'  => ['federation','verband','sektion'],
+		'PerId'    => ['id','athlete'],
+		'tel'      => ['tel', 'telefon', 'telephone', 'phone'],
+		'mobil'    => ['mobile', 'mobilephone', 'cellphone'],
+		'fax'      => ['fax', 'telefax'],
+		'email'    => ['email', 'mail'],
+		'homepage' => ['homepage', 'www', 'url'],
+		'anrede'   => ['anrede', 'title'],
+		// no need as only ranking import 'result'   => ['result','ergebnis'],
 	);
 
 	/**
@@ -50,19 +55,16 @@ class ranking_import extends ranking_result_bo
 	 */
 	function index($content=null,$msg='')
 	{
-		if (!$GLOBALS['egw_info']['user']['apps']['admin'])
+		// fail hard if no rights at all / just URL called
+		if (empty($this->edit_rights) && empty($this->athlete_rights) && empty($this->register_rights))
 		{
-			throw new Api\Exception\NoPermission\Admin();
+			throw new EGroupware\Api\Exception\NoPermission();
 		}
 		$tmpl = new Api\Etemplate('ranking.import');
 
 		$config = Api\Config::read('ranking');
 		$import_url = $config['import_url'];
 
-		if ($tmpl->sitemgr && empty($this->ranking_nations))
-		{
-			return lang('No rights to any nations, admin needs to give read-rights for the competitions of at least one nation!');
-		}
 		//_debug_array($content);
 		if (!is_array($content))
 		{
@@ -81,17 +83,24 @@ class ranking_import extends ranking_result_bo
 					if(isset($content['import'][$n]))
 					{
 						$content['import']['athlete'][$n] = $id;
-						$content['button'] = array('detect' => true);
+						$content['button'] = ['detect' => true];
 					}
 				}
 			}
+		}
+		elseif (is_array($content['import']['as']))
+		{
+			array_walk($content['import']['as'], static function(&$val)
+			{
+				$val = $val['as'];
+			});
 		}
 		if($content['keys']['comp']) $comp = $this->comp->read($content['keys']['comp']);
 		//echo "<p>calendar='$calendar', comp={$content['keys']['comp']}=$comp[rkey]: $comp[name]</p>\n";
 		if ($this->only_nation)
 		{
 			$calendar = $this->only_nation;
-			$tmpl->disable_cells('keys[calendar]');
+			$tmpl->disableElement('keys[calendar]');
 		}
 		elseif ($comp && !$content['keys']['calendar'])
 		{
@@ -105,7 +114,7 @@ class ranking_import extends ranking_result_bo
 		{
 			$calendar = key($this->ranking_nations);
 		}
-		if (!$comp || ($comp['nation'] ? $comp['nation'] : 'NULL') != $calendar)
+		if (!$comp || ($comp['nation'] ?: 'NULL') !== $calendar)
 		{
 			//echo "<p>calendar changed to '$calendar', comp is '$comp[nation]' not fitting --> reset </p>\n";
 			$comp = $cat = false;
@@ -116,11 +125,11 @@ class ranking_import extends ranking_result_bo
 			$cat = false;
 			$content['keys']['route'] = '';	// dont show route-selection
 		}
-		$keys = array(
+		$keys = [
 			'WetId' => $comp['WetId'],
 			'GrpId' => $cat['GrpId'],
 			'route_order' => $content['keys']['route'] < 0 ? -1 : $content['keys']['route'],
-		);
+		];
 		if ($comp && ($content['keys']['old_comp'] != $comp['WetId'] ||		// comp changed or
 			$cat && ($content['keys']['old_cat'] != $cat['GrpId'] || 			// cat changed or
 			!($route = $this->route->read($keys)))))	// route not found and no general result
@@ -129,41 +138,37 @@ class ranking_import extends ranking_result_bo
 		}
 		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
 
-		if($content['button'])
+		if ($content['button'] || is_array($content['file']))
 		{
-			$button = key($content['button']);
+			$button = key($content['button']) ?: 'upload';
 			unset($content['button']);
 			try {
 				switch($button)
 				{
 					case 'upload':
-						$content['import'] = self::do_upload($content['file']['tmp_name'],$content['charset'],
-							$content['delimiter'],$calendar,$cat['sex']);
-						$msg = lang('%1 lines read from file.',count($content['import'])-1);	// -1 because of 'as' key
+						$content['import'] = $this->do_upload($content['file']['tmp_name'],
+							$content['charset'], $content['delimiter'], $calendar, $cat['sex']);
+						$msg = lang('%1 lines read from file.',count($content['import'])-4);	// -1 because of 'as' key
 						break;
 					case 'cancel':
 						unset($content['import']);
 						break;
 					case 'import':
 						$msg = lang('%1 athletes imported.',
-							self::do_import($content['import'],$content['keys'],$content['license'],$calendar,$this->license_year));
+							$this->do_import($content['import'], $content['keys'], $cat['sex'], $content['add_missing'],
+								$content['license'], $this->license_year));
 						break;
-					case 'detect':
-						self::detect_athletes($content['import'],$content['import']['as'],$calendar,$cat['sex'],$content['license'],$this->license_year);
+					case 'apply':
+						$this->detect_athletes($content['import'], $content['import']['as'], $calendar, $cat['sex'], $content['license'], $this->license_year);
 						break;
 					case 'url':
-						try {
-							$msg = $this->from_url($comp, $content['keys']['cat'] ? $cat['rkey'] : null, $content['quali_type'],
-								$content['comp2import'], $import_url);
-						}
-						catch (Exception $e) {
-							$msg = $e->getMessage();
-						}
+						$msg = $this->from_url($comp, $content['keys']['cat'] ? $cat['rkey'] : null, $content['quali_type'],
+							$content['comp2import'], $import_url);
 						break;
 				}
 			}
 			catch (Exception $e) {
-				$msg = $e->getMessage();
+				Api\Framework::message($e->getMessage(), 'error');
 			}
 		}
 		// make some per default disabled ui elements visible:
@@ -175,7 +180,7 @@ class ranking_import extends ranking_result_bo
 			{
 				if ($content['import']['detection'][$n][$c] == 'conflictData')	// replace checkbox for conflict data
 				{
-					$readonlys["replace[$n][$c]"] = false;
+					$readonlys['import']['replace'][$n][$c] = false;
 				}
 			}
 			if ($content['import']['detection'][$n]['row'] == 'noAthlete')	// add button for new athletes
@@ -199,11 +204,17 @@ class ranking_import extends ranking_result_bo
 				$row['presets'] .= '&row='.$n;
 			}
 		}
-		//echo "<p>calendar='$calendar', comp={$content['keys']['comp']}=$comp[rkey]: $comp[name], cat=$cat[rkey]: $cat[name], route={$content['keys']['route']}</p>\n";
-		// create new view
+		// get federation grants
+		$athlete = $nations = $feds_with_grants = [];
+		try {
+			$this->presetFederation($athlete, $nations, $feds_with_grants);
+		}
+		catch (\Exception $e) {
+			$feds_with_grants = [];
+		}
 		$sel_options = array(
-			'delimiter' => array(',' => ',',';' => ';','\t' => 'Tab'),
-			'charset' => array('utf-8' => 'UTF-8','iso-8859-1' => 'ISO-8859-1'),
+			'delimiter' => [',' => ',',';' => ';','\t' => 'Tab'],
+			'charset' => ['utf-8' => 'UTF-8','iso-8859-1' => 'ISO-8859-1'],
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
@@ -211,24 +222,53 @@ class ranking_import extends ranking_result_bo
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
 			),0,'datum DESC'),
-			'cat'      => $this->cats->names(array('rkey' => $comp['gruppen']),0),
-			'route'    => ($import_url ? array(
+			'cat'      => $this->cats->names(['rkey' => $comp['gruppen']],0),
+			'route'    => ($import_url ? [
 				'url' => 'Import URL',
-			) : array()
-			)+array(
+			] : []
+			)+[
 				'athletes' => 'Athletes',
-			)+($comp && $cat ? array(
-				'ranking'  => 'General result into ranking',
-			)+(($routes = $this->route->query_list('route_name','route_order',array(
+			]+($comp && $cat ? [
+				'registration' => 'Registration',
+				'ranking'  => 'Ranking',
+			]/* disabling result-service import for now
+ 			+(($routes = $this->route->query_list('route_name','route_order',[
 				'WetId' => $comp['WetId'],
 				'GrpId' => $cat['GrpId'],
-			),'route_order DESC')) ? $routes : array()): array()),
+			],'route_order DESC')) ? $routes : [])*/ : []),
 			'quali_type' => $this->quali_types,
 			'license' => $this->license_labels,
+			'fed_id' => !$calendar ? array(lang('Select a nation first')) :
+				$this->athlete->federations($calendar,false,$feds_with_grants ? ['fed_id' => $feds_with_grants] : [])
 		);
+		if (count($sel_options['fed_id']) === 1)
+		{
+			$keys['fed_id'] = key($sel_options['fed_id']);
+		}
+		// do not allow to unset, confirm or suspend licenses, unless for admins
+		if (empty($GLOBALS['egw_info']['user']['apps']['admin']))
+		{
+			// apply for license only if athlete rights
+			if (empty($this->athlete_rights))
+			{
+				$sel_options['license'] = [];
+				$readonlys['license'] = true;
+			}
+			else
+			{
+				$sel_options['license'] = ['a' => $sel_options['license']['a']];
+			}
+		}
 		foreach(self::$import_columns as $col => $lables)
 		{
 			$sel_options['as'][$col] = $lables[0];
+		}
+		if (is_array($content['import']['as']))
+		{
+			array_walk($content['import']['as'], static function(&$val)
+			{
+				$val = ['as' => $val];
+			});
 		}
 		if ($comp && !isset($sel_options['comp'][$comp['WetId']])) $sel_options['comp'][$comp['WetId']] = $comp['name'];
 
@@ -248,14 +288,14 @@ class ranking_import extends ranking_result_bo
 
 		$content['import_url'] = $import_url;
 
-		$content['msg'] = $msg;
+		if (!empty($msg)) Api\Framework::message($msg);
 
 		Api\Cache::setSession('ranking', 'pending_import', $content['import']);
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/lang('Import').' '.
 			($cat ? (isset($sel_options['route'][$content['keys']['route']]) ? $sel_options['route'][$content['keys']['route']].' ' : '').$cat['name'] : '');
 		//_debug_array($content);
-		return $tmpl->exec('ranking.ranking_import.index',$content,$sel_options,$readonlys,$content);
+		return $tmpl->exec('ranking.ranking_import.index', $content, $sel_options, $readonlys, $content);
 	}
 
 	/**
@@ -268,14 +308,14 @@ class ranking_import extends ranking_result_bo
 	 * @param string $sex =null gender to use if not set in imported data: 'male' or 'female'
 	 * @return string success message
 	 */
-	private function do_upload($fname,$charset,$delimiter,$nation=null,$sex=null)
+	protected function do_upload($fname,$charset,$delimiter,$nation=null,$sex=null)
 	{
 		// do the import
-		$raw_import = self::csv_import($fname,$charset,$delimiter);
+		$raw_import = $this->csv_import($fname,$charset,$delimiter);
 		//_debug_array($raw_import);
 
 		// try detecting column names
-		$import = array('as' => self::detect_columns($raw_import[0],1));
+		$import = ['as' => $this->detect_columns($raw_import[0],1)];
 
 		foreach($raw_import as $r => &$row)
 		{
@@ -291,7 +331,7 @@ class ranking_import extends ranking_result_bo
 				}
 			}
 		}
-		self::detect_athletes($import,$import['as'],$nation,$sex);
+		$this->detect_athletes($import, $import['as'], $nation, $sex);
 		//_debug_array($import);
 		return $import;
 	}
@@ -305,30 +345,30 @@ class ranking_import extends ranking_result_bo
 	 * @param string $enclosure ='"'
 	 * @return array with lines and columns or string with error message
 	 */
-	private function csv_import($fname,$charset='iso-8859-1',$delimiter=',',$enclosure='"')
+	protected function csv_import($fname,$charset='iso-8859-1',$delimiter=',',$enclosure='"')
 	{
-		if (!$fname || !file_exists($fname) || !is_uploaded_file($fname))
+		if (!$fname || !file_exists($fname))
 		{
-			throw new egw_exception_wrong_userinput(lang('You need to select a file first!'));
+			throw new Api\Exception\WrongUserinput(lang('You need to select a file first!'));
 		}
-		if ($delimiter == '\t') $delimiter = "\t";
+		if ($delimiter === '\t') $delimiter = "\t";
 
 		$n = 0;
-		$lines = array();
+		$lines = [];
 		if (!($fp = fopen($fname,'rb')) || !($labels = fgetcsv($fp,null,$delimiter,$enclosure)) || count($labels) <= 1)
 		{
-			throw new egw_exception_wrong_userinput(lang('Error: no line with column names, eg. wrong delemiter'));
+			throw new Api\Exception\WrongUserinput(lang('Error: no line with column names, eg. wrong delemiter'));
 		}
-		$lines[$n++] = $GLOBALS['egw']->translation->convert($labels,$charset);
+		$lines[$n++] = Api\Translation::convert($labels,$charset);
 
 		while (($line = fgetcsv($fp,null,$delimiter)))
 		{
 			if (count($line) != count($labels))
 			{
 				//_debug_array($labels); _debug_array($line);
-				throw new egw_exception_wrong_userinput(lang('Dataline %1 has a different number of columns (%2) then labels (%3)!',$n,count($line),count($labels)));
+				throw new Api\Exception\WrongUserinput(lang('Dataline %1 has a different number of columns (%2) then labels (%3)!',$n,count($line),count($labels)));
 			}
-			$lines[$n++] = $GLOBALS['egw']->translation->convert($line,$charset);
+			$lines[$n++] = Api\Translation::convert($line,$charset);
 		}
 		fclose($fp);
 
@@ -342,9 +382,9 @@ class ranking_import extends ranking_result_bo
 	 * @param int $first =1 number of first column
 	 * @return array column number => name pairs
 	 */
-	private function detect_columns(array $headers,$first=1)
+	protected function detect_columns(array $headers,$first=1)
 	{
-		$columns = array();
+		$columns = [];
 		foreach($headers as $c => $header)
 		{
 			foreach(self::$import_columns as $col => $labels)
@@ -373,7 +413,7 @@ class ranking_import extends ranking_result_bo
 	 * @param string $license =null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
 	 * @param int $license_year =null default this->license_year
 	 */
-	private function detect_athletes(array &$import,array $col2name,$nation=null,$sex=null,$license=null,$license_year=null)
+	protected function detect_athletes(array &$import, array $col2name, $nation=null, $sex=null, $license=null, $license_year=null)
 	{
 		if ($nation == 'NULL') $nation = null;
 		if (is_null($license_year) || !$license_year) $license_year = $this->license_year;
@@ -384,11 +424,11 @@ class ranking_import extends ranking_result_bo
 		$id_col        = array_search('PerId',$col2name);
 		//error_log(__METHOD__."(,".array2string($col2name).",$nation,$sex) firstname_col=$firstname_col, lastname_col=$lastname_col, nation_col=$nation_col, id_col=$id_col");
 
-		$import['detection'] = array();
+		$import['detection'] = [];
 		$detection =& $import['detection'];
 		foreach($import as $n => &$data)
 		{
-			if ($n < 2 ) continue;	// not an athelete col
+			if ($n < 2 ) continue;	// not an athlete col
 
 			$nat = $nation_col && $data[$nation_col] ? $data[$nation_col] : $nation;
 
@@ -412,11 +452,11 @@ class ranking_import extends ranking_result_bo
 									'/^([0-9]{2}).([0-9]{2}).([0-9]{4})$/',		// DD.MM.YYYY
 									'/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/',	// MM/DD/YYYY
 									'/^([0-9]{2})-([0-9]{2})-([0-9]{4})$/',		// DD-MM-YYYY
-								),array(
+								),[
 									'\\3-\\2-\\1',
 									'\\3-\\1-\\2',
 									'\\3-\\2-\\1',
-								),$data[$c]);
+								],$data[$c]);
 							}
 						}
 						break;
@@ -425,7 +465,7 @@ class ranking_import extends ranking_result_bo
 						{
 							case 'GER':
 								$data[$c] = preg_replace(array('/e\. ?V\. ?/i','/^(Deutscher Alpenverein|Alpenverein|DAV|Sektion|Se.) ?(.*)$/i'),
-									array('','Deutscher Alpenverein \\2'),$data[$c]);
+									['','Deutscher Alpenverein \\2'],$data[$c]);
 								break;
 							case 'SUI':
 								$data[$c] = preg_replace('/^(Schweizer Alpen[ -]*Club|SAC|Club Alpin Suisse|CAS|Sektion|Se.) ?(.*)$/i','Schweizer Alpen Club \\2',$data[$c]);
@@ -466,21 +506,21 @@ class ranking_import extends ranking_result_bo
 					$firstname = implode(' ',$parts);
 				}
 			}
-			$criteria = array(
+			$criteria = [
 				'vorname'  => $firstname,
 				'nachname' => $lastname,
 				'nation'   => $nation_col && $data[$nation_col] ? $data[$nation_col] : $nation,
-			);
+			];
 			if ($sex) $criteria['sex'] = $sex;
 
 			if ($lastname_col && $data[$firstname_col] && $data[$lastname_col] &&
 				($import['athlete'][$n] && !is_array($import['athlete'][$n]) &&
-					($athlete = $this->athlete->read($import['athlete'][$n],'',$license_year,$nation)) ||
-				($athletes = $this->athlete->search($criteria,false,'','','',false,'AND',false,array(
+					($athlete = $this->athlete->read($import['athlete'][$n], '', $license_year, $nation)) ||
+				($athletes = $this->athlete->search($criteria,false,'','','',false,'AND',false,[
 					'license_nation' => $nation,
 					'license_year' => $license_year,
 					'license_year' => $license_year,
-				))) && count($athletes) == 1 && ($athlete=$athletes[0])))	// dont autodetect multiple matches!
+				])) && count($athletes) == 1 && ($athlete=$athletes[0])))	// dont autodetect multiple matches!
 			{
 				$import['athlete'][$n] = $athlete['PerId'];
 				foreach($col2name as $c => $name)
@@ -538,15 +578,18 @@ class ranking_import extends ranking_result_bo
 	 * Import the data in $import into a competition, category and route specified in keys or just the athletes
 	 *
 	 * @param array $import athlete rows with numerical id's starting with 2, plus values for 'as' and 'athlete' keys
-	 * @param array $keys values for keys 'comp', 'cat', 'route' (0..N, 'athlete' or 'ranking'
+	 * @param array $keys values for keys 'comp', 'cat', 'route' (0..N, 'athlete', 'registration' or 'ranking')
+	 * @param string $sex =null should we only search for a certain gender
+	 * @param bool $add_missing =false true: add missing athletes
 	 * @param string $license =null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
 	 * @param string $license_nation =null nation of the license
 	 * @param int $license_year =null default this->license_year
-	 * @return int number of imported athletes
+	 * @return string|int success-message of result import and/or number of imported athletes
+	 * @throw \Exception on error
 	 */
-	private function do_import(array &$import,array $keys,$license=null,$license_nation=null,$license_year=null)
+	protected function do_import(array &$import, array $keys, $sex=null, bool $add_missing=false, $license=null, $license_nation=null, $license_year=null)
 	{
-		if (is_null($license_year) || !$license_year) $license_year = $this->license_year;
+		if (empty($license_year)) $license_year = $this->license_year;
 
 		$imported = 0;
 		$col2name =& $import['as'];
@@ -555,35 +598,54 @@ class ranking_import extends ranking_result_bo
 		$detection =& $import['detection'];
 		$update =& $import['update'];
 		$rank_col = array_search('rank', $col2name);
-		$do_result_import = $rank_col &&	// do result import, if we rank column selected
-			!empty($keys['comp']) && !empty($keys['cat']);
-		$result = array();
+		// result import selected
+		if (!empty($keys['comp']) && !empty($keys['cat']) && (is_numeric($keys['route']) || $keys['route'] === 'ranking'))
+		{
+			if (empty($rank_col))
+			{
+				throw new Api\Exception\WrongUserinput(lang('You need to select a rank column to import a result!'));
+			}
+			$do_result_import = true;
+		}
+		$result = [];
 		foreach($import as $n => &$row)
 		{
-			if ($n < 2 || !$athletes[$n] || is_array($athletes[$n]) || !($athlete = $this->athlete->read($athletes[$n])))
+			if ($n < 2) continue;	// not an athlete row
+
+			$this->athlete->init();
+
+			if (!$athletes[$n] || is_array($athletes[$n]) || !($athlete = $this->athlete->read($athletes[$n])))
 			{
-				if ($n >= 2 && $do_result_import)
+				if ($add_missing)
 				{
-					$do_result_import = false;
-					$error = lang('No result imported, need to select ALL athletes first!');
+					$athlete = ['sex' => $sex];
 				}
-				continue;	// no athlete line or no (valid) athlete selected
+				elseif ($do_result_import)
+				{
+					throw new Api\Exception\WrongUserinput(lang('No result imported, need to select ALL athletes first!'));
+				}
+				else
+				{
+					continue;
+				}
 			}
-			$need_update = false;
+			$need_update = !empty($license);
 			foreach($col2name as $c => $name)
 			{
-				if ($detection[$n][$c] && (!isset($update[$n][$c]) || $update[$n][$c]))
+				if ($add_missing && !isset($athletes[$n]) ||
+					$detection[$n][$c] && (!isset($update[$n][$c]) || $update[$n][$c]))
 				{
 					$athlete[$name] = $row[$c];
 					$need_update = true;
 					// extra handling for federations, athletes store only fed_id, they get only created, if they are explicitly marked for update!
-					if ($name == 'verband')
+					if ($name === 'verband')
 					{
 						if (!($athlete['fed_id'] = $this->federation->get_federation($row[$c],$nation_col?$row[$nation_col]:null,true)) &&
-							$update[$n][$c] && $row[$nation_col])
+							// only allow admins to create new federations
+							$this->is_admin && $update[$n][$c] && $row[$nation_col])
 						{
-							$this->federation->init(array('verband' => $row[$c]));
-							if ($this->federation->save($nation_col && $row[$nation_col] ? array('nation' => $row[$nation_col]) : null) == 0)
+							$this->federation->init(['verband' => $row[$c]]);
+							if ($this->federation->save($nation_col && $row[$nation_col] ? ['nation' => $row[$nation_col]] : null) == 0)
 							{
 								$athlete['fed_id'] = $this->federation->data['fed_id'];
 							}
@@ -591,43 +653,85 @@ class ranking_import extends ranking_result_bo
 					}
 				}
 			}
-			if ($need_update && $this->athlete->save($athlete) == 0)
+			if ($need_update)
 			{
-				// set license if column has a non-empty value
-				if (($lic_col = array_search('license',$col2name)) !== false && $row[$lic_col])
+				// set a default nation & federation otherwise the athlete is not visible
+				if (empty($athlete['fed_id']) && !empty($keys['fed_id']))
 				{
-					$this->athlete->set_license($license_year,$row[$lic_col][0],null,$license_nation);
+					$athlete['fed_id'] = $keys['fed_id'];
 				}
-				unset($detection[$n]);	// unmark as now updated
-				unset($update[$n]);
-				$imported++;
-				// new created athletes need to set PerId
-				if (!$athlete['PerId'])
+				// check missing federation or no rights to create/update athlete --> abort
+				if (empty($athlete['fed_id']) || !$this->acl_check_athlete($athlete))
 				{
-					$athletes[$n] = $this->athelte->data['PerId'];
+					// show already imported athletes
+					if ($n > 2) $this->detect_athletes($import, $col2name, $keys['calendar'], $sex, $license, $license_year);
+					throw new Api\Exception\WrongUserinput(lang('No athlete federation or missing rights to create or update the athlete!'));
+				}
+				if ($this->athlete->save($athlete) === 0)
+				{
+					unset($detection[$n]);	// unmark as now updated
+					unset($update[$n]);
+					$imported++;
+					// new created athletes need to set PerId
+					if (empty($athlete['PerId']))
+					{
+						$athletes[$n] = $this->athlete->data['PerId'];
+					}
+					// set license if column has a non-empty value
+					if (!empty($license) &&
+						$this->athlete->set_license($license_year, $license, null, $license_nation) === false)
+					{
+						throw new Api\Exception\WrongUserinput(lang('Failed to set license for %1 (maybe wrong age-group)!',
+							strtoupper($athlete['nachname']).', '.$athlete['vorname']));
+					}
 				}
 			}
 			if ($do_result_import)
 			{
-				$result[$athletes[$n]] = array(
+				$result[$athletes[$n]] = [
 					'result_rank' => $row[$rank_col],
 					'nation' => $athlete['nation'],
-				);
+				];
 			}
 
 		}
-		// import result into ranking (not result-service!)
-		if ($do_result_import)
+		// run a new detection as that's easier and more consistent
+		$this->detect_athletes($import, $col2name, $keys['calendar'], $sex, $license, $license_year);
+
+		if (($keys['route'] === 'registration' || $do_result_import) &&
+			!$this->acl_check($keys['calendar'], $keys['route'] === 'registration' ? self::ACL_REGISTER : self::ACL_RESULT, $keys['WetId']))
 		{
-			$error = ranking_bo::import_ranking(array(	// $this->import_ranking is from ranking_result_bo!
+			throw new Api\Exception\WrongUserinput(lang('Missing rights to import into the selected competition!'));
+		}
+		// import into registration
+		if ($keys['route'] === 'registration')
+		{
+			$registered = 0;
+			foreach($athletes as $PerId)
+			{
+				if (!empty($PerId) && $this->register($keys['comp'], $keys['cat'], $PerId))
+				{
+					++$registered;
+				}
+			}
+			$import_result = lang('%1 athlets successful registered', $registered);
+		}
+		elseif ($do_result_import && is_numeric($keys['route']))
+		{
+			throw new \Exception('Resultservice import not yet implemented :(');
+		}
+		// import result into ranking (not result-service!)
+		elseif ($do_result_import)
+		{
+			if (!($import_result = ranking_bo::import_ranking([	// $this->import_ranking is from ranking_result_bo!
 				'WetId' => $keys['comp'],
 				'GrpId' => $keys['cat'],
-			), $result);
+			], $result)))
+			{
+				throw new EGroupware\Api\Exception\NoPermission();
+			}
 		}
-		// run a new detection as that's easier and more consistent
-		self::detect_athletes($import,$col2name,$keys['calendar'],null,$license,$license_year);
-
-		return (isset($error) ? $error.' ' : '').$imported;
+		return isset($import_result) ? $import_result.', '.$imported : $imported;
 	}
 
 	/**
@@ -656,7 +760,7 @@ class ranking_import extends ranking_result_bo
 			ob_start();
 		}
 		$arg = $comp;
-		if (!is_array($comp) && !($comp = $this->comp->read(is_numeric($comp) ? array('WetId'=>$comp) : array('rkey'=>$comp))))
+		if (!is_array($comp) && !($comp = $this->comp->read(is_numeric($comp) ? ['WetId'=>$comp] : ['rkey'=>$comp])))
 		{
 			throw new Exception("Competition '$arg' not found!",4);
 		}
@@ -666,7 +770,7 @@ class ranking_import extends ranking_result_bo
 		}
 		elseif(!is_array($cats))
 		{
-			$cats = array($cats);
+			$cats = [$cats];
 		}
 		if (!is_null($debug)) echo $comp['rkey'].': '.$comp['name']."\n";
 
@@ -710,12 +814,12 @@ class ranking_import extends ranking_result_bo
 				curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
 					'etemplate_exec_id' => $exec_id,
 					'exec' => array(
-						'nm' => array(
+						'nm' => [
 							'cat' => $cat['GrpId'],
 							'show_result' => 1,
 							'route' => 0,
 							'num_rows' => '999',
-						),
+						],
 					)
 				)));
 				if ($debug > 2) echo "POSTing $url with $post\n";
@@ -727,19 +831,19 @@ class ranking_import extends ranking_result_bo
 			curl_setopt($ch,CURLOPT_POSTFIELDS,$post=http_build_query(array(
 				'etemplate_exec_id' => $exec_id,
 				'exec' => array(
-					'nm' => array(
+					'nm' => [
 						'cat' => $cat['GrpId'],
 						'show_result' => 1,
 						'route' => 0,
 						'num_rows' => '999',
-					),
+					],
 				)
 			)));
 			if ($debug > 2) echo "POSTing $url with $post\n";
 			$exec_id = self::get_exec_id($download=curl_exec($ch), $debug);	// switch to route=0 and get new exec-id
 			if ($debug > 4) echo $download."\n\n";
 
-			$downloads = $fnames = array();
+			$downloads = $fnames = [];
 			for($route=0; $route <= 6; ++$route)
 			{
 				// download each heat
@@ -748,12 +852,12 @@ class ranking_import extends ranking_result_bo
 					'etemplate_exec_id' => $exec_id,
 					'submit_button' => 'exec[button][download]',
 					'exec' => array(
-						'nm' => array(
+						'nm' => [
 							'cat' => $cat['GrpId'],
 							'show_result' => 1,
 							'route' => $route,
 							'num_rows' => '999',
-						),
+						],
 					)
 				)));
 				if ($debug > 2) echo "\nPOSTing $url with $post\n";
@@ -773,7 +877,7 @@ class ranking_import extends ranking_result_bo
 				}
 				$fnames[$route] = $fname = str_replace('/','-',$matches[1]);
 				// convert from the given charset to eGW's
-				$downloads[$route] = translation::convert($download,$charset);
+				$downloads[$route] = Api\Translation::convert($download, $charset);
 				if ($debug > 1) echo "$fname:\n".implode("\n",array_slice(explode("\n",$downloads[$route]),0,4))."\n\n";
 
 				if ($only_download)
@@ -799,11 +903,11 @@ class ranking_import extends ranking_result_bo
 					}
 					else
 					{
-						$content = array(
+						$content = [
 							'WetId' => $comp['WetId'],
 							'GrpId' => $cat['GrpId'],
 							'route_order' => 0,
-						);
+						];
 						$download = $downloads[0];
 						$quali1 = $this->parse_csv($content,fopen('global://download','r'),false,$add_athletes,(int)$comp2import);
 						if (!is_array($quali1)) die($quali1."\n");
@@ -826,11 +930,11 @@ class ranking_import extends ranking_result_bo
 				}
 				foreach($downloads as $route => $download)
 				{
-					$content = array(
+					$content = [
 						'WetId' => $comp['WetId'],
 						'GrpId' => $cat['GrpId'],
 						'route_order' => $route,
-					);
+					];
 					$discipline = null;
 					if (!$this->init_route($content,$comp,$cat,$discipline))
 					{
@@ -888,11 +992,11 @@ class ranking_import extends ranking_result_bo
 			}
 			if ($import_ranking && $route >= 2)
 			{
-				$content = array(
+				$content = [
 					'WetId' => $comp['WetId'],
 					'GrpId' => $cat['GrpId'],
 					'route_order' => -1,
-				);
+				];
 				if (!$this->init_route($content,$comp,$cat,$discipline))
 				{
 					throw new Exception(lang('Permission denied !!!'),9);

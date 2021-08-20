@@ -583,8 +583,10 @@ class ranking_athlete extends Api\Storage\Base
 
 	/**
 	 * Generates a rkey for an athlete by using one letter of the first name, 2 from the last name the year and the sex
+	 *
+	 * @param array $data =null
 	 */
-	function generate_rkey($data='')
+	function generate_rkey(array $data=null)
 	{
 		if (!is_array($data)) $data =& $this->data;
 
@@ -1265,6 +1267,11 @@ class ranking_athlete extends Api\Storage\Base
 			$current = $this->data;
 			$old = $this->read($this->data['PerId'], false);
 			$this->data = $current;
+		}
+		// automatic generate an rkey for new entries
+		elseif (empty($this->data['rkey']))
+		{
+			$this->generate_rkey();
 		}
 		// get fed_id from national federation, if fed_id is not given but nation
 		if (!$this->data['fed_id'] && $this->data['nation'] &&
