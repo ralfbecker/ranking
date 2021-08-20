@@ -190,8 +190,8 @@ class ranking_import extends ranking_result_bo
 				$row['presets'] = '';
 				foreach($content['import']['as'] as $c => $name)
 				{
-					if ($name && $row[$c]) $row['presets'] .= '&preset['.$name.']='.$row[$c].
-						($name == 'geb_date' && is_numeric($row[$c]) ? '-01-01' : '');
+					if ($name && $name !== 'PerId' && $row[$c]) $row['presets'] .= '&preset['.$name.']='.$row[$c].
+						($name === 'geb_date' && is_numeric($row[$c]) ? '-01-01' : '');
 				}
 				if ($calendar && $calendar != 'NULL' && !in_array('nation',$content['import']['as']))
 				{
