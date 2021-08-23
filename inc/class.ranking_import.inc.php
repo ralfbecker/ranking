@@ -88,7 +88,7 @@ class ranking_import extends ranking_result_bo
 				}
 			}
 		}
-		elseif (is_array($content['import']['as']))
+		if (is_array($content['import']['as']))
 		{
 			array_walk($content['import']['as'], static function(&$val)
 			{
@@ -185,15 +185,15 @@ class ranking_import extends ranking_result_bo
 			}
 			if ($content['import']['detection'][$n]['row'] == 'noAthlete')	// add button for new athletes
 			{
-				$readonlys["add[$n]"] = false;
-				$readonlys["edit[$n]"] = true;
+				$readonlys['import']["add[$n]"] = false;
+				$readonlys['import']["edit[$n]"] = true;
 				$row['presets'] = '';
 				foreach($content['import']['as'] as $c => $name)
 				{
 					if ($name && !in_array($name, ['PerId','rank','result']) && $row[$c])
 					{
 						$row['presets'] .= '&preset['.$name.']='.
-							urlencode($row[$c].($name === 'geb_date' && is_numeric($row[$c]) ? '-01-01' : ''));
+							$row[$c].($name === 'geb_date' && is_numeric($row[$c]) ? '-01-01' : '');
 					}
 				}
 				if ($calendar && $calendar != 'NULL' && !in_array('nation',$content['import']['as']))
