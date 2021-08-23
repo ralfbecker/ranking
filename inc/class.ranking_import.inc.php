@@ -41,7 +41,7 @@ class ranking_import extends ranking_result_bo
 		'tel'      => ['tel', 'telefon', 'telephone', 'phone'],
 		'mobil'    => ['mobile', 'mobilephone', 'cellphone'],
 		'fax'      => ['fax', 'telefax'],
-		'email'    => ['email', 'mail'],
+		'email'    => ['email', 'e-mail', 'mail'],
 		'homepage' => ['homepage', 'www', 'url'],
 		'anrede'   => ['anrede', 'title'],
 		// no need as only ranking import 'result'   => ['result','ergebnis'],
@@ -216,7 +216,7 @@ class ranking_import extends ranking_result_bo
 			$feds_with_grants = [];
 		}
 		$sel_options = array(
-			'delimiter' => [',' => ',',';' => ';','\t' => 'Tab'],
+			'delimiter' => [';' => ';',',' => ',','\t' => 'Tab'],
 			'charset' => ['utf-8' => 'UTF-8','iso-8859-1' => 'ISO-8859-1'],
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
@@ -305,16 +305,26 @@ class ranking_import extends ranking_result_bo
 	 * Handle the file upload
 	 *
 	 * @param string $fname
-	 * @param string $charset ='iso-8859-1'
-	 * @param string $delimiter =','
+	 * @param string $charset
+	 * @param string $delimiter
 	 * @param string $nation =null nation to use if not set in imported data
 	 * @param string $sex =null gender to use if not set in imported data: 'male' or 'female'
 	 * @return string success message
 	 */
-	protected function do_upload($fname,$charset,$delimiter,$nation=null,$sex=null)
+	protected function do_upload($fname, $charset, $delimiter, $nation=null, $sex=null)
 	{
 		// do the import
-		$raw_import = $this->csv_import($fname,$charset,$delimiter);
+		foreach(array_values(array_unique([$delimiter, ';', ',', "\t"])) as $n => $delimiter)
+		{
+			try {
+				$raw_import = $this->csv_import($fname, $charset, $delimiter);
+				break;
+			}
+			catch (\Exception $e) {
+				// try other delimiter
+				if ($n === 2) throw $e;
+			}
+		}
 		//_debug_array($raw_import);
 
 		// try detecting column names
