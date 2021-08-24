@@ -65,7 +65,7 @@
 				<row class="noPrint">
 					<hbox>
 						<select statustext="Select calendar" id="keys[calendar]" no_lang="true" onchange="1"/>
-						<select id="keys[comp]" no_lang="true" onchange="1" empty_label="Select competition"/>
+						<select id="keys[comp]" no_lang="true" search="true" onchange="1" empty_label="Select competition"/>
 					</hbox>
 				</row>
 				<row class="noPrint" disabled="!@keys[comp]">
@@ -141,7 +141,7 @@
 								<select id="as[11][as]" empty_label="Ignore" class="et2_fullWidth"/>
 								<select id="as[12][as]" empty_label="Ignore" class="et2_fullWidth"/>
 							</row>
-							<row class="row {$cont[detection][$row][row]}">
+							<row class="row {$cont['detection'][$row]['row']}">
 								<hbox>
 									<link-entry id="athlete[$row]" only_app="ranking" width="185"
 										onchange="widget.getRoot().getWidgetById('button[apply]').click();"/>
@@ -150,18 +150,18 @@
 									<buttononly statustext="Edit athlete" label="Edit" id="edit[$row]" image="edit"
 										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=')+widget.getParent().getChildren()[0].getValue(), '_blank', 850, 480, 'yes'); return false;"/>
 								</hbox>
-								<checkbox statustext="@detection[$row][help-1]" label="@{$row}[1]" id="replace[$row][1]" readonly="true" class="{$cont[detection][$row][1]}"/>
-								<checkbox statustext="@detection[$row][help-2]" label="@{$row}[2]" id="replace[$row][2]" readonly="true" class="{$cont[detection][$row][2]}"/>
-								<checkbox statustext="@detection[$row][help-3]" label="@{$row}[3]" id="replace[$row][3]" readonly="true" class="{$cont[detection][$row][3]}"/>
-								<checkbox statustext="@detection[$row][help-4]" label="@{$row}[4]" id="replace[$row][4]" readonly="true" class="{$cont[detection][$row][4]}"/>
-								<checkbox statustext="@detection[$row][help-5]" label="@{$row}[5]" id="replace[$row][5]" readonly="true" class="{$cont[detection][$row][5]}"/>
-								<checkbox statustext="@detection[$row][help-6]" label="@{$row}[6]" id="replace[$row][6]" readonly="true" class="{$cont[detection][$row][6]}"/>
-								<checkbox statustext="@detection[$row][help-7]" label="@{$row}[7]" id="replace[$row][7]" readonly="true" class="{$cont[detection][$row][7]}"/>
-								<checkbox statustext="@detection[$row][help-8]" label="@{$row}[8]" id="replace[$row][8]" readonly="true" class="{$cont[detection][$row][8]}"/>
-								<checkbox statustext="@detection[$row][help-9]" label="@{$row}[9]" id="replace[$row][9]" readonly="true" class="{$cont[detection][$row][9]}"/>
-								<checkbox statustext="@detection[$row][help-10]" label="@{$row}[10]" id="replace[$row][10]" readonly="true" class="{$cont[detection][$row][10]}"/>
-								<checkbox statustext="@detection[$row][help-11]" label="@{$row}[11]" id="replace[$row][11]" readonly="true" class="{$cont[detection][$row][11]}"/>
-								<checkbox statustext="@detection[$row][help-12]" label="@{$row}[12]" id="replace[$row][12]" readonly="true" class="{$cont[detection][$row][12]}"/>
+								<checkbox statustext="@detection[$row][help-1]" label="@{$row}[1]" id="replace[$row][1]" readonly="true" class="{$cont['detection'][$row][1]}"/>
+								<checkbox statustext="@detection[$row][help-2]" label="@{$row}[2]" id="replace[$row][2]" readonly="true" class="{$cont['detection'][$row][2]}"/>
+								<checkbox statustext="@detection[$row][help-3]" label="@{$row}[3]" id="replace[$row][3]" readonly="true" class="{$cont['detection'][$row][3]}"/>
+								<checkbox statustext="@detection[$row][help-4]" label="@{$row}[4]" id="replace[$row][4]" readonly="true" class="{$cont['detection'][$row][4]}"/>
+								<checkbox statustext="@detection[$row][help-5]" label="@{$row}[5]" id="replace[$row][5]" readonly="true" class="{$cont['detection'][$row][5]}"/>
+								<checkbox statustext="@detection[$row][help-6]" label="@{$row}[6]" id="replace[$row][6]" readonly="true" class="{$cont['detection'][$row][6]}"/>
+								<checkbox statustext="@detection[$row][help-7]" label="@{$row}[7]" id="replace[$row][7]" readonly="true" class="{$cont['detection'][$row][7]}"/>
+								<checkbox statustext="@detection[$row][help-8]" label="@{$row}[8]" id="replace[$row][8]" readonly="true" class="{$cont['detection'][$row][8]}"/>
+								<checkbox statustext="@detection[$row][help-9]" label="@{$row}[9]" id="replace[$row][9]" readonly="true" class="{$cont['detection'][$row][9]}"/>
+								<checkbox statustext="@detection[$row][help-10]" label="@{$row}[10]" id="replace[$row][10]" readonly="true" class="{$cont['detection'][$row][10]}"/>
+								<checkbox statustext="@detection[$row][help-11]" label="@{$row}[11]" id="replace[$row][11]" readonly="true" class="{$cont['detection'][$row][11]}"/>
+								<checkbox statustext="@detection[$row][help-12]" label="@{$row}[12]" id="replace[$row][12]" readonly="true" class="{$cont['detection'][$row][12]}"/>
 							</row>
 						</rows>
 					</grid>
@@ -182,7 +182,7 @@
 					<template id="ranking.result.official" span="all"/>
 				</row>
 				<row class="onlyPrint">
-					<template id="ranking.result.header{$cont[nm][calendar]}"/>
+					<template id="ranking.result.header{$cont['nm']['calendar']}"/>
 				</row>
 			</rows>
 		</grid>
@@ -191,6 +191,7 @@
 			.noAthlete { background-color: #ffffd0; }
 			.conflictData { background-color: #ffffd0; font-weight: bold; }
 			.newData { font-weight: bold; font-style: italic; }
+			tr.ignore > td * { color: lightgray !important; }
 			table.importGrid { width: auto; margin-left: 0 !important; margin-top: 10px; margin-bottom: 5px }
 			table.importGrid td { padding-right: 5px !important; padding-left: 5px !important }
 			table.importGrid tr > td, table.importGrid tr > td *, table.importGrid tr.th > td { vertical-align: middle !important }

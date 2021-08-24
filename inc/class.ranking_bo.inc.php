@@ -852,9 +852,9 @@ class ranking_bo extends ranking_so
 			throw new Api\Exception\WrongParameter(lang('Competition NOT found !!!'));
 		}
 		$error = $replace = null;
-		if ($comp && !($this->is_admin || $this->is_judge($comp)) &&
+		if ($comp && ($this->comp->has_results($comp,$cat) || !($this->is_admin || $this->is_judge($comp)) &&
 			($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum'])) &&
-			($mode !== 'replace' || empty($comp['replace_deadline']) || $this->date_over($comp['replace_deadline'])))
+			($mode !== 'replace' || empty($comp['replace_deadline']) || $this->date_over($comp['replace_deadline']))))
 		{
 			$error = lang('Registration for this competition is over!');
 		}
@@ -931,7 +931,7 @@ class ranking_bo extends ranking_so
 		// check if all conditions for registration are met
 		if (($error = $this->error_register($athlete, $cat, $comp, $replace ? 'replace' : $mode)))
 		{
-			throw new Api\Exception\WrongUserinput($error);
+			throw new Api\Exception\WrongUserinput(strtoupper($athlete['nachname']).', '.$athlete['vorname'].': '.$error);
 		}
 
 		// check athlete to replace is registed

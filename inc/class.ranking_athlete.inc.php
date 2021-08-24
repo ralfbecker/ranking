@@ -1459,5 +1459,30 @@ class ranking_athlete extends Api\Storage\Base
 		//error_log(__METHOD__."('$pattern', ".array2string($options).' returning '.count($result).' results');
 		return $result;
 	}
+
+	/**
+	 * Get the gender of a given first name (and optional nation)
+	 *
+	 * @param string $firstname
+	 * @param ?string $nation
+	 * @return string|false "male", "female" or false, if not found in db
+	 */
+	public function gender($firstname, $nation=null)
+	{
+		static $genders = [];
+
+		if (!isset($genders[$nation ?? ''][$firstname]))
+		{
+			$where = ['vorname' => $firstname];
+			if (!empty($nation))
+			{
+				$where[] = self::FEDERATIONS_TABLE.'.nation='.$this->db->quote($nation);
+				$join = self::FEDERATIONS_JOIN;
+			}
+			$genders[$nation ?? ''][$firstname] = $this->db->select($this->table_name, 'sex, COUNT(*)', $where, __LINE__, __FILE__,
+				0, 'GROUP BY sex ORDER BY COUNT(*) DESC', 'ranking', 1, $join)->fetchColumn(0);
+		}
+		return $genders[$nation ?? ''][$firstname];
+	}
 }
 ranking_athlete::init_static();

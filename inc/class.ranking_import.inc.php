@@ -45,7 +45,15 @@ class ranking_import extends ranking_result_bo
 		'homepage' => ['homepage', 'www', 'url'],
 		'anrede'   => ['anrede', 'title'],
 		// no need as only ranking import 'result'   => ['result','ergebnis'],
+		'coach'    => ['coach', 'betreuer'],
+		'coach-email' => ['coach-email', 'coach email', 'betreuer-email'],
 	);
+
+	/**
+	 * Coach GrpId by 3-char nation
+	 * @var int[]
+	 */
+	static $nat_coach_cats = ['GER' => 213];
 
 	/**
 	 * Import a csv file
@@ -147,7 +155,7 @@ class ranking_import extends ranking_result_bo
 				{
 					case 'upload':
 						$content['import'] = $this->do_upload($content['file']['tmp_name'],
-							$content['charset'], $content['delimiter'], $calendar, $cat['sex']);
+							$content['charset'], $content['delimiter'], $calendar, $cat);
 						$msg = lang('%1 lines read from file.',count($content['import'])-4);	// -1 because of 'as' key
 						break;
 					case 'cancel':
@@ -155,11 +163,11 @@ class ranking_import extends ranking_result_bo
 						break;
 					case 'import':
 						$msg = lang('%1 athletes imported.',
-							$this->do_import($content['import'], $content['keys'], $cat['sex'], $content['add_missing'],
+							$this->do_import($content['import'], $content['keys'], $cat, $content['add_missing'],
 								$content['license'], $this->license_year));
 						break;
 					case 'apply':
-						$this->detect_athletes($content['import'], $content['import']['as'], $calendar, $cat['sex'], $content['license'], $this->license_year);
+						$this->detect_athletes($content['import'], $content['import']['as'], $calendar, $cat, $content['license'], $this->license_year);
 						break;
 					case 'url':
 						$msg = $this->from_url($comp, $content['keys']['cat'] ? $cat['rkey'] : null, $content['quali_type'],
@@ -221,10 +229,10 @@ class ranking_import extends ranking_result_bo
 			'calendar' => $this->ranking_nations,
 			'comp'     => $this->comp->names(array(
 				'nation' => $calendar,
-				'datum < '.$this->db->quote(date('Y-m-d',time()+7*24*3600)),	// starting 5 days from now
+				'datum < '.$this->db->quote(date('Y-m-d',time()+100*24*3600)),	// starting days from now
 				'datum > '.$this->db->quote(date('Y-m-d',time()-365*24*3600)),	// until one year back
 				'gruppen IS NOT NULL',
-			),0,'datum DESC'),
+			),3,'datum DESC'),
 			'cat'      => $this->cats->names(['rkey' => $comp['gruppen']],0),
 			'route'    => ($import_url ? [
 				'url' => 'Import URL',
@@ -244,6 +252,11 @@ class ranking_import extends ranking_result_bo
 			'fed_id' => !$calendar ? array(lang('Select a nation first')) :
 				$this->athlete->federations($calendar,false,$feds_with_grants ? ['fed_id' => $feds_with_grants] : [])
 		);
+		// show coach* columns only for registration
+		if ($content['route'] !== 'registration')
+		{
+			unset($sel_options['route']['coach'], $sel_options['route']['coach-email']);
+		}
 		if (count($sel_options['fed_id']) === 1)
 		{
 			$keys['fed_id'] = key($sel_options['fed_id']);
@@ -293,6 +306,7 @@ class ranking_import extends ranking_result_bo
 
 		if (!empty($msg)) Api\Framework::message($msg);
 
+		Api\Cache::setSession('ranking', 'import', $content['keys']);
 		Api\Cache::setSession('ranking', 'pending_import', $content['import']);
 		// create a nice header
 		$GLOBALS['egw_info']['flags']['app_header'] = /*lang('Ranking').' - '.*/lang('Import').' '.
@@ -308,10 +322,11 @@ class ranking_import extends ranking_result_bo
 	 * @param string $charset
 	 * @param string $delimiter
 	 * @param string $nation =null nation to use if not set in imported data
-	 * @param string $sex =null gender to use if not set in imported data: 'male' or 'female'
+	 * @param ?array $cat =null category to use
 	 * @return string success message
+	 * @throws Api\Exception\WrongUserinput
 	 */
-	protected function do_upload($fname, $charset, $delimiter, $nation=null, $sex=null)
+	protected function do_upload($fname, $charset, $delimiter, $nation=null, array $cat=null)
 	{
 		// do the import
 		foreach(array_values(array_unique([$delimiter, ';', ',', "\t"])) as $n => $delimiter)
@@ -322,7 +337,7 @@ class ranking_import extends ranking_result_bo
 			}
 			catch (\Exception $e) {
 				// try other delimiter
-				if ($n === 2) throw $e;
+				if ($n === 2 || $e->getCode() === 999) throw $e;
 			}
 		}
 		//_debug_array($raw_import);
@@ -344,7 +359,7 @@ class ranking_import extends ranking_result_bo
 				}
 			}
 		}
-		$this->detect_athletes($import, $import['as'], $nation, $sex);
+		$this->detect_athletes($import, $import['as'], $nation, $cat);
 		//_debug_array($import);
 		return $import;
 	}
@@ -357,6 +372,7 @@ class ranking_import extends ranking_result_bo
 	 * @param string $delimiter =','
 	 * @param string $enclosure ='"'
 	 * @return array with lines and columns or string with error message
+	 * @throw Api\Exception\WrongUserinput with $code 999 for one data-line wrong
 	 */
 	protected function csv_import($fname,$charset='iso-8859-1',$delimiter=',',$enclosure='"')
 	{
@@ -379,7 +395,7 @@ class ranking_import extends ranking_result_bo
 			if (count($line) != count($labels))
 			{
 				//_debug_array($labels); _debug_array($line);
-				throw new Api\Exception\WrongUserinput(lang('Dataline %1 has a different number of columns (%2) then labels (%3)!',$n,count($line),count($labels)));
+				throw new Api\Exception\WrongUserinput(lang('Dataline %1 has a different number of columns (%2) then labels (%3)!',$n,count($line),count($labels)), 999);
 			}
 			$lines[$n++] = Api\Translation::convert($line,$charset);
 		}
@@ -422,20 +438,24 @@ class ranking_import extends ranking_result_bo
 	 * @param array &$import result in $import['athlete']
 	 * @param array $col2name column number => name pairs
 	 * @param string $nation =null nation to use if not set in imported data
-	 * @param string $sex =null should we only search for a certain gender
+	 * @param ?array $cat =null should we only search for a certain category
 	 * @param string $license =null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
 	 * @param int $license_year =null default this->license_year
 	 */
-	protected function detect_athletes(array &$import, array $col2name, $nation=null, $sex=null, $license=null, $license_year=null)
+	protected function detect_athletes(array &$import, array $col2name, $nation=null, array $cat=null, $license=null, $license_year=null)
 	{
 		if ($nation == 'NULL') $nation = null;
 		if (is_null($license_year) || !$license_year) $license_year = $this->license_year;
 
-		$firstname_col = array_search('vorname',$col2name);
+		$firstname_col = array_search('vorname', $col2name);
 		$lastname_col  = array_search('nachname',$col2name);
-		$nation_col    = array_search('nation',$col2name);
-		$id_col        = array_search('PerId',$col2name);
-		//error_log(__METHOD__."(,".array2string($col2name).",$nation,$sex) firstname_col=$firstname_col, lastname_col=$lastname_col, nation_col=$nation_col, id_col=$id_col");
+		$nation_col    = array_search('nation',  $col2name);
+		$id_col        = array_search('PerId',   $col2name);
+		$sex_col       = array_search('sex',     $col2name);
+		$birth_col     = array_search('geb_date',$col2name);
+		$coach_col     = array_search('coach',   $col2name);
+		$coach_email_col= array_search('coach-email', $col2name);
+		//error_log(__METHOD__."(,".array2string($col2name).",$nation,$cat[sex]) firstname_col=$firstname_col, lastname_col=$lastname_col, nation_col=$nation_col, id_col=$id_col");
 
 		$import['detection'] = [];
 		$detection =& $import['detection'];
@@ -491,7 +511,15 @@ class ranking_import extends ranking_result_bo
 							$data[$c] = $license.': '.lang($this->license_labels[$license]);
 						}
 						break;
+					case 'sex':
+						$data[$c] = strtolower($data[$c][0]) === 'm' ? 'male' : 'female';
+						break;
 				}
+			}
+			if (!empty($cat['sex']) && !empty($sex_col) && $cat['sex'] !== $data[$sex_col] ||
+				!empty($birth_col) && $this->in_agegroup($data[$birth_col], $cat))
+			{
+				$detection[$n]['row'] = 'ignore';
 			}
 
 			if ($import['athlete'][$n] && !is_array($import['athlete'][$n]) && $id_col)
@@ -524,7 +552,7 @@ class ranking_import extends ranking_result_bo
 				'nachname' => $lastname,
 				'nation'   => $nation_col && $data[$nation_col] ? $data[$nation_col] : $nation,
 			];
-			if ($sex) $criteria['sex'] = $sex;
+			if (!empty($cat['sex'])) $criteria['sex'] = $cat['sex'];
 
 			if ($lastname_col && $data[$firstname_col] && $data[$lastname_col] &&
 				($import['athlete'][$n] && !is_array($import['athlete'][$n]) &&
@@ -554,6 +582,10 @@ class ranking_import extends ranking_result_bo
 					{
 						// exclude rang, it's not stored in athlete
 					}
+					elseif (substr($name, 0, 5) === 'coach' && !empty($data[$c]))
+					{
+
+					}
 					elseif ($data[$c] && (!$athlete[$name] || // no data stored for athlete
 						$name == 'geb_date' && $athlete[$name] == (int)$data[$c].'-01-01' ||	// birthday replaces birthyear
 						$name == 'verband' && substr($data[$c],0,strlen($athlete[$name])) == $athlete[$name]))	// fed name starts identical
@@ -572,19 +604,90 @@ class ranking_import extends ranking_result_bo
 			{
 				if ($lastname_col)
 				{
-					$import['athlete'][$n] = array('query' => ($sex ? strtoupper($sex[0]).': ' : '').($criteria['nation'] ? $criteria['nation'].': ' : '').
+					$import['athlete'][$n] = array('query' => (!empty($cat['sex']) ? strtoupper($cat['sex'][0]).': ' : '').($criteria['nation'] ? $criteria['nation'].': ' : '').
 						($firstname_col ? $data[$firstname_col].' ' : '').$data[$lastname_col]);	// otherwise row does not show (autorepeat)
+				}
+				elseif (substr($name, 0, 5) === 'coach' && !empty($data[$c]))
+				{
+
 				}
 				else
 				{
 					$import['athlete'][$n] = '';	// otherwise row does not show (autorepeat)
 				}
-				$detection[$n]['row'] = 'noAthlete';
+				if (empty($detection[$n]['row']))	// do NOT overwrite ignore
+				{
+					$detection[$n]['row'] = 'noAthlete';
+				}
 			}
 			if ($id_col) $data[$id_col] = $import['athlete'][$n];
+
+			// do we need to import coaches too
+			if ($coach_col !== false && !empty($data[$coach_col]) || $coach_email_col !== false && !empty($data[$coach_email_col]))
+			{
+				if ($detection[$n]['row'] === 'ignore')
+				{
+					unset($detection[$n][$coach_col ?: $coach_email_col]);
+				}
+				elseif (!($coach = $this->find_coach($data[$coach_col], $data[$coach_email_col], $athlete[$n])))
+				{
+					$detection[$n][$coach_col ?: $coach_email_col] = 'conflictData';
+					$detection[$n]['help-'.($coach_col ?: $coach_email_col)] = lang('add coach: %1', $data[$coach_col ?: $coach_email_col]);
+				}
+				else
+				{
+					$data['coach-id'] = $coach;
+				}
+			}
 		}
 		//_debug_array($import['athlete']);
 		//_debug_array($detection);
+	}
+
+	/**
+	 * Detect and split "Name <Email>"
+	 */
+	const RFC822_EMAIL_PREG = '/^(.*?)\s+<([a-z0-9._-]+@[a-z0-9._-]+)>$/i';
+
+	/**
+	 * Find coach for registration
+	 *
+	 * @param ?string $coach coach-name or rfc822 address "Name <email>"
+	 * @param ?string $coach_email coach-email or rfc822 address "Name <email>"
+	 * @param ?int $athlete PerId of athlete, to not pick athlete, in case they share the email
+	 * @return ?int PerId of coach, if existing, or NULL
+	 */
+	protected function find_coach($coach=null, $coach_email=null, int $athlete=null)
+	{
+		if (!empty($coach) && !empty($coach_email))
+		{
+
+		}
+		// only an RFC822 address in $coach
+		elseif (empty($coach_email) && preg_match(self::RFC822_EMAIL_PREG, $coach, $matches) ||
+			preg_match(self::RFC822_EMAIL_PREG, $coach_email, $matches))
+		{
+			$coach_email = $matches[2];
+		}
+		if (!empty($coach_email))
+		{
+			$where = ['email' => $coach_email, 'sex' => ''];
+		}
+		else
+		{
+			$where = ["CONCAT(vorname,' ',nachname)=".$this->db->quote($coach), 'sex' => ''];
+		}
+		if (!empty($athlete))
+		{
+			$where[] = 'PerId<>'.(int)$athlete;
+		}
+		// prefer no birthdate or older ones for coaches, as the email might be used multiple times
+		if (($coach = $this->athlete->search('', true, 'ORDER BY geb_date IS NULL DESC,geb_date ASC',
+			'', '', '', 'AND', [0, 1], $where)))
+		{
+			return (int)$coach[0]['PerId'];
+		}
+		return null;
 	}
 
 	/**
@@ -592,7 +695,7 @@ class ranking_import extends ranking_result_bo
 	 *
 	 * @param array $import athlete rows with numerical id's starting with 2, plus values for 'as' and 'athlete' keys
 	 * @param array $keys values for keys 'comp', 'cat', 'route' (0..N, 'athlete', 'registration' or 'ranking')
-	 * @param string $sex =null should we only search for a certain gender
+	 * @param array $cat =null should we only search for a certain category
 	 * @param bool $add_missing =false true: add missing athletes
 	 * @param string $license =null 'a'=applied, 'c'=confirmed, 's'=suspended license status to set for not empty license field
 	 * @param string $license_nation =null nation of the license
@@ -600,7 +703,7 @@ class ranking_import extends ranking_result_bo
 	 * @return string|int success-message of result import and/or number of imported athletes
 	 * @throw \Exception on error
 	 */
-	protected function do_import(array &$import, array $keys, $sex=null, bool $add_missing=false, $license=null, $license_nation=null, $license_year=null)
+	protected function do_import(array &$import, array $keys, array $cat=null, bool $add_missing=false, $license=null, $license_nation=null, $license_year=null)
 	{
 		if (empty($license_year)) $license_year = $this->license_year;
 
@@ -623,7 +726,7 @@ class ranking_import extends ranking_result_bo
 		$result = [];
 		foreach($import as $n => &$row)
 		{
-			if ($n < 2) continue;	// not an athlete row
+			if ($n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
 
 			$this->athlete->init();
 
@@ -631,7 +734,7 @@ class ranking_import extends ranking_result_bo
 			{
 				if ($add_missing)
 				{
-					$athlete = ['sex' => $sex];
+					$athlete = ['sex' => $cat['sex']];
 				}
 				elseif ($do_result_import)
 				{
@@ -664,9 +767,6 @@ class ranking_import extends ranking_result_bo
 								}
 							}
 							break;
-						case 'sex':
-							$athlete['sex'] = strtolower($row[$c][0]) === 'm' ? 'male' : 'female';
-							break;
 						default:
 							$athlete[$name] = $row[$c];
 							break;
@@ -684,7 +784,7 @@ class ranking_import extends ranking_result_bo
 				if (empty($athlete['fed_id']) || !$this->acl_check_athlete($athlete))
 				{
 					// show already imported athletes
-					if ($n > 2) $this->detect_athletes($import, $col2name, $keys['calendar'], $sex, $license, $license_year);
+					if ($n > 2) $this->detect_athletes($import, $col2name, $keys['calendar'], $cat, $license, $license_year);
 					throw new Api\Exception\WrongUserinput(lang('No athlete federation or missing rights to create or update the athlete!'));
 				}
 				if (empty($athlete['sex']))
@@ -693,8 +793,7 @@ class ranking_import extends ranking_result_bo
 				}
 				if ($this->athlete->save($athlete) === 0)
 				{
-					unset($detection[$n]);	// unmark as now updated
-					unset($update[$n]);
+					unset($update[$n]);	// unmark as now updated
 					$imported++;
 					// new created athletes need to set PerId
 					if (empty($athlete['PerId']))
@@ -720,7 +819,7 @@ class ranking_import extends ranking_result_bo
 
 		}
 		// run a new detection as that's easier and more consistent
-		$this->detect_athletes($import, $col2name, $keys['calendar'], $sex, $license, $license_year);
+		$this->detect_athletes($import, $col2name, $keys['calendar'], $cat, $license, $license_year);
 
 		if (($keys['route'] === 'registration' || $do_result_import) &&
 			!$this->acl_check($keys['calendar'], $keys['route'] === 'registration' ? self::ACL_REGISTER : self::ACL_RESULT, $keys['WetId']))
@@ -731,14 +830,23 @@ class ranking_import extends ranking_result_bo
 		if ($keys['route'] === 'registration')
 		{
 			$registered = 0;
-			foreach($athletes as $PerId)
+			foreach($athletes as $n => $PerId)
 			{
-				if (!empty($PerId) && $this->register($keys['comp'], $keys['cat'], $PerId))
+				if (!empty($PerId) && $import['detection'][$n]['row'] !== 'ignore' &&
+					$this->register($keys['comp'], $keys['cat'], $PerId))
 				{
 					++$registered;
 				}
 			}
-			$import_result = lang('%1 athlets successful registered', $registered);
+			if (($coaches = $this->import_coaches($import, $keys['comp'], self::$nat_coach_cats[$keys['calendar']], $keys['fed_id'], $add_missing)))
+			{
+				$import_result = lang('%1 athletes and %2 coaches registerted', $registered, $coaches);
+				$this->detect_athletes($import, $col2name, $keys['calendar'], $cat, $license, $license_year);
+			}
+			else
+			{
+				$import_result = lang('%1 athletes successful registered', $registered);
+			}
 		}
 		elseif ($do_result_import && is_numeric($keys['route']))
 		{
@@ -756,6 +864,84 @@ class ranking_import extends ranking_result_bo
 			}
 		}
 		return isset($import_result) ? $import_result.', '.$imported : $imported;
+	}
+
+	/**
+	 * Register coaches
+	 *
+	 * @param array $import
+	 * @param int $comp comp to register coach for
+	 * @param int $cat cat to register coach for
+	 * @param int $fed_id federation to register coach for
+	 * @param bool $add_all true: add all not-existing coaches
+	 * @return int number of registered coaches
+	 * @throws Api\Exception\WrongParameter
+	 * @throws Api\Exception\WrongUserinput
+	 */
+	protected function import_coaches(array $import, int $comp, int $cat, int $fed_id, bool $add_all=false)
+	{
+		$detection =& $import['detection'];
+		$update =& $import['update'];
+
+		$coach_col = array_search('coach', $import['as']);
+		$coach_email_col = array_search('coach-email', $import['as']);
+		if ($coach_col === false && $coach_email_col === false || $fed_id < 1)
+		{
+			return 0;
+		}
+
+		$registered = 0;
+		$added_coaches = [];
+		foreach($import as $n => &$data)
+		{
+			if ($n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
+
+			// do we need to add the coach first
+			if (empty($data['coach-id']) && ($add_all || !isset($update[$n][$coach_col ?: $coach_email_col]) || $update[$n][$coach_col ?: $coach_email_col]))
+			{
+				if (empty($data[$coach_col]) && empty($data[$coach_email_col])) continue;
+
+				if (empty($data[$coach_col]) && preg_match(self::RFC822_EMAIL_PREG, $data[$coach_email_col], $matches) ||
+					preg_match(self::RFC822_EMAIL_PREG, $data[$coach_col], $matches))
+				{
+					list($firstname, $lastname) = explode(' ', $matches[1], 2);
+					$email = $matches[2];
+				}
+				else
+				{
+					list($firstname, $lastname) = explode(' ', $data[$coach_col], 2);
+					$email = $data[$coach_email_col];
+				}
+				// make sure to not add coaches multiple times
+				if (isset($added_coaches[$email]))
+				{
+					$data['coach-id'] = $added_coaches[$email];
+					++$registered;
+					continue;
+				}
+				$coach = [
+					'vorname' => $firstname,
+					'nachname' => $lastname,
+					'email' => $email,
+					'fed_id' => $fed_id,
+					'sex' => $this->athlete->gender($firstname, ($federation ?? $federation=$this->federation->read($fed_id))['nation']),
+				];
+				if (empty($fed_id) || !$this->acl_check_athlete($coach))
+				{
+					throw new Api\Exception\WrongUserinput(lang('No athlete federation or missing rights to create or update the athlete!'));
+				}
+				$this->athlete->init($coach);
+				if ($this->athlete->save() === 0)
+				{
+					$data['coach-id'] = $added_coaches[$email] = $this->athlete->data['PerId'];
+				}
+			}
+			if (!empty($data['coach-id']) && $this->register($comp, $cat, $data['coach-id']))
+			{
+				++$registered;
+			}
+		}
+		return $registered;
 	}
 
 	/**
