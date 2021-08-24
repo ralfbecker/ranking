@@ -1,6 +1,6 @@
 <?php
 /**
- * EGroupware digital ROCK Rankings - athletes selfservie: profile, registration
+ * EGroupware digital ROCK Rankings - athletes selfservice: profile, registration
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
@@ -15,7 +15,7 @@ use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
 
 /**
- * athletes selfservie: profile, registration
+ * athletes selfservice: profile, registration
  */
 class ranking_selfservice extends ranking_bo
 {
@@ -27,7 +27,7 @@ class ranking_selfservice extends ranking_bo
 	);
 
 	/**
-	 * Athlete selfservie: edit profile, register for competitions
+	 * Athlete selfservice: edit profile, register for competitions
 	 *
 	 * @param int $PerId
 	 * @param string $_action 'profile'
@@ -64,7 +64,7 @@ class ranking_selfservice extends ranking_bo
 			!($PerId = $this->selfservice_auth($athlete, $action)))
 		{
 			$this->show_footer($nation2lang[$athlete['nation']]);
-			return;
+			exit;
 		}
 		$lang = $PerId && isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
 		if (Api\Translation::$userlang !== $lang)
@@ -110,6 +110,7 @@ class ranking_selfservice extends ranking_bo
 				throw new Api\Exception\WrongParameter("Unknown action '$action'!");
 		}
 		$this->show_footer($lang);
+		exit;
 	}
 
 	/**
@@ -146,11 +147,11 @@ class ranking_selfservice extends ranking_bo
 			}
 			echo Api\Html::form(strtr($content, $replacements).
 				Api\Html::submit_button('submit', 'Save', ''),
-				array(), '/ranking/athlete.php', array('PerId' => $athlete['PerId']),
+				array(), '/ranking/athlete.php', array('PerId' => $athlete['PerId'], 'cd' => 'no'),
 				'',	'style="display: contents"')."\n";
 
-			echo html::form_1button('logout', lang('Logout'), '',
-					'/ranking/athlete.php', array('action' => 'logout'));
+			echo Api\Html::form_1button('logout', lang('Logout'), '',
+					'/ranking/athlete.php', array('action' => 'logout', 'cd' => 'no'));
 			$this->show_footer($lang);
 			exit;
 		}
@@ -407,10 +408,12 @@ class ranking_selfservice extends ranking_bo
 
 		$recovery_link = Egw::link('/ranking/athlete.php', array(
 			'PerId' => $athlete['PerId'],
-			'action'  => 'recovery',
+			'action' => 'recovery',
+			'cd' => 'no',
 		));
 		if ($athlete && empty($athlete['password']) || in_array($action,array('recovery','password','set')))
 		{
+			if (empty($action)) $action = 'recovery';
 			if (empty($athlete['password']) && !in_array($action,array('password','set','recovery')))
 			{
 				echo "<p class='error'>".lang("You have not yet a password set!")."</p>\n";
@@ -431,7 +434,7 @@ class ranking_selfservice extends ranking_bo
 							self::RECOVERY_TIMEOUT/3600,"<a href='$recovery_link'>","</a>")."</p>\n";
 				}
 				catch (Exception $e) {
-					echo "<p>".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
+					echo "<p class='error'>".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
 						$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
 				}
 			}
@@ -471,10 +474,7 @@ class ranking_selfservice extends ranking_bo
 								setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
 
 								echo "<p><b>".lang('Your new password is now active.')."</b></p>\n";
-								$link = Egw::link('/index.php',array(
-									'menuaction' => 'ranking.ranking_athlete_ui.edit',
-									'PerId' => $athlete['PerId'],
-								));
+								$this->profile_logout_buttons($athlete['PerId']);
 								return $athlete['PerId'];
 								//echo "<p>".lang('You can now %1edit your profile%2 or register for a competition in the calendar.','<a href="'.$link.'">','</a>')."</p>\n";
 								//common::egw_exit();
@@ -490,6 +490,7 @@ class ranking_selfservice extends ranking_bo
 						'PerId' => $athlete['PerId'],
 						'action'  => 'set',
 						'hash' => $athlete['recover_pw_hash'],
+						'cd' => 'no',
 					));
 					echo "<p>".lang("Please enter your new password:")."<br />\n".
 						'('.lang('Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.',7).")</p>\n";
@@ -550,7 +551,8 @@ class ranking_selfservice extends ranking_bo
 			}
 			$link = Egw::link('/ranking/athlete.php', array(
 				'PerId' => $athlete['PerId'],
-				'action'  => $action,
+				'action' => $action,
+				'cd' => 'no',
 			));
 			echo "<form action='$link' method='POST'>\n";
 			if (!$athlete)
@@ -608,8 +610,9 @@ class ranking_selfservice extends ranking_bo
 			));
 			$link = Egw::link('/ranking/athlete.php', array(
 				'PerId' => $athlete['PerId'],
-				'action'  => 'password',
+				'action' => 'password',
 				'hash' => $this->athlete->data['recover_pw_hash'],
+				'cd' => 'no',
 			));
 			if ($link[0] == '/') $link = 'https://'.$_SERVER['SERVER_NAME'].$link;
 		}
