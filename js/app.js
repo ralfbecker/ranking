@@ -26,10 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /*egw:uses
     /api/js/jsapi/egw_app.js
  */
-require("jquery");
-require("jqueryui");
-require("../jsapi/egw_global");
-require("../etemplate/et2_types");
 var egw_app_1 = require("../../api/js/jsapi/egw_app");
 var et2_extension_nextmatch_1 = require("../../api/js/etemplate/et2_extension_nextmatch");
 var et2_core_widget_1 = require("../../api/js/etemplate/et2_core_widget");
@@ -1609,6 +1605,7 @@ var RankingApp = /** @class */ (function (_super) {
         var cats = _widget.getRoot().getArrayMgr('sel_options').getEntry('GrpId');
         var replace = _replace;
         var callback = function (button_id, value, confirmed) {
+            var _this = this;
             var athletes = value.PerId;
             if (!athletes || !athletes.length) {
                 et2_widget_dialog_1.et2_dialog.alert(this.egw.lang('You need to select one or more athletes first!', this.egw.lang('Registration')));
@@ -1623,7 +1620,7 @@ var RankingApp = /** @class */ (function (_super) {
                 reason.set_disabled(true);
             }
             var filter = this.register_nm.getValue();
-            this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+            this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
                     WetId: replace ? replace.WetId : filter.comp,
                     GrpId: replace ? replace.GrpId : value.GrpId,
                     PerId: athletes,
@@ -1631,7 +1628,7 @@ var RankingApp = /** @class */ (function (_super) {
                     reason: value.prequal_reason,
                     confirmed: confirmed,
                     replace: replace ? replace.PerId : undefined
-                }], this.register_callback, null, false, this).sendRequest();
+                }]).then(function (_data) { return _this.register_callback(_data); });
             // keep dialog open by returning false
             return false;
         }.bind(this);
@@ -1668,13 +1665,15 @@ var RankingApp = /** @class */ (function (_super) {
             },
             width: '480px'
         });
-        dialog.template.widgetContainer.getWidgetById('PerId').set_autocomplete_params({
-            GrpId: _replace ? _replace.GrpId : (filters.col_filter.GrpId || cats[0].value),
-            nation: _replace ? _replace.nation : filters.nation,
-            sex: _replace ? _replace.sex : filters.col_filter.sex
-        });
-        if (_replace)
-            dialog.template.widgetContainer.getWidgetById('PerId').set_multiple(false);
+        window.setTimeout(function () {
+            dialog.template.widgetContainer.getWidgetById('PerId').set_autocomplete_params({
+                GrpId: _replace ? _replace.GrpId : (filters.col_filter.GrpId || cats[0].value),
+                nation: _replace ? _replace.nation : filters.nation,
+                sex: _replace ? _replace.sex : filters.col_filter.sex
+            });
+            if (_replace)
+                dialog.template.widgetContainer.getWidgetById('PerId').set_multiple(false);
+        }, 100);
     };
     /**
      * Handle server response to registration request from either this.register or this.register_action
@@ -1682,6 +1681,7 @@ var RankingApp = /** @class */ (function (_super) {
      * @param {object} _data
      */
     RankingApp.prototype.register_callback = function (_data) {
+        var _this = this;
         var taglist = !this.register_dialog ? null : this.register_dialog.template.widgetContainer.getWidgetById('PerId');
         var athletes = taglist ? taglist.getValue() : [];
         if (_data.registered && taglist) {
@@ -1699,16 +1699,16 @@ var RankingApp = /** @class */ (function (_super) {
                 }
                 else {
                     // resend request with confirmation to server
-                    this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+                    _this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
                             WetId: _data.WetId,
                             GrpId: _data.GrpId,
                             PerId: _data.PerId,
                             mode: _data.mode,
                             replace: _data.replace,
                             confirmed: true
-                        }], this.register_callback, null, false, this).sendRequest();
+                        }]).then(function (_data) { return _this.register_callback(_data); });
                 }
-            }.bind(this), _data.question, _data.athlete, null, et2_widget_dialog_1.et2_dialog.BUTTONS_YES_NO, et2_widget_dialog_1.et2_dialog.QUESTION_MESSAGE, undefined, this.egw);
+            }, _data.question, _data.athlete, null, et2_widget_dialog_1.et2_dialog.BUTTONS_YES_NO, et2_widget_dialog_1.et2_dialog.QUESTION_MESSAGE, undefined, this.egw);
         }
         // if we replaced, close the dialog
         else if (_data.replace && this.register_dialog) {
@@ -1754,13 +1754,14 @@ var RankingApp = /** @class */ (function (_super) {
      * @param {array} _selected eg. ["ranking::1638:5:1772"]
      */
     RankingApp.prototype.register_action = function (_action, _selected) {
+        var _this = this;
         var data = this.egw.dataGetUIDdata(_selected[0].id);
-        this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+        this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
                 WetId: data.data.WetId,
                 GrpId: data.data.GrpId,
                 PerId: data.data.PerId,
                 mode: _action.id
-            }], this.register_callback, null, false, this).sendRequest();
+            }]).then(function (_data) { return _this.register_callback(_data); });
     };
     /**
      * Registration mail

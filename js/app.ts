@@ -1949,7 +1949,7 @@ class RankingApp extends EgwApp
 				reason.set_disabled(true);
 			}
 			const filter = this.register_nm.getValue();
-			this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+			this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
 				WetId: replace ? replace.WetId : filter.comp,
 				GrpId: replace ? replace.GrpId : value.GrpId,
 				PerId: athletes,
@@ -1957,7 +1957,7 @@ class RankingApp extends EgwApp
 				reason: value.prequal_reason,
 				confirmed: confirmed,
 				replace: replace ? replace.PerId : undefined
-			}], this.register_callback, null, false, this).sendRequest();
+			}]).then((_data) => this.register_callback(_data));
 
 			// keep dialog open by returning false
 			return false;
@@ -1999,12 +1999,14 @@ class RankingApp extends EgwApp
 			},
 			width: '480px'
 		});
-		dialog.template.widgetContainer.getWidgetById('PerId').set_autocomplete_params({
-			GrpId: _replace ? _replace.GrpId : (filters.col_filter.GrpId || cats[0].value),
-			nation: _replace ? _replace.nation : filters.nation,
-			sex: _replace ? _replace.sex : filters.col_filter.sex
-		});
-		if (_replace) dialog.template.widgetContainer.getWidgetById('PerId').set_multiple(false);
+		window.setTimeout(() => {
+			dialog.template.widgetContainer.getWidgetById('PerId').set_autocomplete_params({
+				GrpId: _replace ? _replace.GrpId : (filters.col_filter.GrpId || cats[0].value),
+				nation: _replace ? _replace.nation : filters.nation,
+				sex: _replace ? _replace.sex : filters.col_filter.sex
+			});
+			if (_replace) dialog.template.widgetContainer.getWidgetById('PerId').set_multiple(false);
+		}, 100);
 	}
 
 	/**
@@ -2024,7 +2026,7 @@ class RankingApp extends EgwApp
 		}
 		if (_data.question)
 		{
-			et2_dialog.show_dialog(function(_button)
+			et2_dialog.show_dialog((_button) =>
 			{
 				if (_button == et2_dialog.NO_BUTTON)
 				{
@@ -2037,16 +2039,16 @@ class RankingApp extends EgwApp
 				else
 				{
 					// resend request with confirmation to server
-					this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+					this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
 						WetId: _data.WetId,
 						GrpId: _data.GrpId,
 						PerId: _data.PerId,
 						mode: _data.mode,
 						replace: _data.replace,
 						confirmed: true
-					}], this.register_callback, null, false, this).sendRequest();
+					}]).then((_data) => this.register_callback(_data));
 				}
-			}.bind(this), _data.question, _data.athlete, null, et2_dialog.BUTTONS_YES_NO,
+			}, _data.question, _data.athlete, null, et2_dialog.BUTTONS_YES_NO,
 			et2_dialog.QUESTION_MESSAGE, undefined, this.egw);
 		}
 		// if we replaced, close the dialog
@@ -2105,12 +2107,12 @@ class RankingApp extends EgwApp
 	{
 		const data = this.egw.dataGetUIDdata(_selected[0].id);
 
-		this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+		this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
 			WetId: data.data.WetId,
 			GrpId: data.data.GrpId,
 			PerId: data.data.PerId,
 			mode: _action.id
-		}], this.register_callback, null, false, this).sendRequest();
+		}]).then((_data) => this.register_callback(_data));
 	}
 
 	/**
