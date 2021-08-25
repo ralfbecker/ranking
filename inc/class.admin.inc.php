@@ -125,14 +125,12 @@ class admin
 			}
 			$preserve = array(
 				'account_id' => $content['account_id'],
-				'admin_menu' => $content['admin_menu'],
 			);
 		}
 		else
 		{
 			$preserve = array(
 				'account_id' => $account_id,
-				'admin_menu' => (int) $_GET['account_id'] ? ExecMethod('admin.uimenuclass.createHTMLCode','edit_user') : false,
 			);
 		}
 		$readonlys = $content = array();
@@ -144,7 +142,6 @@ class admin
 				$rights = $this->acl->get_all_location_rights($account_id,'ranking');
 				$own_rights = $this->acl->get_all_location_rights($account_id,'ranking',false);
 			}
-			$content['admin_menu'] = $preserve['admin_menu'];
 		}
 		if (!($nations = $this->acl->get_locations_for_app('ranking'))) $nations = array();
 		// remove federation ACL (location starting with a hash followed by the fed_id)
