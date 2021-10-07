@@ -1680,7 +1680,7 @@ class ranking_result_ui extends ranking_result_bo
 			switch($content['nm']['discipline'])
 			{
 				case 'lead':
-					ranking_measurement::measurement($content, $sel_options, $readonlys);
+					ranking_measurement::measurement($content, $sel_options, $readonlys, $tmpl);
 					$content['measurement_template'] = 'ranking.result.measurement';
 					break;
 				case 'selfscore':
@@ -1690,7 +1690,7 @@ class ranking_result_ui extends ranking_result_bo
 					break;
 				case 'boulder':
 				case 'boulder2018':
-					ranking_boulder_measurement::measurement($content, $sel_options, $readonlys);
+					ranking_boulder_measurement::measurement($content, $sel_options, $readonlys, $tmpl);
 					$content['measurement_template'] = 'ranking.result.boulder_measurement';
 					break;
 			}

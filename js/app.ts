@@ -640,8 +640,7 @@ class RankingApp extends EgwApp
 			const keys = {WetId: WetId, GrpId: GrpId, route_order: route_order, boulder_n: n};
 
 			this.egw.json('ranking_boulder_measurement::ajax_load_athlete',
-				[PerId, {},	// {} = send data back
-				keys],
+				[PerId, keys],
 				function(_data)
 				{
 					this.et2.setValueById('zone', _data['zone'+n]);
@@ -932,7 +931,7 @@ class RankingApp extends EgwApp
 				update['top'+n] = top ? top : 0;	// required, as backend doesn't store zones with empty top!
 
 				this.egw.json('ranking_boulder_measurement::ajax_update_result',
-					[PerId, update, n, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order}]).sendRequest();
+					[PerId, update, {'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order}, n]).sendRequest();
 			}
 		}
 	}
@@ -1055,8 +1054,7 @@ class RankingApp extends EgwApp
 		const values = _widget.getInstanceManager().getValues(this.et2);
 
 		this.egw.json('ranking_selfscore_measurement::ajax_update_result',
-			[values.nm.PerId, values.score,
-			{'WetId': values.comp.WetId, 'GrpId': values.nm.cat, 'route_order': values.nm.route}],
+			[values.nm.PerId, values.score, {'WetId': values.comp.WetId, 'GrpId': values.nm.cat, 'route_order': values.nm.route}],
 				function(_msg)
 				{
 					this.message(_msg);
@@ -1135,7 +1133,6 @@ class RankingApp extends EgwApp
 
 			this.unmark_holds();
 			this.egw.json('ranking_measurement::ajax_load_athlete', [ _widget.get_value(),
-				[],
 				{ WetId: WetId, GrpId: GrpId, route_order: route_order }],
 				function(_data)
 				{
@@ -1205,8 +1202,8 @@ class RankingApp extends EgwApp
 				}
 			}
 			this.egw.json('ranking_measurement::ajax_update_result',
-				[PerId, { result_height: height.get_value(), result_plus: plus.get_value(), result_time: time.get_value()}, 1,
-				{WetId: WetId, GrpId: GrpId, route_order: route_order}]).sendRequest();
+				[PerId, { result_height: height.get_value(), result_plus: plus.get_value(), result_time: time.get_value()},
+				{WetId: WetId, GrpId: GrpId, route_order: route_order}, 1]).sendRequest();
 		}
 	}
 

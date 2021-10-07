@@ -549,7 +549,7 @@ var RankingApp = /** @class */ (function (_super) {
             var GrpId = this.et2.getValueById('nm[cat]');
             var route_order = this.et2.getValueById('nm[route]');
             var keys = { WetId: WetId, GrpId: GrpId, route_order: route_order, boulder_n: n };
-            this.egw.json('ranking_boulder_measurement::ajax_load_athlete', [PerId, {},
+            this.egw.json('ranking_boulder_measurement::ajax_load_athlete', [PerId,
                 keys], function (_data) {
                 this.et2.setValueById('zone', _data['zone' + n]);
                 this.et2.setValueById('top', _data['top' + n]);
@@ -781,7 +781,7 @@ var RankingApp = /** @class */ (function (_super) {
                 update['try' + n] = this.try_num();
                 update['zone' + n] = bonus === '' ? 'empty' : bonus; // egw_json_encode sends '' as null, which get not stored!
                 update['top' + n] = top_1 ? top_1 : 0; // required, as backend doesn't store zones with empty top!
-                this.egw.json('ranking_boulder_measurement::ajax_update_result', [PerId, update, n, { 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order }]).sendRequest();
+                this.egw.json('ranking_boulder_measurement::ajax_update_result', [PerId, update, { 'WetId': WetId, 'GrpId': GrpId, 'route_order': route_order }, n]).sendRequest();
             }
         }
     };
@@ -936,7 +936,6 @@ var RankingApp = /** @class */ (function (_super) {
             var route_order = this.et2.getValueById('nm[route]');
             this.unmark_holds();
             this.egw.json('ranking_measurement::ajax_load_athlete', [_widget.get_value(),
-                [],
                 { WetId: WetId, GrpId: GrpId, route_order: route_order }], function (_data) {
                 var holds = this.getHoldsByHeight(_data.result_plus == this.TOP_PLUS ? this.TOP_HEIGHT :
                     (_data.result_height ? _data.result_height : 1));
@@ -992,8 +991,8 @@ var RankingApp = /** @class */ (function (_super) {
                         this.mark_holds(holds);
                 }
             }
-            this.egw.json('ranking_measurement::ajax_update_result', [PerId, { result_height: height.get_value(), result_plus: plus.get_value(), result_time: time.get_value() }, 1,
-                { WetId: WetId, GrpId: GrpId, route_order: route_order }]).sendRequest();
+            this.egw.json('ranking_measurement::ajax_update_result', [PerId, { result_height: height.get_value(), result_plus: plus.get_value(), result_time: time.get_value() },
+                { WetId: WetId, GrpId: GrpId, route_order: route_order }, 1]).sendRequest();
         }
     };
     /**

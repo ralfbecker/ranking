@@ -25,7 +25,8 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 *
 	 * @param array &$content
 	 * @param array &$sel_options
-	 * @param array %$readonlys
+	 * @param array &$readonlys
+	 * @param Etemplate $tmpl
 	 */
 	public static function measurement(array &$content, array &$sel_options, array &$readonlys, Etemplate $tmpl)
 	{
@@ -167,9 +168,10 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 *
 	 * @param int $PerId
 	 * @param array $update
-	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
+	 * @param ?array $state =null optional array with values for keys WetId, GrpId and route_order
+	 * @param int $set_current=1 not used
 	 */
-	public static function ajax_update_result($PerId,$update,$state=null)
+	public static function ajax_update_result(int $PerId, array $update, array $state=null, int $set_current=1)
 	{
 		$comp = null;
 		$query =& self::get_check_session($comp, $state);
@@ -254,11 +256,10 @@ class ranking_selfscore_measurement extends ranking_boulder_measurement
 	 * Load data of a given athlete
 	 *
 	 * @param int $PerId
-	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
-	 * @param array $state=null optional array with values for keys WetId, GrpId and route_order
-	 * @param array &$data=null on return athlete data for extending class
+	 * @param ?array $state=null optional array with values for keys WetId, GrpId and route_order
+	 * @param ?array &$data=null on return athlete data for extending class
 	 */
-	public static function ajax_load_athlete($PerId, array $state=null, array &$data=null)
+	public static function ajax_load_athlete(int $PerId, array $state=null, array &$data=null)
 	{
 		$comp = null;
 		$query =& self::get_check_session($comp,$state);

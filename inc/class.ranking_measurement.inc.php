@@ -14,6 +14,7 @@ use EGroupware\Api;
 use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
 use EGroupware\Api\Vfs;
+use EGroupware\Api\Etemplate;
 
 /**
  * Measurement plugin for lead competitions
@@ -25,9 +26,10 @@ class ranking_measurement extends ranking_boulder_measurement
 	 *
 	 * @param array &$content
 	 * @param array &$sel_options
-	 * @param array %$readonlys
+	 * @param array &$readonlys
+	 * @param Etemplate $tmpl
 	 */
-	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
+	public static function measurement(array &$content, array &$sel_options, array &$readonlys, Etemplate $tmpl)
 	{
 		// Framework::validate_file|includeCSS does not work if template was submitted
 		if (Api\Json\Response::isJSONResponse())

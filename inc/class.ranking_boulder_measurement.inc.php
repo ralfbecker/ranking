@@ -12,6 +12,7 @@
 
 use EGroupware\Api;
 use EGroupware\Api\Framework;
+use EGroupware\Api\Etemplate;
 
 /**
  * Measurement plugin for boulder competitions
@@ -23,9 +24,10 @@ class ranking_boulder_measurement
 	 *
 	 * @param array &$content
 	 * @param array &$sel_options
-	 * @param array %$readonlys
+	 * @param array &$readonlys
+	 * @param Etemplate $tmpl
 	 */
-	public static function measurement(array &$content, array &$sel_options, array &$readonlys)
+	public static function measurement(array &$content, array &$sel_options, array &$readonlys, Etemplate $tmpl)
 	{
 		unset($readonlys);
 		//error_log(__METHOD__."() user_agent=".Api\Html::$user_agent.', HTTP_USER_AGENT='.$_SERVER['HTTP_USER_AGENT']);
@@ -87,10 +89,10 @@ class ranking_boulder_measurement
 	 *
 	 * @param int $PerId
 	 * @param array $update
+	 * @param ?array $state =null optional array with values for keys WetId, GrpId and route_order
 	 * @param int $set_current =1 make $PerId the current participant of the route
-	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
 	 */
-	public static function ajax_update_result($PerId,$update,$set_current=1, $state=null)
+	public static function ajax_update_result(int $PerId, array $update, array $state=null, int $set_current=1)
 	{
 		$comp = null;
 		$query =& self::get_check_session($comp,$state);
@@ -232,12 +234,10 @@ class ranking_boulder_measurement
 	 * Load data of a given athlete
 	 *
 	 * @param int $PerId
-	 * @param array $update array with id => key pairs to update, id is the dom id and key the key into internal data
-	 *	or empty array to send data back
-	 * @param array $state =null optional array with values for keys WetId, GrpId and route_order
-	 * @param array &$data =null on return athlete data for extending class
+	 * @param ?array $state =null optional array with values for keys WetId, GrpId and route_order
+	 * @param ?array &$data =null on return athlete data for extending class
 	 */
-	public static function ajax_load_athlete($PerId,array $update, array $state=null, array &$data=null)
+	public static function ajax_load_athlete(int $PerId, array $state=null, array &$data=null)
 	{
 		$comp = null;
 		$query =& self::get_check_session($comp,$state);
@@ -260,13 +260,12 @@ class ranking_boulder_measurement
 		if ((list($data) = ranking_result_bo::$instance->route_result->search(array(),false,'','','',False,'AND',false,$keys)))
 		{
 			//$response->alert(__METHOD__."($PerId, ".array2string($update).', '.array2string($state).') data='.array2string($data));
-			foreach($update ? $update : array_keys($data) as $id => $key)
+			foreach(array_keys($data) as $id => $key)
 			{
 				if ($key === 'result_plus' && (string)$data['result_plus'] === '')
 				{
 					$data['result_plus'] = '0';	// null or '' is NOT understood, must be '0'
 				}
-				if ($update) $response->assign($id, 'value', (string)$data[$key]);
 				// for boulder
 				if (strpos($key,'zone') === 0)
 				{
@@ -281,16 +280,9 @@ class ranking_boulder_measurement
 				$data['profile_url'] = Api\Image::find('ranking', 'transparent');
 			}
 
-			if ($update)
-			{
-				$response->jquery('#msg', 'text', array(ranking_result_bo::athlete2string($data)));
-			}
-			else
-			{
-				$data['athlete'] = ranking_result_bo::athlete2string($data);
-				$data['is_judge'] = ranking_result_bo::$instance->is_judge($comp, false, $keys, $state['boulder_n']);
-				$response->data($data);
-			}
+			$data['athlete'] = ranking_result_bo::athlete2string($data);
+			$data['is_judge'] = ranking_result_bo::$instance->is_judge($comp, false, $keys, $state['boulder_n']);
+			$response->data($data);
 		}
 	}
 
