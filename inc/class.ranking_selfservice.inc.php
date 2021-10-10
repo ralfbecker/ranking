@@ -296,6 +296,7 @@ class ranking_selfservice extends ranking_bo
 						}
 					}
 					catch(Exception $e) {
+						_egw_log_exception($e);
 						die("<p class='error'>".$e->getMessage()."</p>\n");
 					}
 				}
@@ -434,6 +435,7 @@ class ranking_selfservice extends ranking_bo
 							self::RECOVERY_TIMEOUT/3600,"<a href='$recovery_link'>","</a>")."</p>\n";
 				}
 				catch (Exception $e) {
+					_egw_log_exception($e);
 					echo "<p class='error'>".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
 						$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
 				}

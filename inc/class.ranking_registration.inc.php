@@ -433,7 +433,7 @@ class ranking_registration extends Api\Storage\Base
 			{
 				if (is_int($col)) continue;
 
-				if ($col == 'nation' || $col == 'fed_parent')	// nation is from the joined Federations table
+				if (in_array($col, ['nation', 'fed_parent', 'acl_fed_id'], true))	// nation is from the joined Federations table
 				{
 					if ($val)
 					{
