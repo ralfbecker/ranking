@@ -926,7 +926,7 @@ class ranking_export extends ranking_result_bo
 	{
 		foreach($this->route->search(array(
 			'WetId' => is_array($comp) ? $comp['WetId'] : $comp,
-		)) as $route)
+		) ?: []) as $route)
 		{
 			if (!isset($categories[$route['GrpId']]) || $categories[$route['GrpId']]['route_order'] < $route['route_order'])
 			{
