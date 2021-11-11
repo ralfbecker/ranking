@@ -345,7 +345,14 @@ class ranking_athlete extends Api\Storage\Base
 		// do NOT do it, if acl is already set, as we would loose ability to eg. search for an email address
 		if (!is_array($arr) || !array_key_exists('acl', $arr))
 		{
-			$this->data['acl'] = self::ACL_DEFAULT;
+			$this->data['acl'] = [];
+			for($i=1; $i < ranking_athlete::ACL_DENY_PROFILE; $i <<= 1)
+			{
+				if ($i & self::ACL_DEFAULT)
+				{
+					$this->data['acl'][] = $i;
+				}
+			}
 		}
 	}
 
