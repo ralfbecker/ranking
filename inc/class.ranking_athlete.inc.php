@@ -512,6 +512,21 @@ class ranking_athlete extends Api\Storage\Base
 			}
 			$extra_cols[] = $this->table_name.'.PerId AS PerId';	// LEFT JOIN'ed Results.PerId is NULL if there's no result
 		}
+		if ($join && !$only_keys)
+		{
+			$only_keys = [];
+			foreach(array_keys($this->db_cols) as $col)
+			{
+				if (in_array($col, ['PerId', 'modified', 'modifier']))
+				{
+					$only_keys[] = $this->table_name.'.'.$col.' AS '.$col;
+				}
+				else
+				{
+					$only_keys[] = $col;
+				}
+			}
+		}
 		return parent::search($criteria,$only_keys,$order_by,$extra_cols,$wildcard,$empty,$op,$start,$filter,$join,$need_full_no_count);
 	}
 
