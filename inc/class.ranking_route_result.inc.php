@@ -1178,7 +1178,7 @@ class ranking_route_result extends Api\Storage\Base
 				break;
 
 			case 'selfscore':
-				$data['result'] = count($data['score']);
+				$data['result'] = is_array($data['score']) ? count($data['score']) : (int)(bool)($data['score'] ?? null);
 				// selfscore with fixed number of points per boulder distributed to all reaching top
 				// comment as it will not allow to have 99/100 boulders
 				//if ($data['result_top'] != 100*$data['result']-$data['result'])
