@@ -1728,7 +1728,7 @@ class ranking_export extends ranking_result_bo
 			'year'  => (int)$comp['datum'],
 			'GrpId' => $cat['GrpId'],
 			'platz > 0',
-		)) as $result)
+		)) ?: [] as $result)
 		{
 			$modified = Api\DateTime::createFromFormat(Api\DateTime::DATABASE, $result['modified'], Api\DateTime::$server_timezone);
 			if (($ts = $modified->format('U')) > $last_modified) $last_modified = $ts;
