@@ -245,7 +245,7 @@ class ranking_federation_ui extends ranking_bo
 					'order'       => 'nation',// IO name of the column to sort after (optional for the sortheaders)
 					'sort'        => 'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 					'csv_fields'  => false,
-					'default_cols'=> '!fed_id',
+					'default_cols'=> '!fed_id,fed_emails,fed_modified',
 					'dataStorePrefix' => 'ranking_feds',
 					'row_id'      => 'fed_id',
 				);

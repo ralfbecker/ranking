@@ -405,7 +405,10 @@ $phpgw_baseline = array(
 			'fed_continent' => array('type' => 'int','precision' => '1','default' => '0'),
 			'fed_shortcut' => array('type' => 'varchar','precision' => '20'),
 			'fed_since' => array('type' => 'int','precision' => '4','comment' => 'new parent since'),
-			'fed_parent_since' => array('type' => 'int','precision' => '4','comment' => 'new parent')
+			'fed_parent_since' => array('type' => 'int','precision' => '4','comment' => 'new parent'),
+			'fed_emails' => array('type' => 'varchar','precision' => '1024','comment' => 'notification address(es)'),
+			'fed_modifier' => array('type' => 'int','meta' => 'account','precision' => '4'),
+			'fed_modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp')
 		),
 		'pk' => array('fed_id'),
 		'fk' => array(),

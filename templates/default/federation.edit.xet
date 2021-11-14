@@ -29,8 +29,12 @@
 					<textbox id="fed_url" maxlength="128" class="et2_fullWidth"/>
 				</row>
 				<row class="row">
+					<description value="Notification"/>
+					<taglist-email id="fed_emails" statustext="email address(es) for notification e.g. Ralf Becker &lt;ralf.becker@digitalROCK.de>" multiple="true"/>
+				</row>
+				<row class="row">
 					<description value="Parent federation" for="fed_parent"/>
-					<select id="fed_parent" empty_lable="None" class="et2_fullWidth" search="true"/>
+					<select id="fed_parent" empty_label="None" class="et2_fullWidth" search="true"/>
 				</row>
 				<row class="row">
 					<description value="Since" for="fed_since"/>
@@ -58,6 +62,13 @@
 				<row class="row">
 					<description value="Read competition" for="grants[read]"/>
 					<taglist-account id="grants[read]" account_type="both"/>
+				</row>
+				<row class="row">
+					<description value="Last modified"/>
+					<hbox width="100%">
+						<select-account id="fed_modifier" readonly="true"/>
+						<date-time id="fed_modified" readonly="true" align="right"/>
+					</hbox>
 				</row>
 				<row class="dialogFooterToolbar">
 					<hbox>

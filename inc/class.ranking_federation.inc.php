@@ -152,6 +152,23 @@ class ranking_federation extends Api\Storage\Base
 	}
 
 	/**
+	 * saves the content of data to the db
+	 *
+	 * @param array $keys =null if given $keys are copied to data before saveing => allows a save as
+	 * @param string|array $extra_where =null extra where clause, eg. to check an etag, returns true if no affected rows!
+	 * @return int|boolean 0 on success, or errno != 0 on error, or true if $extra_where is given and no rows affected
+	 */
+	function save($keys=null,$extra_where=null)
+	{
+		if (is_array($keys) && count($keys)) $this->data_merge($keys);
+
+		$this->data['fed_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
+		$this->data['fed_modified'] = new Api\DateTime('now');
+
+		return parent::save(null, $extra_where);
+	}
+
+	/**
 	 * searches db for rows matching searchcriteria
 	 *
 	 * '*' and '?' are replaced with sql-wildcards '%' and '_'

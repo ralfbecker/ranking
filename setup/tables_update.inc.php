@@ -2103,3 +2103,37 @@ function ranking_upgrade17_1_003()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '17.1.004';
 }
 
+
+/**
+ * Add notification email addresses
+ *
+ * @return string
+ */
+function ranking_upgrade17_1_004()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_emails',array(
+		'type' => 'varchar',
+		'precision' => '1024',
+		'comment' => 'notification address(es)'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1';
+}
+
+
+function ranking_upgrade21_1()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_modifier',array(
+		'type' => 'int',
+		'meta' => 'account',
+		'precision' => '4'
+	));
+	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_modified',array(
+		'type' => 'timestamp',
+		'nullable' => False,
+		'default' => 'current_timestamp'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1.001';
+}
+
