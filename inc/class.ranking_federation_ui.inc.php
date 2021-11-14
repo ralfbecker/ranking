@@ -47,6 +47,10 @@ class ranking_federation_ui extends ranking_bo
 					Api\Framework::window_close(lang('Entry not found !!!'));
 				}
 				$content['grants'] = $this->federation->get_grants();
+
+				$content['edit_rights'] = $this->is_admin || $this->acl_check($content['nation'], Api\ACL::EDIT) ||
+					$content['fed_parent'] && $this->acl_check($content['fed_parent'], Api\ACL::EDIT) ||
+					$this->acl_check($content['fed_id'], Api\ACL::EDIT);
 			}
 			// edit multiple ones
 			else
@@ -56,11 +60,16 @@ class ranking_federation_ui extends ranking_bo
 				);
 				Api\Framework::message('Apply modifications below to all selected federations', 'info');
 			}
+			// only admin can create new fedeerations or edit multiple ones
+			if (!isset($content['edit_rights']))
+			{
+				$content['edit_rights'] = $this->is_admin;
+			}
 		}
 		// changes are only allowed for admins
-		elseif($this->is_admin)
+		elseif($content['edit_rights'])
 		{
-			$button = key($content['button']);
+			$button = key($content['button'] ?? []);
 			unset($content['button']);
 
 			switch($button)
@@ -91,8 +100,10 @@ class ranking_federation_ui extends ranking_bo
 						$this->federation->set_grants($content['grants']);
 						$msg = lang('Federation saved.');
 						// update content, in case save() set defaults
-						$content = $this->federation->data;
-						$content['grants'] = $this->federation->get_grants();
+						$content = $this->federation->data+[
+							'edit_rights' => $content['edit_rights'],
+							'grants' => $this->federation->get_grants(),
+						];
 					}
 					else
 					{
@@ -118,13 +129,20 @@ class ranking_federation_ui extends ranking_bo
 			Api\Framework::message($msg);
 		}
 
-		if (!$this->is_admin)
+		if (!$content['edit_rights'])
 		{
 			$readonlys = ['__ALL__' => true, 'button[cancel]' => false];
 		}
 		elseif ($content['num_children'] || $content['num_athletes'])
 		{
 			$readonlys['button[delete]'] = true;
+		}
+		// non-admins are not allowed to delete, change parent federation or nation
+		if (!$this->is_admin)
+		{
+			$readonlys['button[delete]'] = true;
+			$readonlys['fed_parent'] = $readonlys['fed_since'] = $readonlys['fed_parent_since'] = true;
+			$readonlys['nation'] = $readonlys['fed_nationname'] = $readonlys['fed_continent'] = true;
 		}
 
 		$fed_parents = empty($content['nation']) ? array() :
