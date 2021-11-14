@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Athlete;
 
 /**
  * Calculate diverse rankings:
@@ -380,16 +381,16 @@ class ranking_calculation
 		//_debug_array($filter);
 		$join = ' JOIN '.$this->bo->comp->table_name.' USING(WetId)';
 		$join .= ' JOIN '.$this->bo->cats->table_name.' USING(GrpId)';
-		$join .= ' JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)';
-		$join .= str_replace('USING(fed_id)','ON a2f.fed_id='.ranking_athlete::FEDERATIONS_TABLE.
-			'.fed_id', ranking_athlete::fed_join('YEAR(Wettkaempfe.datum)'));
+		$join .= ' JOIN '.Athlete::ATHLETE_TABLE.' USING(PerId)';
+		$join .= str_replace('USING(fed_id)','ON a2f.fed_id='.Athlete::FEDERATIONS_TABLE.
+			'.fed_id', Athlete::fed_join('YEAR(Wettkaempfe.datum)'));
 		$extra_cols = $this->bo->comp->table_name.'.name AS comp_name,'.
 			$this->bo->comp->table_name.'.dru_bez AS comp_short,'.
 			$this->bo->comp->table_name.'.datum AS comp_date,'.
 			$this->bo->cats->table_name.'.name AS cat_name,nachname,vorname,acl,'.
-			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,'.
-			ranking_athlete::FEDERATIONS_TABLE.'.fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,'.
-			ranking_athlete::ATHLETE_TABLE.'.PerId AS PerId';
+			Athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,'.
+			Athlete::FEDERATIONS_TABLE.'.fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,'.
+			Athlete::ATHLETE_TABLE.'.PerId AS PerId';
 		$append = 'ORDER BY '.$by.','.$this->bo->comp->table_name.'.datum DESC,WetId,GrpId,Results.platz';
 		if ($use_cup_points)
 		{

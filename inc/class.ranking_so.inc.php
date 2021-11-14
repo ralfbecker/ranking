@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Athlete;
 
 /**
  * EGroupware digital ROCK Rankings - storage object
@@ -25,7 +26,7 @@ use EGroupware\Api;
  * @property-read ranking_category $cats
  * @property-read ranking_cup $cup
  * @property-read ranking_competition $comp
- * @property-read ranking_athlete $athlete
+ * @property-read Athlete $athlete
  * @property-read ranking_result $result
  * @property-read ranking_registration $registration
  * @property-read ranking_route $route
@@ -70,7 +71,7 @@ class ranking_so
 	 */
 	private $comp;
 	/**
-	 * @var ranking_athlete
+	 * @var Athlete
 	 */
 	private $athlete;
 	/**
@@ -120,7 +121,7 @@ class ranking_so
 		'cats'    => 'ranking_category',
 		'cup'     => 'ranking_cup',
 		'comp'    => 'ranking_competition',
-		'athlete' => 'ranking_athlete',
+		'athlete' => Athlete::class,
 		'result'  => 'ranking_result',
 		'registration' => 'ranking_registration',
 		'route'   => 'ranking_route',

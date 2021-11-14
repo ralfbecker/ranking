@@ -146,9 +146,9 @@
 									<link-entry id="athlete[$row]" only_app="ranking" width="185"
 										onchange="widget.getRoot().getWidgetById('button[apply]').click();"/>
 									<buttononly readonly="true" statustext="Add new athlete with the given data" label="Add" id="add[$row]" image="add"
-										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit$row_cont[presets]'),'_blank', 850, 480, 'yes'); return false;"/>
+										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.EGroupware\\Ranking\\Athlete\\Ui.edit$row_cont[presets]'),'_blank', 850, 480, 'yes'); return false;"/>
 									<buttononly statustext="Edit athlete" label="Edit" id="edit[$row]" image="edit"
-										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.ranking_athlete_ui.edit&amp;PerId=')+widget.getParent().getChildren()[0].getValue(), '_blank', 850, 480, 'yes'); return false;"/>
+										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.EGroupware\\Ranking\\Athlete\\Ui.edit&amp;PerId=')+widget.getParent().getChildren()[0].getValue(), '_blank', 850, 480, 'yes'); return false;"/>
 								</hbox>
 								<checkbox statustext="@detection[$row][help-1]" label="@{$row}[1]" id="replace[$row][1]" readonly="true" class="{$cont['detection'][$row][1]}"/>
 								<checkbox statustext="@detection[$row][help-2]" label="@{$row}[2]" id="replace[$row][2]" readonly="true" class="{$cont['detection'][$row][2]}"/>

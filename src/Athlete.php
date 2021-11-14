@@ -10,12 +10,14 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
 use EGroupware\Api;
+use ranking_bo;
 
 /**
  * Athlete object
  */
-class ranking_athlete extends Api\Storage\Base
+class Athlete extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 	const ATHLETE_TABLE = 'Personen';
@@ -128,6 +130,11 @@ class ranking_athlete extends Api\Storage\Base
 	var $timestamps = array('modified','recover_pw_time','last_login');
 
 	/**
+	 * @var Athlete\Tracking
+	 */
+	var $tracking;
+
+	/**
 	 * Names for social media urls
 	 *
 	 * @var array
@@ -161,7 +168,7 @@ class ranking_athlete extends Api\Storage\Base
 	{
 		if (is_null($db))
 		{
-			$db = ranking_so::get_rang_db();
+			$db = \ranking_so::get_rang_db();
 		}
 		parent::__construct('ranking',self::ATHLETE_TABLE,$db);	// call constructor of derived class
 
@@ -252,7 +259,7 @@ class ranking_athlete extends Api\Storage\Base
 			{
 				if ($acl & $n) $data['acl'][] = $n;
 			}
-			// echo "<p>ranking_athlete::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
+			// echo "<p>self::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
 
 			// blank out the acl'ed fields, if user has no athletes rights
 			if (is_object($GLOBALS['ranking_bo']) && !$GLOBALS['ranking_bo']->acl_check_athlete($data))
@@ -316,7 +323,7 @@ class ranking_athlete extends Api\Storage\Base
 			{
 				$data['acl'] |= $n;
 			}
-			//echo "<p>ranking_athlete::data2db() acl=".print_r($acl,true)."=$data[acl]</p>\n";
+			//echo "<p>self::data2db() acl=".print_r($acl,true)."=$data[acl]</p>\n";
 		}
 		if ($data['practice'] && $data['practice'] < 100)
 		{
@@ -346,7 +353,7 @@ class ranking_athlete extends Api\Storage\Base
 		if (!is_array($arr) || !array_key_exists('acl', $arr))
 		{
 			$this->data['acl'] = [];
-			for($i=1; $i < ranking_athlete::ACL_DENY_PROFILE; $i <<= 1)
+			for($i=1; $i < self::ACL_DENY_PROFILE; $i <<= 1)
 			{
 				if ($i & self::ACL_DEFAULT)
 				{
@@ -401,7 +408,7 @@ class ranking_athlete extends Api\Storage\Base
 	 */
 	function &search($criteria,$only_keys=True,$order_by='',$_extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join=true,$need_full_no_count=false)
 	{
-		//echo "<p>ranking_athlete::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
+		//echo "<p>self::search(".print_r($criteria,true).",'$only_keys','$order_by','$extra_cols','$wildcard','$empty','$op','$start',".print_r($filter,true).",'$join')</p>\n";
 
 		if ($only_keys === true) $only_keys = self::ATHLETE_TABLE.'.PerId';
 
@@ -571,7 +578,7 @@ class ranking_athlete extends Api\Storage\Base
 	 */
 	function distinct_list($column,$keys='')
 	{
-		//echo "<p>ranking_athlete::distinct_list('$column',".print_r($keys,true),")</p>\n"; $start = microtime(true);
+		//echo "<p>self::distinct_list('$column',".print_r($keys,true),")</p>\n"; $start = microtime(true);
 
 		static $cache = array();
 		$cache_key = $column.'-'.serialize($keys);
@@ -599,7 +606,7 @@ class ranking_athlete extends Api\Storage\Base
 			$val = $data[$column];
 			$values[$val] = $val;
 		}
-		//echo "<p>ranking_athlete::distinct_list('$column',".print_r($keys,true),") took ".round(1000*(microtime(true)-$start))."ms</p>\n";
+		//echo "<p>self::distinct_list('$column',".print_r($keys,true),") took ".round(1000*(microtime(true)-$start))."ms</p>\n";
 		return $cache[$cache_key] =& $values;
 	}
 
@@ -1108,7 +1115,7 @@ class ranking_athlete extends Api\Storage\Base
 			$this->data['license'] = $status;
 			$this->data['license_cat'] = $GrpId;
 		}
-		//echo "ranking_athlete::set_license($year,'$status',$PerId)"; _debug_array($this->data);
+		//echo "self::set_license($year,'$status',$PerId)"; _debug_array($this->data);
 		return $this->db->affected_rows();
 	}
 
@@ -1311,7 +1318,7 @@ class ranking_athlete extends Api\Storage\Base
 			// send email notifications and do the history logging
 			if (!is_object($this->tracking))
 			{
-				$this->tracking = new ranking_tracking($this);
+				$this->tracking = new Athlete\Tracking($this);
 			}
 
 			$this->tracking->track($this->data,$old);
@@ -1507,4 +1514,4 @@ class ranking_athlete extends Api\Storage\Base
 		return $genders[$nation ?? ''][$firstname];
 	}
 }
-ranking_athlete::init_static();
+Athlete::init_static();

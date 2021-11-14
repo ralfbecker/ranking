@@ -10,13 +10,17 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking\Athlete;
+
 use EGroupware\Api;
 use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
 use EGroupware\Api\Vfs;
+use EGroupware\Ranking\Athlete;
+use ranking_bo;
 
 
-class ranking_athlete_ui extends ranking_bo
+class Ui extends ranking_bo
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -33,20 +37,20 @@ class ranking_athlete_ui extends ranking_bo
 	 * @var array
 	 */
 	static $acl_labels = array(
-		ranking_athlete::ACL_DEFAULT => array(
+		Athlete::ACL_DEFAULT => array(
 			'label' => 'Default for active competitors',
 			'title' => 'Hide only contact data and birthday from public display.',
 		),
-		ranking_athlete::ACL_MINIMAL => array(
+		Athlete::ACL_MINIMAL => array(
 			'label' => 'Show profile page with results',
 			'title' => 'Hide contact data, birthday and city from public display. Still shows optional data like hobbies!',
 		),
-		ranking_athlete::ACL_DENY_PROFILE => array(
+		Athlete::ACL_DENY_PROFILE => array(
 			'label' => 'Hide complete profile page',
 			'title' => 'Website visitors will be told that athlete asked to no longer show his profile page.'
 		),
 		/* dont want to make it to convienient to disable display of name
-		ranking_athlete::ACL_DENY_ALL => array(
+		Athlete::ACL_DENY_ALL => array(
 			'label' => 'Hide all: name and profile page',
 			'title' => 'Name will not be shown to website visitors and they will be told that athlete asked to no longer show his profile page.'
 		),*/
@@ -66,15 +70,15 @@ class ranking_athlete_ui extends ranking_bo
 	 * @var array
 	 */
 	static $acl_deny_labels = array(
-		ranking_athlete::ACL_DENY_BIRTHDAY	=> 'birthday, shows only the year',
-		ranking_athlete::ACL_DENY_EMAIL		=> 'email',
-		ranking_athlete::ACL_DENY_PHONE		=> 'phone',
-		ranking_athlete::ACL_DENY_FAX		=> 'fax',
-		ranking_athlete::ACL_DENY_CELLPHONE	=> 'cellphone',
-		ranking_athlete::ACL_DENY_STREET    => 'street, postcode',
-		ranking_athlete::ACL_DENY_CITY		=> 'city',
-		ranking_athlete::ACL_DENY_PROFILE	=> 'complete profile',
-		ranking_athlete::ACL_DENY_ALL	    => 'all: profile and name',
+		Athlete::ACL_DENY_BIRTHDAY	=> 'birthday, shows only the year',
+		Athlete::ACL_DENY_EMAIL		=> 'email',
+		Athlete::ACL_DENY_PHONE		=> 'phone',
+		Athlete::ACL_DENY_FAX		=> 'fax',
+		Athlete::ACL_DENY_CELLPHONE	=> 'cellphone',
+		Athlete::ACL_DENY_STREET    => 'street, postcode',
+		Athlete::ACL_DENY_CITY		=> 'city',
+		Athlete::ACL_DENY_PROFILE	=> 'complete profile',
+		Athlete::ACL_DENY_ALL	    => 'all: profile and name',
 	);
 
 	/**
@@ -163,14 +167,13 @@ class ranking_athlete_ui extends ranking_bo
 
 			if (!$view && $this->only_nation_athlete) $content['nation'] = $this->only_nation_athlete;
 
-			//echo "<br>ranking_athlete_ui::edit: content ="; _debug_array($content);
 			$this->athlete->init($content['athlete_data']);
 			// reload license, if nation or year changed
 			if ($content['old_license_nation'] != $content['license_nation'])
 			{
 				$content['athlete_data']['license'] = $content['license'] = $this->athlete->get_license($content['license_year'],$content['license_nation']);
 			}
-			// restore some fields set by ranking_athlete::read, which are no real athlete fields
+			// restore some fields set by Athlete::read, which are no real athlete fields
 			foreach(array('comp','last_comp','license','license_cat') as $name)
 			{
 				$this->athlete->data[$name] = $content['athlete_data'][$name];
@@ -189,14 +192,13 @@ class ranking_athlete_ui extends ranking_bo
 			else
 			{
 				$this->athlete->data['acl'] = array();
-				for($acl=1; $acl <= ranking_athlete::ACL_DENY_ALL; $acl *= 2)
+				for($acl=1; $acl <= Athlete::ACL_DENY_ALL; $acl *= 2)
 				{
 					if ($content['acl'] & $acl) $this->athlete->data['acl'][] = $acl;
 				}
 				$content['custom_acl'] = $this->athlete->data['acl'];
 			}
 			$this->athlete->data['acl_fed_id'] = (int)$content['acl_fed_id']['fed_id'];
-			//echo "<br>ranking_athlete_ui::edit: athlete->data ="; _debug_array($this->athlete->data);
 
 			// download (latest) consent document
 			if ($content['download_consent'] && ($path = $this->athlete->consent_document()) &&
@@ -242,7 +244,7 @@ class ranking_athlete_ui extends ranking_bo
 						$msg .= lang("Use the ACL to hide the birthdate, you can't remove it !!!");
 						$this->athlete->data['geb_date'] = $old_geb_date;
 					}
-					elseif($this->athlete->data['geb_date'] && ranking_athlete::age($this->athlete->data['geb_date']) < self::MINIMUM_AGE)
+					elseif($this->athlete->data['geb_date'] && Athlete::age($this->athlete->data['geb_date']) < self::MINIMUM_AGE)
 					{
 						$msg .= lang("Athlets need to be at least %1 years old! Maybe wrong date format.",self::MINIMUM_AGE);
 					}
@@ -459,14 +461,14 @@ class ranking_athlete_ui extends ranking_bo
 			{
 				$content['acl'] = array_sum($content['acl']);
 			}
-			if (in_array(ranking_athlete::ACL_DENY_ALL, $content['custom_acl']))
+			if (in_array(Athlete::ACL_DENY_ALL, $content['custom_acl']))
 			{
-				//$content['acl'] = ranking_athlete::ACL_DENY_ALL;
+				//$content['acl'] = Athlete::ACL_DENY_ALL;
 				$content['acl'] = 'custom';
 			}
-			elseif (in_array(ranking_athlete::ACL_DENY_PROFILE, $content['custom_acl']))
+			elseif (in_array(Athlete::ACL_DENY_PROFILE, $content['custom_acl']))
 			{
-				$content['acl'] = ranking_athlete::ACL_DENY_PROFILE;
+				$content['acl'] = Athlete::ACL_DENY_PROFILE;
 			}
 			elseif (!isset(self::$acl_labels[$content['acl']]))
 			{
@@ -573,7 +575,7 @@ Continuer';
 			// the name of an athlete who has not climbed for more then two years
 			// (gard against federations "reusing" athlets)
 			if ($this->athlete->data['PerId'] && $this->athlete->data['last_comp'] &&
-				ranking_athlete::age($this->athlete->data['last_comp']) > 2 &&
+				Athlete::age($this->athlete->data['last_comp']) > 2 &&
 				!($this->is_admin || array_intersect(array($this->athlete->data['nation'], 'NULL'), $this->edit_rights)))
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = true;
@@ -601,7 +603,7 @@ Continuer';
 			// for self-service, do NOT close the window, but submit the form, which redirects back to athlete.php
 			Api\Etemplate::setElementAttribute('button[cancel]', 'onclick', 'return true;');	// '' does NOT work
 		}
-		$tmpl->exec('ranking.ranking_athlete_ui.edit',$content,
+		$tmpl->exec('ranking.'.self::class.'.edit', $content,
 			$sel_options,$readonlys,array(
 				'athlete_data' => $this->athlete->data,
 				'view' => $view,
@@ -633,11 +635,11 @@ Continuer';
 				return lang('Error: all athlete data is public available, please change access settings!');
 
 			case 'custom':
-				if ($custom_acl >= ranking_athlete::ACL_DENY_PROFILE) break;
+				if ($custom_acl >= Athlete::ACL_DENY_PROFILE) break;
 				$data = [];
-				for($i=1; $i < ranking_athlete::ACL_DENY_PROFILE; $i <<= 1)
+				for($i=1; $i < Athlete::ACL_DENY_PROFILE; $i <<= 1)
 				{
-					if (($i & ranking_athlete::ACL_DEFAULT) && !in_array($i, $custom_acl))
+					if (($i & Athlete::ACL_DEFAULT) && !in_array($i, $custom_acl))
 					{
 						$data[] = lang(self::$acl_deny_labels[$i]);
 					}
@@ -660,7 +662,6 @@ Continuer';
 	 */
 	function get_rows(&$query_in, &$rows, &$readonlys, $ids_only=false)
 	{
-		//echo "ranking_athlete_ui::get_rows() query="; _debug_array($query_in);
 		if (!$query_in['csv_export'])	// only store state if NOT called as csv export
 		{
 			Api\Cache::setSession('athlete_state', 'ranking', $query_in);
@@ -726,15 +727,15 @@ Continuer';
 		{
 			unset($query['col_filter']['acl']);
 		}
-		elseif ($query['col_filter']['acl'] == ranking_athlete::ACL_DENY_PROFILE)
+		elseif ($query['col_filter']['acl'] == Athlete::ACL_DENY_PROFILE)
 		{
-			$query['col_filter'][] = "(acl & ".ranking_athlete::ACL_DENY_PROFILE.")";
+			$query['col_filter'][] = "(acl & ".Athlete::ACL_DENY_PROFILE.")";
 			unset($query['col_filter']['acl']);
 		}
 		elseif ($query['col_filter']['acl'] === 'custom')
 		{
-			$query['col_filter'][] = $this->db->expression(ranking_athlete::ATHLETE_TABLE,
-				'NOT ((acl & '.ranking_athlete::ACL_DENY_PROFILE.') OR ',
+			$query['col_filter'][] = $this->db->expression(Athlete::ATHLETE_TABLE,
+				'NOT ((acl & '.Athlete::ACL_DENY_PROFILE.') OR ',
 				['acl' => array_filter(array_keys(self::$acl_labels), function($key){return $key !== 'custom';})], ')');
 			unset($query['col_filter']['acl']);
 		}
@@ -759,9 +760,9 @@ Continuer';
 			// ACL is an array with values of 2^N eg. [1, 2, 8]
 			$row['acl'] = $row['acl'] ? array_sum($row['acl']) : '0';
 			// only show deny profile, more is not possible anyway
-			if ($row['acl'] & ranking_athlete::ACL_DENY_PROFILE)
+			if ($row['acl'] & Athlete::ACL_DENY_PROFILE)
 			{
-				$row['acl'] = ranking_athlete::ACL_DENY_PROFILE;
+				$row['acl'] = Athlete::ACL_DENY_PROFILE;
 			}
 
 			if (!$row['last_comp'] && $this->acl_check_athlete($row))
@@ -828,7 +829,7 @@ Continuer';
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
-				'get_rows'       =>	'ranking.ranking_athlete_ui.get_rows',
+				'get_rows'       =>	'ranking.'.self::class.'.get_rows',
 				'filter_no_lang' => True,
 				'filter_label'   => lang('Category'),
 				'filter2_label'  => 'License',
@@ -855,7 +856,7 @@ Continuer';
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('Athletes');
 		$this->set_ui_state();
 
-		$tmpl->exec('ranking.ranking_athlete_ui.index',$content,array(
+		$tmpl->exec('ranking.'.self::class.'.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'filter2'=> array('' => 'All')+$this->license_labels,
@@ -954,13 +955,13 @@ Continuer';
 				'caption' => 'Edit',
 				'default' => true,
 				'allowOnMultiple' => false,
-				'url' => 'menuaction=ranking.ranking_athlete_ui.edit&PerId=$id',
+				'url' => 'menuaction=ranking.'.self::class.'.edit&PerId=$id',
 				'popup' => '900x470',
 				'group' => $group=0,
 			),
 			'add' => array(
 				'caption' => 'Add',
-				'url' => 'menuaction=ranking.ranking_athlete_ui.edit',
+				'url' => 'menuaction=ranking.'.self::class.'.edit',
 				'popup' => '900x470',
 				'disabled' => !$this->is_admin && !$this->athlete_rights && !$this->federation->get_user_grants(),
 				'group' => $group,
@@ -968,7 +969,7 @@ Continuer';
 			'license' => array(
 				'caption' => 'Apply for license',
 				'allowOnMultiple' => false,
-				'url' => "menuaction=ranking.ranking_athlete_ui.edit&PerId=\$id&license_nation=$cont[license_nation]&license_year=$cont[license_year]&license_cat=$cont[license_cat]",
+				'url' => "menuaction=ranking.".self::class.".edit&PerId=\$id&license_nation=$cont[license_nation]&license_year=$cont[license_year]&license_cat=$cont[license_cat]",
 				'popup' => '900x470',
 				'enableClass' => 'ApplyLicense',
 				'group' => $group,
@@ -999,7 +1000,7 @@ Continuer';
 		);
 
 		$prefs =& $GLOBALS['egw_info']['user']['preferences']['ranking'];
-		$actions['documents'] = ranking_merge::document_action(
+		$actions['documents'] = Merge::document_action(
 			$prefs['document_dir'], ++$group, 'Insert in document', 'document_',
 			$prefs['default_document']
 		);
@@ -1126,7 +1127,7 @@ Continuer';
 		// if we have a PerId, check if athlete is a minor (to prefer minor-form over general/adult one)
 		if (!empty($PerId) && ($PerId == $this->athlete->data['PerId'] || $this->athlete->read($PerId)))
 		{
-			$age = ranking_athlete::age($this->athlete->data['geb_date']);
+			$age = Athlete::age($this->athlete->data['geb_date']);
 			$minor = !empty($age) && $age < 18;
 			//error_log(__METHOD__."('$nation', $year, $GrpId, $PerId) birthdate={$this->athlete->data['geb_date']} --> age=$age --> minor=".array2string($minor));
 		}
@@ -1160,7 +1161,7 @@ Continuer';
 		if ($this->athlete->read($PerId) &&
 			($vfs_path = $this->license_form_name($nation, $year, $GrpId, $PerId, null, false, $ext)))
 		{
-			$merge = new ranking_merge();
+			$merge = new Merge();
 			$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.
 				$this->athlete->data['nachname'].$ext;
 			// does NOT return, unless there is an error
@@ -1209,7 +1210,7 @@ Continuer';
 			),
 		);
 		$history_stati = array();
-		$tracking = new ranking_tracking($this);
+		$tracking = new Tracking($this);
 		foreach($tracking->field2history as $field => $history)
 		{
 			$history_stati[$history] = $tracking->field2label[$field];

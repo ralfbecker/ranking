@@ -12,6 +12,7 @@
 
 use EGroupware\Api;
 use EGroupware\Api\Egw;
+use EGroupware\Ranking\Athlete;
 
 /**
  * Rankings - Hooks: diverse static methods to be called as hooks
@@ -30,7 +31,7 @@ class ranking_hooks
 			$GLOBALS['egw_info']['server']['versions']['phpgwapi'] .= ' / '.lang('Ranking').' '.lang('Version').' '.$GLOBALS['egw_info']['apps']['ranking']['version'];
 
 			$links = array(
-				'Athletes'      => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_athlete_ui.index','ajax' => 'true')),
+				'Athletes'      => Egw::link('/index.php',array('menuaction' => 'ranking.'.Athlete\Ui::class.'.index','ajax' => 'true')),
 				'Federations'   => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index','ajax' => 'true')),
 				'Competitions'  => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index','ajax' => 'true')),
 				'Cups'          => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index','ajax' => 'true')),
@@ -67,7 +68,7 @@ class ranking_hooks
 				'link'   => 'https://github.com/ralfbecker/ranking/commits/master',
 				'target' => 'changelog',
 			);
-			$docs['Placeholders'] = Egw::link('/index.php','menuaction=ranking.ranking_merge.show_replacements');
+			$docs['Placeholders'] = Egw::link('/index.php','menuaction=ranking.'.Athlete\Merge::class.'.show_replacements');
 			display_sidebox($appname, lang('Documentation'), $docs);
 
 			$file = array();
@@ -176,7 +177,7 @@ class ranking_hooks
 				'name'   => 'default_document',
 				'help'   => lang('If you specify a document (full vfs path) here, %1 displays an extra document icon for each entry. That icon allows to download the specified document with the data inserted.',lang('infolog')).' '.
 					lang('The document can contain placeholder like {{%1}}, to be replaced with the data.','info_subject').' '.
-					lang('The following document-types are supported:').implode(', ', ranking_merge::get_file_extensions()),
+					lang('The following document-types are supported:').implode(', ', Athlete\Merge::get_file_extensions()),
 				'run_lang' => false,
 				'xmlrpc' => True,
 				'admin'  => False,
@@ -188,7 +189,7 @@ class ranking_hooks
 				'name'   => 'document_dir',
 				'help'   => lang('If you specify a directory (full vfs path) here, %1 displays an action for each document. That action allows to download the specified document with the data inserted.',lang('ranking')).' '.
 					lang('The document can contain placeholder like {{%1}}, to be replaced with the data.','nachname').' '.
-					lang('The following document-types are supported:').implode(', ', ranking_merge::get_file_extensions()),
+					lang('The following document-types are supported:').implode(', ', Athlete\Merge::get_file_extensions()),
 				'run_lang' => false,
 				'xmlrpc' => True,
 				'admin'  => False,
@@ -209,15 +210,15 @@ class ranking_hooks
 	{
 		unset($location);	// not used, but required by function signature
 		return array(
-			'query' => 'ranking.ranking_athlete.link_query',
-			'title' => 'ranking.ranking_athlete.link_title',
-//			'titles' => 'ranking.ranking_athlete.link_titles',
+			'query' => 'ranking.'.Athlete::class.'.link_query',
+			'title' => 'ranking.'.Athlete::class.'.link_title',
+//			'titles' => 'ranking.'.Athlete::class.'.link_titles',
 			'view' => array(
-				'menuaction' => 'ranking.ranking_athlete_ui.edit'
+				'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit'
 			),
 			'view_id' => 'PerId',
 			'add' => array(
-				'menuaction' => 'ranking.ranking_athlete_ui.edit'
+				'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit'
 			),
 			'add_popup'  => '900x470',
 		);

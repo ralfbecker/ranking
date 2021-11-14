@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Athlete;
 
 /**
  * result object
@@ -79,7 +80,7 @@ class ranking_result extends Api\Storage\Base
 		{
 			unset($filter['nation']);
 
-			if ($join) $filter[] = $this->db->expression(ranking_athlete::FEDERATIONS_TABLE,array('nation' => $keys['nation']));
+			if ($join) $filter[] = $this->db->expression(Athlete::FEDERATIONS_TABLE,array('nation' => $keys['nation']));
 
 			unset($keys['nation']);
 		}
@@ -110,11 +111,11 @@ class ranking_result extends Api\Storage\Base
 				}
 				unset($filter['year'], $keys['year']);
 
-				$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::fed_join($year);
+				$join = 'JOIN '.Athlete::ATHLETE_TABLE.' USING(PerId)'.Athlete::fed_join($year);
 
 				if (!$extra_cols)
 				{
-					$extra_cols = "nachname,vorname,acl,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
+					$extra_cols = "nachname,vorname,acl,nation,ort,verband,fed_url,".Athlete::FEDERATIONS_TABLE.".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,pkt & 63 AS reg_nr,$this->athlete_table.PerId AS PerId";
 				}
 				else
 				{
@@ -192,7 +193,7 @@ class ranking_result extends Api\Storage\Base
 			$data = Api\Translation::convert($data,$this->source_charset);
 		}
 		// make sure all includes profile!
-		if ($data['acl'] & ranking_athlete::ACL_DENY_ALL) $data['acl'] |= ranking_athlete::ACL_DENY_PROFILE;
+		if ($data['acl'] & Athlete::ACL_DENY_ALL) $data['acl'] |= Athlete::ACL_DENY_PROFILE;
 
 		return $data;
 	}
@@ -348,9 +349,9 @@ class ranking_result extends Api\Storage\Base
 		unset($allowed_nations);	// not used, but required by function signature
 		$results = array();
 		foreach($this->db->query("SELECT $this->athlete_table.*,acl.fed_id AS acl_fed_id,".
-			ranking_athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,COALESCE(r.cup_platz,r.platz) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline".
+			Athlete::FEDERATIONS_TABLE.".nation,verband,fed_url,COALESCE(r.cup_platz,r.platz) AS platz,r.cup_pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline".
 			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".
-			ranking_athlete::fed_join($year).
+			Athlete::fed_join($year).
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND COALESCE(r.cup_platz,r.platz) > 0".
 			' AND r.GrpId '.(count($cats) == 1 ? '='.(int)$cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND r.GrpID=c.GrpId'.
@@ -378,9 +379,9 @@ class ranking_result extends Api\Storage\Base
 	{
 		$results = array();
 		foreach($this->db->query($sql="SELECT $this->athlete_table.*,acl.fed_id AS acl_fed_id,".
-			ranking_athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline'.
+			Athlete::FEDERATIONS_TABLE.'.nation,verband,fed_url,r.platz,r.pkt/100.0 AS pkt,r.WetId,r.GrpId,COALESCE(w.discipline,c.discipline) AS discipline'.
 			" FROM $this->result_table r,$this->comp_table w,$this->cat_table c,$this->athlete_table ".
-			ranking_athlete::fed_join((int)$stand).
+			Athlete::fed_join((int)$stand).
 			" WHERE r.WetId=w.WetId AND $this->athlete_table.PerId=r.PerId AND r.pkt > 0 AND r.platz > 0".
 			' AND r.GrpId '.(count($cats)==1 ? '='.(int) $cats[0] : ' IN ('.implode(',',$cats).')').
 			' AND r.GrpID=c.GrpId'.

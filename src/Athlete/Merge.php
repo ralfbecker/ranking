@@ -12,12 +12,16 @@
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  */
 
+namespace EGroupware\Ranking\Athlete;
+
 use EGroupware\Api;
+use EGroupware\Ranking\Athlete\Ui;
+use ranking_bo;
 
 /**
  * Document merge object for athletes
  */
-class ranking_merge extends Api\Storage\Merge
+class Merge extends Api\Storage\Merge
 {
 	/**
 	 * Functions that can be called via menuaction
@@ -55,14 +59,14 @@ class ranking_merge extends Api\Storage\Merge
 		parent::__construct();
 		$this->bo = ranking_bo::getInstance();
 
-		$this->date_fields += ranking_egw_record::$types['date-time'] +
-			ranking_egw_record::$types['date'] + array('last_comp');
+		$this->date_fields += Record::$types['date-time'] +
+			Record::$types['date'] + array('last_comp');
 
 		$this->selects = array(
 			'nation' => $this->bo->athlete->distinct_list('nation'),
 			'sex'    => $this->bo->genders,
-			'acl'    => ranking_athlete_ui::$acl_labels,
-			'custom_acl' => ranking_athlete_ui::$acl_deny_labels,
+			'acl'    => Ui::$acl_labels,
+			'custom_acl' => Ui::$acl_deny_labels,
 			'license'=> $this->bo->license_labels,
 			'fed_id' => $this->bo->athlete->federations(null, false, []),
 			'license_nation' => $this->bo->license_nations,
@@ -116,11 +120,11 @@ class ranking_merge extends Api\Storage\Merge
 	 */
 	public function athlete_replacements($id, $prefix='', &$content = '')
 	{
-		$record = new ranking_egw_record($id);
+		$record = new Record($id);
 		$entry = array();
 
 		// Convert to human friendly values
-		$types = ranking_egw_record::$types;
+		$types = Record::$types;
 		$selects = $this->selects;
 
 		if($content && strpos($content, '$$#') !== FALSE)
@@ -200,7 +204,7 @@ class ranking_merge extends Api\Storage\Merge
 		echo '<tr><td colspan="4"><h3>'.lang('Athlete fields:')."</h3></td></tr>";
 
 		$n = 0;
-		$tracking = new ranking_tracking($this->bo);
+		$tracking = new Tracking($this->bo);
 		$fields = $tracking->field2label + $this->extra_placeholders;
 
 		foreach($fields as $name => $label)

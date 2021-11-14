@@ -12,6 +12,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Athlete;
 
 class ranking_accounting extends ranking_result_bo
 {
@@ -64,7 +65,7 @@ class ranking_accounting extends ranking_result_bo
 			unset($query['col_filter']['GrpId']);
 		}
 		// we use ranking_athlete::get_rows, to also get the license data (joined with the results table)
-		$join = ' JOIN '.ranking_route_result::RESULT_TABLE.' ON '.ranking_athlete::ATHLETE_TABLE.'.PerId='.ranking_route_result::RESULT_TABLE. '.PerId AND '.
+		$join = ' JOIN '.ranking_route_result::RESULT_TABLE.' ON '.Athlete::ATHLETE_TABLE.'.PerId='.ranking_route_result::RESULT_TABLE. '.PerId AND '.
 			$this->db->expression(ranking_route_result::RESULT_TABLE,$query['col_filter']);
 
 		// col_filter is only for license-date, other filters are already used in the above join

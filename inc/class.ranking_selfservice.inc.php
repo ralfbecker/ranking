@@ -13,6 +13,7 @@
 use EGroupware\Api;
 use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
+use EGroupware\Ranking\Athlete;
 
 /**
  * athletes selfservice: profile, registration
@@ -46,8 +47,8 @@ class ranking_selfservice extends ranking_bo
 		if (substr($_GET['action'], 0, 10) != 'scorecard-') echo $GLOBALS['egw']->framework->header();
 
 		$athlete = array();
-		unset($this->athlete->acl2clear[ranking_athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
-		unset($this->athlete->acl2clear[ranking_athlete::ACL_DENY_PROFILE]);	// same is true for a fully denied profile
+		unset($this->athlete->acl2clear[Athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
+		unset($this->athlete->acl2clear[Athlete::ACL_DENY_PROFILE]);	// same is true for a fully denied profile
 		if (($PerId || ($PerId = $this->is_selfservice())) && !($athlete = $this->athlete->read($PerId)))
 		{
 			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
@@ -81,7 +82,7 @@ class ranking_selfservice extends ranking_bo
 		{
 			case 'profile':
 				Egw::redirect_link('/index.php',array(
-					'menuaction' => 'ranking.ranking_athlete_ui.edit',
+					'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit',
 					'PerId' => $PerId,
 					'cd' => 'no',
 				));
@@ -354,7 +355,7 @@ class ranking_selfservice extends ranking_bo
 		// Edit profile and logout buttons
 		echo "<div id='profile-logout-buttons'>".
 			html::form_1button('profile', lang('Edit Profile'), '', '/index.php', array(
-				'menuaction' => 'ranking.ranking_athlete_ui.edit',
+				'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit',
 				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
 				'cd' => 'no',
 			))."\n".

@@ -12,6 +12,7 @@
 
 use EGroupware\Api;
 use EGroupware\Api\Egw;
+use EGroupware\Ranking\Athlete;
 
 /**
  * XML/JSON export logic
@@ -2046,8 +2047,8 @@ class ranking_export extends ranking_result_bo
 
 		if (($msg = $this->athlete->profile_hidden($athlete)))
 		{
-			$athlete['acl'] = ranking_athlete::ACL_DENY_PROFILE;
-			$athlete = $this->athlete->clear_data_by_acl($athlete, ranking_athlete::ACL_DENY_PROFILE);
+			$athlete['acl'] = Athlete::ACL_DENY_PROFILE;
+			$athlete = $this->athlete->clear_data_by_acl($athlete, Athlete::ACL_DENY_PROFILE);
 			unset($athlete['last_comp'], $athlete['photo']);
 			$athlete['freetext'] = $athlete['error'] = $msg;
 			$athlete['last_modified'] = Api\DateTime::to($athlete['modified'], 'ts');
@@ -2060,7 +2061,7 @@ class ranking_export extends ranking_result_bo
 
 		// athlete requested not to show his profile
 		// --> no results, no ranking, regular profile data already got removed by athlete->db2data called by read
-		if (!($athlete['acl'] & ranking_athlete::ACL_DENY_PROFILE))
+		if (!($athlete['acl'] & Athlete::ACL_DENY_PROFILE))
 		{
 			foreach(array(
 				'photo' => null,
@@ -2187,9 +2188,9 @@ class ranking_export extends ranking_result_bo
 				'nachname' => $pattern.'*',
 				'vorname'  => $pattern.'*',
 			),
-			array('PerId', 'vorname', 'nachname', ranking_athlete::FEDERATIONS_TABLE.'.nation'),
+			array('PerId', 'vorname', 'nachname', Athlete::FEDERATIONS_TABLE.'.nation'),
 			'nachname, vorname', '', '', false, 'OR', array(0, 50), [
-				ranking_athlete::FEDERATIONS_TABLE.".nation != 'XYZ'",	// do not return test federation
+				Athlete::FEDERATIONS_TABLE.".nation != 'XYZ'",	// do not return test federation
 			]) as $row)
 		{
 			$found[] = array(
@@ -2453,7 +2454,7 @@ class ranking_export extends ranking_result_bo
 		{
 			$data = array_merge($data, $feds_with_subs[$data['nation']]);
 		}
-		if (is_array($athlete['acl']) ? in_array(ranking_athlete::ACL_DENY_ALL, $athlete['acl']) : $athlete['acl'] & ranking_athlete::ACL_DENY_ALL)
+		if (is_array($athlete['acl']) ? in_array(Athlete::ACL_DENY_ALL, $athlete['acl']) : $athlete['acl'] & Athlete::ACL_DENY_ALL)
 		{
 			foreach(array('firstname', 'lastname') as $name)
 			{

@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Athlete;
 
 /**
  * registration storage object
@@ -106,7 +107,7 @@ class ranking_registration extends Api\Storage\Base
 		{
 			unset($filter['nation']);
 
-			if ($join) $filter[] = $this->db->expression(ranking_athlete::FEDERATIONS_TABLE,array('nation' => $keys['nation']));
+			if ($join) $filter[] = $this->db->expression(Athlete::FEDERATIONS_TABLE,array('nation' => $keys['nation']));
 
 			unset($keys['nation']);
 		}
@@ -126,13 +127,13 @@ class ranking_registration extends Api\Storage\Base
 			$cols = false;
 			if ($join === true)
 			{
-				$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
+				$join = 'JOIN '.Athlete::ATHLETE_TABLE.' USING(PerId)'.Athlete::FEDERATIONS_JOIN;
 
 				if (!$extra_cols || is_string($extra_cols) && $extra_cols[0] === '+')
 				{
-					$extra_cols = "nachname,vorname,nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
+					$extra_cols = "nachname,vorname,nation,ort,verband,fed_url,".Athlete::FEDERATIONS_TABLE.
 						".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,acl,reg_id,email,".
-						ranking_athlete::ATHLETE_TABLE.".PerId AS PerId".
+						Athlete::ATHLETE_TABLE.".PerId AS PerId".
 						($extra_cols ? ','.substr($extra_cols, 1) : '');
 				}
 				else
@@ -410,16 +411,16 @@ class ranking_registration extends Api\Storage\Base
 
 		if ($join === true)
 		{
-			$join = 'JOIN '.ranking_athlete::ATHLETE_TABLE.' USING(PerId)'.ranking_athlete::FEDERATIONS_JOIN;
+			$join = 'JOIN '.Athlete::ATHLETE_TABLE.' USING(PerId)'.Athlete::FEDERATIONS_JOIN;
 
 			// use fed_id, if there is no fed_parent or a German region
 			$ger_regions = implode(',', array_keys(ranking_bo::getInstance()->federation->regions('GER')));
 			$fed_parent = "CASE WHEN fed_parent IS NULL OR fed_parent IN ($ger_regions) THEN Federations.fed_id ELSE fed_parent END";
 			$extra_cols = str_replace('fed_parent', $fed_parent.' AS fed_parent',
 				array_merge($extra_cols ? explode(',', $extra_cols) : array(),
-					explode(',', "nachname,vorname,sex,".ranking_athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".ranking_athlete::FEDERATIONS_TABLE.
+					explode(',', "nachname,vorname,sex,".Athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".Athlete::FEDERATIONS_TABLE.
 					".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,acl,".
-					ranking_athlete::ATHLETE_TABLE.".PerId AS PerId")));
+					Athlete::ATHLETE_TABLE.".PerId AS PerId")));
 			$order_by = str_replace('fed_parent', $fed_parent, $order_by);
 
 			if (isset($filter['license_nation']))
@@ -437,14 +438,14 @@ class ranking_registration extends Api\Storage\Base
 				{
 					if ($val)
 					{
-						$f = $this->db->expression(ranking_athlete::FEDERATIONS_TABLE,array(
+						$f = $this->db->expression(Athlete::FEDERATIONS_TABLE,array(
 							!is_numeric($val) ? 'nation' : 'fed_parent' => $val,
 						));
 						// for numeric ids / state federations also check SUI Regionalzentrum acl.fed_id
 						if (is_numeric($val))
 						{
-							$f = '('.$f.$this->db->expression(ranking_athlete::FEDERATIONS_TABLE,
-								' OR '.ranking_athlete::FEDERATIONS_TABLE.'.', ['fed_id' => $val],
+							$f = '('.$f.$this->db->expression(Athlete::FEDERATIONS_TABLE,
+								' OR '.Athlete::FEDERATIONS_TABLE.'.', ['fed_id' => $val],
 								' OR acl.', ['fed_id' => $val]).')';
 						}
 						$filter[] = $f;
@@ -453,7 +454,7 @@ class ranking_registration extends Api\Storage\Base
 				}
 				elseif (!isset($this->db_cols[$col]))	// assume it's from joined Athletes table
 				{
-					if ($val) $filter[] = $this->db->expression(ranking_athlete::ATHLETE_TABLE,array($col => $val));
+					if ($val) $filter[] = $this->db->expression(Athlete::ATHLETE_TABLE,array($col => $val));
 					unset($filter[$col]);
 				}
 			}

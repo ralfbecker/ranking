@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Athlete;
 
 class ranking_result_ui extends ranking_result_bo
 {
@@ -409,7 +410,7 @@ class ranking_result_ui extends ranking_result_bo
 						break;
 					}
 					// temporary reset all ACL but deny-profile, so save does NOT remove birthdate, email and city data
-					$this->athlete->acl2clear = array(ranking_athlete::ACL_DENY_PROFILE => $this->athlete->acl2clear[ranking_athlete::ACL_DENY_PROFILE]);
+					$this->athlete->acl2clear = array(Athlete::ACL_DENY_PROFILE => $this->athlete->acl2clear[Athlete::ACL_DENY_PROFILE]);
 					// store email of existing athlete
 					if ($athlete['PerId'] && $athlete['email'] && ($stored = $this->athlete->read($athlete['PerId'])) &&
 						$athlete['email'] != $stored['email'])
@@ -541,7 +542,7 @@ class ranking_result_ui extends ranking_result_bo
 		if ($content['athlete']['PerId'] > 0)
 		{
 			// temporary reset all ACL but deny-profile, so route-judge in registration get birthdate, email and city data
-			$this->athlete->acl2clear = array(ranking_athlete::ACL_DENY_PROFILE => $this->athlete->acl2clear[ranking_athlete::ACL_DENY_PROFILE]);
+			$this->athlete->acl2clear = array(Athlete::ACL_DENY_PROFILE => $this->athlete->acl2clear[Athlete::ACL_DENY_PROFILE]);
 
 			if (($athlete = $this->athlete->read(array('PerId' => $content['athlete']['PerId']))))
 			{

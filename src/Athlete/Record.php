@@ -10,16 +10,21 @@
  * @copyright Nathan Gray
  */
 
+namespace EGroupware\Ranking\Athlete;
+
+use ranking_bo;
+
 /**
- * class ranking_egw_record
- *
- * compatibility layer for iface_egw_record needed for importexport, but also
+ * Compatibility layer for iface_egw_record needed for importexport, but also
  * used by merge to translate and format values
  */
-class ranking_egw_record implements importexport_iface_egw_record
+class Record implements \importexport_iface_egw_record
 {
 	private $identifier = '';
 	private $record = array();
+	/**
+	 * @var \EGroupware\Ranking\Athlete
+	 */
 	private static $bo;
 
 	// Used in conversions

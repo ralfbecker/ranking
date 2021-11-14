@@ -11,13 +11,14 @@
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  */
 
+namespace EGroupware\Ranking\Athlete;
+
 use EGroupware\Api;
-use EGroupware\Api\Link;
 
 /**
  * Change tracking for athletes
  */
-class ranking_tracking extends Api\Storage\Tracking
+class Tracking extends Api\Storage\Tracking
 {
 	/**
 	 * Application we are tracking (required!)
