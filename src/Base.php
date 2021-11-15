@@ -10,13 +10,16 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 use EGroupware\Api\Acl;
+use \ranking_result_bo;
 
 /**
  * ranking business object/logic
  */
-class ranking_bo extends ranking_so
+class Base extends So
 {
 	const ACL_READ = Acl::READ;
 	const ACL_EDIT = Acl::EDIT;
@@ -173,15 +176,20 @@ class ranking_bo extends ranking_so
 	 */
 	var $display_athlete_types = array(
 		'' => 'Default',
-		ranking_competition::NATION => 'Nation',
-		ranking_competition::FEDERATION => 'Federation',
-		ranking_competition::CITY => 'City',
-		ranking_competition::PC_CITY => 'PC City',
-		ranking_competition::NATION_PC_CITY => 'Nation PC City',
-		ranking_competition::PARENT_FEDERATION => 'Parent federation',
-		ranking_competition::FED_AND_PARENT => 'Federation and Parent',
-		ranking_competition::NONE => 'None',
+		Competition::NATION => 'Nation',
+		Competition::FEDERATION => 'Federation',
+		Competition::CITY => 'City',
+		Competition::PC_CITY => 'PC City',
+		Competition::NATION_PC_CITY => 'Nation PC City',
+		Competition::PARENT_FEDERATION => 'Parent federation',
+		Competition::FED_AND_PARENT => 'Federation and Parent',
+		Competition::NONE => 'None',
 	);
+
+	/**
+	 * @var self
+	 */
+	private static $instance;
 
 	/**
 	 * Constructor
@@ -212,7 +220,7 @@ class ranking_bo extends ranking_so
 				continue;
 			}
 			$location = $data['location'];
-			if ($location[0] == ranking_federation::ACL_LOCATION_PREFIX) $location = substr($location,1);
+			if ($location[0] == Federation::ACL_LOCATION_PREFIX) $location = substr($location,1);
 
 			foreach(array(
 				'read_rights'     => self::ACL_READ,
@@ -285,22 +293,24 @@ class ranking_bo extends ranking_so
 				$this->license_nations = array('NULL' => $this->ranking_nations['NULL']);
 				break;
 		}
-		// makeing the ranking_bo object availible for other objects
-		$GLOBALS['ranking_bo'] = $this;
+		if (!isset(self::$instance))
+		{
+			self::$instance = $this;
+		}
 	}
 
 	/**
-	 * Singleton to get a ranking_bo instance
+	 * Singleton to get a Base instance
 	 *
-	 * @return ranking_bo
+	 * @return self
 	 */
 	static public function getInstance()
 	{
-		if (!is_object($GLOBALS['ranking_bo']))
+		if (!isset(self::$instance))
 		{
-			$GLOBALS['ranking_bo'] = new ranking_bo;
+			self::$instance = new self;
 		}
-		return $GLOBALS['ranking_bo'];
+		return self::$instance;
 	}
 
 	/**
@@ -343,7 +353,7 @@ class ranking_bo extends ranking_so
 			}
 			else
 			{
-				$location = is_numeric($nation) ? ranking_federation::ACL_LOCATION_PREFIX.$nation :
+				$location = is_numeric($nation) ? Federation::ACL_LOCATION_PREFIX.$nation :
 					($nation ? $nation : 'NULL');
 				$acl_cache[$nation][$required] = $GLOBALS['egw']->acl->check($location,$required,'ranking') ||
 					($required == self::ACL_ATHLETE || $required == self::ACL_REGISTER) && $GLOBALS['egw']->acl->check('NULL',$required,'ranking');
@@ -672,7 +682,7 @@ class ranking_bo extends ranking_so
 	/**
 	 * Calculates a ranking
 	 *
-	 * @deprecated use ranking_calcualtion::ranking
+	 * @deprecated use Calculation::ranking
 	 */
 	function &ranking (&$cat,&$stand,&$start,&$comp,&$ret_pers,&$rls,&$ret_ex_aquo,&$not_counting,$cup='',
 		array &$comps=null, &$max_comp=null)
@@ -833,11 +843,11 @@ class ranking_bo extends ranking_so
 	 * @param int|array $athlete
 	 * @param int|array $cat
 	 * @param int|array $comp
-	 * @param string $mode =ranking_registration::REGISTERED or eg. "replace"
+	 * @param string $mode =Registration::REGISTERED or eg. "replace"
 	 * @throws Api\Exception\WrongParameter if $athlete, $cat or $comp are not found
 	 * @return string translated error-message or null
 	 */
-	function error_register($athlete, $cat, $comp, $mode=ranking_registration::REGISTERED)
+	function error_register($athlete, $cat, $comp, $mode=Registration::REGISTERED)
 	{
 		if (!is_array($athlete) && !($athlete = $this->athlete->read($athlete)))
 		{
@@ -864,8 +874,8 @@ class ranking_bo extends ranking_so
 			$error = lang('Missing registration rights!');
 		}
 		elseif ($comp && $comp['nation'] && (
-			in_array((int)$comp['open_comp'], array(ranking_competition::OPEN_NOT, ranking_competition::OPEN_NATION)) && $athlete['nation'] != $comp['nation'] ||
-			$comp['open_comp'] == ranking_competition::OPEN_DACH && !in_array($athlete['nation'], array('GER','SUI','AUT'))))
+			in_array((int)$comp['open_comp'], array(Competition::OPEN_NOT, Competition::OPEN_NATION)) && $athlete['nation'] != $comp['nation'] ||
+			$comp['open_comp'] == Competition::OPEN_DACH && !in_array($athlete['nation'], array('GER','SUI','AUT'))))
 		{
 			$error = lang('Wrong nationality');
 		}
@@ -877,7 +887,7 @@ class ranking_bo extends ranking_so
 		{
 			$error = lang('Invalid age for age-group of category');
 		}
-		elseif (in_array($mode, [ranking_registration::REGISTERED, 'replace']))
+		elseif (in_array($mode, [Registration::REGISTERED, 'replace']))
 		{
 			if ($athlete['license'] == 'n' && !$this->allow_no_license_registration($comp))
 			{
@@ -897,7 +907,7 @@ class ranking_bo extends ranking_so
 	 * @param int $comp WetId
 	 * @param int $cat GrpId
 	 * @param int|array $athlete PerId or complete athlete array
-	 * @param int $mode =ranking_registration::REGISTERED ::DELETED, ::PREQUALIFIED, ::CONFIRMED
+	 * @param int $mode =Registration::REGISTERED ::DELETED, ::PREQUALIFIED, ::CONFIRMED
 	 * @param string& $msg =null on return over quota message for admins or jury
 	 * @param string $prequal_reason =null reason why athlete is prequalified
 	 * @param int $replace PerId of athlete to replace or null
@@ -905,7 +915,7 @@ class ranking_bo extends ranking_so
 	 * @throws Api\Exception\WrongParameter for other errors
 	 * @return boolean true of everything is ok, false on error
 	 */
-	function register($comp, $cat, $athlete, $mode=ranking_registration::REGISTERED, &$msg=null, $prequal_reason=null, $replace=null)
+	function register($comp, $cat, $athlete, $mode=Registration::REGISTERED, &$msg=null, $prequal_reason=null, $replace=null)
 	{
 		if (!is_array($athlete)) $athlete = $this->athlete->read($athlete);
 		if (!is_array($comp)) $comp = $this->comp->read($comp);
@@ -946,7 +956,7 @@ class ranking_bo extends ranking_so
 				throw new Api\Exception\WrongParameter("Athlete to replace (#$r) not registered!");
 			}
 			// do not allow to replace with an other registered athlete, as that would implicitly just delete the one to replace
-			if ($data && isset($data[ranking_registration::PREFIX.ranking_registration::REGISTERED]))
+			if ($data && isset($data[Registration::PREFIX.Registration::REGISTERED]))
 			{
 				throw new Api\Exception\WrongUserinput(lang('Athlete to replace with is already registered!'));
 			}
@@ -954,28 +964,28 @@ class ranking_bo extends ranking_so
 
 		switch($mode)
 		{
-			case ranking_registration::DELETED:
+			case Registration::DELETED:
 				// if athlete is registed and was prequalified
-				if ($data && $data[ranking_registration::PREFIX.ranking_registration::REGISTERED] &&
-					$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED])
+				if ($data && $data[Registration::PREFIX.Registration::REGISTERED] &&
+					$data[Registration::PREFIX.Registration::PREQUALIFIED])
 				{
 					// store current registration as just prequalified, but no longer registered or confirmed
 					$this->registration->save(array_merge($data, array(
-						ranking_registration::PREFIX.ranking_registration::REGISTERED => null,
-						ranking_registration::PREFIX.ranking_registration::REGISTERED.ranking_registration::ACCOUNT_POSTFIX => null,
-						ranking_registration::PREFIX.ranking_registration::CONFIRMED => null,
-						ranking_registration::PREFIX.ranking_registration::CONFIRMED.ranking_registration::ACCOUNT_POSTFIX => null,
+						Registration::PREFIX.Registration::REGISTERED => null,
+						Registration::PREFIX.Registration::REGISTERED.Registration::ACCOUNT_POSTFIX => null,
+						Registration::PREFIX.Registration::CONFIRMED => null,
+						Registration::PREFIX.Registration::CONFIRMED.Registration::ACCOUNT_POSTFIX => null,
 					)));
 					// remove id to create new deleted entry
 					unset($data['reg_id']);
 					$this->registration->init($data);
 				}
 				// fall through
-			case ranking_registration::CONFIRMED:
+			case Registration::CONFIRMED:
 				if (!$data) throw new Api\Exception\WrongParameter("Athlete is not registered!");
 				break;
 
-			case ranking_registration::REGISTERED:
+			case Registration::REGISTERED:
 				$nat_fed = !$comp['nation'] || $athlete['nation'] != $comp['nation'] ||
 					!$athlete['fed_parent'] && !$athlete['acl_fed_id'] ?	// only use nation, if no RGZ set!
 					$athlete['nation'] : ($athlete['acl_fed_id'] ? $athlete['acl_fed_id'] : $athlete['fed_parent']);
@@ -986,22 +996,22 @@ class ranking_bo extends ranking_so
 					// if not explicit prequalified, set prequalified timestamp, but no account
 					if (isset($prequalified[is_array($cat) ? $cat['GrpId'] : $cat][$athlete['PerId']]))
 					{
-						$data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED] = $this->registration->now;
+						$data[Registration::PREFIX.Registration::PREQUALIFIED] = $this->registration->now;
 					}
 				}
 				// check if athlete to replace was not prequalified or new one is too
-				if ($replace && (!isset($replace[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]) ||
-					isset($data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED])))
+				if ($replace && (!isset($replace[Registration::PREFIX.Registration::PREQUALIFIED]) ||
+					isset($data[Registration::PREFIX.Registration::PREQUALIFIED])))
 				{
 					break;	// --> no quota check necessary (might fail, as to replace one is not yet deleted!)
 				}
 				// check quota, if athlete is not prequalified and no complimentary list
 				if ($comp['no_complimentary'] &&
 					!isset($prequalified[is_array($cat) ? $cat['GrpId'] : $cat][$athlete['PerId']]) &&
-					!isset($data[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]))
+					!isset($data[Registration::PREFIX.Registration::PREQUALIFIED]))
 				{
 					unset($keys['PerId']);
-					$keys[] = ranking_registration::PREFIX.ranking_registration::PREQUALIFIED.' IS NULL';
+					$keys[] = Registration::PREFIX.Registration::PREQUALIFIED.' IS NULL';
 					if (!is_numeric($nat_fed))
 					{
 						$keys['nation'] = $nat_fed;
@@ -1016,7 +1026,7 @@ class ranking_bo extends ranking_so
 					{
 						$msg = lang('No complimentary list (over quota)').' quota='.(int)$max_quota.'!';
 
-						if ($replace && isset($replace[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]))
+						if ($replace && isset($replace[Registration::PREFIX.Registration::PREQUALIFIED]))
 						{
 							$msg .= "\n".lang('Athlete to replace was prequalied!');
 						}
@@ -1047,7 +1057,7 @@ class ranking_bo extends ranking_so
 				}
 				break;
 
-			case ranking_registration::PREQUALIFIED:
+			case Registration::PREQUALIFIED:
 				if (!$data) $data = $keys;
 				if ($prequal_reason) $data['reg_prequal_reason'] = $prequal_reason;
 				break;
@@ -1058,8 +1068,8 @@ class ranking_bo extends ranking_so
 
 		$this->registration->init($data);
 		$ret = !$this->registration->save(array(
-			ranking_registration::PREFIX.$mode => $this->registration->now,
-			ranking_registration::PREFIX.$mode.ranking_registration::ACCOUNT_POSTFIX => $this->user,
+			Registration::PREFIX.$mode => $this->registration->now,
+			Registration::PREFIX.$mode.Registration::ACCOUNT_POSTFIX => $this->user,
 		));
 
 		// if successful registered and we replace --> delete to replace one now
@@ -1067,8 +1077,8 @@ class ranking_bo extends ranking_so
 		{
 			$this->registration->init($replace);
 			$this->registration->save(array(
-				ranking_registration::PREFIX.ranking_registration::DELETED => $this->registration->now,
-				ranking_registration::PREFIX.ranking_registration::DELETED.ranking_registration::ACCOUNT_POSTFIX => $this->user,
+				Registration::PREFIX.Registration::DELETED => $this->registration->now,
+				Registration::PREFIX.Registration::DELETED.Registration::ACCOUNT_POSTFIX => $this->user,
 			));
 		}
 		return $ret;
@@ -1169,10 +1179,10 @@ class ranking_bo extends ranking_so
 		$exceeding = array();
 		foreach($cats_to_check as $cats)
 		{
-			$this->registration->search(array(), 'DISTINCT '.ranking_registration::TABLE.'.PerId',
+			$this->registration->search(array(), 'DISTINCT '.Registration::TABLE.'.PerId',
 				'nachname', '', '', false, 'AND', array(0, 1), array(
 					'GrpId' => $cats,
-					ranking_registration::TABLE.'.PerId!='.(int)$athlete['PerId'],	// do not return athlete itself
+					Registration::TABLE.'.PerId!='.(int)$athlete['PerId'],	// do not return athlete itself
 				)+$keys);
 			//error_log(__METHOD__."() total_per_discipline=$comp[total_per_discipline], cats=".array2string($cats).", keys=".array2string($keys)." --> total-registered=".$this->registration->total);
 
@@ -1212,7 +1222,7 @@ class ranking_bo extends ranking_so
 			))))
 			{
 				$msg = null;
-				$this->register($comp, $GrpId, $athlete, ranking_registration::DELETED, $msg);
+				$this->register($comp, $GrpId, $athlete, Registration::DELETED, $msg);
 
 				if ($msg) return $msg;
 
@@ -1332,7 +1342,7 @@ class ranking_bo extends ranking_so
 			'WetId'  => $comp['WetId'],
 			'GrpId'  => $add_cat ? array($add_cat, $cat['GrpId']) : $cat['GrpId'],
 			// only use confirmed registrations or all
-			'state'  => (int)$comp['selfregister'] == 1 ? ranking_registration::CONFIRMED : ranking_registration::REGISTERED,
+			'state'  => (int)$comp['selfregister'] == 1 ? Registration::CONFIRMED : Registration::REGISTERED,
 		);
 		$starters = $this->registration->read($filter,'',true,'nation,reg_id');
 
@@ -1723,7 +1733,7 @@ class ranking_bo extends ranking_so
 			// 2006+ EYS counts only european nations
 			if (empty($comp['nation']) && (int)$comp['datum'] >= 2006 && preg_match('/_(EYC|EYS)$/',$cup['rkey']))
 			{
-				$allowed_nations = $this->federation->continent_nations(ranking_federation::EUROPE);
+				$allowed_nations = $this->federation->continent_nations(Federation::EUROPE);
 			}
 			$this->pkte->get_pkte($cup['pkte'],$cup_pkte);
 		}
@@ -1834,7 +1844,7 @@ class ranking_bo extends ranking_so
 		$this->result->save_feldfactor($keys['WetId'],$keys['GrpId'],$feldfactor * $comp['faktor']);
 
 		// invalidate results and ranking feeds
-		ranking_export::delete_results_cache($comp, $keys['GrpId']);
+		Export::delete_results_cache($comp, $keys['GrpId']);
 
 		return lang('results of %1 participants imported into the ranking, feldfactor: %2',count($result),sprintf('%4.2f',$feldfactor));
 	}
@@ -2229,6 +2239,6 @@ class ranking_bo extends ranking_so
 /**
  * Some deprecated defines
  */
-define('EGW_ACL_ATHLETE', ranking_bo::ACL_ATHLETE);
-define('EGW_ACL_REGISTER', ranking_bo::ACL_REGISTER);
-define('EGW_ACL_RESULT', ranking_bo::ACL_RESULT);
+define('EGW_ACL_ATHLETE', Base::ACL_ATHLETE);
+define('EGW_ACL_REGISTER', Base::ACL_REGISTER);
+define('EGW_ACL_RESULT', Base::ACL_RESULT);

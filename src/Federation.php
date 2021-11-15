@@ -10,12 +10,14 @@
  * @copyright 2008-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 
 /**
  * Federation object
  */
-class ranking_federation extends Api\Storage\Base
+class Federation extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 	const APPLICATION = 'ranking';
@@ -348,10 +350,10 @@ class ranking_federation extends Api\Storage\Base
 	 * @var array
 	 */
 	static $grant_types = array(
-		'athletes' => ranking_bo::ACL_ATHLETE,	// edit athletes
-		'register' => ranking_bo::ACL_REGISTER,	// register athletes for national competitions
-		'edit' => ranking_bo::ACL_EDIT,		// edit competitions
-		'read' => ranking_bo::ACL_READ,		// read competitions
+		'athletes' => Base::ACL_ATHLETE,	// edit athletes
+		'register' => Base::ACL_REGISTER,	// register athletes for national competitions
+		'edit' => Base::ACL_EDIT,		// edit competitions
+		'read' => Base::ACL_READ,		// read competitions
 	);
 
 	/**
@@ -451,7 +453,7 @@ class ranking_federation extends Api\Storage\Base
 			$grants = array();
 			foreach($GLOBALS['egw']->acl->read() as $data)	// uses the users account and it's memberships
 			{
-				if ($data['appname'] != 'ranking' || $data['location'][0] != ranking_federation::ACL_LOCATION_PREFIX)
+				if ($data['appname'] != 'ranking' || $data['location'][0] != self::ACL_LOCATION_PREFIX)
 				{
 					continue;
 				}
@@ -539,7 +541,7 @@ class ranking_federation extends Api\Storage\Base
 		{
 			foreach($this->get_user_grants() as $fed_id => $rights)
 			{
-				if ($rights & ranking_bo::ACL_REGISTER)
+				if ($rights & Base::ACL_REGISTER)
 				{
 					$register_rights[$fed_id] = $fed_id;
 				}
@@ -619,7 +621,7 @@ class ranking_federation extends Api\Storage\Base
 	/**
 	 * Get nations for a given continent
 	 *
-	 * @param ing $continent ranking_federation::(AFRIKA|AMERICA|ASIA|EUROPE|OCEANIA)
+	 * @param int $continent self::(AFRIKA|AMERICA|ASIA|EUROPE|OCEANIA)
 	 */
 	function continent_nations($continent)
 	{

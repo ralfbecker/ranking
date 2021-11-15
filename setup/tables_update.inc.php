@@ -10,6 +10,8 @@
  * @copyright 2006-17 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Ranking\Base;
+
 function ranking_upgrade0_9_13_001()
 {
 	$GLOBALS['phpgw_setup']->oProc->AlterColumn('Wettkaempfe','name',array(
@@ -1090,14 +1092,14 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 {
 	if (is_null($db))
 	{
-		$rang_db = ranking_so::get_rang_db();
+		$rang_db = Base::get_rang_db();
 		// update separate rang db too
 		if ($rang_db !== $GLOBALS['egw']->db) ranking_upgrade1_7_002($rang_db);
 	}
 	else
 	{
 		unset($GLOBALS['egw_setup']->oProc->m_odb);
-		$GLOBALS['egw_setup']->oProc->m_odb = ranking_so::get_rang_db();
+		$GLOBALS['egw_setup']->oProc->m_odb = Base::get_rang_db();
 	}
 	$GLOBALS['egw_setup']->oProc->m_odb->query_log = '/tmp/query.log';
 	$GLOBALS['egw_setup']->oProc->AddColumn('Wettkaempfe','cat_id',array(
@@ -1138,7 +1140,7 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 	);
 	foreach($nations as $nation => $cats)
 	{
-		$nat_parent = ranking_so::cat_rkey2id($nation,$nation.' competitions');
+		$nat_parent = Base::cat_rkey2id($nation,$nation.' competitions');
 
 		foreach($GLOBALS['egw_setup']->oProc->m_odb->select('Wettkaempfe','WetId,rkey,gruppen',array(
 			'nation' => $nation != 'int' ? $nation : null,
@@ -1149,7 +1151,7 @@ function ranking_upgrade1_7_002(egw_db $db=null)
 			{
 				if (preg_match('/'.$pattern.'/i',$row['rkey']))
 				{
-					$cat_id = ranking_so::cat_rkey2id($rkey,str_replace('_',' ',$rkey),$nat_parent);
+					$cat_id = Base::cat_rkey2id($rkey,str_replace('_',' ',$rkey),$nat_parent);
 					break;
 				}
 			}

@@ -11,8 +11,11 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
+use EGroupware\Ranking\Selfservice;
+use EGroupware\Ranking\Registration;
 
-class ranking_registration_ui extends ranking_bo
+class ranking_registration_ui extends Base
 {
 	/**
 	 * functions callable via menuaction
@@ -143,22 +146,22 @@ class ranking_registration_ui extends ranking_bo
 				$comp['nation'] && ($this->registration_check($comp, $row['fed_parent'], null, $replace) ||
 					$this->registration_check($comp, $row['acl_fed_id'], null, $replace)))
 			{
-				if ($row['state'] == ranking_registration::PREQUALIFIED)
+				if ($row['state'] == Registration::PREQUALIFIED)
 				{
 					$row['class'] .= ' allowRegister';
 					if ($comp_rights) $row['class'] .= ' allowDelete';
 				}
-				elseif ($row['state'] == ranking_registration::REGISTERED || $row['state'] == ranking_registration::CONFIRMED)
+				elseif ($row['state'] == Registration::REGISTERED || $row['state'] == Registration::CONFIRMED)
 				{
 					$row['class'] .= ' allowDelete allowReplace';
 				}
 			}
 			// if we have just replace rights
-			elseif($replace && ($row['state'] == ranking_registration::REGISTERED || $row['state'] == ranking_registration::CONFIRMED))
+			elseif($replace && ($row['state'] == Registration::REGISTERED || $row['state'] == Registration::CONFIRMED))
 			{
 				$row['class'] .= ' allowReplace';
 			}
-			if ($comp_rights && $row['state'] == ranking_registration::REGISTERED)
+			if ($comp_rights && $row['state'] == Registration::REGISTERED)
 			{
 				$row['class'] .= ' allowConfirm';
 			}
@@ -208,7 +211,7 @@ class ranking_registration_ui extends ranking_bo
 				foreach($this->registration->read(array(
 						'WetId' => $state['comp'],
 						'GrpId' => $_REQUEST['GrpId'],
-						ranking_registration::PREFIX.ranking_registration::DELETED.' IS NULL',
+						Registration::PREFIX.Registration::DELETED.' IS NULL',
 					)) as $athlete)
 				{
 					if ($athlete['reg_registered'])
@@ -300,11 +303,11 @@ class ranking_registration_ui extends ranking_bo
 	function ajax_register(array $params)
 	{
 		static $mode2ts = array(
-			'delete'     => ranking_registration::DELETED,
-			'register'   => ranking_registration::REGISTERED,
-			'prequalify' => ranking_registration::PREQUALIFIED,
-			'confirm'    => ranking_registration::CONFIRMED,
-			'replace'    => ranking_registration::REGISTERED,
+			'delete'     => Registration::DELETED,
+			'register'   => Registration::REGISTERED,
+			'prequalify' => Registration::PREQUALIFIED,
+			'confirm'    => Registration::CONFIRMED,
+			'replace'    => Registration::REGISTERED,
 		);
 
 		$registered = 0;
@@ -510,7 +513,7 @@ class ranking_registration_ui extends ranking_bo
 				'gruppen IS NOT NULL',
 			), 3, 'datum ASC'),
 			'sex' => $this->genders,
-			'state' => ranking_registration::$state_filters,
+			'state' => Registration::$state_filters,
 		);
 		$cont = $preserv = array(
 			'nm'       => array_merge($state, array(
@@ -599,7 +602,7 @@ class ranking_registration_ui extends ranking_bo
 		}
 		$filter = array(
 			'WetId' => $filters['comp'],
-			'state' => ranking_registration::REGISTERED,
+			'state' => Registration::REGISTERED,
 		);
 		if ($button == 'selected')
 		{
@@ -646,10 +649,10 @@ class ranking_registration_ui extends ranking_bo
 				continue;
 			}
 			static $selfservice = null;
-			if (!isset($selfservice)) $selfservice = new ranking_selfservice();
+			if (!isset($selfservice)) $selfservice = new Selfservice();
 
 			try {
-				$selfservice->password_reset_mail($athlete, $data['subject'], $data['body'], $data['from']);
+				$selfservice->passwordResetMail($athlete, $data['subject'], $data['body'], $data['from']);
 				$success++;
 			}
 			catch (Exception $e)
@@ -769,7 +772,7 @@ class ranking_registration_ui extends ranking_bo
 			else	// sort by nation
 			{
 				$order = 'GrpId,nation,reg_id,nachname,vorname';
-				$keys['state'] = ranking_registration::REGISTERED;
+				$keys['state'] = Registration::REGISTERED;
 				$starters = $this->registration->read($keys,'+plz,strasse,tel,mobil',true,$order);
 			}
 

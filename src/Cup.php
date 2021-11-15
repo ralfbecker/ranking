@@ -10,18 +10,20 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 
 /**
  * cup object
  */
-class ranking_cup extends Api\Storage\Base
+class Cup extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 	/**
 	 * reference to the category object
 	 *
-	 * @var ranking_category
+	 * @var Category
 	 */
 	var $cats;
 
@@ -45,18 +47,8 @@ class ranking_cup extends Api\Storage\Base
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = Api\Translation::charset();
+		$this->cats = new Category($source_charset, $this->db);
 
-		foreach(array(
-				'cats'  => 'ranking_category',
-			) as $var => $class)
-		{
-			$egw_name = /*'ranking_'.*/$class;
-			if (!isset($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
-			}
-			$this->$var = $GLOBALS['egw']->$egw_name;
-		}
 		$this->non_db_cols = array('max_per_cat','nat_team_quota');
 	}
 

@@ -11,8 +11,10 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
+use EGroupware\Ranking\Federation;
 
-class ranking_cup_ui extends ranking_bo
+class ranking_cup_ui extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -140,7 +142,7 @@ class ranking_cup_ui extends ranking_bo
 			'split_by_places' => $this->split_by_places,
 			'fed_id'       => $this->federation->federations($this->cup->data['nation'], true),
 			'selfregister' => $this->comp->selfregister_types,
-			'continent' => ranking_federation::$continents,
+			'continent' => Federation::$continents,
 			'display_athlete' => $this->display_athlete_types,
 		);
 		$content['per_cat'] = $content['max_per'] = array();
@@ -158,7 +160,7 @@ class ranking_cup_ui extends ranking_bo
 		$content['average_ex_aquo'] = $content['presets']['average_ex_aquo'];
 
 		// select a category parent fitting to the nation
-		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
+		$content['cat_parent'] = self::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
 		$content['cat_parent_name'] = ($content['nation']? $content['nation'] : 'Int.').' '.lang('Competitions');
 
 		if ($view)

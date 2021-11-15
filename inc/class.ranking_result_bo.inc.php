@@ -11,6 +11,8 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
+use EGroupware\Ranking\Export;
 
 /**
  * @deprecated use ranking_route_result::(TOP_(PLUS|HEIGHT)|(ELIMINATED|WILDCARD)_TIME)
@@ -41,7 +43,7 @@ define('STATUS_UNPUBLISHED',0);
 define('STATUS_STARTLIST',1);
 define('STATUS_RESULT_OFFICIAL',2);
 
-class ranking_result_bo extends ranking_bo
+class ranking_result_bo extends Base
 {
 	/**
 	 * values and labels for route_order
@@ -2694,7 +2696,7 @@ class ranking_result_bo extends ranking_bo
 	 */
 	public static function delete_export_route_cache($comp, $cat=null, $route_order=null, $previous_heats=false)
 	{
-		ranking_export::delete_route_cache($comp, $cat, $route_order, $previous_heats);
+		Export::delete_route_cache($comp, $cat, $route_order, $previous_heats);
 	}
 
 	/**

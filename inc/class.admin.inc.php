@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Federation;
 
 /**
  * Editing athletes data is mapped to EGW_ACL_ADD
@@ -145,10 +146,9 @@ class admin
 		}
 		if (!($nations = $this->acl->get_locations_for_app('ranking'))) $nations = array();
 		// remove federation ACL (location starting with a hash followed by the fed_id)
-		require_once(EGW_INCLUDE_ROOT.'/ranking/inc/class.ranking_federation.inc.php');
 		foreach($nations as $key => $nation)
 		{
-			if ($nation[0] == ranking_federation::ACL_LOCATION_PREFIX) unset($nations[$key]);
+			if ($nation[0] === Federation::ACL_LOCATION_PREFIX) unset($nations[$key]);
 		}
 		sort($nations);
 		if(($null_key = array_search('NULL',$nations)) !== false) unset($nations[$null_key]);	// to have it always first

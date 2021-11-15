@@ -11,8 +11,9 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
 
-class ranking_cats_ui extends ranking_bo
+class ranking_cats_ui extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction

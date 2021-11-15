@@ -10,15 +10,20 @@
  * @copyright 2012-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
-use EGroupware\Ranking\Athlete;
+use \Exception;
+// not yet namespaced ranking_* classes
+use \ranking_result_ui;
+use \ranking_selfscore_measurement;
 
 /**
  * athletes selfservice: profile, registration
  */
-class ranking_selfservice extends ranking_bo
+class Selfservice extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -33,7 +38,7 @@ class ranking_selfservice extends ranking_bo
 	 * @param int $PerId
 	 * @param string $_action 'profile'
 	 */
-	function selfservice($PerId, $_action)
+	function process($PerId, $_action)
 	{
 		static $nation2lang = array(
 			'AUT' => 'de',
@@ -62,9 +67,9 @@ class ranking_selfservice extends ranking_bo
 			echo "<h1 id='action-$action'>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
 		}
 		if ((!$athlete || !$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId) &&
-			!($PerId = $this->selfservice_auth($athlete, $action)))
+			!($PerId = $this->auth($athlete, $action)))
 		{
-			$this->show_footer($nation2lang[$athlete['nation']]);
+			$this->showFooter($nation2lang[$athlete['nation']]);
 			exit;
 		}
 		$lang = $PerId && isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
@@ -76,7 +81,7 @@ class ranking_selfservice extends ranking_bo
 		// check if athlete contented to store his data, if not show consent screen
 		if ($action !== 'logout' && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
 		{
-			$this->consent_data_storage($athlete, $lang);
+			$this->consentDataStorage($athlete, $lang);
 		}
 		switch((string)$action)
 		{
@@ -90,11 +95,11 @@ class ranking_selfservice extends ranking_bo
 
 			case '':
 			case 'register':
-				$this->selfservice_register($athlete, $action_id);
+				$this->registerComp($athlete, $action_id);
 				break;
 
 			case 'scorecard':
-				$this->selfservice_scorecard($athlete, $action_id);
+				$this->scorecard($athlete, $action_id);
 				break;
 
 			case 'logout':
@@ -104,13 +109,13 @@ class ranking_selfservice extends ranking_bo
 			case 'recovery':
 			case 'password':
 			case 'set':
-				$this->selfservice_auth($athlete, $action);
+				$this->auth($athlete, $action);
 				break;
 
 			default:
 				throw new Api\Exception\WrongParameter("Unknown action '$action'!");
 		}
-		$this->show_footer($lang);
+		$this->showFooter($lang);
 		exit;
 	}
 
@@ -122,7 +127,7 @@ class ranking_selfservice extends ranking_bo
 	 * @param array $athlete
 	 * @param string $lang ='en' 'de' for DACH
 	 */
-	private function consent_data_storage(array $athlete, $lang='en')
+	private function consentDataStorage(array $athlete, $lang='en')
 	{
 		if (empty($_POST['consent']))
 		{
@@ -153,7 +158,7 @@ class ranking_selfservice extends ranking_bo
 
 			echo Api\Html::form_1button('logout', lang('Logout'), '',
 					'/ranking/athlete.php', array('action' => 'logout', 'cd' => 'no'));
-			$this->show_footer($lang);
+			$this->showFooter($lang);
 			exit;
 		}
 		// store athlete consent time and IP
@@ -168,7 +173,7 @@ class ranking_selfservice extends ranking_bo
 	 *
 	 * @param string $lang ='en'
 	 */
-	private function show_footer($lang='en')
+	private function showFooter($lang='en')
 	{
 		if (!file_exists($file=EGW_SERVER_ROOT.'/ranking/templates/default/selfservice_footer.'.$lang.'.html'))
 		{
@@ -195,9 +200,9 @@ class ranking_selfservice extends ranking_bo
 	 * @param array $athlete
 	 * @param string $action_id WetId-GrpId-route_order
 	 */
-	private function selfservice_scorecard(array $athlete, $action_id)
+	private function scorecard(array $athlete, $action_id)
 	{
-		$this->profile_logout_buttons($athlete);
+		$this->profileAndLogoutButtons($athlete);
 
 		list($WetId, $GrpId, $route_order) = explode('-', $action_id);
 
@@ -220,7 +225,7 @@ class ranking_selfservice extends ranking_bo
 	 * @param array $athlete
 	 * @param int $WetId =0
 	 */
-	private function selfservice_register(array $athlete, $WetId=0)
+	private function registerComp(array $athlete, $WetId=0)
 	{
 		//echo "<p>".__METHOD__."(array(PerId=>$athlete[PerId],nachname='$athlete[nachname]',vorname=$athlete[vorname]',...), $WetId)</p>\n";
 		if ($WetId)
@@ -286,7 +291,7 @@ class ranking_selfservice extends ranking_bo
 				{
 					try {
 						if ($this->register($comp, (int)$GrpId, $athlete, ($mode=in_array($GrpId,$registered)) ?
-							ranking_registration::DELETED : ranking_registration::REGISTERED))
+							Registration::DELETED : Registration::REGISTERED))
 						{
 							echo "<p class='error'>".lang(!$mode?'%1, %2 registered for category %3':'%1, %2 deleted for category %3',
 								strtoupper($athlete['nachname']), $athlete['vorname'], $cats[$GrpId]);
@@ -342,7 +347,7 @@ class ranking_selfservice extends ranking_bo
 		}
 		if ($found) echo "</ul>\n";
 
-		$this->profile_logout_buttons($athlete);
+		$this->profileAndLogoutButtons($athlete);
 	}
 
 	/**
@@ -350,16 +355,16 @@ class ranking_selfservice extends ranking_bo
 	 *
 	 * @param int|array $athlete
 	 */
-	private function profile_logout_buttons($athlete)
+	private function profileAndLogoutButtons($athlete)
 	{
 		// Edit profile and logout buttons
 		echo "<div id='profile-logout-buttons'>".
-			html::form_1button('profile', lang('Edit Profile'), '', '/index.php', array(
+			Api\Html::form_1button('profile', lang('Edit Profile'), '', '/index.php', array(
 				'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit',
 				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
 				'cd' => 'no',
 			))."\n".
-			html::form_1button('logout', lang('Logout'), '',
+			Api\Html::form_1button('logout', lang('Logout'), '',
 				'/ranking/athlete.php', array('action' => 'logout')).
 			"</div>\n";
 	}
@@ -388,7 +393,7 @@ class ranking_selfservice extends ranking_bo
 	 * @param string &$action
 	 * @return int PerId if we are authenticated for it nor null if not
 	 */
-	private function selfservice_auth(array &$athlete, &$action)
+	private function auth(array &$athlete, &$action)
 	{
 		if (!$athlete && isset($_POST['email']))
 		{
@@ -430,7 +435,7 @@ class ranking_selfservice extends ranking_bo
 				// mail hash to athlete
 				//echo "<p>*** TEST *** <a href='$link'>Click here</a> to set a password *** TEST ***</p>\n";
 				try {
-					$this->password_reset_mail($athlete);
+					$this->passwordResetMail($athlete);
 					echo "<p>".lang('An EMail with instructions how to (re-)set the password has been sent.')."</p>\n".
 						"<p>".lang('You have to act on the instructions in the next %1 hours, or %2request a new mail%3.',
 							self::RECOVERY_TIMEOUT/3600,"<a href='$recovery_link'>","</a>")."</p>\n";
@@ -477,7 +482,7 @@ class ranking_selfservice extends ranking_bo
 								setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
 
 								echo "<p><b>".lang('Your new password is now active.')."</b></p>\n";
-								$this->profile_logout_buttons($athlete['PerId']);
+								$this->profileAndLogoutButtons($athlete['PerId']);
 								return $athlete['PerId'];
 								//echo "<p>".lang('You can now %1edit your profile%2 or register for a competition in the calendar.','<a href="'.$link.'">','</a>')."</p>\n";
 								//common::egw_exit();
@@ -524,7 +529,7 @@ class ranking_selfservice extends ranking_bo
 					error_log(__METHOD__."($athlete[PerId], '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
 					echo "<p class='error'>".lang('Login suspended, too many unsuccessful tries!')."</p>\n";
 					echo "<p>".lang('Try again after %1 minutes.',self::LOGIN_SUSPENDED/60)."</p>\n";
-					$this->show_footer();
+					$this->showFooter();
 					exit;
 				}
 				elseif (!Api\Auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
@@ -589,7 +594,7 @@ class ranking_selfservice extends ranking_bo
 	 * @param type $is_html =false
 	 * @throws Api\Exception\WrongParameter
 	 */
-	public function password_reset_mail(array $athlete, $subject=null, $body=null, $from='digtal ROCK <info@digitalrock.de>', $is_html=false)
+	public function passwordResetMail(array $athlete, $subject=null, $body=null, $from='digtal ROCK <info@digitalrock.de>', $is_html=false)
 	{
 		if (empty($subject) || empty($body))
 		{

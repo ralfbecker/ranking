@@ -10,6 +10,8 @@
  * @copyright 2006-18 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+use EGroupware\Ranking\Selfservice;
+
 $GLOBALS['egw_info'] = array(
 	'flags' => array(
 		'currentapp'	=> 'ranking',
@@ -35,5 +37,5 @@ function check_anon_access(&$anon_account)
 		'', 'text', false, false);
 }
 
-$selfservice = new ranking_selfservice();
-$selfservice->selfservice($_GET['PerId'], $_GET['action']);
+$selfservice = new Selfservice();
+$selfservice->process($_GET['PerId'], $_GET['action']);

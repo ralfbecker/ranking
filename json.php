@@ -22,6 +22,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Export;
 
 $GLOBALS['egw_info'] = array(
 	'flags' => array(
@@ -48,7 +49,7 @@ function check_anon_access(&$anon_account)
 		'', 'text', false, false);
 }
 
-$result = ranking_export::export();
+$result = Export::export();
 $encoding = Api\Translation::charset();
 
 if (!isset($_GET['debug']) || !$_GET['debug'])
@@ -61,7 +62,7 @@ if (!isset($_GET['debug']) || !$_GET['debug'])
 	{
 		header('Content-Type: application/json; charset='.$encoding);
 	}
-	Api\Session::cache_control(isset($result['expires']) ? $result['expires'] : ranking_export::EXPORT_DEFAULT_EXPIRES);
+	Api\Session::cache_control(isset($result['expires']) ? $result['expires'] : Export::EXPORT_DEFAULT_EXPIRES);
 	header('Access-Control-Allow-Origin: *');
 	if (isset($result['etag']))
 	{

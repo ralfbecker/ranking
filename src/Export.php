@@ -10,9 +10,14 @@
  * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 use EGroupware\Api\Egw;
-use EGroupware\Ranking\Athlete;
+// not yet namespaced ranking_* classes
+use \ranking_result_bo;
+use \ranking_route_result;
+use \ranking_selfscore_measurement;
 
 /**
  * XML/JSON export logic
@@ -22,7 +27,7 @@ use EGroupware\Ranking\Athlete;
  * Exported data is cached in a configurable cache specified by Install-ID in ranking configuration
  * to allow two instances to share a ranking database.
  */
-class ranking_export extends ranking_result_bo
+class Export extends ranking_result_bo
 {
 	/**
 	 * Expires time for 404 Not found
@@ -57,43 +62,43 @@ class ranking_export extends ranking_result_bo
 		{
 			if (isset($_GET['person']))
 			{
-				$export = new ranking_export();
+				$export = new self();
 				$result = $export->export_profile($_GET['person'], $_GET['cat']);
 				$root_tag = 'profile';
 			}
 			elseif (isset($_GET['cat']) && (!isset($_GET['comp']) && !isset($_GET['type']) || $_GET['type'] === 'ranking'))
 			{
-				$export = new ranking_export();
+				$export = new self();
 				$result = $export->export_ranking($_GET['cat'], isset($_GET['date']) ? $_GET['date'] : $_GET['comp'], $_GET['cup']);
 				$root_tag = 'ranking';
 			}
 			elseif (in_array($_GET['type'], array('nat_team_ranking','sektionenwertung','regionalzentren')))
 			{
-				$export = new ranking_export();
+				$export = new self();
 				$result = $export->export_aggregated($_GET['type'], $_GET['date'], $_GET['comp'], $_GET['cup'], $_GET['cat']);
 				$root_tag = 'aggregated';
 			}
 			elseif (isset($_GET['term']))
 			{
-				$export = new ranking_export();
+				$export = new self();
 				$result = $export->export_athlete_search($_GET['term']);
 				$root_tag = 'athletes';
 			}
 			elseif (isset($_GET['nation']) || !isset($_GET['comp']))
 			{
-				$export = new ranking_export();
+				$export = new self();
 				$result = $export->export_calendar($_GET['nation'], $_GET['year'], $_GET['filter']);
 				$root_tag = 'calendar';
 			}
 			elseif (isset($_GET['comp']) && $_GET['type'] == 'starters')
 			{
-				$export = new ranking_export();
+				$export = new self();
 				$result = $export->export_starters($_GET['comp']);
 				$root_tag = 'starters';
 			}
 			elseif (isset($_GET['comp']) && !isset($_GET['cat']) || isset($_GET['filter']))
 			{
-				$export = new ranking_export();
+				$export = new self();
 				$result = $export->export_results($_GET['comp'], $_GET['num'], $_GET['all'], $_GET['filter']);
 				$root_tag = 'results';
 			}
@@ -407,7 +412,7 @@ class ranking_export extends ranking_result_bo
 			$cat_rkey2id = self::getCache('cat_rkey2id');
 			if (!isset($cat_rkey2id[$rkey]))
 			{
-				if (!isset($instance)) $instance = new ranking_export();
+				if (!isset($instance)) $instance = new self();
 				if (!($cat_arr = $instance->cats->read($rkey)))
 				{
 					throw new Exception(lang('Category NOT found !!!'));
@@ -425,7 +430,7 @@ class ranking_export extends ranking_result_bo
 		if (in_array($_SERVER['HTTP_HOST'], self::$ignore_caching_hosts) ||
 			$update_cache || !($data = self::getCache($location)))
 		{
-			if (!isset($instance)) $instance = new ranking_export();
+			if (!isset($instance)) $instance = new self();
 
 			if ($heat === 'result')
 			{
@@ -544,7 +549,7 @@ class ranking_export extends ranking_result_bo
 		$route['comp_date'] = $comp['datum'];
 		$route['nation'] = $comp['nation'];
 		$route['display_athlete'] = $comp['display_athlete'] ? $comp['display_athlete'] :
-			ranking_competition::nation2display_athlete($comp['nation']);
+			Competition::nation2display_athlete($comp['nation']);
 
 		// set quali_preselected, if set for category
 		if (($route['quali_preselected'] = $this->comp->quali_preselected($cat['GrpId'], $comp['quali_preselected'])) &&
@@ -620,7 +625,7 @@ class ranking_export extends ranking_result_bo
 		// get discipline from combined heat
 		if ($discipline == 'combined' && $heat >= 0)
 		{
-			$route['discipline'] = $discipline = ranking_result_bo::combined_order2discipline($heat);
+			$route['discipline'] = $discipline = self::combined_order2discipline($heat);
 		}
 		switch($discipline)
 		{
@@ -1289,7 +1294,7 @@ class ranking_export extends ranking_result_bo
 		}
 		$overall = count($cat['GrpIds']) > 1;
 
-		ranking_calculation::$dump_ranking_results = !empty($_GET['dump_results']);
+		Calculation::$dump_ranking_results = !empty($_GET['dump_results']);
 		$comps = array();
 		$start = $comp = $pers = $rls = $ex_aquo = $not_counting = $max_comp = null;
 		try {
@@ -1365,7 +1370,7 @@ class ranking_export extends ranking_result_bo
 			'route_order' => -1,
 			'discipline' => 'ranking',
 			'display_athlete' => $cup['presets']['display_athlete'] ? $cup['presets']['display_athlete'] :
-				ranking_competition::nation2display_athlete($cat['nation']),
+				Competition::nation2display_athlete($cat['nation']),
 			'error' => $error,
 		);
 		if ($comp)	// comp not set if date given
@@ -1604,7 +1609,7 @@ class ranking_export extends ranking_result_bo
 		);
 		if (empty($data['display_athlete']))
 		{
-			$data['display_athlete'] = ranking_competition::nation2display_athlete($comp['nation']);
+			$data['display_athlete'] = Competition::nation2display_athlete($comp['nation']);
 		}
 		// add see also links to national team ranking and combined ranking
 		if (!$comp['nation'] && $comp['quota'] && (
@@ -1749,7 +1754,7 @@ class ranking_export extends ranking_result_bo
 			'participants'  => $results,
 			'last_modified' => $last_modified,
 			'display_athlete' => $comp['display_athlete'] ? $comp['display_athlete'] :
-				ranking_competition::nation2display_athlete($comp['nation']),
+				Competition::nation2display_athlete($comp['nation']),
 		);
 		$ret += $this->see_also_result($comp, $cat, 'result');
 
@@ -1882,7 +1887,7 @@ class ranking_export extends ranking_result_bo
 		foreach($this->registration->read(array(
 			'WetId' => $comp['WetId'],
 			'GrpId' => -1,
-			'state' => ranking_registration::ALL,
+			'state' => Registration::ALL,
 		), '', true, ($comp['nation'] ? 'acl_fed_id,fed_parent' : 'nation').',GrpId,reg_id') as $result)
 		{
 			if (!empty($result['reg_deleted']))
@@ -2404,7 +2409,7 @@ class ranking_export extends ranking_result_bo
 			// do NOT show sub-feds (sektion etc) for IFSC site
 			if (self::base_url() == self::IFSC_SITE)
 			{
-				foreach(ranking_bo::getInstance()->federation->search(null,
+				foreach(Base::getInstance()->federation->search(null,
 					['fed_id', 'verband', 'fed_url', 'nation'], '', '', '', False, 'AND', false, [
 						"nation IN ('GER','SUI', 'JPN')",
 						'fed_parent' => NULL,
@@ -2444,7 +2449,7 @@ class ranking_export extends ranking_result_bo
 					static $rgzs=null;
 					if (!isset($rgzs))
 					{
-						$rgzs = ranking_bo::getInstance()->athlete->federations('SUI');
+						$rgzs = Base::getInstance()->athlete->federations('SUI');
 					}
 					$data['rgz'] = preg_replace('/^SAC-Regionalzentrum /', '', $rgzs[$athlete['acl_fed_id']]);
 				}

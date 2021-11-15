@@ -10,8 +10,9 @@
  * @copyright 2013-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
-use EGroupware\Ranking\Athlete;
 
 /**
  * Calculate diverse rankings:
@@ -22,12 +23,12 @@ use EGroupware\Ranking\Athlete;
  *
  * @property-read array $european_nations 3-digit nation codes of european nations
  */
-class ranking_calculation
+class Calculation
 {
 	/**
-	 * Reference to ranking_bo class
+	 * Reference to Base class
 	 *
-	 * @var ranking_bo
+	 * @var Base
 	 */
 	protected $bo;
 
@@ -58,9 +59,9 @@ class ranking_calculation
 	 */
 	public static $dump_ranking_results;
 
-	public function __construct(ranking_bo $bo=null)
+	public function __construct(Base $bo=null)
 	{
-		$this->bo = $bo ? $bo : new ranking_bo();
+		$this->bo = $bo ?: new Base();
 	}
 
 	/**
@@ -74,7 +75,7 @@ class ranking_calculation
 		switch($name)
 		{
 			case 'european_nations':
-				$european_nations = ranking_bo::getInstance()->federation->continent_nations(ranking_federation::EUROPE);
+				$european_nations = Base::getInstance()->federation->continent_nations(Federation::EUROPE);
 				/*if ((($extra=array_diff($european_nations, $this->old_european_nations)) ||
 					($missing=array_diff($this->old_european_nations, $european_nations))))
 				{
@@ -92,7 +93,7 @@ class ranking_calculation
 	 * @param int $_cup
 	 * @param string &$date=null on return date of ranking
 	 * @param array &$date_comp=null on return latest competition
-	 * @return array see ranking_calculation::aggregate
+	 * @return array see self::aggregate
 	 */
 	public function nat_team_ranking($_comp, $_cats, $_cup, $date=null, array &$date_comp=null)
 	{

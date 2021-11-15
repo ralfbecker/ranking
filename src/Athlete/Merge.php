@@ -15,8 +15,7 @@
 namespace EGroupware\Ranking\Athlete;
 
 use EGroupware\Api;
-use EGroupware\Ranking\Athlete\Ui;
-use ranking_bo;
+use EGroupware\Ranking\Base;
 
 /**
  * Document merge object for athletes
@@ -57,7 +56,7 @@ class Merge extends Api\Storage\Merge
 	function __construct()
 	{
 		parent::__construct();
-		$this->bo = ranking_bo::getInstance();
+		$this->bo = Base::getInstance();
 
 		$this->date_fields += Record::$types['date-time'] +
 			Record::$types['date'] + array('last_comp');
@@ -80,7 +79,7 @@ class Merge extends Api\Storage\Merge
 		$this->contacts = new class {
 			function read($id)
 			{
-				$bo = ranking_bo::getInstance();
+				$bo = Base::getInstance();
 				if (($athlete = $bo->athlete->read($id)))
 				{
 					return [

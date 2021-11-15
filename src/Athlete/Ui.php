@@ -17,10 +17,12 @@ use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
 use EGroupware\Api\Vfs;
 use EGroupware\Ranking\Athlete;
-use ranking_bo;
+use EGroupware\Ranking\Selfservice;
+use EGroupware\Ranking\Base;
+use \Exception;
 
 
-class Ui extends ranking_bo
+class Ui extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -398,8 +400,8 @@ class Ui extends ranking_bo
 			if ($button === 'pw_mail')
 			{
 				try {
-					$selfservice = new ranking_selfservice();
-					$selfservice->password_reset_mail($this->athlete->data);
+					$selfservice = new Selfservice();
+					$selfservice->passwordResetMail($this->athlete->data);
 					$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
 				}
 				catch (Exception $e) {

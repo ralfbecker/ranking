@@ -10,8 +10,14 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
-use EGroupware\Ranking\Athlete;
+// not yet namespaced ranking_* classes
+use ranking_result;
+use ranking_route;
+use ranking_route_result;
+use ranking_display;
 
 /**
  * EGroupware digital ROCK Rankings - storage object
@@ -21,21 +27,21 @@ use EGroupware\Ranking\Athlete;
  *
  * These sub-objects implement DB access to the various tables of the rang database.
  *
- * @property-read ranking_pktsystem $pkte
- * @property-read ranking_rls_system $rls
- * @property-read ranking_category $cats
- * @property-read ranking_cup $cup
- * @property-read ranking_competition $comp
+ * @property-read PktSystem $pkte
+ * @property-read RlsSystem $rls
+ * @property-read Category $cats
+ * @property-read Cup $cup
+ * @property-read Competition $comp
  * @property-read Athlete $athlete
  * @property-read ranking_result $result
- * @property-read ranking_registration $registration
+ * @property-read Registration $registration
  * @property-read ranking_route $route
  * @property-read ranking_route_result $route_result
- * @property-read ranking_federation $federation;
+ * @property-read Federation $federation;
  * @property-read ranking_display $display;
- * @property-read ranking_calculation $calc;
+ * @property-read Calculation $calc;
  */
-class ranking_so
+class So
 {
 	var $debug;
 	/**
@@ -51,23 +57,23 @@ class ranking_so
 	 */
 	var $db;
 	/**
-	 * @var ranking_pktsystem
+	 * @var PktSystem
 	 */
 	private $pkte;
 	/**
-	 * @var ranking_rls_system
+	 * @var RlsSystem
 	 */
 	private $rls;
 	/**
-	 * @var ranking_category
+	 * @var Category
 	 */
 	private $cats;
 	/**
-	 * @var ranking_cup
+	 * @var Cup
 	 */
 	private $cup;
 	/**
-	 * @var ranking_competition
+	 * @var Competition
 	 */
 	private $comp;
 	/**
@@ -79,7 +85,7 @@ class ranking_so
 	 */
 	private $result;
 	/**
-	 * @var ranking_registration
+	 * @var Registration
 	 */
 	private $registration;
 	/**
@@ -91,7 +97,7 @@ class ranking_so
 	 */
 	private $route_result;
 	/**
-	 * @var ranking_federation
+	 * @var Federation
 	 */
 	private $federation;
 	/**
@@ -99,7 +105,7 @@ class ranking_so
 	 */
 	private $display;
 	/**
-	 * @var ranking_calculation
+	 * @var Calculation
 	 */
 	private $calc;
 
@@ -116,19 +122,19 @@ class ranking_so
 	 * @var array
 	 */
 	static $sub_classes = array(
-		'pkte'    => 'ranking_pktsystem',
-		'rls'     => 'ranking_rls_system',
-		'cats'    => 'ranking_category',
-		'cup'     => 'ranking_cup',
-		'comp'    => 'ranking_competition',
+		'pkte'    => PktSystem::class,
+		'rls'     => RlsSystem::class,
+		'cats'    => Category::class,
+		'cup'     => Cup::class,
+		'comp'    => Competition::class,
 		'athlete' => Athlete::class,
 		'result'  => 'ranking_result',
-		'registration' => 'ranking_registration',
+		'registration' => Registration::class,
 		'route'   => 'ranking_route',
 		'route_result'  => 'ranking_route_result',
-		'federation' => 'ranking_federation',
+		'federation' => Federation::class,
 		'display' => 'ranking_display',
-		'calc'    => 'ranking_calculation',
+		'calc'    => Calculation::class,
 	);
 
 
@@ -253,21 +259,11 @@ class ranking_so
 			}
 			$class = self::$sub_classes[$name];
 
-			if (!isset($GLOBALS['egw']->$name))
+			if (!isset($this->$name))
 			{
-				switch($class)
-				{
-					case 'ranking_calculation':
-						$GLOBALS['egw']->$name = new ranking_calculation($this);
-						break;
-
-					default:
-						$GLOBALS['egw']->$name = CreateObject('ranking.'.$class, $this->config['ranking_db_charset'], $this->db,
-							$this->config['vfs_pdf_dir'], $this->config['vfs_pdf_url']);
-						break;
-				}
+				$this->$name = new $class($this->config['ranking_db_charset'], $this->db,
+					$this->config['vfs_pdf_dir'], $this->config['vfs_pdf_url']);
 			}
-			$this->$name = $GLOBALS['egw']->$name;
 		}
 		return $this->$name;
 	}

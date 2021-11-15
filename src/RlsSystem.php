@@ -10,12 +10,14 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 
 /**
  * rls_system object, a rls defines how the ranking is calculated
  */
-class ranking_rls_system extends Api\Storage\Base
+class RlsSystem extends Api\Storage\Base
 {
 	var $charset,$source_charset;
 

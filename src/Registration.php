@@ -10,13 +10,14 @@
  * @copyright 2016-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
-use EGroupware\Ranking\Athlete;
 
 /**
  * registration storage object
  */
-class ranking_registration extends Api\Storage\Base
+class Registration extends Api\Storage\Base
 {
 	/**
 	 * Table name for registration
@@ -177,7 +178,7 @@ class ranking_registration extends Api\Storage\Base
 	function db2data($data=null)
 	{
 		static $athlete=null;
-		if (!isset($athlete)) $athlete = ranking_bo::getInstance()->athlete;
+		if (!isset($athlete)) $athlete = Base::getInstance()->athlete;
 
 		if (!is_array($data))
 		{
@@ -253,13 +254,13 @@ class ranking_registration extends Api\Storage\Base
 
 		// check to update prequalified only after 1. Jan in the year of the competition
 		// as ranking is not valid before and prequalifying competitons might not be updated
-		if (!($comp = ranking_bo::getInstance()->comp->read($WetId)) ||
+		if (!($comp = Base::getInstance()->comp->read($WetId)) ||
 			(int)$comp['datum'] != date('Y'))
 		{
 			return false;
 		}
 
-		if (($prequalified = ranking_bo::getInstance()->prequalified($WetId)))
+		if (($prequalified = Base::getInstance()->prequalified($WetId)))
 		{
 			//error_log(__METHOD__."($WetId) prequalified=".array2string($prequalified));
 			foreach($prequalified as $GrpId => $athletes)
@@ -414,7 +415,7 @@ class ranking_registration extends Api\Storage\Base
 			$join = 'JOIN '.Athlete::ATHLETE_TABLE.' USING(PerId)'.Athlete::FEDERATIONS_JOIN;
 
 			// use fed_id, if there is no fed_parent or a German region
-			$ger_regions = implode(',', array_keys(ranking_bo::getInstance()->federation->regions('GER')));
+			$ger_regions = implode(',', array_keys(Base::getInstance()->federation->regions('GER')));
 			$fed_parent = "CASE WHEN fed_parent IS NULL OR fed_parent IN ($ger_regions) THEN Federations.fed_id ELSE fed_parent END";
 			$extra_cols = str_replace('fed_parent', $fed_parent.' AS fed_parent',
 				array_merge($extra_cols ? explode(',', $extra_cols) : array(),
@@ -425,7 +426,7 @@ class ranking_registration extends Api\Storage\Base
 
 			if (isset($filter['license_nation']))
 			{
-				$join .= ranking_bo::getInstance()->athlete->license_join($filter['license_nation'], $filter['license_year']);
+				$join .= Base::getInstance()->athlete->license_join($filter['license_nation'], $filter['license_year']);
 				$extra_cols[] = 'lic_status AS license';
 				$extra_cols[] = 'l.GrpId AS license_cat';
 				unset($filter['license_nation'], $filter['license_year']);
@@ -464,9 +465,9 @@ class ranking_registration extends Api\Storage\Base
 			foreach($rows as &$row)
 			{
 				// add one of "is(Deleted|Confirmed|Registered|Preregisted)" classes
-				foreach(ranking_registration::$states as $state)
+				foreach(self::$states as $state)
 				{
-					if (!empty($row[ranking_registration::PREFIX.$state]))
+					if (!empty($row[self::PREFIX.$state]))
 					{
 						if (!isset($row['state']))
 						{
@@ -478,14 +479,14 @@ class ranking_registration extends Api\Storage\Base
 						{
 							$row['class'] .= ' is'.ucfirst($state);
 						}
-						$modifier = $row[ranking_registration::PREFIX.$state.ranking_registration::ACCOUNT_POSTFIX];
-						$row['state_changed'] .= Api\DateTime::to($row[ranking_registration::PREFIX.$state]).': '.lang($state).' '.
+						$modifier = $row[self::PREFIX.$state.self::ACCOUNT_POSTFIX];
+						$row['state_changed'] .= Api\DateTime::to($row[self::PREFIX.$state]).': '.lang($state).' '.
 							($modifier ? lang('by').' '.Api\Accounts::username($modifier).' ' : '')."\n".
 							($state == 'prequalified' ? $row['reg_prequal_reason'] : '');
 					}
 				}
 				// always add prequal reason, as it contains also a note when it got removed
-				if (empty($row[ranking_registration::PREFIX.ranking_registration::PREQUALIFIED]) && !empty($row['reg_prequal_reason']))
+				if (empty($row[self::PREFIX.self::PREQUALIFIED]) && !empty($row['reg_prequal_reason']))
 				{
 					$row['state_changed'] .= "\n".$row['reg_prequal_reason'];
 				}

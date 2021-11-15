@@ -10,12 +10,14 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 
 /**
  * category object
  */
-class ranking_category extends Api\Storage\Base
+class Category extends Api\Storage\Base
 {
 	/**
 	 * @var array $data['rkey']2old maps new to old category-names

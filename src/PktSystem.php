@@ -10,13 +10,15 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 
 /**
  * pktsystem object
  *
  */
-class ranking_pktsystem extends Api\Storage\Base
+class PktSystem extends Api\Storage\Base
 {
 	var $pkte_table = 'PktSystemPkte';
 

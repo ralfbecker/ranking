@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
 use EGroupware\Ranking\Athlete;
 
 /**
@@ -51,7 +52,7 @@ class ranking_result extends Api\Storage\Base
 	function athlete_db2data($data=null)
 	{
 		static $athlete=null;
-		if (!isset($athlete)) $athlete = ranking_bo::getInstance()->athlete;
+		if (!isset($athlete)) $athlete = Base::getInstance()->athlete;
 
 		return $athlete->db2data($data);
 	}
@@ -101,7 +102,7 @@ class ranking_result extends Api\Storage\Base
 			$cols = false;
 			if ($join === true)
 			{
-				if (!isset($filter['year']) && ($comp = ranking_bo::getInstance()->comp->read($this->WetId)))
+				if (!isset($filter['year']) && ($comp = Base::getInstance()->comp->read($this->WetId)))
 				{
 					$year = (int)$comp['datum'];
 				}
@@ -296,7 +297,7 @@ class ranking_result extends Api\Storage\Base
 	 */
 	function prequalified($comp,$cat)
 	{
-		$boranking = ranking_bo::getInstance();
+		$boranking = Base::getInstance();
 		if (!is_array($comp) || !isset($comp['prequal_comp']))
 		{
 			$comp = $boranking->comp->read(is_array($comp) ? $comp['WetId'] : $comp);

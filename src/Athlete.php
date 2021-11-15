@@ -11,8 +11,8 @@
  */
 
 namespace EGroupware\Ranking;
+
 use EGroupware\Api;
-use ranking_bo;
 
 /**
  * Athlete object
@@ -77,7 +77,7 @@ class Athlete extends Api\Storage\Base
 	/**
 	 * Instance of category object
 	 *
-	 * @var ranking_category
+	 * @var Category
 	 */
 	var $cats;
 
@@ -168,25 +168,15 @@ class Athlete extends Api\Storage\Base
 	{
 		if (is_null($db))
 		{
-			$db = \ranking_so::get_rang_db();
+			$db = Base::get_rang_db();
 		}
 		parent::__construct('ranking',self::ATHLETE_TABLE,$db);	// call constructor of derived class
 
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = Api\Translation::charset();
+		$this->cats = new Category($source_charset, $this->db);
 
-		foreach(array(
-				'cats'  => 'ranking_category',
-			) as $var => $class)
-		{
-			$egw_name = /*'ranking_'.*/$class;
-			if (!isset($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$source_charset,$this->db,$vfs_pdf_dir,$vfs_pdf_url);
-			}
-			$this->$var =& $GLOBALS['egw']->$egw_name;
-		}
 		$config = Api\Config::read('ranking');
 		$this->picture_path = empty($config['picture_path']) ? $_SERVER['DOCUMENT_ROOT'].'/jpgs' : $config['picture_path'];
 		$this->consent_docs = empty($config['athlete_consent_docs']) ? 'ranking/athlete-consent-docs' : $config['athlete_consent_docs'];
@@ -262,7 +252,7 @@ class Athlete extends Api\Storage\Base
 			// echo "<p>self::db2data($data[nachname], $data[vorname]) acl=$acl=".print_r($data['acl'],true)."</p>\n";
 
 			// blank out the acl'ed fields, if user has no athletes rights
-			if (is_object($GLOBALS['ranking_bo']) && !$GLOBALS['ranking_bo']->acl_check_athlete($data))
+			if (!Base::getInstance()->acl_check_athlete($data))
 			{
 				$data = $this->clear_data_by_acl($data, $acl);
 			}
@@ -1339,7 +1329,7 @@ class Athlete extends Api\Storage\Base
 	function link_title($athlete, $return_array=false)
 	{
 		static $license_labels = null;
-		if (!isset($license_labels)) $license_labels = ranking_bo::getInstance()->license_labels;
+		if (!isset($license_labels)) $license_labels = Base::getInstance()->license_labels;
 
 		if (!is_array($athlete) && $athlete)
 		{
@@ -1456,7 +1446,7 @@ class Athlete extends Api\Storage\Base
 		if ((int)$options['GrpId'] > 0 && (int)$options['WetId'] > 0)
 		{
 			$cat = $this->cats->read((int)$options['GrpId']);
-			$comp = ranking_bo::getInstance ()->comp->read((int)$options['WetId']);
+			$comp = Base::getInstance ()->comp->read((int)$options['WetId']);
 		}
 		$start = isset($options['num_rows']) ? array((int)$options['start'], (int)$options['num_rows']) : false;
 		if (($athletes = $this->search($criteria,false,'nachname,vorname,nation','','%',false,'AND',$start,$filter)))
@@ -1475,7 +1465,7 @@ class Athlete extends Api\Storage\Base
 
 				if ($cat)
 				{
-					$result[$athlete['PerId']]['error'] = ranking_bo::getInstance()->error_register($athlete, $cat, $comp);
+					$result[$athlete['PerId']]['error'] = Base::getInstance()->error_register($athlete, $cat, $comp);
 				}
 
 				if ($options['license_nation'])

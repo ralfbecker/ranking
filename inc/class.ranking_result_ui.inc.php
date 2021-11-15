@@ -12,6 +12,9 @@
 
 use EGroupware\Api;
 use EGroupware\Ranking\Athlete;
+use EGroupware\Ranking\Selfservice;
+use EGroupware\Ranking\Competition;
+use EGroupware\Ranking\Category;
 
 class ranking_result_ui extends ranking_result_bo
 {
@@ -449,8 +452,8 @@ class ranking_result_ui extends ranking_result_bo
 					if ($content['athlete']['password_email'] && $athlete['email'])
 					{
 						try {
-							$selfservice = new ranking_selfservice();
-							$selfservice->password_reset_mail($athlete);
+							$selfservice = new Selfservice();
+							$selfservice->passwordResetMail($athlete);
 							$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
 						}
 						catch (Exception $e) {
@@ -694,7 +697,7 @@ class ranking_result_ui extends ranking_result_bo
 					'nation'.($cat['nation']?'='.$this->db->quote($cat['nation']):' IS NULL').' DESC,'.
 					// then by having an agegroup or not
 					'(from_year IS NOT NULL OR to_year IS NOT NULL) '.
-						(ranking_category::age_group($cat, $comp['datum']) ?  'DESC' : 'ASC'), false);
+						(Category::age_group($cat, $comp['datum']) ?  'DESC' : 'ASC'), false);
 				//add cats from other competitions with identical date
 				if (($comps = $this->comp->names(array('datum' => $comp['datum'],'WetId!='.(int)$comp['WetId']), 0)))
 				{
@@ -894,7 +897,7 @@ class ranking_result_ui extends ranking_result_bo
 		}
 		if (empty($query['display_athlete']))
 		{
-			$query['display_athlete'] = ranking_competition::nation2display_athlete($query['calendar'], true);	// true = internal use, not feed export
+			$query['display_athlete'] = Competition::nation2display_athlete($query['calendar'], true);	// true = internal use, not feed export
 		}
 		$need_start_number = false;
 		$need_lead_time_column = false;
@@ -1041,9 +1044,9 @@ class ranking_result_ui extends ranking_result_bo
 				$rows[$k]['start_order'] = lang('Prequalified');
 			}
 
-			if ($query['display_athlete'] == ranking_competition::CITY) unset($row['plz']);
-			if ($query['display_athlete'] == ranking_competition::PARENT_FEDERATION && empty($row['acl_fed']) ||
-				$query['display_athlete'] == ranking_competition::FED_AND_PARENT)	// German Sektion and LV
+			if ($query['display_athlete'] == Competition::CITY) unset($row['plz']);
+			if ($query['display_athlete'] == Competition::PARENT_FEDERATION && empty($row['acl_fed']) ||
+				$query['display_athlete'] == Competition::FED_AND_PARENT)	// German Sektion and LV
 			{
 				if ($row['fed_parent'])
 				{
@@ -1112,24 +1115,24 @@ class ranking_result_ui extends ranking_result_bo
 		// what columns to show for an athlete: can be set per comp. or has a national default
 		switch($query['display_athlete'])
 		{
-			case ranking_competition::NATION:
+			case Competition::NATION:
 				$rows['no_ort'] = $rows['no_verband'] = $rows['no_acl_fed'] = true;
 				break;
 			default:
-			case ranking_competition::FEDERATION:
+			case Competition::FEDERATION:
 				$rows['no_ort'] = $rows['no_nation'] = $rows['no_acl_fed'] = true;
 				break;
-			case ranking_competition::PC_CITY:
-			case ranking_competition::CITY:
+			case Competition::PC_CITY:
+			case Competition::CITY:
 				$rows['no_nation'] = $rows['no_verband'] = $rows['no_acl_fed'] = $rows['no_PerId'] = true;
 				break;
-			case ranking_competition::NATION_PC_CITY:
+			case Competition::NATION_PC_CITY:
 				$rows['no_verband'] = $rows['no_acl_fed'] = $rows['no_PerId'] = true;
 				break;
-			case ranking_competition::PARENT_FEDERATION:
+			case Competition::PARENT_FEDERATION:
 				$rows['no_ort'] = $rows['no_verband'] = true;
 				break;
-			case ranking_competition::FED_AND_PARENT:
+			case Competition::FED_AND_PARENT:
 				$rows['no_ort'] = $rows['no_nation'] = true;
 				break;
 		}

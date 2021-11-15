@@ -12,7 +12,7 @@
 
 namespace EGroupware\Ranking\Athlete;
 
-use ranking_bo;
+use EGroupware\Ranking\Base;
 
 /**
  * Compatibility layer for iface_egw_record needed for importexport, but also
@@ -51,7 +51,7 @@ class Record implements \importexport_iface_egw_record
 	{
 		$this->identifier = $_identifier;
 
-		if(self::$bo == null) self::$bo = ranking_bo::getInstance()->athlete;
+		if(self::$bo == null) self::$bo = Base::getInstance()->athlete;
 
 		if($_identifier)
 		{

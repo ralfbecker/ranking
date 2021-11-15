@@ -16,6 +16,7 @@ if (!defined('ONE_QUALI'))
 }
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
 use EGroupware\Ranking\Athlete;
 
 /**
@@ -196,7 +197,7 @@ class ranking_route_result extends Api\Storage\Base
 
 		if (isset($filter['WetId']) || isset($filter['year']))
 		{
-			if (!isset($filter['year']) && ($comp = ranking_bo::getInstance()->comp->read($filter['WetId'])))
+			if (!isset($filter['year']) && ($comp = Base::getInstance()->comp->read($filter['WetId'])))
 			{
 				$year = (int)$comp['datum'];
 			}

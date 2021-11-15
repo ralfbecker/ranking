@@ -10,13 +10,15 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking;
+
 use EGroupware\Api;
 use EGroupware\Api\Vfs;
 
 /**
  * competition object
  */
-class ranking_competition extends Api\Storage\Base
+class Competition extends Api\Storage\Base
 {
 	var $non_db_cols = array(	// fields in data, not (direct) saved to the db
 		'durartion' => 'duration'
@@ -25,7 +27,7 @@ class ranking_competition extends Api\Storage\Base
 	/**
 	 * reference to the category object
 	 *
-	 * @var ranking_category
+	 * @var Category
 	 */
 	var $cats;
 	/**
@@ -105,18 +107,8 @@ class ranking_competition extends Api\Storage\Base
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = Api\Translation::charset();
+		$this->cats = new Category($source_charset, $this->db);
 
-		foreach(array(
-				'cats'  => 'ranking_category',
-			) as $var => $class)
-		{
-			$egw_name = /*'ranking_'.*/$class;
-			if (!isset($GLOBALS['egw']->$egw_name))
-			{
-				$GLOBALS['egw']->$egw_name = CreateObject('ranking.'.$class,$this->source_charset,$this->db);
-			}
-			$this->$var = $GLOBALS['egw']->$egw_name;
-		}
 		if ($vfs_pdf_dir) $this->vfs_pdf_dir = $vfs_pdf_dir;
 		if ($vfs_pdf_url) $this->vfs_pdf_url = $vfs_pdf_url;
 	}
@@ -125,7 +117,7 @@ class ranking_competition extends Api\Storage\Base
 	 * Get default display_athlete value for a nation
 	 *
 	 * @param string $nation
-	 * @return string ranking_competition::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY|FED_AND_PARENT|NONE) constants
+	 * @return string self::(FEDERATION|NATION|CITY|PC_CITY|NATION_PC_CITY|FED_AND_PARENT|NONE) constants
 	 */
 	public static function nation2display_athlete($nation, $intern=false)
 	{
@@ -656,7 +648,7 @@ class ranking_competition extends Api\Storage\Base
 		$check = array('WetId' => $WetId);
 		if ($GrpId) $check['GrpId'] = $GrpId;
 
-		return $has_results[$WetId][(string)$GrpId] = $GLOBALS['ranking_bo']->result->has_results($check);
+		return $has_results[$WetId][(string)$GrpId] = Base::getInstance()->result->has_results($check);
 	}
 
 	/**

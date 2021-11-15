@@ -11,8 +11,10 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
+use EGroupware\Ranking\Federation;
 
-class ranking_federation_ui extends ranking_bo
+class ranking_federation_ui extends Base
 {
 	/**
 	 * functions callable via menuaction
@@ -149,12 +151,12 @@ class ranking_federation_ui extends ranking_bo
 			$this->federation->query_list('verband', 'fed_id', array(
 				'nation' => $content['nation'],
 				'fed_id != '.(int)$content['fed_id'],
-			), ranking_federation::FEDERATION_CHILDREN.' DESC, verband ASC');
+			), Federation::FEDERATION_CHILDREN.' DESC, verband ASC');
 
 		$tpl = new Api\Etemplate('ranking.federation.edit');
 		$tpl->exec('ranking.ranking_federation_ui.edit',$content, array(
 			'nation' => $this->athlete->distinct_list('nation'),
-			'fed_continent' => ranking_federation::$continents,
+			'fed_continent' => Federation::$continents,
 			'fed_parent' => $fed_parents,
 			'fed_parent_since' => $fed_parents,
 		), $readonlys, $content, 2);
@@ -285,13 +287,13 @@ class ranking_federation_ui extends ranking_bo
 				$this->federation->query_list('verband','fed_id',array(
 					'nation' => $content['fed']['nation'],
 					'fed_id != '.(int)$content['fed']['fed_id'],
-				),ranking_federation::FEDERATION_CHILDREN.' DESC,verband ASC');
+				),Federation::FEDERATION_CHILDREN.' DESC,verband ASC');
 
 		$this->set_ui_state();
 		$tpl = new Api\Etemplate('ranking.federation.index');
 		$tpl->exec('ranking.ranking_federation_ui.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
-			'fed_continent' => ranking_federation::$continents,
+			'fed_continent' => Federation::$continents,
 			'fed_parent' => $fed_parents,
 			'fed_parent_since' => $fed_parents,
 		), [], $content);

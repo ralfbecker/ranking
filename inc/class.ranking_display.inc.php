@@ -12,6 +12,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
 
 class ranking_display extends Api\Storage\Base2
 {
@@ -24,9 +25,9 @@ class ranking_display extends Api\Storage\Base2
 	 */
 	function __construct(Api\Db $db=null)
 	{
-		if (is_null($db)) $db = $GLOBALS['ranking_bo']->db;
+		if (is_null($db)) $db = Base::get_rang_db();
 
-		parent::__construct('ranking','Displays',$db);	// calling the constructor of so_sql for Displays table
+		parent::__construct('ranking', 'Displays', $db);	// calling the constructor of so_sql for Displays table
 	}
 
 	/**

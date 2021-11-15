@@ -11,6 +11,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
 
 class ranking_import extends ranking_result_bo
 {
@@ -855,7 +856,7 @@ class ranking_import extends ranking_result_bo
 		// import result into ranking (not result-service!)
 		elseif ($do_result_import)
 		{
-			if (!($import_result = ranking_bo::import_ranking([	// $this->import_ranking is from ranking_result_bo!
+			if (!($import_result = Base::import_ranking([	// $this->import_ranking is from ranking_result_bo!
 				'WetId' => $keys['comp'],
 				'GrpId' => $keys['cat'],
 			], $result)))

@@ -13,6 +13,7 @@
 use EGroupware\Api;
 use EGroupware\Api\Egw;
 use EGroupware\Ranking\Athlete;
+use EGroupware\Ranking\Base;
 
 /**
  * Rankings - Hooks: diverse static methods to be called as hooks
@@ -43,7 +44,7 @@ class ranking_hooks
 				'Accounting'    => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index','ajax' => 'true')),
 			);
 			// show import only if user has more than read rights
-			$bo = ranking_bo::getInstance();
+			$bo = Base::getInstance();
 			if (!empty($bo->edit_rights) || !empty($bo->athlete_rights) || !empty($bo->register_rights))
 			{
 				$links['Import'] = Egw::link('/index.php',array('menuaction' => 'ranking.ranking_import.index','ajax' => 'true'));

@@ -13,6 +13,8 @@
 
 use EGroupware\Api;
 use EGroupware\Ranking\Athlete;
+use EGroupware\Ranking\Registration;
+use EGroupware\Ranking\Category;
 
 class ranking_accounting extends ranking_result_bo
 {
@@ -53,7 +55,7 @@ class ranking_accounting extends ranking_result_bo
 		switch (($order = $query['order']))
 		{
 			case 'start_order':
-				$query['order'] = ranking_category::sui_cat_sort(ranking_route_result::RESULT_TABLE.'.GrpId').',start_order';
+				$query['order'] = Category::sui_cat_sort(ranking_route_result::RESULT_TABLE.'.GrpId').',start_order';
 				break;
 		}
 		if (!is_string($query['sort'])) $query['sort'] = 'ASC';
@@ -77,15 +79,15 @@ class ranking_accounting extends ranking_result_bo
 		if ($query['fees']['use_registration'])
 		{
 			$query['col_filter']['WetId'] = $query['comp'];
-			$query['col_filter']['state'] = (int)$comp['selfregister'] == 1 ? ranking_registration::CONFIRMED : ranking_registration::REGISTERED;
+			$query['col_filter']['state'] = (int)$comp['selfregister'] == 1 ? Registration::CONFIRMED : Registration::REGISTERED;
 			if ($query_in['col_filter']['GrpId']) $query['col_filter']['GrpId'] = $query_in['col_filter']['GrpId'];
 
 			$query['order'] = strtr($query['order'], array(
-				ranking_route_result::RESULT_TABLE.'.GrpId' => ranking_registration::TABLE.'.GrpId',
+				ranking_route_result::RESULT_TABLE.'.GrpId' => Registration::TABLE.'.GrpId',
 				'start_order' => 'nachname,vorname',
 			));
 			$total = $this->registration->get_rows($query, $rows, $readonlys, true, false, false,
-				ranking_registration::TABLE.'.GrpId AS GrpId,'.ranking_registration::TABLE.'.reg_id AS start_number');
+				Registration::TABLE.'.GrpId AS GrpId,'.Registration::TABLE.'.reg_id AS start_number');
 		}
 		else
 		{

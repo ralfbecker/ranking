@@ -12,8 +12,11 @@
 
 use EGroupware\Api;
 use EGroupware\Api\Egw;
+use EGroupware\Ranking\Base;
+use EGroupware\Ranking\Federation;
+use EGroupware\Ranking\Competition;
 
-class ranking_competition_ui extends ranking_bo
+class ranking_competition_ui extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -82,7 +85,7 @@ class ranking_competition_ui extends ranking_bo
 			{
 				$this->check_set_nation_fed_id($this->comp->data);
 			}
-			if (!$_content['cat_id']) $_content['cat_id'] = ranking_so::cat_rkey2id($_content['nation']);
+			if (!$_content['cat_id']) $_content['cat_id'] = self::cat_rkey2id($_content['nation']);
 
 			if ($_content['serie'] && $_content['serie'] != $this->comp->data['serie'] &&
 				$this->cup->read(array('SerId' => $_content['serie'])))
@@ -151,8 +154,8 @@ class ranking_competition_ui extends ranking_bo
 								}
 								else
 								{
-									$error_msg = ($extension = ranking_competition::is_image($file['name'], $file['type'])) ? false :
-										lang('File is not an image (%1)', str_replace(array('\\', '$'), '', implode(', ', ranking_competition::$image_types)));
+									$error_msg = ($extension = Competition::is_image($file['name'], $file['type'])) ? false :
+										lang('File is not an image (%1)', str_replace(array('\\', '$'), '', implode(', ', Competition::$image_types)));
 								}
 								if (!$error_msg && $this->comp->attach_files(array($type => $file['tmp_name']), $error_msg, null, $extension))
 								{
@@ -285,7 +288,7 @@ class ranking_competition_ui extends ranking_bo
 			'selfregister' => $this->comp->selfregister_types,
 			'open_comp'    => $this->comp->open_comp_types,
 			'prequal_type' => $this->comp->prequal_types,
-			'continent'    => ranking_federation::$continents,
+			'continent'    => Federation::$continents,
 		);
 		// if cup is not in sel_options, try reading it without filters
 		if (!empty($content['serie']) && !isset($sel_options['serie'][$content['serie']]))
@@ -293,7 +296,7 @@ class ranking_competition_ui extends ranking_bo
 			$sel_options['serie'] += $this->cup->names(['SerId' => $content['serie']]);
 		}
 		// select a category parent fitting to the nation
-		$content['cat_parent'] = ranking_so::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
+		$content['cat_parent'] = self::cat_rkey2id($content['nation'] ? $content['nation'] : 'int');
 		$content['cat_parent_name'] = ($content['nation']? $content['nation'] : 'Int.').' '.lang('Competitions');
 
 		if ($view)
@@ -452,11 +455,11 @@ class ranking_competition_ui extends ranking_bo
 			if (count($read_rights) == 1)
 			{
 				$content['nm']['col_filter']['nation'] = $read_rights[0];
-				$content['nm']['cat_parent'] = ranking_so::cat_rkey2id($read_rights[0]);
+				$content['nm']['cat_parent'] = self::cat_rkey2id($read_rights[0]);
 			}
 			else
 			{
-				$content['nm']['cat_parent'] = ranking_so::cat_rkey2id('parent');
+				$content['nm']['cat_parent'] = self::cat_rkey2id('parent');
 			}
 		}
 		// actions are NOT stored in session

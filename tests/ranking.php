@@ -1,4 +1,7 @@
 #!/usr/bin/env php
+
+use EGroupware\Ranking\Calculation;
+
 <?php
 
 $_REQUEST['domain'] = php_uname('n') == 'RalfsMac.local' ? 'boulder.egroupware.org' :
@@ -6,10 +9,10 @@ $_REQUEST['domain'] = php_uname('n') == 'RalfsMac.local' ? 'boulder.egroupware.o
 $GLOBALS['egw_info']['flags'] = array('currentapp' => 'login');
 require(__DIR__.'/../../header.inc.php');
 
-$result = new ranking_calculation();
+$result = new Calculation();
 
 //$GLOBALS['egw_info']['server']['temp_dir'] = __DIR__;
-//ranking_calculation::$dump_ranking_results = true;
+//Calculation::$dump_ranking_results = true;
 $failed = $successful = 0;
 foreach(scandir($fixtures=__DIR__.'/fixtures') as $file)
 {
