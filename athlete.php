@@ -38,4 +38,4 @@ function check_anon_access(&$anon_account)
 }
 
 $selfservice = new Selfservice();
-$selfservice->process($_GET['PerId'], $_GET['action']);
+$selfservice->process($_GET['PerId'], $_REQUEST['action']);

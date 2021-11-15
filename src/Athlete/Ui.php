@@ -107,7 +107,7 @@ class Ui extends Base
 	 */
 	function edit($content=null,$msg='',$view=false)
 	{
-		if ($_GET['rkey'] || $_GET['PerId'])
+		if (!empty($_GET['rkey']) || !empty($_GET['PerId']))
 		{
 			if (!in_array($license_nation = strip_tags($_GET['license_nation']),$this->license_nations))
 			{
@@ -136,7 +136,7 @@ class Ui extends Base
 			$content['license_nation'] = $license_nation;
 			$content['license_year'] = $this->license_year;
 
-			if (!$_GET['PerId'] && !$_GET['rkey'] || !$this->athlete->data['PerId'])
+			if (empty($_GET['PerId']) && empty($_GET['rkey']) || !$this->athlete->data['PerId'])
 			{
 				$this->athlete->init($_GET['preset']);
 				if (isset($_GET['preset']) && isset($_GET['preset']['verband']) && !isset($_GET['preset']['fed_id']))
@@ -145,7 +145,7 @@ class Ui extends Base
 				}
 				$this->presetFederation($this->athlete->data, $nations, $feds_with_grants);
 			}
-			if (!$nations)
+			if (!$nations && $this->is_selfservice() !== 'new')
 			{
 				Framework::window_close(lang('Permission denied'));
 			}
@@ -507,7 +507,7 @@ Continuer';
 		}
 		$content['acl_fed_id'] = array('fed_id' => $this->athlete->data['acl_fed_id']);
 		$sel_options = array(
-			'nation' => $nations,
+			'nation' => $nations ?: [$content['nation'] => $content['nation']],
 			'sex'    => $this->genders,
 			'acl'    => self::$acl_labels,
 			'custom_acl' => self::$acl_deny_labels,
@@ -583,7 +583,7 @@ Continuer';
 				$readonlys['vorname'] = $readonlys['nachname'] = true;
 			}
 			// forbid athlete selfservice to change certain fields
-			if ($this->athlete->data['PerId'] && $this->is_selfservice() == $this->athlete->data['PerId'])
+			if ($this->athlete->data['PerId'] && $this->is_selfservice() == $this->athlete->data['PerId'] && $this->is_selfservice() !== 'new')
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = $readonlys['geb_date'] = true;
 				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
@@ -593,7 +593,7 @@ Continuer';
 			$this->setup_history($content, $sel_options, $readonlys);
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
-		$tmpl = new Api\Etemplate('ranking.athlete.edit');
+		$tmpl = new Api\Etemplate($this->is_selfservice() !== 'new' ? 'ranking.athlete.edit' : 'ranking.athlete.apply');
 		// selfservice needs old idots mobile support currently, so disable new 16.1 mobile support
 		if ($this->is_selfservice())
 		{
@@ -604,6 +604,9 @@ Continuer';
 
 			// for self-service, do NOT close the window, but submit the form, which redirects back to athlete.php
 			Api\Etemplate::setElementAttribute('button[cancel]', 'onclick', 'return true;');	// '' does NOT work
+
+			// Athletes need a gender
+			unset($sel_options['sex']['']);
 		}
 		$tmpl->exec('ranking.'.self::class.'.edit', $content,
 			$sel_options,$readonlys,array(

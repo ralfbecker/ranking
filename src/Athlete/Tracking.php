@@ -14,6 +14,7 @@
 namespace EGroupware\Ranking\Athlete;
 
 use EGroupware\Api;
+use EGroupware\Ranking\Base;
 
 /**
  * Change tracking for athletes

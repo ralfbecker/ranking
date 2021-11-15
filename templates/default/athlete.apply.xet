@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2//EN" "https://www.egroupware.org/etemplate2.dtd">
+<overlay>
+	<template id="ranking.athlete.apply" template="" lang="" group="0" version="1.9.003">
+		<grid width="100%">
+			<columns>
+				<column width="100"/>
+				<column width="20%"/>
+				<column width="12%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row class="th">
+					<description value="Register / apply for climbing license" span="all" class="header"/>
+				</row>
+				<row class="th">
+					<description for="nachname" value="Last name"/>
+					<textbox statustext="Family name of the athlete in latin chars! Accents and umlauts are ok" id="nachname" needed="true" size="32" maxlength="40"/>
+					<description for="vorname" value="First name"/>
+					<textbox statustext="First name of the athlete in Latin chars! Accents and umlauts are ok" id="vorname" needed="true" size="32" maxlength="40"/>
+				</row>
+				<row class="row">
+					<description for="email" value="Email"/>
+					<url-email id="email" size="32" maxlength="60" needed="true"/>
+					<description for="email2" value="Confirm email"/>
+					<url-email id="email2" size="32" maxlength="60" needed="true"/>
+				</row>
+				<row class="row">
+					<description for="sex" value="Gender"/>
+					<select statustext="gender of the athlete" id="sex" needed="true" empty_label="Select one"/>
+					<description for="nation" value="Nation"/>
+					<select statustext="nation the athlete is competing for" id="nation" needed="true" no_lang="true" onchange="1" empty_label="Select one"/>
+				</row>
+				<row class="row">
+					<description for="geb_date" value="Birthdate"/>
+					<date id="geb_date" data_format="Y-m-d" year_range="-70:+0" needed="true" class="et2_required"/>
+				</row>
+				<row class="th">
+					<description for="verband" value="DAV Sektion"/>
+					<select class="selectboxFullWidth" id="fed_id" span="all" needed="true" empty_label="Select one"/>
+				</row>
+				<row class="dialogFooterToolbar">
+					<hbox span="2">
+						<button statustext="Applies the changes made" label="Apply" id="button[apply]"/>
+						<button statustext="exists without saving the changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

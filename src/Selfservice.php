@@ -49,12 +49,12 @@ class Selfservice extends Base
 		Framework::includeCSS('ranking', 'selfservice', false);
 		Framework::$navbar_done = true;	// do NOT display navbar
 		$_GET['cd'] = 'no';	// suppress framework
-		if (substr($_GET['action'], 0, 10) != 'scorecard-') echo $GLOBALS['egw']->framework->header();
+		if (substr($_action, 0, 10) != 'scorecard-') echo $GLOBALS['egw']->framework->header();
 
 		$athlete = array();
 		unset($this->athlete->acl2clear[Athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
 		unset($this->athlete->acl2clear[Athlete::ACL_DENY_PROFILE]);	// same is true for a fully denied profile
-		if (($PerId || ($PerId = $this->is_selfservice())) && !($athlete = $this->athlete->read($PerId)))
+		if ($_action !== 'apply' && ($PerId || ($PerId = $this->is_selfservice()) && $PerId !== 'new') && !($athlete = $this->athlete->read($PerId)))
 		{
 			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
 		}
@@ -66,7 +66,7 @@ class Selfservice extends Base
 		{
 			echo "<h1 id='action-$action'>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
 		}
-		if ((!$athlete || !$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId) &&
+		if ($_action !== 'apply' && (!$athlete || !$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId) &&
 			!($PerId = $this->auth($athlete, $action)))
 		{
 			$this->showFooter($nation2lang[$athlete['nation']]);
@@ -79,7 +79,7 @@ class Selfservice extends Base
 			Api\Translation::init();
 		}
 		// check if athlete contented to store his data, if not show consent screen
-		if ($action !== 'logout' && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
+		if (!in_array($action, ['logout', 'apply']) && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
 		{
 			$this->consentDataStorage($athlete, $lang);
 		}
@@ -89,6 +89,16 @@ class Selfservice extends Base
 				Egw::redirect_link('/index.php',array(
 					'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit',
 					'PerId' => $PerId,
+					'cd' => 'no',
+				));
+				break;
+
+			case 'apply':
+				$this->is_selfservice('new');
+				Egw::redirect_link('/index.php',array(
+					'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit',
+					'preset[PerId]' => 'new',
+					'preset[nation]' => 'GER',
 					'cd' => 'no',
 				));
 				break;
@@ -565,15 +575,18 @@ class Selfservice extends Base
 			echo "<form action='$link' method='POST'>\n";
 			if (!$athlete)
 			{
+				echo "<p>".lang("If you have no athlete account yet and need to apply for a climbing license, you first need to register:")."\n";
+				echo "<button type='submit' name='action' value='apply'>".lang('Register / apply for climbing license')."</button></p><hr/>\n";
+
 				echo "<p>".lang("Please enter your EMail address and password to register for competitions or edit your profile:")."</p>\n";
 				$pw = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : $_COOKIE[self::EMAIL_COOKIE]);
-				echo "<table>\n<tr><td>".lang('EMail')."</td><td><input type='text' name='email' value='$pw' /></td></tr>\n";
+				echo "<table>\n<tr><td>".lang('EMail')."</td><td><input type='text' name='email' value='$pw' size='32'/></td></tr>\n";
 			}
 			else
 			{
 				echo "<p>".lang("Please enter your password to log in or %1click here%2, if you forgot it.","<a href='$recovery_link'>","</a>")."</p>\n";
 			}
-			echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' /></td>\n";
+			echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' size='32'/></td>\n";
 			echo "<td><input type='submit' value='".lang('Login')."' /></td></tr>\n";
 			echo "</table>\n</form>\n";
 
