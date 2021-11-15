@@ -10,11 +10,13 @@
  * @copyright 2008-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking\Federation;
+
 use EGroupware\Api;
 use EGroupware\Ranking\Base;
 use EGroupware\Ranking\Federation;
 
-class ranking_federation_ui extends Base
+class Ui extends Base
 {
 	/**
 	 * functions callable via menuaction
@@ -154,7 +156,7 @@ class ranking_federation_ui extends Base
 			), Federation::FEDERATION_CHILDREN.' DESC, verband ASC');
 
 		$tpl = new Api\Etemplate('ranking.federation.edit');
-		$tpl->exec('ranking.ranking_federation_ui.edit',$content, array(
+		$tpl->exec('ranking.'.self::class.'.edit',$content, array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'fed_continent' => Federation::$continents,
 			'fed_parent' => $fed_parents,
@@ -258,7 +260,7 @@ class ranking_federation_ui extends Base
 			if (!is_array($content['nm']))
 			{
 				$content['nm'] = array(
-					'get_rows'    =>	'ranking.ranking_federation_ui.get_rows',
+					'get_rows'    =>	'ranking.'.self::class.'.get_rows',
 					'no_filter'   => True,
 					'no_filter2'  => True,
 					'no_cat'      => True,// I  disable the cat-selectbox
@@ -291,7 +293,7 @@ class ranking_federation_ui extends Base
 
 		$this->set_ui_state();
 		$tpl = new Api\Etemplate('ranking.federation.index');
-		$tpl->exec('ranking.ranking_federation_ui.index',$content,array(
+		$tpl->exec('ranking.'.self::class.'.index',$content,array(
 			'nation' => $this->athlete->distinct_list('nation'),
 			'fed_continent' => Federation::$continents,
 			'fed_parent' => $fed_parents,
@@ -311,13 +313,13 @@ class ranking_federation_ui extends Base
 				'caption' => 'Edit',
 				'default' => true,
 				'allowOnMultiple' => $this->is_admin,	// allow admin to edit multiples ones
-				'url' => 'menuaction=ranking.ranking_federation_ui.edit&fed_id=$id',
+				'url' => 'menuaction=ranking.'.self::class.'.edit&fed_id=$id',
 				'popup' => '900x500',
 				'group' => $group=0,
 			),
 			'add' => array(
 				'caption' => 'Add',
-				'url' => 'menuaction=ranking.ranking_federation_ui.edit',
+				'url' => 'menuaction=ranking.'.self::class.'.edit',
 				'popup' => '900x500',
 				'disabled' => !$this->is_admin,
 				'group' => $group,

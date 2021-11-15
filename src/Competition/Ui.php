@@ -10,13 +10,15 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking\Competition;
+
 use EGroupware\Api;
 use EGroupware\Api\Egw;
 use EGroupware\Ranking\Base;
 use EGroupware\Ranking\Federation;
 use EGroupware\Ranking\Competition;
 
-class ranking_competition_ui extends Base
+class Ui extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -72,7 +74,6 @@ class ranking_competition_ui extends Base
 			$button = key($_content['button']);
 			unset($_content['button']);
 
-			//echo "<br>ranking_competition_ui::edit: content ="; _debug_array($_content);
 			$this->comp->data = $_content['comp_data'];
 			$old_rkey = $_content['comp_data']['rkey'];
 			unset($_content['comp_data']);
@@ -96,7 +97,6 @@ class ranking_competition_ui extends Base
 				}
 			}
 			$this->comp->data_merge($_content);
-			//echo "<br>ranking_competition_ui::edit: comp->data ="; _debug_array($this->comp->data);
 
 			if (!$view  && in_array($button, ['save', 'apply', 'update_prequal']) && $this->acl_check_comp($this->comp->data))
 			{
@@ -247,7 +247,7 @@ class ranking_competition_ui extends Base
 			'msg'  => $msg,
 			'tabs' => $_content['tabs'],
 			'referer' => $_content['referer'] ? $_content['referer'] :
-				Api\Header\Referer::get('/index.php?menuaction=ranking.ranking_competition_ui.index'),
+				Api\Header\Referer::get('/index.php?menuaction=ranking.'.self::class.'.index'),
 		);
 		foreach((array) $this->comp->attachments(null,false,false) as $type => $linkdata)
 		{
@@ -327,7 +327,7 @@ class ranking_competition_ui extends Base
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('competition'));
 
 		$tmpl = new Api\Etemplate('ranking.comp.edit');
-		$tmpl->exec('ranking.ranking_competition_ui.edit',$content,
+		$tmpl->exec('ranking.'.self::class.'.edit',$content,
 			$sel_options,$readonlys,array(
 				'comp_data' => $this->comp->data,
 				'view' => $view,
@@ -439,7 +439,7 @@ class ranking_competition_ui extends Base
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
-				'get_rows'       =>	'ranking.ranking_competition_ui.get_rows',
+				'get_rows'       =>	'ranking.'.self::class.'.get_rows',
 				'no_filter'      => True,// I  disable the 1. filter
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 				'bottom_too'     => True,// I  show the nextmatch-line (arrows, filters, search, ...) again after the rows
@@ -470,7 +470,7 @@ class ranking_competition_ui extends Base
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('competitions');
 		$tmpl = new Api\Etemplate('ranking.comp.list');
-		$tmpl->exec('ranking.ranking_competition_ui.index',$content,array(
+		$tmpl->exec('ranking.'.self::class.'.index',$content,array(
 			'nation' => $this->ranking_nations,
 //			'serie'  => $this->cup->names(array(),true),
 			'discipline' => $this->disciplines,
@@ -490,13 +490,13 @@ class ranking_competition_ui extends Base
 				'caption' => 'Edit',
 				'default' => true,
 				'allowOnMultiple' => false,
-				'url' => 'menuaction=ranking.ranking_competition_ui.edit&WetId=$id',
+				'url' => 'menuaction=ranking.'.self::class.'.edit&WetId=$id',
 				'popup' => '900x500',
 				'group' => $group=0,
 			),
 			'add' => array(
 				'caption' => 'Add',
-				'url' => 'menuaction=ranking.ranking_competition_ui.edit',
+				'url' => 'menuaction=ranking.'.self::class.'.edit',
 				'popup' => '900x500',
 				'disabled' => !$this->edit_rights && !$this->is_admin,
 				'group' => $group,
@@ -504,7 +504,7 @@ class ranking_competition_ui extends Base
 			'copy' => array(
 				'caption' => 'Copy',
 				'allowOnMultiple' => false,
-				'url' => 'menuaction=ranking.ranking_competition_ui.edit&copy=$id',
+				'url' => 'menuaction=ranking.'.self::class.'.edit&copy=$id',
 				'popup' => '900x500',
 				'group' => $group,
 			),

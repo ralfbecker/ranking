@@ -10,10 +10,12 @@
  * @copyright 2011-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking\Category;
+
 use EGroupware\Api;
 use EGroupware\Ranking\Base;
 
-class ranking_cats_ui extends Base
+class Ui extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -51,7 +53,7 @@ class ranking_cats_ui extends Base
 			}
 			$matches = null;
 			$referer = preg_match('/menuaction=([^&]+)/',$_SERVER['HTTP_REFERER'],$matches) ?
-				$matches[1] : 'ranking.ranking_cats_ui.index';
+				$matches[1] : 'ranking.'.self::class.'.index';
 			$results = $this->cats->data['results'];
 		}
 		else
@@ -152,7 +154,7 @@ class ranking_cats_ui extends Base
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Category'));
 
 		$tmpl = new Api\Etemplate('ranking.cat.edit');
-		$tmpl->exec('ranking.ranking_cats_ui.edit',$content,
+		$tmpl->exec('ranking.'.self::class.'.edit',$content,
 			$sel_options,$readonlys,array(
 				'cat_data' => $this->cats->data,
 				'view' => $view,
@@ -250,7 +252,7 @@ class ranking_cats_ui extends Base
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
-				'get_rows'       =>	'ranking.ranking_cats_ui.get_rows',
+				'get_rows'       =>	'ranking.'.self::class.'.get_rows',
 				'no_cat'         => True,// I  disable the cat-selectbox
 				'no_filter'      => True,
 				'no_filter2'     => True,
@@ -276,7 +278,7 @@ class ranking_cats_ui extends Base
 		$this->set_ui_state();
 
 		$tmpl = new Api\Etemplate('ranking.cat.list');
-		$tmpl->exec('ranking.ranking_cats_ui.index',$content,array(
+		$tmpl->exec('ranking.'.self::class.'.index',$content,array(
 			'nation' => $this->ranking_nations,
 			'sex'    => array_merge($this->genders,array(''=>'')),	// no none
 			'discipline' => $this->disciplines,
@@ -295,13 +297,13 @@ class ranking_cats_ui extends Base
 				'caption' => 'Edit',
 				'default' => true,
 				'allowOnMultiple' => false,
-				'url' => 'menuaction=ranking.ranking_cats_ui.edit&GrpId=$id',
+				'url' => 'menuaction=ranking.'.self::class.'.edit&GrpId=$id',
 				'popup' => '660x400',
 				'group' => $group=0,
 			),
 			'add' => array(
 				'caption' => 'Add',
-				'url' => 'menuaction=ranking.ranking_cats_ui.edit',
+				'url' => 'menuaction=ranking.'.self::class.'.edit',
 				'popup' => '660x400',
 				'disabled' => $this->is_admin,
 				'group' => $group,

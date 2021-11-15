@@ -10,12 +10,14 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking\Registration;
+
 use EGroupware\Api;
 use EGroupware\Ranking\Base;
 use EGroupware\Ranking\Selfservice;
 use EGroupware\Ranking\Registration;
 
-class ranking_registration_ui extends Base
+class Ui extends Base
 {
 	/**
 	 * functions callable via menuaction
@@ -428,7 +430,7 @@ class ranking_registration_ui extends Base
 				$state = (array)Api\Cache::getSession('ranking', 'registration');
 			}
 			$state += array(
-				'get_rows'       =>	'ranking.ranking_registration_ui.get_rows',
+				'get_rows'       =>	'ranking.'.self::class.'.get_rows',
 				'no_cat'         => true,
 				'no_filter'      => true,
 				'no_filter2'     => true,
@@ -524,7 +526,7 @@ class ranking_registration_ui extends Base
 			'mail'     => $this->mail_defaults(),
 		);
 		//_debug_array($cont);
-		return $tmpl->exec('ranking.ranking_registration_ui.index', $cont, $select_options, $readonlys, $preserv);
+		return $tmpl->exec('ranking.'.self::class.'.index', $cont, $select_options, $readonlys, $preserv);
 	}
 
 	/**
@@ -945,7 +947,7 @@ class ranking_registration_ui extends Base
 				$comp['WetId']	=> $comp['name']
 			)+$select_options['comp'];
 		}
-		return $tmpl->exec('ranking.ranking_registration_ui.result',$cont,$select_options,$readonlys,$preserv);
+		return $tmpl->exec('ranking.'.self::class.'.result',$cont,$select_options,$readonlys,$preserv);
 	}
 
 	/**

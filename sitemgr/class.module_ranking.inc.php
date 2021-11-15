@@ -21,6 +21,6 @@ class module_ranking extends sitemgr_module
 		$this->title = lang('Ranking');
 		$this->description = lang('This module displays information from the ranking app.');
 
-		$this->etemplate_method = 'ranking.ranking_registration_ui.lists';
+		$this->etemplate_method = 'ranking.EGroupware\\Ranking\\Registration\\Ui.lists';
 	}
 }

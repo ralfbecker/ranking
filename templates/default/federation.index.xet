@@ -53,7 +53,7 @@
 		</styles>
 	</template>
 	<template id="ranking.federation.index.left" template="" lang="" group="0" version="1.9.001">
-		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_federation_ui.edit',false,'640x480');"/>
+		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.EGroupware\\Ranking\\Federation\\Ui.edit',false,'640x480');"/>
 	</template>
 	<template id="ranking.federation.index" template="" lang="" group="0" version="1.9.001">
 		<nextmatch id="nm" template="ranking.federation.index.rows" header_left="ranking.federation.index.left"/>

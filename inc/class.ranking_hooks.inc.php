@@ -12,8 +12,13 @@
 
 use EGroupware\Api;
 use EGroupware\Api\Egw;
-use EGroupware\Ranking\Athlete;
 use EGroupware\Ranking\Base;
+use EGroupware\Ranking\Athlete;
+use EGroupware\Ranking\Federation;
+use EGroupware\Ranking\Cup;
+use EGroupware\Ranking\Competition;
+use EGroupware\Ranking\Category;
+use EGroupware\Ranking\Registration;
 
 /**
  * Rankings - Hooks: diverse static methods to be called as hooks
@@ -33,13 +38,13 @@ class ranking_hooks
 
 			$links = array(
 				'Athletes'      => Egw::link('/index.php',array('menuaction' => 'ranking.'.Athlete\Ui::class.'.index','ajax' => 'true')),
-				'Federations'   => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_federation_ui.index','ajax' => 'true')),
-				'Competitions'  => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_competition_ui.index','ajax' => 'true')),
-				'Cups'          => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_cup_ui.index','ajax' => 'true')),
-				'Categories'    => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_cats_ui.index','ajax' => 'true')),
-				'Registration'  => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.index','ajax' => 'true')),
+				'Federations'   => Egw::link('/index.php',array('menuaction' => 'ranking.'.Federation\Ui::class.'.index','ajax' => 'true')),
+				'Competitions'  => Egw::link('/index.php',array('menuaction' => 'ranking.'.Competition\Ui::class.'.index','ajax' => 'true')),
+				'Cups'          => Egw::link('/index.php',array('menuaction' => 'ranking.'.Cup\Ui::class.'.index','ajax' => 'true')),
+				'Categories'    => Egw::link('/index.php',array('menuaction' => 'ranking.'.Category\Ui::class.'.index','ajax' => 'true')),
+				'Registration'  => Egw::link('/index.php',array('menuaction' => 'ranking.'.Registration\Ui::class.'.index','ajax' => 'true')),
 				'Resultservice' => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_result_ui.index','ajax' => 'true')),
-				'Results'       => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_registration_ui.result','ajax' => 'true')),
+				'Results'       => Egw::link('/index.php',array('menuaction' => 'ranking.'.Registration\Ui::class.'.result','ajax' => 'true')),
 				'Ranking'       => Egw::link('/index.php',array('menuaction' => 'ranking.uiranking.index','ajax' => 'true')),
 				'Accounting'    => Egw::link('/index.php',array('menuaction' => 'ranking.ranking_accounting.index','ajax' => 'true')),
 			);

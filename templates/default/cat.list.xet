@@ -38,7 +38,7 @@
 		</grid>
 	</template>
 	<template id="ranking.cat.left" template="" lang="" group="0" version="1.9.001">
-		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.ranking_cats_ui.edit',false,'660x400');"/>
+		<buttononly label="Add" id="add" onclick="egw.open_link('ranking.EGroupware\\Ranking\\Category\\Ui.edit',false,'660x400');"/>
 	</template>
 	<template id="ranking.cat.list" template="" lang="" group="0" version="1.9.001">
 		<nextmatch options="ranking.cat.list.rows" id="nm" header_left="ranking.cat.left" />

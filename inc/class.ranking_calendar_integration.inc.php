@@ -10,6 +10,7 @@
  */
 
 use EGroupware\Api;
+use EGroupware\Ranking\Competition;
 
 /**
  * Ranking Calendar Integration
@@ -37,7 +38,7 @@ class ranking_calendar_integration
 	static public function calendar_search_union(array $data)
 	{
 		//_debug_array($data);
-		$config = config::read(self::APP_NAME);
+		$config = Api\Config::read(self::APP_NAME);
 		$db_name = $config['ranking_db_name'];
 
 		$app_cols = array(
@@ -102,7 +103,7 @@ class ranking_calendar_integration
 				)
 			),
 			'edit_link' => array(
-				'edit' => array('menuaction' => 'ranking.ranking_competition_ui.edit'),
+				'edit' => array('menuaction' => 'ranking.'.Competition\Ui::class.'.edit'),
 				'edit_id' => 'WetId',
 				'edit_popup' => '900x400',
 			),
@@ -175,13 +176,13 @@ class ranking_calendar_integration
 		else
 		{
 			// special handling for egw_cal, as old databases have a different column order!!!
-			$cols = egw_cache::getInstance(__CLASS__,$table);
+			$cols = Api\Cache::getInstance(__CLASS__,$table);
 
 			if (is_null($cols))
 			{
 				$meta = $GLOBALS['egw']->db->metadata($table,true);
 				$cols = array_keys($meta['meta']);
-				egw_cache::setInstance(__CLASS__,$table,$cols);
+				Api\Cache::setInstance(__CLASS__,$table,$cols);
 			}
 		}
 		return $cols;

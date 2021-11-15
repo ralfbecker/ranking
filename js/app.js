@@ -1619,7 +1619,7 @@ var RankingApp = /** @class */ (function (_super) {
                 reason.set_disabled(true);
             }
             var filter = this.register_nm.getValue();
-            this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
+            this.egw.request('ranking.EGroupware\\Ranking\\Registration\\Ui.ajax_register', [{
                     WetId: replace ? replace.WetId : filter.comp,
                     GrpId: replace ? replace.GrpId : value.GrpId,
                     PerId: athletes,
@@ -1698,7 +1698,7 @@ var RankingApp = /** @class */ (function (_super) {
                 }
                 else {
                     // resend request with confirmation to server
-                    _this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
+                    _this.egw.request('ranking.EGroupware\\Ranking\\Registration\\Ui.ajax_register', [{
                             WetId: _data.WetId,
                             GrpId: _data.GrpId,
                             PerId: _data.PerId,
@@ -1739,7 +1739,7 @@ var RankingApp = /** @class */ (function (_super) {
     RankingApp.prototype.replace_action = function (_action, _selected) {
         var data = this.egw.dataGetUIDdata(_selected[0].id);
         this._register(null, this.et2, null, data.data);
-        /*this.egw.json('ranking.ranking_registration_ui.ajax_register', [{
+        /*this.egw.json('ranking.EGroupware\\Ranking\\Registration\\Ui.ajax_register', [{
             WetId: data.data.WetId,
             GrpId: data.data.GrpId,
             PerId: data.data.PerId,
@@ -1755,7 +1755,7 @@ var RankingApp = /** @class */ (function (_super) {
     RankingApp.prototype.register_action = function (_action, _selected) {
         var _this = this;
         var data = this.egw.dataGetUIDdata(_selected[0].id);
-        this.egw.request('ranking.ranking_registration_ui.ajax_register', [{
+        this.egw.request('ranking.EGroupware\\Ranking\\Registration\\Ui.ajax_register', [{
                 WetId: data.data.WetId,
                 GrpId: data.data.GrpId,
                 PerId: data.data.PerId,
@@ -1827,7 +1827,7 @@ var RankingApp = /** @class */ (function (_super) {
         var dialog = et2_core_widget_1.et2_createWidget("dialog", {
             // If you use a template, the second parameter will be the value of the template, as if it were submitted.
             callback: function (_button, _values) {
-                this.egw.json('ranking.ranking_registration_ui.ajax_mail', [_values, _button, selection, filters], null, null, false, this).sendRequest();
+                this.egw.json('ranking.EGroupware\\Ranking\\Registration\\Ui.ajax_mail', [_values, _button, selection, filters], null, null, false, this).sendRequest();
             }.bind(this),
             buttons: buttons,
             title: this.egw.lang('Mail participants'),

@@ -10,11 +10,13 @@
  * @copyright 2006-19 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
+namespace EGroupware\Ranking\Cup;
+
 use EGroupware\Api;
 use EGroupware\Ranking\Base;
 use EGroupware\Ranking\Federation;
 
-class ranking_cup_ui extends Base
+class Ui extends Base
 {
 	/**
 	 * @var array $public_functions functions callable via menuaction
@@ -55,7 +57,6 @@ class ranking_cup_ui extends Base
 		}
 		else
 		{
-			//echo "<br>ranking_cup_ui::edit: content ="; _debug_array($_content);
 			$button = key($_content['button']);
 			unset($_content['button']);
 
@@ -80,8 +81,6 @@ class ranking_cup_ui extends Base
 			$this->cup->data = $_content['cup_data'];
 			unset($_content['cup_data']);
 			$this->cup->data_merge($_content);
-
-			//echo "<br>ranking_cup_ui::edit: cup->data ="; _debug_array($this->cup->data);
 
 			if (!$view && in_array($button, ['save','apply']) && $this->acl_check_comp($this->cup->data))
 			{
@@ -189,7 +188,7 @@ class ranking_cup_ui extends Base
 			}
 		}
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('cup'));
-		$tmpl->exec('ranking.ranking_cup_ui.edit',$content,
+		$tmpl->exec('ranking.'.self::class.'.edit',$content,
 			$sel_options,$readonlys,array(
 				'cup_data' => $this->cup->data,
 				'view' => $view,
@@ -268,7 +267,7 @@ class ranking_cup_ui extends Base
 		if (!is_array($content['nm']))
 		{
 			$content['nm'] = array(
-				'get_rows'       =>	'ranking.ranking_cup_ui.get_rows',
+				'get_rows'       =>	'ranking.'.self::class.'.get_rows',
 				'no_filter'      => True,// I  disable the 1. filter
 				'no_filter2'     => True,// I  disable the 2. filter (params are the same as for filter)
 				'no_cat'         => True,// I  disable the cat-selectbox
@@ -294,7 +293,7 @@ class ranking_cup_ui extends Base
 
 		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang('cups');
 		$tmpl = new Api\Etemplate('ranking.cup.list');
-		$tmpl->exec('ranking.ranking_cup_ui.index',$content,array(
+		$tmpl->exec('ranking.'.self::class.'.index',$content,array(
 			'nation' => $this->ranking_nations,
 		));
 	}
@@ -311,20 +310,20 @@ class ranking_cup_ui extends Base
 				'caption' => 'Edit',
 				'default' => true,
 				'allowOnMultiple' => false,
-				'url' => 'menuaction=ranking.ranking_cup_ui.edit&SerId=$id',
+				'url' => 'menuaction=ranking.'.self::class.'.edit&SerId=$id',
 				'popup' => '720x450',
 				'group' => $group=0,
 			),
 			'add' => array(
 				'caption' => 'Add',
-				'url' => 'menuaction=ranking.ranking_cup_ui.edit',
+				'url' => 'menuaction=ranking.'.self::class.'.edit',
 				'popup' => '720x450',
 				'disabled' => !$this->edit_rights && !$this->is_admin,
 				'group' => $group,
 			),
 			'copy' => array(
 				'caption' => 'Copy',
-				'url' => 'menuaction=ranking.ranking_cup_ui.edit&copy=$id',
+				'url' => 'menuaction=ranking.'.self::class.'.edit&copy=$id',
 				'popup' => '720x450',
 				'disabled' => !$this->edit_rights && !$this->is_admin,
 				'group' => $group,
