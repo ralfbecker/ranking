@@ -1316,18 +1316,18 @@ class Athlete extends Api\Storage\Base
 		$this->data['modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 		$this->data['modified'] = $this->now;
 
-		if (!($err = parent::save()) && $this->data['fed_id'])
+		if (!($err = parent::save()))
 		{
-			$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']) && isset($old);
-
+			if ($this->data['fed_id'])
+			{
+				$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']) && isset($old);
+			}
 			// send email notifications and do the history logging
 			if (!is_object($this->tracking))
 			{
 				$this->tracking = new Athlete\Tracking(Base::getInstance());
 			}
-
 			$this->tracking->track($this->data, $old ?: null);
-
 		}
 		return $err;
 	}

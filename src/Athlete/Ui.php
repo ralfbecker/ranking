@@ -264,9 +264,10 @@ class Ui extends Base
 						$msg .= 'Error: '.lang('Email addresses do NOT match!');
 						Api\Etemplate::set_validation_error('email2', 'Email addresses do NOT match!');
 					}
-					elseif ($this->is_selfservice() === 'new' && !(new Selfservice())->checkRegister($content))
+					elseif ($this->is_selfservice() === 'new' && (new Selfservice())->checkAlreadyRegistered($content))
 					{
-						$msg .= 'Error: '.lang('You are already registered, please use the password reset or ask your federation to set a correct email address.');
+						$msg .= 'Error: '.lang('You are already registered, please use the password reset or ask your federation (%1) to set a correct email address.',
+							$this->federation->get_contacts($content));
 					}
 					elseif ($this->athlete->save(null, null, $fed_changed))
 					{

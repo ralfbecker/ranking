@@ -79,7 +79,7 @@ class Selfservice extends Base
 			Api\Translation::init();
 		}
 		// check if athlete contented to store his data, if not show consent screen
-		if (!in_array($action, ['logout', 'apply']) && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
+		if (!in_array($action, ['logout', 'apply', 'recovery', 'password']) && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
 		{
 			$this->consentDataStorage($athlete, $lang);
 		}
@@ -712,9 +712,10 @@ class Selfservice extends Base
 	 * If everything or everything but email matches, we reject registering the athlete again.
 	 *
 	 * @param array $data
-	 * @return array with matching fields
+	 * @param ?array& $matches on return matching fields
+	 * @return ?array with already registered athlete
 	 */
-	public function checkRegister(array $data)
+	public function checkAlreadyRegistered(array $data, array &$matches=null)
 	{
 		$what = array_intersect_key($data, array_flip(['email', 'vorname', 'nachname', 'geb_date']));
 		$found = $this->athlete->search($what, array_keys($what), 'email,nachname,vorname', '', '', '', 'OR', false, [
@@ -735,10 +736,10 @@ class Selfservice extends Base
 				// all compared fields, but email match --> not allowed
 				!isset($matches['email']) && count($matches) === count($what)-1)
 			{
-				return $matches;
+				return $athlete;
 			}
 		}
-		return [];
+		return null;
 	}
 
 	/**
@@ -749,6 +750,7 @@ class Selfservice extends Base
 	public function continueApply(array $athlete)
 	{
 		$this->is_selfservice($athlete['PerId']);
+		//$this->athlete->set_license(date('Y'), 'r',$athlete['PerId'], $athlete['nation'], null);
 
 		Api\Framework::redirect_link('/ranking/athlete.php', [
 			'PerId' => $athlete['PerId'],
