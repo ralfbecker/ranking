@@ -118,8 +118,11 @@ class Selfservice extends Base
 				// fall through
 			case 'recovery':
 			case 'password':
-			case 'set':
 				$this->auth($athlete, $action);
+				break;
+
+			case 'set':
+				// setting is done in auth() call above
 				break;
 
 			default:
@@ -395,6 +398,14 @@ class Selfservice extends Base
 	 * Name of cookie holding last successful used selfregister email
 	 */
 	const EMAIL_COOKIE = 'digitalrock-selfregister-email';
+	/**
+	 * Minimum PW length
+	 */
+	const PW_MIN_LENGTH = 7;
+	/**
+	 * PW strength, number or char classes, should fit with text:
+	 */
+	const PW_REQ_STRENGTH = 4;
 
 	/**
 	 * Athlete selfservice: password check and recovery
@@ -475,7 +486,7 @@ class Selfservice extends Base
 						{
 							echo "<p class='error'>".lang('Both password do NOT match!')."</p>\n";
 						}
-						elseif(($msg = Api\Auth::crackcheck($_POST['password'])))
+						elseif(($msg = Api\Auth::crackcheck($_POST['password'], self::PW_REQ_STRENGTH, self::PW_MIN_LENGTH)))
 						{
 							echo "<p class='error'>".$msg."</p>\n";
 						}
@@ -511,7 +522,7 @@ class Selfservice extends Base
 						'cd' => 'no',
 					));
 					echo "<p>".lang("Please enter your new password:")."<br />\n".
-						'('.lang('Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.',7).")</p>\n";
+						'('.lang('Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.', self::PW_MIN_LENGTH).")</p>\n";
 					echo "<form action='$link' method='POST'>\n<table>\n";
 					echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' value='".htmlspecialchars($_POST['password'])."' /></td>".
 						"<td><label><input type='checkbox' id='show_passwd'>".lang('show password')."</label></td></tr>\n";
