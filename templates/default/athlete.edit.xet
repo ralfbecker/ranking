@@ -244,9 +244,9 @@
 				</row>
 				<row class="th">
 					<description for="verband" value="Federation"/>
-					<select class="selectboxFullWidth" id="fed_id" span="2"/>
+					<select class="selectboxFullWidth" id="fed_id" span="2" search="true"/>
 					<description value="since" id="a2f_start"/>
-					<select id="acl_fed_id[fed_id]" options="Administrated by: parent federation" class="selectboxFullWidth" span="all"/>
+					<select id="acl_fed_id[fed_id]" empty_label="Administrated by: parent federation" class="selectboxFullWidth" span="all" search="true"/>
 				</row>
 				<row>
 					<tabbox id="tabs" span="all" tab_height="250px">

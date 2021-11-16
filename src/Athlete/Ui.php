@@ -145,7 +145,12 @@ class Ui extends Base
 				}
 				$this->presetFederation($this->athlete->data, $nations, $feds_with_grants);
 			}
-			if (!$nations && $this->is_selfservice() !== 'new')
+			if ($this->is_selfservice() === 'new')
+			{
+				$content['license'] = 'r';
+				$content['license_nation'] = $content['nation'];
+			}
+			elseif (!$nations)
 			{
 				Framework::window_close(lang('Permission denied'));
 			}
@@ -182,7 +187,7 @@ class Ui extends Base
 			}
 			$old_geb_date = $this->athlete->data['geb_date'];
 
-			$button = key($content['button']);
+			$button = key($content['button'] ?? []);
 			unset($content['button']);
 
 			$this->athlete->data_merge($content);
@@ -253,6 +258,15 @@ class Ui extends Base
 					elseif ($this->athlete->not_unique())
 					{
 						$msg .= lang("Error: Key '%1' exists already, it has to be unique !!!",$this->athlete->data['rkey']);
+					}
+					elseif (isset($content['email2']) && $content['email'] !== $content['email2'])
+					{
+						$msg .= 'Error: '.lang('Email addresses do NOT match!');
+						Api\Etemplate::set_validation_error('email2', 'Email addresses do NOT match!');
+					}
+					elseif ($this->is_selfservice() === 'new' && !(new Selfservice())->checkRegister($content))
+					{
+						$msg .= 'Error: '.lang('You are already registered, please use the password reset or ask your federation to set a correct email address.');
 					}
 					elseif ($this->athlete->save(null, null, $fed_changed))
 					{
@@ -397,6 +411,12 @@ class Ui extends Base
 					$msg .= lang('Permission denied !!!').' ('.$this->athlete->data['nation'].')';
 				}
 			}
+			// selfservice applying for a license
+			if ($this->is_selfservice() === 'new' && !empty($this->athlete->data['PerId']) && $this->athlete->data['PerId'] !== 'new')
+			{
+				$selfservice = new Selfservice();
+				return $selfservice->continueApply($this->athlete->data);
+			}
 			if ($button === 'pw_mail')
 			{
 				try {
@@ -433,7 +453,7 @@ class Ui extends Base
 			}
 		}
 		$shown_msg = null;
-		if (true) $content = array(
+		$content = array(
 			'acl' => !empty($content['acl']) ? $content['acl'] : $this->athlete->data['acl'],
 		) + $this->athlete->data + array(
 			'msg' => $msg,
@@ -445,6 +465,7 @@ class Ui extends Base
 			'license_year' => $content['license_year'],
 			'license_nation' => $content['license_nation'],
 			'license_cat' => $content['license_cat'],
+			'email2' => $content['email2'],
 		);
 		// give explicit message if profile is hidden or why it is shown
 		if (empty($content['profile_status']))
@@ -463,12 +484,12 @@ class Ui extends Base
 			{
 				$content['acl'] = array_sum($content['acl']);
 			}
-			if (in_array(Athlete::ACL_DENY_ALL, $content['custom_acl']))
+			if ($this->athlete->aclSet(Athlete::ACL_DENY_ALL, $content['custom_acl']))
 			{
 				//$content['acl'] = Athlete::ACL_DENY_ALL;
 				$content['acl'] = 'custom';
 			}
-			elseif (in_array(Athlete::ACL_DENY_PROFILE, $content['custom_acl']))
+			elseif ($this->athlete->aclSet(Athlete::ACL_DENY_PROFILE, $content['custom_acl']))
 			{
 				$content['acl'] = Athlete::ACL_DENY_PROFILE;
 			}
@@ -513,13 +534,18 @@ Continuer';
 			'custom_acl' => self::$acl_deny_labels,
 			'license'=> $this->license_labels,
 			'fed_id' => !$content['nation'] ? array(lang('Select a nation first')) :
-				$this->athlete->federations($content['nation'],false,$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
+				$this->athlete->federations($content['nation'],$content['nation'] === 'GER' ? null : false,$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
 			'license_nation' => ($license_nations = $this->license_nations),
 			'license_cat' => $this->cats->names(array(
 				'sex' => $content['sex'] ? ($content['sex']=='male'?'!female':'!male') : null,
 				'nation' => $content['license_nation'] != 'NULL' ? $content['license_nation'] : null,
 			),0),
 		);
+		if (!empty($content['fed_id']) && !isset($sel_options['fed_id'][$content['fed_id']]))
+		{
+			$sel_options['fed_id'][$content['fed_id']] = ($fed = $this->federation->read(['fed_id' => $content['fed_id']])) ?
+				$fed['verband'] : '#'.$content['fed_id'];
+		}
 		$edit_rights = $this->acl_check_athlete($this->athlete->data);
 		$readonlys = array(
 			'button[delete]' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->has_results(),
@@ -620,6 +646,7 @@ Continuer';
 				'old_license_nation' => $content['license_nation'],
 				'acl_fed_id' => $content['acl_fed_id'],
 				'custom_acl' => $content['custom_acl'],
+				'acl' => $content['acl'],
 			),2);
 	}
 
@@ -703,7 +730,7 @@ Continuer';
 			}
 			else
 			{
-				$sel_options[$name] = array(1+$query['col_filter'][$name] => lang('Select a nation first'));
+				$sel_options[$name] = array(1+(int)$query['col_filter'][$name] => lang('Select a nation first'));
 			}
 			if (!isset($sel_options[$name][$query['col_filter'][$name]]))
 			{

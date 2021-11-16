@@ -26,23 +26,36 @@
 					<url-email id="email2" size="32" maxlength="60" needed="true"/>
 				</row>
 				<row class="row">
-					<description for="sex" value="Gender"/>
-					<select statustext="gender of the athlete" id="sex" needed="true" empty_label="Select one"/>
-					<description for="nation" value="Nation"/>
-					<select statustext="nation the athlete is competing for" id="nation" needed="true" no_lang="true" onchange="1" empty_label="Select one"/>
-				</row>
-				<row class="row">
 					<description for="geb_date" value="Birthdate"/>
 					<date id="geb_date" data_format="Y-m-d" year_range="-70:+0" needed="true" class="et2_required"/>
+					<description for="sex" value="Gender"/>
+					<select statustext="gender of the athlete" id="sex" needed="true" empty_label="Select one"/>
+				</row>
+				<row class="row">
+					<description for="mobil" value="Cellphone"/>
+					<url-phone id="mobil" size="32" maxlength="60" needed="true"/>
+					<description for="tel" value="Phone"/>
+					<url-phone id="tel" size="32" maxlength="60" />
+				</row>
+				<row class="row">
+					<description for="ort" value="City"/>
+					<hbox>
+						<textbox blur="Postalcode" id="plz" size="8" maxlength="8"/>
+						<textbox id="ort" size="30" maxlength="60" needed="true"/>
+					</hbox>
+					<description for="strasse" value="Street"/>
+					<textbox id="strasse" size="30" maxlength="60"/>
 				</row>
 				<row class="th">
 					<description for="verband" value="DAV Sektion"/>
-					<select class="selectboxFullWidth" id="fed_id" span="all" needed="true" empty_label="Select one"/>
+					<select class="selectboxFullWidth" id="fed_id" needed="true" empty_label="Select one" search="true"/>
+					<description for="nation" value="Nation"/>
+					<select statustext="nation the athlete is competing for" id="nation" needed="true" no_lang="true" onchange="1" empty_label="Select one"/>
 				</row>
 				<row class="dialogFooterToolbar">
 					<hbox span="2">
-						<button statustext="Applies the changes made" label="Apply" id="button[apply]"/>
-						<button statustext="exists without saving the changes" label="Cancel" id="button[cancel]" onclick="window.close();"/>
+						<button label="Continue" id="button[apply]"/>
+						<button label="Cancel" id="button[cancel]" onclick="window.close();"/>
 					</hbox>
 				</row>
 			</rows>

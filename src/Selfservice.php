@@ -66,7 +66,7 @@ class Selfservice extends Base
 		{
 			echo "<h1 id='action-$action'>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
 		}
-		if ($_action !== 'apply' && (!$athlete || !$this->acl_check_athlete($athlete) && !$this->is_selfservice() == $PerId) &&
+		if ($_action !== 'apply' && (!$athlete || !$this->acl_check_athlete($athlete) && $this->is_selfservice() != $PerId) &&
 			!($PerId = $this->auth($athlete, $action)))
 		{
 			$this->showFooter($nation2lang[$athlete['nation']]);
@@ -703,5 +703,56 @@ class Selfservice extends Base
 			$mailer->setFrom($from);
 		}
 		$mailer->send();
+	}
+
+	/**
+	 * Check if athlete trying to register already registered
+	 *
+	 * We test email, first- and lastname and birthday.
+	 * If everything or everything but email matches, we reject registering the athlete again.
+	 *
+	 * @param array $data
+	 * @return array with matching fields
+	 */
+	public function checkRegister(array $data)
+	{
+		$what = array_intersect_key($data, array_flip(['email', 'vorname', 'nachname', 'geb_date']));
+		$found = $this->athlete->search($what, array_keys($what), 'email,nachname,vorname', '', '', '', 'OR', false, [
+			'nation' => $data['nation'],
+			'sex'    => $data['sex'],
+		]) ?: [];
+		foreach($found as $athlete)
+		{
+			$matches = array_intersect_assoc($athlete, $what);
+			// for the birthdate we also consider just a matching year, if one of the dates is 1st of Jan
+			if (!isset($matches['geb_date']) && (substr($data['geb_date'], 4) === '-01-01' || substr($athlete['geb_date'], 4) === '-01-01') &&
+				substr($data['geb_date'], 0, 4) === substr($athlete['geb_date'], 0, 4))
+			{
+				$matches['geb_date'] = $data['geb_date'];
+			}
+			// all compared fields match --> not allowed
+			if (count($matches) === count($what) ||
+				// all compared fields, but email match --> not allowed
+				!isset($matches['email']) && count($matches) === count($what)-1)
+			{
+				return $matches;
+			}
+		}
+		return [];
+	}
+
+	/**
+	 * Continue with applying for a license, after athlete data has been stored
+	 *
+	 * @param array $athlete
+	 */
+	public function continueApply(array $athlete)
+	{
+		$this->is_selfservice($athlete['PerId']);
+
+		Api\Framework::redirect_link('/ranking/athlete.php', [
+			'PerId' => $athlete['PerId'],
+			'action' => 'recovery',
+		]);
 	}
 }

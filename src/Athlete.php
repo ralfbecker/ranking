@@ -1176,19 +1176,29 @@ class Athlete extends Api\Storage\Base
 	 * Return a list of federation names indexed by fed_id, evtl. of a given nation only
 	 *
 	 * @param string $nation =null
-	 * @param boolean $only_national =false if true return only national federations (fed_parent=NULL)
+	 * @param ?boolean $only_national =false if true return only national federations (fed_parent=NULL)
 	 * @return array
 	 */
-	function federations($nation=null,$only_national=false,$filter = array())
+	function federations($nation=null, $only_national=false,$filter = array())
 	{
 		$feds = array();
-		if ($nation) $filter['nation'] = $nation;
-		if ($only_national) $filter[] = 'fed_parent IS NULL';
-
-		foreach($this->db->select(self::FEDERATIONS_TABLE,'fed_id,verband,nation',$filter,__LINE__,__FILE__,false,
-			'ORDER BY nation ASC,verband ASC','ranking') as $fed)
+		if ($nation) $filter[] = self::FEDERATIONS_TABLE.'.nation='.$this->db->quote($nation, 'varchar');
+		if ($only_national)
 		{
-			$feds[$fed['fed_id']] = (!$nation ? $fed['nation'].': ' : '').$fed['verband'];
+			$filter[] = 'fed_parent IS NULL';
+		}
+		elseif($only_national === null)
+		{
+			$join = ' LEFT JOIN '.self::FEDERATIONS_TABLE.' children ON children.fed_parent='.self::FEDERATIONS_TABLE.'.fed_id';
+			$filter[] = 'children.fed_id IS NULL';
+		}
+
+		foreach($this->db->select(self::FEDERATIONS_TABLE, array_map(static function($col)
+		{
+			return self::FEDERATIONS_TABLE.'.'.$col.' AS '.$col;
+		}, ['fed_id','verband','nation']), $filter, __LINE__, __FILE__, false, 'ORDER BY nation ASC,verband ASC','ranking', 0, $join ?? '') as $fed)
+		{
+			$feds[$fed['fed_id']] = (empty($nation) ? $fed['nation'].': ' : '').$fed['verband'];
 		}
 		return $feds;
 	}
@@ -1281,16 +1291,21 @@ class Athlete extends Api\Storage\Base
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
 
 		// we need to get the old values to update the links in customfields and for the tracking
-		if ($this->data['PerId'])
+		if ($this->data['PerId'] && $this->data['PerId'] !== 'new')
 		{
 			$current = $this->data;
 			$old = $this->read($this->data['PerId'], false);
 			$this->data = $current;
 		}
-		// automatic generate an rkey for new entries
-		elseif (empty($this->data['rkey']))
+		else
 		{
-			$this->generate_rkey();
+			unset($this->data['PerId']);
+
+			// automatic generate an rkey for new entries
+			if (empty($this->data['rkey']))
+			{
+				$this->generate_rkey();
+			}
 		}
 		// get fed_id from national federation, if fed_id is not given but nation
 		if (!$this->data['fed_id'] && $this->data['nation'] &&
@@ -1303,15 +1318,15 @@ class Athlete extends Api\Storage\Base
 
 		if (!($err = parent::save()) && $this->data['fed_id'])
 		{
-			$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']);
+			$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']) && isset($old);
 
 			// send email notifications and do the history logging
 			if (!is_object($this->tracking))
 			{
-				$this->tracking = new Athlete\Tracking($this);
+				$this->tracking = new Athlete\Tracking(Base::getInstance());
 			}
 
-			$this->tracking->track($this->data,$old);
+			$this->tracking->track($this->data, $old ?: null);
 
 		}
 		return $err;
@@ -1502,6 +1517,22 @@ class Athlete extends Api\Storage\Base
 				0, 'GROUP BY sex ORDER BY COUNT(*) DESC', 'ranking', 1, $join)->fetchColumn(0);
 		}
 		return $genders[$nation ?? ''][$firstname];
+	}
+
+	/**
+	 * Check if required ACL is set
+	 *
+	 * @param int $required
+	 * @param array|int|null $acl default use $this->data['acl']
+	 * @return bool
+	 */
+	public function aclSet(int $required, $acl=null)
+	{
+		if (!isset($acl))
+		{
+			$acl = $this->data['acl'];
+		}
+		return is_array($acl) ? in_array($required, $acl) : ($required & $acl) === $required;
 	}
 }
 Athlete::init_static();
