@@ -16,6 +16,7 @@ namespace EGroupware\Ranking\Athlete;
 
 use EGroupware\Api;
 use EGroupware\Ranking\Base;
+use \importexport_export_csv;
 
 /**
  * Document merge object for athletes
@@ -35,7 +36,7 @@ class Merge extends Api\Storage\Merge
 	/**
 	 * Extra placeholders that aren't in tracker fields2labels
 	 *
-	 * @var Array
+	 * @var array
 	 */
 	var $extra_placeholders = array(
 		'age' => 'age',
@@ -64,7 +65,10 @@ class Merge extends Api\Storage\Merge
 		$this->selects = array(
 			'nation' => $this->bo->athlete->distinct_list('nation'),
 			'sex'    => $this->bo->genders,
-			'acl'    => Ui::$acl_labels,
+			'acl'    => array_map(static function($option)
+			{
+				return implode(': ', array_map('lang', $option));
+			}, Ui::$acl_labels),    // Ui::$acl_labels is array with values for keys "label" and "title"
 			'custom_acl' => Ui::$acl_deny_labels,
 			'license'=> $this->bo->license_labels,
 			'fed_id' => $this->bo->athlete->federations(null, false, []),
@@ -72,7 +76,7 @@ class Merge extends Api\Storage\Merge
 			'license_cat' => $this->bo->cats->names([], 0),
 		);
 
-		// switch off handling of Api\Html formated content, if Api\Html is not used
+		// switch off handling of Api\Html formatted content, if Api\Html is not used
 		$this->parse_html_styles = Api\Storage\Customfields::use_html('ranking');
 
 		// overwrite contacts call with own implementation
