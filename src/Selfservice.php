@@ -7,7 +7,7 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2012-18 by Ralf Becker <RalfBecker@digitalrock.de>
+ * @copyright 2012-21 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 namespace EGroupware\Ranking;
@@ -49,24 +49,25 @@ class Selfservice extends Base
 		Framework::includeCSS('ranking', 'selfservice', false);
 		Framework::$navbar_done = true;	// do NOT display navbar
 		$_GET['cd'] = 'no';	// suppress framework
-		if (substr($_action, 0, 10) != 'scorecard-') echo $GLOBALS['egw']->framework->header();
+		if (substr($_action, 0, 10) !== 'scorecard-' && $_action !== 'apply')
+		{
+			echo $GLOBALS['egw']->framework->header();
+		}
 
 		$athlete = array();
 		unset($this->athlete->acl2clear[Athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
 		unset($this->athlete->acl2clear[Athlete::ACL_DENY_PROFILE]);	// same is true for a fully denied profile
-		if ($_action !== 'apply' && ($PerId || ($PerId = $this->is_selfservice()) && $PerId !== 'new') && !($athlete = $this->athlete->read($PerId)))
+		if ($_action !== 'register' && ($PerId || ($PerId = $this->is_selfservice()) && $PerId !== 'new') && !($athlete = $this->athlete->read($PerId)))
 		{
 			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
 		}
 		list($action,$action_id) = explode('-', $_action, 2);
 
-		echo '<div id="selfservice">';
-
 		if ($athlete)
 		{
-			echo "<h1 id='action-$action'>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
+			$this->athleteHeader($athlete, $action);
 		}
-		if ($_action !== 'apply' && (!$athlete || !$this->acl_check_athlete($athlete) && $this->is_selfservice() != $PerId) &&
+		if ($_action !== 'register' && (!$athlete || !$this->acl_check_athlete($athlete) && $this->is_selfservice() != $PerId) &&
 			!($PerId = $this->auth($athlete, $action)))
 		{
 			$this->showFooter($nation2lang[$athlete['nation']]);
@@ -79,7 +80,7 @@ class Selfservice extends Base
 			Api\Translation::init();
 		}
 		// check if athlete contented to store his data, if not show consent screen
-		if (!in_array($action, ['logout', 'apply', 'recovery', 'password']) && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
+		if (!in_array($action, ['logout', 'register', 'recovery', 'password']) && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
 		{
 			$this->consentDataStorage($athlete, $lang);
 		}
@@ -93,7 +94,7 @@ class Selfservice extends Base
 				));
 				break;
 
-			case 'apply':
+			case 'register':
 				$this->is_selfservice('new');
 				Egw::redirect_link('/index.php',array(
 					'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit',
@@ -103,8 +104,12 @@ class Selfservice extends Base
 				));
 				break;
 
+			case 'apply':
+				$this->applyLicense($athlete);
+				break;
+
 			case '':
-			case 'register':
+			case 'comp':
 				$this->registerComp($athlete, $action_id);
 				break;
 
@@ -355,7 +360,7 @@ class Selfservice extends Base
 
 			if (!$found++) echo "<p>".lang('Further competitions you can register for:')."</p>\n<ul>\n";
 			echo "<li>".$this->comp->datespan($comp).': '.
-				Api\Html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'register-'.$comp['WetId'])).
+				Api\Html::a_href($comp['name'], '/ranking/athlete.php', array('action' => 'comp-'.$comp['WetId'])).
 				"</li>\n";
 		}
 		if ($found) echo "</ul>\n";
@@ -380,6 +385,22 @@ class Selfservice extends Base
 			Api\Html::form_1button('logout', lang('Logout'), '',
 				'/ranking/athlete.php', array('action' => 'logout')).
 			"</div>\n";
+
+		// check if athlete has a license, if not allow to apply now
+		if (!is_array($athlete) && !($athlete = $this->athlete->read(['PerId' => $athlete])))
+		{
+			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
+		}
+		if (empty($athlete['lic_status']) || $athlete['lic_status'] === 'n')
+		{
+			echo "<div id='apply-license'>".
+				"<p>".lang('To apply for a license you are required to download the application form, sign and post it:')."</p>"."\n".
+				Api\Html::form_1button('license', lang('Apply for license'), '', '/ranking/athlete.php', array(
+					'PerId' => $athlete['PerId'],
+					'action' => 'apply',
+					'cd' => 'no',
+				))."</div>\n";
+		}
 	}
 
 	/**
@@ -430,7 +451,7 @@ class Selfservice extends Base
 			}
 			else
 			{
-				echo "<h1>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
+				$this->athleteHeader($athlete, $action);
 			}
 		}
 
@@ -587,7 +608,7 @@ class Selfservice extends Base
 			if (!$athlete)
 			{
 				echo "<p>".lang("If you have no athlete account yet and need to apply for a climbing license, you first need to register:")."\n";
-				echo "<button type='submit' name='action' value='apply'>".lang('Register / apply for climbing license')."</button></p><hr/>\n";
+				echo "<button type='submit' name='action' value='register'>".lang('Register / apply for climbing license')."</button></p><hr/>\n";
 
 				echo "<p>".lang("Please enter your EMail address and password to register for competitions or edit your profile:")."</p>\n";
 				$pw = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : $_COOKIE[self::EMAIL_COOKIE]);
@@ -758,7 +779,7 @@ class Selfservice extends Base
 	 *
 	 * @param array $athlete
 	 */
-	public function continueApply(array $athlete)
+	public function continueRegister(array $athlete)
 	{
 		$this->is_selfservice($athlete['PerId']);
 		//$this->athlete->set_license(date('Y'), 'r',$athlete['PerId'], $athlete['nation'], null);
@@ -767,5 +788,69 @@ class Selfservice extends Base
 			'PerId' => $athlete['PerId'],
 			'action' => 'recovery',
 		]);
+	}
+
+	/**
+	 * Flag for applyNotifyFederation to notify or not
+	 *
+	 * @var bool
+	 */
+	private static $notify;
+
+	/**
+	 * Apply for license: download PDF and notify federation
+	 *
+	 * @param array $athlete
+	 */
+	protected function applyLicense(array $athlete)
+	{
+		self::$notify = true;
+		Egw::on_shutdown(__CLASS__.'::applyNotifyFederation', [$athlete]);
+
+		$ui = new Athlete\Ui();
+		if (($err = $ui->applyLicense($athlete+[
+			'license_year' => date('Y'),
+			'license_nation' => $athlete['nation'], // national license
+			'license_cat' => null,  // important only for TOFs
+		], 'r')))
+		{
+			self::$notify = false;
+			// add header now, as it was not done to allow download
+			echo $GLOBALS['egw']->framework->header();
+			$this->athleteHeader($athlete);
+			echo "<p class='error'>".$err."</p>\n";
+			$this->profileAndLogoutButtons($athlete);
+		}
+	}
+
+	/**
+	 * Notify responsible person of athletes federation to approve the request
+	 *
+	 * @param array $athlete
+	 */
+	public static function applyNotifyFederation(array $athlete)
+	{
+		if (self::$notify)
+		{
+			error_log(__METHOD__.'('.json_encode($athlete).')');
+		}
+	}
+
+	/**
+	 * Show header with athlete name (for action !== 'apply')
+	 *
+	 * @param array $athlete
+	 * @param ?string $action to add as id "action-$action"
+	 */
+	private function athleteHeader(array $athlete, string $action=null)
+	{
+		if ($action === 'apply')
+		{
+			return; // apply does download
+		}
+		echo '<div id="selfservice">';
+
+		$id = isset($action) ? "id='".htmlspecialchars('action-'.$action)."'" : '';
+		echo "<h1 $id>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
 	}
 }

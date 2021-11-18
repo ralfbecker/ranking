@@ -440,7 +440,9 @@ $phpgw_baseline = array(
 			'lic_suspended' => array('type' => 'date'),
 			'lic_suspended_by' => array('type' => 'int','precision' => '4'),
 			'GrpId' => array('type' => 'int','precision' => '4','comment' => 'optional category for which license was applied'),
-			'lic_until' => array('type' => 'int','precision' => '2','comment' => 'optional end-year, default only valid in current year')
+			'lic_until' => array('type' => 'int','precision' => '2','comment' => 'optional end-year, default only valid in current year'),
+			'lic_registered' => array('type' => 'date','comment' => 'athlete registered/applied'),
+			'lic_registered_by' => array('type' => 'int','precision' => '4')
 		),
 		'pk' => array('PerId','nation','lic_year'),
 		'fk' => array(),

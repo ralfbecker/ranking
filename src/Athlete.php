@@ -1040,7 +1040,7 @@ class Athlete extends Api\Storage\Base
 			'nation' => !$nation || $nation == 'NULL' ? '' : $nation,
 			self::license_valid_sql($year),
 		);
-		if (!in_array($status,array('a','c','s'))/* || $status == 'n'*/)
+		if (!in_array($status,array('r','a','c','s'))/* || $status == 'n'*/)
 		{
 			// if a German license from a previous year get deleted, end it via lic_until the year before
 			if($nation == 'GER' && ($license=$this->db->select(self::LICENSE_TABLE,'*',$where,__LINE__,__FILE__,false,'','ranking')->fetch()) &&
@@ -1071,6 +1071,7 @@ class Athlete extends Api\Storage\Base
 			}
 			switch($status)
 			{
+				case 'r': $what = 'registered'; break;  // athlete registed/applied for license
 				case 'a': $what = 'applied'; break;
 				case 'c': $what = 'confirmed'; break;
 				case 's': $what = 'suspended'; break;

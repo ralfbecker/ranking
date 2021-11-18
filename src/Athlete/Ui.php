@@ -333,62 +333,11 @@ class Ui extends Base
 						}
 						if ($button === 'apply_license')
 						{
-							if ($content['athlete_data']['license'] == 's')
+							$msg .= $this->applyLicense($this->athlete->data+$content, 'a', $required_missing);
+							foreach ($required_missing as $name)
 							{
-								$msg .= ', '.lang('Athlete is suspended !!!');
-								$required_missing = true;	// to not download the form
-							}
-							elseif(!$this->acl_check_athlete($this->athlete->data,self::ACL_ATHLETE,null,$content['license_nation']))
-							{
-								$msg .= ', '.lang('You are not permitted to apply for a license!');
-								$required_missing = true;	// to not download the form
-							}
-							elseif ($content['athlete_data']['license'] != 'a')
-							{
-								// check for required data
-								static $required_for_license = array(
-									'vorname','nachname','nation','geb_date','sex',
-									'verband','ort','strasse','plz',
-									'email','tel','mobil'
-								);
-								foreach($required_for_license as $name)
-								{
-									if (!$this->athlete->data[$name])
-									{
-										if (!$required_missing) $msg .= ', '.lang('Required information missing, application rejected!');
-										Api\Etemplate::set_validation_error($name,lang('Field must not be empty !!!'));
-										$content['tabs'] = 'contact';
-										$required_missing = $name;
-									}
-								}
-								if (!$required_missing)
-								{
-									if ($this->athlete->set_license($content['license_year'],'a',null,$content['license_nation'],$content['license_cat']))
-									{
-										$msg .= ', '.lang('Applied for a %1 license',$content['license_year'].' '.
-											(!$content['license_nation'] || $content['license_nation'] == 'NULL' ?
-											lang('international') : $content['license_nation']));
-									}
-									else
-									{
-										$msg .= ', '.lang('Athlete is NOT in agegroup of selected license category!');
-										$required_missing = true;	// to not download the form
-									}
-								}
-							}
-							else
-							{
-								$msg .= ', '.lang('Someone already applied for a %1 license!',$content['license_year'].' '.
-									(!$content['license_nation'] || $content['license_nation'] == 'NULL' ?
-									lang('international') : $content['license_nation']));
-							}
-							// download form
-							if (!$required_missing && $this->license_form_name(
-								$content['license_nation'], $content['license_year'],
-								$content['license_cat'], $this->athlete->data['PerId']))
-							{
-								$this->licenseform($content['license_nation'], $content['license_year'],
-									$content['license_cat'], $this->athlete->data['PerId']);
+								Api\Etemplate::set_validation_error($name, lang('Field must not be empty !!!'));
+								$content['tabs'] = 'contact';
 							}
 						}
 						// change of license status, requires athlete rights for the license-nation
@@ -412,11 +361,11 @@ class Ui extends Base
 					$msg .= lang('Permission denied !!!').' ('.$this->athlete->data['nation'].')';
 				}
 			}
-			// selfservice applying for a license
+			// selfservice registering
 			if ($this->is_selfservice() === 'new' && !empty($this->athlete->data['PerId']) && $this->athlete->data['PerId'] !== 'new')
 			{
 				$selfservice = new Selfservice();
-				return $selfservice->continueApply($this->athlete->data);
+				return $selfservice->continueRegister($this->athlete->data);
 			}
 			if ($button === 'pw_mail')
 			{
@@ -1176,7 +1125,7 @@ Continuer';
 	}
 
 	/**
-	 * Download the personaliced application form
+	 * Download the personalized application form
 	 *
 	 * @param string $nation =null
 	 * @param int $year =null defaults to $this->license_year
@@ -1185,18 +1134,17 @@ Continuer';
 	 */
 	function licenseform($nation=null, $year=null, $GrpId=null, $PerId=null)
 	{
-		if (is_null($year)) $year = $_GET['license_year'] ? $_GET['license_year'] : $this->license_year;
+		if (is_null($year)) $year = $_GET['license_year'] ?: $this->license_year;
 		if (is_null($nation) && $_GET['license_nation']) $nation = $_GET['license_nation'];
 		if (is_null($GrpId) && $_GET['license_cat']) $GrpId = $_GET['license_cat'];
 		if (is_null($PerId)) $PerId = $_GET['PerId'];
 
-		$ext = null;
 		if ($this->athlete->read($PerId) &&
-			($vfs_path = $this->license_form_name($nation, $year, $GrpId, $PerId, null, false, $ext)))
+			($vfs_path = $this->license_form_name($nation, $year, $GrpId, $PerId, null, false)))
 		{
 			$merge = new Merge();
 			$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.
-				$this->athlete->data['nachname'].$ext;
+				$this->athlete->data['nachname'];
 			// does NOT return, unless there is an error
 			$err = $merge->download($vfs_path, $this->athlete->data['PerId'], $file);
 		}
@@ -1250,5 +1198,62 @@ Continuer';
 		}
 		unset($tracking);
 		$sel_options['status'] = $history_stati;
+	}
+
+	/**
+	 * Apply for a license
+	 *
+	 * @param array $athlete
+	 * @param string $status='a' 'a' for federation or 'r' for self-registration
+	 * @param ?string[] $required_missing on return missing fields eg. to set validation-message(s)
+	 * @return string error-message, on success function does NOT return but download application form
+	 */
+	public function applyLicense(array $athlete, $status='a', array &$required_missing=null)
+	{
+		$required_missing = [];
+		if ($athlete['license'] === 's')
+		{
+			return lang('Athlete is suspended !!!');
+		}
+		if ($status === 'r' && $this->is_selfservice() == $athlete['PerId'] && $athlete['nation'] === 'GER')
+		{
+			// GER athletes are allowed to register/apply via selfservice
+		}
+		elseif (!$this->acl_check_athlete($athlete, self::ACL_ATHLETE, null, $athlete['license_nation']))
+		{
+			return lang('You are not permitted to apply for a license!');
+		}
+		if ($athlete['license'] !== $status)
+		{
+			// check for required data
+			static $required_for_license = array(
+				'vorname', 'nachname', 'nation', 'geb_date', 'sex',
+				'verband', 'ort', 'strasse', 'plz',
+				'email', 'mobil'
+			);
+			foreach ($required_for_license as $name)
+			{
+				if (empty($athlete[$name]) || !trim($athlete[$name]))
+				{
+					$required_missing[] = $name;
+				}
+			}
+			if ($required_missing)
+			{
+				return lang('Required information missing, application rejected!');
+			}
+			if ($this->athlete->set_license($athlete['license_year'], $status, $athlete['PerId'], $athlete['license_nation'], $athlete['license_cat']) === false)
+			{
+				return lang('Athlete is NOT in agegroup of selected license category!');
+			}
+		}
+		// download form
+		if ($this->license_form_name(
+			$athlete['license_nation'], $athlete['license_year'],
+			$athlete['license_cat'], $athlete['PerId']))
+		{
+			$this->licenseform($athlete['license_nation'], $athlete['license_year'],
+				$athlete['license_cat'], $athlete['PerId']);
+		}
 	}
 }

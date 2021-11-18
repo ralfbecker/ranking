@@ -2139,3 +2139,23 @@ function ranking_upgrade21_1()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1.001';
 }
 
+/**
+ * Record athlete registering/applying for license
+ *
+ * @return string
+ */
+function ranking_upgrade21_1_001()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','lic_registered',array(
+		'type' => 'date',
+		'comment' => 'athlete registered/applied'
+	));
+
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','lic_registered_by',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1.002';
+}
+
