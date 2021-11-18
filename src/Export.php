@@ -14,6 +14,7 @@ namespace EGroupware\Ranking;
 
 use EGroupware\Api;
 use EGroupware\Api\Egw;
+use \Exception;
 // not yet namespaced ranking_* classes
 use \ranking_result_bo;
 use \ranking_route_result;
@@ -415,7 +416,7 @@ class Export extends ranking_result_bo
 				if (!isset($instance)) $instance = new self();
 				if (!($cat_arr = $instance->cats->read($rkey)))
 				{
-					throw new Exception(lang('Category NOT found !!!'));
+					throw new Api\Exception\NotFound(lang('Category NOT found !!!'));
 				}
 				$cat_rkey2id[$rkey] = $cat_arr['GrpId'];
 				self::setCache('cat_rkey2id', $cat_rkey2id);
@@ -447,6 +448,10 @@ class Export extends ranking_result_bo
 						$data = $instance->_export_route($comp, $cat, 0);
 						$no_general_result_yet = true;
 					}
+				}
+				// competition or category not found
+				catch (Api\Exception\NotFound $e) {
+					throw $e;
 				}
 				catch(Exception $e) {
 					// try if we have a result in ranking
@@ -515,13 +520,13 @@ class Export extends ranking_result_bo
 
 		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
-			throw new Exception(lang('Category NOT found !!!'));
+			throw new Api\Exception\NotFound(lang('Category NOT found !!!'));
 		}
 
 		//echo "<pre>".print_r($cat,true)."</pre>\n";
 		if (!($comp = $this->comp->read($comp)))
 		{
-			throw new Exception(lang('Competition NOT found !!!'));
+			throw new Api\Exception\NotFound(lang('Competition NOT found !!!'));
 		}
 		if (!($discipline = $comp['discipline']))
 		{
@@ -1286,11 +1291,11 @@ class Export extends ranking_result_bo
 		}
 		if ($cup && !($cup = $this->cup->read($cup)))
 		{
-			throw new Exception(lang('Cup not found!!!'));
+			throw new Api\Exception\NotFound(lang('Cup not found!!!'));
 		}
 		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
-			throw new Exception(lang('Category NOT found !!!'));
+			throw new Api\Exception\NotFound(lang('Category NOT found !!!'));
 		}
 		$overall = count($cat['GrpIds']) > 1;
 
@@ -1538,7 +1543,7 @@ class Export extends ranking_result_bo
 		{
 			if (!($comp = $this->comp->read($comp)))
 			{
-				throw new Exception(lang('Competition NOT found !!!'));
+				throw new Api\Exception\NotFound(lang('Competition NOT found !!!'));
 			}
 			$calendar = $comp['nation'];
 		}
@@ -1714,12 +1719,12 @@ class Export extends ranking_result_bo
 	{
 		if (!is_array($cat) && !($cat = $this->cats->read($cat)))
 		{
-			throw new Exception(lang('Category NOT found !!!'));
+			throw new Api\Exception\NotFound(lang('Category NOT found !!!'));
 		}
 
 		if (!($comp = $this->comp->read($comp)))
 		{
-			throw new Exception(lang('Competition NOT found !!!'));
+			throw new Api\Exception\NotFound(lang('Competition NOT found !!!'));
 		}
 		if (!($discipline = $comp['discipline']))
 		{
@@ -1872,7 +1877,7 @@ class Export extends ranking_result_bo
 
 		if (!($comp = $this->comp->read($comp)))
 		{
-			throw new Exception(lang('Competition NOT found !!!'));
+			throw new Api\Exception\NotFound(lang('Competition NOT found !!!'));
 		}
 		// try again with numeric id
 		$location = 'starters:'.$comp['WetId'];

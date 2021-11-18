@@ -427,7 +427,7 @@ class Competition extends Api\Storage\Base
 			}
 			else
 			{
-				if ($keys === $this->data['rkey']) return $this->data;
+				if ($keys === $this->data['rkey'] && !empty($this->data['WetId'])) return $this->data;
 				$keys = array('rkey' => $keys);
 			}
 		}
