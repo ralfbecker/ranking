@@ -67,7 +67,8 @@ class Selfservice extends Base
 		{
 			$this->athleteHeader($athlete, $action);
 		}
-		if ($_action !== 'register' && (!$athlete || !$this->acl_check_athlete($athlete) && $this->is_selfservice() != $PerId) &&
+		if (!in_array($action, ['register', 'confirm']) &&
+			(!$athlete || !$this->acl_check_athlete($athlete) && $this->is_selfservice() != $PerId) &&
 			!($PerId = $this->auth($athlete, $action)))
 		{
 			$this->showFooter($nation2lang[$athlete['nation']]);
@@ -80,7 +81,8 @@ class Selfservice extends Base
 			Api\Translation::init();
 		}
 		// check if athlete contented to store his data, if not show consent screen
-		if (!in_array($action, ['logout', 'register', 'recovery', 'password']) && (empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
+		if (!in_array($action, ['logout', 'register', 'recovery', 'password', 'confirm']) &&
+			(empty($athlete['consent_time']) || empty($athlete['consent_ip'])))
 		{
 			$this->consentDataStorage($athlete, $lang);
 		}
@@ -106,6 +108,10 @@ class Selfservice extends Base
 
 			case 'apply':
 				$this->applyLicense($athlete);
+				break;
+
+			case 'confirm':
+				$this->confirmLicenseRequest($athlete, $action_id);
 				break;
 
 			case '':
@@ -782,7 +788,6 @@ class Selfservice extends Base
 	public function continueRegister(array $athlete)
 	{
 		$this->is_selfservice($athlete['PerId']);
-		//$this->athlete->set_license(date('Y'), 'r',$athlete['PerId'], $athlete['nation'], null);
 
 		Api\Framework::redirect_link('/ranking/athlete.php', [
 			'PerId' => $athlete['PerId'],
@@ -824,16 +829,127 @@ class Selfservice extends Base
 	}
 
 	/**
+	 * Generate a hash to verify license-request-confirmation by federation / DAV Sektion
+	 *
+	 * @param int $PerId
+	 * @param int $fed_id
+	 * @param string $email
+	 * @param ?int $GrpId
+	 * @return string
+	 */
+	private static function confirmHash(int $PerId, int $fed_id, string $email, int $GrpId=null)
+	{
+		return sha1($PerId.':'.$fed_id.':'.$GLOBALS['egw_info']['server']['install_id'].':'.strtolower($email).':'.$GrpId);
+	}
+
+	/**
+	 * Get notification address(es) for license requests
+	 *
+	 * @param int $fed_id
+	 * @return string[]
+	 */
+	private static function notifyLicenseRequestAddresses(int $fed_id)
+	{
+		$federation = Base::getInstance()->federation;
+		$notify = $federation->getEmails($fed_id);
+
+		// if sektion has no notification address add LV users email addresses
+		if (empty($notify))
+		{
+			$notify = $federation->get_contacts($fed_id, false);
+		}
+		return $notify;
+	}
+
+	/**
 	 * Notify responsible person of athletes federation to approve the request
 	 *
 	 * @param array $athlete
+	 * @param ?int $GrpId for TOF license
+	 * @param ?string $template default ranking/doc/confirm-license-mail.txt
 	 */
-	public static function applyNotifyFederation(array $athlete)
+	public static function applyNotifyFederation(array $athlete, int $GrpId=null, string $template=null)
 	{
 		if (self::$notify)
 		{
-			error_log(__METHOD__.'('.json_encode($athlete).')');
+			if (empty($template))
+			{
+				$template = EGW_SERVER_ROOT.'/ranking/doc/confirm-license-mail.txt';
+			}
+			if (!file_exists($template) || !is_readable($template))
+			{
+				throw new Api\Exception\WrongParameter("Mail template '$template' not found!");
+			}
+			$is_html = !preg_match('/\.txt$/',$template);
+
+			list($subject, $body) = preg_split("/\r?\n/", file_get_contents($template), 2);
+
+			$failed = $success = [];
+			foreach(self::notifyLicenseRequestAddresses($athlete['fed_id']) as $key => $email)
+			{
+				// generate confirm hash
+				$link = Egw::link('/ranking/athlete.php', array(
+					'PerId' => $athlete['PerId'],
+					'action' => 'confirm-' . self::confirmHash($athlete['PerId'], $athlete['fed_id'], $email, $GrpId),
+					'GrpId' => $GrpId ?? '',
+					'cd' => 'no',
+				));
+				if ($link[0] == '/') $link = 'https://' . $_SERVER['SERVER_NAME'] . $link;
+
+				try {
+					self::mail($email,
+						$athlete + array(
+							'LINK' => !$is_html ? $link : '<a href="' . $link . '">' . $link . '<a>',
+							'SERVER_NAME' => $_SERVER['SERVER_NAME'],
+							'LV-EMAIL-ADDRESSES' => implode(', ', (array)Base::getInstance()->federation->get_contacts($athlete, $is_html)),
+						), $subject, $body, "$athlete[vorname] $athlete[nachname] <$athlete[email]>", $is_html);
+					$success[] = $email;
+				}
+				// catch errors to multiple email get send, even if one fails
+				catch (\Exception $e) {
+					$e = new \Exception("Error sending {basename($template} to $email for $athlete[vorname] $athlete[nachname] <$athlete[email]>: ".
+						$e->getMessage(), $e->getCode(), $e);
+					_egw_log_exception($e);
+					$failed[$key] = $email;
+					// todo: notify LV, if notification to sektion failed
+				}
+			}
+			error_log(__METHOD__ . '(' . json_encode($athlete) . ')'.
+				($success ? ' success: '.implode(', ', $success) : '').
+				($failed ? ' FAILED: '.implode(', ', $failed) : ''));
 		}
+	}
+
+	/**
+	 * Link to confirm license request clicked by federation
+	 *
+	 * @param ?array $athlete
+	 * @param string $hash
+	 * @param int $_GET['GrpId'] to confirm eg. TOF
+	 */
+	private function confirmLicenseRequest(array $athlete=null, string $hash)
+	{
+		if (!$athlete || empty($hash))
+		{
+			throw new Api\Exception\WrongParameter(($athlete ? '$athlete' : '$hash').' must not be empty!');
+		}
+		$GrpId = (int)($_GET['GrpId'] ?? 0) ?: null;
+		foreach(self::notifyLicenseRequestAddresses($athlete['fed_id']) as $email)
+		{
+			if ($hash === self::confirmHash($athlete['PerId'], $athlete['fed_id'], $email, $GrpId))
+			{
+				if ($athlete['license'] !== 'r' || !$this->athlete->set_license(date('Y'), 'a', $athlete['PerId'], $athlete['nation'], $GrpId))
+				{
+					echo "<p>".lang('License request already approved.')."</p>\n";
+				}
+				else
+				{
+					echo "<p>".lang('License request approved.')."</p>\n";
+				}
+				return;
+			}
+		}
+		throw new Api\Exception\WrongParameter("Invalid hash for $athlete[vorname] $athlete[nachname] ($athlete[verband] federation #$athlete[fed_id])!");
 	}
 
 	/**

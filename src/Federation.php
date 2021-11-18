@@ -556,10 +556,10 @@ class Federation extends Api\Storage\Base
 	 * Get federation-contact information for a given athlete or fed_id's
 	 *
 	 * @param array $athlete_or_fed_ids athlete array (fed_id, fed_acl_id, fed_parent) or given array of fed_id's
-	 * @param string $type ='athletes'
-	 * @return string html with comma-separated contact-names with mailto-links
+	 * @param string $grant ='athletes'
+	 * @return string|string[] html with comma-separated contact-names with mailto-links or array of rfc822 email addresses
 	 */
-	function get_contacts(array $athlete_or_fed_ids, $type='athletes')
+	function get_contacts(array $athlete_or_fed_ids, bool $html=true, $grant='athletes')
 	{
 		if (isset($athlete_or_fed_ids['PerId']))
 		{
@@ -575,9 +575,9 @@ class Federation extends Api\Storage\Base
 		foreach($fed_ids as $fed_id)
 		{
 			$grants = $this->get_grants($fed_id);
-			if (!$grants[$type]) continue;
+			if (!$grants[$grant]) continue;
 			//echo $fed_id; _debug_array($grants);
-			foreach((array)$grants[$type] as $account_id)
+			foreach((array)$grants[$grant] as $account_id)
 			{
 				if ($account_id < 0) $account_id = $GLOBALS['egw']->accounts->members($account_id,true);
 				foreach((array)$account_id as $account_id)
@@ -585,13 +585,54 @@ class Federation extends Api\Storage\Base
 					if (($account = $GLOBALS['egw']->accounts->read($account_id)) && $account['account_email'])
 					{
 						//echo $account_id; _debug_array($account);
-						$contacts[$account_id] = '<a href="mailto:'.$account['account_email'].'">'.
+						if ($html)
+						{
+							$contacts[$account_id] = '<a href="mailto:'.$account['account_email'].'">'.
 							$account['account_firstname'].' '.$account['account_lastname'].'</a>';
+						}
+						else
+						{
+							$contacts[$account_id] = $account['account_firstname'].' '.$account['account_lastname'].' <'.$account['account_email'].'>';
+						}
 					}
 				}
 			}
 		}
-		return implode(", ", $contacts);
+		if ($html)
+		{
+			return implode(", ", $contacts);
+		}
+		return $contacts;
+	}
+
+	/**
+	 * Get notification emails of a federation
+	 *
+	 * @param ?int $fed_id
+	 * @return string[]
+	 */
+	public function getEmails(int $fed_id=null)
+	{
+		$data = empty($fed_id) ? $this->data : $this->read(['fed_id' => $fed_id]);
+
+		if (empty($data))
+		{
+			throw new Api\Exception\WrongParameter("No fed_id specified or could not read #$fed_id!");
+		}
+		$emails = [];
+		if (!empty($data['fed_emails']))
+		{
+			foreach(explode(',', $data['fed_emails']) as $part)
+			{
+				$mail .= (!empty($mail) ? ',' : '').$part;
+				if (preg_match(Api\Etemplate\Widget\Url::EMAIL_PREG, $mail))
+				{
+					$emails[] = $mail;
+					$mail = null;
+				}
+			}
+		}
+		return $emails;
 	}
 
 	/**
