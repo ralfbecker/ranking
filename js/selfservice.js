@@ -6,12 +6,17 @@
  * @link http://www.egroupware.org
  * @link http://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2014-15 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2014-21 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
-jQuery(function(){
+jQuery(() => {
+	// hide/show password
 	jQuery('#show_passwd').click(function(ev){
 		jQuery('input[name^=password]', this.form).attr('type', this.checked ? 'text' : 'password');
+	});
+
+	// reload window after successful license application form download
+	jQuery('form[action*="action=apply"]').on('submit', () => {
+		window.setTimeout(() => location.href=location.href.replace(/action=[^&]*/, 'action='), 1000)
 	});
 });

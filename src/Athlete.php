@@ -325,6 +325,7 @@ class Athlete extends Api\Storage\Base
 			$data['password'] = Api\Auth::encrypt_ldap($data['password'], 'blowfish_crypt');
 			$data['recover_pw_hash'] = $data['recover_pw_time'] = null;
 			$data['login_failed'] = 0;
+			if ($data !== $this->data) $this->data = array_merge($this->data, $data);
 			error_log(__METHOD__."() password hashed ".array2string($data));
 		}
 		if (count($data) && $this->source_charset)

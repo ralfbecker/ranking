@@ -49,7 +49,8 @@ class Selfservice extends Base
 		Framework::includeCSS('ranking', 'selfservice', false);
 		Framework::$navbar_done = true;	// do NOT display navbar
 		$_GET['cd'] = 'no';	// suppress framework
-		if (substr($_action, 0, 10) !== 'scorecard-' && $_action !== 'apply')
+		list($action, $action_id) = explode('-', $_action, 2)+['', ''];
+		if (!in_array($action, ['scorecard', 'apply']))
 		{
 			echo $GLOBALS['egw']->framework->header();
 		}
@@ -57,11 +58,11 @@ class Selfservice extends Base
 		$athlete = array();
 		unset($this->athlete->acl2clear[Athlete::ACL_DENY_EMAIL]);	// otherwise anon user never get's email returned!
 		unset($this->athlete->acl2clear[Athlete::ACL_DENY_PROFILE]);	// same is true for a fully denied profile
-		if ($_action !== 'register' && ($PerId || ($PerId = $this->is_selfservice()) && $PerId !== 'new') && !($athlete = $this->athlete->read($PerId)))
+		if ($action !== 'register' && ($PerId || ($PerId = $this->is_selfservice()) && $PerId !== 'new') &&
+			!($athlete = $this->athlete->read($PerId, '', date('Y'), 'GER')))
 		{
 			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
 		}
-		list($action,$action_id) = explode('-', $_action, 2);
 
 		if ($athlete)
 		{
@@ -107,7 +108,7 @@ class Selfservice extends Base
 				break;
 
 			case 'apply':
-				$this->applyLicense($athlete);
+				$this->applyLicense($athlete, $action_id);
 				break;
 
 			case 'confirm':
@@ -226,7 +227,7 @@ class Selfservice extends Base
 	 */
 	private function scorecard(array $athlete, $action_id)
 	{
-		$this->profileAndLogoutButtons($athlete);
+		$this->defaultButtons($athlete);
 
 		list($WetId, $GrpId, $route_order) = explode('-', $action_id);
 
@@ -371,7 +372,7 @@ class Selfservice extends Base
 		}
 		if ($found) echo "</ul>\n";
 
-		$this->profileAndLogoutButtons($athlete);
+		$this->defaultButtons($athlete);
 	}
 
 	/**
@@ -379,33 +380,67 @@ class Selfservice extends Base
 	 *
 	 * @param int|array $athlete
 	 */
-	private function profileAndLogoutButtons($athlete)
+	private function defaultButtons($athlete)
 	{
 		// Edit profile and logout buttons
-		echo "<div id='profile-logout-buttons'>".
+		echo "<div id='profile-logout-buttons'>" .
 			Api\Html::form_1button('profile', lang('Edit Profile'), '', '/index.php', array(
-				'menuaction' => 'ranking.'.Athlete\Ui::class.'.edit',
+				'menuaction' => 'ranking.' . Athlete\Ui::class . '.edit',
 				'PerId' => is_array($athlete) ? $athlete['PerId'] : $athlete,
 				'cd' => 'no',
-			))."\n".
+			)) . "\n" .
 			Api\Html::form_1button('logout', lang('Logout'), '',
-				'/ranking/athlete.php', array('action' => 'logout')).
+				'/ranking/athlete.php', array('action' => 'logout')) .
 			"</div>\n";
 
 		// check if athlete has a license, if not allow to apply now
-		if (!is_array($athlete) && !($athlete = $this->athlete->read(['PerId' => $athlete])))
+		if (!is_array($athlete) && !($athlete = $this->athlete->read(['PerId' => $athlete], '', date('Y'), 'GER')))
 		{
 			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
 		}
-		if (empty($athlete['lic_status']) || $athlete['lic_status'] === 'n')
+		if ($athlete['nation'] === 'GER')
 		{
-			echo "<div id='apply-license'>".
-				"<p>".lang('To apply for a license you are required to download the application form, sign and post it:')."</p>"."\n".
-				Api\Html::form_1button('license', lang('Apply for license'), '', '/ranking/athlete.php', array(
-					'PerId' => $athlete['PerId'],
-					'action' => 'apply',
-					'cd' => 'no',
-				))."</div>\n";
+			if (empty($athlete['license']) || $athlete['license'] === 'n')
+			{
+				echo "<div id='apply-license'>" .
+					"<p>" . lang('You have no national climber license. To apply for a license you are required to download the application form, sign and post it:') . "</p>" . "\n" .
+					Api\Html::form_1button('license', lang('Athlete license'), '', '/ranking/athlete.php', array(
+						'PerId' => $athlete['PerId'],
+						'action' => 'apply',
+						'cd' => 'no',
+					));
+
+				if (date('Y') - (int)$athlete['geb_date'] >= 18)
+				{
+					echo Api\Html::form_1button('license', lang('Team official license'), '', '/ranking/athlete.php', array(
+						'PerId' => $athlete['PerId'],
+						'action' => 'apply-GER_TOF',
+						'cd' => 'no',
+					));
+				}
+				echo "</div>\n";
+			}
+			else
+			{
+				switch($athlete['license'])
+				{
+					case 'r':
+						echo "<p>".lang('Your license request is waiting for confirmation by %1.', $athlete['verband'])."</p>\n";
+						break;
+
+					case 'a':
+						echo "<p>".lang('Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.', $athlete['verband'], 'DAV in München')."</p>\n";
+						break;
+
+					case 'c':
+						echo "<p>".lang('Your national license is valid.')."</p>\n";
+						break;
+
+					case 's':
+						echo "<p class='error'>".lang('Your national license has been suspended!')."</p>\n";
+						break;
+				}
+			}
 		}
 	}
 
@@ -448,7 +483,7 @@ class Selfservice extends Base
 			if (empty($_POST['email']) || !($athlete = $this->athlete->read(array(
 				'email' => $_POST['email'],
 				'acl' => null,	// otherwise default ACL will be add to query!
-			))))
+			), '', date('Y'),'GER')))
 			{
 				echo "<p class='error'>".lang('EMail address NOT found!')."<br/>\n";
 				echo lang('Please contact your federation (%1), to have your EMail address added to your athlete profile, so we can mail you a password.',
@@ -524,13 +559,14 @@ class Selfservice extends Base
 								'password' => $_POST['password'],	// will be hashed in data_merge
 							)))
 							{
+								$athlete = $this->athlete->data;
 								// store successful selfservice login
 								$this->is_selfservice($athlete['PerId']);
 
 								setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
 
 								echo "<p><b>".lang('Your new password is now active.')."</b></p>\n";
-								$this->profileAndLogoutButtons($athlete['PerId']);
+								$this->defaultButtons($athlete);
 								return $athlete['PerId'];
 								//echo "<p>".lang('You can now %1edit your profile%2 or register for a competition in the calendar.','<a href="'.$link.'">','</a>')."</p>\n";
 								//common::egw_exit();
@@ -806,25 +842,26 @@ class Selfservice extends Base
 	 * Apply for license: download PDF and notify federation
 	 *
 	 * @param array $athlete
+	 * @param string|int $cat GrpId or rkey of category eg. "GER_TOF"
 	 */
-	protected function applyLicense(array $athlete)
+	protected function applyLicense(array $athlete, $cat=null)
 	{
 		self::$notify = true;
 		Egw::on_shutdown(__CLASS__.'::applyNotifyFederation', [$athlete]);
 
 		$ui = new Athlete\Ui();
-		if (($err = $ui->applyLicense($athlete+[
+		if (($err = $ui->applyLicense([
 			'license_year' => date('Y'),
 			'license_nation' => $athlete['nation'], // national license
-			'license_cat' => null,  // important only for TOFs
-		], 'r')))
+			'license_cat' => $cat && ($cat = $this->cats->read([(is_numeric($cat) ? 'GrpId' : 'rkey') => $cat])) ? $cat['GrpId'] : null,
+		]+$athlete, 'r')))
 		{
 			self::$notify = false;
 			// add header now, as it was not done to allow download
 			echo $GLOBALS['egw']->framework->header();
 			$this->athleteHeader($athlete);
 			echo "<p class='error'>".$err."</p>\n";
-			$this->profileAndLogoutButtons($athlete);
+			$this->defaultButtons($athlete);
 		}
 	}
 
