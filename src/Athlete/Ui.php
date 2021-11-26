@@ -267,7 +267,7 @@ class Ui extends Base
 					elseif ($this->is_selfservice() === 'new' && (new Selfservice())->checkAlreadyRegistered($content))
 					{
 						$msg .= 'Error: '.lang('You are already registered, please use the password reset or ask your federation (%1) to set a correct email address.',
-							$this->federation->get_contacts($content));
+							$this->federation->get_contacts($content+['PerId' => $content['athlete_data']['PerId']]));
 					}
 					elseif ($this->athlete->save(null, null, $fed_changed))
 					{
