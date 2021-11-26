@@ -38,6 +38,14 @@ if (substr($view, 0, 10) === 'ranking.ui' && $view !== 'ranking.uiranking.index'
 	$view = 'ranking.ranking_'.substr($class, 2, substr($class, -1) === 's' ? -1 : 99).'_ui.'.$method;
 }
 
+// fix PSR1 to PSR4 class-names
+list(, $class, $method) = explode('.', $view);
+if (!class_exists($class) && (list(, $type) = explode('_', $view)) &&
+	class_exists($class='EGroupware\\Ranking\\'.ucfirst($type === 'cats' ? 'category' : $type).'\\Ui'))
+{
+	$view = "ranking.$class.$method";
+}
+
 // urls which still need to run in iframe (NOT top-level)
 if (in_array($view, array(
 	'ranking.uiranking.index',
