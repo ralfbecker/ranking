@@ -3,11 +3,10 @@
  *
  * @license http://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package ranking
- * @link http://www.egroupware.org
- * @link http://www.digitalROCK.de
+ * @link https://www.egroupware.org
+ * @link https://www.digitalROCK.de
  * @author Ralf Becker <RalfBecker@digitalrock.de>
- * @copyright 2014-16 by Ralf Becker <RalfBecker@digitalrock.de>
- * @version $Id$
+ * @copyright 2014-21 by Ralf Becker <RalfBecker@digitalrock.de>
  */
 
 div#selfservice {
@@ -21,6 +20,10 @@ p.error {
 }
 form.form_1button {
 	display: inline-block;
+}
+
+select[name=PerId] {
+	font-size: 150% !important;
 }
 
 /**

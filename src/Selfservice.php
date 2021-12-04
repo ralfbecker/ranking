@@ -64,9 +64,25 @@ class Selfservice extends Base
 			throw new Api\Exception\WrongUserinput("Athlete NOT found!");
 		}
 
+		// allow switching between athletes with same email without asking passwords again
+		if ($PerId && $this->is_selfservice() && $this->is_selfservice() != $PerId)
+		{
+			$this->is_selfservice(($authenticated = $this->athlete->read($this->is_selfservice())) &&
+				!strcasecmp($authenticated['email'], $athlete['email']) ? $athlete['PerId'] : 0);
+		}
+
 		if ($athlete)
 		{
-			$this->athleteHeader($athlete, $action);
+			// check if we have multiple athletes with same email --> display athlete chooser
+			if (!empty($athlete['email']))
+			{
+				$athletes = $this->athlete->search('', false, 'vorname, nachname', '', '', false, 'AND', false, [
+					'email' => $athlete['email'],
+					'license_nation' => 'GER',
+					'license_year' => date('Y'),
+				]);
+			}
+			$this->athleteHeader($athlete, $action, !empty($athletes) && count($athletes) > 1 ? $athletes : null);
 		}
 		if (!in_array($action, ['register', 'confirm']) &&
 			(!$athlete || !$this->acl_check_athlete($athlete) && $this->is_selfservice() != $PerId) &&
@@ -480,20 +496,22 @@ class Selfservice extends Base
 	{
 		if (!$athlete && isset($_POST['email']))
 		{
-			if (empty($_POST['email']) || !($athlete = $this->athlete->read(array(
-				'email' => $_POST['email'],
-				'acl' => null,	// otherwise default ACL will be add to query!
-			), '', date('Y'),'GER')))
+			if (empty($_POST['email']) ||
+				!($athletes = $this->athlete->search('', false, 'vorname, nachname', '', '', false, 'AND', false, [
+					'email' => $_POST['email'],
+					'license_nation' => 'GER',
+					'license_year' => date('Y'),
+				])))
 			{
 				echo "<p class='error'>".lang('EMail address NOT found!')."<br/>\n";
 				echo lang('Please contact your federation (%1), to have your EMail address added to your athlete profile, so we can mail you a password.',
 					lang('or the organizer of the competition'))."<br/>\n";
 				echo lang('Maybe you have a different one registered. Try looking it up by using "Edit profile" on your profile page.')."</p>\n";
 			}
-			else
-			{
-				$this->athleteHeader($athlete, $action);
-			}
+		}
+		else
+		{
+			$athletes = $athlete ? [$athlete] : [];
 		}
 
 		$recovery_link = Egw::link('/ranking/athlete.php', array(
@@ -503,6 +521,10 @@ class Selfservice extends Base
 		));
 		if ($athlete && empty($athlete['password']) || in_array($action,array('recovery','password','set')))
 		{
+			if (!$athlete)  // otherwise header is already output
+			{
+				$this->athleteHeader($athlete = $athletes[0], $action);
+			}
 			if (empty($action)) $action = 'recovery';
 			if (empty($athlete['password']) && !in_array($action,array('password','set','recovery')))
 			{
@@ -601,44 +623,55 @@ class Selfservice extends Base
 		}
 		else
 		{
-			if ($athlete && !empty($_POST['password']))
+			// if we have multiple athletes for one email, iterate over them for login
+			foreach($athletes as $k => $athlete)
 			{
-				if ($athlete['login_failed'] >= self::LOGIN_FAILURES &&
-					($this->athlete->now - strtotime($athlete['last_login'])) < self::LOGIN_SUSPENDED)
+				if (!empty($_POST['password']))
 				{
-					$this->athlete->update(array(
-						'last_login' => $this->athlete->now,
-						'login_failed=login_failed+1',
-					));
-					error_log(__METHOD__."($athlete[PerId], '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
-					echo "<p class='error'>".lang('Login suspended, too many unsuccessful tries!')."</p>\n";
-					echo "<p>".lang('Try again after %1 minutes.',self::LOGIN_SUSPENDED/60)."</p>\n";
-					$this->showFooter();
-					exit;
-				}
-				elseif (!Api\Auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
-				{
-					$this->athlete->update(array(
-						'last_login' => $this->athlete->now,
-						'login_failed=login_failed+1',
-					));
-					error_log(__METHOD__."($athlete[PerId], '$action') wrong password, {$this->athlete->data['login_failed']} failure");
-					echo "<p class='error'>".lang('Password you entered is NOT correct!')."</p>\n";
-				}
-				else
-				{
-					$this->athlete->update(array(
-						'last_login' => $this->athlete->now,
-						'login_failed' => 0,
-					));
-					error_log(__METHOD__."($athlete[PerId], '$action') successful login");
-					// store successful selfservice login
-					$this->is_selfservice($athlete['PerId']);
+					if ($athlete['login_failed'] >= self::LOGIN_FAILURES &&
+						($this->athlete->now - strtotime($athlete['last_login'])) < self::LOGIN_SUSPENDED)
+					{
+						$this->athleteHeader($athlete, $action);
+						$this->athlete->update(array(
+							'last_login' => $this->athlete->now,
+							'login_failed=login_failed+1',
+						));
+						error_log(__METHOD__ . "($athlete[PerId], '$action') $athlete[login_failed] failed logins, last $athlete[last_login] --> login suspended");
+						echo "<p class='error'>" . lang('Login suspended, too many unsuccessful tries!') . "</p>\n";
+						echo "<p>" . lang('Try again after %1 minutes.', self::LOGIN_SUSPENDED / 60) . "</p>\n";
+						$this->showFooter();
+						exit;
+					}
+					// successful login
+					elseif (Api\Auth::compare_password($_POST['password'], $athlete['password'], 'crypt'))
+					{
+						$this->athleteHeader($athlete, $action, $athletes);
 
-					setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
+						$this->athlete->update(array(
+							'last_login' => $this->athlete->now,
+							'login_failed' => 0,
+						));
+						error_log(__METHOD__ . "($athlete[PerId], '$action') successful login");
+						// store successful selfservice login
+						$this->is_selfservice($athlete['PerId']);
 
-					if ($action == 'logout') $action = '';
-					return $athlete['PerId'];	// we are now authenticated for $athlete['PerId']
+						setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
+
+						if ($action == 'logout') $action = '';
+						return $athlete['PerId'];    // we are now authenticated for $athlete['PerId']
+					}
+					// failed login with last athlete, otherwise try next one
+					elseif ($k === count($athletes)-1)
+					{
+						$this->athleteHeader($athlete, $action);
+
+						$this->athlete->update(array(
+							'last_login' => $this->athlete->now,
+							'login_failed=login_failed+1',
+						));
+						error_log(__METHOD__ . "($athlete[PerId], '$action') wrong password, {$this->athlete->data['login_failed']} failure");
+						echo "<p class='error'>" . lang('Password you entered is NOT correct!') . "</p>\n";
+					}
 				}
 			}
 			$link = Egw::link('/ranking/athlete.php', array(
@@ -995,7 +1028,7 @@ class Selfservice extends Base
 	 * @param array $athlete
 	 * @param ?string $action to add as id "action-$action"
 	 */
-	private function athleteHeader(array $athlete, string $action=null)
+	private function athleteHeader(array $athlete, string $action=null, array $athletes=null)
 	{
 		if ($action === 'apply')
 		{
@@ -1004,6 +1037,22 @@ class Selfservice extends Base
 		echo '<div id="selfservice">';
 
 		$id = isset($action) ? "id='".htmlspecialchars('action-'.$action)."'" : '';
-		echo "<h1 $id>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
+		if (is_array($athletes) && count($athletes) > 1)
+		{
+			echo "<h1>".Api\Html::form(
+				Api\Html::select('PerId', $athlete['PerId'], array_combine(array_map(static function($athlete)
+				{
+					return $athlete['PerId'];
+				}, $athletes), array_map(static function($athlete)
+				{
+					return $athlete['vorname'].' '.$athlete['nachname'].' ('.$athlete['nation'].')';
+				}, $athletes)), true),
+				'', $_SERVER['PHP_SELF'].'?cd=popup'
+			)."</h1>\n";
+		}
+		else
+		{
+			echo "<h1 $id>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
+		}
 	}
 }

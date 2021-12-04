@@ -19,4 +19,9 @@ jQuery(() => {
 	jQuery('form[action*="action=apply"]').on('submit', () => {
 		window.setTimeout(() => location.href=location.href.replace(/action=[^&]*/, 'action='), 1000)
 	});
+
+	// submit on athlete change
+	jQuery('select[name=PerId]').on('change', function(ev){
+		this.form.submit();
+	});
 });
