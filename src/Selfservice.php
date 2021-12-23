@@ -16,6 +16,8 @@ use EGroupware\Api;
 use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
 use \Exception;
+use Lcobucci\Clock\SystemClock;
+use Lcobucci\JWT;
 // not yet namespaced ranking_* classes
 use \ranking_result_ui;
 use \ranking_selfscore_measurement;
@@ -419,12 +421,25 @@ class Selfservice extends Base
 			if (empty($athlete['license']) || $athlete['license'] === 'n')
 			{
 				echo "<div id='apply-license'>" .
-					"<p>" . lang('You have no national climber license. To apply for a license you are required to download the application form, sign and post it:') . "</p>" . "\n" .
-					Api\Html::form_1button('license', lang('Athlete license'), '', '/ranking/athlete.php', array(
+					"<p>" . lang('You have no national climber license. To apply for a license you are required to download the application form, sign and post it:') . "</p>\n";
+
+				if (($payment = $this->usePayment($athlete)))
+				{
+					echo Api\Html::form_1button('license', lang('Athlete license'), [
+						'PerId' => $athlete['PerId'],
+						'year'  => date('Y'),
+						'firstname' => $athlete['vorname'],
+						'lastname'  => $athlete['nachname'],
+					], $payment['url']);
+				}
+				else
+				{
+					echo Api\Html::form_1button('license', lang('Athlete license'), '', '/ranking/athlete.php', array(
 						'PerId' => $athlete['PerId'],
 						'action' => 'apply',
 						'cd' => 'no',
 					));
+				}
 
 				if (date('Y') - (int)$athlete['geb_date'] >= 18)
 				{
@@ -879,21 +894,38 @@ class Selfservice extends Base
 	 */
 	protected function applyLicense(array $athlete, $cat=null)
 	{
-		self::$notify = true;
-		Egw::on_shutdown(__CLASS__.'::applyNotifyFederation', [$athlete]);
+		try
+		{
+			if (($payment = $this->usePayment($athlete)))
+			{
+				try {
+					$this->validateJWT($_REQUEST['jwt'], $payment, $athlete['PerId'], date('Y'));
+				}
+				catch (\Exception $e) {
+					throw new \Exception(lang("There was an error with your payment") . ': ' . $e->getMessage().': '.$_REQUEST['jwt'],
+						$e->getCode(), $e);
+				}
+			}
+			self::$notify = true;
+			Egw::on_shutdown(__CLASS__ . '::applyNotifyFederation', [$athlete]);
 
-		$ui = new Athlete\Ui();
-		if (($err = $ui->applyLicense([
-			'license_year' => date('Y'),
-			'license_nation' => $athlete['nation'], // national license
-			'license_cat' => $cat && ($cat = $this->cats->read([(is_numeric($cat) ? 'GrpId' : 'rkey') => $cat])) ? $cat['GrpId'] : null,
-		]+$athlete, 'r')))
+			$ui = new Athlete\Ui();
+			if (($err = $ui->applyLicense([
+					'license_year' => date('Y'),
+					'license_nation' => $athlete['nation'], // national license
+					'license_cat' => $cat && ($cat = $this->cats->read([(is_numeric($cat) ? 'GrpId' : 'rkey') => $cat])) ? $cat['GrpId'] : null,
+				] + $athlete, 'r')))
+			{
+				throw new Api\Exception($err);
+			}
+		}
+		catch (\Exception $e)
 		{
 			self::$notify = false;
 			// add header now, as it was not done to allow download
 			echo $GLOBALS['egw']->framework->header();
 			$this->athleteHeader($athlete);
-			echo "<p class='error'>".$err."</p>\n";
+			echo "<p class='error'>".$e->getMessage()."</p>\n";
 			$this->defaultButtons($athlete);
 		}
 	}
@@ -1053,6 +1085,69 @@ class Selfservice extends Base
 		else
 		{
 			echo "<h1 $id>$athlete[vorname] $athlete[nachname] ($athlete[nation])</h1>\n";
+		}
+	}
+
+	/**
+	 * Get payment details for given athlete's federations
+	 *
+	 * @param int|array $athlete
+	 * @return array|null array with values for keys "url" and "key" or null, if there is no payment
+	 * @throws Api\Exception\NotFound Athlete not found
+	 */
+	protected function usePayment($athlete)
+	{
+		$fed2payment = [];
+		if (!file_exists($file=$GLOBALS['egw_info']['server']['files_dir'].'/ranking/payment.php') || !include($file))
+		{
+			return null;
+		}
+		if (is_scalar($athlete) && !($athlete = $this->athlete->read(['PerId' => $athlete])))
+		{
+			throw new Api\Exception\NotFound("Athlete NOT found!");
+		}
+		foreach(['fed_id', 'fed_parent'] as $fed)
+		{
+			if (!empty($athlete[$fed]) && !empty($fed2payment[$athlete[$fed]]))
+			{
+				return $fed2payment[$athlete[$fed]];
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Validate the payment JWT for the given athlete
+	 *
+	 * @param string $jwt
+	 * @param array $payment array with values for keys "url" and "key"
+	 * @param int $PerId
+	 * @param int $year
+	 * @throws \Exception
+	 */
+	protected function validateJWT(string $jwt, array $payment, int $PerId, int $year)
+	{
+		$config = JWT\Configuration::forSymmetricSigner(
+			new JWT\Signer\Hmac\Sha256(),
+			JWT\Signer\Key\InMemory::base64Encoded($payment['key'])
+		);
+		$token = $config->parser()->parse($jwt);
+		assert($token instanceof JWT\Token\Plain);
+
+		$config->setValidationConstraints(
+			new JWT\Validation\Constraint\IssuedBy(preg_replace('#^(https?://[^/]+)/.*$#', '$1', $payment['url'])),
+			new JWT\Validation\Constraint\PermittedFor('https://digitalrock.de'),
+			new JWT\Validation\Constraint\ValidAt(SystemClock::fromUTC(), new \DateInterval('PT60S')),
+			new JWT\Validation\Constraint\SignedWith($config->signer(), $config->verificationKey()),
+			new JWT\Validation\Constraint\RelatedTo((string)$PerId)
+		);
+
+		$config->validator()->assert($token, ...$config->validationConstraints());
+
+		$claims = $token->claims();
+		if (!$claims->has('license-year') || $claims->get('license-year') != $year)
+		{
+			throw new Exception('Missing or wrong "license-year" claim!');
 		}
 	}
 }
