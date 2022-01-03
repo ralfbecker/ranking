@@ -2071,7 +2071,7 @@ class Export extends ranking_result_bo
 
 		// athlete requested not to show his profile
 		// --> no results, no ranking, regular profile data already got removed by athlete->db2data called by read
-		if (!($athlete['acl'] & Athlete::ACL_DENY_PROFILE))
+		if (is_array($athlete['acl']) ? empty($athlete['acl'][Athlete::ACL_DENY_PROFILE]) : !($athlete['acl'] & Athlete::ACL_DENY_PROFILE))
 		{
 			foreach(array(
 				'photo' => null,
