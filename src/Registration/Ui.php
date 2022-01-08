@@ -888,7 +888,7 @@ class Ui extends Base
 				$rows = array(false);
 				foreach($starters as $athlete)
 				{
-					if ($athlete['GrpId'] != $c['GrpId'])
+					if (empty($c) || $athlete['GrpId'] != $c['GrpId'])
 					{
 						$c = $this->cats->read($athlete['GrpId']);
 					}
