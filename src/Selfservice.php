@@ -15,6 +15,7 @@ namespace EGroupware\Ranking;
 use EGroupware\Api;
 use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
+use EGroupware\OpenID\Keys;
 use \Exception;
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT;
@@ -222,7 +223,7 @@ class Selfservice extends Base
 		{
 			$file = EGW_SERVER_ROOT.'/ranking/templates/default/selfservice_footer.html';
 		}
-		if (!($content = file_get_contents($file)))
+		if (!file_exists($file) || !($content = file_get_contents($file)))
 		{
 			$content = "<hr>\n".
 				"| $\$host$$ is a service of EGroupware GmbH\n".
@@ -540,14 +541,13 @@ class Selfservice extends Base
 			{
 				$this->athleteHeader($athlete = $athletes[0], $action);
 			}
-			if (empty($action)) $action = 'recovery';
-			if (empty($athlete['password']) && !in_array($action,array('password','set','recovery')))
+			if (empty($athlete['password']) && !in_array($action, array('password','set','recovery','')))
 			{
 				echo "<p class='error'>".lang("You have not yet a password set!")."</p>\n";
 			}
 			if (empty($athlete['email']) || strpos($athlete['email'],'@') === false)
 			{
-				echo "<p>".lang('Please contact your federation (%1), to have your EMail addressed added to your athlete profile, so we can mail you a password.',
+				echo "<p>".lang('Please contact your federation (%1), to have your email address added to your athlete profile, so we can mail you a password.',
 					$this->federation->get_contacts($athlete))."</p>\n";
 			}
 			elseif ($action == 'recovery')
@@ -605,8 +605,6 @@ class Selfservice extends Base
 								echo "<p><b>".lang('Your new password is now active.')."</b></p>\n";
 								$this->defaultButtons($athlete);
 								return $athlete['PerId'];
-								//echo "<p>".lang('You can now %1edit your profile%2 or register for a competition in the calendar.','<a href="'.$link.'">','</a>')."</p>\n";
-								//common::egw_exit();
 							}
 							else
 							{
@@ -876,6 +874,7 @@ class Selfservice extends Base
 		Api\Framework::redirect_link('/ranking/athlete.php', [
 			'PerId' => $athlete['PerId'],
 			'action' => 'recovery',
+			'cd' => 'no',
 		]);
 	}
 
@@ -931,7 +930,7 @@ class Selfservice extends Base
 	}
 
 	/**
-	 * Generate a hash to verify license-request-confirmation by federation / DAV Sektion
+	 * Generate a token to verify license-request-confirmation by federation/Sektion or state-federation/LV
 	 *
 	 * @param int $PerId
 	 * @param int $fed_id
@@ -939,9 +938,88 @@ class Selfservice extends Base
 	 * @param ?int $GrpId
 	 * @return string
 	 */
-	private static function confirmHash(int $PerId, int $fed_id, string $email, int $GrpId=null)
+	private static function confirmToken(int $PerId, int $fed_id, string $email, int $GrpId=null)
 	{
-		return sha1($PerId.':'.$fed_id.':'.$GLOBALS['egw_info']['server']['install_id'].':'.strtolower($email).':'.$GrpId);
+		$config = (new Keys())->jwtConfiguration();
+		$now   = new \DateTimeImmutable();
+		return $config->builder()
+			// Configures the issuer (iss claim)
+			->issuedBy(self::issuer())
+			// Configures the audience (aud claim)
+			->permittedFor(self::issuer())
+			// Configures the id (jti claim)
+			//->identifiedBy('4f1g23a12aa')
+			// Configures the time that the token was issue (iat claim)
+			->issuedAt($now)
+			// Configures the time that the token can be used (nbf claim)
+			->canOnlyBeUsedAfter($now->modify('+1 minute'))
+			// Configures the expiration time of the token (exp claim)
+			->expiresAt($now->modify('+2 month'))
+			// Configures claims
+			->relatedTo($PerId)
+			// Configures further claims
+			->withClaim('fed_id', $fed_id)
+			->withClaim('email', strtolower($email))
+			->withClaim('GrpId', (string)$GrpId)
+			// Builds a new token
+			->getToken($config->signer(), $config->signingKey());
+	}
+
+	/**
+	 * Check token to verify license-request-confirmation by federation/Sektion or state-federation/LV
+	 *
+	 * @param string $jwt
+	 * @param int $PerId
+	 * @param int $fed_id
+	 * @param string $email
+	 * @param ?int $GrpId
+	 * @return string
+	 */
+	private static function checkConfirmToken(string $jwt, int $PerId, int $fed_id, string $email, int $GrpId=null)
+	{
+		$config = (new Keys())->jwtConfiguration();
+		$token = $config->parser()->parse($jwt);
+		assert($token instanceof JWT\Token\Plain);
+
+		$config->setValidationConstraints(
+			new JWT\Validation\Constraint\IssuedBy(self::issuer()),
+			new JWT\Validation\Constraint\PermittedFor(self::issuer()),
+			new JWT\Validation\Constraint\ValidAt(SystemClock::fromUTC(), new \DateInterval('PT60S')),
+			new JWT\Validation\Constraint\SignedWith($config->signer(), $config->verificationKey()),
+			new JWT\Validation\Constraint\RelatedTo((string)$PerId)
+		);
+
+		try
+		{
+			$config->validator()->assert($token, ...$config->validationConstraints());
+
+			$claims = $token->claims();
+			foreach ([
+				'fed_id' => $fed_id,
+				'email' => strtolower($email),
+				'GrpId' => (string)$GrpId,
+			] as $name => $value)
+			{
+				if (!$claims->has($name) || $claims->get($name) != $value)
+				{
+					throw new Exception("Missing or wrong '$name' claim!");
+				}
+			}
+			return true;
+		}
+		catch (\Exception $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Return our scheme://host used as JWT issuer or audience
+	 *
+	 * @return string
+	 */
+	private static function issuer()
+	{
+		return Api\Header\Http::fullUrl('');
 	}
 
 	/**
@@ -958,7 +1036,7 @@ class Selfservice extends Base
 		// if sektion has no notification address add LV users email addresses
 		if (empty($notify))
 		{
-			$notify = $federation->get_contacts($fed_id, false);
+			$notify = $federation->get_contacts([$fed_id], false);
 		}
 		return $notify;
 	}
@@ -992,7 +1070,7 @@ class Selfservice extends Base
 				// generate confirm hash
 				$link = Egw::link('/ranking/athlete.php', array(
 					'PerId' => $athlete['PerId'],
-					'action' => 'confirm-' . self::confirmHash($athlete['PerId'], $athlete['fed_id'], $email, $GrpId),
+					'action' => 'confirm-' . self::confirmToken($athlete['PerId'], $athlete['fed_id'], $email, $GrpId),
 					'GrpId' => $GrpId ?? '',
 					'cd' => 'no',
 				));
@@ -1026,19 +1104,19 @@ class Selfservice extends Base
 	 * Link to confirm license request clicked by federation
 	 *
 	 * @param ?array $athlete
-	 * @param string $hash
+	 * @param string $token
 	 * @param int $_GET['GrpId'] to confirm eg. TOF
 	 */
-	private function confirmLicenseRequest(array $athlete=null, string $hash)
+	private function confirmLicenseRequest(array $athlete=null, string $token)
 	{
-		if (!$athlete || empty($hash))
+		if (!$athlete || empty($token))
 		{
-			throw new Api\Exception\WrongParameter(($athlete ? '$athlete' : '$hash').' must not be empty!');
+			throw new Api\Exception\WrongParameter(($athlete ? '$athlete' : '$token').' must not be empty!');
 		}
 		$GrpId = (int)($_GET['GrpId'] ?? 0) ?: null;
 		foreach(self::notifyLicenseRequestAddresses($athlete['fed_id']) as $email)
 		{
-			if ($hash === self::confirmHash($athlete['PerId'], $athlete['fed_id'], $email, $GrpId))
+			if (self::checkConfirmToken($token, $athlete['PerId'], $athlete['fed_id'], $email, $GrpId))
 			{
 				if ($athlete['license'] !== 'r' || !$this->athlete->set_license(date('Y'), 'a', $athlete['PerId'], $athlete['nation'], $GrpId))
 				{
@@ -1051,7 +1129,7 @@ class Selfservice extends Base
 				return;
 			}
 		}
-		throw new Api\Exception\WrongParameter("Invalid hash for $athlete[vorname] $athlete[nachname] ($athlete[verband] federation #$athlete[fed_id])!");
+		throw new Api\Exception\WrongParameter("Invalid token for $athlete[vorname] $athlete[nachname] ($athlete[verband] federation #$athlete[fed_id]) and $email!");
 	}
 
 	/**
