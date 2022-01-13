@@ -1192,6 +1192,12 @@ class Athlete extends Api\Storage\Base
 		elseif($only_national === null)
 		{
 			$join = ' LEFT JOIN '.self::FEDERATIONS_TABLE.' children ON children.fed_parent='.self::FEDERATIONS_TABLE.'.fed_id';
+			// fix fed_id filter to avoid column fed_id is ambiguous SQL error
+			if (isset($filter['fed_id']))
+			{
+				$filter[] = $this->db->expression(self::FEDERATIONS_TABLE, self::FEDERATIONS_TABLE.'.', ['fed_id' => $filter['fed_id']]);
+				unset($filter['fed_id']);
+			}
 			$filter[] = 'children.fed_id IS NULL';
 		}
 
