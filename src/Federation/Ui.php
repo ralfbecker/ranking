@@ -239,7 +239,7 @@ class Ui extends Base
 								$msg = lang('Error deleting federation!');
 								break 2;
 							}
-							$msg = count($content['nm']['action']).' '.lang('Federation deleted.');
+							$msg = count($content['nm']['selected']).' '.lang('Federation deleted.');
 							break;
 
 						case 'merge':
