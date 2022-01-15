@@ -156,7 +156,7 @@ class Base extends So
 		's' => 'suspended',		// no registration for competitions possible
 	);
 	/**
-	 * key => label pairs for which this instance maintaince licenses
+	 * key => label pairs for which this instance maintains licenses
 	 *
 	 * (the string 'NULL' is the key for international!)
 	 *
@@ -257,6 +257,12 @@ class Base extends So
 
 		// setup list with nations we rank and intersect it with the read_rights
 		$this->ranking_nations = array('NULL'=>lang('international'))+$this->comp->nations();
+		// fix situation of single user has edit rights for more than one LV
+		if (count($this->edit_rights) > 1 && !$this->read_rights &&
+			is_numeric($this->edit_rights[0]) && ($fed0 = $this->federation->read(['fed_id' => $this->edit_rights[0]])))
+		{
+			$this->read_rights[] = $fed0['nation'] ?? 'GER';
+		}
 		if (!$this->is_admin)
 		{
 			foreach(array_keys($this->ranking_nations) as $key)
@@ -271,7 +277,7 @@ class Base extends So
 			{
 				$this->only_nation_edit = $this->edit_rights[0];
 			}
-			// international ahtlete rights are for all nation's athletes
+			// international athlete rights are for all nation's athletes
 			if (!in_array('NULL',$this->athlete_rights) && count($this->athlete_rights) == 1 && $this->athlete_rights[0] !== 'XYZ')
 			{
 				$this->only_nation_athlete = $this->athlete_rights[0];

@@ -531,6 +531,7 @@ Continuer';
 			{
 				$readonlys[$name] = true;
 			}
+			unset($readonlys['acl_fed_id']);    // cant set both acl_fed_id AND (used) acl_fed_id[fed_id]
 			$readonlys['acl_fed_id[fed_id]'] = $readonlys['foto'] = $readonlys['foto2'] =
 				$readonlys['button[delete]'] = $readonlys['button[save]'] = $readonlys['button[apply]'] = true;
 		}
