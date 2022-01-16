@@ -58,7 +58,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		{
 			$content['nm']['topo'] = '';
 		}
-		if (count($sel_options['topo']) <= 1)
+		if (count((array)$sel_options['topo']) <= 1)
 		{
 			$sel_options['topo'][$content['nm']['topo']] = ' ';
 			$readonlys['nm[topo]'] = true;
