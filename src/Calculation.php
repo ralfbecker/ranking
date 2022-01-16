@@ -735,7 +735,7 @@ class Calculation
 		else
 		{
 			$from_year = $to_year = null;
-			if (!$rls || !($rls['window_type'] != 'wettk_athlet' && $rls['end_pflicht_tol'] &&
+			if (!$rls || !is_array($rls) || !($rls['window_type'] != 'wettk_athlet' && $rls['end_pflicht_tol'] &&
 				$this->bo->cats->age_group($cat,$stand,$from_year,$to_year)))
 			{
 				$from_year = $to_year = 0;
