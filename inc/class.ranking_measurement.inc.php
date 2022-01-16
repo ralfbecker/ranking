@@ -228,7 +228,7 @@ class ranking_measurement extends ranking_boulder_measurement
 		}
 		$holdout = self::db2hold($hold);
 
-		error_log($log.' returning '.array2string($holdout['hold_id'] ? $holdout : false));
+		//error_log($log.' returning '.array2string($holdout['hold_id'] ? $holdout : false));
 		return $holdout['hold_id'] ? $holdout : false;
 	}
 
