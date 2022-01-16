@@ -483,7 +483,7 @@ class Category extends Api\Storage\Base
 	 */
 	function get_combined($GrpId, array $groups)
 	{
-		foreach($this->search(array(), false, '', '', '', false, 'AND', false, array('rkey' => $groups,'mgroups IS NOT NULL')) as $cat)
+		foreach($this->search(array(), false, '', '', '', false, 'AND', false, array('rkey' => $groups,'mgroups IS NOT NULL')) ?: [] as $cat)
 		{
 			if (isset($cat['mgroups'][$GrpId]))
 			{
