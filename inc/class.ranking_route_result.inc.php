@@ -2287,8 +2287,8 @@ class ranking_route_result extends Api\Storage\Base
 			if (empty($result['new_rank'])) break;
 
 			$result['detail'] = self::unserialize($result['detail']);
-			$result['result_time2'] = (int)(1000*$result['detail']['result_time_l']) == (int)(1000*$result['result_time']) ?
-				(int)(1000*$result['detail']['result_time_r']) : (int)(1000*$result['detail']['result_time_l']);
+			$result['result_time2'] = (1000*(int)$result['detail']['result_time_l']) == (1000*(int)$result['result_time']) ?
+				(1000*(int)$result['detail']['result_time_r']) : (1000*(int)$result['detail']['result_time_l']);
 		}
 
 		// we need to do this in 2 steps to kope with more than 2 ex aquo with different or no 2. time!
