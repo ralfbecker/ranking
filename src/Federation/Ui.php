@@ -37,12 +37,32 @@ class Ui extends Base
 	function edit(array $content=null, $msg='')
 	{
 		//$this->is_admin = false;
+		$check_add = $this->aclCheckAdd();
 
 		if (!is_array($content))
 		{
 			if (empty($_GET['fed_id']))
 			{
-				$content = array();
+				$content = array(
+					'edit_rights' => (bool)$check_add,
+				);
+				if (!is_bool($check_add))
+				{
+					$content['fed_parent'] = ((array)$check_add)[0];
+					if (($parent = $this->federation->read($content['fed_parent'])))
+					{
+						$content += array_intersect_key($parent, array_flip(['nation', 'fed_nationname', 'fed_continent']));
+					}
+					switch($content['nation'])
+					{
+						case 'GER':
+							$content['verband'] = 'Deutscher Alpenverein ';
+							break;
+						case 'SUI':
+							$content['verband'] = 'Schweizer Alpen Club ';
+							break;
+					}
+				}
 			}
 			elseif(strpos($_GET['fed_id'], ',') === false)
 			{
@@ -64,7 +84,7 @@ class Ui extends Base
 				);
 				Api\Framework::message('Apply modifications below to all selected federations', 'info');
 			}
-			// only admin can create new fedeerations or edit multiple ones
+			// only admin can create new federations or edit multiple ones
 			if (!isset($content['edit_rights']))
 			{
 				$content['edit_rights'] = $this->is_admin;
@@ -80,6 +100,14 @@ class Ui extends Base
 			{
 				case 'save':
 				case 'apply':
+					if (empty($content['fed_id']))
+					{
+						$this->federation->init();
+					}
+					else
+					{
+						$this->federation->read($content['fed_id']);
+					}
 					// editing of multiple federations
 					if (!empty($content['fed_ids']))
 					{
@@ -147,13 +175,20 @@ class Ui extends Base
 			$readonlys['button[delete]'] = true;
 			$readonlys['fed_parent'] = $readonlys['fed_since'] = $readonlys['fed_parent_since'] = true;
 			$readonlys['nation'] = $readonlys['fed_nationname'] = $readonlys['fed_continent'] = true;
+			if (empty($content['fed_id']) && count((array)$check_add) > 1)
+			{
+				unset($readonlys['fed_parent']);
+			}
 		}
 
 		$fed_parents = empty($content['nation']) ? array() :
 			$this->federation->query_list('verband', 'fed_id', array(
 				'nation' => $content['nation'],
-				'fed_id != '.(int)$content['fed_id'],
-			), Federation::FEDERATION_CHILDREN.' DESC, verband ASC');
+			)+($this->is_admin ? [
+				'fed_id != '.(int)$content['fed_id']
+			] : [
+				'fed_id' => $check_add
+			]), Federation::FEDERATION_CHILDREN.' DESC, verband ASC');
 
 		$tpl = new Api\Etemplate('ranking.federation.edit');
 		$tpl->exec('ranking.'.self::class.'.edit',$content, array(
@@ -162,6 +197,24 @@ class Ui extends Base
 			'fed_parent' => $fed_parents,
 			'fed_parent_since' => $fed_parents,
 		), $readonlys, $content, 2);
+	}
+
+	/**
+	 * Check if user is allowed to add federations
+	 *
+	 * @return bool|int|int[] true: admin can add unconditional, false: user can NOT edit or int to add within returned parent federation(s)
+	 */
+	protected function aclCheckAdd()
+	{
+		if ($this->is_admin)
+		{
+			return true;
+		}
+		if (!$this->edit_rights)
+		{
+			return false;
+		}
+		return count($this->edit_rights) <= 1 ? $this->edit_rights[0] : $this->edit_rights;
 	}
 
 	/**
@@ -298,7 +351,9 @@ class Ui extends Base
 			'fed_continent' => Federation::$continents,
 			'fed_parent' => $fed_parents,
 			'fed_parent_since' => $fed_parents,
-		), [], $content);
+		), [
+			'nm[add]' => !$this->aclCheckAdd(),
+		], $content);
 	}
 
 	/**
