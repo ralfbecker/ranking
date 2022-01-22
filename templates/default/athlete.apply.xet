@@ -56,7 +56,7 @@
 				<row class="dialogFooterToolbar">
 					<hbox span="2">
 						<button label="Continue" id="button[apply]"/>
-						<button label="Cancel" id="button[cancel]" onclick="window.close();"/>
+						<button label="Cancel" id="button[cancel]" novalidate="true" onclick="window.close();"/>
 					</hbox>
 				</row>
 			</rows>
