@@ -382,7 +382,7 @@ if ($mode != 2)
 					{
 						$t_register = 'Anmelden';
 						$t_selfregister = 'sich selbst für diesen Wettkampf anmelden';
-						$link = 'https://'.$_SERVER['HTTP_HOST']."/egroupware/ranking/athlete.php?action=register-$wettk->WetId";
+						$link = 'https://'.$_SERVER['HTTP_HOST']."/egroupware/ranking/athlete.php?action=comp-$wettk->WetId";
 						$minis .= ($minis?"\n| ":'')."<a class='mini_link' href=\"javascript:window.open('$link','_blank','dependent=yes,width=900,height=450,scrollbars=yes,status=yes')\" title='$t_selfregister'>$t_register</a>";
 					}
 					if (file_exists($file_prefix.$result))

@@ -1,8 +1,7 @@
 <?php
-/* $Id$ */
 
 if (basename($_SERVER['PHP_SELF']) == basename(__FILE__) &&
-	!in_array($_SERVER['HTTP_HOST'],array('localhost','ralfsmac.local','ralfsmacbook.local','boulder.outdoor-training.de')))
+	!in_array($_SERVER['HTTP_HOST'], ['localhost', 'ralfsmac.local', 'boulder.egroupware.org']))
 {
 	include_once('cache.php');
 	do_cache();
