@@ -47,10 +47,11 @@
 					<textbox id="strasse" size="30" maxlength="60"/>
 				</row>
 				<row class="th">
-					<description for="verband" value="DAV Sektion"/>
+					<description for="verband" value="Federation"/>
 					<select class="selectboxFullWidth" id="fed_id" needed="true" empty_label="Select one" search="true"/>
 					<description for="nation" value="Nation"/>
-					<select statustext="nation the athlete is competing for" id="nation" needed="true" no_lang="true" onchange="1" empty_label="Select one"/>
+					<select statustext="nation the athlete is competing for" id="nation" needed="true" no_lang="true"
+						onchange="widget.getInstanceManager().submit(undefined,true,true)" empty_label="Select one"/>
 				</row>
 				<row class="dialogFooterToolbar">
 					<hbox span="2">

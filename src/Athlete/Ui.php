@@ -130,6 +130,13 @@ class Ui extends Base
 		}
 		$nations = $this->athlete->distinct_list('nation');
 
+		// self-service registration is only GER and SUI
+		if ($this->is_selfservice() === 'new')
+		{
+			$this->athlete_rights = ['GER', 'SUI'];
+			$nations = array_combine($this->athlete_rights, $this->athlete_rights);
+		}
+
 		// set and enforce nation ACL
 		if (!is_array($content))	// new call
 		{
@@ -520,7 +527,7 @@ Continuer';
 			$readonlys['license_nation'] = true;
 		}
 		// dont allow non-admins to change sex and nation, once it's been set
-		if ($this->athlete->data['PerId'] && !$this->is_admin)
+		if ($this->athlete->data['PerId'] && $this->athlete->data['PerId'] !== 'new' && !$this->is_admin)
 		{
 			if ($this->athlete->data['nation']) $readonlys['nation'] = true;
 			if ($this->athlete->data['sex']) $readonlys['sex'] = true;
@@ -546,7 +553,7 @@ Continuer';
 				$readonlys['acl_fed_id[fed_id]'] = !$this->is_admin;	// dont allow non-admins to set acl_fed_id for nations other then SUI
 			}
 			// forbid SUI RGZs to change Sektion
-			if ($content['nation'] == 'SUI' && !in_array('SUI',$this->athlete_rights) && !$this->is_admin)
+			if ($content['nation'] == 'SUI' && $content['PerId'] !== 'new' && !in_array('SUI',$this->athlete_rights) && !$this->is_admin)
 			{
 				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
 			}
