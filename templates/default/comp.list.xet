@@ -19,7 +19,7 @@
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-sortheader align="center" label="Date" id="datum"/>
+					<nextmatch-sortheader label="Date" id="datum"/>
 					<nextmatch-sortheader label="Name" id="name"/>
 					<nextmatch-filterheader align="center" id="nation" no_lang="1" options="Nation..." class="selectboxFullWidth"/>
 					<nextmatch-filterheader align="center" id="serie" no_lang="1" options="Cup..." class="selectboxFullWidth"/>
@@ -33,7 +33,7 @@
 					<nextmatch-header align="center" label="Status" id="status"/>
 				</row>
 				<row class="nmr">
-					<date align="center" id="${row}[datum]" readonly="true" options="Y-m-d"/>
+					<date id="${row}[datum]" readonly="true" options="Y-m-d"/>
 					<html id="${row}[name]" no_lang="1" class="ml10"/>
 					<description align="center" id="${row}[nation]" no_lang="1"/>
 					<select align="center" id="${row}[serie]" no_lang="1" readonly="true"/>
