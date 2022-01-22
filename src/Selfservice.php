@@ -89,7 +89,7 @@ class Selfservice extends Base
 		}
 		if (!in_array($action, ['register', 'confirm']) &&
 			(!$athlete || !$this->acl_check_athlete($athlete) && $this->is_selfservice() != $PerId) &&
-			!($PerId = $this->auth($athlete, $action)))
+			!($PerId = $this->auth($athlete, $_action)))
 		{
 			$this->showFooter($nation2lang[$athlete['nation']]);
 			exit;
@@ -288,7 +288,7 @@ class Selfservice extends Base
 			{
 				die("<p class='error'>".lang('Competition is NOT open to your federation!')."</p>\n");
 			}
-			if ($this->date_over($comp['deadline'] ? $comp['deadline'] : $comp['datum']))
+			if ($this->date_over($comp['deadline'] ?: $comp['datum']))
 			{
 				die("<p class='error'>".lang('Registration for this competition is over!')."</p>\n");
 			}
@@ -297,7 +297,7 @@ class Selfservice extends Base
 				die("<p class='error'>".lang('Athlete is suspended !!!')."</p>\n");
 			}
 			$error = false;
-			// check if competion requires a license
+			// check if competition requires a license
 			if (empty($comp['no_license']))
 			{
 				if (!($athlete = $this->athlete->read($athlete['PerId'], '', (int)$comp['datum'], $comp['nation'])) ||
