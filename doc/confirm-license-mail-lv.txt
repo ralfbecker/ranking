@@ -1,0 +1,16 @@
+Anfrage Kletterlizenz von $$vorname$$ $$nachname$$
+Sehr geehrte(r) Verantwortliche(r) des Landesverbandes der Sektion $$verband$$,
+
+$$vorname$$ $$nachname$$ hat über digital ROCK eine nationale Kletterlizenz
+beantragt und angegeben Mitglied der Sektion $$verband$$ zu sein.
+
+Wenn Sie als Verantwortliche(r) des zuständigen Landesverbandes der Sektion
+$$verband$$ dem Antrag zustimmen, klicken Sie bitte auf den folgenden Link:
+
+	$$LINK$$
+
+Als Verantwortliche(r) sollten sie vorher prüfen dass:
+- $$verband$$ Mitglied des Landesverbandes ist
+- ...
+
+Dein Team von digital ROCK

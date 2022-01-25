@@ -442,7 +442,11 @@ $phpgw_baseline = array(
 			'GrpId' => array('type' => 'int','precision' => '4','comment' => 'optional category for which license was applied'),
 			'lic_until' => array('type' => 'int','precision' => '2','comment' => 'optional end-year, default only valid in current year'),
 			'lic_registered' => array('type' => 'date','comment' => 'athlete registered/applied'),
-			'lic_registered_by' => array('type' => 'int','precision' => '4')
+			'lic_registered_by' => array('type' => 'int','precision' => '4'),
+			'lic_sektion_confirmed' => array('type' => 'date','comment' => 'Sektion confirmed'),
+			'lic_sektion_confirmed_by' => array('type' => 'int','precision' => '4'),
+			'lic_lv_confirmed' => array('type' => 'date','comment' => 'LV confirmed'),
+			'lic_lv_confirmed_by' => array('type' => 'int','precision' => '4'),
 		),
 		'pk' => array('PerId','nation','lic_year'),
 		'fk' => array(),

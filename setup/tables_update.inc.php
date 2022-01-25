@@ -2159,3 +2159,33 @@ function ranking_upgrade21_1_001()
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1.002';
 }
 
+
+/**
+ * Record Sektion and LV confirmed athlete' license request
+ *
+ * @return string
+ */
+function ranking_upgrade21_1_002()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','lic_sektion_confirmed',array(
+		'type' => 'date',
+		'comment' => 'athlete registered/applied'
+	));
+
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','lic_sektion_confirmed_by',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','lic_lv_confirmed',array(
+		'type' => 'date',
+		'comment' => 'athlete registered/applied'
+	));
+
+	$GLOBALS['egw_setup']->oProc->AddColumn('Licenses','lic_lv_confirmed_by',array(
+		'type' => 'int',
+		'precision' => '4'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1.003';
+}

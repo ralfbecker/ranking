@@ -14,7 +14,7 @@
 $setup_info['ranking']['only_db'] = array('never');
 
 $setup_info['ranking']['name']      = 'ranking';
-$setup_info['ranking']['version']   = '21.1.002';
+$setup_info['ranking']['version']   = '21.1.003';
 $setup_info['ranking']['app_order'] = 1;
 $setup_info['ranking']['tables']    = array('Wettkaempfe','Serien','Gruppen','RangListenSysteme','PktSysteme','Results','Feldfaktoren','PktSystemPkte','Gruppen2Personen','Personen','Routes','RouteResults','RelayResults','Displays','DisplayFormats','Federations','Athlete2Fed','Licenses','RouteHolds','Registration');
 $setup_info['ranking']['only_db']   = array('none');	// do NOT install by default, was array('mysql','postgres');
@@ -30,17 +30,18 @@ $setup_info['ranking']['license']  = 'GPL';
 $setup_info['ranking']['description'] =
 	"<p>Calendar-, result- and ranking-service on this site is provided by digital ROCK.</p>
 	<ul>
-    	<li>IFSC Climbing officials can manage the competition calendar and other website content from everywhere all over the world.</li>
-    	<li>National federations can online register athlets for competitions and update their personal profiles.</li>
-    	<li>Judges can draw starting-lists from the registered athlets, enter results &amp; print result-lists.</li>
-    	<li>Rankings and cup-results are generated on the fly by the system and linked to the athlet's profiles.</li>
+    	<li>Climbing officials can manage the competition calendar and other website content from everywhere all over the world.</li>
+    	<li>Athletes can register for national licenses, to be confirmed by their federation (Sektion) and state-federation (LV)</li>
+    	<li>National federations can online register athletes for competitions and update their personal profiles.</li>
+    	<li>Judges can draw starting-lists from the registered athletes, enter results &amp; print result-lists.</li>
+    	<li>Rankings and cup-results are generated on the fly by the system and linked to the athlete's profiles.</li>
     </ul>";
 
 $setup_info['ranking']['note'] =
 	"<p>If you want more information about the system, please contact us:\n".
-	'<table><tr><td><a href="http://www.digitalrock.de" target="_blank"><img src="ranking/templates/default/images/navbar.png" /></a>&nbsp;&nbsp;</td>
-	<td><p><b>digital ROCK</b> a business unit of <a href="http://www.egroupware.org" target="_blank">EGroupware GmbH</a><br />
-	<a href="http://www.digitalrock.de" target="_blank">www.digitalROCK.de</a><br />
+	'<table><tr><td><a href="https://www.digitalrock.de" target="_blank"><img src="ranking/templates/default/images/navbar.png" /></a>&nbsp;&nbsp;</td>
+	<td><p><b>digital ROCK</b> a business unit of <a href="https://www.egroupware.org" target="_blank">EGroupware GmbH</a><br />
+	<a href="https://www.digitalrock.de" target="_blank">www.digitalROCK.de</a><br />
 	<a href="mailto:RalfBecker at digitalROCK.de"><span onClick="document.location=\'mailto:RalfBecker\'+\'@\'+\'digitalROCK.de\'; return false;">Ralf Becker</span></a></p></td></tr></table></p>';
 
 /* The hooks this app includes, needed for hooks registration */

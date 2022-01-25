@@ -160,6 +160,9 @@ class Selfservice extends Base
 				throw new Api\Exception\WrongParameter("Unknown action '$action'!");
 		}
 		$this->showFooter($lang);
+		// run egw destructor now explicit, in case a (notification) email is send via Egw::on_shutdown(),
+		// as stream-wrappers used by Horde Smtp fail when PHP is already in destruction
+		$GLOBALS['egw']->__destruct();
 		exit;
 	}
 
@@ -906,7 +909,7 @@ class Selfservice extends Base
 				}
 			}
 			self::$notify = true;
-			Egw::on_shutdown(__CLASS__ . '::applyNotifyFederation', [$athlete]);
+			Egw::on_shutdown(__CLASS__ . '::applyNotifyFederations', [$athlete, $cat ?: null]);
 
 			$ui = new Athlete\Ui();
 			if (($err = $ui->applyLicense([
@@ -932,17 +935,15 @@ class Selfservice extends Base
 	/**
 	 * Generate a token to verify license-request-confirmation by federation/Sektion or state-federation/LV
 	 *
-	 * @param int $PerId
-	 * @param int $fed_id
-	 * @param string $email
-	 * @param ?int $GrpId
+	 * @param int $PerId used as "sub" / related to
+	 * @param array $claims additional claims
 	 * @return string
 	 */
-	private static function confirmToken(int $PerId, int $fed_id, string $email, int $GrpId=null)
+	private static function confirmToken(int $PerId, array $claims)
 	{
 		$config = (new Keys())->jwtConfiguration();
 		$now   = new \DateTimeImmutable();
-		return $config->builder()
+		$builder = $config->builder()
 			// Configures the issuer (iss claim)
 			->issuedBy(self::issuer())
 			// Configures the audience (aud claim)
@@ -956,13 +957,19 @@ class Selfservice extends Base
 			// Configures the expiration time of the token (exp claim)
 			->expiresAt($now->modify('+2 month'))
 			// Configures claims
-			->relatedTo($PerId)
-			// Configures further claims
-			->withClaim('fed_id', $fed_id)
-			->withClaim('email', strtolower($email))
-			->withClaim('GrpId', (string)$GrpId)
-			// Builds a new token
-			->getToken($config->signer(), $config->signingKey());
+			->relatedTo($PerId);
+
+		// Configures further claims
+		foreach($claims as $name => $value)
+		{
+			if ($name === 'email')
+			{
+				$value = strtolower($value);
+			}
+			$builder->withClaim($name, (string)$value);
+		}
+		// Builds a new token
+		return $builder->getToken($config->signer(), $config->signingKey());
 	}
 
 	/**
@@ -970,12 +977,10 @@ class Selfservice extends Base
 	 *
 	 * @param string $jwt
 	 * @param int $PerId
-	 * @param int $fed_id
-	 * @param string $email
-	 * @param ?int $GrpId
-	 * @return string
+	 * @param array $check_claims claims to check and throw if they are missing or wrong
+	 * @return ?JWT\Token\DataSet with claims or NULL
 	 */
-	private static function checkConfirmToken(string $jwt, int $PerId, int $fed_id, string $email, int $GrpId=null)
+	private static function checkConfirmToken(string $jwt, int $PerId, array $check_claims=[])
 	{
 		$config = (new Keys())->jwtConfiguration();
 		$token = $config->parser()->parse($jwt);
@@ -994,21 +999,37 @@ class Selfservice extends Base
 			$config->validator()->assert($token, ...$config->validationConstraints());
 
 			$claims = $token->claims();
-			foreach ([
-				'fed_id' => $fed_id,
-				'email' => strtolower($email),
-				'GrpId' => (string)$GrpId,
-			] as $name => $value)
+			if ($check_claims)
 			{
-				if (!$claims->has($name) || $claims->get($name) != $value)
-				{
-					throw new Exception("Missing or wrong '$name' claim!");
-				}
+				self::checkClaims($claims, $check_claims);
 			}
-			return true;
+			return $claims;
 		}
 		catch (\Exception $e) {
-			return false;
+			return null;
+		}
+	}
+
+	/**
+	 * Check claims of a JWT
+	 *
+	 * @param JWT\Token\DataSet $claims
+	 * @param array $check_claims required claims as $name => $value pairs
+	 * @return void
+	 * @throws Exception
+	 */
+	private static function checkClaims(JWT\Token\DataSet $claims, array $check_claims)
+	{
+		foreach ($check_claims as $name => $value)
+		{
+			if ($name === 'email')
+			{
+				$value = strtolower($value);
+			}
+			if (!$claims->has($name) || $claims->get($name) != $value)
+			{
+				throw new \Exception("Missing or wrong '$name' claim!");
+			}
 		}
 	}
 
@@ -1042,62 +1063,80 @@ class Selfservice extends Base
 	}
 
 	/**
-	 * Notify responsible person of athletes federation to approve the request
+	 * Notify responsible person of athletes federations (Sektion and LV) to approve the request
 	 *
 	 * @param array $athlete
 	 * @param ?int $GrpId for TOF license
-	 * @param ?string $template default ranking/doc/confirm-license-mail.txt
 	 */
-	public static function applyNotifyFederation(array $athlete, int $GrpId=null, string $template=null)
+	public static function applyNotifyFederations(array $athlete, int $GrpId=null)
 	{
-		if (self::$notify)
+		if (self::$notify && ($fed = self::getInstance()->federation->read(['fed_id' => $athlete['fed_id']])))
 		{
-			if (empty($template))
-			{
-				$template = EGW_SERVER_ROOT.'/ranking/doc/confirm-license-mail.txt';
-			}
-			if (!file_exists($template) || !is_readable($template))
-			{
-				throw new Api\Exception\WrongParameter("Mail template '$template' not found!");
-			}
-			$is_html = !preg_match('/\.txt$/',$template);
+			// notify athlete federation (Sektion)
+			self::applyNotifyFederation($athlete, $fed['fed_id'], EGW_SERVER_ROOT.'/ranking/doc/confirm-license-mail.txt', $GrpId);
 
-			list($subject, $body) = preg_split("/\r?\n/", file_get_contents($template), 2);
-
-			$failed = $success = [];
-			foreach(self::notifyLicenseRequestAddresses($athlete['fed_id']) as $key => $email)
+			// notify parent federation (LV)
+			if ($fed['fed_parent'])
 			{
-				// generate confirm hash
-				$link = Egw::link('/ranking/athlete.php', array(
-					'PerId' => $athlete['PerId'],
-					'action' => 'confirm-' . self::confirmToken($athlete['PerId'], $athlete['fed_id'], $email, $GrpId),
-					'GrpId' => $GrpId ?? '',
-					'cd' => 'no',
-				));
-				if ($link[0] == '/') $link = 'https://' . $_SERVER['SERVER_NAME'] . $link;
-
-				try {
-					self::mail($email,
-						$athlete + array(
-							'LINK' => !$is_html ? $link : '<a href="' . $link . '">' . $link . '<a>',
-							'SERVER_NAME' => $_SERVER['SERVER_NAME'],
-							'LV-EMAIL-ADDRESSES' => implode(', ', (array)Base::getInstance()->federation->get_contacts($athlete, $is_html)),
-						), $subject, $body, "$athlete[vorname] $athlete[nachname] <$athlete[email]>", $is_html);
-					$success[] = $email;
-				}
-				// catch errors to multiple email get send, even if one fails
-				catch (\Exception $e) {
-					$e = new \Exception("Error sending {basename($template} to $email for $athlete[vorname] $athlete[nachname] <$athlete[email]>: ".
-						$e->getMessage(), $e->getCode(), $e);
-					_egw_log_exception($e);
-					$failed[$key] = $email;
-					// todo: notify LV, if notification to sektion failed
-				}
+				self::applyNotifyFederation($athlete, $fed['fed_parent'], EGW_SERVER_ROOT.'/ranking/doc/confirm-license-mail-lv.txt', $GrpId);
 			}
-			error_log(__METHOD__ . '(' . json_encode($athlete) . ')'.
-				($success ? ' success: '.implode(', ', $success) : '').
-				($failed ? ' FAILED: '.implode(', ', $failed) : ''));
 		}
+	}
+
+	/**
+	 * Notify responsible person of athletes federation to approve the request
+	 *
+	 * @param array $athlete
+	 * @param int $fed_id federation to notif
+	 * @param string $template default ranking/doc/confirm-license-mail.txt
+	 * @param ?int $GrpId for TOF license
+	 */
+	public static function applyNotifyFederation(array $athlete, int $fed_id, string $template, int $GrpId=null)
+	{
+		if (!file_exists($template) || !is_readable($template))
+		{
+			throw new Api\Exception\WrongParameter("Mail template '$template' not found!");
+		}
+		$is_html = !preg_match('/\.txt$/',$template);
+
+		list($subject, $body) = preg_split("/\r?\n/", file_get_contents($template), 2);
+
+		$failed = $success = [];
+		foreach(self::notifyLicenseRequestAddresses($fed_id) as $key => $email)
+		{
+			// generate confirm hash
+			$link = Egw::link('/ranking/athlete.php', array(
+				'PerId' => $athlete['PerId'],
+				'action' => 'confirm-' . self::confirmToken($athlete['PerId'], [
+					'fed_id' => $fed_id,
+					'email' => $email,
+					'GrpId' => $GrpId ?? '',
+				]),
+				'cd' => 'no',
+			));
+			if ($link[0] == '/') $link = 'https://' . $_SERVER['SERVER_NAME'] . $link;
+
+			try {
+				self::mail($email,
+					$athlete + array(
+						'LINK' => !$is_html ? $link : '<a href="' . $link . '">' . $link . '<a>',
+						'SERVER_NAME' => $_SERVER['SERVER_NAME'],
+						'LV-EMAIL-ADDRESSES' => implode(', ', (array)Base::getInstance()->federation->get_contacts($athlete, $is_html)),
+					), $subject, $body, "$athlete[vorname] $athlete[nachname] <$athlete[email]>", $is_html);
+				$success[] = $email;
+			}
+			// catch errors to multiple email get send, even if one fails
+			catch (\Exception $e) {
+				$e = new \Exception("Error sending {basename($template} to $email for $athlete[vorname] $athlete[nachname] <$athlete[email]>: ".
+					$e->getMessage(), $e->getCode(), $e);
+				_egw_log_exception($e);
+				$failed[$key] = $email;
+				// todo: notify LV, if notification to sektion failed
+			}
+		}
+		error_log(__METHOD__ . '(' . json_encode($athlete) . ", $fed_id, '$template', $GrpId)".
+			($success ? ' success: '.implode(', ', $success) : '').
+			($failed ? ' FAILED: '.implode(', ', $failed) : ''));
 	}
 
 	/**
@@ -1105,7 +1144,6 @@ class Selfservice extends Base
 	 *
 	 * @param ?array $athlete
 	 * @param string $token
-	 * @param int $_GET['GrpId'] to confirm eg. TOF
 	 */
 	private function confirmLicenseRequest(array $athlete=null, string $token)
 	{
@@ -1113,12 +1151,37 @@ class Selfservice extends Base
 		{
 			throw new Api\Exception\WrongParameter(($athlete ? '$athlete' : '$token').' must not be empty!');
 		}
-		$GrpId = (int)($_GET['GrpId'] ?? 0) ?: null;
-		foreach(self::notifyLicenseRequestAddresses($athlete['fed_id']) as $email)
+		if (!($claims = self::checkConfirmToken($token, $athlete['PerId'])))
 		{
-			if (self::checkConfirmToken($token, $athlete['PerId'], $athlete['fed_id'], $email, $GrpId))
+			throw new Api\Exception\WrongUserinput(lang('Invalid JsonWebToken').': '.lang('Wrong or missing athlete-ID!'));
+		}
+		if (!($fed = $this->federation->read(['fed_id' => $athlete['fed_id']])))
+		{
+			throw new Api\Exception\WrongParameter("Error reading athlete federation '$athlete[fed_id]'!");
+		}
+		$fed2status = [
+			$fed['fed_id'] => 'e',      // Sektion confirmed
+			$fed['fed_parent'] => 'l',  // LV confirmed
+		];
+		if (!$claims->has('fed_id') || !($fed_id=$claims->get('fed_id')) || !in_array($fed_id, array_keys($fed2status)))
+		{
+			throw new Api\Exception\WrongUserinput(lang('Invalid JsonWebToken').': '.lang("Missing or invalid federation-ID '%1'!", $fed_id));
+		}
+		if (!$claims->has('email'))
+		{
+			throw new Api\Exception\WrongUserinput(lang('Invalid JsonWebToken').': '.lang("Missing or invalid email '%1'!", ''));
+		}
+		$from = $claims->get('email');
+		$GrpId = $claims->has('GrpId') ? (int)$claims->get('GrpId') : null;
+		$my_status = $fed2status[$fed_id];
+		$other_accepted = $my_status === 'l' ? 'e' : 'l';
+		$set_status = $athlete['license'] === $other_accepted ? 'a' : $my_status;
+		foreach(self::notifyLicenseRequestAddresses($fed_id) as $email)
+		{
+			if (strtolower($email) === $from)
 			{
-				if ($athlete['license'] !== 'r' || !$this->athlete->set_license(date('Y'), 'a', $athlete['PerId'], $athlete['nation'], $GrpId))
+				if (!in_array($athlete['license'], ['r', $other_accepted]) ||
+					!$this->athlete->set_license(date('Y'), $set_status, $athlete['PerId'], $athlete['nation'], $GrpId))
 				{
 					echo "<p>".lang('License request already approved.')."</p>\n";
 				}
@@ -1129,7 +1192,7 @@ class Selfservice extends Base
 				return;
 			}
 		}
-		throw new Api\Exception\WrongParameter("Invalid token for $athlete[vorname] $athlete[nachname] ($athlete[verband] federation #$athlete[fed_id]) and $email!");
+		throw new Api\Exception\WrongUserinput("Invalid JsonWebToken for $athlete[vorname] $athlete[nachname] ($athlete[verband] federation #$athlete[fed_id])!");
 	}
 
 	/**
