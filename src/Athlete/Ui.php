@@ -491,7 +491,8 @@ Continuer';
 			'custom_acl' => self::$acl_deny_labels,
 			'license'=> $this->license_labels,
 			'fed_id' => !$content['nation'] ? array(lang('Select a nation first')) :
-				$this->athlete->federations($content['nation'],$content['nation'] === 'GER' ? null : false,$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
+				$this->athlete->federations($content['nation'], $content['nation'] === 'GER' && $this->is_selfservice() ? null : false,
+					$feds_with_grants ? array('fed_id' => $feds_with_grants) : array()),
 			'license_nation' => ($license_nations = $this->license_nations),
 			'license_cat' => $this->cats->names(array(
 				'sex' => $content['sex'] ? ($content['sex']=='male'?'!female':'!male') : null,
@@ -507,7 +508,7 @@ Continuer';
 		$readonlys = array(
 			'button[delete]' => !$this->athlete->data['PerId'] || !$edit_rights || $this->athlete->has_results(),
 			'nation' => !!$this->only_nation_athlete,
-			'pw_mail'=> !$content['email'],
+			'button[pw_mail]'=> !$this->athlete->data['PerId'] || empty($content['email']) || !strpos($content['email'], '@'),
 			// show apply license only if status is 'n' or 'a' AND user has right to apply for license
 			'button[apply_license]' => in_array($content['license'],array('s','c')) ||
 				!$this->acl_check_athlete($this->athlete->data,self::ACL_ATHLETE,null,$content['license_nation']),
