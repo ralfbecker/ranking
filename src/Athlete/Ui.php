@@ -352,7 +352,8 @@ class Ui extends Base
 							$content['athlete_data']['license_cat'] != $content['license_cat']) &&
 							$this->acl_check($content['license_nation'],self::ACL_ATHLETE))	// you need int. athlete rights
 						{
-							if (!$this->athlete->set_license($content['license_year'],$content['license'],null,$content['license_nation'],$content['license_cat']))
+							if (!$this->athlete->set_license($content['license_year'], $content['license'],null,
+								$content['license_nation'], $content['license_cat'] ?: null))
 							{
 								$msg .= ', '.lang('Athlete is NOT in agegroup of selected license category!');
 							}
@@ -1251,7 +1252,8 @@ Continuer';
 			{
 				return lang('Required information missing, application rejected!');
 			}
-			if ($this->athlete->set_license($athlete['license_year'], $status, $athlete['PerId'], $athlete['license_nation'], $athlete['license_cat']) === false)
+			if ($this->athlete->set_license($athlete['license_year'], $status, $athlete['PerId'],
+				$athlete['license_nation'], $athlete['license_cat'] ?: null) === false)
 			{
 				return lang('Athlete is NOT in agegroup of selected license category!');
 			}
