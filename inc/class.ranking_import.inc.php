@@ -462,7 +462,7 @@ class ranking_import extends ranking_result_bo
 		$detection =& $import['detection'];
 		foreach($import as $n => &$data)
 		{
-			if ($n < 2 ) continue;	// not an athlete col
+			if (!is_int($n) || $n < 2 ) continue;	// not an athlete col
 
 			$nat = $nation_col && $data[$nation_col] ? $data[$nation_col] : $nation;
 
