@@ -727,7 +727,7 @@ class ranking_import extends ranking_result_bo
 		$result = [];
 		foreach($import as $n => &$row)
 		{
-			if ($n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
+			if (!is_int($n) || $n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
 
 			$this->athlete->init();
 
@@ -895,7 +895,7 @@ class ranking_import extends ranking_result_bo
 		$added_coaches = [];
 		foreach($import as $n => &$data)
 		{
-			if ($n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
+			if (!is_int($n) || $n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
 
 			// do we need to add the coach first
 			if (empty($data['coach-id']) && ($add_all || !isset($update[$n][$coach_col ?: $coach_email_col]) || $update[$n][$coach_col ?: $coach_email_col]))
