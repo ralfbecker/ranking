@@ -71,7 +71,7 @@ class Ui extends Base
 		}
 		else
 		{
-			$button = key($_content['button']);
+			$button = key($_content['button'] ?? []);
 			unset($_content['button']);
 
 			$this->comp->data = $_content['comp_data'];
