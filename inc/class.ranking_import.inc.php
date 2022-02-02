@@ -156,7 +156,7 @@ class ranking_import extends ranking_result_bo
 				{
 					case 'upload':
 						$content['import'] = $this->do_upload($content['file']['tmp_name'],
-							$content['charset'], $content['delimiter'], $calendar, $cat);
+							$content['charset'], $content['delimiter'], $calendar, $cat ?: null);
 						$msg = lang('%1 lines read from file.',count($content['import'])-4);	// -1 because of 'as' key
 						break;
 					case 'cancel':
@@ -518,7 +518,7 @@ class ranking_import extends ranking_result_bo
 				}
 			}
 			if (!empty($cat['sex']) && !empty($sex_col) && $cat['sex'] !== $data[$sex_col] ||
-				!empty($birth_col) && $this->in_agegroup($data[$birth_col], $cat))
+				!empty($birth_col) && !$this->in_agegroup($data[$birth_col], $cat))
 			{
 				$detection[$n]['row'] = 'ignore';
 			}

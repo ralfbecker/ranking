@@ -109,6 +109,8 @@
 							<column width="150" disabled="!@header[10]"/>
 							<column width="150" disabled="!@header[11]"/>
 							<column width="150" disabled="!@header[12]"/>
+							<column width="150" disabled="!@header[13]"/>
+							<column width="150" disabled="!@header[14]"/>
 						</columns>
 						<rows>
 							<row class="th">
@@ -125,6 +127,8 @@
 								<description id="header[10]"/>
 								<description id="header[11]"/>
 								<description id="header[12]"/>
+								<description id="header[13]"/>
+								<description id="header[14]"/>
 							</row>
 							<row class="th">
 								<description value="Import as"/>
@@ -140,6 +144,8 @@
 								<select id="as[10][as]" empty_label="Ignore" class="et2_fullWidth"/>
 								<select id="as[11][as]" empty_label="Ignore" class="et2_fullWidth"/>
 								<select id="as[12][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[13][as]" empty_label="Ignore" class="et2_fullWidth"/>
+								<select id="as[14][as]" empty_label="Ignore" class="et2_fullWidth"/>
 							</row>
 							<row class="row {$cont['detection'][$row]['row']}">
 								<hbox>
@@ -162,6 +168,8 @@
 								<checkbox statustext="@detection[$row][help-10]" label="@{$row}[10]" id="replace[$row][10]" readonly="true" class="{$cont['detection'][$row][10]}"/>
 								<checkbox statustext="@detection[$row][help-11]" label="@{$row}[11]" id="replace[$row][11]" readonly="true" class="{$cont['detection'][$row][11]}"/>
 								<checkbox statustext="@detection[$row][help-12]" label="@{$row}[12]" id="replace[$row][12]" readonly="true" class="{$cont['detection'][$row][12]}"/>
+								<checkbox statustext="@detection[$row][help-13]" label="@{$row}[13]" id="replace[$row][13]" readonly="true" class="{$cont['detection'][$row][13]}"/>
+								<checkbox statustext="@detection[$row][help-14]" label="@{$row}[14]" id="replace[$row][14]" readonly="true" class="{$cont['detection'][$row][14]}"/>
 							</row>
 						</rows>
 					</grid>
