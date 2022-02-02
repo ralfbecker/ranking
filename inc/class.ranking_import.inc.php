@@ -147,9 +147,9 @@ class ranking_import extends ranking_result_bo
 		}
 		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
 
-		if ($content['button'] || is_array($content['file']))
+		if (!empty($content['button']) || is_array($content['file']))
 		{
-			$button = key($content['button']) ?: 'upload';
+			$button = key($content['button'] ?? ['upload'=>true]);
 			unset($content['button']);
 			try {
 				switch($button)
