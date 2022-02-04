@@ -168,7 +168,7 @@ class ranking_import extends ranking_result_bo
 								$content['license'], $this->license_year));
 						break;
 					case 'apply':
-						$this->detect_athletes($content['import'], $content['import']['as'], $calendar, $cat, $content['license'], $this->license_year);
+						$this->detect_athletes($content['import'], $content['import']['as'], $calendar, $cat ?: null, $content['license'], $this->license_year);
 						break;
 					case 'url':
 						$msg = $this->from_url($comp, $content['keys']['cat'] ? $cat['rkey'] : null, $content['quali_type'],
