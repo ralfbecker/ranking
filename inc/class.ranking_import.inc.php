@@ -498,8 +498,9 @@ class ranking_import extends ranking_result_bo
 						switch($nat)
 						{
 							case 'GER':
-								$data[$c] = preg_replace(array('/e\. ?V\. ?/i','/^(Deutscher Alpenverein|Alpenverein|DAV|Sektion|Se.) ?(.*)$/i'),
+								$data[$c] = preg_replace(array('/e\. ?V\. ?/i','/^(Deutscher Alpenverein|Alpenverein|DAV-Sektion|DAV|Sektion|Se.) ?(.*)$/i'),
 									['','Deutscher Alpenverein \\2'],$data[$c]);
+								$data[$c] = strtr($data[$c], ['ue'=>'ü','oe'=>'ö','ae'=>'ae','Ue'=>'Ü','Oe'=>'Ö','Ae'=>'Ä']);
 								break;
 							case 'SUI':
 								$data[$c] = preg_replace('/^(Schweizer Alpen[ -]*Club|SAC|Club Alpin Suisse|CAS|Sektion|Se.) ?(.*)$/i','Schweizer Alpen Club \\2',$data[$c]);
