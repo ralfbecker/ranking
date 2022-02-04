@@ -282,7 +282,7 @@ class ranking_result_ui extends ranking_result_bo
 						$msg = lang('Heat saved').', ';
 						unset($content['new_route']);
 					}
-					if (!($content['upload_options'] & 1) && $this->has_results($content))
+					if (!((int)$content['upload_options'] & 1) && $this->has_results($content))
 					{
 						$msg = lang('Error: route already has a result!!!');
 						$param['show_result'] = 1;
@@ -292,7 +292,7 @@ class ranking_result_ui extends ranking_result_bo
 						$msg .= lang('Error: no file to upload selected');
 					}
 					elseif (is_numeric($imported = $this->upload($content,$content['file']['tmp_name'],
-						$content['upload_options'] & 2,$content['upload_options'] & 4)))
+						(int)$content['upload_options'] & 2,(int)$content['upload_options'] & 4)))
 					{
 						// set number of problems from csv file
 						if ($content['route_num_problems'])
