@@ -849,8 +849,8 @@ class ranking_import extends ranking_result_bo
 		$this->detect_athletes($import, $col2name, $keys['calendar'], $cat, $license, $license_year);
 
 		if (($keys['route'] === 'registration' || $do_result_import) &&
-			!($comp = $this->comp->read($keys['WetId'])) &&
-			!$this->acl_check_comp($comp, $keys['route'] === 'registration' ? self::ACL_REGISTER : self::ACL_RESULT))
+			(!($comp = $this->comp->read($keys['comp'])) ||
+			!$this->acl_check_comp($comp, $keys['route'] === 'registration' ? self::ACL_REGISTER : self::ACL_RESULT)))
 		{
 			throw new Api\Exception\WrongUserinput(lang('Missing rights to import into the selected competition!'));
 		}
