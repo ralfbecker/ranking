@@ -383,6 +383,7 @@ class ranking_import extends ranking_result_bo
 		}
 		if ($delimiter === '\t') $delimiter = "\t";
 
+		/* do automatic charset detection for now per field
 		if (empty($charset))
 		{
 			if (!($text = file_get_contents($fname, false, null, 0, 100000)) ||
@@ -391,7 +392,7 @@ class ranking_import extends ranking_result_bo
 				$charset = 'iso-8859-1';    // fallback to iso, as this is what German Excel does by default
 			}
 			unset($text);
-		}
+		}*/
 
 		$n = 0;
 		$lines = [];
@@ -399,7 +400,7 @@ class ranking_import extends ranking_result_bo
 		{
 			throw new Api\Exception\WrongUserinput(lang('Error: no line with column names, eg. wrong delemiter'));
 		}
-		$lines[$n++] = Api\Translation::convert($labels,$charset);
+		$lines[$n++] = Api\Translation::convert($labels,$charset ?: mb_detect_encoding(implode(',', $labels), ['utf-8','iso-8859-1'], true));
 
 		while (($line = fgetcsv($fp,null,$delimiter)))
 		{
@@ -408,7 +409,21 @@ class ranking_import extends ranking_result_bo
 				//_debug_array($labels); _debug_array($line);
 				throw new Api\Exception\WrongUserinput(lang('Dataline %1 has a different number of columns (%2) then labels (%3)!',$n,count($line),count($labels)), 999);
 			}
-			$lines[$n++] = Api\Translation::convert($line,$charset);
+			if ($charset)
+			{
+				$lines[$n++] = Api\Translation::convert($line, $charset);
+			}
+			else
+			{
+				foreach($line as &$field)
+				{
+					if (($field_charset = mb_detect_encoding($field, ['utf-8','iso-8859-1'], true)) && strtolower($field_charset) !== 'utf-8')
+					{
+						$field = Api\Translation::convert($field, $field_charset);
+					}
+				}
+				$lines[$n++] = $line;
+			}
 		}
 		fclose($fp);
 
