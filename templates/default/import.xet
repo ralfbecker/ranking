@@ -88,8 +88,8 @@
 				<row disabled="@import[as]">
 					<hbox>
 						<description value="CSV Import"/>
-						<select label="Delimiter" id="delimiter"/>
-						<select label="Import Charset" id="charset"/>
+						<select label="Delimiter" empty_label="automatic" id="delimiter"/>
+						<select label="Import Charset" empty_label="automatic" id="charset"/>
 						<file id="file" onchange="1"/>
 					</hbox>
 				</row>

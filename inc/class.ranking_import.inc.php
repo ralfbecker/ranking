@@ -330,7 +330,7 @@ class ranking_import extends ranking_result_bo
 	protected function do_upload($fname, $charset, $delimiter, $nation=null, array $cat=null)
 	{
 		// do the import
-		foreach(array_values(array_unique([$delimiter, ';', ',', "\t"])) as $n => $delimiter)
+		foreach(array_values(array_unique([$delimiter ?: ';', ';', ',', "\t"])) as $n => $delimiter)
 		{
 			try {
 				$raw_import = $this->csv_import($fname, $charset, $delimiter);
@@ -369,19 +369,29 @@ class ranking_import extends ranking_result_bo
 	 * Import a csv file into an array
 	 *
 	 * @param string $fname name of uploaded file
-	 * @param string $charset ='iso-8859-1' or eg. 'utf-8'
+	 * @param string $charset ='' ''=detect, 'iso-8859-1' or 'utf-8'
 	 * @param string $delimiter =','
 	 * @param string $enclosure ='"'
 	 * @return array with lines and columns or string with error message
 	 * @throw Api\Exception\WrongUserinput with $code 999 for one data-line wrong
 	 */
-	protected function csv_import($fname,$charset='iso-8859-1',$delimiter=',',$enclosure='"')
+	protected function csv_import($fname, $charset='', $delimiter=',', $enclosure='"')
 	{
 		if (!$fname || !file_exists($fname))
 		{
 			throw new Api\Exception\WrongUserinput(lang('You need to select a file first!'));
 		}
 		if ($delimiter === '\t') $delimiter = "\t";
+
+		if (empty($charset))
+		{
+			if (!($text = file_get_contents($fname, false, null, 0, 100000)) ||
+				!($charset = mb_detect_encoding($text, ['utf-8','iso-8859-1'], true)))
+			{
+				$charset = 'iso-8859-1';    // fallback to iso, as this is what German Excel does by default
+			}
+			unset($text);
+		}
 
 		$n = 0;
 		$lines = [];
