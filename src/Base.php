@@ -489,15 +489,16 @@ class Base extends So
 	}
 
 	/**
-	 * Check if current user has edit rights for a competition
+	 * Check if current user has required rights for a competition
 	 *
 	 * @parm array $comp competition or cup data
+	 * @param int $required=self::ACL_EDIT
 	 * @return boolean
 	 */
-	function acl_check_comp(array $comp)
+	function acl_check_comp(array $comp, int $required=self::ACL_EDIT)
 	{
-		return $this->is_admin || $this->acl_check($comp['nation'],self::ACL_EDIT) ||
-			$comp['fed_id'] && $this->acl_check($comp['fed_id'],self::ACL_EDIT);
+		return $this->is_admin || $this->acl_check($comp['nation'], $required, $comp) ||
+			$comp['fed_id'] && $this->acl_check($comp['fed_id'], $required, $comp);
 	}
 
 	/**
