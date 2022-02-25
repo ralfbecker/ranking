@@ -408,7 +408,8 @@ $phpgw_baseline = array(
 			'fed_parent_since' => array('type' => 'int','precision' => '4','comment' => 'new parent'),
 			'fed_emails' => array('type' => 'varchar','precision' => '1024','comment' => 'notification address(es)'),
 			'fed_modifier' => array('type' => 'int','meta' => 'account','precision' => '4'),
-			'fed_modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp')
+			'fed_modified' => array('type' => 'timestamp','nullable' => False,'default' => 'current_timestamp'),
+			'fed_password' => array('type' => 'ascii','precision' => '128')
 		),
 		'pk' => array('fed_id'),
 		'fk' => array(),
@@ -446,7 +447,7 @@ $phpgw_baseline = array(
 			'lic_sektion_confirmed' => array('type' => 'date','comment' => 'Sektion confirmed'),
 			'lic_sektion_confirmed_by' => array('type' => 'int','precision' => '4'),
 			'lic_lv_confirmed' => array('type' => 'date','comment' => 'LV confirmed'),
-			'lic_lv_confirmed_by' => array('type' => 'int','precision' => '4'),
+			'lic_lv_confirmed_by' => array('type' => 'int','precision' => '4')
 		),
 		'pk' => array('PerId','nation','lic_year'),
 		'fk' => array(),

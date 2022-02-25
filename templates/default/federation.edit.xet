@@ -33,6 +33,10 @@
 					<taglist-email id="fed_emails" statustext="email address(es) for notification e.g. Ralf Becker &lt;ralf.becker@digitalROCK.de>" multiple="true"/>
 				</row>
 				<row class="row">
+					<description value="Password"/>
+					<passwd id="fed_password" statustext="Password to confirm license requests or empty to require no password" suggest="8"/>
+				</row>
+				<row class="row">
 					<description value="Parent federation" for="fed_parent"/>
 					<select id="fed_parent" empty_label="None" class="et2_fullWidth" search="true"/>
 				</row>

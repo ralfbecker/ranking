@@ -164,6 +164,11 @@ class Federation extends Api\Storage\Base
 	{
 		if (is_array($keys) && count($keys)) $this->data_merge($keys);
 
+		if (!empty($this->data['fed_password']) && empty(password_get_info($this->data['fed_password'])['algo']))
+		{
+			$this->data['fed_password'] = password_hash($this->data['fed_password'], PASSWORD_DEFAULT);
+		}
+
 		$this->data['fed_modifier'] = $GLOBALS['egw_info']['user']['account_id'];
 		$this->data['fed_modified'] = new Api\DateTime('now');
 

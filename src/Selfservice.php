@@ -1180,6 +1180,24 @@ class Selfservice extends Base
 		{
 			if (strtolower($email) === $from)
 			{
+				if (!empty($fed['fed_password']) &&
+					($_SERVER['REQUEST_METHOD'] === 'GET' ||
+						$_SERVER['REQUEST_METHOD'] === 'POST' && !password_verify($_POST['password'], $fed['fed_password'])))
+				{
+					if ($_SERVER['REQUEST_METHOD'] === 'POST')
+					{
+						echo "<p class='error'>".lang('The entered password is invalid!')."</p>\n";
+					}
+					echo "<p>".lang('Password required to approve license request:')."</p>\n";
+					echo Api\Html::form(
+							Api\Html::input('password', '', 'password')."\n".
+							Api\Html::submit_button('approve', lang('Approve'))/*." ".
+							Api\Html::submit_button('deny', lang('Deny'))*/,
+							[], $_SERVER['REQUEST_URI']
+						)."\n";
+					return;
+				}
+				// ToDo: implement deny
 				if (!in_array($athlete['license'], ['r', $other_accepted]) ||
 					!$this->athlete->set_license(date('Y'), $set_status, $athlete['PerId'], $athlete['nation'], $GrpId))
 				{

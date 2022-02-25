@@ -2189,3 +2189,14 @@ function ranking_upgrade21_1_002()
 
 	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1.003';
 }
+
+function ranking_upgrade21_1_003()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('Federations','fed_password',array(
+		'type' => 'ascii',
+		'precision' => '128'
+	));
+
+	return $GLOBALS['setup_info']['ranking']['currentver'] = '21.1.004';
+}
+
