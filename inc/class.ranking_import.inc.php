@@ -83,6 +83,7 @@ class ranking_import extends ranking_result_bo
 			if ($_GET['cat']) $content['keys']['cat'] = $_GET['cat'];
 			if (is_numeric($_GET['route'])) $content['keys']['route'] = $_GET['route'];
 			if ($_GET['msg']) $msg = $_GET['msg'];
+			if (empty($content['keys']['fed_id'])) $content['keys']['fed_id'] = current($this->edit_rights);
 			$content['import'] = Api\Cache::getSession('ranking', 'pending_import');
 
 			if ($_GET['row'] && is_array($_GET['row']))
