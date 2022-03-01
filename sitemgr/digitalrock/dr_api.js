@@ -1992,6 +1992,10 @@ var Profile = (function() {
 			{
 				case 'categoryChooser':
 					var select = '<select class="chooseCategory">\n';
+					if (typeof _data.categorys === 'undefined')
+					{
+						return '';
+					}
 					for(var i=0; i < _data.categorys.length; ++i)
 					{
 						var cat = _data.categorys[i];
