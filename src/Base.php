@@ -581,14 +581,15 @@ class Base extends So
 			$this->acl_check($comp['nation'], self::ACL_RESULT);
 
 		// check for route judge rights, if not already a judge
-		if (!$is_judge && $route && (is_array($route) && isset($route['route_judges']) ||
-			($route = $this->route->read($route))) && $route['route_judges'] &&
+		if (!$is_judge && $route &&
+			(is_array($route) && isset($route['route_judges']) || ($route = $this->route->read($route))) &&
+			isset($route['route_judges']) && is_array($route['route_judges']) &&
 			$route['route_status'] != STATUS_RESULT_OFFICIAL &&			// only 'til result is offical
 			$distance < 1 && abs($distance) <= $this->judge_right_days+$comp['duration'])	// and one day before competition started
 		{
 			$is_judge = in_array($this->user, isset($problem) && count($route['route_judges']) > 1 ?
 				$route['route_judges'][$problem-1] :	// allow only judges from a specific boulder
-				call_user_func_array('array_merge', $route['route_judges'] ?: []));	// allow judges from all boulders
+				call_user_func_array('array_merge', $route['route_judges']));	// allow judges from all boulders
 		}
 		//if (!$is_judge) error_log(__METHOD__."(#$comp[WetId]=$comp[rkey], $allow_before, ".array2string($route).") distance=$distance, route_judges=$route[route_judges] returning ".array2string($is_judge).' '.function_backtrace());
 		return $is_judge;
