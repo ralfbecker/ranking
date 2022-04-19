@@ -1512,8 +1512,10 @@ class Base extends So
 		elseif ($distribution_only)
 		{
 			// randomize after seeding (distribution in 2 routes) by ranking
-			shuffle($startlist[1]);
-			shuffle($startlist[2]);
+			foreach($startlist as &$to_shuffle)
+			{
+				shuffle($to_shuffle);
+			}
 		}
 		if ($stagger)
 		{
