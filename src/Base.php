@@ -108,19 +108,19 @@ class Base extends So
 	 */
 	var $edit_rights = array();
 	/**
-	 * nations the user is allowed to edit athlets
+	 * nations the user is allowed to edit athletes
 	 *
 	 * @var array
 	 */
 	var $athlete_rights = array();
 	/**
-	 * nations the user is allowed to edit athlets
+	 * nations the user is allowed to edit athletes
 	 *
 	 * @var array
 	 */
 	var $athlete_rights_no_judge = array();
 	/**
-	 * nations the user is allowed to register athlets for competitions
+	 * nations the user is allowed to register athletes for competitions
 	 */
 	var $register_rights = array();
 	/**
@@ -150,10 +150,10 @@ class Base extends So
 	 */
 	var $license_labels = array(
 		'n' => 'none',
-		'r' => 'registered',
+		'r' => 'Athlete applied',
 		'e' => 'Sektion confirmed',
 		'l' => 'LV confirmed',
-		'a' => 'applied',
+		'a' => 'Sektion & LV confirmed',
 		'c' => 'confirmed',
 		's' => 'suspended',		// no registration for competitions possible
 	);

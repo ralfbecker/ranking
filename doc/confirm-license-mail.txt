@@ -1,20 +1,22 @@
-Anfrage Kletterlizenz von $$vorname$$ $$nachname$$
-Sehr geehrte(r) Verantwortliche(r) der Sektion $$verband$$,
+Antrag auf nationale Kletterlizenz: Bitte um verbindliche Bestätigung [$$PerId$$]
+Sehr geehrte Damen und Herren,
 
-$$vorname$$ $$nachname$$ hat über digital ROCK eine nationale Kletterlizenz
-beantragt und angegeben Mitglied der Sektion $$verband$$ zu sein.
+der/die Athlet*in $$vorname$$ $$nachname$$ ($$geb_date$$) hat eine nationale Kletterlizenz beantragt und möchte auf Kletterwettkämpfen für ihre Sektion / ihren Verein / ihre Startgemeinschaft starten.
 
-Wenn Sie als Verantwortliche(r) des $$verband$$ dem Antrag zustimmen,
-klicken Sie bitte auf den folgenden Link:
+So Sie dem zustimmen, bitten wir Sie unter dem untenstehenden Link um die nachfolgende, verbindliche Bestätigung durch eine für Ihre Sektion / Ihren Verein / ihre Startgemeinschaft vertretungsbefugte Person. Bitte beachten Sie, dass für die verbindliche Bestätigung ein Passwort erforderlich ist. Dieses hat Ihr Vorstand als vertretungsbefugtes Organ erhalten.
+$$confirm$$
+Ich bestätige,
 
-	$$LINK$$
+dass unsere Sektion / unser Verein / unsere Startgemeinschaft $$verband$$ dem obenstehenden Antrag auf eine nationale Kletterlizenz durch Athlet*in $$vorname$$ $$nachname$$ ($$geb_date$$) zustimmt und diesen mitträgt, dass der/die Athlet*in Mitglied unserer Sektion / unseres Vereins / unserer Startgemeinschaft ist (Gastmitgliedschaft genügt nicht) und die Befugnis hat, für unsere Sektion / unseren Verein / unsere Startgemeinschaft sowie in deren / dessen Namen an Wettkämpfen teilzunehmen.
 
-Als Verantwortliche(r) sollten sie vorher prüfen dass:
-- $$vorname$$ $$nachname$$ Mitglied Ihrer Sektion ist
-- ...
+Zudem bestätige ich,
 
-Bei Rückfragen wenden Sie sich an die Verantwortlichen Ihres Landesverbandes:
+dass unsere Sektion / unser Verein / unsere Startgemeinschaft im zuständigen Landesverband Mitglied ist, dass sie/er im Wettkampfsportbetrieb tätig sein will und dass unsere Sektion / unser Verein / unsere Startgemeinschaft die „Richtlinien Nationale DAV-Kletterlizenz“ (zu finden hier [Link]) anerkennt.
+$$confirm$$
+Verbindliche Bestätigung: $$LINK$$
 
-$$LV-EMAIL-ADDRESSES$$
+So Sie dem Antrag nicht zustimmen, bitten wir Sie, den obenstehenden Link nicht anzuklicken, sondern dies dem zuständigen Landesverband sowie dem Antragsteller mitzuteilen.
 
-Dein Team von digital ROCK
+Im Falle von Fragen wenden Sie sich bitte an $$LV-EMAIL-ADDRESSES$$
+
+Mit freundlichen Grüßen

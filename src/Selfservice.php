@@ -640,8 +640,9 @@ class Selfservice extends Base
 		else
 		{
 			// if we have multiple athletes for one email, iterate over them for login
-			foreach($athletes as $k => $athlete)
+			foreach($athletes as $k => $athlete2)
 			{
+				$athlete = $athlete2;
 				if (!empty($_POST['password']))
 				{
 					if ($athlete['login_failed'] >= self::LOGIN_FAILURES &&
@@ -1073,33 +1074,53 @@ class Selfservice extends Base
 		if (self::$notify && ($fed = self::getInstance()->federation->read(['fed_id' => $athlete['fed_id']])))
 		{
 			// notify athlete federation (Sektion)
-			self::applyNotifyFederation($athlete, $fed['fed_id'], EGW_SERVER_ROOT.'/ranking/doc/confirm-license-mail.txt', $GrpId);
+			self::applyNotifyFederation($athlete, $fed['fed_id'], 'confirm-license-mail', $GrpId);
 
 			// notify parent federation (LV)
 			if ($fed['fed_parent'])
 			{
-				self::applyNotifyFederation($athlete, $fed['fed_parent'], EGW_SERVER_ROOT.'/ranking/doc/confirm-license-mail-lv.txt', $GrpId);
+				self::applyNotifyFederation($athlete, $fed['fed_parent'], 'confirm-license-mail-lv', $GrpId);
 			}
 		}
+	}
+
+	/**
+	 * Find a mail template preferring html over txt and vfs /templates/ranking over doc dir in sources
+	 *
+	 * @param string $template basename of template
+	 * @param bool& $is_html on return true for html, false for text
+	 * @return string[] subject and body of mail
+	 * @throws Api\Exception\WrongParameter if template not found
+	 */
+	private static function getTemplate($template, &$is_html)
+	{
+		foreach([Api\Vfs::PREFIX.'/templates/ranking', EGW_SERVER_ROOT.'/ranking/doc'] as $dir)
+		{
+			foreach(['.html', '.txt'] as $extension)
+			{
+				$path = $dir.'/'.$template.$extension;
+				if (file_exists($path) && is_readable($path))
+				{
+					$is_html = $extension === '.html';
+
+					return preg_split("/\r?\n/", file_get_contents($path), 2);
+				}
+			}
+		}
+		throw new Api\Exception\WrongParameter("Mail template '$path' not found!");
 	}
 
 	/**
 	 * Notify responsible person of athletes federation to approve the request
 	 *
 	 * @param array $athlete
-	 * @param int $fed_id federation to notif
-	 * @param string $template default ranking/doc/confirm-license-mail.txt
+	 * @param int $fed_id federation to notify
+	 * @param string $template
 	 * @param ?int $GrpId for TOF license
 	 */
 	public static function applyNotifyFederation(array $athlete, int $fed_id, string $template, int $GrpId=null)
 	{
-		if (!file_exists($template) || !is_readable($template))
-		{
-			throw new Api\Exception\WrongParameter("Mail template '$template' not found!");
-		}
-		$is_html = !preg_match('/\.txt$/',$template);
-
-		list($subject, $body) = preg_split("/\r?\n/", file_get_contents($template), 2);
+		list($subject, $body) = self::getTemplate($template, $is_html);
 
 		$failed = $success = [];
 		foreach(self::notifyLicenseRequestAddresses($fed_id) as $key => $email)
@@ -1122,6 +1143,7 @@ class Selfservice extends Base
 						'LINK' => !$is_html ? $link : '<a href="' . $link . '">' . $link . '<a>',
 						'SERVER_NAME' => $_SERVER['SERVER_NAME'],
 						'LV-EMAIL-ADDRESSES' => implode(', ', (array)Base::getInstance()->federation->get_contacts($athlete, $is_html)),
+						'confirm' => '',    // remove markers allowing to cut out confirmation text
 					), $subject, $body, "$athlete[vorname] $athlete[nachname] <$athlete[email]>", $is_html);
 				$success[] = $email;
 			}
@@ -1163,7 +1185,8 @@ class Selfservice extends Base
 			$fed['fed_id'] => 'e',      // Sektion confirmed
 			$fed['fed_parent'] => 'l',  // LV confirmed
 		];
-		if (!$claims->has('fed_id') || !($fed_id=$claims->get('fed_id')) || !in_array($fed_id, array_keys($fed2status)))
+		if (!$claims->has('fed_id') || !($fed_id=$claims->get('fed_id')) || !in_array($fed_id, array_keys($fed2status)) ||
+			!($auth_fed = $this->federation->read(['fed_id' => $fed_id])))
 		{
 			throw new Api\Exception\WrongUserinput(lang('Invalid JsonWebToken').': '.lang("Missing or invalid federation-ID '%1'!", $fed_id));
 		}
@@ -1180,13 +1203,25 @@ class Selfservice extends Base
 		{
 			if (strtolower($email) === $from)
 			{
-				if (!empty($fed['fed_password']) &&
+				if (!empty($auth_fed['fed_password']) &&
 					($_SERVER['REQUEST_METHOD'] === 'GET' ||
-						$_SERVER['REQUEST_METHOD'] === 'POST' && !password_verify($_POST['password'], $fed['fed_password'])))
+						$_SERVER['REQUEST_METHOD'] === 'POST' && !password_verify($_POST['password'], $auth_fed['fed_password'])))
 				{
 					if ($_SERVER['REQUEST_METHOD'] === 'POST')
 					{
 						echo "<p class='error'>".lang('The entered password is invalid!')."</p>\n";
+					}
+					// show extra confirmation message, if given in mail
+					list(, $body) = self::getTemplate($my_status === 'e' ? 'confirm-license-mail' : 'confirm-license-mail-lv', $is_html);
+					list(, $confirm) = explode('$$confirm$$', $body);
+					if (!empty(trim($confirm)))
+					{
+						if (!$is_html) echo "\n<b><pre style='white-space: pre-wrap'>";
+						echo trim(strtr($confirm, array_combine(array_map(static function($name)
+						{
+							return '$$'.$name.'$$';
+						}, array_keys($athlete)), array_values($athlete))));
+						if (!$is_html) echo "</pre></b>\n";
 					}
 					echo "<p>".lang('Password required to approve license request:')."</p>\n";
 					echo Api\Html::form(
