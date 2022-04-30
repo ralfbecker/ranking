@@ -589,7 +589,7 @@ class Base extends So
 		{
 			$is_judge = in_array($this->user, isset($problem) && count($route['route_judges']) > 1 ?
 				$route['route_judges'][$problem-1] :	// allow only judges from a specific boulder
-				call_user_func_array('array_merge', $route['route_judges']));	// allow judges from all boulders
+				array_merge(...array_filter($route['route_judges'])));	// allow judges from all boulders, ignoring not set ones
 		}
 		//if (!$is_judge) error_log(__METHOD__."(#$comp[WetId]=$comp[rkey], $allow_before, ".array2string($route).") distance=$distance, route_judges=$route[route_judges] returning ".array2string($is_judge).' '.function_backtrace());
 		return $is_judge;
