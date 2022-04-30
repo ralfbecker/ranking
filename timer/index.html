@@ -13,20 +13,22 @@
 		<!-- Inline functions -->
 		<script type="text/javascript">
 			// Global variables
-			var beep1 = new Audio("./css/beep-1.mp3");
-			var beep4 = new Audio("./css/countdown.mp3");
-			var theRotationInterval;
-			var finalTimer;
-			var theStartTime;
+			const beep1 = new Audio("./css/beep-1.mp3");
+			const beep4 = new Audio("./css/countdown.mp3");
+			const countdownLimit = 15;
+			let theRotationInterval;
+			let finalTimer;
+			let theStartTime;
 
 			/* countdownTimer() */
 			function countdownTimer() {
 				/* Calculate the time remaining */
-				var now = new Date();
+				const now = new Date();
+				let minutes, seconds;
 				if (finalTimer) {
-					var secs = Math.floor((now.getTime() - theStartTime)/1000);
-					var minutes = Math.floor((theRotationInterval*60 - secs) / 60);
-					var seconds = Math.abs((theRotationInterval*60 - secs) % 60);
+					const secs = Math.floor((now.getTime() - theStartTime)/1000);
+					minutes = Math.floor((theRotationInterval*60 - secs) / 60);
+					seconds = Math.abs((theRotationInterval*60 - secs) % 60);
 
 					if (stopOn0 && (minutes < 0 || minutes <= 0 && seconds <= 0))
 					{
@@ -34,37 +36,42 @@
 						seconds = minutes = 0;
 					}
 				}
+				else if (theRotationInterval > countdownLimit) {
+					const secs = theRotationInterval*60 - Math.floor((now.getTime() - theStartTime)/1000);
+					minutes = Math.floor(secs / 60);
+					seconds = Math.floor(secs % 60);
+				}
 				else {
-					var minutes = theRotationInterval - (Math.floor(now.getTime()/60000) % theRotationInterval) - 1;
-					var seconds = 59 - now.getSeconds();
+					minutes = theRotationInterval - (Math.floor(now.getTime()/60000) % theRotationInterval) - 1;
+					seconds = 59 - now.getSeconds();
 				}
 				//console.log('start='+theStartTime+', now='+now.toLocaleString()+', secs='+secs+', min='+minutes+', sec='+seconds);
 				/* Display the time and any warnings */
 				displayTime(minutes,seconds);
-			};
+			}
 			/* displayTime(minutes, seconds) */
-			function displayTime(minutesRemaining, secondsRemaining){
+			function displayTime(minutesRemaining, secondsRemaining) {
 				/* Play Audio Signal */
 				switch (minutesRemaining) {
 					case 1:
 						if(secondsRemaining<1) beep1.play();
 						break;
 					case 0:
-						if(secondsRemaining==5) beep4.play();
+						if(secondsRemaining == 5) beep4.play();
 						break;
-				};
-				// we dont want negative minutes in final timer
+				}
+				// we don't want negative minutes in final timer
 				if (minutesRemaining < 0) minutesRemaining = Math.abs(minutesRemaining)-1;
 				/* Format and display */
 				if (secondsRemaining<10) secondsRemaining = "0" + secondsRemaining;
 				$('#inner').text(minutesRemaining+':'+secondsRemaining);
-			};
+			}
 
-			var timer;
-			var stopOn0 = false;
+			let timer;
+			let stopOn0 = false;
 
-			$(document).ready(function(){
-				$('#basic-modal-content').modal({minHeight:'220px'});
+			$(function(){
+				$('#basic-modal-content').modal({minHeight:'250px'});
 				$('#restart').hide();
 				$('#stopOn0Span').hide();
 
@@ -76,10 +83,13 @@
 						beep1.play();
 						$('#restart').show();
 					}
+					else if(theRotationInterval > countdownLimit) {
+						beep1.play();
+					}
 					theStartTime = new Date().getTime();
 
 					/* Size the display font based on the viewport height */
-					var theHeight = 0.7 * screen.height;
+					const theHeight = 0.7 * screen.height;
 					$('#inner').css('height', theHeight).css('top', -theHeight/2).css('font-size', theHeight );
 
 					countdownTimer();
@@ -129,6 +139,7 @@
 			<input id="time" name="time" type="number" min="2" max="10" step="1" value="4" />
 			<label for="time"> min </label>
 			<input id="start" type="button" value="Start" />
+			<p><i>Times greater than 15 minutes directly start a countdown, NOT synchronized to the full hour.</i></p>
 			<p><input id="final" type="checkbox" /><label for="final">use final timer (starts again at press of restart)</label><br/>
 			&nbsp; &nbsp; <span id="stopOn0Span" style="display: none"><input id="stopOn0" type="checkbox" checked /><label for="stopOn0" >stop timer on 0, otherwise count up again</label></span></p>
 			<p>Color <input id="color" type="color" value="#ffffff" size="7"/>
@@ -140,4 +151,3 @@
 		<input id="restart" type="button" value="Restart" />
 	</body>
 </html>
-
