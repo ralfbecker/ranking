@@ -145,8 +145,11 @@ class Selfservice extends Base
 
 			case 'logout':
 				$this->is_selfservice(0);
-				$athlete = array();
-				// fall through
+				Framework::redirect_link('/ranking/athlete.php', [  // redirect to remove action=logout
+					'cd' => 'no',
+				]);
+				break;
+
 			case 'recovery':
 			case 'password':
 				$this->auth($athlete, $action);
@@ -527,6 +530,10 @@ class Selfservice extends Base
 					lang('or the organizer of the competition'))."<br/>\n";
 				echo lang('Maybe you have a different one registered. Try looking it up by using "Edit profile" on your profile page.')."</p>\n";
 			}
+			else
+			{
+				$athlete = $athletes[0];
+			}
 		}
 		else
 		{
@@ -540,7 +547,7 @@ class Selfservice extends Base
 		));
 		if ($athlete && empty($athlete['password']) || in_array($action,array('recovery','password','set')))
 		{
-			if (!$athlete)  // otherwise header is already output
+			if (!$athlete && count($athletes))  // otherwise header is already output
 			{
 				$this->athleteHeader($athlete = $athletes[0], $action);
 			}
@@ -674,7 +681,6 @@ class Selfservice extends Base
 
 						setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
 
-						if ($action == 'logout') $action = '';
 						return $athlete['PerId'];    // we are now authenticated for $athlete['PerId']
 					}
 					// failed login with last athlete, otherwise try next one
