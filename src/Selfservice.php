@@ -53,7 +53,7 @@ class Selfservice extends Base
 		Framework::$navbar_done = true;	// do NOT display navbar
 		$_GET['cd'] = 'no';	// suppress framework
 		list($action, $action_id) = explode('-', $_action, 2)+['', ''];
-		if (!in_array($action, ['scorecard', 'apply']))
+		if (!in_array($action, ['scorecard', 'apply', 'download']))
 		{
 			echo $GLOBALS['egw']->framework->header();
 		}
@@ -128,6 +128,10 @@ class Selfservice extends Base
 
 			case 'apply':
 				$this->applyLicense($athlete, $action_id);
+				break;
+
+			case 'download':
+				$this->downloadLicense($athlete);
 				break;
 
 			case 'confirm':
@@ -448,7 +452,7 @@ class Selfservice extends Base
 					));
 				}
 
-				if (date('Y') - (int)$athlete['geb_date'] >= 18)
+				if (empty($athlete['geb_date']) || date('Y') - (int)$athlete['geb_date'] >= 18)
 				{
 					echo Api\Html::form_1button('license', lang('Team official license'), '', '/ranking/athlete.php', array(
 						'PerId' => $athlete['PerId'],
@@ -464,10 +468,24 @@ class Selfservice extends Base
 				{
 					case 'r':
 						echo "<p>".lang('Your license request is waiting for confirmation by %1.', $athlete['verband'])."</p>\n";
-						break;
-
+						// fall through to display download License button
 					case 'a':
-						echo "<p>".lang('Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.', $athlete['verband'], 'DAV in München')."</p>\n";
+						if ($athlete['license'] === 'a')
+						{
+							echo "<p>".lang('Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.', $athlete['verband'], 'DAV in München')."</p>\n";
+						}
+						// display [Download license button], in case athlete somehow missed or lost it
+						$ui = new Athlete\Ui();
+						if ($ui->license_form_name(
+							$athlete['nation'], date('Y'),
+							$athlete['license_cat'], $athlete['PerId']))
+						{
+							echo Api\Html::form_1button('download', lang('Download license application'), '', '/ranking/athlete.php', array(
+								'PerId' => $athlete['PerId'],
+								'action' => 'download',
+								'cd' => 'no',
+							));
+						}
 						break;
 
 					case 'c':
@@ -940,6 +958,23 @@ class Selfservice extends Base
 	}
 
 	/**
+	 * Download the license form, does NOT return, if license-template exists and license is applied for, but not yet confirmed
+	 *
+	 * @param array $athlete
+	 */
+	protected function downloadLicense(array $athlete)
+	{
+		$ui = new Athlete\Ui();
+		if (in_array($athlete['license'], ['r', 'a']) &&
+			$ui->license_form_name(
+			$athlete['nation'], date('Y'), $athlete['license_cat'], $athlete['PerId']))
+		{
+			$ui->licenseform($athlete['nation'], date('Y'),
+				$athlete['license_cat'], $athlete['PerId']);
+		}
+	}
+
+	/**
 	 * Generate a token to verify license-request-confirmation by federation/Sektion or state-federation/LV
 	 *
 	 * @param int $PerId used as "sub" / related to
@@ -1262,7 +1297,7 @@ class Selfservice extends Base
 	 */
 	private function athleteHeader(array $athlete, string $action=null, array $athletes=null)
 	{
-		if ($action === 'apply')
+		if (in_array($action, ['download', 'apply']))
 		{
 			return; // apply does download
 		}
