@@ -97,7 +97,7 @@ class Selfservice extends Base
 		$lang = $PerId && isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
 		if (Api\Translation::$userlang !== $lang)
 		{
-			Api\Translation::$userlang = $lang;
+			Api\Translation::$userlang = $GLOBALS['egw_info']['user']['preferences']['common']['lang'] = $lang;
 			Api\Translation::init();
 		}
 		// check if athlete contented to store his data, if not show consent screen

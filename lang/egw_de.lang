@@ -84,6 +84,7 @@ athlete including %1 results merged.	ranking	de	Athlet einschließlich %1 Ergebn
 athlete is not in agegroup of selected license category!	ranking	de	Athlet is NICHT in der Altersklasse der ausgewählten Lizenzkategorie!
 athlete is not in the age-group of that category	ranking	de	Athlet hat NICHT den erforderlichen Jahrgang für diese Kategorie
 athlete is suspended !!!	ranking	de	Athlet ist gesperrt !!!
+athlete license	ranking	de	Athletenlizenz
 athlete not found !!!	ranking	de	Athlet NICHT gefunden !!!
 athlete scorecard already checked, update denied!	ranking	de	Die Scorecard des Athleten wurde bereits geprüft, update verweigert!
 athlete to replace was prequalied!	ranking	de	Zu ersetzender Athlete war vorqualifiziert!
@@ -199,6 +200,7 @@ delimiter	ranking	de	Begrenzungszeichen
 deny public access to	ranking	de	öffentlichen Zugriff verweigern zu
 deny public display of the checked information	ranking	de	öffentlichen Anzeige der ausgewählte Informationen verweigern
 detect athletes	ranking	de	Athleten erkennen
+did you already mailed your application form to %1? if not, you can download it again and do so now:	ranking	de	Hast Du Deinen Antrag schon an den %1 abgeschickt? Falls nicht, kannst Du ihn nochmal runterladen und das jetzt erledigen:
 digital rock	ranking	de	digital ROCK
 discipline	ranking	de	Disziplin
 display	ranking	de	Anzeige
@@ -215,6 +217,7 @@ double-click on a row to view or edit it, or right click for more options.	ranki
 down	ranking	de	Nach unten
 download	ranking	de	Herunterladen
 download all	ranking	de	Alle herunterladen
+download license application	ranking	de	Lizenzantrag herunterladen
 duration in days or textual competition-date like 'mid july'	ranking	de	Dauer in Tagen oder Text für Wettkampfdatum wie 'Mitte Juli'
 duration or textual date	ranking	de	Dauer oder Text
 each new upload will overwrite the previous one	ranking	de	jeder neue Upload überschreibt den vorherigen
@@ -342,6 +345,7 @@ how to use resultservice	ranking	de	Wie man den Ergebnisservice benutzt
 id	ranking	de	ID
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	de	Wenn ein Geschlecht ausgewählt wird, können nur Athleten dieses Geschlechts in der Kategorie sein (normalerweise sollte ein Geschlecht gewählt werden)
 if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	de	Falls Sie noch kein Passwort haben oder es vergessen haben, geben sie einfach nur Ihre E-Mail Adresse an. Dann erhalten Sie eine E-Mail mit Anweisungen zum Setzen des Passworts.
+if you have no athlete account yet and need to apply for a climbing license, you first need to register:	ranking	de	Wenn Du noch kein Athleten-Konto und eine Kletterlizenz beantragen will, musst Du Dich hier zuerst registrieren:
 ignore	ranking	de	Ignorieren
 import	ranking	de	Importieren
 import as	ranking	de	Importieren als
@@ -623,9 +627,11 @@ target for athlete profile (default: profil)	ranking	de	Ziel (target) für Athle
 target for national team rankings (default: nat_team_ranking)	ranking	de	Ziel (target) für nationale Team Rankings (Vorgabe: nat_team_ranking)
 target for result service (default: resultservice)	ranking	de	Ziel (target) für Ergebnisservice (Vorgabe: resultservice)
 target for start lists (default: startlist)	ranking	de	Ziel (target) für Startlisten (Vorgabe: startlist)
+team official license	ranking	de	Lizenz für Teamoffizielle
 teamname	ranking	de	Teamname
 teamofficials	ranking	de	Teamoffizielle
 telephone, email, homepage, city, ...	ranking	de	Telefon, Email, Homepage, Stadt, ...
+the entered password is invalid!	ranking	de	Das eingegebene Passwort ist falsch!
 the link is expired, please have a %1new mail send to you%2.	ranking	de	Der Link ist abgelaufen, bitte eine %1neue Mail anfordern%2.
 the link you clicked or entered is not correct, maybe a typo!	ranking	de	Der angeklickte oder eingegebenen Link ist NICHT korrekt, evtl. ein Tipfehler!
 there is a manual in left menu under preferences.	ranking	de	Es gibt ein (englisches) Handbuch links im Menü unter Einstellungen.
@@ -725,12 +731,14 @@ wrong or not configured vfs directory	ranking	de	Falsch oder NICHT konfigurierte
 wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!	ranking	de	Falsche Quote von %1 für Ko-System (benutze 16, 8 oder 4 für Geschwindigkeit oder %2 für Combined)!
 xml file uses unknown schema (format)!	ranking	de	XML Datei benutzt unbekanntes Schema (Format)!
 year of the calendar (empty for current)	ranking	de	Jahr des Kalenders (leer für aktuelles)
+you are already registered, please use the password reset or ask your federation (%1) to set a correct email address.	ranking	de	Du bist bereits registriert, bitte benutze den Password Reset oder bitte Deinen Verband (%1) Deine E-Mail Adresse einzutragen.
 you are not allowed to register for %1!	ranking	de	Sie sind nicht berechtigt für %1 zu registrieren!
 you are not permitted to apply for a license!	ranking	de	Sie dürfen keine Lizenz beantragen!
 you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	de	Sie können jetzt %1Ihr Profil bearbeiten%2 oder sich im Kalender für einen Wettkampf registrieren.
 you can only create a new heat, if the previous one '%1' has a result!	ranking	de	Sie können nur dann eine neue Runde anlegen, wenn die vorherige '%1' ein Ergebnis hat!
 you can only delete the last heat, not one in between!	ranking	de	Sie können nur die letzte Runde löschen, nicht eine dazwischen!
 you either need to search an athlete or enter required fields to add him!	ranking	de	Sie müssen entweder einen Athleten suchen oder die erforderlichen Felder ausfüllen um ihn hinzu zu fügen!
+you have no national climber license. to apply for a license you are required to download the application form, sign and post it:	ranking	de	Du hast noch keine nationale Kletterlizenz. Um eine Lizenz zu beantragen must Du den Antrag herunter laden, unterschreiben und per Post abschicken:
 you have not yet a password set!	ranking	de	Du hast noch kein Passwort gesetzt!
 you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	de	Du musst den Anweisungen innerhalb der nächsten %1 Stunden folgen, oder %2eine neue Mail anfordern%3.
 you need to delete the results first !!!	ranking	de	Sie müssen zuerst die Ergebnisse löschen !!!
@@ -740,6 +748,10 @@ you need to select a file first!	ranking	de	Sie müssen zuerst eine Datei auswä
 you need to select an other athlete first!	ranking	de	Sie müssen zuerst einen anderen Athleten auswählen!
 you need to select one or more athletes first!	ranking	de	Sie müssen zuerst einen oder mehrere Athleten auswählen!
 you need to select some federations first!	ranking	de	Sie müssen zuerst einige Verbände auswählen!
+your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.	ranking	de	Dein Lizenzantrag wurde von %1 bestätigt und wartet jetzt darauf das der Antrag per Post eingeht und vom %1 bestätigt wird.
+your license request is waiting for confirmation by %1.	ranking	de	Dein Lizenzantrag wartet auf die Bestätigung des %1.
+your national license has been suspended!	ranking	de	Deine nationale Kletterlizenz wurde suspendiert!
+your national license is valid.	ranking	de	Deine nationale Kletterlizenz ist gültig.
 your new password is now active.	ranking	de	Dein neues Passwort ist jetzt aktiv.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	de	Dein Passwort muss mindestens: %1 Zeichen lang sein, einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 zip code	ranking	de	Postleitzahl

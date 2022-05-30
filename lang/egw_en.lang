@@ -88,6 +88,7 @@ athlete including %1 results merged.	ranking	en	Athlete including %1 results mer
 athlete is not in agegroup of selected license category!	ranking	en	Athlete is NOT in agegroup of selected license category!
 athlete is not in the age-group of that category	ranking	en	Athlete is NOT in the age-group of that category
 athlete is suspended !!!	ranking	en	Athlete is suspended !!!
+athlete license	ranking	en	Athlete license
 athlete not found !!!	ranking	en	Athlete NOT found !!!
 athlete scorecard already checked, update denied!	ranking	en	Athlete scorecard already checked, update denied!
 athlete to replace was prequalied!	ranking	en	Athlete to replace was prequalied!
@@ -203,6 +204,7 @@ delimiter	ranking	en	Delimiter
 deny public access to	ranking	en	deny public access to
 deny public display of the checked information	ranking	en	deny public display of the checked information
 detect athletes	ranking	en	Detect athletes
+did you already mailed your application form to %1? if not, you can download it again and do so now:	ranking	en	Did you already mailed your application form to %1? If not, you can download it again and do so now:
 digital rock	ranking	en	digital ROCK
 discipline	ranking	en	Discipline
 display	ranking	en	Display
@@ -219,6 +221,7 @@ double-click on a row to view or edit it, or right click for more options.	ranki
 down	ranking	en	Down
 download	ranking	en	Download
 download all	ranking	en	Download all
+download license application	ranking	en	Download license application
 duration in days or textual competition-date like 'mid july'	ranking	en	duration in days or textual competition-date like 'mid July'
 duration or textual date	ranking	en	Duration or textual date
 each new upload will overwrite the previous one	ranking	en	each new upload will overwrite the previous one
@@ -346,6 +349,7 @@ how to use resultservice	ranking	en	How to use Resultservice
 id	ranking	en	ID
 if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	en	if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)
 if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	en	If you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.
+if you have no athlete account yet and need to apply for a climbing license, you first need to register:	ranking	en	If you have no athlete account yet and need to apply for a climbing license, you first need to register:
 ignore	ranking	en	Ignore
 import	ranking	en	Import
 import as	ranking	en	Import as
@@ -629,9 +633,11 @@ target for athlete profile (default: profil)	ranking	en	Target for athlete profi
 target for national team rankings (default: nat_team_ranking)	ranking	en	Target for national team rankings (default: nat_team_ranking)
 target for result service (default: resultservice)	ranking	en	Target for result service (default: resultservice)
 target for start lists (default: startlist)	ranking	en	Target for start lists (default: startlist)
+team official license	ranking	en	Team official license
 teamname	ranking	en	Teamname
 teamofficials	ranking	en	Teamofficials
 telephone, email, homepage, city, ...	ranking	en	telephone, email, homepage, city, ...
+the entered password is invalid!	ranking	en	The entered password is invalid!
 the link is expired, please have a %1new mail send to you%2.	ranking	en	The link is expired, please have a %1new mail send to you%2.
 the link you clicked or entered is not correct, maybe a typo!	ranking	en	The link you clicked or entered is NOT correct, maybe a typo!
 there is a manual in left menu under preferences.	ranking	en	There is a manual in left menu under preferences.
@@ -731,12 +737,14 @@ wrong or not configured vfs directory	ranking	en	Wrong or NOT configured VFS dir
 wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!	ranking	en	Wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!
 xml file uses unknown schema (format)!	ranking	en	XML file uses unknown schema (format)!
 year of the calendar (empty for current)	ranking	en	Year of the calendar (empty for current)
+you are already registered, please use the password reset or ask your federation (%1) to set a correct email address.	ranking	en	You are already registered, please use the password reset or ask your federation (%1) to set a correct email address.
 you are not allowed to register for %1!	ranking	en	You are not allowed to register for %1!
 you are not permitted to apply for a license!	ranking	en	You are not permitted to apply for a license!
 you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	en	You can now %1edit your profile%2 or register for a competition in the calendar.
 you can only create a new heat, if the previous one '%1' has a result!	ranking	en	You can only create a new round, if the previous one '%1' has a result!
 you can only delete the last heat, not one in between!	ranking	en	You can only delete the last round, not one in between!
 you either need to search an athlete or enter required fields to add him!	ranking	en	You either need to search an athlete or enter required fields to add him!
+you have no national climber license. to apply for a license you are required to download the application form, sign and post it:	ranking	en	You have no national climber license. To apply for a license you are required to download the application form, sign and post it:
 you have not yet a password set!	ranking	en	You have not yet a password set!
 you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	en	You have to act on the instructions in the next %1 hours, or %2request a new mail%3.
 you need to delete the results first !!!	ranking	en	You need to delete the results first !!!
@@ -746,6 +754,10 @@ you need to select a file first!	ranking	en	You need to select a file first!
 you need to select an other athlete first!	ranking	en	You need to select an other athlete first!
 you need to select one or more athletes first!	ranking	en	You need to select one or more athletes first!
 you need to select some federations first!	ranking	en	You need to select some federations first!
+your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.	ranking	en	Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.
+your license request is waiting for confirmation by %1.	ranking	en	Your license request is waiting for confirmation by %1.
+your national license has been suspended!	ranking	en	Your national license has been suspended!
+your national license is valid.	ranking	en	Your national license is valid.
 your new password is now active.	ranking	en	Your new password is now active.
 your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	en	Your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.
 zip code	ranking	en	Zip Code
