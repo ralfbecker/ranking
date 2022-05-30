@@ -77,7 +77,7 @@ class Selfservice extends Base
 		if ($athlete)
 		{
 			// check if we have multiple athletes with same email --> display athlete chooser
-			if (!empty($athlete['email']))
+			if (!empty($athlete['email']) && $action !== 'confirm')
 			{
 				$athletes = $this->athlete->search('', false, 'vorname, nachname', '', '', false, 'AND', false, [
 					'email' => $athlete['email'],
@@ -467,24 +467,34 @@ class Selfservice extends Base
 				switch($athlete['license'])
 				{
 					case 'r':
-						echo "<p>".lang('Your license request is waiting for confirmation by %1.', $athlete['verband'])."</p>\n";
-						// fall through to display download License button
+					case 'e':
 					case 'a':
-						if ($athlete['license'] === 'a')
-						{
-							echo "<p>".lang('Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.', $athlete['verband'], 'DAV in München')."</p>\n";
-						}
 						// display [Download license button], in case athlete somehow missed or lost it
 						$ui = new Athlete\Ui();
 						if ($ui->license_form_name(
 							$athlete['nation'], date('Y'),
 							$athlete['license_cat'], $athlete['PerId']))
 						{
-							echo Api\Html::form_1button('download', lang('Download license application'), '', '/ranking/athlete.php', array(
-								'PerId' => $athlete['PerId'],
-								'action' => 'download',
-								'cd' => 'no',
-							));
+							echo "<p>".lang('Did you already mailed your application form to %1? If not, you can download it again and do so now:',
+								'DAV in München').' '.
+								Api\Html::form_1button('download', lang('Download license application'), '', '/ranking/athlete.php', array(
+									'PerId' => $athlete['PerId'],
+									'action' => 'download',
+									'cd' => 'no',
+								))."</p>\n";
+						}
+						switch($athlete['license'])
+						{
+							case 'r':
+								echo "<p>".lang('Your license request is waiting for confirmation by %1.', $athlete['verband'])."</p>\n";
+								break;
+							case 'e':
+								echo "<p>".lang('Your license request is waiting for confirmation by %1.',
+										self::getInstance()->federation->read($athlete['fed_parent'])['verband'])."</p>\n";
+								break;
+							case 'a':
+								echo "<p>".lang('Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.', $athlete['verband'], 'DAV in München')."</p>\n";
+								break;
 						}
 						break;
 
@@ -1115,7 +1125,8 @@ class Selfservice extends Base
 		if (self::$notify && ($fed = self::getInstance()->federation->read(['fed_id' => $athlete['fed_id']])))
 		{
 			// notify athlete federation (Sektion)
-			self::applyNotifyFederation($athlete, $fed['fed_id'], 'confirm-license-mail', $GrpId);
+			self::applyNotifyFederation($athlete, $fed['fed_id'], 'confirm-license-mail', $GrpId,
+				self::notifyLicenseRequestAddresses($fed['fed_parent']));
 
 			// notify parent federation (LV)
 			if ($fed['fed_parent'])
@@ -1158,8 +1169,9 @@ class Selfservice extends Base
 	 * @param int $fed_id federation to notify
 	 * @param string $template
 	 * @param ?int $GrpId for TOF license
+	 * @param ?string|string[] $parent_contact contact-information of parent federation
 	 */
-	public static function applyNotifyFederation(array $athlete, int $fed_id, string $template, int $GrpId=null)
+	public static function applyNotifyFederation(array $athlete, int $fed_id, string $template, int $GrpId=null, $parent_contact=null)
 	{
 		list($subject, $body) = self::getTemplate($template, $is_html);
 
@@ -1181,9 +1193,9 @@ class Selfservice extends Base
 			try {
 				self::mail($email,
 					$athlete + array(
-						'LINK' => !$is_html ? $link : '<a href="' . $link . '">' . $link . '<a>',
+						'LINK' => $link,
 						'SERVER_NAME' => $_SERVER['SERVER_NAME'],
-						'LV-EMAIL-ADDRESSES' => implode(', ', (array)Base::getInstance()->federation->get_contacts($athlete, $is_html)),
+						'LV-EMAIL-ADDRESSES' => $parent_contact ? implode(', ', (array)$parent_contact) : '',
 						'confirm' => '',    // remove markers allowing to cut out confirmation text
 					), $subject, $body, "$athlete[vorname] $athlete[nachname] <$athlete[email]>", $is_html);
 				$success[] = $email;
@@ -1224,7 +1236,7 @@ class Selfservice extends Base
 		}
 		$fed2status = [
 			$fed['fed_id'] => 'e',      // Sektion confirmed
-			$fed['fed_parent'] => 'l',  // LV confirmed
+			$fed['fed_parent'] => 'a',  // LV confirmed
 		];
 		if (!$claims->has('fed_id') || !($fed_id=$claims->get('fed_id')) || !in_array($fed_id, array_keys($fed2status)) ||
 			!($auth_fed = $this->federation->read(['fed_id' => $fed_id])))
@@ -1237,15 +1249,22 @@ class Selfservice extends Base
 		}
 		$from = $claims->get('email');
 		$GrpId = $claims->has('GrpId') ? (int)$claims->get('GrpId') : null;
-		$my_status = $fed2status[$fed_id];
-		$other_accepted = $my_status === 'l' ? 'e' : 'l';
-		$set_status = $athlete['license'] === $other_accepted ? 'a' : $my_status;
+		$set_status = $fed2status[$fed_id];
 		foreach(self::notifyLicenseRequestAddresses($fed_id) as $email)
 		{
 			if (strtolower($email) === $from)
 			{
-				if (!empty($auth_fed['fed_password']) &&
-					($_SERVER['REQUEST_METHOD'] === 'GET' ||
+				if (empty($auth_fed['fed_password']))
+				{
+					echo "<p class='error'>".lang('Password required to approve license request:').' '.lang('no password set!')."</p>\n";
+					return;
+				}
+				if (in_array($athlete['license'], [$set_status, 'a', 'c']))
+				{
+					echo "<p>".lang('License request already approved.')."</p>\n";
+					return;
+				}
+				if (($_SERVER['REQUEST_METHOD'] === 'GET' ||
 						$_SERVER['REQUEST_METHOD'] === 'POST' && !password_verify($_POST['password'], $auth_fed['fed_password'])))
 				{
 					if ($_SERVER['REQUEST_METHOD'] === 'POST')
@@ -1253,7 +1272,7 @@ class Selfservice extends Base
 						echo "<p class='error'>".lang('The entered password is invalid!')."</p>\n";
 					}
 					// show extra confirmation message, if given in mail
-					list(, $body) = self::getTemplate($my_status === 'e' ? 'confirm-license-mail' : 'confirm-license-mail-lv', $is_html);
+					list(, $body) = self::getTemplate($set_status === 'e' ? 'confirm-license-mail' : 'confirm-license-mail-lv', $is_html);
 					list(, $confirm) = explode('$$confirm$$', $body);
 					if (!empty(trim($confirm)))
 					{
@@ -1274,8 +1293,7 @@ class Selfservice extends Base
 					return;
 				}
 				// ToDo: implement deny
-				if (!in_array($athlete['license'], ['r', $other_accepted]) ||
-					!$this->athlete->set_license(date('Y'), $set_status, $athlete['PerId'], $athlete['nation'], $GrpId))
+				if (!$this->athlete->set_license(date('Y'), $set_status, $athlete['PerId'], $athlete['nation'], $GrpId))
 				{
 					echo "<p>".lang('License request already approved.')."</p>\n";
 				}

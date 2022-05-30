@@ -152,7 +152,6 @@ class Base extends So
 		'n' => 'none',
 		'r' => 'Athlete applied',
 		'e' => 'Sektion confirmed',
-		'l' => 'LV confirmed',
 		'a' => 'Sektion & LV confirmed',
 		'c' => 'confirmed',
 		's' => 'suspended',		// no registration for competitions possible
