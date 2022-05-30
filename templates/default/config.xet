@@ -24,7 +24,7 @@
 				<row>
 					<vbox>
 						<description value="Filesystem path for upload of athlete pictures"/>
-						<description value="Default: $_SERVER[DOCUMENT_ROOT]/jpgs --> URL: /jpgs"/>
+						<description value="Default: $_SERVER[DOCUMENT_ROOT]/jpgs --&gt; URL: /jpgs"/>
 					</vbox>
 					<textbox id="newsettings[picture_path]" size="80"/>
 				</row>
