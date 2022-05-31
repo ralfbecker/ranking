@@ -427,6 +427,29 @@ class RankingApp extends EgwApp
 		}, msg, this.egw.lang('Delete'));
 	}
 
+	/**
+	 * Let user confirm federation change for GER, as it invalidates the license
+	 *
+	 * @param {jQuery.Event} _event
+	 * @param {et2_number} _widget
+	 */
+	federationChanged(_event, _widget : et2_selectbox)
+	{
+		if (this.et2.getArrayMgr('content').getEntry('nation') !== 'GER')
+		{
+			return;
+		}
+
+		et2_dialog.show_dialog((_button) =>
+		{
+			if (_button === et2_dialog.CANCEL_BUTTON)
+			{
+				_widget.set_value(this.et2.getArrayMgr('content').getEntry('fed_id'));
+			}
+		}, "Wenn die Sektion gewechselt wird, erlischt die Kletterlizenz! Sie muss neu beantragt UND von Sektion, LV und DAV in München bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann.",
+		'Sektion wechseln?', undefined, et2_dialog.BUTTONS_OK_CANCEL, et2_dialog.QUESTION_MESSAGE);
+	}
+
 	/***************************************************************************
 	 * Resultist lead
 	 **************************************************************************/

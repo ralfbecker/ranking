@@ -257,7 +257,7 @@ class Base extends So
 		}
 
 		// setup list with nations we rank and intersect it with the read_rights
-		$this->ranking_nations = array('NULL'=>lang('international'))+$this->comp->nations();
+		$this->ranking_nations = array('GER' => 'GER', 'NULL' => lang('international'))+$this->comp->nations();
 		// fix situation of single user has edit rights for more than one LV
 		if (count($this->edit_rights) > 1 && !$this->read_rights &&
 			is_numeric($this->edit_rights[0]) && ($fed0 = $this->federation->read(['fed_id' => $this->edit_rights[0]])))

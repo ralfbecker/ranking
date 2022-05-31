@@ -111,7 +111,8 @@ class Ui extends Base
 		{
 			if (!in_array($license_nation = strip_tags($_GET['license_nation']),$this->license_nations))
 			{
-				$license_nation = key($this->license_nations);
+				$nm_state = Api\Cache::getSession('athlete_state', 'ranking') ?: [];
+				$license_nation = $nm_state['col_filter']['nation'] ?? key($this->license_nations);
 			}
 			if ($this->athlete->read($_GET,'',$this->license_year,$license_nation))
 			{
@@ -231,6 +232,7 @@ class Ui extends Base
 				exit;
 			}
 
+			$msg_type = 'error';
 			if (in_array($button, ['save', 'apply', 'apply_license']))
 			{
 				if ($this->acl_check_athlete($this->athlete->data))
@@ -294,10 +296,12 @@ class Ui extends Base
 							$view = true;
 						}
 						$msg .= lang('%1 saved',lang('Athlete'));
+						$msg_type = 'success';
 
 						if ($this->athlete->data['nation'] == 'GER' && $fed_changed)
 						{
-							$msg .= "\n".lang('License should be removed when federation was changed!');
+							$msg .= "\n\n".lang('Lizenz muss wegen Sektionsänderung neu beantragt und bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann!');
+							$msg_type = 'info';
 						}
 						foreach(array(
 							'foto' => null,
@@ -329,14 +333,14 @@ class Ui extends Base
 										imagedestroy($dst);
 									}
 									$msg .= ($msg ? ', ' : '') . ($this->athlete->attach_picture($content[$pic]['tmp_name'], null, $postfix) ?
-										lang('Picture attached') : lang('Error attaching the picture'));
+										lang('Picture attached') : lang('Error attaching the picture', $msg_type='error'));
 								}
 							}
 						}
 						if ($content['upload_consent'])
 						{
 							$msg .= ($msg ? ', ' : '') . ($this->athlete->attach_consent($content['upload_consent']) ?
-								lang('Consent document attached') : lang('Error attaching consent document'));
+								lang('Consent document attached') : lang('Error attaching consent document', $msg_type='error'));
 						}
 						if ($button === 'apply_license')
 						{
@@ -345,6 +349,7 @@ class Ui extends Base
 							{
 								Api\Etemplate::set_validation_error($name, lang('Field must not be empty !!!'));
 								$content['tabs'] = 'contact';
+								$msg_type = 'error';
 							}
 						}
 						// change of license status, requires athlete rights for the license-nation
@@ -381,10 +386,12 @@ class Ui extends Base
 					$selfservice = new Selfservice();
 					$selfservice->passwordResetMail($this->athlete->data);
 					$msg .= "\n".lang('An EMail with instructions how to (re-)set the password has been sent.');
+					$msg_type = 'info';
 				}
 				catch (Exception $e) {
-					$msg .= "\n".lang('Sorry, an error happend sending your EMail (%1), please try again later or %2contact us%3.',
+					$msg .= "\n".lang('Sorry, an error happened sending your EMail (%1), please try again later or %2contact us%3.',
 						$e->getMessage(),'<a href="mailto:info@digitalrock.de">','</a>');
+					$msg_type = 'error';
 				}
 			}
 			if ($button === 'delete' && $this->acl_check_athlete($this->athlete->data) &&
@@ -398,6 +405,7 @@ class Ui extends Base
 				else
 				{
 					$msg = lang('Error: deleting %1 !!!',lang('Athlete'));
+					$msg_type = 'error';
 					$button = 'apply';	// do not exit dialog
 				}
 			}
@@ -410,11 +418,11 @@ class Ui extends Base
 				Framework::window_close();
 			}
 		}
+		Framework::message($msg, $msg_type);
 		$shown_msg = null;
 		$content = array(
 			'acl' => !empty($content['acl']) ? $content['acl'] : $this->athlete->data['acl'],
 		) + $this->athlete->data + array(
-			'msg' => $msg,
 			'profile_status' => $this->athlete->profile_hidden($this->athlete->data, $shown_msg),
 			'is_admin' => $this->is_admin,
 			'tabs' => str_replace('ranking.athlete.edit.', '', $content['tabs']),
@@ -557,7 +565,7 @@ Continuer';
 			// forbid SUI RGZs to change Sektion
 			if ($content['nation'] == 'SUI' && $content['PerId'] !== 'new' && !in_array('SUI',$this->athlete_rights) && !$this->is_admin)
 			{
-				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
+				$readonlys['fed_id'] = true;
 			}
 			// forbid non-admins or users without competition edit rights to change
 			// the name of an athlete who has not climbed for more then two years
@@ -568,18 +576,35 @@ Continuer';
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = true;
 			}
+			$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
+			$tmpl = new Api\Etemplate($this->is_selfservice() !== 'new' ? 'ranking.athlete.edit' : 'ranking.athlete.apply');
 			// forbid athlete selfservice to change certain fields
 			if ($this->athlete->data['PerId'] && $this->is_selfservice() == $this->athlete->data['PerId'] && $this->is_selfservice() !== 'new')
 			{
 				$readonlys['vorname'] = $readonlys['nachname'] = $readonlys['geb_date'] = true;
-				$readonlys['fed_id'] = $readonlys['a2f_start'] = true;
+				$readonlys['license_nation'] = true;
 				// 'til we have some kind of review mechanism
 				$readonlys['tabs']['pictures'] = true;
 			}
+			// do NOT allow to change local federation, if athlete already climbed this year
+			if ($content['nation'] === 'GER')
+			{
+				if ((int)$content['last_comp'] == date('Y'))
+				{
+					$readonlys['fed_id'] = !$this->is_admin;
+					Api\Etemplate::setElementAttribute('fed_id', 'statustext',
+						'Sektion darf nicht gewechselt werden, wenn in dem Jahr schon an einem Wettkampf teilgenommen wurde!');
+				}
+				// warn that allowed changes still voids the climbing license, if the athlete has already one
+				elseif (!empty($content['license']) && $content['license'] !== 'n')
+				{
+					Api\Etemplate::setElementAttribute('fed_id', 'statustext',
+						$warning="Wenn die Sektion gewechselt wird, erlischt die Kletterlizenz!\nSie muss neu beantragt UND von Sektion, LV und DAV in München bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann.");
+					Api\Etemplate::setElementAttribute('fed_id', 'onchange', 'app.ranking.federationChanged');
+				}
+			}
 			$this->setup_history($content, $sel_options, $readonlys);
 		}
-		$GLOBALS['egw_info']['flags']['app_header'] = lang('ranking').' - '.lang($view ? 'view %1' : 'edit %1',lang('Athlete'));
-		$tmpl = new Api\Etemplate($this->is_selfservice() !== 'new' ? 'ranking.athlete.edit' : 'ranking.athlete.apply');
 		// selfservice needs old idots mobile support currently, so disable new 16.1 mobile support
 		if ($this->is_selfservice())
 		{

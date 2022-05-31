@@ -12,17 +12,17 @@
 			<rows>
 				<row class="row">
 					<description for="email" value="Email"/>
-					<url-email statustext="use access control to deny display on the website" id="email" options="30,60" span="all"/>
+					<url-email statustext="use access control to deny display on the website" id="email" size="30" maxlength="60" span="all"/>
 				</row>
 				<row class="row">
 					<description for="tel" value="Phone"/>
-					<url-phone statustext="use access control to deny display on the website" id="tel" options="20,20"/>
+					<url-phone statustext="use access control to deny display on the website" id="tel" size="20" maxlength="20"/>
 					<description for="fax" value="Fax"/>
-					<url-phone statustext="use access control to deny display on the website" id="fax" options="20,20"/>
+					<url-phone statustext="use access control to deny display on the website" id="fax" size="20" maxlength="20"/>
 				</row>
 				<row class="row">
 					<description for="mobil" value="Cellphone"/>
-					<url-phone statustext="use access control to deny display on the website" id="mobil" options="20,20" span="all"/>
+					<url-phone statustext="use access control to deny display on the website" id="mobil" size="20" maxlength="20" span="all"/>
 				</row>
 				<row class="row">
 					<description for="ort" value="City"/>
@@ -86,27 +86,27 @@
 			<rows>
 				<row class="row">
 					<description value="Website" for="homepage"/>
-					<url statustext="URL to own homepage, eg. http://domain.com" id="homepage" options="64,60"/>
+					<url statustext="URL to own homepage, eg. http://domain.com" id="homepage" size="64" maxlength="60"/>
 				</row>
 				<row class="row">
 					<description value="Facebook" for="facebook"/>
-					<textbox id="facebook" options="64,64"/>
+					<textbox id="facebook" size="64" maxlength="64"/>
 				</row>
 				<row class="row">
 					<description value="Twitter" for="twitter"/>
-					<textbox id="twitter" options="64,64"/>
+					<textbox id="twitter" size="64" maxlength="64"/>
 				</row>
 				<row class="row">
 					<description value="Instagram" for="instagram"/>
-					<textbox id="instagram" options="64,64" span="all"/>
+					<textbox id="instagram" size="64" maxlength="64" span="all"/>
 				</row>
 				<row class="row">
 					<description value="YouTube" for="youtube"/>
-					<textbox id="youtube" options="64,64" span="all"/>
+					<textbox id="youtube" size="64" maxlength="64" span="all"/>
 				</row>
 				<row class="row">
 					<description value="Video iframe" for="video_iframe"/>
-					<url id="video_iframe" options="64,128" span="all"/>
+					<url id="video_iframe" size="64" maxlength="128" span="all"/>
 				</row>
 			</rows>
 		</grid>

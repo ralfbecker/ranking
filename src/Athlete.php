@@ -1330,7 +1330,16 @@ class Athlete extends Api\Storage\Base
 		{
 			if ($this->data['fed_id'])
 			{
+				if ($old && $this->data['nation'] === 'GER' && !Base::getInstance()->is_admin && (int)$old['last_comp'] == date('Y'))
+				{
+					throw new Api\Exception\WrongUserinput('Sektion darf nicht gewechselt werden, wenn in dem Jahr schon an einem Wettkampf teilgenommen wurde!');
+				}
 				$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']) && isset($old);
+
+				if ($set_fed)
+				{
+					$this->set_license(date('Y'), 'n', $this->data['PerId'], 'GER');
+				}
 			}
 			// send email notifications and do the history logging
 			if (!is_object($this->tracking))
