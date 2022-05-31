@@ -585,6 +585,11 @@ Continuer';
 				$readonlys['license_nation'] = true;
 				// 'til we have some kind of review mechanism
 				$readonlys['tabs']['pictures'] = true;
+
+				// do NOT allow to change email via selfservice, until we confirm new email BEFORE storing it
+				// as it would allow taking over other athletes by entering their email
+				// confirmation of new email by mailing link with signed JWT to new email
+				$readonlys['email'] = true;
 			}
 			// do NOT allow to change local federation, if athlete already climbed this year
 			if ($content['nation'] === 'GER')

@@ -1330,7 +1330,7 @@ class Athlete extends Api\Storage\Base
 		{
 			if ($this->data['fed_id'])
 			{
-				if ($old && $this->data['nation'] === 'GER' && !Base::getInstance()->is_admin && (int)$old['last_comp'] == date('Y'))
+				if (!empty($old) && $this->data['nation'] === 'GER' && !Base::getInstance()->is_admin && (int)$old['last_comp'] == date('Y'))
 				{
 					throw new Api\Exception\WrongUserinput('Sektion darf nicht gewechselt werden, wenn in dem Jahr schon an einem Wettkampf teilgenommen wurde!');
 				}
