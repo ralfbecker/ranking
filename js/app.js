@@ -383,6 +383,23 @@ var RankingApp = /** @class */ (function (_super) {
             }
         }, msg, this.egw.lang('Delete'));
     };
+    /**
+     * Let user confirm federation change for GER, as it invalidates the license
+     *
+     * @param {jQuery.Event} _event
+     * @param {et2_number} _widget
+     */
+    RankingApp.prototype.federationChanged = function (_event, _widget) {
+        var _this = this;
+        if (this.et2.getArrayMgr('content').getEntry('nation') !== 'GER') {
+            return;
+        }
+        et2_widget_dialog_1.et2_dialog.show_dialog(function (_button) {
+            if (_button === et2_widget_dialog_1.et2_dialog.CANCEL_BUTTON) {
+                _widget.set_value(_this.et2.getArrayMgr('content').getEntry('fed_id'));
+            }
+        }, "Wenn die Sektion gewechselt wird, erlischt die Kletterlizenz! Sie muss neu beantragt UND von Sektion, LV und DAV in München bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann.", 'Sektion wechseln?', undefined, et2_widget_dialog_1.et2_dialog.BUTTONS_OK_CANCEL, et2_widget_dialog_1.et2_dialog.QUESTION_MESSAGE);
+    };
     /***************************************************************************
      * Resultist lead
      **************************************************************************/
@@ -549,8 +566,7 @@ var RankingApp = /** @class */ (function (_super) {
             var GrpId = this.et2.getValueById('nm[cat]');
             var route_order = this.et2.getValueById('nm[route]');
             var keys = { WetId: WetId, GrpId: GrpId, route_order: route_order, boulder_n: n };
-            this.egw.json('ranking_boulder_measurement::ajax_load_athlete', [PerId,
-                keys], function (_data) {
+            this.egw.json('ranking_boulder_measurement::ajax_load_athlete', [PerId, keys], function (_data) {
                 this.et2.setValueById('zone', _data['zone' + n]);
                 this.et2.setValueById('top', _data['top' + n]);
                 this.et2.getWidgetById('avatar').set_src(_data['profile_url']);
@@ -885,8 +901,7 @@ var RankingApp = /** @class */ (function (_super) {
      */
     RankingApp.prototype.update_scorecard = function (_event, _widget) {
         var values = _widget.getInstanceManager().getValues(this.et2);
-        this.egw.json('ranking_selfscore_measurement::ajax_update_result', [values.nm.PerId, values.score,
-            { 'WetId': values.comp.WetId, 'GrpId': values.nm.cat, 'route_order': values.nm.route }], function (_msg) {
+        this.egw.json('ranking_selfscore_measurement::ajax_update_result', [values.nm.PerId, values.score, { 'WetId': values.comp.WetId, 'GrpId': values.nm.cat, 'route_order': values.nm.route }], function (_msg) {
             this.message(_msg);
             this.resultlist.update();
         }, null, false, this).sendRequest();
