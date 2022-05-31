@@ -81,6 +81,7 @@ athlete %1 not found!	ranking	en	Athlete %1 not found!
 athlete 1	ranking	en	Athlete 1
 athlete 2	ranking	en	Athlete 2
 athlete 3	ranking	en	Athlete 3
+athlete applied	ranking	en	Athlete applied
 athlete does not meet registration requirements: %1!	ranking	en	Athlete does NOT meet registration requirements: %1!
 athlete has a recent result from %1.	ranking	en	Athlete has a recent result from %1.
 athlete has no license! use regular registration to apply for a license first.	ranking	en	Athlete has no license! Use regular registration to apply for a license first.
@@ -383,6 +384,8 @@ license confirmed or applied for	ranking	en	License confirmed or applied for
 license number	ranking	en	License number
 license should be removed when federation was changed!	ranking	en	License should be removed when federation was changed!
 line	ranking	en	Line
+local & state federation confirmed	ranking	en	Local & state federation confirmed
+local federation confirmed	ranking	en	Local federation confirmed
 login suspended, too many unsuccessful tries!	ranking	en	Login suspended, too many unsuccessful tries!
 mail participants	ranking	en	Mail participants
 mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	en	Mail to %1 participants send, %2 had no email-address, %3 failed.

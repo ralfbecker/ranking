@@ -77,6 +77,7 @@ are you sure you want to make an exception?	ranking	de	Sind Sie sicher, dass Sie
 as of	ranking	de	Stand
 athlete	ranking	de	Athlet
 athlete %1 not found!	ranking	de	Athlet %1 nicht gefunden!
+athlete applied	ranking	de	Athlete beantragt
 athlete does not meet registration requirements: %1!	ranking	de	Athlete erfüllt NICHT die Vorrausetzung für eine Registrierung: %1!
 athlete has a recent result from %1.	ranking	de	Athlete hat ein aktuelles Ergebnis vom %1.
 athlete has no license! use regular registration to apply for a license first.	ranking	de	Athlet hat keine Lizenz! Benutzen Sie die reguläre Registrierung um eine zu beantragen.
@@ -377,6 +378,8 @@ license confirmed or applied for	ranking	de	Lizenz bestätigt oder beantragt
 license number	ranking	de	Lizenznummer
 license should be removed when federation was changed!	ranking	de	Lizenz sollte entfernt werden, wenn der Verband geändert wurde!
 line	ranking	de	Zeile
+local & state federation confirmed	ranking	de	Sektion & LV bestätigt
+local federation confirmed	ranking	de	Sektion bestätigt
 login suspended, too many unsuccessful tries!	ranking	de	Login ausgesetzt, zu viele erfolglosen Versuche!
 mail participants	ranking	de	Teilnehmer anmailen
 mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	de	Mail an %1 Teilnehmer gesendet, %2 hatten keine EMail Adresse, %3 sind fehlgeschlagen.

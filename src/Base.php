@@ -151,8 +151,8 @@ class Base extends So
 	var $license_labels = array(
 		'n' => 'none',
 		'r' => 'Athlete applied',
-		'e' => 'Sektion confirmed',
-		'a' => 'Sektion & LV confirmed',
+		'e' => 'Local federation confirmed',
+		'a' => 'Local & state federation confirmed',
 		'c' => 'confirmed',
 		's' => 'suspended',		// no registration for competitions possible
 	);
