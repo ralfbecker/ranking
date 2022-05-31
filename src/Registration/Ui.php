@@ -930,7 +930,7 @@ class Ui extends Base
 			$select_options['comp'] = $this->comp->names(array(
 				'nation' => $calendar,
 				'datum < '.$this->db->quote(date('Y-m-d')),
-			),0,'datum DESC');
+			),3,'datum DESC');
 		}
 		else
 		{
@@ -938,7 +938,7 @@ class Ui extends Base
 			$select_options['comp'] = $this->comp->names(array(
 				'nation' => $calendar,
 				'WetId' => $this->result->comps_with_startlist(array('nation' => $calendar)),
-			),0,'datum ASC');
+			),3,'datum ASC');
 		}
 		// anyway include the used competition
 		if ($comp && !isset($select_options['comp'][$comp['WetId']]))
