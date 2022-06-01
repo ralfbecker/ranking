@@ -525,6 +525,10 @@ div._startnumbers div.et2_hbox_right {
   padding-right: 0;
 }
 @media all {
+  #selfservice {
+    overflow-y: auto;
+    height: inherit;
+  }
   html * {
     -webkit-user-select: text;
     -moz-user-select: none;
@@ -700,3 +704,4 @@ div._startnumbers div.et2_hbox_right {
     display: none !important;
   }
 }
+/*# sourceMappingURL=app.css.map */
