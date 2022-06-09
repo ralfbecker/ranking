@@ -656,7 +656,10 @@ class Selfservice extends Base
 								setcookie(self::EMAIL_COOKIE, $athlete['email'], strtotime('1year'), '/', $_SERVER['SERVER_NAME']);
 
 								echo "<p><b>".lang('Your new password is now active.')."</b></p>\n";
-								$this->defaultButtons($athlete);
+								if (!empty($athletes['consent_time']) && !empty($athletes['consent_ip']))
+								{
+									$this->defaultButtons($athlete);
+								}
 								return $athlete['PerId'];
 							}
 							else
