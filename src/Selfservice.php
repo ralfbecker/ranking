@@ -1197,7 +1197,7 @@ class Selfservice extends Base
 		foreach(self::notifyLicenseRequestAddresses($fed_id) as $key => $email)
 		{
 			// generate confirm hash
-			$link = Egw::link('/ranking/athlete.php', array(
+			$link = Framework::getUrl(Egw::link('/ranking/athlete.php', array(
 				'PerId' => $athlete['PerId'],
 				'action' => 'confirm-' . self::confirmToken($athlete['PerId'], [
 					'fed_id' => $fed_id,
@@ -1205,8 +1205,7 @@ class Selfservice extends Base
 					'GrpId' => $GrpId ?? '',
 				]),
 				'cd' => 'no',
-			));
-			if ($link[0] == '/') $link = 'https://' . $_SERVER['SERVER_NAME'] . $link;
+			)));
 
 			try {
 				self::mail($email,
@@ -1306,7 +1305,7 @@ class Selfservice extends Base
 							Api\Html::input('password', '', 'password')."\n".
 							Api\Html::submit_button('approve', lang('Approve'))/*." ".
 							Api\Html::submit_button('deny', lang('Deny'))*/,
-							[], $_SERVER['REQUEST_URI']
+							[], '/ranking/athlete.php', $_GET
 						)."\n";
 					return;
 				}
@@ -1350,7 +1349,7 @@ class Selfservice extends Base
 				{
 					return $athlete['vorname'].' '.$athlete['nachname'].' ('.$athlete['nation'].')';
 				}, $athletes)), true),
-				'', $_SERVER['PHP_SELF'].'?cd=popup'
+				'', '/ranking/athlete.php?cd=no'
 			)."</h1>\n";
 		}
 		else
