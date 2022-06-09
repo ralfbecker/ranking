@@ -74,7 +74,16 @@ class Selfservice extends Base
 				!strcasecmp($authenticated['email'], $athlete['email']) ? $athlete['PerId'] : 0);
 		}
 
-		if ($athlete)
+		// load translation matching athlete or browser preferences
+		$lang = $PerId && isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] :
+			strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
+		if (Api\Translation::$userlang !== $lang)
+		{
+			Api\Translation::$userlang = $GLOBALS['egw_info']['user']['preferences']['common']['lang'] = $lang;
+			Api\Translation::init();
+		}
+
+		if ($athlete && !in_array($action, ['password', 'set']))
 		{
 			// check if we have multiple athletes with same email --> display athlete chooser
 			if (!empty($athlete['email']) && $action !== 'confirm')
@@ -93,12 +102,6 @@ class Selfservice extends Base
 		{
 			$this->showFooter($nation2lang[$athlete['nation']]);
 			exit;
-		}
-		$lang = $PerId && isset($nation2lang[$athlete['nation']]) ? $nation2lang[$athlete['nation']] : 'en';
-		if (Api\Translation::$userlang !== $lang)
-		{
-			Api\Translation::$userlang = $GLOBALS['egw_info']['user']['preferences']['common']['lang'] = $lang;
-			Api\Translation::init();
 		}
 		// check if athlete contented to store his data, if not show consent screen
 		if (!in_array($action, ['logout', 'register', 'recovery', 'password', 'confirm']) &&
@@ -606,7 +609,19 @@ class Selfservice extends Base
 			}
 			elseif ($action == 'password' || $action == 'set')
 			{
-				if ($_GET['hash'] != $athlete['recover_pw_hash'])
+				// in case multiple athletes use same email, find the one matching the hash
+				if ($_GET['hash'] !== $athlete['recover_pw_hash'] &&
+					($athletes = $this->athlete->search('', false, 'vorname, nachname', '', '', false, 'AND', false, [
+						'email' => $athlete['email'],
+						'recover_pw_hash' => $_GET['hash'],
+				])))
+				{
+					$athlete = array_shift($athletes);
+				}
+				// output matching athlete header now
+				$this->athleteHeader($athlete, $action);
+
+				if ($_GET['hash'] !== $athlete['recover_pw_hash'])
 				{
 					echo "<p class='error'>".lang("The link you clicked or entered is NOT correct, maybe a typo!")."</p>\n";
 					echo "<p>".lang("Try again or have a %1new mail send to you%2.","<a href='$recovery_link'>","</a>")."</p>\n";
