@@ -1186,7 +1186,7 @@ Continuer';
 			$file = 'License '.$year.' '.$this->athlete->data['vorname'].' '.
 				$this->athlete->data['nachname'];
 			// does NOT return, unless there is an error
-			$err = $merge->download($vfs_path, $this->athlete->data['PerId'], $file);
+			$err = $merge->download($vfs_path, $this->athlete->data['PerId'], $file, '', 'pdf');
 		}
 		header('HTTP/1.1 204 No Content');
 		error_log(__METHOD__."('$nation', $year, $GrpId, $PerId) vfs_path=$vfs_path, merge-error: $err");
