@@ -895,7 +895,7 @@ Continuer';
 	 * @param array $selected PerId's
 	 * @param boolean $select_all true: use all rows from current state/session
 	 * @return string success message
-	 * @throws Exception with error message
+	 * @throws Api\Exception\NoPermission with error message
 	 */
 	protected function action($action, array $selected, $select_all)
 	{
@@ -939,7 +939,7 @@ Continuer';
 				case 'merge':
 					if (!$this->is_admin)
 					{
-						throw new Execption(lang('Permission denied !!!'));
+						throw new Api\Exception\NoPermission(lang('Permission denied !!!'));
 					}
 					if (count($selected) !== 2)
 					{
@@ -951,14 +951,14 @@ Continuer';
 				case 'export';
 					if (!($this->is_admin || count($this->athlete_rights) || $this->federation->get_user_grants()))
 					{
-						throw new Execption(lang('Permission denied !!!'));
+						throw new Api\Exception\NoPermission(lang('Permission denied !!!'));
 					}
 					$this->export($selected, $select_all);
 			}
 		}
 		if ($failed)
 		{
-			throw new Exception(lang('%1 athlete(s) %2, %3 failed because of missing permissions or existing results!',
+			throw new Api\Exception\NoPermission(lang('%1 athlete(s) %2, %3 failed because of missing permissions or existing results!',
 				$success, $action_msg, $failed));
 		}
 		return lang('%1 athlete(s) %2', $success, $action_msg);
