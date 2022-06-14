@@ -56,6 +56,7 @@ class Selfservice extends Base
 		if (!in_array($action, ['scorecard', 'apply', 'download']))
 		{
 			echo $GLOBALS['egw']->framework->header();
+			echo "<div id='selfservice'>\n";
 		}
 
 		$athlete = array();
@@ -751,9 +752,6 @@ class Selfservice extends Base
 			echo "<form action='$link' method='POST'>\n";
 			if (!$athlete)
 			{
-				echo "<p>".lang("If you have no athlete account yet and need to apply for a climbing license, you first need to register:")."\n";
-				echo "<button type='submit' name='action' value='register'>".lang('Register / apply for climbing license')."</button></p><hr/>\n";
-
 				echo "<p>".lang("Please enter your EMail address and password to register for competitions or edit your profile:")."</p>\n";
 				$pw = htmlspecialchars(isset($_POST['email']) ? $_POST['email'] : $_COOKIE[self::EMAIL_COOKIE]);
 				echo "<table>\n<tr><td>".lang('EMail')."</td><td><input type='text' name='email' value='$pw' size='32'/></td></tr>\n";
@@ -769,6 +767,9 @@ class Selfservice extends Base
 			if (!$athlete)
 			{
 				echo "<p>".lang("If you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.")."</p>\n";
+				echo "<hr/>\n";
+				echo "<p>".lang("If you have no athlete account yet and need to apply for a climbing license, you first need to register:")."\n";
+				echo "<button type='submit' name='action' value='register'>".lang('Register')."</button></p>\n";
 			}
 		}
 	}
