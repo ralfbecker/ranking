@@ -762,7 +762,7 @@ class Selfservice extends Base
 			}
 			echo "<tr><td>".lang('Password')."</td><td><input type='password' name='password' size='32'/></td>\n";
 			echo "<td><input type='submit' value='".lang('Login')."' /></td></tr>\n";
-			echo "</table>\n</form>\n";
+			echo "</table>\n";
 
 			if (!$athlete)
 			{
@@ -771,6 +771,7 @@ class Selfservice extends Base
 				echo "<p>".lang("If you have no athlete account yet and need to apply for a climbing license, you first need to register:")."\n";
 				echo "<button type='submit' name='action' value='register'>".lang('Register')."</button></p>\n";
 			}
+			echo "</form>\n";
 		}
 	}
 
