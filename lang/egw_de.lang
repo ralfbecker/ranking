@@ -327,10 +327,10 @@ heat deleted	ranking	de	Runde gelöscht
 heat saved	ranking	de	Runde gespeichert
 heat updated	ranking	de	Runde aktualisiert
 hide complete profile page	ranking	de	Komplettes Athleten Profil verbergen
-hide contact data, birthday and city from public display. still shows optional data like hobbies!	ranking	de	Verberge Kontaktdaten, Geburtstag und Wohnort von der öffentlichen Anzeige. Zeigt immer noch optionale Daten wie Hobbies!
+hide contact data, birthday and city from public display. still shows optional data like hobbies!	ranking	de	Verberge Kontaktdaten, Geburtstag und Wohnort von der öffentlichen Anzeige. Zeigt immer noch optionale Daten wie Hobbys!
 hide only contact data and birthday from public display.	ranking	de	Nur Kontaktdaten von der öffentlichen Anzeige ausnehmen.
 historic athlete profile is hidden as we have no explicit consent from him/her to show the data.	ranking	de	Historisches Athletenprofil ist verborgen da wir keine explizite Zustimmung zur Anzeige der Daten haben.
-hobbies	ranking	de	Hobies
+hobbies	ranking	de	Hobbys
 homepage	ranking	de	Internetadresse
 host	admin	de	Rechner
 host nation	ranking	de	durchführende Nation
@@ -716,7 +716,7 @@ website	ranking	de	Webseite
 website visitors will be told that athlete asked to no longer show his profile page.	ranking	de	Besucher der Webseite bekommen gesagt, dass der Athlete sein Profil nicht länger anzeigen möchte.
 weight (kg)	ranking	de	Gewicht (kg)
 weight in kilogram	ranking	de	Gewicht in Kilogram
-weight, size, hobbies, ...	ranking	de	Gewicht, Größe, Hobies, ...
+weight, size, hobbies, ...	ranking	de	Gewicht, Größe, Hobbys, ...
 wetid	ranking	de	WetId
 where is the athlete born (incl. nation)	ranking	de	wo wurde der Athlet geboren (einschl. Land)
 which birthyear are allowd in this cathegory, if it is limited on this	ranking	de	Welche Jahrgänge sind in dieser Kategorie zulässig, falls sie darin begrenzt ist
