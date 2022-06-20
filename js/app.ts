@@ -446,7 +446,7 @@ class RankingApp extends EgwApp
 			{
 				_widget.set_value(this.et2.getArrayMgr('content').getEntry('fed_id'));
 			}
-		}, "Wenn die Sektion gewechselt wird, erlischt die Kletterlizenz! Sie muss neu beantragt UND von Sektion, LV und DAV in München bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann.",
+		}, "Wenn die Sektion gewechselt wird, erlischt die Kletterlizenz! Sie muss neu beantragt UND von Sektion, LV und Bundesgeschäftsstelle bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann.",
 		'Sektion wechseln?', undefined, et2_dialog.BUTTONS_OK_CANCEL, et2_dialog.QUESTION_MESSAGE);
 	}
 

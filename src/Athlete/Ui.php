@@ -604,7 +604,7 @@ Continuer';
 				elseif (!empty($content['license']) && $content['license'] !== 'n')
 				{
 					Api\Etemplate::setElementAttribute('fed_id', 'statustext',
-						$warning="Wenn die Sektion gewechselt wird, erlischt die Kletterlizenz!\nSie muss neu beantragt UND von Sektion, LV und DAV in München bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann.");
+						$warning="Wenn die Sektion gewechselt wird, erlischt die Kletterlizenz!\nSie muss neu beantragt UND von Sektion, LV und Bundesgeschäftsstelle bestätigt werden, bevor wieder an einem Wettkampf teilgenommen werden kann.");
 					Api\Etemplate::setElementAttribute('fed_id', 'onchange', 'app.ranking.federationChanged');
 				}
 			}

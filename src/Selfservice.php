@@ -480,7 +480,7 @@ class Selfservice extends Base
 							$athlete['license_cat'], $athlete['PerId']))
 						{
 							echo "<p>".lang('Did you already mailed your application form to %1? If not, you can download it again and do so now:',
-								'DAV in München').' '.
+								'Bundesgeschäftsstelle').' '.
 								Api\Html::form_1button('download', lang('Download license application'), '', '/ranking/athlete.php', array(
 									'PerId' => $athlete['PerId'],
 									'action' => 'download',
@@ -497,7 +497,7 @@ class Selfservice extends Base
 										self::getInstance()->federation->read($athlete['fed_parent'])['verband'])."</p>\n";
 								break;
 							case 'a':
-								echo "<p>".lang('Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.', $athlete['verband'], 'DAV in München')."</p>\n";
+								echo "<p>".lang('Your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.', $athlete['verband'], 'Bundesgeschäftsstelle')."</p>\n";
 								break;
 						}
 						break;
