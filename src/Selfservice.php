@@ -1216,7 +1216,7 @@ class Selfservice extends Base
 						'SERVER_NAME' => $_SERVER['SERVER_NAME'],
 						'LV-EMAIL-ADDRESSES' => $parent_contact ? implode(', ', (array)$parent_contact) : '',
 						'confirm' => '',    // remove markers allowing to cut out confirmation text
-					), $subject, $body, "$athlete[vorname] $athlete[nachname] <$athlete[email]>", $is_html);
+					), $subject, $body, "digital ROCK <info@digitalROCK.de>", $is_html);
 				$success[] = $email;
 			}
 			// catch errors to multiple email get send, even if one fails
