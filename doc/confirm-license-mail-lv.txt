@@ -3,12 +3,15 @@ Sehr geehrte(r) Verantwortliche(r) des Landesverbandes der Sektion $$verband$$,
 
 $$vorname$$ $$nachname$$ hat über digital ROCK eine nationale Kletterlizenz beantragt und angegeben Mitglied der Sektion $$verband$$ zu sein.
 
-Um als Verantwortliche(r) des zuständigen Landesverbandes der Sektion $$verband$$ dem Antrag zustimmen, melden Sie sich bitte auf digital ROCK an: https://www.digitalrock.de/egroupware/
+Um als Verantwortliche(r) des zuständigen Landesverbandes der Sektion $$verband$$ dem Antrag zustimmen, melden Sie sich bitte auf digital ROCK an:
+	https://www.digitalrock.de/egroupware/
 
 Die Zustimmung kann immer erst NACH Bestätigung des Antrages durch die Sektion erfolgen!
 
 Als Verantwortliche(r) sollten sie vorher prüfen dass:
 - $$verband$$ Mitglied des Landesverbandes ist
-- ...
+
+Sollte innerhalb von 7 Tagen keine Freigabe der Sektion vorliegen, wenden Sie sich bitte an den Ansprechpartner.
+Bei Ablehnung des Antrages informieren Sie bitte umgehend den Athleten, die Sektion und den Bundesverband.
 
 Dein Team von digital ROCK
