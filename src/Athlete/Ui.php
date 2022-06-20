@@ -530,7 +530,7 @@ Continuer';
 			'download_consent' => !$this->athlete->data['PerId'] || !$edit_rights && !$this->is_admin || !$this->athlete->consent_document(),
 		);
 		// only allow to set license-category when applying or having rights to change license
-		$readonlys['license_cat'] = $readonlys['apply_license'] && $readonlys['license'];
+		$readonlys['license_cat'] = $readonlys['apply_license'] || $readonlys['license'];
 
 		if (count($license_nations) == 1)	// no selectbox, if no selection
 		{
