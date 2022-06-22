@@ -17,7 +17,7 @@ jQuery(() => {
 
 	// reload window after successful license application form download
 	jQuery('form[action*="action=apply"]').on('submit', () => {
-		window.setTimeout(() => location.href=location.href.replace(/action=[^&]*/, 'action='), 3000)
+		egw.loading_prompt('test', true, 'Dein Lizenzantrag wird erstellt, bitte warten ...');
 	});
 
 	// submit on athlete change

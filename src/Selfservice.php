@@ -16,6 +16,7 @@ use EGroupware\Api;
 use EGroupware\Api\Framework;
 use EGroupware\Api\Egw;
 use EGroupware\OpenID\Keys;
+use EGroupware\SwoolePush;
 use \Exception;
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT;
@@ -55,8 +56,7 @@ class Selfservice extends Base
 		list($action, $action_id) = explode('-', $_action, 2)+['', ''];
 		if (!in_array($action, ['scorecard', 'apply', 'download']))
 		{
-			echo $GLOBALS['egw']->framework->header();
-			echo "<div id='selfservice'>\n";
+			self::header();
 		}
 
 		$athlete = array();
@@ -175,6 +175,20 @@ class Selfservice extends Base
 		// as stream-wrappers used by Horde Smtp fail when PHP is already in destruction
 		$GLOBALS['egw']->__destruct();
 		exit;
+	}
+
+	/**
+	 * Output header and div#selfservice
+	 *
+	 * @return void
+	 */
+	static function header()
+	{
+		// pass push-token to framework, to be able to use push
+		$extra = [];
+		SwoolePush\Hooks::framework_header(['popup' => false, 'extra' => &$extra]);
+		echo $GLOBALS['egw']->framework->header($extra);
+		echo "<div id='selfservice'>\n";
 	}
 
 	/**
@@ -980,7 +994,7 @@ class Selfservice extends Base
 		{
 			self::$notify = false;
 			// add header now, as it was not done to allow download
-			echo $GLOBALS['egw']->framework->header();
+			self::header();
 			$this->athleteHeader($athlete);
 			echo "<p class='error'>".$e->getMessage()."</p>\n";
 			$this->defaultButtons($athlete);
@@ -1144,14 +1158,37 @@ class Selfservice extends Base
 	{
 		if (self::$notify && ($fed = self::getInstance()->federation->read(['fed_id' => $athlete['fed_id']])))
 		{
+			$push = new Api\Json\Push();
+			$push->redirect(Api\Framework::link('/ranking/athlete.php?action=&cd=no'));
+
 			// notify athlete federation (Sektion)
-			self::applyNotifyFederation($athlete, $fed['fed_id'], 'confirm-license-mail', $GrpId,
+			$failed = self::applyNotifyFederation($athlete, $fed['fed_id'], 'confirm-license-mail', $GrpId,
 				self::notifyLicenseRequestAddresses($fed['fed_parent']));
 
 			// notify parent federation (LV)
 			if ($fed['fed_parent'])
 			{
-				self::applyNotifyFederation($athlete, $fed['fed_parent'], 'confirm-license-mail-lv', $GrpId);
+				$failed += self::applyNotifyFederation($athlete, $fed['fed_parent'], 'confirm-license-mail-lv', $GrpId);
+			}
+
+			// give browser and server time to process above redirect
+			sleep(5);
+
+			// if any email failed to send, push error to client/athlete and mail us
+			if ($failed)
+			{
+				$push->message(implode(', ', $failed), 'error');
+
+				$mailer = new Api\Mailer();
+				$mailer->setFrom('Athlete License Application <info@digitalrock.de>');
+				$mailer->addAddress('Athlete License Application <info@digitalrock.de>');
+				$mailer->addHeader('Subject', 'Athlete License Application failed to send EMail');
+				$mailer->setBody(implode("\n", $failed));
+				$mailer->send();
+			}
+			else
+			{
+				$push->message(lang('Benachrichtigungen an Sektion und Landesverband erfolgreich gesendet.'), 'success');
 			}
 		}
 	}
@@ -1190,6 +1227,7 @@ class Selfservice extends Base
 	 * @param string $template
 	 * @param ?int $GrpId for TOF license
 	 * @param ?string|string[] $parent_contact contact-information of parent federation
+	 * @return string[] email => error-message pairs for addresses failed to send
 	 */
 	public static function applyNotifyFederation(array $athlete, int $fed_id, string $template, int $GrpId=null, $parent_contact=null)
 	{
@@ -1224,13 +1262,15 @@ class Selfservice extends Base
 				$e = new \Exception("Error sending {basename($template} to $email for $athlete[vorname] $athlete[nachname] <$athlete[email]>: ".
 					$e->getMessage(), $e->getCode(), $e);
 				_egw_log_exception($e);
-				$failed[$key] = $email;
+				$failed[$email] = $e->getMessage();
 				// todo: notify LV, if notification to sektion failed
 			}
 		}
 		error_log(__METHOD__ . '(' . json_encode($athlete) . ", $fed_id, '$template', $GrpId)".
 			($success ? ' success: '.implode(', ', $success) : '').
 			($failed ? ' FAILED: '.implode(', ', $failed) : ''));
+
+		return $failed;
 	}
 
 	/**
