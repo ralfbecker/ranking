@@ -148,9 +148,11 @@ class ranking_import extends ranking_result_bo
 		}
 		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
 
-		if (!empty($content['button']) || is_array($content['file']))
+		if (!empty($content['button']) || is_array($content['file']) ||
+			// re-run detection / [apply] button, if category changes
+			($cat_changed = !empty($content['import'] && $cat && $content['old_cat'] != $cat['GrpId'])))
 		{
-			$button = key($content['button'] ?? ['upload'=>true]);
+			$button = !empty($cat_changed) ? 'apply' : key($content['button'] ?? ['upload'=>true]);
 			unset($content['button']);
 			try {
 				switch($button)
@@ -300,7 +302,7 @@ class ranking_import extends ranking_result_bo
 		$content['keys']['cat']      = $content['keys']['old_cat'] = $cat ? $cat['GrpId'] : null;
 		$this->set_ui_state($calendar,$comp['WetId'],$cat['GrpId']);
 
-		// make competition and category data availible for print
+		// make competition and category data available for print
 		$content['comp'] = $comp;
 		$content['cat']  = $cat;
 
