@@ -1330,9 +1330,10 @@ class Athlete extends Api\Storage\Base
 		{
 			if ($this->data['fed_id'])
 			{
-				if (!empty($old) && $this->data['nation'] === 'GER' && !Base::getInstance()->is_admin && (int)$old['last_comp'] == date('Y'))
+				if (!empty($old) && $this->data['nation'] === 'GER' && $old['fed_id'] != $this->data['fed_id'] &&
+					(int)$old['last_comp'] == date('Y') && !Base::getInstance()->is_admin)
 				{
-					throw new Api\Exception\WrongUserinput('Sektion darf nicht gewechselt werden, wenn in dem Jahr schon an einem Wettkampf teilgenommen wurde!');
+					throw new Api\Exception\WrongUserinput("Sektion darf nicht gewechselt werden, wenn in dem Jahr schon an einem Wettkampf teilgenommen wurde (letzter Wettkampf von $old[nachname], $old[vorname]: $old[last_comp])!");
 				}
 				$set_fed = $this->set_federation($this->data['fed_id'],$this->data['a2f_start'],$this->data['PerId'],$this->data['acl_fed_id']) && isset($old);
 
