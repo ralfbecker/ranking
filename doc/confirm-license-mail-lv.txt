@@ -1,5 +1,5 @@
-Anfrage Kletterlizenz von $$vorname$$ $$nachname$$ [$$PerId]
-Sehr geehrte(r) Verantwortliche(r) des Landesverbandes der Sektion $$verband$$,
+Anfrage Kletterlizenz von $$vorname$$ $$nachname$$ [$$PerId$$]
+Sehr geehrte(r) Verantwortliche(r) des Landesverbandes,
 
 $$vorname$$ $$nachname$$ hat über digital ROCK eine nationale Kletterlizenz beantragt und angegeben Mitglied der Sektion $$verband$$ zu sein.
 

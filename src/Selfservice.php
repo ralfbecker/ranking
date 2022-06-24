@@ -84,7 +84,7 @@ class Selfservice extends Base
 			Api\Translation::init();
 		}
 
-		if ($athlete && !in_array($action, ['password', 'set']))
+		if ($athlete && !in_array($action, ['password', 'set']) && empty($_POST['password']))
 		{
 			// check if we have multiple athletes with same email --> display athlete chooser
 			if (!empty($athlete['email']) && $action !== 'confirm')
