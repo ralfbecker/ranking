@@ -1458,21 +1458,22 @@ var RankingApp = /** @class */ (function (_super) {
         var buttons = [];
         var width = 480;
         if (!nm.result_official && !_ro) {
-            buttons.push({ button_id: 'update', text: this.egw.lang('Update'), id: 'update', image: 'apply', default: true, disabled: !!entry.checked });
+            buttons.push({ text: this.egw.lang('Update'), id: 'update', image: 'apply', default: true, disabled: !!entry.checked });
             if (nm.is_judge && nm.template == 'ranking.result.index.rows_boulder') {
                 if (entry.checked) {
-                    buttons.push({ button_id: 'uncheck', text: this.egw.lang('Uncheck'), id: 'uncheck', image: 'bullet' });
+                    buttons.push({ text: this.egw.lang('Uncheck'), id: 'uncheck', image: 'bullet' });
                 }
                 else {
-                    buttons.push({ button_id: 'checked', text: this.egw.lang('Checked'), id: 'checked', image: 'check', "default": true });
+                    buttons.push({ text: this.egw.lang('Checked'), id: 'checked', image: 'check', "default": true });
                 }
                 width = 575;
             }
         }
-        buttons.push({ button_id: 'previous', text: this.egw.lang('Back'), id: 'previous', image: 'back', disabled: !row.prev });
-        buttons.push({ button_id: 'next', text: this.egw.lang('Next'), id: 'next', image: 'continue', disabled: !row.next });
-        buttons.push({ button_id: 'close', text: this.egw.lang('Close'), id: 'close', image: 'cancel', click: function () {
-                jQuery(this).dialog("close");
+        buttons.push({ text: this.egw.lang('Back'), id: 'previous', image: 'back', disabled: !row.prev });
+        buttons.push({ text: this.egw.lang('Next'), id: 'next', image: 'continue', disabled: !row.next });
+        buttons.push({ text: this.egw.lang('Close'), id: 'close', image: 'cancel', click: function () {
+                var _c;
+                (_c = jQuery(this)) === null || _c === void 0 ? void 0 : _c.dialog("close"); // not existing/used in master
             } });
         var dialog = et2_core_widget_1.et2_createWidget("dialog", {
             id: 'update-result',
@@ -1500,8 +1501,10 @@ var RankingApp = /** @class */ (function (_super) {
                     case 'previous':
                         self.action_edit({}, [{ id: row.prev }], _heat, _ro);
                         break;
+                    case 'close':
+                        break;
                     default:
-                        et2_widget_dialog_1.et2_dialog.alert('Not yet ;-)');
+                        et2_widget_dialog_1.et2_dialog.alert('Not (yet) implemented ;-)');
                 }
             },
             title: this.egw.lang('Update Result'),
