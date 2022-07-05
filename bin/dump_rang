@@ -23,8 +23,9 @@ INSERT INTO PersonenExport (PerId,rkey,nachname,vorname,sex,ort,geb_date,acl)
 SELECT PerId,rkey,nachname,vorname,sex,ort,concat(year(geb_date),"-01-01"),acl
 FROM Personen
 EOF
-# dump all tables but Personen (incl. PersonenExport)
-$SSH ${MYSQL}dump $DB Athlete2Fed Federations Feldfaktoren Gruppen Gruppen2Personen Licenses RelayResults Results RouteResults Routes Serien Wettkaempfe Registration PersonenExport
+# dump all tables but Personen (incl. PersonenExport in an extra query, to not reach our max_query_time limit)
+$SSH ${MYSQL}dump $DB Athlete2Fed Federations Feldfaktoren Gruppen Gruppen2Personen Licenses RelayResults Results RouteResults Routes Serien Wettkaempfe Registration
+$SSH ${MYSQL}dump $DB PersonenExport
 # rename PersonenExport to Personen
 echo 'DROP TABLE IF EXISTS Personen;
 RENAME TABLE PersonenExport TO Personen;'

@@ -368,7 +368,7 @@ class ranking_route_result extends Api\Storage\Base
 				}
 				else
 				{
-					// the general result is always sorted by the overal rank (to get it)
+					// the general result is always sorted by the overall rank (to get it)
 					// now we need to store that rank in result_rank
 					$old = null;
 					//echo "<p>quali_preselected=$quali_preselected</p>\n";
@@ -1625,9 +1625,7 @@ class ranking_route_result extends Api\Storage\Base
 					else
 					{
 						$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_final);
-						// ORDER BY CASE column-alias does NOT work with MySQL 5.0.22-Debian_Ubuntu6.06.6, it works with 5.0.51a-log SUSE
-						//$order_by = 'result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE result_time END ASC';
-						$order_by = "result_time IS NULL,CASE ($mode) WHEN 1 THEN 0 ELSE result_time END ASC";
+						$order_by = "result_time IS NULL,CASE new_rank WHEN 1 THEN 0 ELSE quali_time END ASC";
 					}
 
 					// speed final used time(s) from speed qualification
@@ -2232,13 +2230,13 @@ class ranking_route_result extends Api\Storage\Base
 			// sort tied with times by time
 			elseif ($a['result_time'] && $b['result_time'])
 			{
-				// first by result-time
+				/* since 2022 no longer: first by result-time
 				if ($a['result_time'] != $b['result_time'])
 				{
 					return $a['result_time'] > $b['result_time'] ? 1 : -1;
 				}
 				// then by quali-time
-				elseif ($a['quali_time'] != $b['quali_time'])
+				else*/if ($a['quali_time'] != $b['quali_time'])
 				{
 					return $a['quali_time'] > $b['quali_time'] ? 1 : -1;
 				}

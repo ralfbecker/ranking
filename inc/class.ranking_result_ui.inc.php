@@ -1736,6 +1736,11 @@ class ranking_result_ui extends ranking_result_bo
 		{
 			$sel_options['show_result'] = array(2 => ' ');
 			$readonlys['nm[show_result]'] = true;
+			$tmpl->disableElement('nm[show_result]');
+		}
+		else
+		{
+			$tmpl->disableElement('nm[show_result]', false);
 		}
 		if ($content['nm']['discipline'] == 'speedrelay')
 		{
