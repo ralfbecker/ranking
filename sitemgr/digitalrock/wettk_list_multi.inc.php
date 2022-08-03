@@ -207,7 +207,7 @@ while($row = mysqli_fetch_object($_years))
 	}
 }
 // show last years rankings
-if (!in_array($year,$years)) list(,$year) = @each($years);
+if (!in_array($year,$years)) $year = current($years);
 
 $wettks = my_query($sql="SELECT *,DATE_FORMAT(datum,'%d.%m.%y') AS fdatum" .
                    " FROM Wettkaempfe WHERE ($wettks)" .
