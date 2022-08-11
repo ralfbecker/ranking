@@ -57,7 +57,7 @@ class Ui extends Base
 		}
 		else
 		{
-			$button = key($_content['button']);
+			$button = key($_content['button'] ?? []);
 			unset($_content['button']);
 
 			$view = $_content['view'] && !($button === 'edit' && $this->acl_check_comp($this->cup->data));

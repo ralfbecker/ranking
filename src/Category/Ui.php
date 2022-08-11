@@ -70,7 +70,7 @@ class Ui extends Base
 				$this->cats->data['mgroups'] = $this->cats->query_list('rkey', 'GrpId', array('GrpId' => $_content['mgroups']));
 			}
 
-			$button = key($_content['button']);
+			$button = key($_content['button'] ?? []);
 			//error_log(__METHOD__."() button=$button, cats->data=".array2string($this->cats->data));
 
 			if (in_array($button, array('save', 'apply', 'delete')) && !$this->is_admin)

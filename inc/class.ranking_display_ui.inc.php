@@ -349,7 +349,7 @@ class ranking_display_ui extends ranking_display_bo
 			unset($frm['button']);
 			$dsp_id = $frm['dsp_id'];
 
-			$button = key($content['button']);
+			$button = key($content['button'] ?? []);
 
 			switch($button)
 			{
