@@ -550,6 +550,11 @@ class ranking_import extends ranking_result_bo
 				!empty($birth_col) && !$this->in_agegroup($data[$birth_col], $cat))
 			{
 				$detection[$n]['row'] = 'ignore';
+				$import['ignore'][$n] = true;
+			}
+			elseif(!empty($import['ignore'][$n]))
+			{
+				$detection[$n]['row'] = 'ignored';
 			}
 
 			if ($import['athlete'][$n] && !is_array($import['athlete'][$n]) && $id_col)
@@ -742,7 +747,7 @@ class ranking_import extends ranking_result_bo
 		$nation_col = array_search('nation',$col2name);
 		$athletes =& $import['athlete'];
 		$detection =& $import['detection'];
-		$update =& $import['update'];
+		$replace =& $import['replace'];
 		$rank_col = array_search('rank', $col2name);
 		// result import selected
 		if (!empty($keys['comp']) && !empty($keys['cat']) && (is_numeric($keys['route']) || $keys['route'] === 'ranking'))
@@ -756,8 +761,10 @@ class ranking_import extends ranking_result_bo
 		$result = [];
 		foreach($import as $n => &$row)
 		{
-			if (!is_int($n) || $n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
-
+			if (!is_int($n) || $n < 2 || $detection[$n]['row'] === 'ignore' || !empty($import['ignore'][$n]))
+			{
+				continue;	// not an athlete row or to ignore
+			}
 			$this->athlete->init();
 
 			if (!$athletes[$n] || is_array($athletes[$n]) || !($athlete = $this->athlete->read($athletes[$n])))
@@ -779,7 +786,7 @@ class ranking_import extends ranking_result_bo
 			foreach($col2name as $c => $name)
 			{
 				if ($add_missing && !isset($athletes[$n]) && $name !== 'PerId' ||
-					$detection[$n][$c] && (!isset($update[$n][$c]) || $update[$n][$c]))
+					$detection[$n][$c] && (!isset($replace[$n][$c]) || $replace[$n][$c]))
 				{
 					$need_update = true;
 					// extra handling for federations, athletes store only fed_id, they get only created, if they are explicitly marked for update!
@@ -788,7 +795,7 @@ class ranking_import extends ranking_result_bo
 						case 'verband':
 							if (!($athlete['fed_id'] = $this->federation->get_federation($row[$c],$nation_col?$row[$nation_col]:null,true)) &&
 								// only allow admins to create new federations
-								$this->is_admin && $update[$n][$c] && $row[$nation_col])
+								$this->is_admin && $replace[$n][$c] && $row[$nation_col])
 							{
 								$this->federation->init(['verband' => $row[$c]]);
 								if ($this->federation->save($nation_col && $row[$nation_col] ? ['nation' => $row[$nation_col]] : null) == 0)
@@ -823,7 +830,7 @@ class ranking_import extends ranking_result_bo
 				}
 				if ($this->athlete->save($athlete) === 0)
 				{
-					unset($update[$n]);	// unmark as now updated
+					unset($replace[$n]);	// unmark as now updated
 					$imported++;
 					// new created athletes need to set PerId
 					if (empty($athlete['PerId']))
@@ -861,7 +868,7 @@ class ranking_import extends ranking_result_bo
 			$registered = 0;
 			foreach($athletes as $n => $PerId)
 			{
-				if (!empty($PerId) && $import['detection'][$n]['row'] !== 'ignore' &&
+				if (!empty($PerId) && $import['detection'][$n]['row'] !== 'ignore' && empty($import['ignore'][$n]) &&
 					$this->register($keys['comp'], $keys['cat'], $PerId))
 				{
 					++$registered;
@@ -910,7 +917,7 @@ class ranking_import extends ranking_result_bo
 	protected function import_coaches(array $import, int $comp, int $cat, int $fed_id, bool $add_all=false)
 	{
 		$detection =& $import['detection'];
-		$update =& $import['update'];
+		$replace =& $import['replace'];
 
 		$coach_col = array_search('coach', $import['as']);
 		$coach_email_col = array_search('coach-email', $import['as']);
@@ -923,10 +930,12 @@ class ranking_import extends ranking_result_bo
 		$added_coaches = [];
 		foreach($import as $n => &$data)
 		{
-			if (!is_int($n) || $n < 2 || $detection[$n]['row'] === 'ignore') continue;	// not an athlete row or to ignore
-
+			if (!is_int($n) || $n < 2 || $detection[$n]['row'] === 'ignore' || !empty($import['ignore'][$n]))
+			{
+				continue;    // not an athlete row or to ignore
+			}
 			// do we need to add the coach first
-			if (empty($data['coach-id']) && ($add_all || !isset($update[$n][$coach_col ?: $coach_email_col]) || $update[$n][$coach_col ?: $coach_email_col]))
+			if (empty($data['coach-id']) && ($add_all || !isset($replace[$n][$coach_col ?: $coach_email_col]) || $replace[$n][$coach_col ?: $coach_email_col]))
 			{
 				if (empty($data[$coach_col]) && empty($data[$coach_email_col])) continue;
 

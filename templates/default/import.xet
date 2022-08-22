@@ -131,7 +131,10 @@
 								<description id="header[14]"/>
 							</row>
 							<row class="th">
-								<description value="Import as"/>
+								<hbox width="100%">
+									<description value="Import as"/>
+									<description value="Ignore" align="right"/>
+								</hbox>
 								<select id="as[1][as]" empty_label="Ignore" class="et2_fullWidth"/>
 								<select id="as[2][as]" empty_label="Ignore" class="et2_fullWidth"/>
 								<select id="as[3][as]" empty_label="Ignore" class="et2_fullWidth"/>
@@ -155,6 +158,7 @@
 										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.EGroupware\\Ranking\\Athlete\\Ui.edit$row_cont[presets]'),'_blank', 850, 480, 'yes'); return false;"/>
 									<buttononly statustext="Edit athlete" label="Edit" id="edit[$row]" image="edit"
 										onclick="egw_openWindowCentered2(egw::link('/index.php','menuaction=ranking.EGroupware\\Ranking\\Athlete\\Ui.edit&amp;PerId=')+widget.getParent().getChildren()[0].getValue(), '_blank', 850, 480, 'yes'); return false;"/>
+									<checkbox id="ignore[$row]" statustext="Ignore" disabled="@detection[$row][row]=ignore" onchange="widget.getParent().getDOMNode().parentElement.parentElement.classList.toggle('ignored', widget.checked)"/>
 								</hbox>
 								<checkbox statustext="@detection[$row][help-1]" label="@{$row}[1]" id="replace[$row][1]" readonly="true" class="{$cont['detection'][$row][1]}"/>
 								<checkbox statustext="@detection[$row][help-2]" label="@{$row}[2]" id="replace[$row][2]" readonly="true" class="{$cont['detection'][$row][2]}"/>
@@ -176,10 +180,10 @@
 				</row>
 				<row class="noPrint" disabled="!@import[2]">
 					<hbox>
-						<select id="license" empty_label="Set license to"/>
-						<checkbox label="Add missing athletes" id="add_missing"/>
+						<select id="license" empty_label="Set license to" width="fit-content"/>
+						<checkbox label="Add missing athletes" id="add_missing" width="fit-content"/>
 						<button label="Import" id="button[import]" image="save" background_image="true"/>
-						<button statustext="Apply the changes made" label="Update" id="button[apply]" image="edit" background_image="true"/>
+						<button statustext="Apply the changes made" label="Apply" id="button[apply]" image="edit" background_image="true"/>
 						<button label="Cancel" id="button[cancel]"/>
 					</hbox>
 				</row>
@@ -199,7 +203,7 @@
 			.noAthlete { background-color: #ffffd0; }
 			.conflictData { background-color: #ffffd0; font-weight: bold; }
 			.newData { font-weight: bold; font-style: italic; }
-			tr.ignore > td * { color: lightgray !important; }
+			tr.ignore > td *, tr.ignored > td * { color: lightgray !important; }
 			table.importGrid { width: auto; margin-left: 0 !important; margin-top: 10px; margin-bottom: 5px }
 			table.importGrid td { padding-right: 5px !important; padding-left: 5px !important }
 			table.importGrid tr > td, table.importGrid tr > td *, table.importGrid tr.th > td { vertical-align: middle !important }
