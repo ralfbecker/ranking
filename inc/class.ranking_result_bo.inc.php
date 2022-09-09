@@ -591,7 +591,7 @@ class ranking_result_bo extends Base
 		}
 		foreach(array_keys($discipline2route) as $single_discipline)
 		{
-			foreach(array_keys($cat['mgroups']) as $gid)
+			foreach(array_keys($cat['mgroups'] ?? []) as $gid)
 			{
 				if (($c = $this->cats->read($gid)) &&
 					in_array($c['rkey'], $comp['gruppen']) &&
