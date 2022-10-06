@@ -3,13 +3,13 @@
 <!-- $Id$ -->
 <overlay>
 	<template id="ranking.admin.acl" template="" lang="" group="0" version="1.0.0.001">
-		<grid>
+		<grid width="100%">
 			<columns>
+				<column width="80"/>
 				<column/>
 				<column/>
 				<column/>
-				<column/>
-				<column/>
+				<column width="100"/>
 			</columns>
 			<rows>
 				<row class="th">
@@ -19,11 +19,11 @@
 					<description value="Edit athlete"/>
 					<description value="Delete"/>
 				</row>
-				<row class="row">
+				<row class="row" valign="top">
 					<textbox no_lang="1" id="${row}[nation]" size="3" maxlength="3"/>
-					<listbox type="select-account" rows="5" options="both" id="${row}[read]"/>
-					<listbox type="select-account" rows="5" options="both" id="${row}[edit]"/>
-					<listbox type="select-account" rows="5" options="both" id="${row}[athlets]"/>
+					<select-account rows="5" account_type="both" id="${row}[read]"/>
+					<select-account rows="5" account_type="both" id="${row}[edit]"/>
+					<select-account rows="5" account_type="both" id="${row}[athlets]"/>
 					<button image="delete" label="Delete" align="center" id="delete[$row]" onclick="return confirm('Delete all rights for that nation');"/>
 				</row>
 			</rows>
