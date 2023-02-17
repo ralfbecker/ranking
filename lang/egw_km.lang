@@ -1,0 +1,771 @@
+%1 athletes imported.	ranking	km	អត្តពលិក %1 បាននាំចូល។
+%1 deleted	ranking	km	%1 បានលុប
+%1 federations added to parent federation.	ranking	km	សហព័ន្ធ %1 ត្រូវបានបន្ថែមទៅសហព័ន្ធមេ។
+%1 federations merged.	ranking	km	សហព័ន្ធ %1 បានរួមបញ្ចូលគ្នា។
+%1 is already registered!	ranking	km	%1 ត្រូវបានចុះឈ្មោះរួចហើយ!
+%1 is an admin and has therefor all rights!	ranking	km	%1 គឺជាអ្នកគ្រប់គ្រង ហើយមានសិទ្ធិទាំងអស់!
+%1 lines read from file.	ranking	km	បន្ទាត់ %1 បានអានពីឯកសារ។
+%1 no longer prequalified athletes (without registration) deleted.	ranking	km	%1 លែងមានអត្តពលិកដែលមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់ទៀតហើយ (ដោយគ្មានការចុះឈ្មោះ) ត្រូវបានលុប។
+%1 no longer prequalified athletes with registration, you need to check quota!	ranking	km	%1 លែងមានអត្តពលិកដែលមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់ជាមួយនឹងការចុះឈ្មោះទៀតហើយ អ្នកត្រូវពិនិត្យមើលកូតា!
+%1 participants imported	ranking	km	អ្នកចូលរួម %1 បាននាំចូល
+%1 prequalified athletes in registration, %2 changed or added.	ranking	km	%1 អត្តពលិកដែលមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់ក្នុងការចុះឈ្មោះ %2 បានផ្លាស់ប្តូរ ឬបន្ថែម។
+%1 registered.	ranking	km	%1 បានចុះឈ្មោះ។
+%1 saved	ranking	km	បាន​រក្សា​ទុក %1
+%1 years, since %2	ranking	km	%1 ឆ្នាំ ចាប់តាំងពី %2
+%1, %2 deleted for category %3	ranking	km	%1, %2 បានលុបសម្រាប់ប្រភេទ %3
+%1, %2 registered for category %3	ranking	km	%1, %2 បានចុះឈ្មោះសម្រាប់ប្រភេទ %3
+%1. false start	ranking	km	%1 ការចាប់ផ្តើមមិនពិត
+%1. heat	ranking	km	%1 ជុំ
+%1. topo	ranking	km	%1 តូប៉ូ
+%1. try	ranking	km	%1 ព្យាយាម
+%s (<0 age from)	ranking	km	%s (<0 អាយុចាប់ពី)
+%s (<0 age to)	ranking	km	%s (<0 អាយុ​ដល់)
+%s quota has to be 0 for lead final, otherwise time is not used!	ranking	km	%s កូតាត្រូវតែជា 0 សម្រាប់វគ្គផ្តាច់ព្រ័ត្រ បើមិនដូច្នេះទេ ពេលវេលាមិនត្រូវបានប្រើប្រាស់ទេ!
+'%1' does not exist or is not readable by the webserver !!!	ranking	km	'%1' មិន​មាន ឬ​មិន​អាច​អាន​បាន​ដោយ webserver !!!
+(%1 athletes not from %2 skipped)	ranking	km	(អត្តពលិក%1 មិនមែនមកពី%2 បានរំលងទេ)
+1. display	ranking	km	1. បង្ហាញ
+1. january	ranking	km	1. ខែមករា
+1. place	ranking	km	1. កន្លែង
+1. select competition\n2. click on [+ register]\n3. select category\n4. search for athletes to register	ranking	km	1. ជ្រើសរើសការប្រកួតប្រជែង\n2. ចុចលើ [+ចុះឈ្មោះ]\n3. ជ្រើសរើសប្រភេទ\n4. ស្វែងរកអត្តពលិកដើម្បីចុះឈ្មោះ
+2. display	ranking	km	2. បង្ហាញ
+2. lane	ranking	km	2. ផ្លូវ
+2. qualification	ranking	km	2. គុណវុឌ្ឍិ
+2. time	ranking	km	2. ពេលវេលា
+3. place	ranking	km	3. កន្លែង
+a document with the athlete consent was uploaded.	ranking	km	ឯកសារដែលមានការយល់ព្រមពីអត្តពលិកត្រូវបានបង្ហោះ។
+ability	ranking	km	សមត្ថភាព
+aborts without saving changes	ranking	km	បោះបង់ដោយមិនរក្សាទុកការផ្លាស់ប្តូរ
+access control, key	ranking	km	ការគ្រប់គ្រងការចូលប្រើ, គន្លឹះ
+accounting	ranking	km	គណនេយ្យ
+actions	ranking	km	សកម្មភាព
+add a cup	ranking	km	បន្ថែមពែងមួយ។
+add a new athlete	ranking	km	បន្ថែមអត្តពលិកថ្មី។
+add a new category	ranking	km	បន្ថែមប្រភេទថ្មី។
+add a new competition	ranking	km	បន្ថែមការប្រកួតប្រជែងថ្មី។
+add a new cup	ranking	km	បន្ថែមពែងថ្មី។
+add a new heat	ranking	km	បន្ថែមជុំថ្មី។
+add athletes	ranking	km	បន្ថែមអត្តពលិក
+add heat	ranking	km	បន្ថែមជុំ
+add new athlete with the given data	ranking	km	បន្ថែមអត្តពលិកថ្មីជាមួយនឹងទិន្នន័យដែលបានផ្តល់ឱ្យ
+add not existing athletes to the database, use with caution!	ranking	km	បន្ថែមអត្តពលិកដែលមិនមានស្រាប់ទៅក្នុងមូលដ្ឋានទិន្នន័យ សូមប្រើដោយប្រុងប្រយ័ត្ន!
+add to parent federation opened for editing	ranking	km	បន្ថែមទៅសហព័ន្ធមេបានបើកសម្រាប់ការកែសម្រួល
+additional category	ranking	km	ប្រភេទបន្ថែម
+admin rights required!	ranking	km	Admin ទាមទារសិទ្ធិ!
+administrated by: parent federation	ranking	km	គ្រប់គ្រងដោយ៖ សហព័ន្ធមាតាបិតា
+age	ranking	km	អាយុ
+all above	ranking	km	ខាងលើទាំងអស់។
+all complimentary	ranking	km	ឥតគិតថ្លៃទាំងអស់។
+all lists no longer contain input fields or buttons:	ranking	km	បញ្ជីទាំងអស់លែងមានប្រអប់បញ្ចូល ឬប៊ូតុងទៀតហើយ៖
+all participants	ranking	km	អ្នកចូលរួមទាំងអស់។
+all points gets multiplicated with this factor, eg. for different competition types	ranking	km	ពិន្ទុទាំងអស់ត្រូវបានគុណជាមួយនឹងកត្តានេះ ឧ។ សម្រាប់ប្រភេទការប្រកួតផ្សេងៗ
+all: profile and name	ranking	km	ទាំងអស់៖ ប្រវត្តិរូប និងឈ្មោះ
+allow athletes to register themself for this competition	ranking	km	អនុញ្ញាតឱ្យអត្តពលិកចុះឈ្មោះដោយខ្លួនឯងសម្រាប់ការប្រកួតនេះ។
+allowed without extra confirmation	ranking	km	អនុញ្ញាតដោយគ្មានការបញ្ជាក់បន្ថែម
+allows athletes to register themself for this competition	ranking	km	អនុញ្ញាតឱ្យអត្តពលិកចុះឈ្មោះដោយខ្លួនឯងសម្រាប់ការប្រកួតនេះ។
+already registered	ranking	km	បានចុះឈ្មោះរួចហើយ
+already registered for combined, no single category registration allowed!	ranking	km	បាន​ចុះ​ឈ្មោះ​រួច​ហើយ​សម្រាប់​ការ​រួម​បញ្ចូល​គ្នា, គ្មាន​ការ​ចុះ​បញ្ជី​មួយ​ប្រភេទ​ត្រូវ​បាន​អនុញ្ញាត!
+an email with instructions how to (re-)set the password has been sent.	ranking	km	អ៊ីមែលដែលមានការណែនាំអំពីរបៀប (ឡើងវិញ) កំណត់ពាក្យសម្ងាត់ត្រូវបានផ្ញើ។
+an error happend, while storing your password!	ranking	km	កំហុសបានកើតឡើង ខណៈពេលរក្សាទុកពាក្យសម្ងាត់របស់អ្នក!
+applied	ranking	km	បានអនុវត្ត
+applied for a %1 license	ranking	km	បានដាក់ពាក្យសុំអាជ្ញាប័ណ្ណ%1
+applies for the license and downloads the necessary form to mail to the office	ranking	km	ដាក់ពាក្យសុំអាជ្ញាប័ណ្ណ និងទាញយកទម្រង់ចាំបាច់ដើម្បីផ្ញើទៅការិយាល័យ
+apply for	ranking	km	ដាក់ពាក្យ​សម្រាប់
+apply for license	ranking	km	ស្នើសុំអាជ្ញាប័ណ្ណ
+apply modifications below to all selected federations	ranking	km	អនុវត្តការកែប្រែខាងក្រោមចំពោះសហព័ន្ធដែលបានជ្រើសរើសទាំងអស់។
+apply the changes made	ranking	km	អនុវត្តការផ្លាស់ប្តូរដែលបានធ្វើ
+apply the changes of this athlete only	ranking	km	អនុវត្តការផ្លាស់ប្តូរអត្តពលិកនេះតែប៉ុណ្ណោះ
+are you sure you want to make an exception?	ranking	km	តើ​អ្នក​ប្រាកដ​ជា​ចង់​ធ្វើ EXCEPTION ទេ?
+as of	ranking	km	ពី
+athlete	ranking	km	អត្តពលិក
+athlete %1 not found!	ranking	km	រកមិនឃើញអត្តពលិក%1ទេ!
+athlete 1	ranking	km	អត្តពលិក ១
+athlete 2	ranking	km	អត្តពលិក ២
+athlete 3	ranking	km	អត្តពលិក ៣
+athlete applied	ranking	km	អត្តពលិកបានអនុវត្ត
+athlete does not meet registration requirements: %1!	ranking	km	អត្តពលិកមិនបំពេញតម្រូវការចុះឈ្មោះទេ៖ %1!
+athlete has a recent result from %1.	ranking	km	អត្តពលិកមានលទ្ធផលថ្មីៗពី%1។
+athlete has no license! use regular registration to apply for a license first.	ranking	km	អត្តពលិក​គ្មាន​អាជ្ញាប័ណ្ណ! ប្រើការចុះឈ្មោះទៀងទាត់ដើម្បីស្នើសុំអាជ្ញាប័ណ្ណជាមុនសិន។
+athlete including %1 results merged.	ranking	km	អត្តពលិក​រួម​បញ្ចូល​លទ្ធផល%1 បាន​បញ្ចូល​គ្នា​។
+athlete is not in agegroup of selected license category!	ranking	km	អត្តពលិកមិនស្ថិតក្នុងក្រុមអាយុនៃប្រភេទអាជ្ញាបណ្ណដែលបានជ្រើសរើសទេ!
+athlete is not in the age-group of that category	ranking	km	អត្តពលិកមិនស្ថិតក្នុងក្រុមអាយុនៃប្រភេទនោះទេ។
+athlete is suspended !!!	ranking	km	អត្តពលិកត្រូវព្យួរ!!!
+athlete license	ranking	km	អាជ្ញាប័ណ្ណអត្តពលិក
+athlete not found !!!	ranking	km	រកមិនឃើញអត្តពលិក!!!
+athlete scorecard already checked, update denied!	ranking	km	ប័ណ្ណពិន្ទុអត្តពលិកបានពិនិត្យរួចហើយ ធ្វើបច្ចុប្បន្នភាពត្រូវបានបដិសេធ!
+athlete to replace was prequalied!	ranking	km	អត្តពលិក​មក​ជំនួស​ត្រូវ​បាន​ពិន្ទុ​មុន!
+athlete to replace with is already registered!	ranking	km	អត្តពលិក​មក​ជំនួស​ត្រូវ​បាន​ចុះ​ឈ្មោះ​ហើយ!
+athletes	ranking	km	អត្តពលិក
+athlets need to be at least %1 years old! maybe wrong date format.	ranking	km	អត្តពលិកត្រូវមានអាយុយ៉ាងតិច %1 ឆ្នាំ! ប្រហែលជាទម្រង់កាលបរិច្ឆេទខុស។
+attention: merging can not be undone! really want to merge?	ranking	km	យកចិត្តទុកដាក់៖ ការបញ្ចូលគ្នាមិនអាចត្រឡប់វិញបានទេ! ពិតជាចង់បញ្ចូលគ្នាមែនទេ?
+beamer	ranking	km	Beamer
+beamer / videowalls	ranking	km	Beamer / ជញ្ជាំងវីដេអូ
+before	ranking	km	ពីមុន
+before which year the old system was used (first year of new system)	ranking	km	មុនឆ្នាំណាដែលប្រព័ន្ធចាស់ត្រូវបានប្រើប្រាស់ (ឆ្នាំដំបូងនៃប្រព័ន្ធថ្មី)
+best of	ranking	km	ល្អបំផុត
+best of two (record format)	ranking	km	ល្អបំផុតនៃពីរ (ទម្រង់កំណត់ត្រា)
+better result splits ties	ranking	km	លទ្ធផលកាន់តែប្រសើរ បំបែកចំណង
+birthdate	ranking	km	ថ្ងៃខែ​ឆ្នាំ​កំណើត
+birthday	ranking	km	ថ្ងៃកំណើត
+birthday, shows only the year	ranking	km	ខួបកំណើត, បង្ហាញតែឆ្នាំ
+birthyear	ranking	km	ឆ្នាំ​កំណើត
+birthyears from	ranking	km	ឆ្នាំកំណើតពី
+body height in centimeter	ranking	km	កម្ពស់រាងកាយគិតជាសង់ទីម៉ែត្រ
+both password do not match!	ranking	km	ពាក្យសម្ងាត់ទាំងពីរមិនត្រូវគ្នា!
+boulder	ranking	km	ផ្ទាំងថ្ម
+boulder: height, tries	ranking	km	boulder : កម្ពស់, ព្យាយាម
+by	ranking	km	ដោយ
+can not be higher than top!	ranking	km	មិនអាចខ្ពស់ជាងកំពូលទេ!
+can not be higher than tries!	ranking	km	មិនអាចខ្ពស់ជាងការព្យាយាម!
+can not be lower than tops!	ranking	km	មិនអាចទាបជាងកំពូល!
+can not create directory '%1' !!!	ranking	km	មិនអាចបង្កើតថត '%1' បានទេ!!!
+can not create topo directory %1!	ranking	km	មិនអាចបង្កើតថត topo%1 បានទេ!
+can not move '%1' to %2 !!!	ranking	km	មិនអាចផ្លាស់ទី '%1' ទៅ%2 !!!
+can't connect to time controll program at '%1': %2	ranking	km	មិនអាចភ្ជាប់ទៅកម្មវិធីគ្រប់គ្រងពេលវេលានៅ '%1': %2
+can't find co-participant!	ranking	km	រក​មិន​ឃើញ​អ្នក​ចូលរួម!
+can't open connection to display %1 (%2:%3)!!!	ranking	km	មិនអាចបើកការតភ្ជាប់ដើម្បីបង្ហាញ%1 (%2:%3) !!!
+can't open connection to displays at %1 !!!	ranking	km	មិនអាចបើកការតភ្ជាប់ដើម្បីបង្ហាញនៅ%1 !!!
+can't open connection to timy at %1 !!!	ranking	km	មិន​អាច​បើក​ការ​តភ្ជាប់​ទៅ Timy នៅ %1 !!!
+can't open control port (%1) %2 !!!	ranking	km	មិនអាចបើកច្រកគ្រប់គ្រង (%1) %2 !!!
+cannel without saving	ranking	km	Cannel ដោយមិនរក្សាទុក
+categories	ranking	km	ប្រភេទ
+category license is applied for, does not limit athletes to compete in that category only	ranking	km	អាជ្ញាបណ្ណ​ប្រភេទ​ត្រូវ​បាន​អនុវត្ត​សម្រាប់ មិន​កំណត់​អត្តពលិក​ឱ្យ​ប្រកួត​ក្នុង​ប្រភេទ​នោះ​តែ​ប៉ុណ្ណោះ។
+category not found !!!	ranking	km	ប្រភេទរកមិនឃើញ!!!
+cathegories	ranking	km	ប្រភេទ
+cellphone	ranking	km	ទូរស័ព្ទ​ចល័ត
+changes applied to %1 federations.	ranking	km	ការផ្លាស់ប្ដូរបានអនុវត្តចំពោះសហព័ន្ធ%1។
+check all	ranking	km	ពិនិត្យ​ទាំងអស់
+checked	ranking	km	បានពិនិត្យ
+children	ranking	km	កុមារ
+city	ranking	km	ទីក្រុង
+click here to have a mail send to your stored email address with instructions how to set your password, register for competitions and edit your profile.	ranking	km	ចុចត្រង់នេះ ដើម្បីផ្ញើសំបុត្រទៅកាន់អាសយដ្ឋានអ៊ីមែលដែលបានរក្សាទុករបស់អ្នក ជាមួយនឹងការណែនាំអំពីរបៀបកំណត់ពាក្យសម្ងាត់របស់អ្នក ចុះឈ្មោះសម្រាប់ការប្រកួតប្រជែង និងកែសម្រួលទម្រង់របស់អ្នក។
+click to view	ranking	km	ចុចដើម្បីមើល
+climbing professional	ranking	km	ជំនាញឡើងភ្នំ
+climbing since (years)	ranking	km	ឡើងតាំងពី (ឆ្នាំ)
+climbing time	ranking	km	ពេលវេលាឡើងភ្នំ
+climbingdata xml files can only set results, not create new participants!	ranking	km	ឯកសារ xml ClimbingData អាចកំណត់លទ្ធផលបាន មិនមែនបង្កើតអ្នកចូលរួមថ្មីទេ!
+clone of	ranking	km	ក្លូននៃ
+closes	ranking	km	បិទ
+columns	ranking	km	ជួរឈរ
+comment is displayed in "see also" list below ranking	ranking	km	មតិយោបល់ត្រូវបានបង្ហាញនៅក្នុងបញ្ជី "មើលផងដែរ" ខាងក្រោមចំណាត់ថ្នាក់
+comments	ranking	km	មតិយោបល់
+comp. date	ranking	km	comp. កាលបរិច្ឆេទ
+competition	ranking	km	ការប្រកួតប្រជែង
+competition already has a result for this category!	ranking	km	ការប្រកួតប្រជែងមានលទ្ធផលសម្រាប់ប្រភេទនេះរួចហើយ!
+competition calendar	ranking	km	ប្រតិទិននៃការប្រកួតប្រជែង
+competition does not allow self-registration!	ranking	km	ការប្រកួតប្រជែងមិនអនុញ្ញាតឱ្យចុះឈ្មោះដោយខ្លួនឯង!
+competition has no categories you are allowed to register for!	ranking	km	ការប្រកួតប្រជែងមិនមានប្រភេទដែលអ្នកត្រូវបានអនុញ្ញាតឱ្យចុះឈ្មោះ!
+competition has not yet a result	ranking	km	ការប្រកួតប្រជែងមិនទាន់មានលទ្ធផលនៅឡើយ
+competition has not yet a startlist	ranking	km	ការប្រកួតប្រជែងមិនទាន់មានបញ្ជីចាប់ផ្តើមនៅឡើយទេ
+competition is not open to your federation!	ranking	km	ការប្រកួតប្រជែងមិនបើកចំហចំពោះសហព័ន្ធរបស់អ្នកទេ!
+competition logo	ranking	km	និមិត្តសញ្ញាការប្រកួតប្រជែង
+competition name	ranking	km	ឈ្មោះការប្រកួតប្រជែង
+competition not found !!!	ranking	km	រកមិនឃើញការប្រកួតប្រជែង !!!
+competition not found!	ranking	km	រកមិនឃើញការប្រកួតប្រជែង!
+competition results	ranking	km	លទ្ធផលប្រកួតប្រជែង
+competitions	ranking	km	ការប្រកួតប្រជែង
+competitions counting	ranking	km	ការប្រកួតប្រជែងរាប់
+complete profile	ranking	km	ទម្រង់ពេញលេញ
+complete result	ranking	km	លទ្ធផលពេញលេញ
+complimentary	ranking	km	ឥតគិតថ្លៃ
+confirmed	ranking	km	បញ្ជាក់
+consent data storage	ranking	km	ការយល់ព្រមលើការផ្ទុកទិន្នន័យ
+contact	ranking	km	ទំនាក់ទំនង
+copy current formats to the new competition, which does not have any formats yet?	ranking	km	ចម្លងទម្រង់បច្ចុប្បន្នទៅការប្រកួតប្រជែងថ្មី ដែលមិនទាន់មានទម្រង់ណាមួយនៅឡើយ?
+could not open %1!	ranking	km	មិន​អាច​បើក%1!
+counting for rankings	ranking	km	រាប់សម្រាប់ចំណាត់ថ្នាក់
+create new federation: %1 (%2)	ranking	km	បង្កើតសហព័ន្ធថ្មី៖ %1 (%2)
+cup	ranking	km	ពែង
+cup (unranked last)	ranking	km	ពែង (មិនជាប់ចំណាត់ថ្នាក់ចុងក្រោយ)
+cup not found!!!	ranking	km	រកមិនឃើញទេ!!!
+cuppattern	ranking	km	លំនាំពែង
+cups	ranking	km	ពែង
+current registration in %1 category(s) were deleted.	ranking	km	ការចុះឈ្មោះបច្ចុប្បន្ននៅក្នុង %1 ប្រភេទ(s) ត្រូវបានលុប។
+custom acl right	ranking	km	សិទ្ធិ ACL ផ្ទាល់ខ្លួន
+database	admin	km	មូលដ្ឋានទិន្នន័យ
+dataline %1 has a different number of columns (%2) then labels (%3)!	ranking	km	បន្ទាត់​ទិន្នន័យ%1 មាន​ចំនួន​ជួរ​ឈរ​ផ្សេង​គ្នា (%2) បន្ទាប់​មក​ស្លាក (%3)!
+deadline	ranking	km	ផុតកំណត់
+default details	ranking	km	ព័ត៌មានលម្អិតលំនាំដើម
+default for active competitors	ranking	km	លំនាំដើមសម្រាប់ដៃគូប្រកួតប្រជែងសកម្ម
+default ranking view	ranking	km	ទិដ្ឋភាព​ចំណាត់ថ្នាក់​លំនាំដើម
+defines how many points gets awarded for each place in the cup (not ranking)	ranking	km	កំណត់ចំនួនពិន្ទុដែលទទួលបានសម្រាប់កន្លែងនីមួយៗក្នុងពែង (មិនមែនចំណាត់ថ្នាក់)
+defines how many points gets awarded for each place in the ranking (not cup)	ranking	km	កំណត់ចំនួនពិន្ទុដែលទទួលបានសម្រាប់កន្លែងនីមួយៗក្នុងចំណាត់ថ្នាក់ (មិនមែនពែង)
+delete all rights for this nation	ranking	km	លុបសិទ្ធិទាំងអស់សម្រាប់ជាតិនេះ។
+delete an eventually existing result withour further confirmation	ranking	km	លុបលទ្ធផលដែលមាននៅទីបំផុតជាមួយនឹងការបញ្ជាក់បន្ថែមរបស់យើង។
+delete result	ranking	km	លុបលទ្ធផល
+delete this athlete	ranking	km	លុបអត្តពលិកនេះ
+delete this category	ranking	km	លុបប្រភេទនេះ
+delete this competition	ranking	km	លុបការប្រកួតនេះ
+delete this cup	ranking	km	លុបពែងនេះ
+delete this federation	ranking	km	លុបសហព័ន្ធនេះ
+delete this heat including all results	ranking	km	លុបកំដៅនេះរួមទាំងលទ្ធផលទាំងអស់
+delete this participant (can not be undone)	ranking	km	លុបអ្នកចូលរួមនេះ (មិនអាចត្រឡប់វិញបានទេ)
+deleted	ranking	km	បានលុប
+deletes this cup	ranking	km	លុបពែងនេះ
+delimiter	ranking	km	កំណត់ព្រំដែន
+deny public access to	ranking	km	បដិសេធការចូលប្រើជាសាធារណៈ
+deny public display of the checked information	ranking	km	បដិសេធការបង្ហាញជាសាធារណៈនៃព័ត៌មានដែលបានត្រួតពិនិត្យ
+detect athletes	ranking	km	រកឃើញអត្តពលិក
+did you already mailed your application form to %1? if not, you can download it again and do so now:	ranking	km	តើ​អ្នក​បាន​ផ្ញើ​ទម្រង់​ពាក្យ​សុំ​របស់​អ្នក​ទៅ​កាន់%1 រួច​ហើយ​ឬ​នៅ? បើមិនអញ្ចឹងទេ អ្នកអាចទាញយកវាម្តងទៀត ហើយធ្វើវាឥឡូវនេះ៖
+digital rock	ranking	km	ឌីជីថល ROCK
+discipline	ranking	km	វិន័យ
+display	ranking	km	បង្ហាញ
+display #%1 not found!!!	ranking	km	រកមិនឃើញ ការបង្ហាញ #%1!!!
+display athlete	ranking	km	បង្ហាញអត្តពលិក
+display cup	ranking	km	បង្ហាញពែង
+display no ranking	ranking	km	បង្ហាញមិនមានចំណាត់ថ្នាក់
+display ranking	ranking	km	បង្ហាញចំណាត់ថ្នាក់
+display saved	ranking	km	បានរក្សាទុកការបង្ហាញ
+display this message again next time?	ranking	km	បង្ហាញសារនេះម្តងទៀតនៅពេលក្រោយ?
+displays	ranking	km	ការបង្ហាញ
+do you want to use a day-license?	ranking	km	តើអ្នកចង់ប្រើអាជ្ញាប័ណ្ណថ្ងៃទេ?
+double-click on a row to view or edit it, or right click for more options.	ranking	km	ចុចពីរដងលើជួរដេកមួយដើម្បីមើល ឬកែសម្រួលវា ឬចុចកណ្ដុរស្ដាំសម្រាប់ជម្រើសច្រើនទៀត។
+down	ranking	km	ចុះ
+download	ranking	km	ទាញយក
+download all	ranking	km	ទាញយកទាំងអស់។
+download license application	ranking	km	ទាញយកពាក្យសុំអាជ្ញាប័ណ្ណ
+duration in days or textual competition-date like 'mid july'	ranking	km	រយៈពេលជាថ្ងៃ ឬកាលបរិច្ឆេទប្រកួតប្រជែងតាមអត្ថបទដូចជា 'ពាក់កណ្តាលខែកក្កដា'
+duration or textual date	ranking	km	រយៈពេល ឬកាលបរិច្ឆេទអត្ថបទ
+each new upload will overwrite the previous one	ranking	km	ការអាប់ឡូតថ្មីនីមួយៗនឹងសរសេរជាន់ពីលើឯកសារមុន។
+edit %1	ranking	km	កែសម្រួល %1
+edit athlete	ranking	km	កែសម្រួលអត្តពលិក
+edit competition	ranking	km	កែសម្រួលការប្រកួតប្រជែង
+edit heat	ranking	km	កែសម្រួលជុំ
+edit profile	ranking	km	កែទម្រង់
+edit this athlete	ranking	km	កែសម្រួលអត្តពលិកនេះ។
+edit this competition	ranking	km	កែសម្រួលការប្រកួតនេះ។
+edit this cup	ranking	km	កែសម្រួលពែងនេះ។
+edit this heat	ranking	km	កែសម្រួលជុំនេះ។
+edit topo	ranking	km	កែសម្រួល topo
+eliminated	ranking	km	លុបចោល
+email address not found!	ranking	km	រកមិនឃើញអាសយដ្ឋានអ៊ីមែល!
+email address(es) for notification e.g. ralf becker <ralf.becker@digitalrock.de>	ranking	km	អាសយដ្ឋានអ៊ីមែលសម្រាប់ការជូនដំណឹង ឧ Ralf Becker <ralf.becker@digitalROCK.de>
+email required to send password email!	ranking	km	អ៊ីម៉េលតម្រូវឱ្យផ្ញើអ៊ីមែលពាក្យសម្ងាត់!
+encoding	ranking	km	ការអ៊ិនកូដ
+end	ranking	km	ចប់
+entry copied - edit and save the copy now.	ranking	km	ធាតុដែលបានចម្លង - កែសម្រួល និងរក្សាទុកច្បាប់ចម្លងឥឡូវនេះ។
+entry not found !!!	ranking	km	រកមិនឃើញទេ!!!
+error attaching the picture	ranking	km	កំហុសក្នុងការភ្ជាប់រូបភាព
+error deleting federation!	ranking	km	កំហុសក្នុងការលុបសហព័ន្ធ!
+error deleting format!	ranking	km	កំហុសក្នុងការលុបទម្រង់!
+error deleting handhold!	ranking	km	មាន​បញ្ហា​ក្នុង​ការ​លុប​ដៃ!
+error saving display!	ranking	km	កំហុសក្នុងការរក្សាទុកការបង្ហាញ!
+error saving federation!	ranking	km	កំហុសក្នុងការរក្សាទុកសហព័ន្ធ!
+error saving format!	ranking	km	កំហុសក្នុងការរក្សាទុកទម្រង់!
+error storing handhold!	ranking	km	កំហុសក្នុងការរក្សាទុកដៃ!
+error uploading topo!	ranking	km	កំហុសក្នុងការបង្ហោះ topo!
+error writing to display!!!	ranking	km	សរសេរខុសដើម្បីបង្ហាញ!!!
+error: all athlete data is public available, please change access settings!	ranking	km	កំហុស៖ ទិន្នន័យអត្តពលិកទាំងអស់មានជាសាធារណៈ សូមផ្លាស់ប្តូរការកំណត់ការចូលប្រើ!
+error: attaching '%1' as %2 (%3) !!!	ranking	km	កំហុស៖ ភ្ជាប់ '%1' ជា %2 (%3) !!!
+error: dataline %1 contains %2 instead of %3 columns !!!	ranking	km	កំហុស៖ បន្ទាត់ទិន្នន័យ%1 មាន %2 ជំនួសឱ្យជួរ %3 !!!
+error: dataline %1 contains not existing athlete id #%2 !!!	ranking	km	កំហុស៖ បន្ទាត់ទិន្នន័យ%1 មិនមានលេខសម្គាល់អត្តពលិកដែលមានស្រាប់ #%2 !!!
+error: dataline %1 contains wrong %2 id #%3 instead of #%4 !!!	ranking	km	កំហុស៖ បន្ទាត់ទិន្នន័យ%1 មានលេខសម្គាល់ %2 ខុស #%3 ជំនួសឱ្យ #%4 !!!
+error: dataline %1, athlete %2 has wrong gender '%3' !!!	ranking	km	កំហុស៖ បន្ទាត់ទិន្នន័យ%1 អត្តពលិក%2 មានភេទខុស '%3' !!!
+error: deleting %1 !!!	ranking	km	កំហុស៖ កំពុងលុប%1 !!!
+error: deleting the heat!!!	ranking	km	កំហុស៖ លុបរង្វង់ !!!
+error: following athlete data is public available	ranking	km	កំហុស៖ ទិន្នន័យអត្តពលិកខាងក្រោមមានជាសាធារណៈ
+error: generating startlist!!!	ranking	km	កំហុស៖ បង្កើតបញ្ជីចាប់ផ្តើម !!!
+error: heat already has a result!!!	ranking	km	កំហុស៖ ជុំមានលទ្ធផលហើយ!!!
+error: key '%1' exists already, it has to be unique !!!	ranking	km	កំហុស៖ គ្រាប់ចុច '%1' មានរួចហើយ វាត្រូវតែមានតែមួយគត់!!!
+error: no file to upload selected	ranking	km	កំហុស៖ គ្មានឯកសារដែលត្រូវផ្ទុកឡើងត្រូវបានជ្រើសរើស
+error: no line with column names, eg. delemiter is not ;	ranking	km	កំហុស៖ គ្មានបន្ទាត់ដែលមានឈ្មោះជួរឈរ ឧ។ អ្នកលុបគឺមិនមែន;
+error: no line with column names, eg. wrong delemiter	ranking	km	កំហុស៖ គ្មានបន្ទាត់ដែលមានឈ្មោះជួរឈរ ឧ។ អ្នកបំបែកខុស
+error: registration	ranking	km	កំហុស៖ ការចុះឈ្មោះ
+error: removing the %1 !!!	ranking	km	កំហុស៖ ការដក %1 !!!
+error: renaming the attachments !!!	ranking	km	កំហុស៖ ប្តូរឈ្មោះឯកសារភ្ជាប់ !!!
+error: required column %1 not found !!!	ranking	km	កំហុស៖ ទាមទារជួរឈរ %1 រកមិនឃើញ !!!
+error: route already has a result!!!	ranking	km	កំហុស៖ ផ្លូវមានលទ្ធផលហើយ!!!
+error: saving the heat!!!	ranking	km	កំហុស៖ រក្សាទុកជុំ !!!
+error: while saving !!!	ranking	km	កំហុស៖ ពេលរក្សាទុក !!!
+everything public	ranking	km	អ្វីគ្រប់យ៉ាងជាសាធារណៈ
+exists without saving the changes	ranking	km	មានដោយមិនចាំបាច់រក្សាទុកការផ្លាស់ប្តូរ
+factor	ranking	km	កត្តា
+fall	ranking	km	ធ្លាក់
+false start	ranking	km	ការចាប់ផ្តើមមិនពិត
+false start %1: %2	ranking	km	ការចាប់ផ្តើមមិនពិត%1៖ %2
+family name of the athlete in latin chars! accents and umlauts are ok	ranking	km	ឈ្មោះគ្រួសាររបស់អត្តពលិកជាអក្សរឡាតាំង! ការសង្កត់សំឡេង និង umlauts គឺយល់ព្រម
+fax	ranking	km	ទូរសារ
+federation	ranking	km	សហព័ន្ធ
+federation and parent	ranking	km	សហព័ន្ធនិងឪពុកម្តាយ
+federation deleted.	ranking	km	សហព័ន្ធត្រូវបានលុបចោល។
+federation needs to confirm	ranking	km	សហព័ន្ធត្រូវតែបញ្ជាក់
+federation or nationality	ranking	km	សហព័ន្ធ ឬសញ្ជាតិ
+federation saved.	ranking	km	សហព័ន្ធបានរក្សាទុក។
+federations	ranking	km	សហព័ន្ធ
+fees	ranking	km	ថ្លៃសេវា
+female	ranking	km	ស្ត្រី
+fieldfactorpoints	ranking	km	Fieldfactorpoints
+file %1 not found (either type=%2 or dr_path=%3 wrong)!	ranking	km	រកមិនឃើញឯកសារ %1 (ប្រភេទ=%2 ឬ DR_PATH=%3 ខុស)!
+file '%1' successful attached as %2	ranking	km	ឯកសារ '%1' បានភ្ជាប់ដោយជោគជ័យជា%2
+file is not a pdf	ranking	km	ឯកសារមិនមែនជា PDF ទេ។
+file is not an image (%1)	ranking	km	ឯកសារមិនមែនជារូបភាព (%1)
+filesystem path for upload of athlete pictures	admin	km	ផ្លូវប្រព័ន្ធឯកសារសម្រាប់ការបង្ហោះរូបភាពអត្តពលិក
+final	ranking	km	ចុងក្រោយ
+first name of the athlete in latin chars! accents and umlauts are ok	ranking	km	ឈ្មោះដំបូងរបស់អត្តពលិកក្នុងអក្សរឡាតាំង! ការសង្កត់សំឡេង និង umlauts គឺយល់ព្រម
+for categories %1 together only a total of %2 registrations allowed!	ranking	km	សម្រាប់ប្រភេទ%1 មានតែការចុះឈ្មោះសរុប %2 ប៉ុណ្ណោះដែលត្រូវបានអនុញ្ញាត!
+for internal use, not shown on the website.	ranking	km	សម្រាប់ការប្រើប្រាស់ខាងក្នុង មិនត្រូវបានបង្ហាញនៅលើគេហទំព័រទេ។
+format	ranking	km	ទម្រង់
+format #%1 not found!	ranking	km	រកមិនឃើញទម្រង់ #%1!
+format deleted	ranking	km	បានលុបទម្រង់
+format saved	ranking	km	បានរក្សាទុកទម្រង់
+free text	ranking	km	អត្ថបទឥតគិតថ្លៃ
+from	ranking	km	ពី
+from other competitions	ranking	km	ពីការប្រកួតផ្សេងៗ
+from the ranking	ranking	km	ពីចំណាត់ថ្នាក់
+full cathegory name (must not be empty)	ranking	km	ឈ្មោះពេញ category (មិនត្រូវទទេ)
+full competition name (must not be empty)	ranking	km	ឈ្មោះពេញនៃការប្រកួតប្រជែង (មិនត្រូវទទេ)
+full cup name (must not be empty)	ranking	km	ឈ្មោះពេញពែង (មិនត្រូវទទេ)
+further competitions you can register for:	ranking	km	ការប្រកួតប្រជែងបន្ថែម អ្នកអាចចុះឈ្មោះសម្រាប់៖
+gender	ranking	km	ភេទ
+gender of the athlete	ranking	km	ភេទរបស់អត្តពលិក
+gender...	ranking	km	ភេទ...
+general	ranking	km	ទូទៅ
+general result	ranking	km	លទ្ធផលទូទៅ
+generate all startlists together	ranking	km	បង្កើតបញ្ជីចាប់ផ្តើមទាំងអស់រួមគ្នា
+generate startlist	ranking	km	បង្កើតបញ្ជីចាប់ផ្តើម
+go	ranking	km	ទៅ
+grpid	ranking	km	GrpId
+has already a result!	ranking	km	ទទួលបានលទ្ធផលហើយ!
+header	ranking	km	បឋមកថា
+heat	ranking	km	ជុំ
+heat deleted	ranking	km	បានលុបជុំ
+heat saved	ranking	km	បានរក្សាទុកជុំ
+heat updated	ranking	km	បានធ្វើបច្ចុប្បន្នភាពជុំ
+hide complete profile page	ranking	km	លាក់ទំព័រប្រវត្តិរូបពេញលេញ
+hide contact data, birthday and city from public display. still shows optional data like hobbies!	ranking	km	លាក់ទិន្នន័យទំនាក់ទំនង ថ្ងៃកំណើត និងទីក្រុងពីការបង្ហាញជាសាធារណៈ។ នៅតែបង្ហាញទិន្នន័យស្រេចចិត្តដូចជាចំណូលចិត្ត!
+hide only contact data and birthday from public display.	ranking	km	លាក់តែទិន្នន័យទំនាក់ទំនង និងថ្ងៃកំណើតពីការបង្ហាញជាសាធារណៈ។
+historic athlete profile is hidden as we have no explicit consent from him/her to show the data.	ranking	km	កម្រងព័ត៌មានអត្តពលិកជាប្រវត្តិសាស្ត្រត្រូវបានលាក់ ដោយសារយើងមិនមានការយល់ព្រមច្បាស់លាស់ពីគាត់/នាង ដើម្បីបង្ហាញទិន្នន័យ។
+hobbies	ranking	km	ចំណង់ចំណូលចិត្ត
+homepage	ranking	km	ទំព័រដើម
+host	admin	km	ម្ចាស់ផ្ទះ
+host nation	ranking	km	ប្រទេសម្ចាស់ផ្ទះ
+host quota	ranking	km	កូតាម្ចាស់ផ្ទះ
+host/ip	ranking	km	ម៉ាស៊ីន/IP
+hostname or ip the timy control program is running, eg. localhost	ranking	km	ឈ្មោះម៉ាស៊ីន ឬ IP ដែលកម្មវិធីគ្រប់គ្រង Timy កំពុងដំណើរការ ឧ. localhost
+how is the key for the default cup of this cathegory, eg. '??_wc' for the worldcup ?? is replaced by year	ranking	km	តើគន្លឹះសម្រាប់ពែងលំនាំដើមនៃ Category នេះយ៉ាងដូចម្តេច ឧ។ '??_WC' សម្រាប់ World Cup ?? ត្រូវបានជំនួសដោយឆ្នាំ
+how many athletes from the complimentary list of each nation should be used	ranking	km	តើអត្តពលិកប៉ុន្មាននាក់ពីបញ្ជីឥតគិតថ្លៃរបស់ប្រទេសនីមួយៗគួរតែត្រូវបានប្រើប្រាស់
+how many athlets (percentage) of the field are used to calculate the fieldfaktor, usualy all=100%	ranking	km	តើអត្តពលិកប៉ុន្មាននាក់ (ភាគរយ) នៃវាលត្រូវបានប្រើដើម្បីគណនា fieldfaktor ជាធម្មតាទាំងអស់ = 100%
+how many athlets of the field gets points, eg. 50% (defaults to all if empty)	ranking	km	តើអត្តពលិកប៉ុន្មាននាក់នៃទីលានទទួលបានពិន្ទុ ឧ. 50% (លំនាំដើមសម្រាប់ទាំងអស់ប្រសិនបើទទេ)
+how to register athletes	ranking	km	របៀបចុះឈ្មោះអត្តពលិក
+how to use resultservice	ranking	km	របៀបប្រើសេវាកម្មលទ្ធផល
+id	ranking	km	លេខសម្គាល់
+if a gender is selected, only athlets of this gender can be in the cathegory (usualy a gender should be selected)	ranking	km	ប្រសិនបើភេទត្រូវបានជ្រើសរើស មានតែអត្តពលិកនៃភេទនេះប៉ុណ្ណោះដែលអាចស្ថិតនៅក្នុងក្រុមជំនុំ (ជាធម្មតាភេទគួរតែត្រូវបានជ្រើសរើស)
+if you do not yet have a password or you don't remember it, just enter your email address to get an email with instruction how to set a password.	ranking	km	ប្រសិនបើអ្នកមិនទាន់មានពាក្យសម្ងាត់ ឬអ្នកមិនចាំវាទេ គ្រាន់តែបញ្ចូលអាសយដ្ឋានអ៊ីមែលរបស់អ្នក ដើម្បីទទួលបានអ៊ីមែលដែលមានការណែនាំអំពីរបៀបកំណត់ពាក្យសម្ងាត់។
+if you have no athlete account yet and need to apply for a climbing license, you first need to register:	ranking	km	ប្រសិនបើអ្នកមិនទាន់មានគណនីអត្តពលិកនៅឡើយទេ ហើយត្រូវការដាក់ពាក្យសុំអាជ្ញាប័ណ្ណឡើងភ្នំ ដំបូងអ្នកត្រូវចុះឈ្មោះ៖
+ignore	ranking	km	មិនអើពើ
+import	ranking	km	នាំចូល
+import as	ranking	km	នាំចូលជា
+import charset	ranking	km	នាំចូលសំណុំតួអក្សរ
+import file	ranking	km	នាំចូលឯកសារ
+import from url	ranking	km	នាំចូលពី URL
+import into ranking	ranking	km	នាំចូលក្នុងចំណាត់ថ្នាក់
+import the result into the ranking	ranking	km	នាំចូលលទ្ធផលទៅក្នុងចំណាត់ថ្នាក់
+in kilogram	ranking	km	ក្នុង​គីឡូក្រាម
+incl. nation-code	ranking	km	រួមបញ្ចូល លេខកូដជាតិ
+information pdf	ranking	km	ព័ត៌មានជា PDF
+install-id of instance to use for export caching (default current one)	admin	km	ដំឡើង-ID នៃឧទាហរណ៍ដើម្បីប្រើសម្រាប់ការនាំចេញឃ្លាំងសម្ងាត់ (លំនាំដើមបច្ចុប្បន្នមួយ)
+internal key, leave it empty to have it automaticaly generated	ranking	km	សោខាងក្នុង ទុកវាឱ្យនៅទទេដើម្បីឱ្យវាបង្កើតដោយស្វ័យប្រវត្តិ
+into current category	ranking	km	ចូលទៅក្នុងប្រភេទបច្ចុប្បន្ន
+invalid age for age-group of category	ranking	km	អាយុមិនត្រឹមត្រូវសម្រាប់ក្រុមអាយុនៃប្រភេទ
+isolation	ranking	km	ការដាក់ឱ្យនៅដាច់ដោយឡែក
+isolation zone	ranking	km	តំបន់ដាច់ស្រយាល។
+isolation zone and starting time	ranking	km	តំបន់ដាច់ស្រយាល និងពេលវេលាចាប់ផ្តើម
+judge	ranking	km	ចៅក្រម
+judges	ranking	km	ចៅក្រម
+judges have the right to create startlists and results 2 weeks befor and after the competition	ranking	km	ចៅក្រមមានសិទ្ធិបង្កើតបញ្ជីចាប់ផ្តើម និងលទ្ធផល 2 សប្តាហ៍មុន និងក្រោយការប្រកួត
+key must not be empty !!!	ranking	km	គន្លឹះមិនត្រូវទទេ!!!
+key of the category	ranking	km	គន្លឹះនៃប្រភេទ
+key of the competition	ranking	km	គន្លឹះនៃការប្រកួតប្រជែង
+key of the cup	ranking	km	គន្លឹះនៃពែង
+key of the person	ranking	km	គន្លឹះនៃបុគ្គល
+lane a	ranking	km	ផ្លូវ ក
+last competition	ranking	km	ការប្រកួតចុងក្រោយ
+lead	ranking	km	នាំមុខ
+license confirmed or applied for	ranking	km	អាជ្ញាបណ្ណត្រូវបានបញ្ជាក់ ឬដាក់ពាក្យសុំ
+license number	ranking	km	លេខអាជ្ញាប័ណ្ណ
+license should be removed when federation was changed!	ranking	km	អាជ្ញាបណ្ណគួរតែត្រូវបានដកចេញនៅពេលដែលសហព័ន្ធត្រូវបានផ្លាស់ប្តូរ!
+line	ranking	km	បន្ទាត់
+local & state federation confirmed	ranking	km	សហព័ន្ធក្នុងស្រុក និងរដ្ឋបានបញ្ជាក់
+local federation confirmed	ranking	km	សហព័ន្ធក្នុងស្រុកបញ្ជាក់
+login suspended, too many unsuccessful tries!	ranking	km	ការ​ចូល​ត្រូវ​បាន​ផ្អាក ការ​ព្យាយាម​មិន​បាន​ជោគជ័យ​ច្រើន​ពេក!
+mail participants	ranking	km	អ្នកចូលរួមសំបុត្រ
+mail to %1 participants send, %2 had no email-address, %3 failed.	ranking	km	អ៊ីមែលទៅអ្នកចូលរួម %1 ផ្ញើ %2 មិនមានអាសយដ្ឋានអ៊ីមែល %3 បានបរាជ័យ។
+makes all your contact data public available!	ranking	km	ធ្វើឱ្យទិន្នន័យទំនាក់ទំនងរបស់អ្នកទាំងអស់មានជាសាធារណៈ!
+male	ranking	km	បុរស
+mark items you want to deny public access, nothing marked means everything is public!	ranking	km	សម្គាល់ធាតុដែលអ្នកចង់បដិសេធការចូលប្រើជាសាធារណៈ គ្មានអ្វីសម្គាល់មានន័យថាអ្វីៗទាំងអស់ជាសាធារណៈ!
+max	ranking	km	អតិបរមា
+maximum number of competition counting for the ranking (empty for all)	ranking	km	ចំនួនអតិបរមានៃការប្រកួតប្រជែងរាប់សម្រាប់ចំណាត់ថ្នាក់ (ទទេសម្រាប់ទាំងអស់គ្នា)
+maybe you have a different one registered. try looking it up by using "edit profile" on your profile page.	ranking	km	ប្រហែលជាអ្នកមានការចុះឈ្មោះផ្សេង។ សាកល្បងរកមើលវាដោយប្រើ "កែសម្រួលទម្រង់" នៅលើទំព័រកម្រងព័ត៌មានរបស់អ្នក។
+measurement	ranking	km	ការវាស់វែង
+measurement aborted!	ranking	km	ការវាស់វែងត្រូវបានលុបចោល!
+merge	ranking	km	បញ្ចូលគ្នា
+merge selected federations with the one opened for editing	ranking	km	បញ្ចូលសហព័ន្ធដែលបានជ្រើសរើសជាមួយសហព័ន្ធដែលបានបើកសម្រាប់ការកែសម្រួល
+merges this entry into the selected one.	ranking	km	បញ្ចូលធាតុនេះទៅក្នុងធាតុដែលបានជ្រើសរើស។
+minimum disciplines	ranking	km	វិញ្ញាសាអប្បបរមា
+minus	ranking	km	ដក
+missing registration rights!	ranking	km	បាត់សិទ្ធិចុះឈ្មោះ!
+more	ranking	km	ច្រើនទៀត
+multiple categories check their sum against the quota, not each one!	ranking	km	ប្រភេទជាច្រើនពិនិត្យមើលផលបូករបស់ពួកគេធៀបនឹងកូតា មិនមែនប្រភេទនីមួយៗទេ!
+name(s)	ranking	km	ឈ្មោះ
+narrow your search	ranking	km	បង្រួមការស្វែងរករបស់អ្នក។
+nation	ranking	km	ជាតិ
+nation acl	common	km	ជាតិ ACL
+nation if national competition or internatinal	ranking	km	ប្រទេសជាតិ ប្រសិនបើការប្រកួតប្រជែងថ្នាក់ជាតិ ឬអន្តរជាតិ
+nation if national competition or none for an internatinal one	ranking	km	ប្រទេសជាតិ ប្រសិនបើការប្រកួតប្រជែងថ្នាក់ជាតិ ឬគ្មានសម្រាប់អន្តរជាតិ
+nation the athlete is competing for	ranking	km	ប្រទេសដែលអត្តពលិកកំពុងប្រកួតប្រជែង
+nation to use (empty = international)	ranking	km	ជាតិដែលត្រូវប្រើ (ទទេ = អន្តរជាតិ)
+nation, birthyear and gender have to be identical to merge, the names have to be similar!	ranking	km	ជាតិ​ឆ្នាំ​កំណើត និង​ភេទ​ត្រូវ​តែ​ដូចគ្នា​ដើម្បី​បញ្ចូល​គ្នា ឈ្មោះ​ត្រូវ​តែ​ស្រដៀង​គ្នា!
+national federation	ranking	km	សហព័ន្ធជាតិ
+national registration	ranking	km	ការចុះឈ្មោះជាតិ
+national team ranking	ranking	km	ចំណាត់ថ្នាក់ក្រុមជាតិ
+nationname	ranking	km	ឈ្មោះជាតិ
+nations and federations	ranking	km	ប្រជាជាតិ និងសហព័ន្ធ
+new athlete profile with no result yet.	ranking	km	ទម្រង់​អត្តពលិក​ថ្មី​ដែល​មិន​ទាន់​មាន​លទ្ធផល។
+next startnumber increment by	ranking	km	លេខចាប់ផ្តើមបន្ទាប់បង្កើនដោយ
+no athlete (&person=xyz) or no category (&cat=xyz) selected via the url!	ranking	km	គ្មានអត្តពលិក (&person=XYZ) ឬគ្មានប្រភេទ (&cat=XYZ) ដែលបានជ្រើសរើសតាមរយៈ URL!
+no birthdate	ranking	km	គ្មានថ្ងៃកំណើត
+no categories defined!	ranking	km	មិនទាន់កំណត់ប្រភេទទេ!
+no competition (&comp=xyz) and no cup (&cup=xyz) selected via the url!	ranking	km	គ្មានការប្រកួតប្រជែង (&comp=XYZ) និងគ្មានពែង (&cup=XYZ) ដែលបានជ្រើសរើសតាមរយៈ URL!
+no complimentary list (over quota)	ranking	km	មិនមានបញ្ជីឥតគិតថ្លៃ (លើសកូតា)
+no federation selected to edit!	ranking	km	គ្មាន​សហព័ន្ធ​បាន​ជ្រើសរើស​ដើម្បី​កែសម្រួល​ទេ!
+no license required for registration	ranking	km	មិនត្រូវការអាជ្ញាប័ណ្ណសម្រាប់ការចុះឈ្មោះ
+no participant with startnumber "%1"!	ranking	km	គ្មានអ្នកចូលរួមដែលមានលេខចាប់ផ្តើម "%1" ទេ!
+no participants yet!	ranking	km	មិនទាន់មានអ្នកចូលរួមទេ!
+no previous heat (%1) found!	ranking	km	រកមិនឃើញកំដៅពីមុន (%1) ទេ!
+no quota set in the previous heat!!!	ranking	km	គ្មានកូតាកំណត់ក្នុងជុំមុន!!!
+no ranking defined or no results yet for category %1 !!!	ranking	km	មិន​មាន​ចំណាត់​ថ្នាក់​ដែល​បាន​កំណត់ ឬ​មិន​ទាន់​មាន​លទ្ធផល​សម្រាប់​ប្រភេទ %1 !!!
+no result for discipline %1 found!	ranking	km	No result for រក ឃ %1!
+no result imported, need to select all athletes first!	ranking	km	No result imported ត្រូវការជ្រើសរើសអត្តពលិកទាំងអស់ជាមុន!
+no result yet !!!	ranking	km	មិនទាន់មានលទ្ធផល!!!
+no rights to any nations, admin needs to give read-rights for the competitions of at least one nation!	ranking	km	គ្មានសិទ្ធិសម្រាប់ជាតិណាមួយទេ admin ត្រូវតែផ្តល់សិទ្ធិអានសម្រាប់ការប្រកួតនៃប្រទេសយ៉ាងហោចណាស់មួយ!
+no route with discipline %1 found!	ranking	km	រកមិនឃើញផ្លូវដែលមានវិន័យ%1 ទេ!
+no starters yet !!!	ranking	km	មិនទាន់មានការចាប់ផ្តើមទេ!!!
+no startlist or result yet!	ranking	km	មិនទាន់មានបញ្ជីចាប់ផ្តើម ឬលទ្ធផលនៅឡើយទេ!
+not allowed	ranking	km	មិន​អនុញ្ញាត
+not deleted	ranking	km	មិនត្រូវបានលុបទេ។
+not used at the moment	ranking	km	មិនត្រូវបានប្រើនៅពេលនេះទេ។
+nothing to apply!	ranking	km	គ្មានអ្វីត្រូវអនុវត្តទេ!
+nothing to update	ranking	km	គ្មានអ្វីត្រូវធ្វើបច្ចុប្បន្នភាពទេ។
+notice	ranking	km	សេចក្តីជូនដំណឹង
+number of competitions counting for the cup	ranking	km	ចំនួននៃការប្រកួតរាប់សម្រាប់ពែង
+number of competitions counting for the cup (empty for all)	ranking	km	ចំនួននៃការប្រកួតរាប់សម្រាប់ពែង (ទទេសម្រាប់ទាំងអស់)
+number of problems	ranking	km	ចំនួននៃបញ្ហា
+observation time	ranking	km	ពេលវេលាសង្កេត
+on how many routes is the first round	ranking	km	នៅលើផ្លូវប៉ុន្មានគឺជុំទីមួយ
+one qualification	ranking	km	គុណវុឌ្ឍិមួយ។
+online consent of athlete on %1.	ranking	km	ការយល់ព្រមតាមអ៊ីនធឺណិតរបស់អត្តពលិកនៅលើ%1។
+only %1 of %2 entries displayed!	ranking	km	មានតែធាតុ%1 នៃ%2 ប៉ុណ្ណោះដែលបានបង្ហាញ!
+only fill values different from egw	admin	km	បំពេញតែតម្លៃខុសគ្នាពី eGW
+open comp.	ranking	km	បើកកុំព្យូទ័រ។
+open scorecards:	ranking	km	បើកតារាងពិន្ទុ៖
+opens	ranking	km	បើក
+or	ranking	km	ឬ
+or the organizer of the competition	ranking	km	ឬអ្នករៀបចំការប្រកួត
+other sports	ranking	km	កីឡាផ្សេងទៀត។
+other sports practiced	ranking	km	កីឡាផ្សេងទៀតបានអនុវត្ត
+overall result	ranking	km	លទ្ធផលរួម
+pagename for athlete profile (default: pstambl)	ranking	km	ឈ្មោះទំព័រសម្រាប់ទម្រង់អត្តពលិក (លំនាំដើម៖ pstambl)
+pagename for ranglists (default: ranglist)	ranking	km	ឈ្មោះទំព័រសម្រាប់បញ្ជីជួរ (លំនាំដើម៖ បញ្ជីជួរ)
+pagename for results (default: result)	ranking	km	ឈ្មោះទំព័រសម្រាប់លទ្ធផល (លំនាំដើម៖ លទ្ធផល)
+pagename(,target) for athlete profiles	ranking	km	ឈ្មោះទំព័រ (, គោលដៅ) សម្រាប់ទម្រង់អត្តពលិក
+pairing speed final	ranking	km	ការផ្គូផ្គងល្បឿនចុងក្រោយ
+parent federation	ranking	km	សហព័ន្ធមាតាបិតា
+participant deleted	ranking	km	បានលុបអ្នកចូលរួម
+participants without password	ranking	km	អ្នកចូលរួមដោយគ្មានពាក្យសម្ងាត់
+participants without password or recent reminder	ranking	km	អ្នកចូលរួមដោយគ្មានពាក្យសម្ងាត់ ឬការរំលឹកថ្មីៗ
+participants, at least on that place in the used ranking or cup, don't need to climb qualification	ranking	km	អ្នកចូលរួម យ៉ាងហោចណាស់នៅលើកន្លែងនោះក្នុងចំណាត់ថ្នាក់ ឬពែងដែលបានប្រើ មិនចាំបាច់ឡើងវគ្គជម្រុះទេ
+password email	ranking	km	អ៊ីមែលពាក្យសម្ងាត់
+password you entered is not correct!	ranking	km	ពាក្យសម្ងាត់ដែលអ្នកបានបញ្ចូលមិនត្រឹមត្រូវទេ!
+pc city	ranking	km	ទីក្រុង PC
+pc city (nation)	ranking	km	ទីក្រុង PC (ជាតិ)
+perid	ranking	km	PerId
+permission denied !!!	ranking	km	ការអនុញ្ញាតត្រូវបានបដិសេធ !!!
+personal profile	ranking	km	ប្រវត្តិរូបផ្ទាល់ខ្លួន
+phone	ranking	km	ទូរស័ព្ទ
+picture	ranking	km	រូបភាព
+picture attached	ranking	km	រូបភាពភ្ជាប់មកជាមួយ
+picture resized to %1 pixel	ranking	km	ប្តូរទំហំរូបភាពទៅ%1 ភីកសែល
+place	ranking	km	កន្លែង
+place of birth	ranking	km	ទី​កន្លែង​កំណើត
+please check the categories you want to register for:	ranking	km	សូមពិនិត្យមើលប្រភេទដែលអ្នកចង់ចុះឈ្មោះសម្រាប់៖
+please contact your federation (%1), to have your email address added to your athlete profile, so we can mail you a password.	ranking	km	សូមទាក់ទងសហព័ន្ធរបស់អ្នក (%1) ដើម្បីឱ្យអាសយដ្ឋានអ៊ីមែលរបស់អ្នកត្រូវបានបន្ថែមទៅកម្រងព័ត៌មានអត្តពលិករបស់អ្នក ដូច្នេះយើងអាចផ្ញើលេខសម្ងាត់មកអ្នក។
+please contact your federation (%1).	ranking	km	សូមទាក់ទងសហព័ន្ធរបស់អ្នក (%1)។
+please enter your email address and password to register for competitions or edit your profile:	ranking	km	សូមបញ្ចូលអាសយដ្ឋានអ៊ីមែល និងពាក្យសម្ងាត់របស់អ្នក ដើម្បីចុះឈ្មោះសម្រាប់ការប្រកួត ឬកែសម្រួលប្រវត្តិរូបរបស់អ្នក៖
+please enter your new password:	ranking	km	សូមបញ្ចូលពាក្យសម្ងាត់ថ្មីរបស់អ្នក៖
+please enter your password to log in or %1click here%2, if you forgot it.	ranking	km	សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នកដើម្បីចូល ឬ %1 ចុចទីនេះ %2 ប្រសិនបើអ្នកភ្លេចវា។
+please try again ...	ranking	km	សូម​ព្យាយាម​ម្តង​ទៀត ...
+please use only a first capital letter for names, do not capitalise the whole word!	ranking	km	សូមប្រើតែអក្សរធំដំបូងសម្រាប់ឈ្មោះប៉ុណ្ណោះ កុំសរសេរអក្សរធំទាំងស្រុង!
+plus	ranking	km	បូក
+pointalocation	ranking	km	ការកំណត់ទីតាំង
+points	ranking	km	ពិន្ទុ
+port	admin	km	ច្រក
+postalcode	ranking	km	លេខ​កូដ​ប្រៃ​ស​ណី​យ
+prefix for the following page names (default none)	ranking	km	បុព្វបទសម្រាប់ឈ្មោះទំព័រខាងក្រោម (គ្មានលំនាំដើម)
+prequalified	ranking	km	មានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់
+prequalified competitiors	ranking	km	គូប្រជែងដែលមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់
+prequalified competitiors for registration	ranking	km	អ្នកប្រកួតប្រជែងដែលមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់សម្រាប់ការចុះឈ្មោះ
+prequalified competitiors for startlist	ranking	km	អ្នកប្រកួតប្រជែងដែលមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់សម្រាប់បញ្ជីចាប់ផ្តើម
+prequalify	ranking	km	មានលក្ខណៈគ្រប់គ្រាន់
+presets	ranking	km	ការកំណត់ជាមុន
+presets for competitions	ranking	km	ការកំណត់ជាមុនសម្រាប់ការប្រកួត
+previous heat	ranking	km	ជុំមុន។
+previous rankingsystem	ranking	km	ប្រព័ន្ធចំណាត់ថ្នាក់មុន។
+previous round has no result!	ranking	km	ជុំ​មុន​អត់​មាន​លទ្ធផល!
+previous round not found!	ranking	km	រក​មិន​ឃើញ​ជុំ​មុន!
+previous years cup "%1" not found!	ranking	km	រកមិនឃើញពែង "%1" ឆ្នាំមុន!
+professional	ranking	km	វិជ្ជាជីវៈ
+profile	ranking	km	ប្រវត្តិរូប
+profile hidden	ranking	km	ប្រវត្តិរូបត្រូវបានលាក់
+profile shown	ranking	km	បង្ហាញទម្រង់
+provisional	ranking	km	បណ្តោះអាសន្ន
+provisional result	ranking	km	លទ្ធផលបណ្តោះអាសន្ន
+qualification	ranking	km	គុណវុឌ្ឍិ
+qualification, 1/2-final, ...	ranking	km	វគ្គជម្រុះ, 1/2- Final, ...
+quota	ranking	km	កូតា
+quota by federation or category	ranking	km	កូតាតាមសហព័ន្ធ ឬប្រភេទ
+random (distribution cup)	ranking	km	ចៃដន្យ (ពែងចែកចាយ)
+random (distribution ranking)	ranking	km	ចៃដន្យ (ចំណាត់ថ្នាក់នៃការចែកចាយ)
+random (keep existing startorder!)	ranking	km	ចៃដន្យ (រក្សាលំដាប់ដែលមានស្រាប់!)
+ranglist	ranking	km	បញ្ជីចំណាត់ថ្នាក់
+rank	ranking	km	ចំណាត់ថ្នាក់
+ranking	common	km	ចំណាត់ថ្នាក់
+ranking (unranked last)	ranking	km	ចំណាត់ថ្នាក់ (មិនជាប់ចំណាត់ថ្នាក់ចុងក្រោយ)
+ranking comment	ranking	km	ចំណាត់ថ្នាក់មតិ
+ranking database	admin	km	ចំណាត់ថ្នាក់មូលដ្ឋានទិន្នន័យ
+rankings - categories	ranking	km	ចំណាត់ថ្នាក់ - ប្រភេទ
+rankings - cathegories	ranking	km	ចំណាត់ថ្នាក់ - ប្រភេទ
+rankingsystem	ranking	km	ប្រព័ន្ធចំណាត់ថ្នាក់
+read competition	ranking	km	អានការប្រកួត
+register	ranking	km	ចុះឈ្មោះ
+register / apply for climbing license	ranking	km	ចុះឈ្មោះ / ដាក់ពាក្យសុំអាជ្ញាប័ណ្ណឡើងភ្នំ
+register athlets for this competition	ranking	km	ចុះឈ្មោះអត្តពលិកសម្រាប់ការប្រកួតនេះ។
+register for	ranking	km	ចុះឈ្មោះសម្រាប់
+register this athlete for the selected category	ranking	km	ចុះឈ្មោះអត្តពលិកនេះសម្រាប់ប្រភេទដែលបានជ្រើសរើស
+registered	ranking	km	បានចុះឈ្មោះ
+registration	ranking	km	ការចុះឈ្មោះ
+registration deadline	ranking	km	ថ្ងៃផុតកំណត់នៃការចុះឈ្មោះ
+registration for this competition is over!	ranking	km	ការចុះឈ្មោះសម្រាប់ការប្រកួតនេះបានបញ្ចប់!
+remark	ranking	km	ចំណាំ
+remove the attached pdf	ranking	km	លុបឯកសារ PDF ដែលភ្ជាប់មកជាមួយ
+remove the grafic	ranking	km	យកក្រាហ្វិកចេញ
+removed the %1	ranking	km	បានលុប%1
+repeat	ranking	km	ធ្វើម្តងទៀត
+replace: %1	ranking	km	ជំនួស៖ %1
+require to drop results equally by discipline	ranking	km	តម្រូវឱ្យទម្លាក់លទ្ធផលស្មើៗគ្នាតាមវិន័យ
+required information missing	ranking	km	បាត់ព័ត៌មានចាំបាច់
+required information missing, application rejected!	ranking	km	បាត់ព័ត៌មានចាំបាច់ កម្មវិធីត្រូវបានបដិសេធ!
+result	ranking	km	លទ្ធផល
+result (latest result, result of all cats or result of one cat)	ranking	km	លទ្ធផល (លទ្ធផលចុងក្រោយ លទ្ធផលនៃឆ្មាទាំងអស់ ឬលទ្ធផលនៃឆ្មាមួយ)
+result form is timed out, please reload the form by clicking on the application icon.	ranking	km	ទម្រង់បែបបទលទ្ធផលគឺអស់ពេល សូមផ្ទុកទម្រង់បែបបទឡើងវិញដោយចុចលើរូបតំណាងកម្មវិធី។
+result official	ranking	km	លទ្ធផលផ្លូវការ
+result pdf	ranking	km	លទ្ធផល PDF
+resultlist	ranking	km	បញ្ជីលទ្ធផល
+results	ranking	km	លទ្ធផល
+results of %1 participants imported into the ranking, feldfactor: %2	ranking	km	លទ្ធផល​នៃ​អ្នក​ចូល​រួម %1 ដែល​បាន​នាំ​ចូល​ទៅ​ក្នុង​ចំណាត់​ថ្នាក់, feldfactor ៖ %2
+resultservice	ranking	km	សេវាលទ្ធផល
+reverse cup (unranked first)	ranking	km	ពែងបញ្ច្រាស (មិនមានចំណាត់ថ្នាក់ដំបូង)
+reverse ranking (unranked first)	ranking	km	ចំណាត់ថ្នាក់បញ្ច្រាស (មិនជាប់ចំណាត់ថ្នាក់ដំបូង)
+route	ranking	km	ផ្លូវ
+route not found !!!	ranking	km	រកមិនឃើញផ្លូវទេ!!!
+route not found!	ranking	km	រកមិនឃើញផ្លូវទេ!
+routejudges	ranking	km	ផ្លូវកាត់
+routes	ranking	km	ផ្លូវ
+rows	ranking	km	ជួរដេក
+saves the changes made	ranking	km	រក្សាទុកការផ្លាស់ប្តូរដែលបានធ្វើ
+select a category to additionally add to startlist (eg. juniors to men)	ranking	km	ជ្រើសរើសប្រភេទដើម្បីបន្ថែមទៅក្នុងបញ្ជីចាប់ផ្តើម (ឧ. ក្មេងតូចដល់បុរស)
+select a competition	ranking	km	ជ្រើសរើសការប្រកួតប្រជែង
+select a cup for a cup-ranking	ranking	km	ជ្រើសរើសពែងសម្រាប់ចំណាត់ថ្នាក់ពែង
+select a federation	ranking	km	ជ្រើសរើសសហព័ន្ធ
+select a nation first	ranking	km	ជ្រើសរើសជាតិជាមុនសិន
+select an action	ranking	km	ជ្រើសរើសសកម្មភាព
+select calendar	ranking	km	ជ្រើសរើសប្រតិទិន
+select competition	ranking	km	ជ្រើសរើសការប្រកួតប្រជែង
+select heat	ranking	km	ជ្រើសរើសជុំ
+select how the ranking should be calculated	ranking	km	ជ្រើសរើសរបៀបដែលចំណាត់ថ្នាក់គួរតែត្រូវបានគណនា
+select if you want to import into a different category (eg. import juniors from men result)	ranking	km	ជ្រើសរើសប្រសិនបើអ្នកចង់នាំចូលទៅក្នុងប្រភេទផ្សេង (ឧ. នាំចូលយុវជនពីលទ្ធផលបុរស)
+select multiple federations for a further action	ranking	km	ជ្រើសរើសសហព័ន្ធជាច្រើនសម្រាប់សកម្មភាពបន្ថែម
+select order for qualification startlist or use default	ranking	km	ជ្រើសរើសលំដាប់សម្រាប់បញ្ជីចាប់ផ្តើមគុណវុឌ្ឍិ ឬប្រើលំនាំដើម
+select participant for time measurment	ranking	km	ជ្រើសរើសអ្នកចូលរួមសម្រាប់ការវាស់វែងពេលវេលា
+select type of list to show	ranking	km	ជ្រើសរើសប្រភេទបញ្ជីដែលត្រូវបង្ហាញ
+selected category	ranking	km	ប្រភេទដែលបានជ្រើសរើស
+selected participants	ranking	km	អ្នកចូលរួមដែលបានជ្រើសរើស
+selfregister	ranking	km	ការចុះឈ្មោះខ្លួនឯង
+send email to set password to athlete	ranking	km	ផ្ញើអ៊ីមែលដើម្បីកំណត់ពាក្យសម្ងាត់ដល់អត្តពលិក
+serid	ranking	km	SerId
+set "%1" to %2.	ranking	km	កំណត់ "%1" ទៅ %2 ។
+set by category	ranking	km	កំណត់តាមប្រភេទ
+set license to	ranking	km	កំណត់អាជ្ញាប័ណ្ណទៅ
+set password	ranking	km	កំណត់ពាក្យសម្ងាត់
+short for display in rankings / tables	ranking	km	ខ្លីសម្រាប់បង្ហាញក្នុងចំណាត់ថ្នាក់/តារាង
+shortcut	ranking	km	ផ្លូវកាត់
+show athlets from all categories	ranking	km	បង្ហាញអត្តពលិកពីគ្រប់ប្រភេទ
+show jurylist	ranking	km	បង្ហាញបញ្ជីចៅក្រម
+show password	ranking	km	បង្ហាញពាក្យសម្ងាត់
+show profile page with results	ranking	km	បង្ហាញទំព័រប្រវត្តិរូបជាមួយនឹងលទ្ធផល
+since	ranking	km	ចាប់តាំងពី
+since how many years is the athlete climbing (not only competing)	ranking	km	តើអត្តពលិកឡើងប៉ុន្មានឆ្នាំ (មិនត្រឹមតែប្រកួតប្រជែង)
+size (cm)	ranking	km	ទំហំ (សង់ទីម៉ែត្រ)
+small final	ranking	km	វគ្គផ្តាច់ព្រ័ត្រតូច
+someone already applied for a %1 license!	ranking	km	មាននរណាម្នាក់បានដាក់ពាក្យសុំអាជ្ញាប័ណ្ណ %1 រួចហើយ!
+sorry, an error happend sending your email (%1), please try again later or %2contact us%3.	ranking	km	សូមអភ័យទោស កំហុសបានកើតឡើងក្នុងការផ្ញើអ៊ីមែលរបស់អ្នក (%1) សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ ឬ%2ទាក់ទងមកយើង%3។
+sorry, the climber requested not to show his profile!	ranking	km	សូមទោស អ្នកឡើងភ្នំសុំមិនបង្ហាញប្រវត្តិរូបរបស់គាត់!
+sorted athletes by %1	ranking	km	បានតម្រៀបអត្តពលិកដោយ%1
+speed	ranking	km	ល្បឿន
+speedrelay	ranking	km	ការបញ្ជូនតល្បឿន
+sponsor logos	ranking	km	និមិត្តសញ្ញាឧបត្ថម្ភ
+squad	ranking	km	ក្រុម
+start	ranking	km	ចាប់ផ្តើម
+start heat	ranking	km	ចាប់ផ្តើមជុំ
+start order	ranking	km	ចាប់ផ្តើមការបញ្ជាទិញ
+start- and result-lists no longer contain input fields or buttons:\ndouble-click on an athlete to enter his result, or right click for more options.	ranking	km	បញ្ជីចាប់ផ្តើម និងបញ្ជីលទ្ធផលលែងមានប្រអប់បញ្ចូល ឬប៊ូតុងទៀតហើយ៖\nd ចុចពីរដងលើអត្តពលិក ដើម្បីបញ្ចូលលទ្ធផលរបស់គាត់ ឬចុចខាងស្តាំសម្រាប់ជម្រើសច្រើនទៀត។
+start- number	ranking	km	លេខប៊ីប៊ី
+start- order	ranking	km	ចាប់ផ្តើម - លំដាប់
+startdate	ranking	km	ថ្ងៃ​ចាប់ផ្តើម
+startdate (first heat, not registration) of the competition (must not be empty)	ranking	km	កាលបរិច្ឆេទចាប់ផ្តើម (ជុំទីមួយមិនចុះឈ្មោះ) នៃការប្រកួតប្រជែង (មិនត្រូវទទេ)
+starting time	ranking	km	ពេលវេលាចាប់ផ្តើម
+startlist	ranking	km	បញ្ជីចាប់ផ្តើម
+startlist for category %1 generated	ranking	km	បញ្ជីចាប់ផ្តើមសម្រាប់ប្រភេទ%1 បានបង្កើត
+startlist generated	ranking	km	បញ្ជីចាប់ផ្តើមត្រូវបានបង្កើតឡើង
+startlist pdf	ranking	km	បញ្ជីចាប់ផ្តើម PDF
+startlists	ranking	km	បញ្ជីចាប់ផ្តើម
+startnumber	ranking	km	ប៊ីបលេខ
+startorder	ranking	km	ការបញ្ជាទិញចាប់ផ្តើម
+street	ranking	km	ផ្លូវ
+street, postcode	ranking	km	ផ្លូវ, លេខកូដប្រៃសណីយ៍
+sum	ranking	km	ផលបូក
+suspended	ranking	km	ផ្អាក
+target for athlete profile (default: profil)	ranking	km	គោលដៅសម្រាប់ទម្រង់អត្តពលិក (លំនាំដើម៖ ទម្រង់)
+target for national team rankings (default: nat_team_ranking)	ranking	km	គោលដៅសម្រាប់ចំណាត់ថ្នាក់ក្រុមជាតិ (លំនាំដើម៖ nat_team_ranking)
+target for result service (default: resultservice)	ranking	km	គោលដៅសម្រាប់សេវាកម្មលទ្ធផល (លំនាំដើម៖ សេវាលទ្ធផល)
+target for start lists (default: startlist)	ranking	km	គោលដៅសម្រាប់បញ្ជីចាប់ផ្តើម (លំនាំដើម៖ បញ្ជីចាប់ផ្តើម)
+team official license	ranking	km	អាជ្ញាប័ណ្ណផ្លូវការរបស់ក្រុម
+teamname	ranking	km	ឈ្មោះ​ក្រុម
+teamofficials	ranking	km	ក្រុមមន្ត្រី
+telephone, email, homepage, city, ...	ranking	km	ទូរស័ព្ទ អ៊ីមែល ទំព័រដើម ទីក្រុង...
+the entered password is invalid!	ranking	km	ពាក្យសម្ងាត់ដែលបានបញ្ចូលមិនត្រឹមត្រូវ!
+the link is expired, please have a %1new mail send to you%2.	ranking	km	តំណ​នេះ​បាន​ផុត​កំណត់ សូម​មាន​សំបុត្រ%1ថ្មី​ផ្ញើ​ទៅ​អ្នក%2។
+the link you clicked or entered is not correct, maybe a typo!	ranking	km	តំណដែលអ្នកបានចុច ឬបញ្ចូលមិនត្រឹមត្រូវទេ ប្រហែលជាការវាយអក្សរ!
+there is a manual in left menu under preferences.	ranking	km	មានសៀវភៅដៃនៅក្នុងម៉ឺនុយខាងឆ្វេងក្រោមចំណូលចិត្ត។
+this athlete has no license!	ranking	km	អត្តពលិកម្នាក់នេះគ្មានអាជ្ញាប័ណ្ណទេ!
+this module displays calendar, results and rankings	ranking	km	ម៉ូឌុលនេះបង្ហាញប្រតិទិន លទ្ធផល និងចំណាត់ថ្នាក់
+this module displays information from the ranking app.	ranking	km	ម៉ូឌុលនេះបង្ហាញព័ត៌មានពីកម្មវិធីចំណាត់ថ្នាក់។
+this module displays information from the resultservice of the ranking app.	ranking	km	ម៉ូឌុលនេះបង្ហាញព័ត៌មានពីសេវាកម្មលទ្ធផលនៃកម្មវិធីចំណាត់ថ្នាក់។
+this text will be shown in the profil on the website.	ranking	km	អត្ថបទនេះនឹងត្រូវបានបង្ហាញនៅក្នុងប្រវត្តិរូបនៅលើគេហទំព័រ។
+til place	ranking	km	ទៅកន្លែង
+time	ranking	km	ពេលវេលា
+time measured	ranking	km	ពេលវេលាវាស់វែង
+time measurement	ranking	km	ការវាស់វែងពេលវេលា
+to confirm	ranking	km	បញ្ជាក់
+to remove already registered athletes:\nright click on them in list and choose 'delete' from context menu	ranking	km	ដើម្បីលុបអត្តពលិកដែលបានចុះឈ្មោះរួចហើយ៖\nចុចខាងស្តាំលើពួកគេក្នុងបញ្ជី ហើយជ្រើសរើស 'លុប' ពីម៉ឺនុយបរិបទ
+to select multiple rows use ctrl (cmd for mac) or shift to select ranges.	ranking	km	ដើម្បីជ្រើសរើសជួរច្រើនប្រើ Ctrl (Cmd for Mac) ឬ Shift ដើម្បីជ្រើសរើសជួរ។
+to year	ranking	km	ដល់ឆ្នាំ
+too much data for column '%1' (%2)!	ranking	km	ទិន្នន័យច្រើនពេកសម្រាប់ជួរឈរ '%1' (%2)!
+top	ranking	km	កំពូល
+top: number of tries	ranking	km	កំពូល៖ ចំនួននៃការព្យាយាម
+top: number of tries or no	ranking	km	កំពូល៖ ចំនួននៃការព្យាយាម ឬអត់
+top: total number or no	ranking	km	ខាងលើ៖ ចំនួនសរុប ឬអត់
+topo deleted.	ranking	km	Topo ត្រូវបានលុប។
+topo uploaded as %1.	ranking	km	Topo បានបង្ហោះជា%1។
+total of %1 athlets registered in all categories.	ranking	km	អត្តពលិក %1 សរុបដែលបានចុះឈ្មោះក្នុងប្រភេទទាំងអស់។
+total quota of %1 exceeded in %2 incl. combined starters!	ranking	km	កូតាសរុបនៃ%1 លើសក្នុង %2 រួមបញ្ចូល។ ការចាប់ផ្តើមរួមបញ្ចូលគ្នា!
+tries	ranking	km	ព្យាយាម
+try	ranking	km	ព្យាយាម
+try again after %1 minutes.	ranking	km	ព្យាយាមម្តងទៀតបន្ទាប់ពី%1 នាទី។
+try again or have a %1new mail send to you%2.	ranking	km	ព្យាយាមម្តងទៀត ឬមាន%1អ៊ីមែលថ្មីផ្ញើទៅអ្នក%2។
+two * two qualification	ranking	km	ពីរ * ពីរគុណវុឌ្ឍិ
+two qualification	ranking	km	គុណវុឌ្ឍិពីរ
+two qualification for all, flash one after the other	ranking	km	គុណវុឌ្ឍិពីរសម្រាប់ទាំងអស់គ្នា បញ្ចេញពន្លឺមួយបន្ទាប់ពីផ្សេងទៀត។
+two qualification for all, flash simultaniously	ranking	km	គុណវុឌ្ឍិពីរសម្រាប់ទាំងអស់គ្នា បញ្ចេញពន្លឺក្នុងពេលដំណាលគ្នា។
+two qualification for all, identical startorder	ranking	km	គុណវុឌ្ឍិពីរសម្រាប់ទាំងអស់គ្នា លំដាប់ចាប់ផ្តើមដូចគ្នា។
+two qualification for all, no countback	ranking	km	គុណវុឌ្ឍិពីរសម្រាប់ទាំងអស់គ្នា គ្មានការរាប់ថយក្រោយទេ។
+two qualification for all, on sight	ranking	km	គុណវុឌ្ឍិពីរសម្រាប់ទាំងអស់គ្នានៅលើការមើលឃើញ
+two qualification starting groups with two staggered flash routes each	ranking	km	ក្រុមចាប់ផ្តើមគុណវុឌ្ឍិចំនួនពីរជាមួយនឹងផ្លូវ flash staggered ពីរនីមួយៗ
+two qualification with height sum	ranking	km	គុណវុឌ្ឍិពីរជាមួយនឹងផលបូកកម្ពស់
+two qualification, half quota	ranking	km	គុណវុឌ្ឍិពីរ កូតាពាក់កណ្តាល
+type of display	ranking	km	ប្រភេទនៃការបង្ហាញ
+type of qualification: automatic	ranking	km	ប្រភេទនៃគុណវុឌ្ឍិ៖ ស្វ័យប្រវត្តិ
+uncheck	ranking	km	ដោះធីក
+unique (internal) key, in the form: 'yy_cc' or 'yyccc' yy=year, ccc=cup, eg. '02_wc', '02eyc'	ranking	km	គន្លឹះតែមួយគត់ (ខាងក្នុង) ក្នុងទម្រង់៖ 'YY_CC' ឬ 'YYCCC' YY=Year, CCC=Cup, ឧ។ '02_WC', '02EYC'
+unique (internal) key, in the form: 'yy_cc_ll' or 'yyccc_ll' yy=year, ccc=cup, ll=location	ranking	km	កូនសោតែមួយគត់ (ខាងក្នុង) ក្នុងទម្រង់៖ 'YY_CC_LL' ឬ 'YYCCC_LL' YY=Year, CCC=Cup, LL=ទីតាំង
+unknown category or not a category of this competition	ranking	km	មិនស្គាល់ប្រភេទ ឬមិនមែនជាប្រភេទនៃការប្រកួតនេះ។
+unknown mode="%1"!	ranking	km	របៀបមិនស្គាល់ = "%1"!
+unknown type	ranking	km	ប្រភេទមិនស្គាល់
+unpublished	ranking	km	មិនបានផ្សព្វផ្សាយ
+until which date (incl.) are registrations allowed	ranking	km	រហូតដល់កាលបរិច្ឆេទណាមួយ (រាប់បញ្ចូល) ត្រូវបានអនុញ្ញាត
+until which date (incl.) are replacements allowed	ranking	km	រហូតដល់កាលបរិច្ឆេទណាមួយ (រាប់បញ្ចូល) ត្រូវបានអនុញ្ញាត
+up	ranking	km	ឡើង
+update result	ranking	km	ធ្វើបច្ចុប្បន្នភាពលទ្ធផល
+update time	ranking	km	ពេលវេលាធ្វើបច្ចុប្បន្នភាព
+upload a portrait picture for the profile	ranking	km	បង្ហោះរូបភាពបញ្ឈរសម្រាប់កម្រងព័ត៌មាន
+upload document about consent to data storage and use	ranking	km	ផ្ទុកឡើងឯកសារអំពីការយល់ព្រមក្នុងការផ្ទុកទិន្នន័យ និងការប្រើប្រាស់
+upload topo	ranking	km	បង្ហោះ topo
+uploaded picture is no jpeg !!!	ranking	km	រូបភាពដែលបានបង្ហោះមិនមែនជា JPEG !!!
+url for pdf files (excluding the year)	admin	km	URL សម្រាប់ឯកសារ pdf (មិនរាប់បញ្ចូលឆ្នាំ)
+url to own homepage, eg. http://domain.com	ranking	km	URL ទៅគេហទំព័រផ្ទាល់ខ្លួន ឧ. http://domain.com
+use "yes" or "no, prefession"	ranking	km	ប្រើ "បាទ/ចាស" ឬ "ទេ"
+use access control to deny display on the website	ranking	km	ប្រើការគ្រប់គ្រងការចូលប្រើ ដើម្បីបដិសេធការបង្ហាញនៅលើគេហទំព័រ
+use better result to break ties in the ranking	ranking	km	ប្រើលទ្ធផលល្អប្រសើរជាងមុនដើម្បីបំបែកទំនាក់ទំនងក្នុងចំណាត់ថ្នាក់
+use default order	ranking	km	ប្រើលំដាប់លំនាំដើម
+use registration data, instead of participants	ranking	km	ប្រើទិន្នន័យចុះឈ្មោះជំនួសឱ្យអ្នកចូលរួម
+use regular registration to apply for a license first.	ranking	km	ប្រើការចុះឈ្មោះទៀងទាត់ដើម្បីស្នើសុំអាជ្ញាប័ណ្ណជាមុនសិន។
+use the acl to hide the birthdate, you can't remove it !!!	ranking	km	ប្រើ ACL ដើម្បីលាក់ថ្ងៃខែឆ្នាំកំណើត មិនអាចលុបវាចេញបានទេ!!!
+used to preset a link in rankings and competition-calendar	ranking	km	ប្រើដើម្បីកំណត់តំណជាមុននៅក្នុងតារាងចំណាត់ថ្នាក់ និងការប្រកួត-ប្រតិទិន
+vfs directory for the pdf files (excluding the year)	admin	km	ថត VFS សម្រាប់ឯកសារ pdf (មិនរាប់បញ្ចូលឆ្នាំ)
+vfs directory for topo files (excluding the year)	admin	km	ថត VFS សម្រាប់ឯកសារ topo (មិនរាប់បញ្ចូលឆ្នាំ)
+vfs path for pictures of the athletes	ranking	km	ផ្លូវ VFS សម្រាប់រូបភាពអត្តពលិក
+view %1	ranking	km	មើល%1
+view consent document	ranking	km	មើលឯកសារយល់ព្រម
+view the attached pdf	ranking	km	មើលឯកសារ PDF ដែលភ្ជាប់មកជាមួយ
+view this athlete	ranking	km	មើលអត្តពលិកនេះ។
+view this competition	ranking	km	មើលការប្រកួតនេះ។
+view this cup	ranking	km	មើលពែងនេះ។
+website	ranking	km	គេហទំព័រ
+website visitors will be told that athlete asked to no longer show his profile page.	ranking	km	អ្នកចូលមើលគេហទំព័រនឹងត្រូវបានប្រាប់ថាអត្តពលិកបានស្នើសុំឱ្យឈប់បង្ហាញទំព័រប្រវត្តិរូបរបស់គាត់ទៀតហើយ។
+weight (kg)	ranking	km	ទំងន់ (គីឡូក្រាម)
+weight in kilogram	ranking	km	ទំងន់គិតជាគីឡូក្រាម
+weight, size, hobbies, ...	ranking	km	ទម្ងន់ ទំហំ ចំណូលចិត្ត...
+wetid	ranking	km	WetId
+where is the athlete born (incl. nation)	ranking	km	តើអត្តពលិកកើតនៅឯណា (រាប់បញ្ចូលទាំងជាតិ)
+which birthyear are allowd in this cathegory, if it is limited on this	ranking	km	តើឆ្នាំកំណើតណាត្រូវបានអនុញ្ញាតនៅក្នុង cathegory នេះ ប្រសិនបើវាត្រូវបានកំណត់នៅលើនេះ។
+which cathegories are competing	ranking	km	ប្រភេទណាខ្លះកំពុងប្រកួតប្រជែង
+which pointalocation should be used to calculate the fieldfactor, usualy cuwr or none if no fieldfactor used	ranking	km	Pointalocation ដែលគួរប្រើដើម្បីគណនា fieldfactor ជាធម្មតា CUWR ឬ none ប្រសិនបើគ្មាន fieldfactor ប្រើ
+which rankingsystem was used before, if any	ranking	km	តើប្រព័ន្ធចំណាត់ថ្នាក់មួយណាត្រូវបានប្រើប្រាស់ពីមុន បើសិនជាមាន
+which view do you want to see, when you start the ranking app?	ranking	km	តើទិដ្ឋភាពមួយណាដែលអ្នកចង់ឃើញ នៅពេលអ្នកចាប់ផ្តើមកម្មវិធីចំណាត់ថ្នាក់?
+wildcard	ranking	km	អក្សរជំនួស
+without excluding non-members	ranking	km	ដោយមិនរាប់បញ្ចូលសមាជិកដែលមិនមែនជាសមាជិក
+wrong admin-account or -password !!!	ranking	km	ខុស admin-account ឬ-password!!!
+wrong gender	ranking	km	ខុសភេទ
+wrong mode="%1" for discipline "%2"!	ranking	km	របៀបខុស="%1" សម្រាប់វិន័យ "%2"!
+wrong mode="%1" for this heat (qualification - final mismatch)!	ranking	km	របៀបខុស = "%1" សម្រាប់កំដៅនេះ (គុណវុឌ្ឍិ - មិនត្រូវគ្នាចុងក្រោយ)!
+wrong nationality	ranking	km	ជាតិសាសន៍ខុស
+wrong or not configured vfs directory	ranking	km	ខុស ឬមិនបានកំណត់រចនាសម្ព័ន្ធថត VFS
+wrong quota of %1 for co-system (use 16, 8 or 4 for speed or %2 for combined)!	ranking	km	កូតា%1 ខុសសម្រាប់ប្រព័ន្ធសហ (ប្រើ 16, 8 ឬ 4 សម្រាប់ល្បឿន ឬ%2 សម្រាប់បញ្ចូលគ្នា)!
+xml file uses unknown schema (format)!	ranking	km	ឯកសារ XML ប្រើគ្រោងការណ៍មិនស្គាល់ (ទ្រង់ទ្រាយ)!
+year of the calendar (empty for current)	ranking	km	ឆ្នាំនៃប្រតិទិន (ទទេសម្រាប់បច្ចុប្បន្ន)
+you are already registered, please use the password reset or ask your federation (%1) to set a correct email address.	ranking	km	អ្នកបានចុះឈ្មោះរួចហើយ សូមប្រើការកំណត់ពាក្យសម្ងាត់ឡើងវិញ ឬសួរសហព័ន្ធរបស់អ្នក (%1) ដើម្បីកំណត់អាសយដ្ឋានអ៊ីមែលត្រឹមត្រូវ។
+you are not allowed to register for %1!	ranking	km	អ្នកមិនត្រូវបានអនុញ្ញាតឱ្យចុះឈ្មោះសម្រាប់%1 ទេ!
+you are not permitted to apply for a license!	ranking	km	អ្នកមិនត្រូវបានអនុញ្ញាតឱ្យដាក់ពាក្យសុំអាជ្ញាប័ណ្ណទេ!
+you can now %1edit your profile%2 or register for a competition in the calendar.	ranking	km	ឥឡូវនេះ អ្នកអាច %1 កែសម្រួលប្រវត្តិរូបរបស់អ្នក%2 ឬចុះឈ្មោះសម្រាប់ការប្រកួតប្រជែងនៅក្នុងប្រតិទិន។
+you can only create a new heat, if the previous one '%1' has a result!	ranking	km	អ្នក​អាច​បង្កើត​ជុំ​ថ្មី​បាន​តែ​ប្រសិន​បើ​មុន '%1' មាន​លទ្ធផល!
+you can only delete the last heat, not one in between!	ranking	km	អ្នក​អាច​លុប​បាន​តែ​ជុំ​ចុង​ក្រោយ​ប៉ុណ្ណោះ មិនមែន​មួយ​នៅ​ចន្លោះ​នោះ​ទេ!
+you either need to search an athlete or enter required fields to add him!	ranking	km	អ្នកត្រូវស្វែងរកអត្តពលិក ឬបញ្ចូលវាលដែលត្រូវការដើម្បីបន្ថែមគាត់!
+you have no national climber license. to apply for a license you are required to download the application form, sign and post it:	ranking	km	អ្នកមិនមានអាជ្ញាប័ណ្ណអ្នកឡើងភ្នំជាតិទេ។ ដើម្បីដាក់ពាក្យសុំអាជ្ញាប័ណ្ណ អ្នកត្រូវទាញយកទម្រង់ពាក្យសុំ ហើយចុះហត្ថលេខា និងបង្ហោះវា៖
+you have not yet a password set!	ranking	km	អ្នកមិនទាន់កំណត់លេខសម្ងាត់ទេ!
+you have to act on the instructions in the next %1 hours, or %2request a new mail%3.	ranking	km	អ្នក​ត្រូវ​ធ្វើ​តាម​ការ​ណែនាំ​នៅ​ក្នុង %1 ម៉ោង​បន្ទាប់ ឬ %2 ស្នើសុំ​អ៊ីមែល​ថ្មី%3។
+you need to delete the results first !!!	ranking	km	អ្នកត្រូវលុបលទ្ធផលជាមុនសិន!!!
+you need to mail the downloaded and signed form to the office! please check if you filled out all fields (you may hide some via acl from public viewing). continue	ranking	km	អ្នកត្រូវផ្ញើទម្រង់ដែលបានទាញយក និងចុះហត្ថលេខាទៅការិយាល័យ! សូមពិនិត្យមើលថាតើអ្នកបានបំពេញវាលទាំងអស់ (អ្នកអាចលាក់ខ្លះតាមរយៈ ACL ពីការមើលជាសាធារណៈ)។ បន្ត
+you need to select a competition first!	ranking	km	អ្នកត្រូវជ្រើសរើសការប្រកួតប្រជែងជាមុនសិន!
+you need to select a file first!	ranking	km	អ្នកត្រូវជ្រើសរើសឯកសារជាមុនសិន!
+you need to select an other athlete first!	ranking	km	អ្នកត្រូវជ្រើសរើសអត្តពលិកផ្សេងទៀតជាមុនសិន!
+you need to select one or more athletes first!	ranking	km	អ្នកត្រូវជ្រើសរើសអត្តពលិកម្នាក់ ឬច្រើននាក់ជាមុនសិន!
+you need to select some federations first!	ranking	km	អ្នកត្រូវជ្រើសរើសសហព័ន្ធខ្លះជាមុនសិន!
+your license request has been confirmed by %1 and is waiting now for your posted application to be confirmed by %2.	ranking	km	សំណើអាជ្ញាប័ណ្ណរបស់អ្នកត្រូវបានបញ្ជាក់ដោយ%1 ហើយកំពុងរង់ចាំឥឡូវនេះសម្រាប់កម្មវិធីដែលបានបង្ហោះរបស់អ្នកត្រូវបានបញ្ជាក់ដោយ%2។
+your license request is waiting for confirmation by %1.	ranking	km	សំណើអាជ្ញាប័ណ្ណរបស់អ្នកកំពុងរង់ចាំការបញ្ជាក់ដោយ%1។
+your national license has been suspended!	ranking	km	អាជ្ញាប័ណ្ណជាតិរបស់អ្នកត្រូវបានព្យួរ!
+your national license is valid.	ranking	km	អាជ្ញាប័ណ្ណជាតិរបស់អ្នកមានសុពលភាព។
+your new password is now active.	ranking	km	ពាក្យសម្ងាត់ថ្មីរបស់អ្នកឥឡូវនេះសកម្ម។
+your password need to be at least: %1 characters long, containing a capital letter, a number and a special character.	ranking	km	ពាក្យ​សម្ងាត់​របស់​អ្នក​ត្រូវ​មាន​យ៉ាង​ហោច​ណាស់៖ តួអក្សរ %1 មាន​អក្សរ​ធំ លេខ និង​តួអក្សរ​ពិសេស។
+zip code	ranking	km	លេខ​កូដ​តំបន់
+zone	ranking	km	តំបន់
+zone: number of tries	ranking	km	តំបន់៖ ចំនួននៃការព្យាយាម
+zone: number of tries or no	ranking	km	តំបន់៖ ចំនួននៃការព្យាយាម ឬអត់
+zone: total number or no	ranking	km	តំបន់៖ ចំនួនសរុប ឬអត់
