@@ -250,7 +250,7 @@ foreach ($_GET as $name => $value)
 {
 	if ($value && $name != 'year') $hidden_vars .= "\t\t\t".'<input type="hidden" name="'.$name.'" value="'.htmlspecialchars($value).'">'."\n";
 }
-echo "\t\t".'<form id="yearSelection" action="'.$_SERVER['PHP_SELF'].'" method="GET" style="float:left; padding-top: 35px; margin-bottom: 5px;">'."\n".$hidden_vars.
+echo "\t\t".'<form id="yearSelection" action="'.htmlspecialchars($_SERVER['SCRIPT_NAME']).'" method="GET" style="float:left; padding-top: 35px; margin-bottom: 5px;">'."\n".$hidden_vars.
      "\t\t\t".'<span class="cal_head">'.$extra_header[$year].' '.($mode != 2 ? $t_calendar : $t_ranking)."</span>\n".
      "\t\t\t".'<select class="cal_head" name="year" onchange="this.form.submit();">'."\n";
 

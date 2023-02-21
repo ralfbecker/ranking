@@ -94,7 +94,7 @@ function do_header($head_title,$title,$align="center",$raise=0,$target='profil',
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
    <meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]">
-   <meta name="GENERATOR" content="<?php echo substr($_SERVER['PHP_SELF'],1); ?> (c) 2000-<?php echo date('Y'); ?> by Ralf Becker">
+   <meta name="GENERATOR" content="<?php echo htmlspecialchars(substr($_SERVER['SCRIPT_NAME'],1)); ?> (c) 2000-<?php echo date('Y'); ?> by Ralf Becker">
    <meta name="KeyWords" content="digital ROCK, Klettern, Wettkampfklettern, Sportklettern, climbing, climbing competitions, UIAA, DAV, ICC, EYC, worldcup, worldranking, CUWR">
    <title>digital ROCK: <?php echo $head_title; ?></title>
 <?php
@@ -573,8 +573,8 @@ function mailto($email,$content='',$at=' AT ',$dot=' DOT ')
 function fail ($error,$more = '')
 {
 	echo "<h2>$error</h2>\n";
-	echo "<p><b>URL:</b> 'http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']."'</p>\n";
-	echo '<p><b>Referer:</b> <a href="'.htmlspecialchars($_SERVER['HTTP_REFERER']).'" title="return to the refering page">'.$_SERVER['HTTP_REFERER']."</a></p>\n";
+	echo "<p><b>URL:</b> 'https://".htmlspecialchars($_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'].'?'.$_SERVER['QUERY_STRING'])."'</p>\n";
+	echo '<p><b>Referer:</b> <a href="'.htmlspecialchars($_SERVER['HTTP_REFERER']).'" title="return to the refering page">'.htmlspecialchars($_SERVER['HTTP_REFERER'])."</a></p>\n";
 	if ($more)
 		echo $more;
 

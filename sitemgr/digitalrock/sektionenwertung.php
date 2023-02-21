@@ -28,7 +28,7 @@ $results_per_wettk = /*prepare_var('max','int',array('GET'),*/$gruppe ? 2 : 1;//
 
 $window_anz = 12;	// letzten 12 monate zaehlen
 
-if ($debug) echo "<p>$_SERVER[PHP_SELF]: stand='$stand', gruppe='$gruppe', serie='$serie'</p>\n";
+if ($debug) echo "<p>".htmlspecialchars($_SERVER['SCRIPT_NAME']).": stand='$stand', gruppe='$gruppe', serie='$serie'</p>\n";
 
 if (!$gruppe)	// Sektionenrangliste: bestes Ergebnis jeder Kategorie (Erwachsene und Jugend)
 {

@@ -20,7 +20,7 @@ if (!defined('DR_PATH')) {	// we are not running inside sitemgr
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
    <meta name="Author" content="Ralf Becker [http://www.digitalROCK.de]" />
-   <meta name="GENERATOR" content="<?php echo substr($_SERVER['PHP_SELF'],1); ?> (c) 2001-<?php echo date('Y'); ?> by Ralf Becker" />
+   <meta name="GENERATOR" content="<?php echo htmlspecialchars(substr($_SERVER['SCRIPT_NAME'],1)); ?> (c) 2001-<?php echo date('Y'); ?> by Ralf Becker" />
    <meta name="KeyWords" content="digital ROCK, Klettern, Wettkampfklettern, Sportklettern, climbing, climbing competitions, UIAA, DAV, ICC, EYC, worldcup, worldranking, CUWR" />
    <base target="profil" />
    <title>digital ROCK: <?php echo $t_latest_result; ?></title>
@@ -51,7 +51,7 @@ if ($w_rkey == '')
 {
 	$w_rkey = $replace == $wettk->rkey ? $with : $wettk->rkey;
 }
-echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET" target="_self">'."\n";
+echo '<form action="'.htmlspecialchars($_SERVER['SCRIPT_NAME']).'" method="GET" target="_self">'."\n";
 foreach($_GET+array('header' => $header) as $name => $value)
 {
 	if ($name != 'w_rkey') echo "\t".'<input type="hidden" name="'.htmlspecialchars($name).'" value="'.htmlspecialchars($value).'">'."\n";
