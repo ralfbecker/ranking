@@ -572,7 +572,7 @@ function mailto($email,$content='',$at=' AT ',$dot=' DOT ')
 
 function fail ($error,$more = '')
 {
-	echo "<h2>$error</h2>\n";
+	echo "<h2>".htmlspecialchars($error)."</h2>\n";
 	echo "<p><b>URL:</b> 'https://".htmlspecialchars($_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'].'?'.$_SERVER['QUERY_STRING'])."'</p>\n";
 	echo '<p><b>Referer:</b> <a href="'.htmlspecialchars($_SERVER['HTTP_REFERER']).'" title="return to the refering page">'.htmlspecialchars($_SERVER['HTTP_REFERER'])."</a></p>\n";
 	if ($more)
