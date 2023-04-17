@@ -120,26 +120,26 @@ class ranking_route_result extends Api\Storage\Base
 	 * For a union-query you call search for each query with $start=='UNION' and one more with only $order_by and $start set to run the union-query.
 	 *
 	 * @param array|string $criteria array of key and data cols, OR a SQL query (content for WHERE), fully quoted (!)
-	 * @param boolean|string|array $only_keys =true True returns only keys, False returns all cols. or
+	 * @param boolean|string|array $only_keys True returns only keys, False returns all cols. or
 	 *	comma seperated list or array of columns to return
 	 * @param string $order_by ='' fieldnames + {ASC|DESC} separated by colons ',', can also contain a GROUP BY (if it contains ORDER BY)
-	 * @param string|array $extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
-	 * @param string $wildcard ='' appended befor and after each criteria
-	 * @param boolean $empty =false False=empty criteria are ignored in query, True=empty have to be empty in row
-	 * @param string $op ='AND' defaults to 'AND', can be set to 'OR' too, then criteria's are OR'ed together
-	 * @param mixed $start =false if != false, return only maxmatch rows begining with start, or array($start,$num), or 'UNION' for a part of a union query
+	 * @param string|array $_extra_cols ='' string or array of strings to be added to the SELECT, eg. "count(*) as num"
+	 * @param string $wildcard ='' appended before and after each criteria
+	 * @param boolean $empty False: empty criteria are ignored in query, True: empty have to be empty in row
+	 * @param string $op ='AND' defaults to 'AND', can be set to 'OR' too, then criteria are OR'ed together
+	 * @param mixed $start =false if != false, return only maxmatch rows beginning with start, or array($start,$num), or 'UNION' for a part of a union query
 	 * @param array $filter =null if set (!=null) col-data pairs, to be and-ed (!) into the query without wildcards
 	 * @param string $join ='' sql to do a join, added as is after the table-name, eg. "JOIN table2 ON x=y" or
 	 *	"LEFT JOIN table2 ON (x=y AND z=o)", Note: there's no quoting done on $join, you are responsible for it!!!
 	 * @return boolean|array of matching rows (the row is an array of the cols) or False
 	 */
-	function &search($criteria,$only_keys=True,$order_by='',$extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='',$need_full_no_count=false)
+	function &search($criteria,$only_keys=True,$order_by='',$_extra_cols='',$wildcard='',$empty=False,$op='AND',$start=false,$filter=null,$join='',$need_full_no_count=false)
 	{
 		//error_log(__METHOD__."(crit=".array2string($criteria).",only_keys=".array2string($only_keys).",order_by=$order_by,extra_cols=".array2string($extra_cols).",$wildcard,$empty,$op,$start,filter=".array2string($filter).",join=$join)");
-		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',',$extra_cols) : array();
+		$extra_cols = is_array($_extra_cols) ? $_extra_cols : ($_extra_cols ? explode(',', $_extra_cols) : []);
 		$initial_filter = $filter;
 
-		// avoid PerId is ambigous SQL error
+		// avoid PerId is ambiguous SQL error
 		if (is_array($criteria) && isset($criteria[$this->id_col]))
 		{
 			$criteria[$this->table_name.'.'.$this->id_col] = $criteria[$this->id_col];
@@ -256,7 +256,7 @@ class ranking_route_result extends Api\Storage\Base
 			{
 				$extra_cols[] = 'ROUND(('.$this->_sql_rank_prev_heat($route_order,$route_type).'),2) AS rank_prev_heat';
 			}
-			// heats after first heat after qualifcation
+			// heats after first heat after qualification
 			elseif ($route_order >= 2+(int)($route_type == TWO_QUALI_HALF)+($route_type == THREE_QUALI_ALL_NO_STAGGER ? 2 : 0))
 			{
 				$extra_cols[] = '('.$this->_sql_rank_prev_heat($route_order,$route_type).') AS rank_prev_heat';
@@ -413,6 +413,12 @@ class ranking_route_result extends Api\Storage\Base
 							{
 								$row['result_rank'] = $n+1;						// --> set the place according to the position in the list
 								break;
+							}
+							// speed general result for 2023+, must NOT do a count-back as best-time is already used for ranking each heat
+							if ($year >= 2023 && $discipline === 'speed' && !empty($row['result_rank'.$route_order]))
+							{
+								$row['result_rank'] = $old['result_rank'];
+								break;		// no further countback
 							}
 							// for quali on two routes with half quota, there's no countback to the quali only if there's a result for the 2. heat
 							if ($route_type == TWO_QUALI_HALF && $route_order == 2 && $row['result_rank2'] ||
@@ -799,6 +805,20 @@ class ranking_route_result extends Api\Storage\Base
 			'='.(int)($route_order-1))." AND $this->table_name.$this->id_col=p.$this->id_col";
 	}
 
+	/**
+	 * Return SQL sub-query to get best time of current and all previous heats
+	 *
+	 * @param int $route_order
+	 * @return string
+	 */
+	private function _sql_best_time(int $route_order)
+	{
+		return 'SELECT MIN(result_time) FROM '.self::RESULT_TABLE.' best WHERE best.route_order<='.$route_order.
+			' AND best.WetId='.self::RESULT_TABLE.'.WetId'.
+			' AND best.GrpId='.self::RESULT_TABLE.'.GrpId'.
+			' AND best.PerId='.self::RESULT_TABLE.'.PerId';
+	}
+
 	private function _count_ex_aquo($r)
 	{
 		// result_rank == NULL is counted wrong if we do: $r.result_rank=c$r.result_rank
@@ -837,7 +857,7 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		$route_names = $GLOBALS['egw']->route->query_list('route_name','route_order',$keys+array('route_order >= 0'),'route_order');
 
-		// qualificaiton overall result or group A/B
+		// qualification overall result or group A/B
 		if ($route_type == TWO_QUALI_GROUPS)
 		{
 			if ($quali_overall == 3 || !$quali_overall)	// overall group A+B (runs as $result_type == TWO_QUALI_HALF!)
@@ -1364,7 +1384,7 @@ class ranking_route_result extends Api\Storage\Base
 	 */
 	public static function unserialize($data)
 	{
-		return !$data ? array() : ($data[0] == '{' ? json_decode($data, true) : unserialize($data));
+		return !$data ? array() : ($data[0] == '{' ? json_decode($data, true) : unserialize($data, ['allowed_classes' => false]));
 	}
 
 	/**
@@ -1614,7 +1634,7 @@ class ranking_route_result extends Api\Storage\Base
 						$mode = str_replace('RouteResults',$this->table_name,$this->rank_speed_combi_final);
 						$order_by = "result_time IS NULL,$mode,result_time";
 					}*/
-					// 2019+ combined final (including loosers in all heats)
+					// 2019+ combined final (including losers in all heats)
 					if ($route && $route['discipline'] == 'combined' && $keys['route_order'] > 3)
 					{
 						$mode = '('.str_replace('RouteResults', $this->table_name,
@@ -1632,7 +1652,10 @@ class ranking_route_result extends Api\Storage\Base
 					$extra_cols[] = '('.str_replace('result_detail','result_time',
 						$this->_sql_rank_prev_heat($keys['route_order'], 'speed-final')).') AS quali_time';
 					$extra_cols[] = 'start_order';	// needed to identify the pairings
-					$order_by .= ',(start_order-1) DIV 2,quali_time';	// order tied pairs by quali_time
+					// pre2023: order tied pairs by quali_time
+					//$order_by .= ',(start_order-1) DIV 2,quali_time';
+					// 2023+: order tied pairs by best time
+					$order_by .= ',(start_order-1) DIV 2,best_time';
 				}
 				break;
 			case 'boulder2018':
@@ -1671,10 +1694,12 @@ class ranking_route_result extends Api\Storage\Base
 			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'combined').') AS rank_prev_heat';
 			$order_by .= ',rank_prev_heat ASC';
 		}
-		// speed finals use countback to speed qualification
+		// pre2023: speed finals use countback to speed qualification
+		// 2023+: uses best time from all previous heats
 		elseif ($discipline == 'speed' && $keys['route_order'] >= 2)
 		{
-			$extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'speed-final').') AS quali_details';
+			// pre2023: $extra_cols[] = '('.$this->_sql_rank_prev_heat($keys['route_order'], 'speed-final').') AS quali_details';
+			$extra_cols[] = '('.$this->_sql_best_time($keys['route_order']).') AS best_time';
 		}
 		elseif (substr($discipline,0,5) != 'speed' && $keys['route_order'] >= (2+(int)($route_type == TWO_QUALI_HALF)))
 		{
@@ -1762,7 +1787,8 @@ class ranking_route_result extends Api\Storage\Base
 				// for regular boulder final (and previous heat is on one route), we have to do countback to previous heat first
 				//!($route && $route['discipline'] === 'combined') && ($route['route_order'] > 2 || $route['route_type'] == ONE_QUALI));
 		}
-		// speed final tie breaking by countback to speed qualification
+		// pre2023: speed final tie breaking by countback to speed qualification
+		// 2023+: tie breaking by best time out of current and all previous rounds
 		if ($discipline == 'speed' && $keys['route_order'] >= 2)
 		{
 			$this->speed_final_tie_breaking($result, $keys, $route && $route['discipline'] === 'combined');
@@ -2141,7 +2167,7 @@ class ranking_route_result extends Api\Storage\Base
 	}
 
 	/**
-	 * Apply 2018+ speed final tie-breaking rules
+	 * Apply 2023+ speed final tie-breaking rules: use best time of current and all previous rounds
 	 *
 	 * New rank is in key 'new_rank' (NOT 'result_rank')!
 	 *
@@ -2149,6 +2175,102 @@ class ranking_route_result extends Api\Storage\Base
 	 * @param array $keys
 	 * @param boolean $combined =false true for combined
 	 */
+	public function speed_final_tie_breaking(array &$results, array $keys, $combined=false)
+	{
+		$last = $last_new_rank = $last_pairing = null;
+		foreach($results as $n => &$result)
+		{
+			// check if we have a tie in a pairing (other ties won't matter for KO system!)
+			if ($last_new_rank && $last_new_rank == $result['new_rank'] && $last_pairing == intdiv($result['start_order']-1, 2))
+			{
+				// in last final heat (small final and final) we are NOT sorted by result_time
+				if ($result['result_time'] != $last['result_time'])
+				{
+					if ($last['result_time'] && (!$result['result_time'] || $result['result_time'] > $last['result_time']))
+					{
+						$result['new_rank']++;
+					}
+					elseif ($result['result_time'] && (!$last['result_time'] || $last['result_time'] > $result['result_time']))
+					{
+						$results[$n-1]['new_rank']++;
+					}
+				}
+				if ($last_new_rank != $result['new_rank'])
+				{
+					// already fixed above for last final heat
+				}
+				// do result have a wildcard
+				elseif (!isset($result['result_time']) && !$result['eliminated'])
+				{
+					$results[$n-1]['new_rank']++;
+				}
+				// do last have a wildcard
+				elseif (!isset($last['result_time']) && !$last['eliminated'])
+				{
+					$result['new_rank']++;
+				}
+				// check if last one has no or a bigger best time
+				elseif (!$last['best_time'] && $result['best_time'] || $last['best_time'] > $result['best_time'])
+				{
+					$results[$n-1]['new_rank']++;
+				}
+			}
+			$last = $result;
+			$last_new_rank = $result['new_rank'];
+			$last_pairing = intdiv($result['start_order']-1, 2);
+		}
+
+		// order again by new_rank, as it might have changed because of above tie-breaks
+		usort($results, static function($a, $b)
+		{
+			if (!isset($a['new_rank'])) $a['new_rank'] = 99999;
+			if (!isset($b['new_rank'])) $b['new_rank'] = 99999;
+			// sort first by new_rank
+			if ($a['new_rank'] != $b['new_rank'])
+			{
+				return $a['new_rank'] - $b['new_rank'];
+			}
+			return $a['best_time'] <=> $b['best_time'];
+		});
+
+		// now we need to fix new_rank for losers of broken ties, as regular code only looks for result_time
+		if (!$combined || $keys['route_order'] < 5)
+		{
+			$last = null;
+			foreach($results as $n => &$result)
+			{
+				if ($result['new_rank'] > 1 && $result['result_time'])
+				{
+					if (!$last || $last['best_time'] < $result['best_time'])
+					{
+						$result['new_rank'] = $n+1;
+					}
+					else
+					{
+						$result['new_rank'] = $last['new_rank'];
+					}
+				}
+				$last = $result;
+			}
+		}
+		/* dump results for writing tests, if not running the test ;)
+		if ($keys['WetId'])
+		{
+			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
+				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
+			error_log(__METHOD__."() logged input and results to ".realpath($path));
+		}*/
+	}
+
+	/**
+	 * Apply 2018+ and pre2023 speed final tie-breaking rules
+	 *
+	 * New rank is in key 'new_rank' (NOT 'result_rank')!
+	 *
+	 * @param array& $results on return new_rank might be changed (and need storing)
+	 * @param array $keys
+	 * @param boolean $combined =false true for combined
+	 *
 	public function speed_final_tie_breaking(array &$results, array $keys, $combined=false)
 	{
 		$input = $results;
@@ -2230,13 +2352,14 @@ class ranking_route_result extends Api\Storage\Base
 			// sort tied with times by time
 			elseif ($a['result_time'] && $b['result_time'])
 			{
-				/* since 2022 no longer: first by result-time
-				if ($a['result_time'] != $b['result_time'])
-				{
-					return $a['result_time'] > $b['result_time'] ? 1 : -1;
-				}
+				// since 2022 no longer: first by result-time
+				//if ($a['result_time'] != $b['result_time'])
+				//{
+				//	return $a['result_time'] > $b['result_time'] ? 1 : -1;
+				//}
 				// then by quali-time
-				else*/if ($a['quali_time'] != $b['quali_time'])
+				//else
+	            if ($a['quali_time'] != $b['quali_time'])
 				{
 					return $a['quali_time'] > $b['quali_time'] ? 1 : -1;
 				}
@@ -2256,15 +2379,15 @@ class ranking_route_result extends Api\Storage\Base
 				}
 			}
 		}
-		/* dump results for writing tests, if not running the test ;)
-		if ($keys['WetId'])
-		{
-			file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
-				"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
-			error_log(__METHOD__."() logged input and results to ".realpath($path));
-		}*/
+		// dump results for writing tests, if not running the test ;)
+		//if ($keys['WetId'])
+		//{
+		//	file_put_contents($path=$GLOBALS['egw_info']['server']['temp_dir'].'/final-'.$keys['WetId'].'-'.$keys['GrpId'].'.php',
+		//		"<?php\n\n\$input = ".var_export($input, true).";\n\n\$results = ".var_export($results, true).";\n");
+		//	error_log(__METHOD__."() logged input and results to ".realpath($path));
+		//}
 		unset($keys, $input);	// suppress warning for not used parameters
-	}
+	}*/
 
 	/**
 	 * 2019+ tie breaking of speed qualification using 2. time (2019 rule 9.17.A.1.b)
