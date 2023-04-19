@@ -1731,7 +1731,7 @@ class ranking_route_result extends Api\Storage\Base
 		}
 		//error_log(__METHOD__.'('.array2string($keys).", $route_type, '$discipline', $quali_preselected) extra_cols=".array2string($extra_cols).", order_by=$order_by");
 		$this->db->transaction_begin();
-		$join = '';//'JOIN Personen USING(PerId)'; $extra_cols[] = 'nachname'; $extra_cols[] = 'vorname';
+		$join = 'JOIN Personen USING(PerId)'; $extra_cols[] = 'nachname'; $extra_cols[] = 'vorname';
 		$result = $this->search($keys, $this->id_col.',result_rank,result_detail AS detail',
 			'ORDER BY '.$order_by.' FOR UPDATE', $extra_cols, '', false, 'AND', false, null, $join);
 
@@ -2239,9 +2239,9 @@ class ranking_route_result extends Api\Storage\Base
 			$last = null;
 			foreach($results as $n => &$result)
 			{
-				if ($result['new_rank'] > 1 && $result['result_time'])
+				if ($result['new_rank'] > 1 && ($result['result_time'] || $result['eliminated']))   // loser AND already has started (time or eliminated)
 				{
-					if (!$last || $last['best_time'] < $result['best_time'])
+					if (!$last || $last['new_rank'] == 1 || $last['best_time'] < $result['best_time'])
 					{
 						$result['new_rank'] = $n+1;
 					}
