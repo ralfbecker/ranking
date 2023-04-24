@@ -808,12 +808,15 @@ class ranking_route_result extends Api\Storage\Base
 	/**
 	 * Return SQL sub-query to get best time of current and all previous heats
 	 *
+	 * We regard a wildcard time (1*1000) as better than false start or fall (999999*1000), but not better than any regular time,
+	 * therefore with replace it in best_time with 999998000.
+	 *
 	 * @param int $route_order
 	 * @return string
 	 */
 	private function _sql_best_time(int $route_order)
 	{
-		return 'SELECT MIN(result_time) FROM '.self::RESULT_TABLE.' best WHERE best.route_order<='.$route_order.
+		return 'SELECT MIN(CASE result_time WHEN 1000 THEN 999998000 ELSE result_time END) FROM '.self::RESULT_TABLE.' best WHERE best.route_order<='.$route_order.
 			' AND best.WetId='.self::RESULT_TABLE.'.WetId'.
 			' AND best.GrpId='.self::RESULT_TABLE.'.GrpId'.
 			' AND best.PerId='.self::RESULT_TABLE.'.PerId';
