@@ -808,8 +808,8 @@ class ranking_route_result extends Api\Storage\Base
 	/**
 	 * Return SQL sub-query to get best time of current and all previous heats
 	 *
-	 * We regard a wildcard time (1*1000) as better than false start or fall (999999*1000), but not better than any regular time,
-	 * therefore with replace it in best_time with 999998000.
+	 * We regard a wildcard time (1 * 1000) as better than false start or fall (999999 * 1000), but not better than any regular time,
+	 * therefore we replace it in best_time with 999998000.
 	 *
 	 * @param int $route_order
 	 * @return string
