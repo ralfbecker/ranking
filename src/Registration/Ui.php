@@ -792,6 +792,7 @@ class Ui extends Base
 					'vorname'  => 'firstname',
 					'email'    => 'email',
 					'nation'   => 'nation',
+					'verband'  => 'federation',
 					'geb_date' => 'birthdate',
 					'ranking',
 					'ranking-points',
@@ -854,6 +855,20 @@ class Ui extends Base
 								break;
 							case 'ranking-points':
 								$val = isset($ranking[$athlete['PerId']]) ? sprintf('%1.2f',$ranking[$athlete['PerId']]['pkt']) : '';
+								break;
+							case 'federation':
+								// show only Sektion for national competitions and remove it for international
+								if ($calendar && $calendar != 'NULL')
+								{
+									$val = preg_replace_callback('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /', static function($matches)
+									{
+										return $matches[1] == 'Deutscher Alpenverein' ? 'DAV ' : 'SAC ';
+									}, $athlete['verband']);
+								}
+								elseif (preg_match('/^(Deutscher Alpenverein|Schweizer Alpen[ -]{1}Club) /', $athlete['verband'], $matches))
+								{
+									$val = $matches[1];
+								}
 								break;
 							default:
 								$val = $athlete[$name];
