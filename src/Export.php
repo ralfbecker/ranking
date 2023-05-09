@@ -2167,8 +2167,8 @@ class Export extends ranking_result_bo
 				}
 			}
 		}
-		// historic profiles: athlete not in ranking and last modification more then 1 year ago
-		$data['expires'] = !$data['rankings'][0]['rank'] && time()-$data['last_modified'] > 365*86400 ?
+		// historic profiles: athlete not in ranking and last modification more than 1 year ago
+		$data['expires'] = empty($data['rankings'][0]['rank']) && time()-(int)$data['last_modified'] > 365*86400 ?
 			self::EXPORT_PROFILE_HISTORIC_EXPIRES : self::EXPORT_PROFILE_EXPIRES;
 
 		unset($data['last_modified']);	// to NOT cause etag change by not contained data
