@@ -470,6 +470,7 @@ class Selfservice extends Base
 					));
 				}
 
+				/* disabled Team Official, as it's not yet ready from DAV side
 				if (empty($athlete['geb_date']) || date('Y') - (int)$athlete['geb_date'] >= 18)
 				{
 					echo Api\Html::form_1button('license', lang('Team official license'), '', '/ranking/athlete.php', array(
@@ -477,7 +478,7 @@ class Selfservice extends Base
 						'action' => 'apply-GER_TOF',
 						'cd' => 'no',
 					));
-				}
+				}*/
 				echo "</div>\n";
 			}
 			else
