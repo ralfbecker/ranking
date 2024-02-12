@@ -14,6 +14,12 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
 ini_set(version_compare(PHP_VERSION, '5.6', '<') ? 'mbstring.internal_encoding' : 'default_charset', 'utf-8');
 if (!headers_sent()) header('Content-type: text/html; charset=utf-8');
 
+global $gruppe,$grp_inc,$url_drock,$url_icc_info,$t_see_also,$jpgs;
+if (!include_once '.db_rang.php')
+{
+	throw new Exception(".db_rang.php NOT found!".' cwd='.getcwd());
+}
+
 if (!function_exists('array2string'))
 {
 	/**
@@ -42,12 +48,6 @@ if (!function_exists('array2string'))
 		}
 		return 'UNKNOWN TYPE!';
 	}
-}
-
-global $gruppe,$grp_inc,$url_drock,$url_icc_info,$t_see_also,$jpgs;
-if (!include_once '.db_rang.php')
-{
-	throw new Exception(".db_rang.php NOT found!".' cwd='.getcwd());
 }
 
 if (!$url_drock) $url_drock='https://www.digitalROCK.de';
@@ -237,11 +237,11 @@ function wettk_datum($wettk)
 	{
 		preg_match( "/.*@(.*)/",$wettk->gruppen,$grps );
 		preg_match( "/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",$wettk->datum,$dats );
-		if ($grps[1] && !($grps[1]+0))	// keine Zahl --> statt Tag+Monat verw.
+		if (!empty($grps[1]) && !(int)$grps[1])	// keine Zahl --> statt Tag+Monat verw.
 		{
 			return ("$grps[1] $dats[1]");
 		}					// wenn nichts angegeb. und ab 2001, dann wettk 2-taegig
-		$days = $grps[1] ? $grps[1]+0 : ($dats[1] >= 2001 ? 2 : 1);
+		$days = $grps[1] ? (int)$grps[1] : ($dats[1] >= 2001 ? 2 : 1);
 
 		$ende = mktime( 0,0,0,$dats[2],$dats[3]+$days-1,$dats[1] );
 		$day = date( "d",$ende );
@@ -660,7 +660,7 @@ if (!function_exists('_debug_array'))
 	}
 }
 
-global $mysql;
+global $mysql, $hostname, $username, $password, $db_name;
 ini_set('mysql.connect_timeout', 1);
 foreach(explode(';', $hostname) as $host)
 {
