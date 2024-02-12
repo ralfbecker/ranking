@@ -242,7 +242,7 @@ class Cup extends Api\Storage\Base
 		{
 			if (!isset($GLOBALS['egw']->comp))
 			{
-				$GLOBALS['egw']->comp = CreateObject('ranking.competition',$this->source_charset,$this->db);
+				$GLOBALS['egw']->comp = new Competition($this->source_charset,$this->db);
 			}
 			$cats = array($cat_rkey);
 			// ToDo: add mgroups
