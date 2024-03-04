@@ -1,13 +1,13 @@
 actions	ranking	tr	Eylemler
-birthday	ranking	tr	Do?um Tarihi
-city	ranking	tr	?ehir
-contact	ranking	tr	?leti?im
-delete this category	ranking	tr	bu kategoriyi sil
+birthday	ranking	tr	Doğum Günü
+city	ranking	tr	Şehir
+contact	ranking	tr	İletişim
+delete this category	ranking	tr	Bu kategoriyi sil
 display	ranking	tr	Görüntüle
-download	ranking	tr	?ndir
+download	ranking	tr	İndir
 fax	ranking	tr	Fax
 from	ranking	tr	Nereden
-import	ranking	tr	?thal Et
+import	ranking	tr	İthalat
 import file	ranking	tr	Dosya ithal et
 more	ranking	tr	Daha fazla
 or	ranking	tr	ya da
