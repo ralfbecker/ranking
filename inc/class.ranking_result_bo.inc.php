@@ -2707,6 +2707,7 @@ class ranking_result_bo extends Base
 	 */
 	function process_sort(array &$query,$isRelay=false)
 	{
+		if (!in_array(strtolower($query['sort']), ['asc','desc'])) $query['sort'] = 'asc';
 		$alpha_sort = $isRelay ? ',team_nation '.$query['sort'].',team_name' :
 			',nachname '.$query['sort'].',vorname';
 		// in speed(relay) sort by time first and then alphabetic
@@ -2736,6 +2737,9 @@ class ranking_result_bo extends Base
 				break;
 			case 'nation':
 				$query['order'] = 'Federations.nation '.$query['sort'].$alpha_sort;
+				break;
+			default:
+				$query['order'] = Api\Storage\Base::sanitizeOrderBy($query['order']);
 				break;
 		}
 	}

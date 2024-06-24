@@ -422,7 +422,10 @@ class Registration extends Api\Storage\Base
 					explode(',', "nachname,vorname,sex,".Athlete::FEDERATIONS_TABLE.".nation AS nation,ort,verband,fed_url,".Athlete::FEDERATIONS_TABLE.
 					".fed_id AS fed_id,fed_parent,acl.fed_id AS acl_fed_id,geb_date,acl,".
 					Athlete::ATHLETE_TABLE.".PerId AS PerId")));
-			$order_by = str_replace('fed_parent', $fed_parent, $order_by);
+			// fix Storage\Base::sanitizeOrderBy() failure:
+			// acl_fed_id,CASE WHEN fed_parent IS NULL OR fed_parent IN (655,967,966,965) THEN Federations.fed_id ELSE fed_parent END,GrpId,reg_id ASC
+			$order_by = str_replace('fed_parent', $fed_parent, self::sanitizeOrderBy($order_by));
+			$this->sanitize_order_by = false;
 
 			if (isset($filter['license_nation']))
 			{

@@ -110,6 +110,10 @@ class ranking_route_result extends Api\Storage\Base
 		if ($source_charset) $this->source_charset = $source_charset;
 
 		$this->charset = Api\Translation::charset();
+
+		// disable because of sanitizeOrderBy() failure (see also ranking_result_bo::processSort()):
+		// CASE WHEN result_rank IS NULL THEN start_order ELSE 0 END ASC,result_rank ASC,nachname ASC,vorname ASC
+		$this->sanitize_order_by = false;
 	}
 
 	/**
