@@ -186,7 +186,7 @@ class Competition extends Api\Storage\Base
 			// calculate an end-date as Y-m-d and a printable span like 1. - 3. Januar 2007
 			list($y,$m,$d) = explode('-',$data['datum']);
 			$start = mktime(12,0,0,(int)$m,(int)$d,(int)$y);
-			$end = $start + ($data['duration']-1)*24*60*60;
+			$end = $start + (is_numeric($data['duration']) ? ($data['duration']-1)*24*60*60 : 0);
 			$data['date_end'] = date('Y-m-d',$end);
 			$data['date_span'] = (int)$d.' '.(date('m',$end) != $m ? lang(date('F',$start)) : '').
 				($data['duration'] > 1 ? ' - '.(int)date('d',$end).' ' : '').lang(date('F',$end)).' '.$y;
