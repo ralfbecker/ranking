@@ -21,22 +21,22 @@
 				<row class="th">
 					<vbox>
 						<nextmatch-sortheader label="License" id="PerId"/>
-						<nextmatch-filterheader id="nation" no_lang="1" options="Nation..."/>
+						<nextmatch-filterheader id="nation" no_lang="1" ariaLabel="Nation" emptyLabel="All"/>
 					</vbox>
 					<vbox>
 						<nextmatch-sortheader label="Last name" id="_nachname"/>
-						<nextmatch-filterheader id="nachname" no_lang="1" options="All" class="selectboxFullWidth"/>
+						<nextmatch-filterheader id="nachname" no_lang="1" ariaLable="Last name" emptyLabel="All" class="selectboxFullWidth"/>
 					</vbox>
 					<vbox>
 						<nextmatch-sortheader label="First name" id="_vorname"/>
-						<nextmatch-filterheader id="vorname" no_lang="1" options="All" class="selectboxFullWidth"/>
+						<nextmatch-filterheader id="vorname" no_lang="1" ariaLabel="First name" emptyLabel="All" class="selectboxFullWidth"/>
 					</vbox>
-					<nextmatch-filterheader align="center" id="sex" options="Gender..."/>
+					<nextmatch-filterheader id="sex" ariaLabel="Gender" emptyLabel="All"/>
 					<nextmatch-sortheader align="center" label="Birthdate" id="geb_date"/>
 					<nextmatch-sortheader label="City" id="ort"/>
 					<vbox>
 						<nextmatch-sortheader label="Federation" id="verband"/>
-						<nextmatch-filterheader id="fed_id" options="All" class="selectboxFullWidth"/>
+						<nextmatch-filterheader id="fed_id" ariaLabel="Federation" emptyLabel="All" class="selectboxFullWidth"/>
 					</vbox>
 					<nextmatch-sortheader label="Squad" id="kader"/>
 					<nextmatch-sortheader label="Last competition" id="last_comp"/>
@@ -44,7 +44,7 @@
 						<select id="license_nation" readonly="true" no_lang="1"/>
 						<description value="License" id="license_year" no_lang="1"/>
 					</vbox>
-					<nextmatch-filterheader id="acl" options="Access" class="selectboxFullWidth"/>
+					<nextmatch-filterheader id="acl" ariaLabel="Access" emptyLabel="All" class="selectboxFullWidth"/>
 					<nextmatch-sortheader label="Last modified" id="modified"/>
 				</row>
 				<row class="row $row_cont[class]">
