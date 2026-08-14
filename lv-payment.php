@@ -26,7 +26,7 @@ if (empty($_REQUEST['PerId']) || !is_numeric($_REQUEST['PerId']) ||
 	empty($_REQUEST['firstname']) || empty($_REQUEST['lastname']))
 {
 	http_response_code(400);
-	die("Invalid or missing request parameters: ".json_encode($_REQUEST));
+	die("Invalid or missing request parameters.");
 }
 
 // composer require lcobucci/jwt:3.4
