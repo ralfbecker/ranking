@@ -19,8 +19,8 @@ import {et2_button} from "../../api/js/etemplate/et2_widget_button";
 import {et2_createWidget, et2_widget} from "../../api/js/etemplate/et2_core_widget";
 import {et2_textbox} from "../../api/js/etemplate/et2_widget_textbox";
 import {et2_dialog} from "../../api/js/etemplate/et2_widget_dialog";
-import {et2_selectbox} from "../../api/js/etemplate/et2_widget_selectbox";
-import {et2_checkbox} from "../../api/js/etemplate/et2_widget_checkbox";
+import {et2_selectbox} from "../../api/js/etemplate/legacy-shims/et2_widget_selectbox";
+import {et2_checkbox} from "../../api/js/etemplate/legacy-shims/et2_widget_checkbox";
 import {etemplate2} from "../../api/js/etemplate/etemplate2";
 
 declare var Resultlist;	// ../sitemgr/digitalrock/dr_api.js
