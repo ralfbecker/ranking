@@ -15,7 +15,7 @@
 
 import { EgwApp } from '../../api/js/jsapi/egw_app';
 import {et2_nextmatch, et2_nextmatch_sortheader} from "../../api/js/etemplate/et2_extension_nextmatch";
-import {et2_button} from "../../api/js/etemplate/et2_widget_button";
+import type {et2_button} from "../../api/js/etemplate/legacy-shims/et2_widget_button";
 import {et2_createWidget, et2_widget} from "../../api/js/etemplate/et2_core_widget";
 import {et2_textbox} from "../../api/js/etemplate/legacy-shims/et2_widget_textbox";
 import {et2_dialog} from "../../api/js/etemplate/et2_widget_dialog";
