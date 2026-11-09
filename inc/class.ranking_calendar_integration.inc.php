@@ -65,8 +65,8 @@ class ranking_calendar_integration
 		$where = array();
 
 		// we use startdate also for end, as enddate in infolog is a due date
-		if ($data['start']) $where[] = (int)$data['start'] . ' <= UNIX_TIMESTAMP(datum)';
-		if ($data['end']) $where[] = 'UNIX_TIMESTAMP(datum) <= '.(int)$data['end'];
+		if ($data['start']) $where[] = Api\Db\SqlFragment::raw((int)$data['start'] . ' <= UNIX_TIMESTAMP(datum)');
+		if ($data['end']) $where[] = Api\Db\SqlFragment::raw('UNIX_TIMESTAMP(datum) <= '.(int)$data['end']);
 		if ($data['cat_id'] > 0) $where['cat_id'] = $GLOBALS['egw']->categories->return_all_children($data['cat_id']);
 
 		// search infolog
@@ -77,8 +77,8 @@ class ranking_calendar_integration
 				$pattern = ' '.$GLOBALS['egw']->db->capabilities[Api\Db::CAPABILITY_CASE_INSENSITIV_LIKE].' '.$GLOBALS['egw']->db->quote('%'.$data['query'].'%');
 				$columns = array('rkey','name','dru_bez','gruppen');
 
-				$where[] = '('.(is_numeric($data['query']) ? 'WetId='.(int)$data['query'].' OR ' : '').
-					implode($pattern.' OR ',$columns).$pattern.') ';
+				$where[] = Api\Db\SqlFragment::raw('('.(is_numeric($data['query']) ? 'WetId='.(int)$data['query'].' OR ' : '').
+					implode($pattern.' OR ',$columns).$pattern.') ');
 			}
 			else
 			{
@@ -86,7 +86,7 @@ class ranking_calendar_integration
 				{
 					if (isset($app_cols[$name]))
 					{
-						$where[] = $app_cols[$name].' = '.$GLOBALS['egw']->db->quote($value);
+						$where[] = Api\Db\SqlFragment::raw($app_cols[$name].' = '.$GLOBALS['egw']->db->quote($value));
 					}
 				}
 			}

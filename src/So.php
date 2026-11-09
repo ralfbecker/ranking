@@ -175,8 +175,11 @@ class So
 		}
 		else
 		{
-			$db = $GLOBALS['egw']->db;
+			$db = clone $GLOBALS['egw']->db;
 		}
+		// this old, never-audited app still builds raw SQL fragments the legacy way
+		// throughout - opt out rather than chasing every site
+		$db->requireSqlFragmentObjects(false);
 		return $db;
 	}
 
